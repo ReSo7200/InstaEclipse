@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- app wide -->
+    <string name="app_name">InstaEclipse</string>
+    <string name="version">Versiya: 0.2.1</string>
+    <string name="home">Ana Səhifə</string>
+    <string name="features">Funksiyalar</string>
+    <string name="help">Kömək</string>
+
+    <!-- home -->
+    <string name="module_disabled">Modul aktiv deyil. Lütfən aktiv edin.</string>
+
+    <string name="module_status">Modul Statusu:</string>
+
+    <string name="module_status_disabled">Modul Statusu: Deaktiv</string>
+    <string name="request_enable_module">Lütfən modulu Xposed Installer'da aktiv edin.</string>
+
+    <string name="module_status_enabled_no_root">Modul Statusu: Aktiv (Root Yoxdur)</string>
+    <string name="request_enable_root">Avtomatik yenidən başlatma üçün root  lazımdır. Manual yenidən başlatma lazımdır.</string>
+
+    <string name="module_status_enabled">Modul Statusu: Aktiv</string>
+    <string name="module_active">Modul aktivdir və işləyir.</string>
+
+    <string name="checking_instagram">Instagram Yoxlanılır</string>
+    <string name="installed_instagram_version">Quraşdırılmış Instagram Versiyası: </string>
+    <string name="not_installed_instagram">Instagram quraşdırılmayıb.</string>
+    <string name="error_instagram">Instagram statusu yoxlanarkən xəta baş verdi.</string>
+
+    <string name="restart_instagram">Instagram'ı Yenidən Başlat</string>
+    <string name="contributors">Təhfə Verənlər</string>
+    <string name="special_thanks">Xüsusi Təşəkkürlər</string>
+
+    <!-- Don’t translate! -->
+    <string name="instagram_logo" translatable="false">Instagram Logo</string>
+
+    <!-- help -->
+    <string name="help_amp_troubleshooting">Kömək &amp; Problemlərin Həlli</string>
+    <string name="find_updates_and_documentation">Yeniləmələri və Dökümentasiyanı tapın.</string>
+    <string name="go_to_github">GitHub'a Keç</string>
+    <string name="find_support">Dəstək alın.</string>
+    <string name="go_to_telegram">Telegram'a Keç</string>
+    <string name="instaeclipse_telegram_group" translatable="false">InstaEclipse Telegram Group</string>
+
+    <!-- Don’t translate! -->
+    <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
+    <string name="github">GitHub</string>
+    <string name="telegram">Telegram</string>
+
+    <!-- faq -->
+    <string name="frequently_asked_questions">Tez-tez Soruşulan Suallar</string>
+    <string name="faq_1">1. Google Play Versiyasındı işləmir və ya xəta verir? APKMirror APK'lərindən istifadə edin.</string>
+    <string name="faq_2">2. Modul aktiv deyil? Modulu LSPosed'də deaktiv edib yenidən aktiv edin.</string>
+    <string name="faq_3">3. Funksiyalar işləmir? Instagram'ı zorla dayandırıb keşini təmizləyin.</string>
+    <string name="faq_4">4. Tərtibatçı variantları xəta verir? Tərtibatçı variantları bələdçisini izləyin.</string>
+    <string name="faq_5">5. Tərtibatçı variantlarında qəribə etiketlər və ya nömrələr var? Sabit versiyalardı qarışıq olduğunu gözünə alaraq Beta və ya Alfa versiyalardan istifadə edin.</string>
+    <string name="faq_6">6. "Dikkat Dağıtıcıları Bağla" funksiyası aktiv amma məzmun hələ də görünür? Instagram'ı zorla dayandırın və keşini təmizləyin.</string>
+
+    <!-- features -->
+    <string name="developer_options">Tərtibatçı Variantları</string>
+    <string name="ghost_mode">Gizli Rejim</string>
+    <string name="distraction_free">Diqqət Dağıtıcıları Bağla</string>
+    <string name="remove_ads">Reklamları Sil</string>
+    <string name="remove_analytics">Analitikləri Sil</string>
+
+    <string name="enable_disable_all">Hamısını Aktiv/Deaktiv Et</string>
+
+    <!-- Don’t translate! -->
+    <string name="hint" translatable="false">Hint</string>
+
+    <!-- ghost -->
+    <string name="ghost_mode_options">Gizli Rejim Seçimləri</string>
+    <string name="typing">Yazır</string>
+    <string name="story">Hekayə</string>
+    <string name="live">Canlı Yayım</string>
+    <string name="direct_messages">Birbaşa Mesajlar</string>
+    <string name="disable_typing">"Yazır" Seçimini Deaktiv Et</string>
+
+    <!-- developer_options -->
+    <string name="developer_options_guide">Tərtibatçı Variantları Bələdçisi</string>
+    <string name="dev_options_version_req">Yalnız Beta/Alfa versiyalarında istifadə edin!</string>
+    <string name="dev_options_req">Əvvəlcə daxil olduğunuzdan əmin olun!</string>
+
+    <string name="dev_options_1">1. Instagram'ı açın və Ana Səhifə düyməsini basıb saxlayın.</string>
+    <string name="dev_options_2">2. Tərtibatçı Variantları > MetaConfig Ayarları &amp; Override-lara keçin.</string>
+    <string name="dev_options_3">3. "Employee" sözünü axtarın və aşağıdaki variantları aktiv edin:</string>
+    <string name="dev_options_4">4. Sonda, tətbiqin xəta verməməsi üçün moduldaki Tərtibatçı Variantlarını deaktiv edin.</string>
+
+    <!-- Don’t translate! -->
+    <string name="is_employee" translatable="false">• is employee</string>
+    <string name="is_employee_or_test_user" translatable="false">• is employee or test user</string>
+    <string name="employee_options" translatable="false">• employee options</string>
+
+    <!-- distraction free -->
+    <string name="distraction_free_options">Diqqət Dağıtıcıları Bağlat Seçimləri</string>
+    <string name="disable_stories">Hekayələri Deaktiv Et</string>
+    <string name="disable_feed">Axışı Deaktiv Et</string>
+    <string name="disable_reels">Reels'ləri Deaktiv Et</string>
+    <string name="disable_explore">Kəşf Etməyi Deaktiv Et</string>
+    <string name="disable_comments">Rəyləri Deaktiv Et</string>
+
+    <!-- contributor card -->
+    <string name="contributor_name">Töhfə Verənin Adı</string>
+
+    <!-- Toast -->
+    <string name="restart_insta_toast">Instagram Yenidən Başlatılır</string>
+    <string name="failed_restart_insta_toast">Instagram yenidən başlatıla bilmədi</string>
+    <string name="non_root_restart_insta_toast">Zəhmət olmasa Instagram'ı zorla dayandırıb yenidən açın</string>
+    <string name="clear_cache_insta_toast">Ən yaxşı təcrübə üçün Instagram'ın keşini təmizləyin</string>
+</resources>
