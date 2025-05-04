@@ -118,6 +118,6 @@
     <string name="hooked_methods_toast">顯示已啟用功能提示</string>
 
     <!-- contributor card -->
-    <string name="contributor_name">OrStudio.tw</string>
+    <string name="contributor_name">Contributor Name</string>
 
 </resources>
