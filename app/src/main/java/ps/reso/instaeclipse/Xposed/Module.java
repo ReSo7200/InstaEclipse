@@ -25,6 +25,7 @@ import ps.reso.instaeclipse.mods.ghost.ViewOnce;
 import ps.reso.instaeclipse.mods.misc.AutoPlayDisable;
 import ps.reso.instaeclipse.mods.misc.FollowerIndicator;
 import ps.reso.instaeclipse.mods.misc.StoryFlipping;
+import ps.reso.instaeclipse.mods.misc.TrackingLinkDisable;
 import ps.reso.instaeclipse.mods.network.Interceptor;
 import ps.reso.instaeclipse.mods.ui.InstagramUI;
 import ps.reso.instaeclipse.utils.toast.CustomToast;
@@ -207,6 +208,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         XposedBridge.log("(InstaEclipse | AdBlocker): ❌ Failed to hook");
                     }
 
+                    // tracking link disable
+                    try {
+                        new TrackingLinkDisable().disableTrackingLinks(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        XposedBridge.log("(InstaEclipse | TrackingLinkDisable): ❌ Failed to hook");
+                    }
+
                     // Miscellaneous
                     try {
                         new StoryFlipping().handleStoryFlippingDisable(dexKitBridge); // Story Flipping
@@ -245,6 +253,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     } catch (Throwable ignored) {
                         XposedBridge.log("(InstaEclipse | Interceptor): ❌ Failed to hook");
                     }
+
+
                 }
 
             });

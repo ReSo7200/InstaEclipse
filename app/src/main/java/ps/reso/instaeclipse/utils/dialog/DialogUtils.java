@@ -474,7 +474,8 @@ public class DialogUtils {
                 createSwitch(context, "Disable Story Auto-Swipe", FeatureFlags.disableStoryFlipping),
                 createSwitch(context, "Disable Video Autoplay", FeatureFlags.disableVideoAutoPlay),
                 createSwitch(context, "Show Follower Toast", FeatureFlags.showFollowerToast),
-                createSwitch(context, "Show Feature Toasts", FeatureFlags.showFeatureToasts)
+                createSwitch(context, "Show Feature Toasts", FeatureFlags.showFeatureToasts),
+                createSwitch(context, "Disable Tracking Links", FeatureFlags.disableTrackingLinks)
         };
 
         // Create Enable/Disable All switch
@@ -513,6 +514,9 @@ public class DialogUtils {
                         break;
                     case 3:
                         FeatureFlags.showFeatureToasts = isChecked;
+                        break;
+                    case 4:
+                        FeatureFlags.disableTrackingLinks = isChecked;
                         break;
                 }
 
