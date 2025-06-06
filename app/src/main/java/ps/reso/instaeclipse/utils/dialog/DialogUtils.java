@@ -1,8 +1,11 @@
 package ps.reso.instaeclipse.utils.dialog;
 
+import static ps.reso.instaeclipse.mods.ui.InstagramUI.exportCurrentDevConfig;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -57,6 +60,17 @@ public class DialogUtils {
         currentDialog.show();
     }
 
+    public static void showSimpleDialog(Context context, String title, String message) {
+        try {
+            new AlertDialog.Builder(context)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton("OK", null)
+                    .show();
+        } catch (Exception e) {
+            // handle UI crash fallback
+        }
+    }
 
     @SuppressLint("SetTextI18n")
     private static LinearLayout buildMainMenuLayout(Context context) {
@@ -81,16 +95,9 @@ public class DialogUtils {
         mainLayout.addView(createDivider(context));
 
         // Now building menu manually
-        // 0 - Developer Mode => DIRECT SWITCH
-        @SuppressLint("UseSwitchCompatOrMaterialCode")
-        Switch devSwitch = createSwitch(context, "🎛 Developer Mode", FeatureFlags.isDevEnabled);
-        devSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.isDevEnabled = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        mainLayout.addView(devSwitch);
 
-        mainLayout.addView(createDivider(context));
+        // 0 - Developer Options => OPEN PAGE
+        mainLayout.addView(createClickableSection(context, "🎛 Developer Options", () -> showDevOptions(context)));
 
         // 1 - Ghost Mode Settings => OPEN PAGE
         mainLayout.addView(createClickableSection(context, "👻 Ghost Mode Settings", () -> showGhostOptions(context)));
@@ -265,6 +272,84 @@ public class DialogUtils {
     }
 
     // ==== SECTIONS ====
+
+    private static void showDevOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+
+        // Developer Mode Switch
+        @SuppressLint("UseSwitchCompatOrMaterialCode")
+        Switch devModeSwitch = createSwitch(context, "Enable Developer Mode", FeatureFlags.isDevEnabled);
+        devModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.isDevEnabled = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+
+        layout.addView(devModeSwitch);
+        layout.addView(createDivider(context));
+
+        // 📥 Import Dev Config Button
+        Button importButton = new Button(context);
+        importButton.setText("📥 Import Dev Config");
+        importButton.setOnClickListener(v -> {
+            Activity instagramActivity = InstagramUI.getCurrentActivity();
+            if (instagramActivity != null && !instagramActivity.isFinishing()) {
+                FeatureFlags.isImportingConfig = true;
+
+                Intent importIntent = new Intent();
+                importIntent.setComponent(new ComponentName(
+                        "ps.reso.instaeclipse",
+                        "ps.reso.instaeclipse.mods.ui.JsonImportActivity"
+                ));
+                importIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                try {
+                    instagramActivity.startActivity(importIntent);
+                } catch (Exception e) {
+                    XposedBridge.log("InstaEclipse | ❌ Failed to start JsonImportActivity: " + e.getMessage());
+                    showSimpleDialog(context, "Error", "Unable to open InstaEclipse UI.");
+                }
+
+            } else {
+                showSimpleDialog(context, "Error", "Instagram is not open or ready.");
+            }
+        });
+
+        layout.addView(importButton);
+
+
+        // 📤 Export Dev Config Button
+        Button exportButton = new Button(context);
+        exportButton.setText("📤 Export Dev Config");
+        exportButton.setOnClickListener(v -> {
+            FeatureFlags.isExportingConfig = true;
+            Activity instagramActivity = InstagramUI.getCurrentActivity();
+            if (instagramActivity != null && !instagramActivity.isFinishing()) {
+                exportCurrentDevConfig(instagramActivity);
+
+                // Launch InstaEclipse export screen
+                Intent exportIntent = new Intent();
+                exportIntent.setComponent(new ComponentName(
+                        "ps.reso.instaeclipse",
+                        "ps.reso.instaeclipse.mods.ui.JsonExportActivity"
+                ));
+                exportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                try {
+                    instagramActivity.startActivity(exportIntent);
+                } catch (Exception e) {
+                    showSimpleDialog(context, "Error", "Unable to open InstaEclipse UI.");
+                }
+
+            } else {
+                showSimpleDialog(context, "Error", "Instagram is not open or ready.");
+            }
+        });
+
+        layout.addView(exportButton);
+
+        // Save current dev mode flag when dialog is closed
+        showSectionDialog(context, "Developer Options 🎛", layout, SettingsManager::saveAllFlags);
+    }
 
     private static void showGhostOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
@@ -482,14 +567,12 @@ public class DialogUtils {
         @SuppressLint("UseSwitchCompatOrMaterialCode")
         Switch enableAllSwitch = createSwitch(context, "Enable/Disable All", areAllEnabled(switches));
 
-        // Master listener
         enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             for (Switch s : switches) {
                 s.setChecked(isChecked);
             }
         });
 
-        // Individual child listeners
         for (int i = 0; i < switches.length; i++) {
             final int index = i;
             switches[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -501,7 +584,7 @@ public class DialogUtils {
                     }
                 });
 
-                // Update corresponding FeatureFlag immediately
+                // Update FeatureFlags
                 switch (index) {
                     case 0:
                         FeatureFlags.disableStoryFlipping = isChecked;
@@ -520,11 +603,9 @@ public class DialogUtils {
                         break;
                 }
 
-                // Save immediately
                 SettingsManager.saveAllFlags();
             });
         }
-
 
         // Add views to layout
         layout.addView(createDivider(context));
@@ -535,10 +616,21 @@ public class DialogUtils {
             layout.addView(s);
         }
 
-        // Show the dialog
+        // Show dialog
         showSectionDialog(context, "Miscellaneous ⚙️", layout, () -> {
         });
     }
+
+    public static Activity extractActivity(Context context) {
+        if (context instanceof Activity) return (Activity) context;
+        if (context instanceof ContextThemeWrapper) {
+            Context baseContext = ((ContextThemeWrapper) context).getBaseContext();
+            if (baseContext instanceof Activity) return (Activity) baseContext;
+        }
+        return null;
+    }
+
+
 
 
     @SuppressLint("SetTextI18n")
@@ -773,13 +865,11 @@ public class DialogUtils {
         return container;
     }
 
-
     private static boolean areAllEnabled(Switch[] switches) {
         for (Switch s : switches) {
             if (!s.isChecked()) return false;
         }
         return true;
     }
-
 
 }

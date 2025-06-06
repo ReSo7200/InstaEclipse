@@ -24,6 +24,17 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".mods.ui.JsonImportActivity"
+            android:exported="true"
+            android:theme="@style/Theme.InstaEclipse">
+        </activity>
+
+        <activity
+            android:name=".mods.ui.JsonExportActivity"
+            android:exported="true"
+            android:theme="@style/Theme.InstaEclipse" />
+
         <!-- Xposed Meta-data -->
         <meta-data
             android:name="xposedmodule"
