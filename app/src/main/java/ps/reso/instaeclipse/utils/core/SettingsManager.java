@@ -49,6 +49,7 @@ public class SettingsManager {
         // Ads
         editor.putBoolean("isAdBlockEnabled", FeatureFlags.isAdBlockEnabled);
         editor.putBoolean("isAnalyticsBlocked", FeatureFlags.isAnalyticsBlocked);
+        editor.putBoolean("disableTrackingLinks", FeatureFlags.disableTrackingLinks);
 
         // Misc
         editor.putBoolean("isMiscEnabled", FeatureFlags.isMiscEnabled);
@@ -56,7 +57,6 @@ public class SettingsManager {
         editor.putBoolean("disableVideoAutoPlay", FeatureFlags.disableVideoAutoPlay);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
         editor.putBoolean("showFeatureToasts", FeatureFlags.showFeatureToasts);
-        editor.putBoolean("disableTrackingLinks", FeatureFlags.disableTrackingLinks);
 
         editor.apply();
 
@@ -98,6 +98,7 @@ public class SettingsManager {
         // Ads
         FeatureFlags.isAdBlockEnabled = prefs.getBoolean("isAdBlockEnabled", false);
         FeatureFlags.isAnalyticsBlocked = prefs.getBoolean("isAnalyticsBlocked", false);
+        FeatureFlags.disableTrackingLinks = prefs.getBoolean("disableTrackingLinks", false);
 
         // Misc
         FeatureFlags.isMiscEnabled = prefs.getBoolean("isMiscEnabled", false);
@@ -105,7 +106,6 @@ public class SettingsManager {
         FeatureFlags.disableVideoAutoPlay = prefs.getBoolean("disableVideoAutoPlay", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);
         FeatureFlags.showFeatureToasts = prefs.getBoolean("showFeatureToasts", false);
-        FeatureFlags.disableTrackingLinks = prefs.getBoolean("disableTrackingLinks", false);
 
         FeatureManager.refreshFeatureStatus();
     }
