@@ -1,0 +1,121 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- app wide -->
+    <string name="app_name">InstaEclipse</string>
+    <string name="version" translatable="false">v0.4.1 Beta</string>
+    <string name="home">Startseite</string>
+    <string name="features">Funktionen</string>
+    <string name="help">Hilfe</string>
+    <string name="instagram_version">Version</string>
+
+    <!-- home -->
+    <string name="module_disabled">Modul ist nicht aktiviert. Bitte aktiviere es.</string>
+	
+	<string name="module_status">Modulstatus:</string>
+    <string name="module_status_disabled">Modulstatus: Deaktiviert</string>
+    <string name="request_enable_module">Bitte aktiviere das Modul im Xposed Installer.</string>
+    <string name="module_status_enabled_no_root">Modulstatus: Aktiviert (Kein Root-Zugriff)</string>
+    <string name="request_enable_root">Root-Zugriff ist für den automatischen Neustart erforderlich. Manueller Neustart nötig.</string>
+    <string name="module_status_enabled">Modulstatus: Aktiviert</string>
+    <string name="module_active">Das Modul ist aktiv und funktioniert.</string>
+
+    <string name="checking_instagram">Instagram wird überprüft</string>
+    <string name="installed_instagram_version">Instagram ist installiert</string>
+    <string name="not_installed_instagram">Instagram ist nicht installiert</string>
+    <string name="error_instagram">Fehler beim Überprüfen des Instagram-Status</string>
+
+    <string name="launch_instagram">Instagram starten</string>
+    <string name="download_apk">APK herunterladen</string>
+    <string name="how_to_use">Anleitung</string>
+    <string name="usage_instructions">Halte das Suchsymbol gedrückt</string>
+    <string name="contributors">Mitwirkende</string>
+    <string name="special_thanks">Besonderer Dank</string>
+
+    <!-- Don't translate! -->
+    <string name="instagram_logo" translatable="false">Instagram Logo</string>
+    <string name="instagram_info" translatable="false">instagram_info</string>
+
+    <!-- help -->
+    <string name="help_amp_troubleshooting">Hilfe &amp; Fehlerbehebung</string>
+    <string name="find_updates_and_documentation">Finde Updates und Dokumentation.</string>
+    <string name="go_to_github">Zu GitHub</string>
+    <string name="find_support">Support finden.</string>
+    <string name="go_to_telegram">Zu Telegram</string>
+    <string name="instaeclipse_telegram_group" translatable="false">InstaEclipse Telegram Group</string>
+
+
+    <!-- Don't translate! -->
+    <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
+    <string name="github">GitHub</string>
+    <string name="telegram">Telegram</string>
+
+    <!-- faq -->
+    <string name="frequently_asked_questions">Häufig gestellte Fragen</string>
+    <string name="faq_1"><b>1. Funktioniert nicht / stürzt mit Google Play Version ab?</b>\n- Verwende APKs von APKMirror</string>
+    <string name="faq_2"><b>2. Modul nicht aktiviert?</b>\n- Deaktiviere und aktiviere das Modul erneut in LSPosed.</string>
+    <string name="faq_3"><b>3. Funktionen funktionieren nicht?</b>\n- Erzwinge das Beenden von Instagram und starte es neu.</string>
+    <string name="faq_4"><b>4. Entwickleroptionen verursachen Abstürze?</b>\n- Folge der Anleitung für Entwickleroptionen.</string>
+    <string name="faq_5"><b>5. Entwickleroptionen haben komische Bezeichnungen oder Nummern?</b>\n- Verwende Beta- oder Alpha-Versionen, da stabile Versionen verschleiert sind.</string>
+    <string name="faq_6"><b>6. Ablenkungsfreier Modus ist aktiviert, aber Inhalte erscheinen trotzdem?</b>\n- Erzwinge das Beenden von Instagram und leere den Cache.</string>
+
+    <!-- guide -->
+    <string name="module_not_working_title">Modul funktioniert immer noch nicht?</string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[If you are <b>rooted</b> try using <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>If you are <b>not rooted</b> install <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> then follow <a href="https://t.me/instaEclipse_discussion/158/5149">this guide</a>]]></string>
+
+    <!-- features -->
+    <string name="developer_options">Entwickleroptionen</string>
+    <string name="ghost_mode">Geistermodus</string>
+    <string name="distraction_free">Ablenkungsfrei</string>
+    <string name="remove_ads">Werbung entfernen</string>
+    <string name="remove_analytics">Analytik entfernen</string>
+
+    <string name="enable_disable_all">Alle aktivieren/deaktivieren</string>
+
+    <!-- Don't translate! -->
+    <string name="hint" translatable="false">Hint</string>
+
+    <!-- ghost -->
+    <string name="ghost_mode_options">Optionen für Geistermodus</string>
+    <string name="typing">Tippstatus</string>
+    <string name="story">Story</string>
+    <string name="view_once">Einmal ansehen</string>
+    <string name="live">Live</string>
+    <string name="direct_messages">Direktnachrichten</string>
+    <string name="disable_typing">Tippstatus</string>
+    <string name="screen_shot">Screenshot</string>
+
+    <!-- developer_options -->
+    <string name="developer_options_guide">Anleitung für Entwickleroptionen</string>
+    <string name="dev_options_version_req">Nur mit Beta-/Alpha-Versionen verwenden!</string>
+    <string name="dev_options_req">Stelle sicher, dass du angemeldet bist!</string>
+
+    <string name="dev_options_1">1. Öffne Instagram und halte die Home-Taste gedrückt.</string>
+    <string name="dev_options_2">2. Gehe zu Entwickleroptionen > MetaConfig Einstellungen &amp; Overrides.</string>
+    <string name="dev_options_3">3. Suche nach „Employee“ und aktiviere folgende Optionen:</string>
+    <string name="dev_options_4">4. Deaktiviere abschließend die Entwickleroptionen im Modul, um App-Abstürze zu vermeiden.</string>
+
+
+    <!-- Don't translate! -->
+    <string name="is_employee" translatable="false">• is employee</string>
+    <string name="is_employee_or_test_user" translatable="false">• is employee or test user</string>
+    <string name="employee_options" translatable="false">• employee options</string>
+
+    <!-- distraction free -->
+    <string name="distraction_free_options">Optionen für ablenkungsfreien Modus</string>
+    <string name="disable_stories">Stories deaktivieren</string>
+    <string name="disable_feed">Feed deaktivieren</string>
+    <string name="disable_reels">Reels deaktivieren</string>
+    <string name="disable_explore">Entdecken deaktivieren</string>
+    <string name="disable_comments">Kommentare deaktivieren</string>
+
+    <!-- Miscellaneous -->
+    <string name="misc">Sonstiges</string>
+    <string name="miscellaneous_options">Sonstige Optionen</string>
+    <string name="story_flipping">Story-Wechsel deaktivieren</string>
+    <string name="video_autoplay">Video-Autoplay deaktivieren</string>
+    <string name="follower_toast">Follower-Benachrichtigung anzeigen</string>
+    <string name="hooked_methods_toast">Aktivierte Funktionen anzeigen</string>
+
+    <!-- contributor card -->
+    <string name="contributor_name">Name des Mitwirkenden</string>
+
+</resources>
