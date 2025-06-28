@@ -1,0 +1,122 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- app wide -->
+    <string name="app_name">InstaEclipse</string>
+    <string name="version" translatable="false">v0.4.2 Beta</string>
+    <string name="home">Beranda</string>
+    <string name="features">Fitur</string>
+    <string name="help">Bantuan</string>
+    <string name="instagram_version">Versi</string>
+
+    <!-- home -->
+    <string name="module_disabled">Modul tidak aktif. Silakan aktifkan.</string>
+
+    <string name="module_status">Status Modul:</string>
+
+    <string name="module_status_disabled">Status Modul: Dinonaktifkan</string>
+    <string name="request_enable_module">Silakan aktifkan modul di Xposed Installer.</string>
+
+    <string name="module_status_enabled_no_root">Status Modul: Diaktifkan (Tanpa Akses Root)</string>
+    <string name="request_enable_root">Akses root diperlukan untuk memulai ulang otomatis. Diperlukan restart manual.</string>
+
+    <string name="module_status_enabled">Status Modul: Diaktifkan</string>
+    <string name="module_active">Modul aktif dan berfungsi.</string>
+
+    <string name="checking_instagram">Memeriksa Instagram</string>
+    <string name="installed_instagram_version">Instagram terpasang</string>
+    <string name="not_installed_instagram">Instagram tidak terpasang</string>
+    <string name="error_instagram">Kesalahan saat memeriksa status Instagram</string>
+
+    <string name="launch_instagram">Luncurkan Instagram</string>
+    <string name="download_apk">Unduh APK</string>
+    <string name="how_to_use">Cara Penggunaan</string>
+    <string name="usage_instructions">Tahan ikon pencarian</string>
+    <string name="contributors">Kontributor</string>
+    <string name="special_thanks">Terima Kasih Khusus</string>
+
+    <!-- Don't translate! -->
+    <string name="instagram_logo" translatable="false">Instagram Logo</string>
+    <string name="instagram_info" translatable="false">instagram_info</string>
+
+    <!-- help -->
+    <string name="help_amp_troubleshooting">Bantuan &amp; Pemecahan Masalah</string>
+    <string name="find_updates_and_documentation">Temukan pembaruan dan dokumentasi.</string>
+    <string name="go_to_github">Buka GitHub</string>
+    <string name="find_support">Temukan dukungan.</string>
+    <string name="go_to_telegram">Buka Telegram</string>
+    <string name="instaeclipse_telegram_group" translatable="false">Grup Telegram InstaEclipse</string>
+
+    <!-- Don't translate! -->
+    <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
+    <string name="github">GitHub</string>
+    <string name="telegram">Telegram</string>
+
+    <!-- faq -->
+    <string name="frequently_asked_questions">Pertanyaan yang Sering Diajukan</string>
+    <string name="faq_1"><b>1. Tidak berfungsi/crash saat menggunakan Versi Google Play?</b>\n- Gunakan APK dari APKMirror</string>
+    <string name="faq_2"><b>2. Modul tidak aktif?</b>\n- Nonaktifkan dan aktifkan kembali modul di LSPosed.</string>
+    <string name="faq_3"><b>3. Fitur tidak berfungsi?</b>\n- Paksa berhenti dan mulai ulang Instagram.</string>
+    <string name="faq_4"><b>4. Opsi pengembang menyebabkan crash?</b>\n- Ikuti panduan opsi pengembang.</string>
+    <string name="faq_5"><b>5. Opsi pengembang memiliki label atau angka yang aneh?</b>\n- Gunakan versi Beta atau Alpha karena versi Stabil memiliki obfuskasi.</string>
+    <string name="faq_6"><b>6. Mode Bebas Gangguan diaktifkan tetapi konten masih muncul?</b>\n- Paksa berhenti Instagram dan bersihkan cache-nya.</string>
+
+    <!-- guide -->
+    <string name="module_not_working_title">Modul masih tidak berfungsi?</string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jika Anda memiliki <b>root</b>, coba gunakan <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed dari JingMatrix</a><br/><br/>Jika Anda <b>tidak memiliki root</b>, instal <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch dari JingMatrix</a> lalu ikuti <a href="https://t.me/instaEclipse_discussion/158/5149">panduan ini</a>]]></string>
+
+    <!-- features -->
+    <string name="developer_options">Opsi Pengembang</string>
+    <string name="ghost_mode">Mode Hantu</string>
+    <string name="distraction_free">Bebas Gangguan</string>
+    <string name="remove_ads">Hapus Iklan</string>
+    <string name="remove_analytics">Hapus Analitik</string>
+
+    <string name="enable_disable_all">Aktifkan/Nonaktifkan Semua</string>
+
+    <!-- Don't translate! -->
+    <string name="hint" translatable="false">Hint</string>
+
+    <!-- ghost -->
+    <string name="ghost_mode_options">Opsi Mode Hantu</string>
+    <string name="typing">Mengetik</string>
+    <string name="story">Story</string>
+    <string name="view_once">Sekali Lihat</string>
+    <string name="live">Live</string>
+    <string name="direct_messages">Pesan Langsung</string>
+    <string name="disable_typing">Mengetik</string>
+    <string name="screen_shot">Tangkapan Layar</string>
+
+    <!-- developer_options -->
+    <string name="developer_options_guide">Panduan Opsi Pengembang</string>
+    <string name="dev_options_version_req">Gunakan hanya pada versi Beta/Alpha!</string>
+    <string name="dev_options_req">Pastikan Anda sudah masuk terlebih dahulu!</string>
+
+    <string name="dev_options_1">1. Buka Instagram dan tahan tombol Beranda.</string>
+    <string name="dev_options_2">2. Arahkan ke Opsi Pengembang > Pengaturan &amp; Penggantian MetaConfig.</string>
+    <string name="dev_options_3">3. Cari \'Employee\' dan aktifkan opsi berikut:</string>
+    <string name="dev_options_4">4. Terakhir, nonaktifkan Opsi Pengembang dari modul untuk mencegah aplikasi crash.</string>
+
+    <!-- Don't translate! -->
+    <string name="is_employee" translatable="false">• is employee</string>
+    <string name="is_employee_or_test_user" translatable="false">• is employee or test user</string>
+    <string name="employee_options" translatable="false">• employee options</string>
+
+    <!-- distraction free -->
+    <string name="distraction_free_options">Opsi Bebas Gangguan</string>
+    <string name="disable_stories">Nonaktifkan Story</string>
+    <string name="disable_feed">Nonaktifkan Beranda</string>
+    <string name="disable_reels">Nonaktifkan Reels</string>
+    <string name="disable_explore">Nonaktifkan Explore</string>
+    <string name="disable_comments">Nonaktifkan Komentar</string>
+
+    <!-- Miscellaneous -->
+    <string name="misc">Lainnya</string>
+    <string name="miscellaneous_options">Opsi Lainnya</string>
+    <string name="story_flipping">Nonaktifkan Story Flipping</string>
+    <string name="video_autoplay">Nonaktifkan Putar Otomatis Video</string>
+    <string name="follower_toast">Tampilkan Toast Pengikut</string>
+    <string name="hooked_methods_toast">Tampilkan Toast Fitur yang Diaktifkan</string>
+
+    <!-- contributor card -->
+    <string name="contributor_name">Nama Kontributor</string>
+
+</resources>
