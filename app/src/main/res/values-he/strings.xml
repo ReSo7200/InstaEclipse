@@ -1,0 +1,110 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- app wide -->
+    <string name="app_name">InstaEclipse</string>
+    <string name="home">דף הבית</string>
+    <string name="features">תכונות</string>
+    <string name="help">עזרה</string>
+
+    <!-- home -->
+    <string name="instagram_version">גרסה</string>
+    <string name="module_disabled">המודול אינו מופעל. נא להפעיל אותו.</string>
+
+    <string name="module_status">סטטוס המודול:</string>
+
+    <string name="module_status_disabled">סטטוס המודול: אינו מופעל</string>
+    <string name="request_enable_module">נא להפעיל את המודול בXposed.</string>
+
+    <string name="module_status_enabled_no_root">סטטוס המודול: מופעל )בלי גישה לRoot)</string>
+    <string name="request_enable_root">גישה לRoot נדרש עבור תכונת הauto-restart. הפעלה מחדש ידנית נדרשת.</string>
+
+    <string name="module_status_enabled">סטטוס המודול: תקין</string>
+    <string name="module_active">המודול תקין ועובד.</string>
+
+    <string name="checking_instagram">בודק אינסטגרם</string>
+    <string name="installed_instagram_version">אינסטגרם מותקן</string>
+    <string name="not_installed_instagram">אינסטגרם אינו מותקן</string>
+    <string name="error_instagram">שגיאה במהלך בדיקת סטטוס אינסטגרם</string>
+
+    <string name="launch_instagram">הפעל אינסטגרם</string>
+    <string name="download_apk">הורדת APK</string>
+    <string name="how_to_use">הוראות שימוש</string>
+    <string name="usage_instructions">נא ללחוץ ארוך על כפתור החיפוש באפליקציה</string>
+    <string name="contributors">תורמים</string>
+    <string name="special_thanks">תודה מיוחדת</string>
+
+    <!-- Don't translate! -->
+
+    <!-- help -->
+    <string name="help_amp_troubleshooting">עזרה &amp; פתירת בעיות</string>
+    <string name="find_updates_and_documentation">מציאת עדכונים ותיעוד.</string>
+    <string name="go_to_github">פתיחת GitHub</string>
+    <string name="find_support">מציאת תמיכה.</string>
+    <string name="go_to_telegram">פתיחת Telegram</string>
+    
+    <!-- Don't translate! -->
+
+    <!-- faq -->
+    <string name="frequently_asked_questions">שאלות נפוצות</string>
+    <string name="faq_1"><b>1. אינו עובד/קורס אצל שימוש בגרסת האפליקציה מהGoogle Play?</b>\n- נא להשתמש בקובץ APK מאתר APKMirror.</string>
+    <string name="faq_2"><b>2. מודול אינו מופעל?</b>\n- השבת את המודול ותפעילו אותו מחדש בLSPosed.</string>
+    <string name="faq_3"><b>3. התכונות אינם עובדות?</b>\n- נא לעצור בכוח את אפליקציית אינסטגרם ותפעילו אותו מחדש.</string>
+    <string name="faq_4"><b>4. הגדרות מפתחים גורמים לקריסות?</b>\n- נא לעקוב אחרי מדריך ההגרות מפתחים.</string>
+    <string name="faq_5"><b>5. להגרות מפתחים יש תגים מוזרים או מספרים?</b>\n- נא להשתמש בגרסת Beta או Alpha במקום, כי גרסאות יציבות )Stable) של האפליקציה עוברות אובפוסקציה.</string>
+    <string name="faq_6"><b>6. "ללא הסחות דעת" מופעל אך התוכן עדיין מופיע?</b>\n- לעצור בכוח את האפליקציה ולמחוק לו את הcache.</string>
+
+    <!-- guide -->
+    <string name="module_not_working_title">המודול עדיין לא עובד?</string>
+
+    <!-- features -->
+    <string name="developer_options">הגדרות מפתחים</string>
+    <string name="ghost_mode">מצב רפאים</string>
+    <string name="distraction_free">ללא הסחות דעת</string>
+    <string name="remove_ads">מחיקת פרסומות</string>
+    <string name="remove_analytics">מחיקת אנליטיקות</string>
+
+    <string name="enable_disable_all">הפעלה/השבתת הכל</string>
+
+    <!-- Don't translate! -->
+
+    <!-- ghost -->
+    <string name="ghost_mode_options">הגדרות מצב רפאים</string>
+    <string name="typing">הקלדה</string>
+    <string name="story">Story</string>
+    <string name="view_once">מדיה חד-פעמית (View-Once)</string>
+    <string name="live">Live</string>
+    <string name="direct_messages">הודעות פרטיות</string>
+    <string name="disable_typing">הקלדה</string>
+    <string name="screen_shot">צילום מסך</string>
+
+    <!-- developer_options -->
+    <string name="developer_options_guide">מדריך הגדרות מפתחים</string>
+    <string name="dev_options_version_req">נא להשתמש רק על גרסאות Beta או Alpha בלבד!</string>
+    <string name="dev_options_req">נא לוודא שאתם כבר מחוברים לחשבון שלכם!</string>
+
+    <string name="dev_options_1">1. לפתוח אינסטגרם וללחוץ ארוך על כפתור עמוד הבית.</string>
+    <string name="dev_options_2">2. לגשת להגדרת מפתחים > הגדרות MetaConfig &amp; Overrides.</string>
+    <string name="dev_options_3">3. לחפש \'Employee\' ולהפעיל את ההגדרות הבאות:</string>
+    <string name="dev_options_4">4. לסוף, השבת את ההגדרות מפתחים מהמודול כדי למנות קריסות אפליקציה.</string>
+
+    <!-- Don't translate! -->
+
+    <!-- distraction free -->
+    <string name="distraction_free_options">הגדרות מצב "ללא הסחות דעת"</string>
+    <string name="disable_stories">השבתת Stories</string>
+    <string name="disable_feed">השבתת תוכן עמוד הבית</string>
+    <string name="disable_reels">השבתת ריילז</string>
+    <string name="disable_explore">השבתת עמוד הExplore</string>
+    <string name="disable_comments">השבתת עמוד התגובות</string>
+
+    <!-- Miscellaneous -->
+    <string name="misc">אחר</string>
+    <string name="miscellaneous_options">הגדרות נוספות</string>
+    <string name="story_flipping">השבתת הלפת Stories</string>
+    <string name="video_autoplay">השבתת התחלת סרטונים אוטומתית</string>
+    <string name="follower_toast">הראה עוקבים בהודעת סטטוס</string>
+    <string name="hooked_methods_toast">הראה הודעת סטטוס עם כל התכונות המופעלות</string>
+
+    <!-- contributor card -->
+    <string name="contributor_name">שם התורם</string>
+
+</resources>
