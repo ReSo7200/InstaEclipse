@@ -44,6 +44,7 @@ This module is built to stay compatible with **new Instagram releases** by lever
 - Disable Auto Play Videos.
 - Follower indicator
 </details>
+---
 
 
 <details>
@@ -149,3 +150,10 @@ We welcome contributions from everyone!
 - **Want to help?** Submit a pull request to improve InstaEclipse.
 
 > Every contribution, big or small, is highly valued. Thank you for helping us grow!
+---
+
+## 🌐 Translations
+
+- [हिंदी में पढ़ें (Hindi)](README.hi.md)
+- [বাংলায় পড়ুন (Bengali)](README.bn.md)
+
