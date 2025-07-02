@@ -1,0 +1,117 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- app wide -->
+    <string name="app_name">InstaEclipse</string>
+    <string name="home">Startpagina</string>
+    <string name="features">Functies</string>
+    <string name="help">Hulp</string>
+    <string name="instagram_version">Versie</string>
+
+    <!-- home -->
+    <string name="module_disabled">Module is niet geactiveerd. Activeer het alsjeblieft.</string>
+	
+	<string name="module_status">Modulestatus:</string>
+    <string name="module_status_disabled">Modulestatus: Uitgeschakeld</string>
+    <string name="request_enable_module">Activeer het module in de Xposed Installer.</string>
+    <string name="module_status_enabled_no_root">Modulestatus: Ingeschakeld (Geen roottoegang)</string>
+    <string name="request_enable_root">Roottoegang is vereist voor automatisch herstarten. Herstart handmatig.</string>
+    <string name="module_status_enabled">Modulestatus: Ingeschakeld</string>
+    <string name="module_active">Het module is actief en werkt.</string>
+
+    <string name="checking_instagram">Instagram wordt gecontroleerd</string>
+    <string name="installed_instagram_version">Instagram is geïnstalleerd</string>
+    <string name="not_installed_instagram">Instagram is niet geïnstalleerd</string>
+    <string name="error_instagram">Fout bij het controleren van de Instagram-status</string>
+
+    <string name="launch_instagram">Instagram openen</string>
+    <string name="download_apk">APK downloaden</string>
+    <string name="how_to_use">Handleiding</string>
+    <string name="usage_instructions">Houd het zoekpictogram ingedrukt</string>
+    <string name="contributors">Bijdragers</string>
+    <string name="special_thanks">Speciale dank</string>
+
+    <!-- Don't translate! -->
+    <string name="instagram_logo" translatable="false">Instagram Logo</string>
+    <string name="instagram_info" translatable="false">instagram_info</string>
+
+    <!-- help -->
+    <string name="help_amp_troubleshooting">Hulp &amp; Probleemoplossing</string>
+    <string name="find_updates_and_documentation">Vind updates en documentatie.</string>
+    <string name="go_to_github">Ga naar GitHub</string>
+    <string name="find_support">Zoek ondersteuning.</string>
+    <string name="go_to_telegram">Ga naar Telegram</string>
+    <string name="instaeclipse_telegram_group" translatable="false">InstaEclipse Telegram Group</string>
+
+    <!-- Don't translate! -->
+    <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
+    <string name="github">GitHub</string>
+    <string name="telegram">Telegram</string>
+
+    <!-- faq -->
+    <string name="frequently_asked_questions">Veelgestelde vragen</string>
+    <string name="faq_1"><b>1. Werkt niet / crasht met Google Play-versie?</b>\n- Gebruik APK's van APKMirror</string>
+    <string name="faq_2"><b>2. Module niet geactiveerd?</b>\n- Schakel het module uit en weer in via LSPosed.</string>
+    <string name="faq_3"><b>3. Functies werken niet?</b>\n- Forceer het stoppen van Instagram en start opnieuw.</string>
+    <string name="faq_4"><b>4. Ontwikkelaarsopties veroorzaken crashes?</b>\n- Volg de handleiding voor ontwikkelaarsopties.</string>
+    <string name="faq_5"><b>5. Ontwikkelaarsopties hebben vreemde labels of nummers?</b>\n- Gebruik beta- of alpha-versies, want stabiele versies zijn verhuld.</string>
+    <string name="faq_6"><b>6. Afleidingsvrije modus is ingeschakeld, maar inhoud verschijnt nog steeds?</b>\n- Forceer het stoppen van Instagram en wis de cache.</string>
+
+    <!-- guide -->
+    <string name="module_not_working_title">Module werkt nog steeds niet?</string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Als je <b>root</b> hebt, probeer dan <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix' LSPosed</a><br/><br/>Als je <b>geen root</b> hebt, installeer dan <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix' LSPatch</a> en volg vervolgens <a href="https://t.me/instaEclipse_discussion/158/5149">deze handleiding</a>]]></string>
+
+    <!-- features -->
+    <string name="developer_options">Ontwikkelaarsopties</string>
+    <string name="ghost_mode">Spookmodus</string>
+    <string name="distraction_free">Afleidingsvrij</string>
+    <string name="remove_ads">Advertenties verwijderen</string>
+    <string name="remove_analytics">Analyse verwijderen</string>
+
+    <string name="enable_disable_all">Alles in-/uitschakelen</string>
+
+    <!-- Don't translate! -->
+    <string name="hint" translatable="false">Hint</string>
+
+    <!-- ghost -->
+    <string name="ghost_mode_options">Spookmodus-opties</string>
+    <string name="typing">Typstatus</string>
+    <string name="story">Verhaal</string>
+    <string name="view_once">Eenmalig bekijken</string>
+    <string name="live">Live</string>
+    <string name="direct_messages">Directe berichten</string>
+    <string name="disable_typing">Typstatus</string>
+    <string name="screen_shot">Screenshot</string>
+
+    <!-- developer_options -->
+    <string name="developer_options_guide">Handleiding voor ontwikkelaarsopties</string>
+    <string name="dev_options_version_req">Gebruik alleen met Beta-/Alpha-versies!</string>
+    <string name="dev_options_req">Zorg dat je bent aangemeld!</string>
+
+    <string name="dev_options_1">1. Open Instagram en houd de homeknop ingedrukt.</string>
+    <string name="dev_options_2">2. Ga naar Ontwikkelaarsopties > MetaConfig-instellingen &amp; Overrides.</string>
+    <string name="dev_options_3">3. Zoek naar "Employee" en activeer de volgende opties:</string>
+    <string name="dev_options_4">4. Schakel ontwikkelaarsopties in het module uit om crashes te voorkomen.</string>
+
+    <!-- Don't translate! -->
+    <string name="is_employee" translatable="false">• is employee</string>
+    <string name="is_employee_or_test_user" translatable="false">• is employee or test user</string>
+    <string name="employee_options" translatable="false">• employee options</string>
+
+    <!-- distraction free -->
+    <string name="distraction_free_options">Afleidingsvrije modus-opties</string>
+    <string name="disable_stories">Verhalen uitschakelen</string>
+    <string name="disable_feed">Feed uitschakelen</string>
+    <string name="disable_reels">Reels uitschakelen</string>
+    <string name="disable_explore">Verkennen uitschakelen</string>
+    <string name="disable_comments">Reacties uitschakelen</string>
+
+    <!-- Miscellaneous -->
+    <string name="misc">Overig</string>
+    <string name="miscellaneous_options">Overige opties</string>
+    <string name="story_flipping">Verhaal-swipen uitschakelen</string>
+    <string name="video_autoplay">Automatisch afspelen uitschakelen</string>
+    <string name="follower_toast">Melding bij nieuwe volger weergeven</string>
+    <string name="hooked_methods_toast">Actieve functies weergeven</string>
+
+    <!-- contributor card -->
+    <string name="contributor_name">Naam van de bijdrager</string>
+</resources>
