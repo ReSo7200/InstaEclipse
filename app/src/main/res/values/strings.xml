@@ -116,6 +116,94 @@
     <string name="follower_toast">Show Follower Toast</string>
     <string name="hooked_methods_toast">Show Enabled Features Toast</string>
 
+    <!-- Injected dialog and toasts (host app process) -->
+    <string name="ig_dialog_title">InstaEclipse 🌘</string>
+    <string name="ig_dialog_menu_dev_options">🎛 Developer Options</string>
+    <string name="ig_dialog_menu_ghost_settings">👻 Ghost Mode Settings</string>
+    <string name="ig_dialog_menu_ad_analytics_block">🛡 Ad/Analytics Block</string>
+    <string name="ig_dialog_menu_distraction_free">🧘 Distraction-Free Instagram</string>
+    <string name="ig_dialog_menu_misc_features">⚙ Misc Features</string>
+    <string name="ig_dialog_menu_about">ℹ️ About</string>
+    <string name="ig_dialog_menu_restart_app">🔁 Restart App</string>
+    <string name="ig_dialog_close">❌ Close</string>
+    <string name="ig_dialog_back">← Back</string>
+    <string name="ig_dialog_section_dev_options">Developer Options 🎛</string>
+    <string name="ig_dialog_section_ghost_mode">Ghost Mode 👻</string>
+    <string name="ig_dialog_section_ad_analytics">Ad/Analytics Block 🛡️</string>
+    <string name="ig_dialog_section_distraction_free">Distraction-Free Instagram 🧘</string>
+    <string name="ig_dialog_section_misc">Miscellaneous ⚙️</string>
+    <string name="ig_dialog_section_about">About</string>
+    <string name="ig_dialog_section_restart">Restart App</string>
+    <string name="ig_dialog_section_quick_toggle">Customize Quick Toggle 🛠️</string>
+    <string name="ig_dialog_enable_disable_all">Enable/Disable All</string>
+    <string name="ig_dialog_dev_enable">Enable Developer Mode</string>
+    <string name="ig_dialog_dev_import">📥 Import Dev Config</string>
+    <string name="ig_dialog_dev_export">📤 Export Dev Config</string>
+    <string name="ig_dialog_error">Error</string>
+    <string name="ig_dialog_unable_open_ui">Unable to open InstaEclipse UI.</string>
+    <string name="ig_dialog_instagram_not_ready">Instagram is not open or ready.</string>
+    <string name="ig_dialog_customize_quick_toggle">🛠 Customize Quick Toggle</string>
+    <string name="ig_dialog_quick_include_hide_seen">Include Hide Seen</string>
+    <string name="ig_dialog_quick_include_hide_typing">Include Hide Typing</string>
+    <string name="ig_dialog_quick_include_disable_screenshot">Include Disable Screenshot Detection</string>
+    <string name="ig_dialog_quick_include_hide_view_once">Include Hide View Once</string>
+    <string name="ig_dialog_quick_include_hide_story_seen">Include Hide Story Seen</string>
+    <string name="ig_dialog_quick_include_hide_live_seen">Include Hide Live Seen</string>
+    <string name="ig_dialog_ghost_hide_seen">Hide Seen</string>
+    <string name="ig_dialog_ghost_hide_typing">Hide Typing</string>
+    <string name="ig_dialog_ghost_disable_screenshot">Disable Screenshot Detection</string>
+    <string name="ig_dialog_ghost_hide_view_once">Hide View Once</string>
+    <string name="ig_dialog_ghost_hide_story_seen">Hide Story Seen</string>
+    <string name="ig_dialog_ghost_hide_live_seen">Hide Live Seen</string>
+    <string name="ig_dialog_ad_block_ads">Block Ads</string>
+    <string name="ig_dialog_ad_block_analytics">Block Analytics</string>
+    <string name="ig_dialog_ad_disable_tracking_links">Disable Tracking Links</string>
+    <string name="ig_dialog_extreme_mode">Extreme Mode 🔒 (Irreversible until reinstall)</string>
+    <string name="ig_dialog_disable_reels_except_dm">Disable Reels Except in DMs</string>
+    <string name="ig_dialog_extreme_confirm_title">Activate Extreme Mode?</string>
+    <string name="ig_dialog_extreme_confirm_message">Once activated, you cannot disable Distraction-Free Mode until you reinstall the app. Continue?</string>
+    <string name="ig_dialog_misc_disable_story_autoswipe">Disable Story Auto-Swipe</string>
+    <string name="ig_dialog_misc_disable_video_autoplay">Disable Video Autoplay</string>
+    <string name="ig_dialog_disable_repost">Disable Repost</string>
+    <string name="ig_dialog_misc_show_follower_toast">Show Follower Toast</string>
+    <string name="ig_dialog_misc_show_feature_toasts">Show Feature Toasts</string>
+    <string name="ig_dialog_created_by">Created by @reso7200</string>
+    <string name="ig_dialog_github_repo">🌐 GitHub Repo</string>
+    <string name="ig_dialog_restart_message">⚠️ Clear app cache and restart?</string>
+    <string name="ig_dialog_restart_now">🔁 Restart Now</string>
+    <string name="ig_dialog_restart_not_found">Could not find the app to restart.</string>
+    <string name="ig_dialog_restart_failed">Restart failed: %1$s</string>
+    <string name="ig_toast_no_ghost_option_selected">❗ No Ghost Mode options selected!</string>
+    <string name="ig_toast_ghost_enabled">👻 Ghost Mode Enabled</string>
+    <string name="ig_toast_ghost_disabled">❌ Ghost Mode Disabled</string>
+    <string name="ig_toast_message_marked_read">✅ Message was marked as read</string>
+    <string name="ig_toast_instaeclipse_loaded">InstaEclipse Loaded 🎯</string>
+
+    <!-- Update check -->
+    <string name="ig_update_available">Update Available</string>
+    <string name="ig_update_message">A new version (%1$s) is available. Would you like to update now?</string>
+    <string name="ig_update_action_update">Update</string>
+    <string name="ig_update_action_later">Later</string>
+    <string name="ig_update_error_title">Error</string>
+    <string name="ig_update_error_message">Failed to check for updates. Please try again later.</string>
+
+    <!-- Config import/export -->
+    <string name="ig_config_importing">Importing config...</string>
+    <string name="ig_config_import_success">✅ Imported into mc_overrides.json</string>
+    <string name="ig_config_import_failed">❌ Failed to import config</string>
+    <string name="ig_config_select_json">Select JSON Config</string>
+    <string name="ig_config_not_valid_json">❌ Not a valid JSON file</string>
+    <string name="ig_config_failed_read_file">❌ Failed to read file: %1$s</string>
+    <string name="ig_config_cancelled_no_file">Cancelled or no file selected</string>
+    <string name="ig_config_export_file_name" translatable="false">mc_overrides_exported.json</string>
+    <string name="ig_config_invalid_uri">❌ Invalid URI</string>
+    <string name="ig_config_clipboard_empty">❌ Clipboard is empty.</string>
+    <string name="ig_config_clipboard_no_data">❌ Clipboard has no data.</string>
+    <string name="ig_config_clipboard_text_empty">❌ Clipboard text is empty.</string>
+    <string name="ig_config_clipboard_invalid_json">❌ Clipboard does not contain valid JSON.</string>
+    <string name="ig_config_export_success">✅ JSON exported successfully.</string>
+    <string name="ig_config_failed_save_file">❌ Failed to save file: %1$s</string>
+
     <!-- contributor card -->
     <string name="contributor_name">Contributor Name</string>
 

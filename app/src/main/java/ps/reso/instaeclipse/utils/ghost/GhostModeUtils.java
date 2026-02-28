@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.widget.Toast;
 
+import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.mods.ghost.ui.GhostEmojiManager;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
+import ps.reso.instaeclipse.utils.i18n.I18n;
 
 public class GhostModeUtils {
     public static boolean isGhostModeActive() {
@@ -54,7 +56,7 @@ public class GhostModeUtils {
             if (activity != null) {
                 GhostEmojiManager.addGhostEmojiNextToInbox(activity, false);
             }
-            Toast.makeText(context, "❗ No Ghost Mode options selected!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, I18n.t(context, R.string.ig_toast_no_ghost_option_selected), Toast.LENGTH_SHORT).show();
             return; // Nothing to do
         }
 
@@ -78,9 +80,9 @@ public class GhostModeUtils {
 
         // Toast
         if (newState) {
-            Toast.makeText(context, "👻 Ghost Mode Enabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, I18n.t(context, R.string.ig_toast_ghost_enabled), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(context, "❌ Ghost Mode Disabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, I18n.t(context, R.string.ig_toast_ghost_disabled), Toast.LENGTH_SHORT).show();
         }
     }
 }
