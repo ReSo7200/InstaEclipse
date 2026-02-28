@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import ps.reso.instaeclipse.R;
+
 public class VersionCheckUtility {
 
     private static final String CURRENT_VERSION = "0.4.5"; // Current version
@@ -62,14 +64,14 @@ public class VersionCheckUtility {
 
     private static void showUpdateDialog(Context context, String updateUrl, String newVersion) {
         new MaterialAlertDialogBuilder(context)
-                .setTitle("Update Available")
-                .setMessage("A new version (" + newVersion + ") is available. Would you like to update now?")
-                .setPositiveButton("Update", (dialogInterface, which) -> {
+                .setTitle(context.getString(R.string.ig_update_available))
+                .setMessage(context.getString(R.string.ig_update_message, newVersion))
+                .setPositiveButton(R.string.ig_update_action_update, (dialogInterface, which) -> {
                     // Open the update URL in the browser
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
                     context.startActivity(browserIntent);
                 })
-                .setNegativeButton("Later", (dialogInterface, which) -> {
+                .setNegativeButton(R.string.ig_update_action_later, (dialogInterface, which) -> {
                     // Dismiss the dialog
                     dialogInterface.dismiss();
                 })
@@ -78,9 +80,9 @@ public class VersionCheckUtility {
 
     private static void showErrorDialog(Context context) {
         new MaterialAlertDialogBuilder(context)
-                .setTitle("Error")
-                .setMessage("Failed to check for updates. Please try again later.")
-                .setPositiveButton("OK", (dialogInterface, which) -> dialogInterface.dismiss())
+                .setTitle(context.getString(R.string.ig_update_error_title))
+                .setMessage(context.getString(R.string.ig_update_error_message))
+                .setPositiveButton(android.R.string.ok, (dialogInterface, which) -> dialogInterface.dismiss())
                 .show();
     }
 }

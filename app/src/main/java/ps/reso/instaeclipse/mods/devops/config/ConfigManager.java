@@ -14,7 +14,9 @@ import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 
 import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
+import ps.reso.instaeclipse.utils.i18n.I18n;
 
 public class ConfigManager {
 
@@ -22,7 +24,7 @@ public class ConfigManager {
     public static void importConfigFromClipboard(Context context) {
 
         android.app.ProgressDialog progress = new android.app.ProgressDialog(context);
-        progress.setMessage("Importing config...");
+        progress.setMessage(I18n.t(context, R.string.ig_config_importing));
         progress.setCancelable(false);
         progress.show();
 
@@ -54,14 +56,14 @@ public class ConfigManager {
 
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progress.dismiss();
-                    Toast.makeText(context, "✅ Imported into mc_overrides.json", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, I18n.t(context, R.string.ig_config_import_success), Toast.LENGTH_LONG).show();
                     XposedBridge.log("InstaEclipse | ✅ JSON imported from clipboard into mc_overrides.json");
                 });
             } catch (Exception e) {
                 XposedBridge.log("InstaEclipse | ❌ Clipboard import failed: " + e.getMessage());
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progress.dismiss();
-                    Toast.makeText(context, "❌ Failed to import config", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, I18n.t(context, R.string.ig_config_import_failed), Toast.LENGTH_LONG).show();
                 });
             } finally {
                 // 100% guarantee the flag is OFF after an attempt

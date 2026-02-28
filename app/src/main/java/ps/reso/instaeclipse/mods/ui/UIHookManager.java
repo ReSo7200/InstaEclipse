@@ -16,6 +16,7 @@ import java.util.Map;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.mods.devops.config.ConfigManager;
 import ps.reso.instaeclipse.mods.ui.utils.BottomSheetHookUtil;
@@ -24,6 +25,7 @@ import ps.reso.instaeclipse.utils.dialog.DialogUtils;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.ghost.GhostModeUtils;
+import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.toast.CustomToast;
 
 public class UIHookManager {
@@ -110,7 +112,7 @@ public class UIHookManager {
                             messageList.scrollBy(0, 100); // scroll back down
 
                             FeatureFlags.isGhostSeen = true;
-                            Toast.makeText(activity, "✅ Message was marked as read", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, I18n.t(activity, R.string.ig_toast_message_marked_read), Toast.LENGTH_SHORT).show();
 
                         }, 300);
 
@@ -158,7 +160,7 @@ public class UIHookManager {
                         CustomToast.toastShown = true;
 
                         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                            StringBuilder sb = new StringBuilder("InstaEclipse Loaded 🎯\n");
+                            StringBuilder sb = new StringBuilder(I18n.t(activity, R.string.ig_toast_instaeclipse_loaded) + "\n");
                             for (Map.Entry<String, Boolean> entry : FeatureStatusTracker.getStatus().entrySet()) {
                                 sb.append(entry.getValue() ? "✅ " : "❌ ").append(entry.getKey()).append("\n");
                             }

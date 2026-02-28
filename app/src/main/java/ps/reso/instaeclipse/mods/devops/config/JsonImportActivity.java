@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 
 public class JsonImportActivity extends Activity {
@@ -30,7 +31,7 @@ public class JsonImportActivity extends Activity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("application/json");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(Intent.createChooser(intent, "Select JSON Config"), PICK_JSON_FILE);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.ig_config_select_json)), PICK_JSON_FILE);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -50,16 +51,16 @@ public class JsonImportActivity extends Activity {
                         //Toast.makeText(this, "Config copied, returning to import…", Toast.LENGTH_SHORT).show();
                     } else {
                         FeatureFlags.isImportingConfig = false;
-                        Toast.makeText(this, "❌ Not a valid JSON file", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.ig_config_not_valid_json), Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
                     FeatureFlags.isImportingConfig = false; // <- make sure we reset on error
-                    Toast.makeText(this, "❌ Failed to read file: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.ig_config_failed_read_file, e.getMessage()), Toast.LENGTH_LONG).show();
                 }
             } else {
                 // User pressed back / cancelled
                 FeatureFlags.isImportingConfig = false; // <- ensure OFF on cancel
-                Toast.makeText(this, "Cancelled or no file selected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.ig_config_cancelled_no_file), Toast.LENGTH_SHORT).show();
             }
         }
         finish(); // Done, return to Instagram

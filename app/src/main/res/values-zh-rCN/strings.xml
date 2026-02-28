@@ -114,6 +114,95 @@
     <string name="video_autoplay">禁用视频自动播放</string>
     <string name="follower_toast">显示关注者提示</string>
     <string name="hooked_methods_toast">显示已启用功能提示</string>
+
+    <!-- 注入弹窗与提示（宿主进程） -->
+    <string name="ig_dialog_title">InstaEclipse 🌘</string>
+    <string name="ig_dialog_menu_dev_options">🎛 开发者选项</string>
+    <string name="ig_dialog_menu_ghost_settings">👻 幽灵模式设置</string>
+    <string name="ig_dialog_menu_ad_analytics_block">🛡 广告/分析拦截</string>
+    <string name="ig_dialog_menu_distraction_free">🧘 无干扰 Instagram</string>
+    <string name="ig_dialog_menu_misc_features">⚙ 杂项功能</string>
+    <string name="ig_dialog_menu_about">ℹ️ 关于</string>
+    <string name="ig_dialog_menu_restart_app">🔁 重启应用</string>
+    <string name="ig_dialog_close">❌ 关闭</string>
+    <string name="ig_dialog_back">← 返回</string>
+    <string name="ig_dialog_section_dev_options">开发者选项 🎛</string>
+    <string name="ig_dialog_section_ghost_mode">幽灵模式 👻</string>
+    <string name="ig_dialog_section_ad_analytics">广告/分析拦截 🛡️</string>
+    <string name="ig_dialog_section_distraction_free">无干扰 Instagram 🧘</string>
+    <string name="ig_dialog_section_misc">杂项 ⚙️</string>
+    <string name="ig_dialog_section_about">关于</string>
+    <string name="ig_dialog_section_restart">重启应用</string>
+    <string name="ig_dialog_section_quick_toggle">自定义快速开关 🛠️</string>
+    <string name="ig_dialog_enable_disable_all">启用/禁用所有</string>
+    <string name="ig_dialog_dev_enable">启用开发者模式</string>
+    <string name="ig_dialog_dev_import">📥 导入开发者配置</string>
+    <string name="ig_dialog_dev_export">📤 导出开发者配置</string>
+    <string name="ig_dialog_error">错误</string>
+    <string name="ig_dialog_unable_open_ui">无法打开 InstaEclipse 界面。</string>
+    <string name="ig_dialog_instagram_not_ready">Instagram 未打开或尚未准备就绪。</string>
+    <string name="ig_dialog_customize_quick_toggle">🛠 自定义快速开关</string>
+    <string name="ig_dialog_quick_include_hide_seen">包含：隐藏已读</string>
+    <string name="ig_dialog_quick_include_hide_typing">包含：隐藏输入状态</string>
+    <string name="ig_dialog_quick_include_disable_screenshot">包含：禁用截图检测</string>
+    <string name="ig_dialog_quick_include_hide_view_once">包含：隐藏查看一次</string>
+    <string name="ig_dialog_quick_include_hide_story_seen">包含：隐藏动态已读</string>
+    <string name="ig_dialog_quick_include_hide_live_seen">包含：隐藏直播已读</string>
+    <string name="ig_dialog_ghost_hide_seen">隐藏已读</string>
+    <string name="ig_dialog_ghost_hide_typing">隐藏输入状态</string>
+    <string name="ig_dialog_ghost_disable_screenshot">禁用截图检测</string>
+    <string name="ig_dialog_ghost_hide_view_once">隐藏查看一次</string>
+    <string name="ig_dialog_ghost_hide_story_seen">隐藏动态已读</string>
+    <string name="ig_dialog_ghost_hide_live_seen">隐藏直播已读</string>
+    <string name="ig_dialog_ad_block_ads">拦截广告</string>
+    <string name="ig_dialog_ad_block_analytics">拦截分析</string>
+    <string name="ig_dialog_ad_disable_tracking_links">禁用追踪链接</string>
+    <string name="ig_dialog_extreme_mode">极限模式 🔒（重新安装前不可撤销）</string>
+    <string name="ig_dialog_disable_reels_except_dm">禁用 Reels（私信除外）</string>
+    <string name="ig_dialog_extreme_confirm_title">启用极限模式？</string>
+    <string name="ig_dialog_extreme_confirm_message">启用后，在重新安装应用之前无法关闭无干扰模式。继续？</string>
+    <string name="ig_dialog_misc_disable_story_autoswipe">禁用动态自动翻页</string>
+    <string name="ig_dialog_misc_disable_video_autoplay">禁用视频自动播放</string>
+    <string name="ig_dialog_disable_repost">禁用转发</string>
+    <string name="ig_dialog_misc_show_follower_toast">显示关注提示</string>
+    <string name="ig_dialog_misc_show_feature_toasts">显示功能提示</string>
+    <string name="ig_dialog_created_by">作者：@reso7200</string>
+    <string name="ig_dialog_github_repo">🌐 GitHub 仓库</string>
+    <string name="ig_dialog_restart_message">⚠️ 清除应用缓存并重启？</string>
+    <string name="ig_dialog_restart_now">🔁 立即重启</string>
+    <string name="ig_dialog_restart_not_found">找不到要重启的应用。</string>
+    <string name="ig_dialog_restart_failed">重启失败：%1$s</string>
+    <string name="ig_toast_no_ghost_option_selected">❗ 未选择任何幽灵模式选项！</string>
+    <string name="ig_toast_ghost_enabled">👻 幽灵模式已启用</string>
+    <string name="ig_toast_ghost_disabled">❌ 幽灵模式已禁用</string>
+    <string name="ig_toast_message_marked_read">✅ 消息已标记为已读</string>
+    <string name="ig_toast_instaeclipse_loaded">InstaEclipse 已加载 🎯</string>
+
+    <!-- 更新检查 -->
+    <string name="ig_update_available">发现更新</string>
+    <string name="ig_update_message">发现新版本（%1$s）。现在更新吗？</string>
+    <string name="ig_update_action_update">更新</string>
+    <string name="ig_update_action_later">稍后</string>
+    <string name="ig_update_error_title">错误</string>
+    <string name="ig_update_error_message">检查更新失败，请稍后重试。</string>
+
+    <!-- 配置导入导出 -->
+    <string name="ig_config_importing">正在导入配置...</string>
+    <string name="ig_config_import_success">✅ 已导入到 mc_overrides.json</string>
+    <string name="ig_config_import_failed">❌ 导入配置失败</string>
+    <string name="ig_config_select_json">选择 JSON 配置</string>
+    <string name="ig_config_not_valid_json">❌ 不是有效的 JSON 文件</string>
+    <string name="ig_config_failed_read_file">❌ 读取文件失败：%1$s</string>
+    <string name="ig_config_cancelled_no_file">已取消或未选择文件</string>
+    <string name="ig_config_export_file_name" translatable="false">mc_overrides_exported.json</string>
+    <string name="ig_config_invalid_uri">❌ 无效的 URI</string>
+    <string name="ig_config_clipboard_empty">❌ 剪贴板为空。</string>
+    <string name="ig_config_clipboard_no_data">❌ 剪贴板没有数据。</string>
+    <string name="ig_config_clipboard_text_empty">❌ 剪贴板文本为空。</string>
+    <string name="ig_config_clipboard_invalid_json">❌ 剪贴板中不是有效 JSON。</string>
+    <string name="ig_config_export_success">✅ JSON 导出成功。</string>
+    <string name="ig_config_failed_save_file">❌ 保存文件失败：%1$s</string>
+
     <!--  contributor card  -->
     <string name="contributor_name">Contributor Name</string>
 </resources>

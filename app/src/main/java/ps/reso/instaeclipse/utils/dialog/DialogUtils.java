@@ -26,12 +26,14 @@ import java.io.File;
 import java.util.Objects;
 
 import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.mods.devops.config.ConfigManager;
 import ps.reso.instaeclipse.mods.ghost.ui.GhostEmojiManager;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.ghost.GhostModeUtils;
+import ps.reso.instaeclipse.utils.i18n.I18n;
 
 public class DialogUtils {
 
@@ -59,7 +61,11 @@ public class DialogUtils {
 
     public static void showSimpleDialog(Context context, String title, String message) {
         try {
-            new AlertDialog.Builder(context).setTitle(title).setMessage(message).setPositiveButton("OK", null).show();
+            new AlertDialog.Builder(context)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
         } catch (Exception e) {
             // handle UI crash fallback
         }
@@ -78,7 +84,7 @@ public class DialogUtils {
 
         // Title
         TextView title = new TextView(context);
-        title.setText("InstaEclipse 🌘");
+        title.setText(I18n.t(context, R.string.ig_dialog_title));
         title.setTextColor(Color.WHITE);
         title.setTextSize(22);
         title.setGravity(Gravity.CENTER);
@@ -90,25 +96,25 @@ public class DialogUtils {
         // Now building menu manually
 
         // 0 - Developer Options => OPEN PAGE
-        mainLayout.addView(createClickableSection(context, "🎛 Developer Options", () -> showDevOptions(context)));
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_dev_options), () -> showDevOptions(context)));
 
         // 1 - Ghost Mode Settings => OPEN PAGE
-        mainLayout.addView(createClickableSection(context, "👻 Ghost Mode Settings", () -> showGhostOptions(context)));
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), () -> showGhostOptions(context)));
 
         // 2 - Ad/Analytics Block => OPEN PAGE
-        mainLayout.addView(createClickableSection(context, "🛡 Ad/Analytics Block", () -> showAdOptions(context)));
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_ad_analytics_block), () -> showAdOptions(context)));
 
         // 3 - Distraction-Free Instagram => OPEN PAGE
-        mainLayout.addView(createClickableSection(context, "🧘 Distraction-Free Instagram", () -> showDistractionOptions(context)));
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_distraction_free), () -> showDistractionOptions(context)));
 
         // 4 - Misc Features => OPEN PAGE
-        mainLayout.addView(createClickableSection(context, "⚙ Misc Features", () -> showMiscOptions(context)));
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_misc_features), () -> showMiscOptions(context)));
 
         // 5 - About => OPEN PAGE
-        mainLayout.addView(createClickableSection(context, "ℹ️ About", () -> showAboutDialog(context)));
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_about), () -> showAboutDialog(context)));
 
         // 6 - Restart Instagram => OPEN PAGE
-        mainLayout.addView(createClickableSection(context, "🔁 Restart App", () -> showRestartSection(context)));
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_restart_app), () -> showRestartSection(context)));
 
         mainLayout.addView(createDivider(context));
 
@@ -123,7 +129,7 @@ public class DialogUtils {
 
         // Embedded Close Button
         TextView closeButton = new TextView(context);
-        closeButton.setText("❌ Close");
+        closeButton.setText(I18n.t(context, R.string.ig_dialog_close));
         closeButton.setTextColor(Color.WHITE);
         closeButton.setTextSize(16);
         closeButton.setPadding(20, 30, 20, 30);
@@ -156,10 +162,17 @@ public class DialogUtils {
         LinearLayout layout = createSwitchLayout(context);
 
         // Create switches for customizing what gets toggled
-        Switch[] toggleSwitches = new Switch[]{createSwitch(context, "Include Hide Seen", FeatureFlags.quickToggleSeen), createSwitch(context, "Include Hide Typing", FeatureFlags.quickToggleTyping), createSwitch(context, "Include Disable Screenshot Detection", FeatureFlags.quickToggleScreenshot), createSwitch(context, "Include Hide View Once", FeatureFlags.quickToggleViewOnce), createSwitch(context, "Include Hide Story Seen", FeatureFlags.quickToggleStory), createSwitch(context, "Include Hide Live Seen", FeatureFlags.quickToggleLive)};
+        Switch[] toggleSwitches = new Switch[]{
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_quick_include_hide_seen), FeatureFlags.quickToggleSeen),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_quick_include_hide_typing), FeatureFlags.quickToggleTyping),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_quick_include_disable_screenshot), FeatureFlags.quickToggleScreenshot),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_quick_include_hide_view_once), FeatureFlags.quickToggleViewOnce),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_quick_include_hide_story_seen), FeatureFlags.quickToggleStory),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_quick_include_hide_live_seen), FeatureFlags.quickToggleLive)
+        };
 
         // Create Enable/Disable All switch
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, "Enable/Disable All", areAllEnabled(toggleSwitches));
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(toggleSwitches));
 
         // Master listener
         enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -224,7 +237,7 @@ public class DialogUtils {
         }
 
         // Show dialog
-        showSectionDialog(context, "Customize Quick Toggle 🛠️", layout, () -> {
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_quick_toggle), layout, () -> {
         });
 
     }
@@ -257,12 +270,12 @@ public class DialogUtils {
                 // Forcibly kill the current process to ensure a clean restart
                 Runtime.getRuntime().exit(0);
             } else {
-                Toast.makeText(context, "Could not find the app to restart.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, I18n.t(context, R.string.ig_dialog_restart_not_found), Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             String packageName = context.getPackageName();
             XposedBridge.log("InstaEclipse: Restart failed for " + packageName + " - " + e.getMessage());
-            Toast.makeText(context, "Restart failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_restart_failed, e.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -311,7 +324,7 @@ public class DialogUtils {
         LinearLayout layout = createSwitchLayout(context);
 
         // Developer Mode Switch
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch devModeSwitch = createSwitch(context, "Enable Developer Mode", FeatureFlags.isDevEnabled);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch devModeSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_dev_enable), FeatureFlags.isDevEnabled);
         devModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             FeatureFlags.isDevEnabled = isChecked;
             SettingsManager.saveAllFlags();
@@ -322,7 +335,7 @@ public class DialogUtils {
 
         // 📥 Import Dev Config Button
         Button importButton = new Button(context);
-        importButton.setText("📥 Import Dev Config");
+        importButton.setText(I18n.t(context, R.string.ig_dialog_dev_import));
         importButton.setOnClickListener(v -> {
             Activity instagramActivity = UIHookManager.getCurrentActivity();
             if (instagramActivity != null && !instagramActivity.isFinishing()) {
@@ -336,11 +349,11 @@ public class DialogUtils {
                     instagramActivity.startActivity(importIntent);
                 } catch (Exception e) {
                     XposedBridge.log("InstaEclipse | ❌ Failed to start JsonImportActivity: " + e.getMessage());
-                    showSimpleDialog(context, "Error", "Unable to open InstaEclipse UI.");
+                    showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_unable_open_ui));
                 }
 
             } else {
-                showSimpleDialog(context, "Error", "Instagram is not open or ready.");
+                showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_instagram_not_ready));
             }
         });
 
@@ -349,7 +362,7 @@ public class DialogUtils {
 
         // 📤 Export Dev Config Button
         Button exportButton = new Button(context);
-        exportButton.setText("📤 Export Dev Config");
+        exportButton.setText(I18n.t(context, R.string.ig_dialog_dev_export));
         exportButton.setOnClickListener(v -> {
             FeatureFlags.isExportingConfig = true;
             Activity instagramActivity = UIHookManager.getCurrentActivity();
@@ -364,28 +377,35 @@ public class DialogUtils {
                 try {
                     instagramActivity.startActivity(exportIntent);
                 } catch (Exception e) {
-                    showSimpleDialog(context, "Error", "Unable to open InstaEclipse UI.");
+                    showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_unable_open_ui));
                 }
 
             } else {
-                showSimpleDialog(context, "Error", "Instagram is not open or ready.");
+                showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_instagram_not_ready));
             }
         });
 
         layout.addView(exportButton);
 
         // Save current dev mode flag when dialog is closed
-        showSectionDialog(context, "Developer Options 🎛", layout, SettingsManager::saveAllFlags);
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_dev_options), layout, SettingsManager::saveAllFlags);
     }
 
     private static void showGhostOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        Switch[] switches = new Switch[]{createSwitch(context, "Hide Seen", FeatureFlags.isGhostSeen), createSwitch(context, "Hide Typing", FeatureFlags.isGhostTyping), createSwitch(context, "Disable Screenshot Detection", FeatureFlags.isGhostScreenshot), createSwitch(context, "Hide View Once", FeatureFlags.isGhostViewOnce), createSwitch(context, "Hide Story Seen", FeatureFlags.isGhostStory), createSwitch(context, "Hide Live Seen", FeatureFlags.isGhostLive)};
+        Switch[] switches = new Switch[]{
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_ghost_hide_seen), FeatureFlags.isGhostSeen),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_ghost_hide_typing), FeatureFlags.isGhostTyping),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_ghost_disable_screenshot), FeatureFlags.isGhostScreenshot),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_ghost_hide_view_once), FeatureFlags.isGhostViewOnce),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_ghost_hide_story_seen), FeatureFlags.isGhostStory),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_ghost_hide_live_seen), FeatureFlags.isGhostLive)
+        };
 
-        layout.addView(createClickableSection(context, "🛠 Customize Quick Toggle", () -> showGhostQuickToggleOptions(context)));
+        layout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_customize_quick_toggle), () -> showGhostQuickToggleOptions(context)));
 
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, "Enable/Disable All", areAllEnabled(switches));
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
         enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             for (Switch s : switches) {
@@ -445,7 +465,7 @@ public class DialogUtils {
             layout.addView(s);
         }
 
-        showSectionDialog(context, "Ghost Mode 👻", layout, () -> {
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_ghost_mode), layout, () -> {
             // No need to set FeatureFlags here anymore because handled instantly
         });
     }
@@ -455,16 +475,16 @@ public class DialogUtils {
         LinearLayout layout = createSwitchLayout(context);
 
         // Create switches
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch adBlock = createSwitch(context, "Block Ads", FeatureFlags.isAdBlockEnabled);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch adBlock = createSwitch(context, I18n.t(context, R.string.ig_dialog_ad_block_ads), FeatureFlags.isAdBlockEnabled);
 
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch analytics = createSwitch(context, "Block Analytics", FeatureFlags.isAnalyticsBlocked);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch analytics = createSwitch(context, I18n.t(context, R.string.ig_dialog_ad_block_analytics), FeatureFlags.isAnalyticsBlocked);
 
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch trackingLinks = createSwitch(context, "Disable Tracking Links", FeatureFlags.disableTrackingLinks);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch trackingLinks = createSwitch(context, I18n.t(context, R.string.ig_dialog_ad_disable_tracking_links), FeatureFlags.disableTrackingLinks);
 
         Switch[] switches = new Switch[]{adBlock, analytics, trackingLinks};
 
         // Create Enable/Disable All switch
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, "Enable/Disable All", areAllEnabled(switches));
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
         // Master listener
         enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -506,7 +526,7 @@ public class DialogUtils {
         }
 
         // Show the dialog
-        showSectionDialog(context, "Ad/Analytics Block 🛡️", layout, () -> {
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_ad_analytics), layout, () -> {
         });
     }
 
@@ -515,19 +535,19 @@ public class DialogUtils {
         LinearLayout layout = createSwitchLayout(context);
 
         // Child switches
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch extremeModeSwitch = createSwitch(context, "Extreme Mode 🔒 (Irreversible until reinstall)", FeatureFlags.isExtremeMode);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableStoriesSwitch = createSwitch(context, "Disable Stories", FeatureFlags.disableStories);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableFeedSwitch = createSwitch(context, "Disable Feed", FeatureFlags.disableFeed);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableReelsSwitch = createSwitch(context, "Disable Reels", FeatureFlags.disableReels);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch onlyInDMSwitch = createSwitch(context, "Disable Reels Except in DMs", FeatureFlags.disableReelsExceptDM);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableExploreSwitch = createSwitch(context, "Disable Explore", FeatureFlags.disableExplore);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableCommentsSwitch = createSwitch(context, "Disable Comments", FeatureFlags.disableComments);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch extremeModeSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_extreme_mode), FeatureFlags.isExtremeMode);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableStoriesSwitch = createSwitch(context, I18n.t(context, R.string.disable_stories), FeatureFlags.disableStories);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableFeedSwitch = createSwitch(context, I18n.t(context, R.string.disable_feed), FeatureFlags.disableFeed);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableReelsSwitch = createSwitch(context, I18n.t(context, R.string.disable_reels), FeatureFlags.disableReels);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch onlyInDMSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_disable_reels_except_dm), FeatureFlags.disableReelsExceptDM);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableExploreSwitch = createSwitch(context, I18n.t(context, R.string.disable_explore), FeatureFlags.disableExplore);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch disableCommentsSwitch = createSwitch(context, I18n.t(context, R.string.disable_comments), FeatureFlags.disableComments);
 
         Switch[] switches = new Switch[]{disableStoriesSwitch, disableFeedSwitch, disableReelsSwitch, onlyInDMSwitch, disableExploreSwitch, disableCommentsSwitch};
 
 
         // Enable/Disable All
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, "Enable/Disable All", areAllEnabled(switches));
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
         if (FeatureFlags.isExtremeMode) {
             disableAllSwitches(switches, enableAllSwitch, onlyInDMSwitch);
@@ -538,9 +558,9 @@ public class DialogUtils {
         extremeModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Activate Extreme Mode?");
-                builder.setMessage("Once activated, you cannot disable Distraction-Free Mode until you reinstall the app. Continue?");
-                builder.setPositiveButton("Yes", (dialog, which) -> {
+                builder.setTitle(I18n.t(context, R.string.ig_dialog_extreme_confirm_title));
+                builder.setMessage(I18n.t(context, R.string.ig_dialog_extreme_confirm_message));
+                builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
                     FeatureFlags.isExtremeMode = true;
                     FeatureFlags.isDistractionFree = true;
 
@@ -557,7 +577,7 @@ public class DialogUtils {
                     disableAllSwitches(switches, enableAllSwitch, onlyInDMSwitch);
                     extremeModeSwitch.setEnabled(false);
                 });
-                builder.setNegativeButton("Cancel", (dialog, which) -> extremeModeSwitch.setChecked(false));
+                builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> extremeModeSwitch.setChecked(false));
                 builder.show();
             }
         });
@@ -617,7 +637,7 @@ public class DialogUtils {
             layout.addView(s);
         }
 
-        showSectionDialog(context, "Distraction-Free Instagram 🧘", layout, () -> {
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {
             FeatureFlags.disableStories = disableStoriesSwitch.isChecked();
             FeatureFlags.disableFeed = disableFeedSwitch.isChecked();
             FeatureFlags.disableReels = disableReelsSwitch.isChecked();
@@ -663,15 +683,15 @@ public class DialogUtils {
 
         // Create all child switches
         Switch[] switches = new Switch[]{
-                createSwitch(context, "Disable Story Auto-Swipe", FeatureFlags.disableStoryFlipping),
-                createSwitch(context, "Disable Video Autoplay", FeatureFlags.disableVideoAutoPlay),
-                createSwitch(context, "Disable Repost", FeatureFlags.disableRepost),
-                createSwitch(context, "Show Follower Toast", FeatureFlags.showFollowerToast),
-                createSwitch(context, "Show Feature Toasts", FeatureFlags.showFeatureToasts)
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_disable_story_autoswipe), FeatureFlags.disableStoryFlipping),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_disable_video_autoplay), FeatureFlags.disableVideoAutoPlay),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_disable_repost), FeatureFlags.disableRepost),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_show_follower_toast), FeatureFlags.showFollowerToast),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_show_feature_toasts), FeatureFlags.showFeatureToasts)
         };
 
         // Create Enable/Disable All switch
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, "Enable/Disable All", areAllEnabled(switches));
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
         enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             for (Switch s : switches) {
@@ -723,7 +743,7 @@ public class DialogUtils {
         }
 
         // Show dialog
-        showSectionDialog(context, "Miscellaneous ⚙️", layout, () -> {
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_misc), layout, () -> {
         });
     }
 
@@ -736,21 +756,21 @@ public class DialogUtils {
         layout.setGravity(Gravity.CENTER_HORIZONTAL);
 
         TextView title = new TextView(context);
-        title.setText("InstaEclipse 🌘");
+        title.setText(I18n.t(context, R.string.ig_dialog_title));
         title.setTextColor(Color.WHITE);
         title.setTextSize(20f);
         title.setGravity(Gravity.CENTER);
         title.setPadding(0, 0, 0, 20);
 
         TextView creator = new TextView(context);
-        creator.setText("Created by @reso7200");
+        creator.setText(I18n.t(context, R.string.ig_dialog_created_by));
         creator.setTextColor(Color.LTGRAY);
         creator.setTextSize(16f);
         creator.setGravity(Gravity.CENTER);
         creator.setPadding(0, 0, 0, 30);
 
         Button githubButton = new Button(context);
-        githubButton.setText("🌐 GitHub Repo");
+        githubButton.setText(I18n.t(context, R.string.ig_dialog_github_repo));
         githubButton.setTextColor(Color.WHITE);
         githubButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#3F51B5")));
         githubButton.setPadding(40, 20, 40, 20);
@@ -770,7 +790,7 @@ public class DialogUtils {
         layout.addView(creator);
         layout.addView(githubButton);
 
-        showSectionDialog(context, "About", layout, () -> {
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_about), layout, () -> {
         });
     }
 
@@ -782,14 +802,14 @@ public class DialogUtils {
         layout.setGravity(Gravity.CENTER_HORIZONTAL);
 
         TextView message = new TextView(context);
-        message.setText("⚠️ Clear app cache and restart?");
+        message.setText(I18n.t(context, R.string.ig_dialog_restart_message));
         message.setTextColor(Color.WHITE);
         message.setTextSize(18f);
         message.setGravity(Gravity.CENTER);
         message.setPadding(0, 0, 0, 30);
 
         Button restartButton = new Button(context);
-        restartButton.setText("🔁 Restart Now");
+        restartButton.setText(I18n.t(context, R.string.ig_dialog_restart_now));
         restartButton.setTextColor(Color.WHITE);
         restartButton.setPadding(40, 20, 40, 20);
 
@@ -798,7 +818,7 @@ public class DialogUtils {
         layout.addView(message);
         layout.addView(restartButton);
 
-        showSectionDialog(context, "Restart App", layout, () -> {
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_restart), layout, () -> {
         });
     }
 
@@ -834,7 +854,7 @@ public class DialogUtils {
 
         // Footer button
         TextView backBtn = new TextView(context);
-        backBtn.setText("← Back");
+        backBtn.setText(I18n.t(context, R.string.ig_dialog_back));
         backBtn.setTextColor(Color.WHITE);
         backBtn.setTextSize(16);
         backBtn.setGravity(Gravity.CENTER);
