@@ -2,7 +2,7 @@
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
     <string name="version" translatable="false">v0.4.5 Beta</string>
-    <string name="home">Menu</string>
+    <string name="home">Accueil</string>
     <string name="features">Fonctionnalités</string>
     <string name="help">Aide</string>
     <string name="instagram_version">Version</string>
@@ -12,11 +12,11 @@
 
     <string name="module_status">Statut du module :</string>
 
-    <string name="module_status_disabled">Statut du module : Désactiver</string>
-    <string name="request_enable_module">Veuillez activer le module dans Xposed.</string>
+    <string name="module_status_disabled">Statut du module : Désactivé</string>
+    <string name="request_enable_module">Veuillez activer le module dans LSPosed.</string>
 
     <string name="module_status_enabled_no_root">Statut du module : Activé (Accès Non Rooté)</string>
-    <string name="request_enable_root">L\'accès Root est requis pour le redémarrage-auto. Redémarrage manuel requis.</string>
+    <string name="request_enable_root">L\'accès Root est requis pour le redémarrage auto. Redémarrage manuel requis.</string>
 
     <string name="module_status_enabled">Statut du module : Activé</string>
     <string name="module_active">Le module est actif et fonctionnel.</string>
@@ -52,12 +52,12 @@
 
     <!-- faq -->
     <string name="frequently_asked_questions">FAQ</string>
-    <string name="faq_1"><![CDATA[<b>1. Ne fonctionne pas/plante lors de l&#39;utilisation de la version Google Play ?</b><br/>- Utilisez les APKs de APKMirror]]></string>
-    <string name="faq_2"><![CDATA[<b>2. Le module n&#39;est pas activé ?</b><br/>- Désactivez et réactivez le module dans LSPosed.]]></string>
-    <string name="faq_3"><![CDATA[<b>3. Les fonctionnalités ne fonctionnent pas ?</b><br/>- Forcez l&#39;arrêt et redémarrez Instagram.]]></string>
-    <string name="faq_4"><![CDATA[<b>4. Les options développeur provoquent des plantages ?</b><br/>- Suivez le guide des options pour développeurs.]]></string>
-    <string name="faq_5"><![CDATA[<b>5. Les options développeur ont des étiquettes ou des numéros bizarres ?</b><br/>- Utilisez les versions Bêta ou Alpha car les versions Stables ont des obfuscations.]]></string>
-    <string name="faq_6"><![CDATA[<b>6. Le mode Sans Distraction est activé mais le contenu apparaît toujours ?</b><br/>- Forcez l&#39;arrêt d&#39;Instagram et videz son cache.]]></string>
+    <string name="faq_1"><b>1. Ne fonctionne pas/plante lors de l\'utilisation de la version Google Play ?</b>\n- Utilisez les APKs de APKMirror.</string>
+    <string name="faq_2"><b>2. Le module n\'est pas activé ?</b>\n- Désactivez et réactivez le module dans LSPosed.</string>
+    <string name="faq_3"><b>3. Les fonctionnalités ne fonctionnent pas ?</b>\n- Forcez l\'arrêt et redémarrez Instagram.></string>
+    <string name="faq_4"><b>4. Les options développeur provoquent des plantages ?</b>\n- Suivez le guide des options pour développeurs.</string>
+    <string name="faq_5"><b>5. Les options développeur ont des étiquettes ou des numéros bizarres ?</b>\n- Utilisez les versions Bêta ou Alpha car les versions Stables ont des obfuscations.</string>
+    <string name="faq_6"><b>6. Le mode Sans Distraction est activé mais le contenu apparaît toujours ?</b>\n- Forcez l\'arrêt d\'Instagram et videz son cache.</string>
 
     <!-- guide -->
     <string name="module_not_working_title">Le module ne fonctionne toujours pas?</string>
@@ -67,33 +67,33 @@
     <string name="developer_options">Options Développeurs</string>
     <string name="ghost_mode">Mode Fantôme</string>
     <string name="distraction_free">Sans Distractions</string>
-    <string name="remove_ads">Enlevé les pubs</string>
-    <string name="remove_analytics">Désactiver les Analyses</string>
+    <string name="remove_ads">Désactiver les pubs</string>
+    <string name="remove_analytics">Désactiver le suivi</string>
 
-    <string name="enable_disable_all">Activé/Désactiver Tous</string>
+    <string name="enable_disable_all">Tout Activer/Désactiver</string>
 
     <!-- Don't translate! -->
     <string name="hint" translatable="false">Hint</string>
 
     <!-- ghost -->
     <string name="ghost_mode_options">Options Mode Fantôme</string>
-    <string name="typing">Entrain d\'écrire</string>
+    <string name="typing">En train d\'écrire</string>
     <string name="story">Story</string>
     <string name="view_once">Vue Unique</string>
     <string name="live">Live</string>
     <string name="direct_messages">Messages Direct</string>
-    <string name="disable_typing">Entrain d\'écrire</string>
+    <string name="disable_typing">En train d\'écrire</string>
     <string name="screen_shot">Screenshot</string>
 
     <!-- developer_options -->
-    <string name="developer_options_guide">Guide options développeurs</string>
-    <string name="dev_options_version_req">Utiliser le uniquement sur les versions Beta/Alpha seulement !</string>
-    <string name="dev_options_req">Assurer vous d\'être d\'abord connecté !</string>
+    <string name="developer_options_guide">Guide des options développeurs</string>
+    <string name="dev_options_version_req">À utiliser uniquement sur les versions Beta/Alpha !</string>
+    <string name="dev_options_req">Assurer vous d\'être connecté !</string>
 
-    <string name="dev_options_1">1. Ouvrez Instagram et maintenez le bouton Menu.</string>
-    <string name="dev_options_2">2. Navigué au options développeurs > MetaConfig Settings &amp; Overrides.</string>
-    <string name="dev_options_3">3. Recherchez \'Employee\' et activer les options suivantes:</string>
-    <string name="dev_options_4">4. Enfin, Désactiver les options pour développeurs a partir du module pour éviter les plantages d\'application.</string>
+    <string name="dev_options_1">1. Ouvrez Instagram et maintenez le bouton Accueil.</string>
+    <string name="dev_options_2">2. Appuyez sur Experimentations > MetaConfig Settings &amp; Overrides.</string>
+    <string name="dev_options_3">3. Recherchez \'Employee\' et activez les options suivantes:</string>
+    <string name="dev_options_4">4. Enfin, désactivez les options pour développeurs a partir du module pour éviter les plantages d\'application.</string>
 
     <!-- Don't translate! -->
     <string name="is_employee" translatable="false">• is employee</string>
@@ -110,11 +110,11 @@
 
     <!-- Miscellaneous -->
     <string name="misc">Divers</string>
-    <string name="miscellaneous_options">Options Divers</string>
-    <string name="story_flipping">Désactiver défilement auto des Story</string>
-    <string name="video_autoplay">Désactiver lecture auto des vidéos</string>
-    <string name="follower_toast">Afficher Notification "Suivi en Retour"</string>
-    <string name="hooked_methods_toast">Afficher la Notification des fonctions activées</string>
+    <string name="miscellaneous_options">Options Diverses</string>
+    <string name="story_flipping">Désactiver le défilement auto des Story</string>
+    <string name="video_autoplay">Désactiver la lecture auto des vidéos</string>
+    <string name="follower_toast">Afficher la notification "Suivi en Retour"</string>
+    <string name="hooked_methods_toast">Afficher la notification des fonctionnalités activées</string>
 
     <!-- contributor card -->
     <string name="contributor_name">Contributor Name</string>
