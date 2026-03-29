@@ -32,6 +32,26 @@ import ps.reso.instaeclipse.utils.core.Contributor;
 
 public class HomeFragment extends Fragment {
 
+    private static final List<String> SUPPORTED_PACKAGES = Arrays.asList(
+            CommonUtils.IG_PACKAGE_NAME,
+            "com.instagram.android",
+            "com.instagold.android",
+            "com.instaflux.app",
+            "com.myinsta.android",
+            "cc.honista.app",
+            "com.instaprime.android",
+            "com.instafel.android",
+            "com.instadm.android",
+            "com.dfistagram.android",
+            "com.Instander.android",
+            "com.aero.instagram",
+            "com.instapro.android",
+            "com.instaflow.android",
+            "com.instagram1.android",
+            "com.instagram2.android",
+            "com.instagramclone.android",
+            "com.instaclone.android"
+    );
     private MaterialButton launchInstagramButton;
     private MaterialCardView instagramStatusCard;
     private TextView instagramStatusText;
@@ -63,12 +83,15 @@ public class HomeFragment extends Fragment {
         // Launch Instagram Button Listener
         launchInstagramButton.setOnClickListener(v -> {
             PackageManager pm = requireContext().getPackageManager();
-            Intent launchIntent = pm.getLaunchIntentForPackage("com.instagram.android");
-            if (launchIntent != null) {
-                startActivity(launchIntent);
-            } else {
-                Toast.makeText(getActivity(), getString(R.string.not_installed_instagram), Toast.LENGTH_SHORT).show();
+            Intent launchIntent = null;
+            for (String packageName : SUPPORTED_PACKAGES) {
+                launchIntent = pm.getLaunchIntentForPackage(packageName);
+                if (launchIntent != null) {
+                    startActivity(launchIntent);
+                    return;
+                }
             }
+            Toast.makeText(getActivity(), getString(R.string.not_installed_instagram), Toast.LENGTH_SHORT).show();
         });
 
         // Download APK Button Logic
@@ -86,13 +109,31 @@ public class HomeFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     private void checkInstagramStatus() {
-        String instagramPackage = CommonUtils.IG_PACKAGE_NAME; // IG package name
+        PackageInfo packageInfo = null;
+        String versionName = null;
+        String packageName = null;
         PackageManager pm = requireContext().getPackageManager(); // Get PackageManager
 
-        try {
-            PackageInfo packageInfo = pm.getPackageInfo(instagramPackage, 0);
-            String versionName = packageInfo.versionName;
+        for (String pkg : SUPPORTED_PACKAGES) {
+            try {
+                packageInfo = pm.getPackageInfo(pkg, 0);
+                versionName = packageInfo.versionName;
+                packageName = pkg;
+                break;
+            } catch (PackageManager.NameNotFoundException ignored) {
+            }
+        }
 
+        if (packageInfo == null || versionName == null) {
+            instagramStatusText.setText(getString(R.string.not_installed_instagram));
+            instagramStatusText.setTypeface(null, android.graphics.Typeface.BOLD);
+            instagramStatusCard.setCardBackgroundColor(getResources().getColor(R.color.dark_red));
+            instagramLogo.setImageResource(R.drawable.ic_cancel);
+            launchInstagramButton.setBackgroundColor(android.graphics.Color.parseColor("#262626"));
+            return;
+        }
+
+        try {
             String installedText = getString(R.string.installed_instagram_version);
             String versionText = getString(R.string.instagram_version) + ": " + versionName;
             String fullText = installedText + "\n" + versionText;
@@ -108,20 +149,13 @@ public class HomeFragment extends Fragment {
             instagramLogo.setImageResource(R.drawable.ic_instagram_logo);
 
             // Add OnClickListener to open app settings if Instagram is installed
+            final String instagramPackage = packageName;
             instagramInfoIcon.setOnClickListener(v -> {
                 Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 intent.setData(Uri.parse("package:" + instagramPackage));
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             });
-
-
-        } catch (PackageManager.NameNotFoundException e) {
-            instagramStatusText.setText(getString(R.string.not_installed_instagram));
-            instagramStatusText.setTypeface(null, android.graphics.Typeface.BOLD);
-            instagramStatusCard.setCardBackgroundColor(getResources().getColor(R.color.dark_red));
-            instagramLogo.setImageResource(R.drawable.ic_cancel);
-            launchInstagramButton.setBackgroundColor(android.graphics.Color.parseColor("#262626"));
 
         } catch (Exception e) {
             instagramStatusText.setText(getString(R.string.error_instagram));
