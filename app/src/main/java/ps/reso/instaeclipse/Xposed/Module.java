@@ -21,6 +21,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ps.reso.instaeclipse.mods.ads.AdBlocker;
 import ps.reso.instaeclipse.mods.ads.TrackingLinkDisable;
 import ps.reso.instaeclipse.mods.devops.DevOptionsEnable;
+import ps.reso.instaeclipse.mods.ghost.GhostCommunityMarkAsReadButton;
+import ps.reso.instaeclipse.mods.ghost.GhostMarkAsReadButton;
 import ps.reso.instaeclipse.mods.ghost.ScreenshotDetection;
 import ps.reso.instaeclipse.mods.ghost.SeenState;
 import ps.reso.instaeclipse.mods.ghost.StorySeen;
@@ -147,6 +149,12 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
             XposedHelpers.findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    Context context = (Context) param.args[0];
+                    SettingsManager.init(context);
+                    SettingsManager.loadAllFlags(context);
+                }
+                @Override
                 protected void afterHookedMethod(MethodHookParam param) {
 
                     XposedBridge.log("InstaEclipse: Settings loaded via Application.attach for " + lpparam.packageName);
@@ -176,6 +184,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Ghost Mode
                     try {
                         new SeenState().handleSeenBlock(dexKitBridge); // DM Seen
+                        new GhostMarkAsReadButton(moduleSourceDir).install(lpparam.classLoader); // Mark as Read Button
+                        new GhostCommunityMarkAsReadButton().install(lpparam.classLoader); // Community Mark as Read Button
                     } catch (Throwable ignored) {
                         XposedBridge.log("(InstaEclipse | GhostSeen): ❌ Failed to hook");
                     }
