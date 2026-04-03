@@ -72,6 +72,7 @@ public class Interceptor {
                                     }
                                     if (FeatureFlags.isGhostStory) {
                                         shouldDrop |= uri.getPath().contains("/api/v2/media/seen/");
+                                        FeatureStatusTracker.setHooked("GhostStories");
                                     }
                                     if (FeatureFlags.isGhostLive) {
                                         shouldDrop |= uri.getPath().contains("/heartbeat_and_get_viewer_count/");
@@ -148,10 +149,12 @@ public class Interceptor {
                                     }
                                     /*
                                      DEV Purposes
-                                    else {
-                                        XposedBridge.log("Logging: " + uri.getHost() + uri.getPath());
-                                    }
                                      */
+
+                            /*else {
+                                        XposedBridge.log("Logging: " + uri.getHost() + uri.getPath());
+                                    }*/
+
 
                                     if (FeatureFlags.showFollowerToast) {
                                         if (uri.getPath() != null && uri.getPath().startsWith("/api/v1/friendships/show/")) {
