@@ -1,0 +1,45 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Before you continue
+        > **Failure to complete all checkboxes may result in your issue being closed and you being temporarily blocked from opening new issues.**
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Pre-submission checklist
+      description: You must check every box before submitting.
+      options:
+        - label: I have searched [existing issues](https://github.com/ReSo7200/InstaEclipse/issues) and this feature has **not already been requested**.
+          required: true
+        - label: This is a feature request for **InstaEclipse**, not a general Instagram feature.
+          required: true
+        - label: I understand that submitting duplicate requests or ignoring this checklist may result in being blocked from the repo.
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature summary
+      description: Describe the feature you'd like in one or two sentences.
+      placeholder: I'd like InstaEclipse to be able to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why is this useful?
+      description: Explain the use case — why would this benefit users?
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Additional details
+      description: Any implementation ideas, screenshots, or references to similar features in other mods.
