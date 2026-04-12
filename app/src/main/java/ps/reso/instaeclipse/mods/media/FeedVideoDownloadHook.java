@@ -174,9 +174,6 @@ public class FeedVideoDownloadHook {
         } catch (Throwable ignored) {}
 
         installUriCaptureHook();
-        // installViewHook(); — replaced by PostDownloadContextMenuHook (three-dots menu)
-        // installLongPressHook();
-        // installShareHook();
     }
 
     // ── Hook 1: Uri.parse (fallback buffer) ──────────────────────────────────
@@ -982,34 +979,33 @@ public class FeedVideoDownloadHook {
     }
 
     private static void resolveDictUserGetter(ClassLoader classLoader) {
-        if (mutableMediaDictIntfClass == null || userClass == null) {
-            XposedBridge.log("(IE|DL|Username) ❌ mutableMediaDictIntfClass or userClass not resolved");
-            return;
-        }
-        // Scan MutableMediaDictIntf + its direct superinterfaces for a
-        // no-arg method whose return type is assignable to userClass
-        List<Class<?>> toScan = new ArrayList<>();
-        toScan.add(mutableMediaDictIntfClass);
-        for (Class<?> iface : mutableMediaDictIntfClass.getInterfaces()) {
-            String n = iface.getName();
-            if (n.startsWith("com.instagram.") || n.startsWith("X.") || n.startsWith("com.facebook."))
-                toScan.add(iface);
-        }
-        for (Class<?> cls : toScan) {
-            for (Method m : cls.getDeclaredMethods()) {
-                if (m.getParameterCount() != 0) continue;
-                Class<?> ret = m.getReturnType();
-                if (ret == void.class || ret.isPrimitive()) continue;
-                if (userClass.isAssignableFrom(ret)) {
+        if (mutableMediaDictIntfClass == null || userClass == null) return;
+
+        // Use a Breadth-First Search to find the getter in the interface hierarchy
+        // Instagram 423+ often hides this in a parent interface like X.IdM
+        Deque<Class<?>> queue = new ArrayDeque<>();
+        Set<Class<?>> visited = new HashSet<>();
+        queue.add(mutableMediaDictIntfClass);
+
+        while (!queue.isEmpty()) {
+            Class<?> curr = queue.poll();
+            if (curr == null || !visited.add(curr)) continue;
+
+            for (Method m : curr.getDeclaredMethods()) {
+                // We are looking for the method that returns the User class
+                // we found via "username_missing_during_update"
+                if (m.getParameterCount() == 0 && m.getReturnType().equals(userClass)) {
                     m.setAccessible(true);
                     dictUserGetter = m;
-                    XposedBridge.log("(IE|DL|Username) dictUserGetter=" + m.getName()
-                            + " on " + cls.getName() + " returns " + ret.getName());
+                    XposedBridge.log("(IE|DL|Username) ✅ Resolved dictUserGetter: " + m.getName()
+                            + " on " + curr.getName());
                     return;
                 }
             }
+            // Add parent interfaces to the queue
+            Collections.addAll(queue, curr.getInterfaces());
         }
-        XposedBridge.log("(IE|DL|Username) ❌ no dictUserGetter found on MutableMediaDictIntf tree");
+        XposedBridge.log("(IE|DL|Username) ❌ Failed to resolve dictUserGetter in hierarchy");
     }
 
     // ── Download dispatch ─────────────────────────────────────────────────────
@@ -1022,69 +1018,53 @@ public class FeedVideoDownloadHook {
      */
     @SuppressLint("DiscouragedApi")
     private String getUsernameFromView(View likeBtn) {
-        if (likeBtn == null) {
-            XposedBridge.log("(IE|DL|Username) likeBtn is null");
-            return null;
-        }
-        if (mediaClass == null) {
-            XposedBridge.log("(IE|DL|Username) mediaClass not resolved, cannot extract username");
-            return null;
-        }
+        if (likeBtn == null || mediaClass == null) return null;
 
-        // 1. Try like button's own listener
         Object media = getMediaFromListener(getOnClickListener(likeBtn));
-        XposedBridge.log("(IE|DL|Username) media from likeBtn listener=" + (media != null ? media.getClass().getName() : "null"));
 
-        // 2. Fall back to save button's listener (same walk-up as resolveUrls Tier-1b)
+        // Fallback to save button if like button listener is empty
         if (media == null) {
             Context ctx = likeBtn.getContext();
-            int saveResId = ctx.getResources().getIdentifier(
-                    "row_feed_button_save", "id", ctx.getPackageName());
+            int saveResId = ctx.getResources().getIdentifier("row_feed_button_save", "id", ctx.getPackageName());
             if (saveResId != 0) {
                 android.view.ViewParent p = likeBtn.getParent();
                 for (int i = 0; i < 4 && p instanceof ViewGroup vg; i++, p = vg.getParent()) {
                     View saveBtn = vg.findViewById(saveResId);
                     if (saveBtn != null) {
                         media = getMediaFromListener(getOnClickListener(saveBtn));
-                        XposedBridge.log("(IE|DL|Username) media from saveBtn (level=" + i + ")="
-                                + (media != null ? media.getClass().getName() : "null"));
                         if (media != null) break;
                     }
                 }
             }
         }
 
-        if (media == null) {
-            XposedBridge.log("(IE|DL|Username) ❌ media object not found");
-            return null;
-        }
+        if (media == null) return null;
 
-        // Primary: call dictUserGetter on LiveTreeMediaDict to get the User object
+        // TIER 1: Use the resolved Dictionary Getter
         if (dictUserGetter != null && mutableMediaDictIntfClass != null) {
             try {
                 Object dictIntf = findFieldAssignableTo(media, mutableMediaDictIntfClass);
-                XposedBridge.log("(IE|DL|Username) dictIntf=" + (dictIntf != null ? dictIntf.getClass().getName() : "null"));
                 if (dictIntf != null) {
-                    Object user = dictUserGetter.invoke(dictIntf);
-                    XposedBridge.log("(IE|DL|Username) user=" + (user != null ? user.getClass().getName() : "null"));
-                    if (user != null) {
-                        String username = UserUtils.callUsernameGetter(user);
-                        XposedBridge.log("(IE|DL|Username) callUsernameGetter=" + username);
-                        if (username != null) return username;
+                    Object userObj = dictUserGetter.invoke(dictIntf);
+                    if (userObj != null) {
+                        String name = UserUtils.callUsernameGetter(userObj);
+                        if (name != null) return name;
                     }
                 }
-            } catch (Throwable t) {
-                XposedBridge.log("(IE|DL|Username) dictUserGetter invoke failed: " + t);
-            }
-        } else {
-            XposedBridge.log("(IE|DL|Username) dictUserGetter not resolved yet"
-                    + " (dictUserGetter=" + dictUserGetter + ")");
+            } catch (Throwable ignored) {}
         }
 
-        // Fallback: field scan
-        String username = scanObjectForUsername(media, 0, Collections.newSetFromMap(new IdentityHashMap<>()));
-        XposedBridge.log("(IE|DL|Username) fallback scan resolved=" + username);
-        return username;
+        // TIER 2: Direct Class Bridge (Best for newer LiveTree versions)
+        // If we can't find the dictionary, search the Media object for ANY field
+        // that matches the User class directly.
+        Object userObj = findFieldOfType(media, userClass, 3);
+        if (userObj != null) {
+            String name = UserUtils.callUsernameGetter(userObj);
+            if (name != null) return name;
+        }
+
+        // TIER 3: Last resort recursive scan
+        return scanObjectForUsername(media, 0, Collections.newSetFromMap(new IdentityHashMap<>()));
     }
 
     private Object getMediaFromListener(Object listener) {
@@ -1143,7 +1123,13 @@ public class FeedVideoDownloadHook {
         String mimeType = isVideo ? "video/mp4" : "image/jpeg";
 
         if (!FeatureFlags.downloaderCustomUri.isEmpty()) {
-            return openSafOutputStream(ctx, filename, mimeType, username);
+            try {
+                return openSafOutputStream(ctx, filename, mimeType, username);
+            } catch (Exception e) {
+                // SAF can fail on some devices (e.g. Xiaomi/MIUI) where the documents
+                // provider authority differs or is restricted. Fall through to MediaStore.
+                XposedBridge.log("(InstaEclipse|DL) SAF failed, falling back to MediaStore: " + e.getMessage());
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
