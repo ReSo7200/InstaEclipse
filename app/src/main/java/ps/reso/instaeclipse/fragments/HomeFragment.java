@@ -195,12 +195,12 @@ public class HomeFragment extends Fragment {
                 new Contributor("silvzr", "https://github.com/silvzr", null, null),
                 new Contributor("oct", "https://github.com/oct888", null, null),
                 new Contributor("HalfManBear", "https://github.com/halfmanbear", null, null),
-                new Contributor("ar5to", "https://github.com/ar5to", null, "https://t.me/ar5to")
+                new Contributor("ar5to", "https://github.com/ar5to", null, "https://t.me/ar5to"),
+                new Contributor("particle-box", "https://github.com/particle-box", null, null)
         );
 
         List<Contributor> specialThanks = Arrays.asList(
                 new Contributor("xHookman", "https://github.com/xHookman", null, null),
-                new Contributor("particle-box", "https://github.com/particle-box", null, "https://t.me/particle_box"),
                 new Contributor("Bluepapilte", null, null, "https://t.me/instasmashrepo"),
                 new Contributor("BdrcnAYYDIN", null, null, "https://t.me/BdrcnAYYDIN"),
                 new Contributor("Amàzing World", null, null, null)
