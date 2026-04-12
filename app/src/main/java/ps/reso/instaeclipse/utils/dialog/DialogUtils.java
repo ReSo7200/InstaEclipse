@@ -454,28 +454,28 @@ public class DialogUtils {
                         FeatureFlags.isGhostTyping = isChecked;
                         break;
                     case 2:
-                        FeatureFlags.isGhostScreenshot = isChecked;
-                        break;
-                    case 3:
-                        FeatureFlags.isGhostViewOnce = isChecked;
-                        break;
-                    case 4:
-                        FeatureFlags.enableUnlimitedReplays = isChecked;
-                        break;
-                    case 5:
                         FeatureFlags.isGhostStory = isChecked;
                         break;
-                    case 6:
+                    case 3:
                         FeatureFlags.isGhostLive = isChecked;
                         break;
-                    case 7:
+                    case 4:
                         FeatureFlags.allowScreenshots = isChecked;
                         break;
+                    case 5:
+                        FeatureFlags.isGhostScreenshot = isChecked;
+                        break;
+                    case 6:
+                        FeatureFlags.isGhostViewOnce = isChecked;
+                        break;
+                    case 7:
+                        FeatureFlags.enableUnlimitedReplays = isChecked;
+                        break;
                     case 8:
-                        FeatureFlags.keepEphemeralMessages = isChecked;
+                        FeatureFlags.permanentViewMode = isChecked;
                         break;
                     case 9:
-                        FeatureFlags.permanentViewMode = isChecked;
+                        FeatureFlags.keepEphemeralMessages = isChecked;
                         break;
                 }
 
