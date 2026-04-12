@@ -12,7 +12,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.tracker.FollowIndicatorTracker;
 
-public class Interceptor {
+public class IGNetworkInterceptor {
 
     public void handleInterceptor(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
@@ -63,6 +63,12 @@ public class Interceptor {
                                     boolean shouldDrop = false;
 
                                     // Ghost Mode URIs
+                                    if (FeatureFlags.isGhostSeen){
+                                        shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened");
+                                    }
+                                    if (FeatureFlags.keepEphemeralMessages) {
+                                        shouldDrop |= uri.getPath().contains("/mark_ephemeral_item_ranges_viewed");
+                                    }
                                     if (FeatureFlags.isGhostScreenshot) {
                                         shouldDrop |= uri.getPath().endsWith("/screenshot/") || uri.getPath().endsWith("/ephemeral_screenshot/");
                                     }
@@ -135,6 +141,10 @@ public class Interceptor {
                                     if (FeatureFlags.disableRepost) {
                                         shouldDrop |= uri.getPath().contains("/media/create_note/");
                                     }
+                                    if (FeatureFlags.disableDiscoverPeople) {
+                                        shouldDrop |= uri.getPath().contains("/discover/ayml/");
+                                        FeatureStatusTracker.setHooked("DisableDiscoverPeople");
+                                    }
 
                                     if (shouldDrop) {
                                         // XposedBridge.log("the URI was blocked: " + uri.getPath());
@@ -157,11 +167,13 @@ public class Interceptor {
 
 
                                     if (FeatureFlags.showFollowerToast) {
-                                        if (uri.getPath() != null && uri.getPath().startsWith("/api/v1/friendships/show/")) {
-                                            String[] parts = uri.getPath().split("/");
-                                            if (parts.length >= 5) {
-                                                // Extracted ID from /api/v1/friendships/show/{id}
-                                                FollowIndicatorTracker.currentlyViewedUserId = parts[5];
+                                        String path = uri.getPath();
+                                        if (path != null && path.startsWith("/api/v1/friendships/show/")) {
+                                            String[] parts = path.split("/");
+                                            if (parts.length >= 6) {
+                                                String capturedId = parts[5];
+                                                FollowIndicatorTracker.currentlyViewedUserId = capturedId;
+                                                XposedBridge.log("(IE|Interceptor) captured userId=" + capturedId);
                                             }
                                         }
                                     }
