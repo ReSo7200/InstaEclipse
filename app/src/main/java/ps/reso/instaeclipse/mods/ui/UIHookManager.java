@@ -5,9 +5,14 @@ import static ps.reso.instaeclipse.mods.ghost.ui.GhostEmojiManager.addGhostEmoji
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
+import android.provider.DocumentsContract;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -20,20 +25,24 @@ import java.util.Map;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.mods.devops.config.ConfigManager;
 import ps.reso.instaeclipse.mods.ui.utils.BottomSheetHookUtil;
 import ps.reso.instaeclipse.mods.ui.utils.VibrationUtil;
+import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.dialog.DialogUtils;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.ghost.GhostModeUtils;
+import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.toast.CustomToast;
 
 public class UIHookManager {
 
     @SuppressLint("StaticFieldLeak")
     private static Activity currentActivity;
+    static final int FOLDER_PICKER_REQUEST = 0x9E50;
 
     public static Activity getCurrentActivity() {
         return currentActivity;
@@ -88,49 +97,6 @@ public class UIHookManager {
         }
 
         addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
-
-        // Mark messages (DM) as seen by holding on gallery button
-        hookLongPress(activity, "row_thread_composer_button_gallery", v -> {
-            VibrationUtil.vibrate(activity);
-
-            if (!FeatureFlags.isGhostSeen) {
-                return true;
-            }
-
-            FeatureFlags.isGhostSeen = false;
-
-            activity.getWindow().getDecorView().post(() -> {
-                try {
-                    // Look for the exact message list view by ID
-                    @SuppressLint("DiscouragedApi") int messageListId = activity.getResources().getIdentifier("message_list", "id", activity.getPackageName());
-                    View view = activity.findViewById(messageListId);
-
-                    if (view instanceof ViewGroup messageList) {
-
-                        // Try scrolling via translation if standard scroll methods don't exist
-                        messageList.scrollBy(0, -100); // scroll up
-
-                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                            messageList.scrollBy(0, 100); // scroll back down
-
-                            FeatureFlags.isGhostSeen = true;
-                            Toast.makeText(activity, "✅ Message was marked as read", Toast.LENGTH_SHORT).show();
-
-                        }, 300);
-
-
-                    } else {
-                        XposedBridge.log("⚠️ message_list not a ViewGroup or not found — fallback to reset flag");
-
-                        new Handler(Looper.getMainLooper()).postDelayed(() -> FeatureFlags.isGhostSeen = true, 300);
-                    }
-                } catch (Exception e) {
-                    XposedBridge.log("❌ Exception in scroll logic: " + Log.getStackTraceString(e));
-                }
-            });
-
-            return true;
-        });
 
     }
 
@@ -196,12 +162,6 @@ public class UIHookManager {
                                         // Add the Ghost Emoji next to Inbox
                                         addGhostEmojiNextToInbox(activity, isAnyGhostOptionEnabled());
 
-                                        // Handle Config Import if triggered
-                                        if (FeatureFlags.isImportingConfig) {
-                                            FeatureFlags.isImportingConfig = false;
-                                            ConfigManager.importConfigFromClipboard(activity);
-                                        }
-
                                         // 3. Show Success Toast
                                         if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
                                             CustomToast.toastShown = true;
@@ -265,10 +225,6 @@ public class UIHookManager {
                             try {
                                 setupHooks(activity);
                                 addGhostEmojiNextToInbox(activity, isAnyGhostOptionEnabled());
-                                if (FeatureFlags.isImportingConfig) {
-                                    FeatureFlags.isImportingConfig = false;
-                                    ConfigManager.importConfigFromClipboard(activity);
-                                }
                             } catch (Exception e) {
                                 XposedBridge.log("(InstaEclipse) UI Error: " + e);
                             }
@@ -281,6 +237,33 @@ public class UIHookManager {
         } catch (Throwable t) {
             XposedBridge.log("(InstaEclipse): ❌ onResume discovery failed: " + t.getMessage());
         }
+
+        // Hook onActivityResult — catches folder picker result in the Instagram process
+        XposedHelpers.findAndHookMethod(Activity.class, "onActivityResult",
+                int.class, int.class, Intent.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                if ((int) param.args[0] != FOLDER_PICKER_REQUEST) return;
+                if ((int) param.args[1] != Activity.RESULT_OK)    return;
+                Intent data = (Intent) param.args[2];
+                if (data == null) return;
+                Uri treeUri = data.getData();
+                String path = treeUriToPath(treeUri);
+                Activity activity = (Activity) param.thisObject;
+                // Take persistent read+write permission so the SAF grant survives restarts
+                try {
+                    activity.getContentResolver().takePersistableUriPermission(treeUri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                } catch (Throwable ignored) {}
+                FeatureFlags.downloaderCustomUri  = treeUri.toString();
+                FeatureFlags.downloaderCustomPath = path != null ? path : treeUri.toString();
+                SettingsManager.init(activity);
+                SettingsManager.saveAllFlags();
+                String display = path != null ? path : treeUri.toString();
+                Toast.makeText(activity, I18n.t(activity, R.string.ig_toast_download_folder_set, display), Toast.LENGTH_SHORT).show();
+                XposedBridge.log("(IE|DL) folder set — path=" + display + " uri=" + treeUri);
+            }
+        });
 
         // Hook getBottomSheetNavigator - Instagram Main
         BottomSheetHookUtil.hookBottomSheetNavigator(Module.dexKitBridge);
@@ -321,6 +304,90 @@ public class UIHookManager {
             }
         } else {
             applySearchHook(activity, view);
+        }
+    }
+
+    /** Registers a broadcast receiver in the Instagram process to handle config imports. */
+    public static void registerConfigImportReceiver(android.content.Context context) {
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(android.content.Context ctx, Intent intent) {
+                String json = intent.getStringExtra("json_content");
+                if (json != null && !json.isEmpty()) {
+                    ConfigManager.importConfigFromJson(ctx, json);
+                }
+            }
+        };
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(receiver,
+                    new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"),
+                    android.content.Context.RECEIVER_EXPORTED);
+        } else {
+            context.registerReceiver(receiver,
+                    new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"));
+        }
+        XposedBridge.log("(InstaEclipse) ✅ Config import receiver registered.");
+    }
+
+    /** Registers a receiver in the Instagram process to restore settings from a backup JSON. */
+    public static void registerSettingsRestoreReceiver(android.content.Context context) {
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(android.content.Context ctx, Intent intent) {
+                String json = intent.getStringExtra("json_content");
+                if (json == null || json.isEmpty()) return;
+                new Thread(() -> {
+                    try {
+                        ps.reso.instaeclipse.utils.backup.SettingsBackupManager.fromJson(json);
+                        SettingsManager.saveAllFlags();
+                        ps.reso.instaeclipse.utils.feature.FeatureManager.refreshFeatureStatus();
+                        Handler mainHandler = new Handler(Looper.getMainLooper());
+                        mainHandler.post(() -> Toast.makeText(ctx.getApplicationContext(),
+                                "✅ " + I18n.t(ctx, R.string.ig_toast_settings_restored), Toast.LENGTH_SHORT).show());
+                    } catch (Exception e) {
+                        Handler mainHandler = new Handler(Looper.getMainLooper());
+                        mainHandler.post(() -> Toast.makeText(ctx.getApplicationContext(),
+                                "❌ " + I18n.t(ctx, R.string.ig_toast_restore_failed, e.getMessage()), Toast.LENGTH_LONG).show());
+                    }
+                }).start();
+            }
+        };
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                context.registerReceiver(receiver,
+                        new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"),
+                        android.content.Context.RECEIVER_EXPORTED);
+            } else {
+                context.registerReceiver(receiver,
+                        new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"));
+            }
+            XposedBridge.log("(InstaEclipse) ✅ Settings restore receiver registered.");
+        } catch (Throwable e) {
+            XposedBridge.log("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
+        }
+    }
+
+    /** Called from DialogUtils to launch the system folder picker inside the Instagram Activity. */
+    public static void launchFolderPicker(Activity activity) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        activity.startActivityForResult(intent, FOLDER_PICKER_REQUEST);
+    }
+
+    private static String treeUriToPath(Uri treeUri) {
+        try {
+            String docId = DocumentsContract.getTreeDocumentId(treeUri);
+            String[] parts = docId.split(":", 2);
+            String storageType = parts[0];
+            String relativePath = parts.length > 1 ? parts[1] : "";
+            String base = "primary".equalsIgnoreCase(storageType)
+                    ? Environment.getExternalStorageDirectory().getAbsolutePath()
+                    : "/storage/" + storageType;
+            return relativePath.isEmpty() ? base : base + "/" + relativePath;
+        } catch (Throwable t) {
+            XposedBridge.log("(IE|DL) treeUriToPath error: " + t);
+            return null;
         }
     }
 
