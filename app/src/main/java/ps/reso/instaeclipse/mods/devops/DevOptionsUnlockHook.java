@@ -14,12 +14,21 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
-public class DevOptionsEnable {
+public class DevOptionsUnlockHook {
 
     public void handleDevOptions(DexKitBridge bridge) {
+        // Cache hit: we only stored the target class name; re-hook its boolean methods via reflection
+        if (DexKitCache.isCacheValid()) {
+            String cachedClass = DexKitCache.loadString("DevOptionsClass");
+            if (cachedClass != null) {
+                hookBooleanMethodsViaReflection(cachedClass);
+                return;
+            }
+        }
         try {
             findAndHookDynamicMethod(bridge);
         } catch (Exception e) {
@@ -78,12 +87,40 @@ public class DevOptionsEnable {
 
                     String targetClass = invokedMethod.getClassName();
                     XposedBridge.log("(InstaEclipse | DevOptionsEnable): 📦 Hooking boolean methods in: " + targetClass);
+                    DexKitCache.saveString("DevOptionsClass", targetClass);
                     hookAllBooleanMethodsInClass(bridge, targetClass);
                     return;
                 }
             }
         } catch (Exception e) {
             XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Error inspecting invoked methods: " + e.getMessage());
+        }
+    }
+
+    /** Cache-hit path: hooks the target class's boolean(UserSession) methods without DexKit. */
+    private void hookBooleanMethodsViaReflection(String className) {
+        try {
+            Class<?> clazz = Module.hostClassLoader.loadClass(className);
+            XC_MethodHook hook = new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    if (FeatureFlags.isDevEnabled) {
+                        param.setResult(true);
+                        FeatureStatusTracker.setHooked("DevOptions");
+                    }
+                }
+            };
+            for (Method m : clazz.getDeclaredMethods()) {
+                if (m.getReturnType() != boolean.class) continue;
+                Class<?>[] params = m.getParameterTypes();
+                if (params.length != 1) continue;
+                if (!params[0].getName().equals("com.instagram.common.session.UserSession")) continue;
+                m.setAccessible(true);
+                XposedBridge.hookMethod(m, hook);
+                XposedBridge.log("(InstaEclipse | DevOptionsEnable): ✅ Hooked (cache): " + className + "." + m.getName());
+            }
+        } catch (Throwable e) {
+            XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Reflection fallback failed: " + e.getMessage());
         }
     }
 
