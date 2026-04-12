@@ -10,12 +10,29 @@ import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
 public class AdBlocker {
 
     public void disableSponsoredContent(DexKitBridge bridge, ClassLoader classLoader) {
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                if (FeatureFlags.isAdBlockEnabled) param.setResult(false);
+            }
+        };
+
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("AdBlocker", classLoader);
+            if (cached != null) {
+                XposedBridge.hookMethod(cached, hook);
+                FeatureStatusTracker.setHooked("AdBlocker");
+                return;
+            }
+        }
+
         try {
             List<MethodData> methods = bridge.findMethod(
                     FindMethod.create().matcher(
@@ -34,15 +51,8 @@ public class AdBlocker {
 
                 try {
                     Method targetMethod = method.getMethodInstance(classLoader);
-
-                    XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            if (FeatureFlags.isAdBlockEnabled) {
-                                param.setResult(false); // prevent ad
-                            }
-                        }
-                    });
+                    DexKitCache.saveMethod("AdBlocker", targetMethod);
+                    XposedBridge.hookMethod(targetMethod, hook);
 
                     XposedBridge.log("(InstaEclipse | AdBlocker): ✅ Hooked (dynamic check): " +
                             method.getClassName() + "." + method.getName());
