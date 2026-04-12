@@ -14,10 +14,12 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
+import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.toast.CustomToast;
 
-public class FollowerIndicator {
+public class FollowStatusFinder {
 
     public String type;
 
@@ -149,13 +151,12 @@ public class FollowerIndicator {
 
             // If DexKit gave us the interface, switch to the implementation
             if (userClassName.equals("com.instagram.user.model.FriendshipStatus")) {
-                //userClassName = userIdClassName;
                 userClassName = "com.instagram.user.model.FriendshipStatusImpl";
                 try {
                     if (userIdClassName != null) {
                         final String methodName = "getId";
 
-                        // Hook into that class’s toString()
+                        // Hook into that class's toString()
                         XposedHelpers.findAndHookMethod(userIdClassName, classLoader, methodName, new XC_MethodHook() {
                             @Override
                             protected void afterHookedMethod(MethodHookParam param) {
@@ -196,11 +197,14 @@ public class FollowerIndicator {
                     try {
                         if (userId[0].equals(targetId)) {
                             Context context = AndroidAppHelper.currentApplication().getApplicationContext();
+                            String statusStr = followsMe
+                                    ? I18n.t(context, R.string.ig_toast_follows_you)
+                                    : I18n.t(context, R.string.ig_toast_not_follows_you);
                             String message;
                             if (username != null && !username.isEmpty()) {
-                                message = "@" + username + " (" + userId[0] + ") " + (followsMe ? "follows you ✅" : "doesn’t follow you ❌");
+                                message = "@" + username + " (" + userId[0] + ") " + statusStr;
                             } else {
-                                message = " (" + userId[0] + ") " + (followsMe ? "follows you ✅" : "doesn’t follow you ❌");
+                                message = " (" + userId[0] + ") " + statusStr;
                             }
                             CustomToast.showCustomToast(context, message);
                             ps.reso.instaeclipse.utils.tracker.FollowIndicatorTracker.currentlyViewedUserId = null;

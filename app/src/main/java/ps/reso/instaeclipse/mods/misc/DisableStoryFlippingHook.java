@@ -11,11 +11,26 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 
-public class StoryFlipping {
+public class DisableStoryFlippingHook {
+
+    private static final XC_MethodHook HOOK = new XC_MethodHook() {
+        @Override
+        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+            if (FeatureFlags.disableStoryFlipping) param.setResult(null);
+        }
+    };
 
     public void handleStoryFlippingDisable(DexKitBridge bridge) {
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("StoryFlipping", Module.hostClassLoader);
+            if (cached != null) {
+                XposedBridge.hookMethod(cached, HOOK);
+                return;
+            }
+        }
         try {
             findAndHookMethod(bridge);
         } catch (Exception e) {
@@ -45,16 +60,8 @@ public class StoryFlipping {
             for (MethodData method : methods) {
                 try {
                     Method targetMethod = method.getMethodInstance(Module.hostClassLoader);
-
-                    XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            if (FeatureFlags.disableStoryFlipping) {
-                                // If disableStoryFlipping is enabled, block story flipping
-                                param.setResult(null); // Skip original method
-                            }
-                        }
-                    });
+                    DexKitCache.saveMethod("StoryFlipping", targetMethod);
+                    XposedBridge.hookMethod(targetMethod, HOOK);
 
                     XposedBridge.log("(InstaEclipse | StoryFlipping): ✅ Hooked (dynamic check): " +
                             method.getClassName() + "." + method.getName());
