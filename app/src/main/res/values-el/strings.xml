@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
+    <string name="version" translatable="false">v0.5 Beta</string>
     <string name="home">Αρχική</string>
     <string name="features">Λειτουργίες</string>
     <string name="help">Βοήθεια</string>
     <string name="instagram_version">Έκδοση</string>
 
     <!-- home -->
+    <string name="back">Πίσω</string>
+    <string name="apply_changes">Εφαρμογή Αλλαγών</string>
+    <string name="multiple_versions_detected">⚠ Εντοπίστηκαν πολλαπλές εκδόσεις</string>
     <string name="module_disabled">Το Module δεν είναι ενεργό. Παρακαλούμε ενεργοποιήστε το.</string>
-
     <string name="module_status">Κατάσταση Module:</string>
-
     <string name="module_status_disabled">Κατάσταση Module: Ανενεργό</string>
     <string name="request_enable_module">Παρακαλούμε ενεργοποιήστε το Module στο Xposed Installer.</string>
-
     <string name="module_status_enabled_no_root">Κατάσταση Module: Ενεργό (Χωρίς Πρόσβαση Root)</string>
     <string name="request_enable_root">Η πρόσβαση Root είναι απαραίτητη για την αυτόματη επανεκκίνηση. Απαιτείται χειροκίνητη επανεκκίνηση.</string>
-
     <string name="module_status_enabled">Κατάσταση Module: Ενεργό</string>
     <string name="module_active">Το module είναι ενεργό και λειτουργεί.</string>
-
     <string name="checking_instagram">Γίνεται έλεγχος του Instagram</string>
     <string name="installed_instagram_version">Το Instagram είναι εγκατεστημένο</string>
     <string name="not_installed_instagram">Το Instagram δεν είναι εγκατεστημένο</string>
     <string name="error_instagram">Σφάλμα ελέγχου κατάστασης του Instagram</string>
-
     <string name="launch_instagram">Άνοιγμα του Instagram</string>
     <string name="download_apk">Λήψη APK</string>
     <string name="how_to_use">Οδηγίες χρήσης</string>
@@ -43,7 +41,7 @@
     <string name="go_to_github">Μετάβαση στο GitHub</string>
     <string name="find_support">Βρείτε υποστήριξη.</string>
     <string name="go_to_telegram">Μετάβαση στο Telegram</string>
-    <string name="instaeclipse_telegram_group" translatable="false">Ομάδα Telegram του InstaEclipse</string>
+    <string name="instaeclipse_telegram_group" translatable="false">InstaEclipse Telegram Group</string>
 
     <!-- Don't translate! -->
     <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
@@ -57,10 +55,24 @@
     <string name="faq_3"><b>3. Προβλήματα με τις λειτουργίες του InstaEclipse;</b>\n- Κλείστε αναγκαστικά το Instagram και ανοίξτε το ξανά.</string>
     <string name="faq_4"><b>4. Οι επιλογές προγραμματιστών προκαλούν προβλήματα;</b>\n- Ακολουθήστε τον οδηγό επιλογών προγραμματιστών.</string>
     <string name="faq_5"><b>5. Οι επιλογές προγραμματιστών έχουν περίεργες ετικέτες ή αριθμούς;</b>\n- Εγκαταστήστε τις εκδόσεις Beta ή Alpha, καθώς οι σταθερές εκδόσεις έχουν απόκρυψη ονομάτων/αριθμών.</string>
-    <string name="faq_6"><b>6. Η λειτουργία “Αφαίρεση Περισπασμών” είναι ενεργή αλλά εμφανίζεται ακόμα περιεχόμενο;</b>\n- Κλείστε αναγκαστικά το Instagram και κάντε εκκαθάριση της cache του.</string>
+    <string name="faq_6"><b>6. Η λειτουργία "Αφαίρεση Περισπασμών" είναι ενεργή αλλά εμφανίζεται ακόμα περιεχόμενο;</b>\n- Κλείστε αναγκαστικά το Instagram και κάντε εκκαθάριση της cache του.</string>
 
     <!-- guide -->
     <string name="module_not_working_title">Το Module εξακολουθεί να μην λειτουργεί;</string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[If you are <b>rooted</b> try using <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>If you are <b>not rooted</b> install <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> then follow <a href="https://t.me/instaEclipse_discussion/158/5149">this guide</a>]]></string>
+
+    <!-- features fragment section headers -->
+    <string name="feat_categories">Κατηγορίες:</string>
+    <string name="feat_tools">Εργαλεία:</string>
+    <string name="feat_features">Λειτουργίες:</string>
+    <string name="feat_config">Ρυθμίσεις:</string>
+    <string name="feat_options">Επιλογές:</string>
+    <string name="feat_quick_toggle">Γρήγορη Εναλλαγή:</string>
+    <string name="feat_danger_zone">Επικίνδυνη Ζώνη:</string>
+    <string name="feat_download_folder">Φάκελος Λήψεων:</string>
+    <string name="feat_downloader_set_folder">📂 Ορισμός Θέσης Φακέλου Λήψεων</string>
+    <string name="feat_downloader_selected">📂 Επιλέχθηκε: %1$s</string>
+    <string name="feat_downloader_reset_folder">🗑 Επαναφορά Φακέλου Λήψεων</string>
 
     <!-- features -->
     <string name="developer_options">Επιλογές Προγραμματιστών</string>
@@ -68,7 +80,6 @@
     <string name="distraction_free">Αφαίρεση Περισπασμών</string>
     <string name="remove_ads">Αφαίρεση Διαφημίσεων</string>
     <string name="remove_analytics">Αφαίρεση Αναλυτικών Στοιχείων</string>
-
     <string name="enable_disable_all">Ενεργοποίηση/Απενεργοποίηση Όλων</string>
 
     <!-- Don't translate! -->
@@ -88,7 +99,6 @@
     <string name="developer_options_guide">Οδηγός Επιλογών Προγραμματιστών</string>
     <string name="dev_options_version_req">Χρησιμοποιήστε το σε εκδόσεις Beta/Alpha μόνο!</string>
     <string name="dev_options_req">Βεβαιωθείτε πως έχετε συνδεθεί πρώτα!</string>
-
     <string name="dev_options_1">1. Ανοίξτε το Instagram και πατήστε παρατεταμένα το κουμπί της αρχικής σελίδας.</string>
     <string name="dev_options_2">2. Μεταβείτε στο Developer Options > MetaConfig Settings &amp; Overrides.</string>
     <string name="dev_options_3">3. Κάντε αναζήτηση για \'Employee\' και ενεργοποιήστε τις ακόλουθες επιλογές:</string>
@@ -117,4 +127,220 @@
 
     <!-- contributor card -->
     <string name="contributor_name">Όνομα Συνεισφέροντα</string>
+
+    <!-- ================================================================ -->
+    <!-- Dialog strings — used in the host (Instagram) process via I18n   -->
+    <!-- ================================================================ -->
+
+    <!-- Common -->
+    <string name="ig_dialog_title" translatable="false">InstaEclipse 🌘</string>
+    <string name="ig_dialog_close">Κλείσιμο</string>
+    <string name="ig_dialog_enable_disable_all">Ενεργοποίηση/Απενεργοποίηση Όλων</string>
+    <string name="ig_dialog_error">Σφάλμα</string>
+    <string name="ig_dialog_ok">ΟΚ</string>
+    <string name="ig_dialog_yes">Ναι</string>
+    <string name="ig_dialog_cancel">Ακύρωση</string>
+
+    <!-- Main menu items -->
+    <string name="ig_dialog_menu_dev_options">🎛 Επιλογές Προγραμματιστών</string>
+    <string name="ig_dialog_menu_ghost_settings">👻 Ρυθμίσεις Αόρατης Λειτουργίας</string>
+    <string name="ig_dialog_menu_ad_analytics">🛡 Αποκλεισμός Διαφημίσεων/Αναλυτικών</string>
+    <string name="ig_dialog_menu_distraction_free">🧘 Instagram Χωρίς Περισπασμούς</string>
+    <string name="ig_dialog_menu_misc">⚙ Διάφορες Λειτουργίες</string>
+    <string name="ig_dialog_menu_downloader">📥 Λήψη</string>
+    <string name="ig_dialog_menu_backup_restore">💾 Δημιουργία Αντιγράφου &amp; Επαναφορά</string>
+    <string name="ig_dialog_menu_about">ℹ️ Σχετικά</string>
+    <string name="ig_dialog_menu_restart">🔁 Επανεκκίνηση Εφαρμογής</string>
+
+    <!-- Section titles -->
+    <string name="ig_dialog_section_dev_options">Επιλογές Προγραμματιστών 🎛</string>
+    <string name="ig_dialog_section_ghost_mode">Αόρατη Λειτουργία 👻</string>
+    <string name="ig_dialog_section_ad_analytics">Αποκλεισμός Διαφημίσεων/Αναλυτικών 🛡️</string>
+    <string name="ig_dialog_section_distraction_free">Instagram Χωρίς Περισπασμούς 🧘</string>
+    <string name="ig_dialog_section_misc">Διάφορα ⚙️</string>
+    <string name="ig_dialog_section_downloader">Λήψη 📥</string>
+    <string name="ig_dialog_section_downloader_settings">Ρυθμίσεις Λήψης ⚙️</string>
+    <string name="ig_dialog_section_backup_restore">Δημιουργία Αντιγράφου &amp; Επαναφορά 💾</string>
+    <string name="ig_dialog_section_about">Σχετικά</string>
+    <string name="ig_dialog_section_restart">Επανεκκίνηση Εφαρμογής</string>
+    <string name="ig_dialog_section_quick_toggle">Προσαρμογή Γρήγορης Εναλλαγής 🛠️</string>
+
+    <!-- Developer options -->
+    <string name="ig_dialog_dev_enable">Ενεργοποίηση Λειτουργίας Προγραμματιστή</string>
+    <string name="ig_dialog_dev_import">Εισαγωγή Ρυθμίσεων Προγραμματιστή</string>
+    <string name="ig_dialog_dev_export">Εξαγωγή Ρυθμίσεων Προγραμματιστή</string>
+    <string name="ig_dialog_dev_remove_build_expired">Αφαίρεση Αναδυόμενου Παλαιάς Έκδοσης</string>
+    <string name="ig_dialog_unable_open_ui">Αδύνατο άνοιγμα διεπαφής InstaEclipse.</string>
+    <string name="ig_dialog_instagram_not_ready">Το Instagram δεν είναι ανοιχτό ή έτοιμο.</string>
+    <string name="ig_dialog_mc_overrides_not_found">Το αρχείο mc_overrides.json δεν βρέθηκε.</string>
+    <string name="ig_dialog_failed_read_config">Αδύνατη ανάγνωση ρυθμίσεων: %1$s</string>
+    <string name="export_no_config_data">Δεν ελήφθησαν δεδομένα ρυθμίσεων.</string>
+    <string name="export_config_success">Οι ρυθμίσεις εξήχθησαν επιτυχώς.</string>
+    <string name="export_config_failed">Αποτυχία αποθήκευσης: %1$s</string>
+    <string name="export_invalid_uri">Μη έγκυρο URI</string>
+    <string name="ig_toast_config_imported">✅ Οι ρυθμίσεις εισήχθησαν.</string>
+    <string name="ig_toast_config_import_failed">❌ Αποτυχία εισαγωγής ρυθμίσεων.</string>
+
+    <!-- JsonImportActivity -->
+    <string name="json_select_config">Επιλογή αρχείου JSON</string>
+    <string name="json_target_not_specified">❌ Δεν ορίστηκε πακέτο προορισμού.</string>
+    <string name="json_sent">✅ Στάλθηκε στο Instagram.</string>
+    <string name="json_not_valid">❌ Μη έγκυρο αρχείο JSON.</string>
+    <string name="json_read_failed">❌ Αποτυχία ανάγνωσης αρχείου: %1$s</string>
+    <string name="json_cancelled">Ακυρώθηκε ή δεν επιλέχθηκε αρχείο.</string>
+
+    <!-- Ghost Mode options -->
+    <string name="ig_dialog_ghost_hide_dm_seen">Απόκρυψη Ανάγνωσης DM</string>
+    <string name="ig_dialog_ghost_hide_typing">Απόκρυψη Δείκτη Πληκτρολόγησης</string>
+    <string name="ig_dialog_ghost_hide_story_views">Απόκρυψη Προβολών Story</string>
+    <string name="ig_dialog_ghost_hide_live_presence">Απόκρυψη Παρουσίας σε Live</string>
+    <string name="ig_dialog_ghost_allow_screenshots_dms">Επιτροπή Στιγμιοτύπων σε DM</string>
+    <string name="ig_dialog_ghost_bypass_screenshot">Παράκαμψη Εντοπισμού Στιγμιοτύπων</string>
+    <string name="ig_dialog_ghost_hide_view_once">Απόκρυψη Ανοίγματος Μηνύματος μιας Χρήσης</string>
+    <string name="ig_dialog_ghost_unlimited_replays">Απεριόριστες Επαναλήψεις μιας Χρήσης</string>
+    <string name="ig_dialog_ghost_permanent_view_once">Μόνιμα Αρχεία μιας Χρήσης</string>
+    <string name="ig_dialog_ghost_keep_disappearing">Διατήρηση Εξαφανιζόμενων Μηνυμάτων</string>
+    <string name="ig_dialog_customize_quick_toggle">🛠 Προσαρμογή Γρήγορης Εναλλαγής</string>
+
+    <!-- Quick Toggle options -->
+    <string name="ig_dialog_quick_hide_seen">Συμπερίληψη Απόκρυψης Ανάγνωσης DM</string>
+    <string name="ig_dialog_quick_hide_typing">Συμπερίληψη Απόκρυψης Δείκτη Πληκτρολόγησης</string>
+    <string name="ig_dialog_quick_disable_screenshot">Συμπερίληψη Παράκαμψης Εντοπισμού Στιγμιοτύπων</string>
+    <string name="ig_dialog_quick_hide_view_once">Συμπερίληψη Απόκρυψης Ανοίγματος μιας Χρήσης</string>
+    <string name="ig_dialog_quick_hide_story_seen">Συμπερίληψη Απόκρυψης Προβολών Story</string>
+    <string name="ig_dialog_quick_hide_live_seen">Συμπερίληψη Απόκρυψης Παρουσίας σε Live</string>
+    <string name="ig_dialog_quick_keep_ephemeral">Συμπερίληψη Διατήρησης Εξαφανιζόμενων Μηνυμάτων</string>
+    <string name="ig_dialog_quick_unlimited_replays">Συμπερίληψη Απεριόριστων Επαναλήψεων μιας Χρήσης</string>
+    <string name="ig_dialog_quick_permanent_view">Συμπερίληψη Μόνιμων Αρχείων μιας Χρήσης</string>
+    <string name="ig_dialog_quick_allow_screenshots">Συμπερίληψη Επιτροπής Στιγμιοτύπων σε DM</string>
+
+    <!-- Ad / Analytics options -->
+    <string name="ig_dialog_ad_block_ads">Αποκλεισμός Διαφημίσεων</string>
+    <string name="ig_dialog_ad_block_analytics">Αποκλεισμός Αναλυτικών</string>
+    <string name="ig_dialog_ad_disable_tracking">Απενεργοποίηση Συνδέσμων Παρακολούθησης</string>
+
+    <!-- Distraction-Free options -->
+    <string name="ig_dialog_distraction_extreme_mode">Ακραία Λειτουργία 🔒 (Μη αναστρέψιμο μέχρι επανεγκατάσταση)</string>
+    <string name="ig_dialog_distraction_disable_stories">Απενεργοποίηση Ιστοριών</string>
+    <string name="ig_dialog_distraction_disable_feed">Απενεργοποίηση Ροής</string>
+    <string name="ig_dialog_distraction_disable_reels">Απενεργοποίηση Reels</string>
+    <string name="ig_dialog_distraction_disable_reels_except_dm">Απενεργοποίηση Reels Εκτός DM</string>
+    <string name="ig_dialog_distraction_disable_explore">Απενεργοποίηση Εξερεύνησης</string>
+    <string name="ig_dialog_distraction_disable_comments">Απενεργοποίηση Σχολίων</string>
+    <string name="ig_dialog_distraction_extreme_title">Ενεργοποίηση Ακραίας Λειτουργίας;</string>
+    <string name="ig_dialog_distraction_extreme_message">Μετά την ενεργοποίηση, δεν μπορείτε να απενεργοποιήσετε τη Λειτουργία Χωρίς Περισπασμούς μέχρι να επανεγκαταστήσετε την εφαρμογή. Συνέχεια;</string>
+
+    <!-- Miscellaneous options -->
+    <string name="ig_dialog_misc_disable_story_autoswipe">Απενεργοποίηση Αυτόματης Εναλλαγής Story</string>
+    <string name="ig_dialog_misc_disable_video_autoplay">Απενεργοποίηση Αυτόματης Αναπαραγωγής Βίντεο</string>
+    <string name="ig_dialog_misc_disable_repost">Απενεργοποίηση Αναδημοσίευσης</string>
+    <string name="ig_dialog_misc_show_feature_toasts">Εμφάνιση Ειδοποιήσεων Λειτουργιών</string>
+    <string name="ig_dialog_misc_show_follower_toast">Εμφάνιση Ειδοποίησης Ακόλουθου</string>
+    <string name="ig_dialog_misc_view_story_mentions">Προβολή Αναφορών Story</string>
+    <string name="ig_dialog_misc_disable_discover_people">Απενεργοποίηση Προτάσεων Χρηστών</string>
+    <string name="ig_dialog_misc_copy_comment">Αντιγραφή Σχολίου</string>
+
+    <!-- Comment Copy dialog -->
+    <string name="ig_comment_copy_title">Αντιγραφή Σχολίου</string>
+    <string name="ig_comment_copy_full">Αντιγραφή Ολόκληρου Σχολίου</string>
+    <string name="ig_comment_select_part">Επιλογή Τμήματος για Αντιγραφή</string>
+    <string name="ig_comment_select_title">Επιλογή για Αντιγραφή</string>
+    <string name="ig_comment_copy_selected">Αντιγραφή Επιλεγμένου</string>
+    <string name="ig_toast_comment_copied">✅ Αντιγράφηκε στο πρόχειρο!</string>
+
+    <!-- Downloader options -->
+    <string name="ig_dialog_downloader_settings">⚙ Ρυθμίσεις Λήψης</string>
+    <string name="ig_dialog_downloader_posts">Λήψη Δημοσιεύσεων</string>
+    <string name="ig_dialog_downloader_stories">Λήψη Ιστοριών</string>
+    <string name="ig_dialog_downloader_reels">Λήψη Reels</string>
+    <string name="ig_dialog_downloader_profiles">Λήψη Φωτογραφιών Προφίλ</string>
+    <string name="ig_dialog_downloader_folder">📁 Φάκελος Λήψεων</string>
+    <string name="ig_dialog_downloader_username_subfolder">Αποθήκευση σε Υποφάκελο Χρήστη</string>
+    <string name="ig_dialog_downloader_add_timestamp">Προσθήκη Χρονοσφραγίδας στο Όνομα Αρχείου</string>
+    <string name="ig_dialog_downloader_cannot_open_picker">Αδύνατο άνοιγμα επιλογέα φακέλου εδώ</string>
+
+    <!-- Backup &amp; Restore -->
+    <string name="ig_dialog_backup_settings">Δημιουργία Αντιγράφου Ρυθμίσεων</string>
+    <string name="ig_dialog_restore_settings">Επαναφορά Ρυθμίσεων</string>
+    <string name="ig_dialog_backup_failed">Αποτυχία δημιουργίας αντιγράφου: %1$s</string>
+
+    <!-- About -->
+    <string name="ig_dialog_about_created_by" translatable="false">Created by @reso7200</string>
+    <string name="ig_dialog_about_github">GitHub</string>
+    <string name="ig_dialog_about_telegram">Telegram</string>
+
+    <!-- Restart -->
+    <string name="ig_dialog_restart_message">⚠️ Εκκαθάριση cache εφαρμογής και επανεκκίνηση;</string>
+    <string name="ig_dialog_restart_now">Επανεκκίνηση Τώρα</string>
+    <string name="ig_dialog_restart_not_found">Αδύνατη εύρεση εφαρμογής για επανεκκίνηση.</string>
+    <string name="ig_dialog_restart_failed">Αποτυχία επανεκκίνησης: %1$s</string>
+
+    <!-- Toast: Ghost mode quick toggle -->
+    <string name="ig_toast_ghost_no_options">Δεν επιλέχθηκαν επιλογές Αόρατης Λειτουργίας!</string>
+    <string name="ig_toast_ghost_enabled">Αόρατη Λειτουργία Ενεργοποιήθηκε</string>
+    <string name="ig_toast_ghost_disabled">Αόρατη Λειτουργία Απενεργοποιήθηκε</string>
+    <string name="ig_toast_seen_sent">✅ Εστάλη Ανάγνωση</string>
+    <string name="ig_toast_channel_seen_sent">✅ Εστάλη Ανάγνωση Καναλιού</string>
+
+    <!-- Toast: Follower status -->
+    <string name="ig_toast_follows_you">σε ακολουθεί ✅</string>
+    <string name="ig_toast_not_follows_you">δεν σε ακολουθεί ❌</string>
+
+    <!-- Toast: App settings -->
+    <string name="ig_toast_settings_applied">Οι Ρυθμίσεις Εφαρμόστηκαν!</string>
+    <string name="ig_toast_restart_manual">Παρακαλώ κλείστε το Instagram χειροκίνητα για να εφαρμοστούν οι αλλαγές.</string>
+    <string name="ig_toast_settings_restored">Οι ρυθμίσεις επαναφέρθηκαν επιτυχώς.</string>
+    <string name="ig_toast_restore_failed">Αποτυχία επαναφοράς: %1$s</string>
+
+    <!-- Toast: Download folder -->
+    <string name="ig_toast_download_folder_set">Φάκελος λήψεων: %1$s</string>
+    <string name="ig_toast_download_folder_updated">Ο φάκελος λήψεων ενημερώθηκε!</string>
+    <string name="ig_toast_download_folder_reset">Ο φάκελος λήψεων επαναφέρθηκε στην προεπιλογή</string>
+
+    <!-- Toast: Downloader feedback -->
+    <string name="ig_toast_downloading">Γίνεται λήψη…</string>
+    <string name="ig_toast_downloading_video">Γίνεται λήψη βίντεο…</string>
+    <string name="ig_toast_downloading_photo">Γίνεται λήψη φωτογραφίας…</string>
+    <string name="ig_toast_video_saved">Το βίντεο αποθηκεύτηκε στον φάκελο InstaEclipse</string>
+    <string name="ig_toast_photo_saved">Η φωτογραφία αποθηκεύτηκε στον φάκελο InstaEclipse</string>
+    <string name="ig_toast_saved">Αποθηκεύτηκε στον φάκελο InstaEclipse</string>
+    <string name="ig_toast_download_failed">Αποτυχία λήψης: %1$s</string>
+    <string name="ig_toast_downloading_reel">Γίνεται λήψη reel…</string>
+    <string name="ig_toast_reel_saved">Το reel αποθηκεύτηκε στον φάκελο InstaEclipse</string>
+    <string name="ig_toast_reel_failed">Αποτυχία λήψης reel: %1$s</string>
+    <string name="ig_toast_reel_url_not_found">Η διεύθυνση URL του reel δεν βρέθηκε</string>
+    <string name="ig_toast_post_url_not_found">Η διεύθυνση URL της δημοσίευσης δεν βρέθηκε</string>
+    <string name="ig_toast_no_media_for_post">Δεν βρέθηκε πολυμέσο για αυτή τη δημοσίευση</string>
+    <string name="ig_toast_no_media">Δεν βρέθηκε πολυμέσο</string>
+    <string name="ig_toast_downloading_story_video">Γίνεται λήψη βίντεο ιστορίας…</string>
+    <string name="ig_toast_downloading_story_photo">Γίνεται λήψη φωτογραφίας ιστορίας…</string>
+    <string name="ig_toast_story_saved">Η ιστορία αποθηκεύτηκε στον φάκελο InstaEclipse</string>
+    <string name="ig_toast_story_url_not_found">Η διεύθυνση URL της ιστορίας δεν βρέθηκε</string>
+    <string name="ig_toast_downloading_profile_pic">Γίνεται λήψη εικόνας προφίλ…</string>
+    <string name="ig_toast_profile_pic_saved">Η εικόνα προφίλ αποθηκεύτηκε!</string>
+    <string name="ig_toast_profile_pic_url_not_found">Αδύνατη λήψη URL εικόνας προφίλ</string>
+    <string name="ig_toast_merging_video_audio">Συγχώνευση βίντεο + ήχου…</string>
+    <string name="ig_toast_downloading_n_items">Γίνεται λήψη %1$d αρχείων…</string>
+    <string name="ig_toast_downloading_all_n_items">Γίνεται λήψη όλων των %1$d αρχείων…</string>
+    <string name="ig_toast_all_items_saved">Όλα τα %1$d αρχεία αποθηκεύτηκαν στον φάκελο InstaEclipse</string>
+    <string name="ig_toast_items_partial_saved">%1$d από %2$d αρχεία αποθηκεύτηκαν (%3$d απέτυχαν)</string>
+    <string name="ig_toast_no_reel_url_scroll">Η διεύθυνση URL του reel δεν βρέθηκε — κάντε κύλιση στο reel πρώτα</string>
+
+    <!-- Downloader carousel UI -->
+    <string name="ig_dl_title">Λήψη</string>
+    <string name="ig_dl_carousel_subtitle">Καρουζέλ • %1$d αρχεία</string>
+    <string name="ig_dl_carousel_current">Λήψη τρέχοντος (%1$d από %2$d)</string>
+    <string name="ig_dl_carousel_all">Λήψη όλων των %1$d αρχείων</string>
+
+    <!-- Story mentions -->
+    <string name="ig_btn_view_mentions">Προβολή Αναφορών</string>
+    <string name="ig_toast_mention_copied">@%1$s αντιγράφηκε</string>
+    <string name="ig_toast_all_mentions_copied">Όλες οι αναφορές αντιγράφηκαν</string>
+
+    <!-- Story mentions dialog -->
+    <string name="ig_mention_dialog_title">Αναφορές Story</string>
+    <string name="ig_mention_subtitle">%1$d αναφορά(ές) • πατήστε για αντιγραφή</string>
+    <string name="ig_mention_no_mentions">Δεν βρέθηκαν αναφορές σε αυτή την ιστορία</string>
+    <string name="ig_mention_copy_all">Αντιγραφή Όλων</string>
+
 </resources>

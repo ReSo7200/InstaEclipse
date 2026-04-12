@@ -5,6 +5,11 @@
         android:title="@string/home" />
 
     <item
+        android:id="@+id/nav_features"
+        android:icon="@drawable/ic_features"
+        android:title="@string/features" />
+
+    <item
         android:id="@+id/nav_help"
         android:icon="@drawable/nav_selector_help"
         android:title="@string/help" />

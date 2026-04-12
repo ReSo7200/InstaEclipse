@@ -2,11 +2,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--  app wide  -->
     <string name="app_name">InstaEclipse</string>
+    <string name="version" translatable="false">v0.5 Beta</string>
     <string name="home">首页</string>
     <string name="features">功能</string>
     <string name="help">帮助</string>
     <string name="instagram_version">版本</string>
+
     <!--  home  -->
+    <string name="back">返回</string>
+    <string name="apply_changes">应用更改</string>
+    <string name="multiple_versions_detected">⚠ 检测到多个版本</string>
     <string name="module_disabled">模块未启用。请启用它。</string>
     <string name="module_status">模块状态：</string>
     <string name="module_status_disabled">模块状态：已禁用</string>
@@ -25,9 +30,11 @@
     <string name="usage_instructions">长按搜索图标</string>
     <string name="contributors">贡献者</string>
     <string name="special_thanks">特别感谢</string>
+
     <!--  Don't translate!  -->
     <string name="instagram_logo" translatable="false">Instagram Logo</string>
     <string name="instagram_info" translatable="false">instagram_info</string>
+
     <!--  help  -->
     <string name="help_amp_troubleshooting">帮助和故障排除</string>
     <string name="find_updates_and_documentation">查询更新和文档。</string>
@@ -35,41 +42,38 @@
     <string name="find_support">查询支持</string>
     <string name="go_to_telegram">前往 Telegram</string>
     <string name="instaeclipse_telegram_group" translatable="false">InstaEclipse Telegram Group</string>
+
     <!--  Don't translate!  -->
     <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
     <string name="github">GitHub</string>
     <string name="telegram">Telegram</string>
+
     <!--  faq  -->
     <string name="frequently_asked_questions">常见问题</string>
-    <string name="faq_1">
-<b>1. 使用 Google Play 版本时无法正常运行或崩溃？</b>
-\n- 请使用 APKMirror 下载的版本。
-</string>
-    <string name="faq_2">
-<b>2. 模块未启用？</b>
-\n- 在 LSPosed 中禁用并重新启用该模块。
-</string>
-    <string name="faq_3">
-<b>3. 功能无法使用？</b>
-\n- 强制停止并重新启动 Instagram。
-</string>
-    <string name="faq_4">
-<b>4. 开发者选项导致崩溃？</b>
-\n- 按照开发者选项指南操作。
-</string>
-    <string name="faq_5">
-<b>5. 开发者选项的标签或数字异常</b>
-\n- 使用 Beta 或 Alpha 版本，因为稳定版有进行过混淆。
-</string>
-    <string name="faq_6">
-<b>6. 启用了无干扰模式，但内容仍然显示？</b>
-\n- 强制停止 Instagram 并清除其缓存。
-</string>
+    <string name="faq_1"><b>1. 使用 Google Play 版本时无法正常运行或崩溃？</b>\n- 请使用 APKMirror 下载的版本。</string>
+    <string name="faq_2"><b>2. 模块未启用？</b>\n- 在 LSPosed 中禁用并重新启用该模块。</string>
+    <string name="faq_3"><b>3. 功能无法使用？</b>\n- 强制停止并重新启动 Instagram。</string>
+    <string name="faq_4"><b>4. 开发者选项导致崩溃？</b>\n- 按照开发者选项指南操作。</string>
+    <string name="faq_5"><b>5. 开发者选项的标签或数字异常</b>\n- 使用 Beta 或 Alpha 版本，因为稳定版有进行过混淆。</string>
+    <string name="faq_6"><b>6. 启用了无干扰模式，但内容仍然显示？</b>\n- 强制停止 Instagram 并清除其缓存。</string>
+
     <!--  guide  -->
     <string name="module_not_working_title">模块仍然无法使用？</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false">
-<![CDATA[ 如果您已<b>获取 root 权限</b>，请尝试使用 <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>。如果您未<b>获取 root 权限</b>，请安装<a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a>，然后依据<a href="https://t.me/instaEclipse_discussion/158/5149">指南</a>进行操作 ]]>
-</string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[ 如果您已<b>获取 root 权限</b>，请尝试使用 <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>。如果您未<b>获取 root 权限</b>，请安装<a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a>，然后依据<a href="https://t.me/instaEclipse_discussion/158/5149">指南</a>进行操作 ]]></string>
+
+    <!-- features fragment section headers -->
+    <string name="feat_categories">分类：</string>
+    <string name="feat_tools">工具：</string>
+    <string name="feat_features">功能：</string>
+    <string name="feat_config">配置：</string>
+    <string name="feat_options">选项：</string>
+    <string name="feat_quick_toggle">快速切换：</string>
+    <string name="feat_danger_zone">危险区域：</string>
+    <string name="feat_download_folder">下载文件夹：</string>
+    <string name="feat_downloader_set_folder">📂 设置下载文件夹位置</string>
+    <string name="feat_downloader_selected">📂 已选择：%1$s</string>
+    <string name="feat_downloader_reset_folder">🗑 重置下载文件夹</string>
+
     <!--  features  -->
     <string name="developer_options">开发者选项</string>
     <string name="ghost_mode">幽灵模式</string>
@@ -77,8 +81,10 @@
     <string name="remove_ads">移除广告</string>
     <string name="remove_analytics">移除分析</string>
     <string name="enable_disable_all">启用/禁用所有</string>
+
     <!--  Don't translate!  -->
     <string name="hint" translatable="false">Hint</string>
+
     <!--  ghost  -->
     <string name="ghost_mode_options">幽灵模式选项</string>
     <string name="typing">隐藏输入状态</string>
@@ -88,6 +94,7 @@
     <string name="direct_messages">私信</string>
     <string name="disable_typing">停用输入状态提示</string>
     <string name="screen_shot">截图</string>
+
     <!--  developer_options  -->
     <string name="developer_options_guide">开发者选项指南</string>
     <string name="dev_options_version_req">仅能在 Beta/Alpha 中启用！</string>
@@ -96,10 +103,12 @@
     <string name="dev_options_2">2. 导航至开发者选项 > MetaConfig 设定与覆盖。</string>
     <string name="dev_options_3">3. 搜索「Employee」并启用以下选项：</string>
     <string name="dev_options_4">4. 最后，从模块中禁用开发者选项以防止应用崩溃。</string>
+
     <!--  Don't translate!  -->
     <string name="is_employee" translatable="false">• is employee</string>
     <string name="is_employee_or_test_user" translatable="false">• is employee or test user</string>
     <string name="employee_options" translatable="false">• employee options</string>
+
     <!--  distraction free  -->
     <string name="distraction_free_options">无干扰模式选项</string>
     <string name="disable_stories">关闭限时动态</string>
@@ -107,6 +116,7 @@
     <string name="disable_reels">关闭连续短片</string>
     <string name="disable_explore">禁用探索</string>
     <string name="disable_comments">禁用评论</string>
+
     <!--  Miscellaneous  -->
     <string name="misc">杂项</string>
     <string name="miscellaneous_options">杂项选项</string>
@@ -114,6 +124,223 @@
     <string name="video_autoplay">禁用视频自动播放</string>
     <string name="follower_toast">显示关注者提示</string>
     <string name="hooked_methods_toast">显示已启用功能提示</string>
+
     <!--  contributor card  -->
-    <string name="contributor_name">Contributor Name</string>
+    <string name="contributor_name">贡献者名称</string>
+
+    <!-- ================================================================ -->
+    <!-- Dialog strings — used in the host (Instagram) process via I18n   -->
+    <!-- ================================================================ -->
+
+    <!-- Common -->
+    <string name="ig_dialog_title" translatable="false">InstaEclipse 🌘</string>
+    <string name="ig_dialog_close">关闭</string>
+    <string name="ig_dialog_enable_disable_all">启用/禁用所有</string>
+    <string name="ig_dialog_error">错误</string>
+    <string name="ig_dialog_ok">确定</string>
+    <string name="ig_dialog_yes">是</string>
+    <string name="ig_dialog_cancel">取消</string>
+
+    <!-- Main menu items -->
+    <string name="ig_dialog_menu_dev_options">🎛 开发者选项</string>
+    <string name="ig_dialog_menu_ghost_settings">👻 幽灵模式设置</string>
+    <string name="ig_dialog_menu_ad_analytics">🛡 屏蔽广告/分析</string>
+    <string name="ig_dialog_menu_distraction_free">🧘 无干扰 Instagram</string>
+    <string name="ig_dialog_menu_misc">⚙ 其他功能</string>
+    <string name="ig_dialog_menu_downloader">📥 下载器</string>
+    <string name="ig_dialog_menu_backup_restore">💾 备份 &amp; 恢复</string>
+    <string name="ig_dialog_menu_about">ℹ️ 关于</string>
+    <string name="ig_dialog_menu_restart">🔁 重启应用</string>
+
+    <!-- Section titles -->
+    <string name="ig_dialog_section_dev_options">开发者选项 🎛</string>
+    <string name="ig_dialog_section_ghost_mode">幽灵模式 👻</string>
+    <string name="ig_dialog_section_ad_analytics">屏蔽广告/分析 🛡️</string>
+    <string name="ig_dialog_section_distraction_free">无干扰 Instagram 🧘</string>
+    <string name="ig_dialog_section_misc">杂项 ⚙️</string>
+    <string name="ig_dialog_section_downloader">下载器 📥</string>
+    <string name="ig_dialog_section_downloader_settings">下载器设置 ⚙️</string>
+    <string name="ig_dialog_section_backup_restore">备份 &amp; 恢复 💾</string>
+    <string name="ig_dialog_section_about">关于</string>
+    <string name="ig_dialog_section_restart">重启应用</string>
+    <string name="ig_dialog_section_quick_toggle">自定义快速切换 🛠️</string>
+
+    <!-- Developer options -->
+    <string name="ig_dialog_dev_enable">启用开发者模式</string>
+    <string name="ig_dialog_dev_import">导入开发者配置</string>
+    <string name="ig_dialog_dev_export">导出开发者配置</string>
+    <string name="ig_dialog_dev_remove_build_expired">移除版本过期弹窗</string>
+    <string name="ig_dialog_unable_open_ui">无法打开 InstaEclipse 界面。</string>
+    <string name="ig_dialog_instagram_not_ready">Instagram 未打开或未就绪。</string>
+    <string name="ig_dialog_mc_overrides_not_found">未找到 mc_overrides.json。</string>
+    <string name="ig_dialog_failed_read_config">读取配置失败：%1$s</string>
+    <string name="export_no_config_data">未收到配置数据。</string>
+    <string name="export_config_success">配置导出成功。</string>
+    <string name="export_config_failed">保存失败：%1$s</string>
+    <string name="export_invalid_uri">无效的 URI</string>
+    <string name="ig_toast_config_imported">✅ 配置已导入。</string>
+    <string name="ig_toast_config_import_failed">❌ 导入配置失败。</string>
+
+    <!-- JsonImportActivity -->
+    <string name="json_select_config">选择 JSON 配置文件</string>
+    <string name="json_target_not_specified">❌ 未指定目标包。</string>
+    <string name="json_sent">✅ 已发送至 Instagram。</string>
+    <string name="json_not_valid">❌ 非有效 JSON 文件。</string>
+    <string name="json_read_failed">❌ 读取文件失败：%1$s</string>
+    <string name="json_cancelled">已取消或未选择文件。</string>
+
+    <!-- Ghost Mode options -->
+    <string name="ig_dialog_ghost_hide_dm_seen">隐藏私信已读状态</string>
+    <string name="ig_dialog_ghost_hide_typing">隐藏正在输入指示器</string>
+    <string name="ig_dialog_ghost_hide_story_views">隐藏限时动态观看记录</string>
+    <string name="ig_dialog_ghost_hide_live_presence">隐藏直播在线状态</string>
+    <string name="ig_dialog_ghost_allow_screenshots_dms">允许在私信中截图</string>
+    <string name="ig_dialog_ghost_bypass_screenshot">绕过截图检测</string>
+    <string name="ig_dialog_ghost_hide_view_once">隐藏查看一次已读状态</string>
+    <string name="ig_dialog_ghost_unlimited_replays">无限重播查看一次媒体</string>
+    <string name="ig_dialog_ghost_permanent_view_once">永久查看一次媒体</string>
+    <string name="ig_dialog_ghost_keep_disappearing">保留阅后即焚消息</string>
+    <string name="ig_dialog_customize_quick_toggle">🛠 自定义快速切换</string>
+
+    <!-- Quick Toggle options -->
+    <string name="ig_dialog_quick_hide_seen">包含隐藏私信已读状态</string>
+    <string name="ig_dialog_quick_hide_typing">包含隐藏正在输入指示器</string>
+    <string name="ig_dialog_quick_disable_screenshot">包含绕过截图检测</string>
+    <string name="ig_dialog_quick_hide_view_once">包含隐藏查看一次已读状态</string>
+    <string name="ig_dialog_quick_hide_story_seen">包含隐藏限时动态观看记录</string>
+    <string name="ig_dialog_quick_hide_live_seen">包含隐藏直播在线状态</string>
+    <string name="ig_dialog_quick_keep_ephemeral">包含保留阅后即焚消息</string>
+    <string name="ig_dialog_quick_unlimited_replays">包含无限重播查看一次媒体</string>
+    <string name="ig_dialog_quick_permanent_view">包含永久查看一次媒体</string>
+    <string name="ig_dialog_quick_allow_screenshots">包含允许在私信中截图</string>
+
+    <!-- Ad / Analytics options -->
+    <string name="ig_dialog_ad_block_ads">屏蔽广告</string>
+    <string name="ig_dialog_ad_block_analytics">屏蔽分析</string>
+    <string name="ig_dialog_ad_disable_tracking">禁用追踪链接</string>
+
+    <!-- Distraction-Free options -->
+    <string name="ig_dialog_distraction_extreme_mode">极端模式 🔒 (重新安装前不可逆)</string>
+    <string name="ig_dialog_distraction_disable_stories">关闭限时动态</string>
+    <string name="ig_dialog_distraction_disable_feed">关闭动态</string>
+    <string name="ig_dialog_distraction_disable_reels">关闭连续短片</string>
+    <string name="ig_dialog_distraction_disable_reels_except_dm">关闭连续短片（私信除外）</string>
+    <string name="ig_dialog_distraction_disable_explore">禁用探索</string>
+    <string name="ig_dialog_distraction_disable_comments">禁用评论</string>
+    <string name="ig_dialog_distraction_extreme_title">启用极端模式？</string>
+    <string name="ig_dialog_distraction_extreme_message">启用后，在重新安装应用之前无法禁用无干扰模式。是否继续？</string>
+
+    <!-- Miscellaneous options -->
+    <string name="ig_dialog_misc_disable_story_autoswipe">禁用限时动态自动切换</string>
+    <string name="ig_dialog_misc_disable_video_autoplay">禁用视频自动播放</string>
+    <string name="ig_dialog_misc_disable_repost">禁用转发</string>
+    <string name="ig_dialog_misc_show_feature_toasts">显示功能提示</string>
+    <string name="ig_dialog_misc_show_follower_toast">显示关注者提示</string>
+    <string name="ig_dialog_misc_view_story_mentions">查看限时动态提及</string>
+    <string name="ig_dialog_misc_disable_discover_people">禁用发现好友</string>
+    <string name="ig_dialog_misc_copy_comment">复制评论</string>
+
+    <!-- Comment Copy dialog -->
+    <string name="ig_comment_copy_title">复制评论</string>
+    <string name="ig_comment_copy_full">复制完整评论</string>
+    <string name="ig_comment_select_part">选择要复制的部分</string>
+    <string name="ig_comment_select_title">选择要复制的内容</string>
+    <string name="ig_comment_copy_selected">复制所选内容</string>
+    <string name="ig_toast_comment_copied">✅ 已复制到剪贴板！</string>
+
+    <!-- Downloader options -->
+    <string name="ig_dialog_downloader_settings">⚙ 下载器设置</string>
+    <string name="ig_dialog_downloader_posts">下载帖子</string>
+    <string name="ig_dialog_downloader_stories">下载限时动态</string>
+    <string name="ig_dialog_downloader_reels">下载连续短片</string>
+    <string name="ig_dialog_downloader_profiles">下载个人资料图片</string>
+    <string name="ig_dialog_downloader_folder">📁 下载文件夹</string>
+    <string name="ig_dialog_downloader_username_subfolder">保存到用户名子文件夹</string>
+    <string name="ig_dialog_downloader_add_timestamp">在文件名中添加时间戳</string>
+    <string name="ig_dialog_downloader_cannot_open_picker">无法在此处打开文件夹选择器</string>
+
+    <!-- Backup &amp; Restore -->
+    <string name="ig_dialog_backup_settings">备份设置</string>
+    <string name="ig_dialog_restore_settings">恢复设置</string>
+    <string name="ig_dialog_backup_failed">创建备份失败：%1$s</string>
+
+    <!-- About -->
+    <string name="ig_dialog_about_created_by" translatable="false">Created by @reso7200</string>
+    <string name="ig_dialog_about_github">GitHub</string>
+    <string name="ig_dialog_about_telegram">Telegram</string>
+
+    <!-- Restart -->
+    <string name="ig_dialog_restart_message">⚠️ 清除应用缓存并重启？</string>
+    <string name="ig_dialog_restart_now">立即重启</string>
+    <string name="ig_dialog_restart_not_found">找不到要重启的应用。</string>
+    <string name="ig_dialog_restart_failed">重启失败：%1$s</string>
+
+    <!-- Toast: Ghost mode quick toggle -->
+    <string name="ig_toast_ghost_no_options">未选择幽灵模式选项！</string>
+    <string name="ig_toast_ghost_enabled">幽灵模式已启用</string>
+    <string name="ig_toast_ghost_disabled">幽灵模式已禁用</string>
+    <string name="ig_toast_seen_sent">✅ 已读已发送</string>
+    <string name="ig_toast_channel_seen_sent">✅ 频道已读已发送</string>
+
+    <!-- Toast: Follower status -->
+    <string name="ig_toast_follows_you">正在关注您 ✅</string>
+    <string name="ig_toast_not_follows_you">未关注您 ❌</string>
+
+    <!-- Toast: App settings -->
+    <string name="ig_toast_settings_applied">设置已应用！</string>
+    <string name="ig_toast_restart_manual">请手动关闭 Instagram 以使更改生效。</string>
+    <string name="ig_toast_settings_restored">设置已成功恢复。</string>
+    <string name="ig_toast_restore_failed">恢复失败：%1$s</string>
+
+    <!-- Toast: Download folder -->
+    <string name="ig_toast_download_folder_set">下载文件夹：%1$s</string>
+    <string name="ig_toast_download_folder_updated">下载文件夹已更新！</string>
+    <string name="ig_toast_download_folder_reset">下载文件夹已重置为默认值</string>
+
+    <!-- Toast: Downloader feedback -->
+    <string name="ig_toast_downloading">正在下载…</string>
+    <string name="ig_toast_downloading_video">正在下载视频…</string>
+    <string name="ig_toast_downloading_photo">正在下载图片…</string>
+    <string name="ig_toast_video_saved">视频已保存到 InstaEclipse 文件夹</string>
+    <string name="ig_toast_photo_saved">图片已保存到 InstaEclipse 文件夹</string>
+    <string name="ig_toast_saved">已保存到 InstaEclipse 文件夹</string>
+    <string name="ig_toast_download_failed">下载失败：%1$s</string>
+    <string name="ig_toast_downloading_reel">正在下载连续短片…</string>
+    <string name="ig_toast_reel_saved">连续短片已保存到 InstaEclipse 文件夹</string>
+    <string name="ig_toast_reel_failed">连续短片下载失败：%1$s</string>
+    <string name="ig_toast_reel_url_not_found">未找到连续短片 URL</string>
+    <string name="ig_toast_post_url_not_found">未找到帖子 URL</string>
+    <string name="ig_toast_no_media_for_post">此帖子未找到媒体</string>
+    <string name="ig_toast_no_media">未找到媒体</string>
+    <string name="ig_toast_downloading_story_video">正在下载限时动态视频…</string>
+    <string name="ig_toast_downloading_story_photo">正在下载限时动态图片…</string>
+    <string name="ig_toast_story_saved">限时动态已保存到 InstaEclipse 文件夹</string>
+    <string name="ig_toast_story_url_not_found">未找到限时动态 URL</string>
+    <string name="ig_toast_downloading_profile_pic">正在下载个人资料图片…</string>
+    <string name="ig_toast_profile_pic_saved">个人资料图片已保存！</string>
+    <string name="ig_toast_profile_pic_url_not_found">无法获取个人资料图片 URL</string>
+    <string name="ig_toast_merging_video_audio">正在合并视频 + 音频…</string>
+    <string name="ig_toast_downloading_n_items">正在下载 %1$d 个项目…</string>
+    <string name="ig_toast_downloading_all_n_items">正在下载全部 %1$d 个项目…</string>
+    <string name="ig_toast_all_items_saved">全部 %1$d 个项目已保存到 InstaEclipse 文件夹</string>
+    <string name="ig_toast_items_partial_saved">%1$d / %2$d 个项目已保存（%3$d 个失败）</string>
+    <string name="ig_toast_no_reel_url_scroll">未找到连续短片 URL — 请先滚动查看连续短片</string>
+
+    <!-- Downloader carousel UI -->
+    <string name="ig_dl_title">下载</string>
+    <string name="ig_dl_carousel_subtitle">轮播 • %1$d 个项目</string>
+    <string name="ig_dl_carousel_current">下载当前（%1$d / %2$d）</string>
+    <string name="ig_dl_carousel_all">下载全部 %1$d 个项目</string>
+
+    <!-- Story mentions -->
+    <string name="ig_btn_view_mentions">查看提及</string>
+    <string name="ig_toast_mention_copied">@%1$s 已复制</string>
+    <string name="ig_toast_all_mentions_copied">所有提及已复制</string>
+
+    <!-- Story mentions dialog -->
+    <string name="ig_mention_dialog_title">限时动态提及</string>
+    <string name="ig_mention_subtitle">%1$d 个提及 • 点击复制</string>
+    <string name="ig_mention_no_mentions">此限时动态中未找到提及</string>
+    <string name="ig_mention_copy_all">复制全部</string>
+
 </resources>
