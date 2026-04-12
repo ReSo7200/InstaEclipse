@@ -12,12 +12,22 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
-public class ViewOnce {
+public class GhostViewOnceHook {
 
     public void handleViewOnceBlock(DexKitBridge bridge) {
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("GhostViewOnce", Module.hostClassLoader);
+            if (cached != null) {
+                XposedBridge.hookMethod(cached, buildViewOnceHook());
+                FeatureStatusTracker.setHooked("GhostViewOnce");
+                return;
+            }
+        }
+
         try {
             // Step 1: Find methods containing "visual_item_seen"
             List<MethodData> methods = bridge.findMethod(
@@ -47,43 +57,8 @@ public class ViewOnce {
                     }
 
                     // Step 3: Hook method
-                    XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            if (!FeatureFlags.isGhostViewOnce) {
-                                return; // Feature disabled → skip
-                            }
-
-                            Object rw = param.args[2]; // Third argument (visual item object)
-                            if (rw == null) {
-                                return;
-                            }
-
-                            for (Method m : rw.getClass().getDeclaredMethods()) {
-                                // Only check methods with no params returning String
-                                if (m.getParameterTypes().length != 0 || m.getReturnType() != String.class) {
-                                    continue;
-                                }
-
-                                try {
-                                    m.setAccessible(true);
-                                    String value = (String) m.invoke(rw);
-                                    if (value == null) {
-                                        continue;
-                                    }
-
-                                    if (value.contains("visual_item_seen") ||
-                                            value.contains("send_visual_item_seen_marker")) {
-                                        // XposedBridge.log("Blocked ViewOnce send: " + value);
-                                        param.setResult(null); // Block this call
-                                    }
-                                } catch (Throwable ignored) {
-                                    // Ignore reflection errors
-                                }
-                            }
-                        }
-                    });
-
+                    DexKitCache.saveMethod("GhostViewOnce", reflectMethod);
+                    XposedBridge.hookMethod(reflectMethod, buildViewOnceHook());
 
                     XposedBridge.log("(InstaEclipse | ViewOnce): ✅ Hooked (dynamic check): " +
                             method.getClassName() + "." + method.getName());
@@ -95,5 +70,27 @@ public class ViewOnce {
         } catch (Throwable e) {
             XposedBridge.log("(InstaEclipse | ViewOnce): ❌ Exception: " + e.getMessage());
         }
+    }
+
+    private static XC_MethodHook buildViewOnceHook() {
+        return new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                if (!FeatureFlags.isGhostViewOnce) return;
+                Object rw = param.args[2];
+                if (rw == null) return;
+                for (Method m : rw.getClass().getDeclaredMethods()) {
+                    if (m.getParameterTypes().length != 0 || m.getReturnType() != String.class) continue;
+                    try {
+                        m.setAccessible(true);
+                        String value = (String) m.invoke(rw);
+                        if (value != null && (value.contains("visual_item_seen") ||
+                                value.contains("send_visual_item_seen_marker"))) {
+                            param.setResult(null);
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            }
+        };
     }
 }

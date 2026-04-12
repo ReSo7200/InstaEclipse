@@ -17,13 +17,14 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
+import ps.reso.instaeclipse.utils.i18n.I18n;
 
-public class GhostMarkAsReadButton {
+public class GhostDMMarkAsReadHook {
 
     private static final String GHOST_BTN_TAG = "ie_ghost_seen_btn";
     private final String moduleSourceDir;
 
-    public GhostMarkAsReadButton(String moduleSourceDir) {
+    public GhostDMMarkAsReadHook(String moduleSourceDir) {
         this.moduleSourceDir = moduleSourceDir;
     }
 
@@ -59,7 +60,7 @@ public class GhostMarkAsReadButton {
         ghostBtn.setTag(GHOST_BTN_TAG);
 
         try {
-            Drawable icon = XModuleResources.createInstance(moduleSourceDir, null)
+            @SuppressLint("UseCompatLoadingForDrawables") Drawable icon = XModuleResources.createInstance(moduleSourceDir, null)
                     .getDrawable(R.drawable.ic_eye, null);
             ghostBtn.setImageDrawable(icon);
         } catch (Exception e) {
@@ -81,8 +82,7 @@ public class GhostMarkAsReadButton {
         ghostBtn.setOnClickListener(v -> triggerSeenLogic(parent));
 
         parent.post(() -> {
-            parent.addView(ghostBtn);
-            ghostBtn.bringToFront(); // Ensures it stays above the mic/gallery
+            parent.addView(ghostBtn, 3);
         });
     }
 
@@ -106,7 +106,7 @@ public class GhostMarkAsReadButton {
                 view.postDelayed(() -> {
                     group.scrollBy(0, 200);
                     FeatureFlags.isGhostSeen = true;
-                    Toast.makeText(ctx, "✅ Seen Sent", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_seen_sent), Toast.LENGTH_SHORT).show();
                 }, 300);
             }
         } catch (Exception e) {
