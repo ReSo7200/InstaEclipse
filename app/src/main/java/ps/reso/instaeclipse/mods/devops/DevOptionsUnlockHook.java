@@ -1,14 +1,12 @@
 package ps.reso.instaeclipse.mods.devops;
 
 import org.luckypray.dexkit.DexKitBridge;
-import org.luckypray.dexkit.query.FindClass;
 import org.luckypray.dexkit.query.FindMethod;
-import org.luckypray.dexkit.query.matchers.ClassMatcher;
 import org.luckypray.dexkit.query.matchers.MethodMatcher;
-import org.luckypray.dexkit.result.ClassData;
 import org.luckypray.dexkit.result.MethodData;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -18,154 +16,95 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
+/**
+ * Unlocks Instagram's developer / employee options.
+ *
+ * Strategy:
+ *  1. Find every obfuscated method that references the "is_employee" string (only in X.* classes).
+ *  2. For each such method, inspect the methods it *calls* (getInvokes).
+ *  3. Collect only the ones that match boolean(UserSession) — those are the specific employee-
+ *     gate checks (is_employee, is_employee_or_test_user, employee_options …).
+ *  4. Hook only those collected methods, not the entire class.
+ *
+ * This avoids the previous "hook every boolean in the class" approach which was both noisy
+ * and potentially incorrect, since the class can contain many unrelated boolean checks.
+ */
 public class DevOptionsUnlockHook {
 
+    private static final XC_MethodHook HOOK = new XC_MethodHook() {
+        @Override
+        protected void beforeHookedMethod(MethodHookParam param) {
+            if (FeatureFlags.isDevEnabled) {
+                param.setResult(true);
+            }
+        }
+    };
+
     public void handleDevOptions(DexKitBridge bridge) {
-        // Cache hit: we only stored the target class name; re-hook its boolean methods via reflection
         if (DexKitCache.isCacheValid()) {
-            String cachedClass = DexKitCache.loadString("DevOptionsClass");
-            if (cachedClass != null) {
-                hookBooleanMethodsViaReflection(cachedClass);
+            List<Method> cached = DexKitCache.loadMethods("DevOptionsMethods", Module.hostClassLoader);
+            if (cached != null && !cached.isEmpty()) {
+                for (Method m : cached) XposedBridge.hookMethod(m, HOOK);
+                FeatureStatusTracker.setHooked("DevOptions");
                 return;
             }
         }
+
         try {
-            findAndHookDynamicMethod(bridge);
-        } catch (Exception e) {
-            XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Error handling Dev Options: " + e.getMessage());
+            findAndHook(bridge);
+        } catch (Throwable t) {
+            XposedBridge.log("(IE|DevOptions) ❌ " + t);
         }
     }
 
-    private void findAndHookDynamicMethod(DexKitBridge bridge) {
-        try {
-            // Step 1: Find classes referencing "is_employee"
-            List<ClassData> classes = bridge.findClass(FindClass.create()
-                    .matcher(ClassMatcher.create().usingStrings("is_employee"))
-            );
+    private void findAndHook(DexKitBridge bridge) {
+        // Step 1: find all X.* methods that reference "is_employee"
+        List<MethodData> isEmployeeMethods = bridge.findMethod(FindMethod.create()
+                .matcher(MethodMatcher.create()
+                        .usingStrings("is_employee")));
 
-            if (classes.isEmpty()) return;
-
-            for (ClassData classData : classes) {
-                String className = classData.getName();
-                if (!className.startsWith("X.")) continue;
-
-                // Step 2: Find methods referencing "is_employee" within the class
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .declaredClass(className)
-                                .usingStrings("is_employee"))
-                );
-
-                if (methods.isEmpty()) continue;
-
-                for (MethodData method : methods) {
-                    inspectInvokedMethods(bridge, method);
-                }
-            }
-        } catch (Exception e) {
-            XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Error during discovery: " + e.getMessage());
+        if (isEmployeeMethods.isEmpty()) {
+            XposedBridge.log("(IE|DevOptions) ❌ no methods referencing 'is_employee'");
+            return;
         }
-    }
 
-    private void inspectInvokedMethods(DexKitBridge bridge, MethodData method) {
-        try {
-            List<MethodData> invokedMethods = method.getInvokes();
-            if (invokedMethods.isEmpty()) return;
+        List<Method> targets = new ArrayList<>();
 
-            for (MethodData invokedMethod : invokedMethods) {
-                String returnType = String.valueOf(invokedMethod.getReturnType());
+        for (MethodData method : isEmployeeMethods) {
+            if (!method.getClassName().startsWith("X.")) continue;
 
-                if (!returnType.contains("boolean")) continue;
-
-                List<String> paramTypes = new java.util.ArrayList<>();
-                for (Object param : invokedMethod.getParamTypes()) {
-                    paramTypes.add(String.valueOf(param));
-                }
-
-                if (paramTypes.size() == 1 &&
-                        paramTypes.get(0).contains("com.instagram.common.session.UserSession")) {
-
-                    String targetClass = invokedMethod.getClassName();
-                    XposedBridge.log("(InstaEclipse | DevOptionsEnable): 📦 Hooking boolean methods in: " + targetClass);
-                    DexKitCache.saveString("DevOptionsClass", targetClass);
-                    hookAllBooleanMethodsInClass(bridge, targetClass);
-                    return;
-                }
-            }
-        } catch (Exception e) {
-            XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Error inspecting invoked methods: " + e.getMessage());
-        }
-    }
-
-    /** Cache-hit path: hooks the target class's boolean(UserSession) methods without DexKit. */
-    private void hookBooleanMethodsViaReflection(String className) {
-        try {
-            Class<?> clazz = Module.hostClassLoader.loadClass(className);
-            XC_MethodHook hook = new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    if (FeatureFlags.isDevEnabled) {
-                        param.setResult(true);
-                        FeatureStatusTracker.setHooked("DevOptions");
-                    }
-                }
-            };
-            for (Method m : clazz.getDeclaredMethods()) {
-                if (m.getReturnType() != boolean.class) continue;
-                Class<?>[] params = m.getParameterTypes();
-                if (params.length != 1) continue;
-                if (!params[0].getName().equals("com.instagram.common.session.UserSession")) continue;
-                m.setAccessible(true);
-                XposedBridge.hookMethod(m, hook);
-                XposedBridge.log("(InstaEclipse | DevOptionsEnable): ✅ Hooked (cache): " + className + "." + m.getName());
-            }
-        } catch (Throwable e) {
-            XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Reflection fallback failed: " + e.getMessage());
-        }
-    }
-
-    private void hookAllBooleanMethodsInClass(DexKitBridge bridge, String className) {
-        try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create()
-                            .declaredClass(className))
-            );
-
-            for (MethodData method : methods) {
-                String returnType = String.valueOf(method.getReturnType());
-                List<String> paramTypes = new java.util.ArrayList<>();
-                for (Object param : method.getParamTypes()) {
-                    paramTypes.add(String.valueOf(param));
-                }
-
-                if (returnType.contains("boolean") &&
-                        paramTypes.size() == 1 &&
-                        paramTypes.get(0).contains("com.instagram.common.session.UserSession")) {
-
-                    try {
-                        Method targetMethod = method.getMethodInstance(Module.hostClassLoader);
-
-                        XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
-                            @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
-                                if (FeatureFlags.isDevEnabled) {
-                                    param.setResult(true);
-                                    FeatureStatusTracker.setHooked("DevOptions");
-                                }
-                            }
-                        });
-
-                        XposedBridge.log("(InstaEclipse | DevOptionsEnable): ✅ Hooked: " +
-                                method.getClassName() + "." + method.getName());
-
-                    } catch (Throwable e) {
-                        XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Failed to hook " + method.getName() + ": " + e.getMessage());
-                    }
-                }
+            // Step 2: walk the call-graph one level and collect boolean(UserSession) callees
+            List<MethodData> invokes;
+            try {
+                invokes = method.getInvokes();
+            } catch (Throwable ignored) {
+                continue;
             }
 
-        } catch (Exception e) {
-            XposedBridge.log("(InstaEclipse | DevOptionsEnable): ❌ Error while hooking class: " + className + " → " + e.getMessage());
+            for (MethodData invoked : invokes) {
+                if (!String.valueOf(invoked.getReturnType()).contains("boolean")) continue;
+                List<?> params = invoked.getParamTypes();
+                if (params.size() != 1) continue;
+                if (!String.valueOf(params.get(0))
+                        .contains("com.instagram.common.session.UserSession")) continue;
+
+                try {
+                    Method m = invoked.getMethodInstance(Module.hostClassLoader);
+                    if (!targets.contains(m)) targets.add(m);
+                } catch (Throwable ignored) {}
+            }
         }
+
+        if (targets.isEmpty()) {
+            XposedBridge.log("(IE|DevOptions) ❌ no boolean(UserSession) targets found");
+            return;
+        }
+
+        DexKitCache.saveMethods("DevOptionsMethods", targets);
+        for (Method m : targets) {
+            XposedBridge.hookMethod(m, HOOK);
+            XposedBridge.log("(IE|DevOptions) ✅ hooked " + m.getDeclaringClass().getName() + "." + m.getName());
+        }
+        FeatureStatusTracker.setHooked("DevOptions");
     }
 }
