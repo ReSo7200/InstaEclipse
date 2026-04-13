@@ -42,13 +42,26 @@ public class EclipseMenuButton {
             protected void afterHookedMethod(MethodHookParam param) {
                 View view = (View) param.thisObject;
                 Context ctx = view.getContext();
+                String pkgName = ctx.getPackageName();
 
-                int leftBtnId = ctx.getResources().getIdentifier("action_bar_left_button", "id", ctx.getPackageName());
+                // List of potential IDs to anchor onto
+                String[] targetIds = {
+                        "action_bar_title_view"
+                };
 
-                if (leftBtnId != 0 && view.getId() == leftBtnId) {
-                    // Anchor on the left action button — inject after it (to its right)
-                    if (view.getParent() instanceof ViewGroup parent) {
-                        injectButton(ctx, parent, parent.indexOfChild(view) + 1);
+                for (String idName : targetIds) {
+                    int resId = ctx.getResources().getIdentifier(idName, "id", pkgName);
+
+                    // If the ID exists in this version and matches the current view
+                    if (resId != 0 && view.getId() == resId) {
+                        if (view.getParent() instanceof ViewGroup parent) {
+                            // Check if we already injected to prevent duplicates
+                            if (parent.findViewWithTag("injected_btn_tag") == null) {
+                                injectButton(ctx, parent, parent.indexOfChild(view) + 1);
+                            }
+                        }
+                        // Break the loop once we've matched and handled the view
+                        break;
                     }
                 }
             }
@@ -74,8 +87,8 @@ public class EclipseMenuButton {
 
         ViewGroup.MarginLayoutParams lp =
                 new ViewGroup.MarginLayoutParams(dp(ctx, 32), dp(ctx, 56));
-        lp.topMargin  = dp(ctx, 30);
-        lp.leftMargin = dp(ctx, 12);
+        lp.topMargin  = dp(ctx, 0);
+        lp.leftMargin = dp(ctx, 0);
         btn.setLayoutParams(lp);
         btn.setPadding(0, 0, 0, 0);
         btn.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);

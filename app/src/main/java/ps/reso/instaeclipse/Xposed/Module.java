@@ -50,7 +50,6 @@ import ps.reso.instaeclipse.mods.misc.DisableVideoAutoPlayHook;
 import ps.reso.instaeclipse.mods.misc.FollowStatusFinder;
 import ps.reso.instaeclipse.mods.misc.StoryMentionHook;
 import ps.reso.instaeclipse.mods.network.IGNetworkInterceptor;
-import ps.reso.instaeclipse.mods.ui.EclipseMenuButton;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.core.CommonUtils;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
@@ -214,12 +213,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     UIHookManager instagramUI = new UIHookManager();
                     instagramUI.mainActivity(hostClassLoader);
 
-                    // Eclipse menu button (eye icon in action bar)
+                   /* // Eclipse menu button
+                   This was disabled due to some issues
                     try {
                         new EclipseMenuButton(moduleSourceDir).install(lpparam);
                     } catch (Throwable ignored) {
                         XposedBridge.log("(InstaEclipse | EclipseMenuButton): ❌ Failed to hook");
-                    }
+                    }*/
 
                     XposedBridge.log("(InstaEclipse): " + lpparam.packageName + " package detected. Starting feature hooks...");
 
