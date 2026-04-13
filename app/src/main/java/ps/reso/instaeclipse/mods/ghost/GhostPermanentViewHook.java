@@ -99,15 +99,34 @@ public class GhostPermanentViewHook {
                 if (!FeatureFlags.permanentViewMode) return;
                 Object result = param.getResult();
                 if (result == null) return;
+
+                // Collect seen_count and all String fields in one pass
+                int seenCount = 0;
                 Class<?> cls = result.getClass();
+                while (cls != null && cls != Object.class) {
+                    for (Field f : cls.getDeclaredFields()) {
+                        if (f.getType() == int.class) {
+                            f.setAccessible(true);
+                            try { seenCount = f.getInt(result); } catch (Throwable ignored) {}
+                        }
+                    }
+                    cls = cls.getSuperclass();
+                }
+
+                cls = result.getClass();
                 while (cls != null && cls != Object.class) {
                     for (Field f : cls.getDeclaredFields()) {
                         if (f.getType() != String.class) continue;
                         f.setAccessible(true);
                         try {
                             String val = (String) f.get(result);
-                            if ("once".equals(val) || "replayable".equals(val)
-                                    || "allow_replay".equals(val)) {
+                            if ("once".equals(val)) {
+                                // seen_count >= 1 means it was already viewed — CDN URL is gone
+                                if (seenCount >= 1) return;
+                                f.set(result, "permanent");
+                            } else if ("replayable".equals(val) || "allow_replay".equals(val)) {
+                                // replayable allows 2 views; >= 2 means fully consumed
+                                if (seenCount >= 2) return;
                                 f.set(result, "permanent");
                             }
                         } catch (Throwable ignored) {}
