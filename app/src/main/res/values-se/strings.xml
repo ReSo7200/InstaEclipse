@@ -168,7 +168,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Kringgå skärmdumpsdetektering</string>
     <string name="ig_dialog_ghost_hide_view_once">Dölj öppning av engångsmeddelanden</string>
     <string name="ig_dialog_ghost_unlimited_replays">Obegränsade uppspelningar</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Gör tillfälliga medier permanenta</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Gör tillfälliga medier permanenta</string>
     <string name="ig_dialog_ghost_keep_disappearing">Behåll försvinnande meddelanden</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Anpassa snabbväxling</string>
     <string name="ig_dialog_quick_hide_seen">Inkludera dölj läst i direktmeddelanden</string>
@@ -303,7 +303,7 @@
     <string name="feat_downloader_reset_folder">🗑 Återställ nedladdningsmapp</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠ Flera versioner hittades</string>
+    <string name="multiple_versions_detected">⚠️ Flera versioner hittades</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">Story-omnämnanden</string>

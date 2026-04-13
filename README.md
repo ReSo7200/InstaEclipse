@@ -36,19 +36,19 @@ It uses [DexKit](https://github.com/LuckyPray/DexKit) for dynamic class/method d
 
 <br/>
 
-| Feature | Description |
-|---|---|
-| Hide DM Seen | Read messages without sending the read receipt |
-| Hide Typing Indicator | Type freely without the other person knowing |
-| Hide Story Views | View stories without appearing in the viewer list |
-| Hide Live Presence | Join lives anonymously |
-| Bypass Screenshot Detection | Take screenshots in DMs without triggering alerts |
-| Allow Screenshots in DMs | Re-enable screenshot capability in restricted chats |
-| Hide View Once Opened | Open view-once media without marking it as seen |
-| Unlimited View-Once Replays | Replay view-once media as many times as you want |
-| Permanent View Once Media | Prevent view-once media from disappearing |
-| Keep Disappearing Messages | Stop ephemeral messages from deleting |
-| Quick Toggle | Enable/disable all ghost options from inside Instagram with one tap |
+| Feature                                            | Description |
+|----------------------------------------------------|---|
+| Hide DM Seen                                       | Read messages without sending the read receipt |
+| Hide Typing Indicator                              | Type freely without the other person knowing |
+| Hide Story Views                                   | View stories without appearing in the viewer list |
+| Hide Live Presence                                 | Join lives anonymously |
+| Bypass Screenshot Detection                        | Take screenshots in DMs without triggering alerts |
+| Allow Screenshots in DMs                           | Re-enable screenshot capability in restricted chats |
+| Hide View Once Opened                              | Open view-once media without marking it as seen |
+| Unlimited View-Once Replays                        | Replay view-once media as many times as you want |
+| Permanent View Once Media (May cause some bugs ⚠️) | Prevent view-once media from disappearing |
+| Keep Disappearing Messages                         | Stop ephemeral messages from deleting |
+| Quick Toggle                                       | Enable/disable all ghost options from inside Instagram with one tap |
 
 </details>
 

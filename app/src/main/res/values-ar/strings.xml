@@ -167,7 +167,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">تجاوز كشف لقطات الشاشة</string>
     <string name="ig_dialog_ghost_hide_view_once">إخفاء فتح الرسائل المرئية لمرة</string>
     <string name="ig_dialog_ghost_unlimited_replays">تشغيل غير محدود للمشاركات المؤقتة</string>
-    <string name="ig_dialog_ghost_permanent_view_once">تحويل الوسائط المؤقتة إلى دائمة</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ تحويل الوسائط المؤقتة إلى دائمة</string>
     <string name="ig_dialog_ghost_keep_disappearing">الاحتفاظ بالرسائل المختفية</string>
     <string name="ig_dialog_customize_quick_toggle">تخصيص التبديل السريع 🛠</string>
     <string name="ig_dialog_quick_hide_seen">تضمين إخفاء رؤية الرسائل المباشرة</string>
@@ -302,7 +302,7 @@
     <string name="feat_downloader_reset_folder">🗑 إعادة تعيين مجلد التنزيل</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠ تم اكتشاف إصدارات متعددة</string>
+    <string name="multiple_versions_detected">⚠️ تم اكتشاف إصدارات متعددة</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">إشارات القصة</string>

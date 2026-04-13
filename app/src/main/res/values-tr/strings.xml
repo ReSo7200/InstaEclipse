@@ -169,7 +169,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Ekran Görüntüsü Tespitini Atla</string>
     <string name="ig_dialog_ghost_hide_view_once">Bir Kez Görüntüle Açılmasını Gizle</string>
     <string name="ig_dialog_ghost_unlimited_replays">Sınırsız Tekrar İzleme</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Geçici Medyayı Kalıcı Yap</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Geçici Medyayı Kalıcı Yap</string>
     <string name="ig_dialog_ghost_keep_disappearing">Kaybolan Mesajları Sakla</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Hızlı Geçişi Özelleştir</string>
     <string name="ig_dialog_quick_hide_seen">DM Okundu Bilgisini Gizlemeyi Dahil Et</string>
@@ -304,7 +304,7 @@
     <string name="feat_downloader_reset_folder">🗑 İndirme Klasörünü Sıfırla</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠ Birden fazla sürüm tespit edildi</string>
+    <string name="multiple_versions_detected">⚠️ Birden fazla sürüm tespit edildi</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">Hikaye Bahsedilmeleri</string>

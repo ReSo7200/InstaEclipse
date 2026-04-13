@@ -11,7 +11,7 @@
     <!-- home -->
     <string name="back">Πίσω</string>
     <string name="apply_changes">Εφαρμογή Αλλαγών</string>
-    <string name="multiple_versions_detected">⚠ Εντοπίστηκαν πολλαπλές εκδόσεις</string>
+    <string name="multiple_versions_detected">⚠️ Εντοπίστηκαν πολλαπλές εκδόσεις</string>
     <string name="module_disabled">Το Module δεν είναι ενεργό. Παρακαλούμε ενεργοποιήστε το.</string>
     <string name="module_status">Κατάσταση Module:</string>
     <string name="module_status_disabled">Κατάσταση Module: Ανενεργό</string>
@@ -198,7 +198,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Παράκαμψη Εντοπισμού Στιγμιοτύπων</string>
     <string name="ig_dialog_ghost_hide_view_once">Απόκρυψη Ανοίγματος Μηνύματος μιας Χρήσης</string>
     <string name="ig_dialog_ghost_unlimited_replays">Απεριόριστες Επαναλήψεις μιας Χρήσης</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Μόνιμα Αρχεία μιας Χρήσης</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Μόνιμα Αρχεία μιας Χρήσης</string>
     <string name="ig_dialog_ghost_keep_disappearing">Διατήρηση Εξαφανιζόμενων Μηνυμάτων</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Προσαρμογή Γρήγορης Εναλλαγής</string>
 

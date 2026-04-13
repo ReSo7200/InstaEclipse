@@ -10,7 +10,7 @@
     <!-- home -->
     <string name="back">חזרה</string>
     <string name="apply_changes">החל שינויים</string>
-    <string name="multiple_versions_detected">⚠ זוהו מספר גרסאות</string>
+    <string name="multiple_versions_detected">⚠️ זוהו מספר גרסאות</string>
     <string name="module_disabled">המודול אינו מופעל. נא להפעיל אותו.</string>
     <string name="module_status">סטטוס המודול:</string>
     <string name="module_status_disabled">סטטוס המודול: אינו מופעל</string>
@@ -197,7 +197,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">עקוף זיהוי צילום מסך</string>
     <string name="ig_dialog_ghost_hide_view_once">הסתר פתיחת מדיה חד-פעמית</string>
     <string name="ig_dialog_ghost_unlimited_replays">צפיות חוזרות ללא הגבלה</string>
-    <string name="ig_dialog_ghost_permanent_view_once">מדיה חד-פעמית קבועה</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ מדיה חד-פעמית קבועה</string>
     <string name="ig_dialog_ghost_keep_disappearing">שמור הודעות נעלמות</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 התאם אישית החלפה מהירה</string>
 

@@ -10,7 +10,7 @@
     <!-- home -->
     <string name="back">Retour</string>
     <string name="apply_changes">Appliquer les modifications</string>
-    <string name="multiple_versions_detected">⚠ Plusieurs versions détectées</string>
+    <string name="multiple_versions_detected">⚠️ Plusieurs versions détectées</string>
     <string name="module_disabled">Le module n\'est pas activé. Veuillez l\'activer.</string>
     <string name="module_status">Statut du module :</string>
     <string name="module_status_disabled">Statut du module : Désactiver</string>
@@ -197,7 +197,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Contourner Détection de capture d\'écran</string>
     <string name="ig_dialog_ghost_hide_view_once">Masquer Ouverture Vue Unique</string>
     <string name="ig_dialog_ghost_unlimited_replays">Relectures illimitées Vue Unique</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Médias Vue Unique permanents</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Médias Vue Unique permanents</string>
     <string name="ig_dialog_ghost_keep_disappearing">Conserver Messages éphémères</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Personnaliser Bascule Rapide</string>
 

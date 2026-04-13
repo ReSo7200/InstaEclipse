@@ -174,7 +174,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Screenshot-Erkennung umgehen</string>
     <string name="ig_dialog_ghost_hide_view_once">„Einmal ansehen" verbergen</string>
     <string name="ig_dialog_ghost_unlimited_replays">Unbegrenzte Wiedergabe</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Einmal-Medien dauerhaft speichern</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Einmal-Medien dauerhaft speichern</string>
     <string name="ig_dialog_ghost_keep_disappearing">Verschwindende Nachrichten behalten</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Schnellschalter anpassen</string>
     <string name="ig_dialog_quick_hide_seen">DM-Gelesen-Status verbergen einschließen</string>
@@ -309,7 +309,7 @@
     <string name="feat_downloader_reset_folder">🗑 Download-Ordner zurücksetzen</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠ Mehrere Versionen erkannt</string>
+    <string name="multiple_versions_detected">⚠️ Mehrere Versionen erkannt</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">Story-Erwähnungen</string>

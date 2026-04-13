@@ -10,7 +10,7 @@
     <!-- home -->
     <string name="back">Back</string>
     <string name="apply_changes">Apply Changes</string>
-    <string name="multiple_versions_detected">⚠ Multiple versions detected</string>
+    <string name="multiple_versions_detected">⚠️ Multiple versions detected</string>
     <string name="module_disabled">Module is not enabled. Please enable it.</string>
 
     <string name="module_status">Module Status:</string>
@@ -205,7 +205,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Bypass Screenshot Detection</string>
     <string name="ig_dialog_ghost_hide_view_once">Hide View Once Opened</string>
     <string name="ig_dialog_ghost_unlimited_replays">Unlimited View-Once Replays</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Permanent View Once Media</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Permanent View Once Media</string>
     <string name="ig_dialog_ghost_keep_disappearing">Keep Disappearing Messages</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Customize Quick Toggle</string>
 

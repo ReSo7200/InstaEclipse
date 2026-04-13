@@ -168,7 +168,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Contornar deteção de capturas de ecrã</string>
     <string name="ig_dialog_ghost_hide_view_once">Ocultar abertura de mensagens temporárias</string>
     <string name="ig_dialog_ghost_unlimited_replays">Repetições ilimitadas de visualização única</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Tornar mídia temporária permanente</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Tornar mídia temporária permanente</string>
     <string name="ig_dialog_ghost_keep_disappearing">Guardar mensagens que desaparecem</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Personalizar ativação rápida</string>
     <string name="ig_dialog_quick_hide_seen">Incluir ocultar leitura em mensagens diretas</string>
@@ -303,7 +303,7 @@
     <string name="feat_downloader_reset_folder">🗑 Redefinir pasta de transferência</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠ Várias versões detetadas</string>
+    <string name="multiple_versions_detected">⚠️ Várias versões detetadas</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">Menções de história</string>

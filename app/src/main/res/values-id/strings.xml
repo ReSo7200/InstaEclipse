@@ -10,7 +10,7 @@
     <!-- home -->
     <string name="back">Kembali</string>
     <string name="apply_changes">Terapkan Perubahan</string>
-    <string name="multiple_versions_detected">⚠ Beberapa versi terdeteksi</string>
+    <string name="multiple_versions_detected">⚠️ Beberapa versi terdeteksi</string>
     <string name="module_disabled">Modul tidak aktif. Silakan aktifkan.</string>
     <string name="module_status">Status Modul:</string>
     <string name="module_status_disabled">Status Modul: Dinonaktifkan</string>
@@ -197,7 +197,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Lewati Deteksi Tangkapan Layar</string>
     <string name="ig_dialog_ghost_hide_view_once">Sembunyikan Pembukaan Sekali Lihat</string>
     <string name="ig_dialog_ghost_unlimited_replays">Putar Ulang Sekali Lihat Tanpa Batas</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Media Sekali Lihat Permanen</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Media Sekali Lihat Permanen</string>
     <string name="ig_dialog_ghost_keep_disappearing">Simpan Pesan yang Menghilang</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Sesuaikan Sakelar Cepat</string>
 

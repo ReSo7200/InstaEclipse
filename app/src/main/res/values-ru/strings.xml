@@ -169,7 +169,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Обойти обнаружение скриншотов</string>
     <string name="ig_dialog_ghost_hide_view_once">Скрыть открытие одноразовых сообщений</string>
     <string name="ig_dialog_ghost_unlimited_replays">Неограниченное воспроизведение</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Сохранить временные медиа навсегда</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ Сохранить временные медиа навсегда</string>
     <string name="ig_dialog_ghost_keep_disappearing">Сохранять исчезающие сообщения</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 Настроить быстрое переключение</string>
     <string name="ig_dialog_quick_hide_seen">Включить скрытие прочтения в личных сообщениях</string>
@@ -304,7 +304,7 @@
     <string name="feat_downloader_reset_folder">🗑 Сбросить папку загрузки</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠ Обнаружено несколько версий</string>
+    <string name="multiple_versions_detected">⚠️ Обнаружено несколько версий</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">Упоминания в истории</string>

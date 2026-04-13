@@ -176,7 +176,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">繞過截圖偵測</string>
     <string name="ig_dialog_ghost_hide_view_once">隱藏限看一次開啟</string>
     <string name="ig_dialog_ghost_unlimited_replays">無限重播限看一次</string>
-    <string name="ig_dialog_ghost_permanent_view_once">將限看媒體轉為永久</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ 將限看媒體轉為永久</string>
     <string name="ig_dialog_ghost_keep_disappearing">保留消失訊息</string>
     <string name="ig_dialog_customize_quick_toggle">🛠 自訂快速切換</string>
     <string name="ig_dialog_quick_hide_seen">包含隱藏私訊已讀</string>
@@ -311,7 +311,7 @@
     <string name="feat_downloader_reset_folder">🗑 重設下載資料夾</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠ 偵測到多個版本</string>
+    <string name="multiple_versions_detected">⚠️ 偵測到多個版本</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">限時動態提及</string>
