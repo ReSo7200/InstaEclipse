@@ -47,14 +47,12 @@ import ps.reso.instaeclipse.mods.media.StoryDownloadHook;
 import ps.reso.instaeclipse.mods.misc.CommentCopyHook;
 import ps.reso.instaeclipse.mods.misc.DisableStoryFlippingHook;
 import ps.reso.instaeclipse.mods.misc.DisableVideoAutoPlayHook;
-import ps.reso.instaeclipse.mods.misc.FollowStatusFinder;
 import ps.reso.instaeclipse.mods.misc.StoryMentionHook;
 import ps.reso.instaeclipse.mods.network.IGNetworkInterceptor;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.core.CommonUtils;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
-import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureManager;
 
 
@@ -165,6 +163,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
         try {
 
+
             XposedHelpers.findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
@@ -212,14 +211,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
                     UIHookManager instagramUI = new UIHookManager();
                     instagramUI.mainActivity(hostClassLoader);
-
-                   /* // Eclipse menu button
-                   This was disabled due to some issues
-                    try {
-                        new EclipseMenuButton(moduleSourceDir).install(lpparam);
-                    } catch (Throwable ignored) {
-                        XposedBridge.log("(InstaEclipse | EclipseMenuButton): ❌ Failed to hook");
-                    }*/
 
                     XposedBridge.log("(InstaEclipse): " + lpparam.packageName + " package detected. Starting feature hooks...");
 
@@ -325,50 +316,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         new BuildExpiredPopupHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         XposedBridge.log("(InstaEclipse | BuildExpired): ❌ Failed to hook");
-                    }
-
-                    try {
-                        if (FeatureFlags.showFollowerToast) {
-                            FollowStatusFinder followerIndicator = new FollowStatusFinder();
-                            FollowStatusFinder.FollowMethodResult result = null;
-                            String userIdClass = null;
-
-                            // Cache hit: use stored className/methodName strings (no DexKit needed)
-                            if (DexKitCache.isCacheValid()) {
-                                String cachedStatus = DexKitCache.loadString("FollowerStatus");
-                                if (cachedStatus != null) {
-                                    int sep = cachedStatus.indexOf('\u0000');
-                                    if (sep > 0) {
-                                        result = new FollowStatusFinder.FollowMethodResult(
-                                                cachedStatus.substring(sep + 1),
-                                                cachedStatus.substring(0, sep));
-                                        userIdClass = DexKitCache.loadString("FollowUserIdClass");
-                                    }
-                                }
-                            }
-
-                            // DexKit path
-                            if (result == null) {
-                                result = followerIndicator.findFollowerStatusMethod(Module.dexKitBridge);
-                                if (result != null) {
-                                    DexKitCache.saveString("FollowerStatus",
-                                            result.userClassName + '\u0000' + result.methodName);
-                                    userIdClass = followerIndicator.findUserIdClassIfNeeded(
-                                            Module.dexKitBridge, result.userClassName);
-                                    DexKitCache.saveString("FollowUserIdClass",
-                                            userIdClass != null ? userIdClass : "");
-                                }
-                            }
-
-                            if (result != null) {
-                                if (userIdClass != null && userIdClass.isEmpty()) userIdClass = null;
-                                followerIndicator.checkFollow(hostClassLoader, result.methodName, result.userClassName, userIdClass);
-                            } else {
-                                XposedBridge.log("(InstaEclipse | FollowerStatus): ❌ Method not found");
-                            }
-                        }
-                    } catch (Throwable e) {
-                        XposedBridge.log("(InstaEclipse | FollowerStatus): ❌ Failed to hook + " + e);
                     }
 
                     // Media Download (feed)

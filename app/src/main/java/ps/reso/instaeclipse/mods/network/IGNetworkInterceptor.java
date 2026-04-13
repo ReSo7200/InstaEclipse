@@ -348,19 +348,24 @@ public class IGNetworkInterceptor {
                                         }
                                     }
                                     String path = uri.getPath();
-                                    if (FeatureFlags.showFollowerToast && path.startsWith("/api/v1/friendships/show/")) {
-                                        String[] parts = path.split("/");
-                                        if (parts.length >= 6) {
-                                            final String capturedId = parts[5];
+                                    if (FeatureFlags.showFollowerToast) {
+                                        FeatureStatusTracker.setHooked("FollowerToast");
+                                        if (path.startsWith("/api/v1/friendships/show/")){
+                                            String[] parts = path.split("/");
+                                            if (parts.length >= 6) {
+                                                final String capturedId = parts[5];
 
-                                            // 1. Mark the target for the toast
-                                            FollowIndicatorTracker.currentlyViewedUserId = capturedId;
-                                            XposedBridge.log("(IE|Interceptor) captured userId=" + capturedId);
+                                                // 1. Mark the target for the toast
+                                                FollowIndicatorTracker.currentlyViewedUserId = capturedId;
+                                                XposedBridge.log("(IE|Interceptor) captured userId=" + capturedId);
 
-                                            // 2. Register callbacks for the LIVE response bytes
-                                            if (param.args.length > 1) registerCallback(param.args[1], capturedId);
-                                            if (param.args.length > 2) registerCallback(param.args[2], capturedId);
+                                                // 2. Register callbacks for the LIVE response bytes
+                                                if (param.args.length > 1) registerCallback(param.args[1], capturedId);
+                                                if (param.args.length > 2) registerCallback(param.args[2], capturedId);
+                                            }
                                         }
+
+
                                     }
 
                                 }
