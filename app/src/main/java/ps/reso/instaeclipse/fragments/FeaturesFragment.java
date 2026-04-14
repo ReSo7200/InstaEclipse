@@ -63,6 +63,7 @@ public class FeaturesFragment extends Fragment {
     private ExtendedFloatingActionButton fabSave;
     private ActivityResultLauncher<Uri> dirPickerLauncher;
     private ActivityResultLauncher<String[]> restoreFileLauncher;
+    private ActivityResultLauncher<String> notifPermLauncher;
 
     private String currentMenu = "main";
 
@@ -75,17 +76,29 @@ public class FeaturesFragment extends Fragment {
             if ("ps.reso.instaeclipse.ACTION_SEND_PREFS".equals(intent.getAction())) {
                 Bundle bundle = intent.getExtras();
                 if (bundle != null) {
+                    // If we just set the path locally (via dirPickerLauncher), the incoming
+                    // reply from Instagram may still carry the old value — skip overwriting.
+                    boolean suppressPath = localCache.getBoolean("pathJustSetLocally", false);
                     SharedPreferences.Editor editor = localCache.edit();
+                    if (suppressPath) editor.remove("pathJustSetLocally");
                     for (String key : bundle.keySet()) {
                         Object value = bundle.get(key);
                         if (value instanceof Boolean) {
                             editor.putBoolean(key, (Boolean) value);
                         } else if (value instanceof String) {
+                            if (suppressPath && ("downloaderCustomPath".equals(key) || "downloaderCustomUri".equals(key))) {
+                                continue;
+                            }
                             editor.putString(key, (String) value);
                         }
                     }
                     editor.apply();
-                    if (adapter != null) adapter.notifyDataSetChanged();
+                    // Rebuild downloader menu so the folder title reflects the latest value
+                    if ("downloader".equals(currentMenu)) {
+                        loadDownloaderMenu();
+                    } else if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             }
         }
@@ -122,6 +135,9 @@ public class FeaturesFragment extends Fragment {
             }
         });
 
+        notifPermLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(), granted -> {});
+
         dirPickerLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(), uri -> {
             if (uri != null) {
                 final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
@@ -137,10 +153,16 @@ public class FeaturesFragment extends Fragment {
                     path = uriString;
                 }
 
+                // Set flag + save new path atomically so the incoming ACTION_SEND_PREFS
+                // reply (triggered by onResume's ACTION_REQUEST_PREFS) doesn't overwrite us.
+                // commit() (not apply()) ensures the XML is flushed to disk before we make it
+                // world-readable so the module's XSharedPreferences can pick it up on cold start.
                 SharedPreferences.Editor editor = localCache.edit();
+                editor.putBoolean("pathJustSetLocally", true);
                 editor.putString("downloaderCustomUri", uriString);
                 editor.putString("downloaderCustomPath", path);
-                editor.apply();
+                editor.commit();
+                makeLocalCacheWorldReadable();
 
                 Intent intentUri = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
                 intentUri.putExtra("key", "downloaderCustomUri");
@@ -166,6 +188,15 @@ public class FeaturesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_features, container, false);
         localCache = requireContext().getSharedPreferences("instaeclipse_cache", Context.MODE_PRIVATE);
+
+        // Request POST_NOTIFICATIONS permission (required API 33+ for download progress notifications)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                    android.Manifest.permission.POST_NOTIFICATIONS)
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                notifPermLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
 
         recyclerFeatures = fragmentView.findViewById(R.id.recycler_features);
         recyclerFeatures.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -780,15 +811,31 @@ public class FeaturesFragment extends Fragment {
     // TOOLS ACTIONS & HANDLERS
     // =========================================================
 
+    /**
+     * Makes the localCache SharedPreferences file world-readable so the module can
+     * access it via XSharedPreferences on a cold Instagram start (when the sync
+     * broadcast was never delivered because Instagram wasn't running at the time).
+     * Apps are allowed to change permissions on their own files.
+     */
+    private void makeLocalCacheWorldReadable() {
+        try {
+            java.io.File prefsFile = new java.io.File(
+                    requireContext().getApplicationInfo().dataDir + "/shared_prefs/instaeclipse_cache.xml");
+            prefsFile.setReadable(true, false);
+        } catch (Throwable ignored) {}
+    }
+
     private void pickDownloadFolder() {
         dirPickerLauncher.launch(null);
     }
 
     private void resetDownloadFolder() {
         SharedPreferences.Editor editor = localCache.edit();
+        editor.remove("pathJustSetLocally");
         editor.putString("downloaderCustomUri", "");
         editor.putString("downloaderCustomPath", "");
-        editor.apply();
+        editor.commit();
+        makeLocalCacheWorldReadable();
 
         Intent intentUri = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
         intentUri.putExtra("key", "downloaderCustomUri");

@@ -21,6 +21,7 @@ import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -53,6 +54,7 @@ import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.core.CommonUtils;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
+import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureManager;
 
 
@@ -74,25 +76,18 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     @Override
     public void initZygote(StartupParam startupParam) {
-        XposedBridge.log("(InstaEclipse): Zygote initialized.");
-
-        // Save the module's APK path
         moduleSourceDir = startupParam.modulePath;
 
-        // Detect ABI correctly
-        String abi = Build.SUPPORTED_ABIS[0]; // Primary ABI
+        String abi = Build.SUPPORTED_ABIS[0];
         String abiFolder;
-
         if (abi.equalsIgnoreCase("arm64-v8a")) abiFolder = "arm64";
         else if (abi.equalsIgnoreCase("armeabi-v7a") || abi.equalsIgnoreCase("armeabi") || abi.equalsIgnoreCase("armv8i"))
             abiFolder = "arm";
         else if (abi.equalsIgnoreCase("x86")) abiFolder = "x86";
         else if (abi.equalsIgnoreCase("x86_64")) abiFolder = "x86_64";
-        else abiFolder = abi; // fallback just in case
+        else abiFolder = abi;
 
         moduleLibDir = moduleSourceDir.substring(0, moduleSourceDir.lastIndexOf("/")) + "/lib/" + abiFolder;
-
-        XposedBridge.log("(InstaEclipse) Module paths initialized:" + "\nSourceDir: " + moduleSourceDir + "\nLibDir: " + moduleLibDir);
     }
 
     @Override
@@ -100,21 +95,12 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         // Ensure preferences are loaded
 
 
-        XposedBridge.log("(InstaEclipse): Loaded package: " + lpparam.packageName);
-
         // Hook into your module
         if (lpparam.packageName.equals(CommonUtils.MY_PACKAGE_NAME)) {
             try {
-
                 if (dexKitBridge == null) {
-                    // Load the .so file from your module
                     System.load(moduleLibDir + "/libdexkit.so");
-                    XposedBridge.log("libdexkit.so loaded successfully.");
-
-                    // Initialize DexKitBridge with your module's APK (for module-specific tasks, if needed)
                     dexKitBridge = DexKitBridge.create(moduleSourceDir);
-
-                    XposedBridge.log("DexKitBridge initialized for InstaEclipse.");
                 }
 
                 // Hook your module
@@ -188,12 +174,23 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
 
-                    XposedBridge.log("InstaEclipse: Settings loaded via Application.attach for " + lpparam.packageName);
-
                     // Setup context, preferences
                     Context context = (Context) param.args[0];
                     SettingsManager.init(context);
                     SettingsManager.loadAllFlags(context);
+
+                    // Pull downloader path from companion app's cache so it's available even
+                    // when Instagram was started without ever receiving the sync broadcast.
+                    try {
+                        XSharedPreferences cp = new XSharedPreferences(CommonUtils.MY_PACKAGE_NAME, "instaeclipse_cache");
+                        cp.reload();
+                        String path = cp.getString("downloaderCustomPath", "");
+                        String uri  = cp.getString("downloaderCustomUri",  "");
+                        if (!path.isEmpty()) FeatureFlags.downloaderCustomPath = path;
+                        if (!uri.isEmpty())  FeatureFlags.downloaderCustomUri  = uri;
+                    } catch (Throwable ignored) {
+                    }
+
                     FeatureManager.refreshFeatureStatus(); // Update internal feature states
 
                     // Activate the LSPosed Sync Bridge to listen to FeaturesFragment updates
@@ -211,8 +208,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
                     UIHookManager instagramUI = new UIHookManager();
                     instagramUI.mainActivity(hostClassLoader);
-
-                    XposedBridge.log("(InstaEclipse): " + lpparam.packageName + " package detected. Starting feature hooks...");
 
                     IGNetworkInterceptor interceptor = new IGNetworkInterceptor();
 
@@ -487,7 +482,12 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         if (Build.VERSION.SDK_INT >= 33) {
             context.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
         } else {
-            ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+            // On API < 33 there are no EXPORTED/NOT_EXPORTED flags.
+            // ContextCompat.RECEIVER_NOT_EXPORTED injects a custom permission that the
+            // companion app doesn't hold, silently blocking its broadcasts from reaching
+            // this receiver.  Use the plain two-arg overload instead so the companion app
+            // can send ACTION_UPDATE_PREF_STRING and friends without restriction.
+            context.registerReceiver(receiver, filter);
         }
     }
 }

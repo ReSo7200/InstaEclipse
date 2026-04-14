@@ -8,11 +8,8 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.DocumentsContract;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -42,8 +39,6 @@ public class UIHookManager {
 
     @SuppressLint("StaticFieldLeak")
     private static Activity currentActivity;
-    static final int FOLDER_PICKER_REQUEST = 0x9E50;
-
     public static Activity getCurrentActivity() {
         return currentActivity;
     }
@@ -183,7 +178,6 @@ public class UIHookManager {
                         });
                     }
                 });
-                XposedBridge.log("(InstaEclipse): ✅ Successfully hooked " + methodData.getName() + " in InstagramMainActivity");
             } else {
                 XposedBridge.log("(InstaEclipse): ❌ Failed to find any onCreate candidate in InstagramMainActivity");
             }
@@ -231,39 +225,11 @@ public class UIHookManager {
                         });
                     }
                 });
-                XposedBridge.log("(InstaEclipse): ✅ Auto-detected and hooked obfuscated onResume: " + methodName);
                 break;
             }
         } catch (Throwable t) {
             XposedBridge.log("(InstaEclipse): ❌ onResume discovery failed: " + t.getMessage());
         }
-
-        // Hook onActivityResult — catches folder picker result in the Instagram process
-        XposedHelpers.findAndHookMethod(Activity.class, "onActivityResult",
-                int.class, int.class, Intent.class, new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) {
-                if ((int) param.args[0] != FOLDER_PICKER_REQUEST) return;
-                if ((int) param.args[1] != Activity.RESULT_OK)    return;
-                Intent data = (Intent) param.args[2];
-                if (data == null) return;
-                Uri treeUri = data.getData();
-                String path = treeUriToPath(treeUri);
-                Activity activity = (Activity) param.thisObject;
-                // Take persistent read+write permission so the SAF grant survives restarts
-                try {
-                    activity.getContentResolver().takePersistableUriPermission(treeUri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                } catch (Throwable ignored) {}
-                FeatureFlags.downloaderCustomUri  = treeUri.toString();
-                FeatureFlags.downloaderCustomPath = path != null ? path : treeUri.toString();
-                SettingsManager.init(activity);
-                SettingsManager.saveAllFlags();
-                String display = path != null ? path : treeUri.toString();
-                Toast.makeText(activity, I18n.t(activity, R.string.ig_toast_download_folder_set, display), Toast.LENGTH_SHORT).show();
-                XposedBridge.log("(IE|DL) folder set — path=" + display + " uri=" + treeUri);
-            }
-        });
 
         // Hook getBottomSheetNavigator - Instagram Main
         BottomSheetHookUtil.hookBottomSheetNavigator(Module.dexKitBridge);
@@ -326,7 +292,6 @@ public class UIHookManager {
             context.registerReceiver(receiver,
                     new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"));
         }
-        XposedBridge.log("(InstaEclipse) ✅ Config import receiver registered.");
     }
 
     /** Registers a receiver in the Instagram process to restore settings from a backup JSON. */
@@ -361,33 +326,8 @@ public class UIHookManager {
                 context.registerReceiver(receiver,
                         new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"));
             }
-            XposedBridge.log("(InstaEclipse) ✅ Settings restore receiver registered.");
-        } catch (Throwable e) {
+            } catch (Throwable e) {
             XposedBridge.log("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
-        }
-    }
-
-    /** Called from DialogUtils to launch the system folder picker inside the Instagram Activity. */
-    public static void launchFolderPicker(Activity activity) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        activity.startActivityForResult(intent, FOLDER_PICKER_REQUEST);
-    }
-
-    private static String treeUriToPath(Uri treeUri) {
-        try {
-            String docId = DocumentsContract.getTreeDocumentId(treeUri);
-            String[] parts = docId.split(":", 2);
-            String storageType = parts[0];
-            String relativePath = parts.length > 1 ? parts[1] : "";
-            String base = "primary".equalsIgnoreCase(storageType)
-                    ? Environment.getExternalStorageDirectory().getAbsolutePath()
-                    : "/storage/" + storageType;
-            return relativePath.isEmpty() ? base : base + "/" + relativePath;
-        } catch (Throwable t) {
-            XposedBridge.log("(IE|DL) treeUriToPath error: " + t);
-            return null;
         }
     }
 

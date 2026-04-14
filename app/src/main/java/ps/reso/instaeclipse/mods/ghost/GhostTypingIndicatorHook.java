@@ -31,6 +31,7 @@ public class GhostTypingIndicatorHook {
             Method cached = DexKitCache.loadMethod("GhostTyping", Module.hostClassLoader);
             if (cached != null) {
                 XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("(InstaEclipse | TypingBlock): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
                 FeatureStatusTracker.setHooked("GhostTyping");
                 return;
             }

@@ -33,6 +33,7 @@ public class GhostScreenshotDetectionHook {
             Method cached = DexKitCache.loadMethod("GhostScreenshot", Module.hostClassLoader);
             if (cached != null) {
                 XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("(InstaEclipse | ScreenshotBlock): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
                 FeatureStatusTracker.setHooked("GhostScreenshot");
                 return;
             }

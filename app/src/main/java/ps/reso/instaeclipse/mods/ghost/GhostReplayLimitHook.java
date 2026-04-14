@@ -83,6 +83,7 @@ public class GhostReplayLimitHook {
             List<Method> cached = DexKitCache.loadMethods("Replays_parse", classLoader);
             if (cached != null && !cached.isEmpty()) {
                 for (Method m : cached) XposedBridge.hookMethod(m, hook);
+                XposedBridge.log("[IE] ✅ Ghost Replay – parseFromJson");
                 return;
             }
         }
@@ -105,6 +106,7 @@ public class GhostReplayLimitHook {
                 XposedBridge.log("(IE|Replays) ❌ parseFromJson method not found");
             } else {
                 DexKitCache.saveMethods("Replays_parse", hooked);
+                XposedBridge.log("[IE] ✅ Ghost Replay – parseFromJson");
             }
         } catch (Throwable t) {
             XposedBridge.log("(IE|Replays) ❌ hookParseFromJsonMethod: " + t);
@@ -128,6 +130,7 @@ public class GhostReplayLimitHook {
             Method cached = DexKitCache.loadMethod("Replays_sync", classLoader);
             if (cached != null) {
                 XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("[IE] ✅ Ghost Replay – sync");
                 FeatureStatusTracker.setHooked("UnlimitedReplays");
                 return;
             }
@@ -145,6 +148,7 @@ public class GhostReplayLimitHook {
                     if (!java.lang.reflect.Modifier.isSynchronized(m.getModifiers())) continue;
                     DexKitCache.saveMethod("Replays_sync", m);
                     XposedBridge.hookMethod(m, hook);
+                    XposedBridge.log("[IE] ✅ Ghost Replay – sync");
                     XposedBridge.log("(IE|Replays) ✅ sync hook → " + md.getClassName() + "." + md.getName());
                     FeatureStatusTracker.setHooked("UnlimitedReplays");
                     return;

@@ -19,29 +19,31 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.ghost.GhostModeUtils;
 
 public class BottomSheetHookUtil {
 
+    private static final String CACHE_KEY = "BottomSheet";
+
     public static void hookBottomSheetNavigator(DexKitBridge bridge) {
+        // Try cache first
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod(CACHE_KEY, Module.hostClassLoader);
+            if (cached != null) {
+                hookMethod(cached);
+                return;
+            }
+        }
+
         try {
             List<MethodData> methods = bridge.findMethod(
                     FindMethod.create()
-                            .matcher(
-                                    MethodMatcher.create()
-                                            .usingStrings("BottomSheetConstants")
-                            )
+                            .matcher(MethodMatcher.create().usingStrings("BottomSheetConstants"))
             );
 
-            if (methods.isEmpty()) {
-                return;
-            }
-
             for (MethodData method : methods) {
-                // ✅ Filter to only methods inside the InstagramMainActivity class
-                if (!method.getClassName().equals("com.instagram.mainactivity.InstagramMainActivity")) {
-                    continue;
-                }
+                if (!method.getClassName().equals("com.instagram.mainactivity.InstagramMainActivity")) continue;
 
                 Method reflectMethod;
                 try {
@@ -54,30 +56,12 @@ public class BottomSheetHookUtil {
                 String returnType = String.valueOf(method.getReturnType());
                 ClassDataList paramTypes = method.getParamTypes();
 
-                // ✅ Match: final, non-static, non-void return, 0-args
                 if (!Modifier.isStatic(modifiers)
                         && Modifier.isFinal(modifiers)
                         && !returnType.contains("void")
                         && paramTypes.size() == 0) {
-
-                    XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
-                            final Activity activity = getCurrentActivity();
-                            if (activity != null) {
-                                activity.runOnUiThread(() -> {
-                                    try {
-                                        setupHooks(activity);
-                                        addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
-                                    } catch (Exception ignored) {
-                                    }
-                                });
-                            }
-                        }
-                    });
-
-                    XposedBridge.log("(InstaEclipse | BottomSheet): ✅ Hooked: " +
-                            method.getClassName() + "." + method.getName());
+                    DexKitCache.saveMethod(CACHE_KEY, reflectMethod);
+                    hookMethod(reflectMethod);
                     return;
                 }
             }
@@ -85,6 +69,25 @@ public class BottomSheetHookUtil {
         } catch (Throwable e) {
             XposedBridge.log("(InstaEclipse | BottomSheet): ❌ DexKit exception: " + e.getMessage());
         }
+    }
+
+    private static void hookMethod(Method reflectMethod) {
+        XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                final Activity activity = getCurrentActivity();
+                if (activity != null) {
+                    activity.runOnUiThread(() -> {
+                        try {
+                            setupHooks(activity);
+                            addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
+                        } catch (Exception ignored) {
+                        }
+                    });
+                }
+            }
+        });
+        XposedBridge.log("(InstaEclipse | BottomSheet): ✅ Hooked: " + reflectMethod.getDeclaringClass().getName() + "." + reflectMethod.getName());
     }
 }
 

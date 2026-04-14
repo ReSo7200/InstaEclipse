@@ -98,9 +98,6 @@ public class StoryDownloadHook {
         DexKitCache.saveMethod("StoryDownload_button", method);
 
         try {
-            XposedBridge.log("(IE|Story) ✅ Button builder: "
-                    + method.getDeclaringClass().getName() + "." + method.getName());
-
             XposedBridge.hookMethod(method, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
@@ -159,9 +156,6 @@ public class StoryDownloadHook {
         }
 
         try {
-            XposedBridge.log("(IE|Story) ✅ Click handler: "
-                    + method.getDeclaringClass().getName() + "." + method.getName());
-
             XposedBridge.hookMethod(method, new XC_MethodHook() {
 
                 @Override
@@ -208,7 +202,6 @@ public class StoryDownloadHook {
             });
 
             FeatureStatusTracker.setHooked("StoryDownload");
-            XposedBridge.log("(IE|Story) ✅ StoryDownload hooked");
 
         } catch (Throwable t) {
             XposedBridge.log("(IE|Story) ❌ Click handler hook: " + t);
@@ -682,10 +675,12 @@ public class StoryDownloadHook {
                 + " file=" + fn);
         Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_story_video) : I18n.t(ctx, R.string.ig_toast_downloading_story_photo), Toast.LENGTH_SHORT).show();
         mainHandler.post(() -> new Thread(() -> {
-            try (java.io.OutputStream out = FeedVideoDownloadHook.openOutputStream(ctx, fn, isVideo, currentStoryUsername)) {
-                downloadToStream(url, out);
-                mainHandler.post(() -> Toast.makeText(ctx,
-                        I18n.t(ctx, R.string.ig_toast_story_saved), Toast.LENGTH_SHORT).show());
+            try {
+                boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, isVideo, currentStoryUsername);
+                if (!delegated) {
+                    mainHandler.post(() -> Toast.makeText(ctx,
+                            I18n.t(ctx, R.string.ig_toast_story_saved), Toast.LENGTH_SHORT).show());
+                }
             } catch (Throwable e) {
                 mainHandler.post(() -> Toast.makeText(ctx,
                         I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());

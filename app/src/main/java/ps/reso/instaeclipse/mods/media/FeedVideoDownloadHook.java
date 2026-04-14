@@ -890,9 +890,9 @@ public class FeedVideoDownloadHook {
                         try {
                             Method m = methodData.getMethodInstance(classLoader);
                             XposedBridge.hookMethod(m, urlHook);
-                            hooked.add(m);
                             XposedBridge.log("(IE|DL|DexKit) ✅ Hooked getUrl() on "
                                     + classData.getName());
+                            hooked.add(m);
                         } catch (Throwable e) {
                             XposedBridge.log("(IE|DL|DexKit) ❌ Hook failed for "
                                     + classData.getName() + ": " + e.getMessage());
@@ -927,7 +927,6 @@ public class FeedVideoDownloadHook {
                     userClass = classLoader.loadClass(cachedClassName);
                     if (cachedGetter != null) {
                         UserUtils.userUsernameGetter = cachedGetter;
-                        XposedBridge.log("(IE|DL|Username) Restored from cache: userClass=" + cachedClassName);
                     }
                     // dictUserGetter is pure-reflection — fall through to scan below
                     resolveDictUserGetter(classLoader);
@@ -997,8 +996,7 @@ public class FeedVideoDownloadHook {
                 if (m.getParameterCount() == 0 && m.getReturnType().equals(userClass)) {
                     m.setAccessible(true);
                     dictUserGetter = m;
-                    XposedBridge.log("(IE|DL|Username) ✅ Resolved dictUserGetter: " + m.getName()
-                            + " on " + curr.getName());
+                    XposedBridge.log("(IE|DL|Username) ✅ Resolved dictUserGetter: " + m.getName());
                     return;
                 }
             }
@@ -1114,35 +1112,62 @@ public class FeedVideoDownloadHook {
 
     /**
      * Opens a writable OutputStream for the download destination, handling all storage strategies:
-     *   - SAF tree URI (custom folder picked by user) — works on all APIs, full path control
-     *   - MediaStore Downloads (API 29+, default) — scoped-storage safe, no root permission needed
-     *   - Legacy direct file (API < 29) — plain FileOutputStream on external storage
+     *   1. Raw file path (custom folder, avoids SAF authority issues when URI was granted to companion app)
+     *   2. SAF tree URI (works when folder was picked from inside Instagram's own dialog)
+     *   3. MediaStore Downloads (API 29+, default scoped-storage path)
+     *   4. Legacy direct file (API < 29)
      */
     static OutputStream openOutputStream(Context ctx, String filename, boolean isVideo, String username)
             throws Exception {
         String mimeType = isVideo ? "video/mp4" : "image/jpeg";
 
+        // 1. Raw path — preferred when set; bypasses SAF authority entirely
+        if (!FeatureFlags.downloaderCustomPath.isEmpty()) {
+            try {
+                return openRawPathOutputStream(filename, username);
+            } catch (Exception e) {
+                XposedBridge.log("(InstaEclipse|DL) Raw path failed, trying SAF: " + e.getMessage());
+            }
+        }
+
+        // 2. SAF — only works when the folder was picked inside Instagram's process
+        //    (so Instagram holds the persistable URI permission, not the companion app)
         if (!FeatureFlags.downloaderCustomUri.isEmpty()) {
             try {
                 return openSafOutputStream(ctx, filename, mimeType, username);
             } catch (Exception e) {
-                // SAF can fail on some devices (e.g. Xiaomi/MIUI) where the documents
-                // provider authority differs or is restricted. Fall through to MediaStore.
                 XposedBridge.log("(InstaEclipse|DL) SAF failed, falling back to MediaStore: " + e.getMessage());
             }
         }
 
+        // 3. MediaStore (API 29+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return openMediaStoreOutputStream(ctx, filename, mimeType, username);
         }
 
-        // Legacy API < 29: direct file write
+        // 4. Legacy API < 29: direct file write
         File dir = new File(Environment.getExternalStorageDirectory(), "InstaEclipse");
         if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
             dir = new File(dir, username);
         }
         //noinspection ResultOfMethodCallIgnored
         dir.mkdirs();
+        return new FileOutputStream(new File(dir, filename));
+    }
+
+    private static OutputStream openRawPathOutputStream(String filename, String username) throws Exception {
+        String rawPath = FeatureFlags.downloaderCustomPath;
+        // Reject if path conversion failed and we got a content URI string as fallback
+        if (rawPath.startsWith("content://")) {
+            throw new Exception("Not a raw file path: " + rawPath);
+        }
+        File dir = new File(rawPath);
+        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+            dir = new File(dir, username);
+        }
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new Exception("Cannot create dir: " + dir.getAbsolutePath());
+        }
         return new FileOutputStream(new File(dir, filename));
     }
 
@@ -1185,14 +1210,11 @@ public class FeedVideoDownloadHook {
     @SuppressLint("NewApi")
     private static OutputStream openMediaStoreOutputStream(Context ctx, String filename, String mimeType, String username)
             throws Exception {
-        String relPath = "InstaEclipse";
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
-            relPath += "/" + username;
-        }
+        String relPath = buildMediaStoreRelPath(username);
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
         values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
-        values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/" + relPath);
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, relPath);
         Uri collection = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
         Uri itemUri = ctx.getContentResolver().insert(collection, values);
         if (itemUri == null) throw new Exception("MediaStore insert failed");
@@ -1201,14 +1223,115 @@ public class FeedVideoDownloadHook {
         return out;
     }
 
-    /** Copies tempFile into the correct download destination then deletes the temp. */
-    static void saveFileToDestination(Context ctx, File tempFile, String filename, boolean isVideo, String username)
-            throws Exception {
+    // Standard top-level directories that MediaStore.Downloads accepts as RELATIVE_PATH roots
+    private static final java.util.Set<String> MS_ROOTS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "Download", "Downloads", "Pictures", "DCIM", "Movies", "Music",
+            "Ringtones", "Alarms", "Notifications", "Podcasts", "Audiobooks"));
+
+    /**
+     * Derives the MediaStore RELATIVE_PATH for the download.
+     * - If the custom path falls under a known MediaStore root (Download, Pictures, …),
+     *   it is used directly (e.g. Pictures/IG).
+     * - Otherwise the path is nested under Download/ (e.g. /sdcard/Test55 → Download/Test55).
+     * - Falls back to Download/InstaEclipse when no custom path is set.
+     */
+    private static String buildMediaStoreRelPath(String username) {
+        String customPath = FeatureFlags.downloaderCustomPath;
+        String base = "Download/InstaEclipse"; // default
+
+        if (!customPath.isEmpty() && !customPath.startsWith("content://")) {
+            String extBase = Environment.getExternalStorageDirectory().getAbsolutePath();
+            if (customPath.startsWith(extBase + "/")) {
+                String relative = customPath.substring(extBase.length() + 1); // e.g. "Test55" or "Pictures/IG"
+                String topLevel = relative.split("/")[0];
+                base = MS_ROOTS.contains(topLevel) ? relative : ("Download/" + relative);
+            }
+        }
+
+        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+            base += "/" + username;
+        }
+        return base;
+    }
+
+    /** Copies tempFile to the download destination (only used when no custom SAF URI is set). */
+    static void saveFileToDestination(Context ctx, File tempFile, String filename,
+                                      boolean isVideo, String username) throws Exception {
         try (FileInputStream in = new FileInputStream(tempFile);
              OutputStream out = openOutputStream(ctx, filename, isVideo, username)) {
             byte[] buf = new byte[32768]; int n;
             while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
         }
+    }
+
+    /**
+     * Reads the companion app's latest SAF URI from its shared prefs WITHOUT overwriting
+     * FeatureFlags — callers decide what to do with the value.
+     */
+    private static String readCompanionUri() {
+        try {
+            de.robv.android.xposed.XSharedPreferences cp =
+                    new de.robv.android.xposed.XSharedPreferences(
+                            "ps.reso.instaeclipse", "instaeclipse_cache");
+            cp.reload();
+            return cp.getString("downloaderCustomUri", "");
+        } catch (Throwable t) {
+            return "";
+        }
+    }
+
+    /**
+     * Downloads {@code url} and saves it with the configured destination.
+     *
+     * When a custom SAF URI is configured, the CDN URL is forwarded to
+     * {@link DownloadSaveService} in the companion-app process — it holds the SAF
+     * permission (granted when the user picked the folder in FeaturesFragment) and writes
+     * the file directly.  No file-descriptor passing across UIDs is required.
+     *
+     * @return {@code true} when delegated (async — service shows its own toast).
+     */
+    static boolean downloadAndSave(Context ctx, String url, String filename,
+                                   boolean isVideo, String username) throws Exception {
+        // Prefer FeatureFlags (live value synced from companion via broadcast).
+        // Fall back to reading companion cache directly (missed-broadcast / cold-start case).
+        String uri = FeatureFlags.downloaderCustomUri.isEmpty()
+                ? readCompanionUri()
+                : FeatureFlags.downloaderCustomUri;
+
+        if (!uri.isEmpty()) {
+            delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
+            return true;
+        }
+
+        // No custom folder configured → MediaStore / raw path.
+        try (OutputStream out = openOutputStream(ctx, filename, isVideo, username)) {
+            downloadToStream(url, out);
+        }
+        return false;
+    }
+
+    /**
+     * Starts {@link DownloadSaveService} in the companion-app process, passing the CDN
+     * URL(s) as plain string extras — no file descriptors cross the process boundary.
+     * The service downloads the media itself and writes to the SAF folder it already owns.
+     *
+     * @param audioUrl non-null to request a video+audio merge inside the service
+     */
+    private static void delegateUrlToCompanionApp(Context ctx,
+                                                   String url,
+                                                   String audioUrl,
+                                                   String filename, boolean isVideo,
+                                                   String username) throws Exception {
+        android.content.Intent intent = new android.content.Intent();
+        intent.setClassName("ps.reso.instaeclipse",
+                            "ps.reso.instaeclipse.mods.media.DownloadSaveService");
+        intent.putExtra("url",      url);
+        if (audioUrl != null) intent.putExtra("audioUrl", audioUrl);
+        intent.putExtra("filename", filename);
+        intent.putExtra("mimeType", isVideo ? "video/mp4" : "image/jpeg");
+        intent.putExtra("username", username);
+        ctx.startForegroundService(intent);
+        XposedBridge.log("(IE|DL) Delegated to DownloadSaveService: " + filename);
     }
 
     /**
@@ -1313,11 +1436,13 @@ public class FeedVideoDownloadHook {
             String fn = buildFilename(username, "post", mediaId, isVid);
             Toast.makeText(ctx, isVid ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
             executor.submit(() -> {
-                try (OutputStream out = openOutputStream(ctx, fn, isVid, username)) {
-                    downloadToStream(url, out);
-                    mainHandler.post(() -> Toast.makeText(ctx,
-                            isVid ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
-                            Toast.LENGTH_SHORT).show());
+                try {
+                    boolean delegated = downloadAndSave(ctx, url, fn, isVid, username);
+                    if (!delegated) {
+                        mainHandler.post(() -> Toast.makeText(ctx,
+                                isVid ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
+                                Toast.LENGTH_SHORT).show());
+                    }
                 } catch (Throwable e) {
                     XposedBridge.log("(IE|Post|DL) single failed: " + e);
                     mainHandler.post(() -> Toast.makeText(ctx,
@@ -1435,10 +1560,12 @@ public class FeedVideoDownloadHook {
                 String fn = buildFilename(username, "post", mediaId, isVid);
                 Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
-                    try (OutputStream out = openOutputStream(ctx, fn, isVid, username)) {
-                        downloadToStream(url, out);
-                        mainHandler.post(() -> Toast.makeText(ctx,
-                                I18n.t(ctx, R.string.ig_toast_saved), Toast.LENGTH_SHORT).show());
+                    try {
+                        boolean delegated = downloadAndSave(ctx, url, fn, isVid, username);
+                        if (!delegated) {
+                            mainHandler.post(() -> Toast.makeText(ctx,
+                                    I18n.t(ctx, R.string.ig_toast_saved), Toast.LENGTH_SHORT).show());
+                        }
                     } catch (Throwable e) {
                         mainHandler.post(() -> Toast.makeText(ctx,
                                 I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
@@ -1458,8 +1585,8 @@ public class FeedVideoDownloadHook {
                     for (String url : urls) {
                         boolean isVid = isVideoUrl(url);
                         String fn = buildFilename(username, "post", mediaId, isVid);
-                        try (OutputStream out = openOutputStream(ctx, fn, isVid, username)) {
-                            downloadToStream(url, out);
+                        try {
+                            downloadAndSave(ctx, url, fn, isVid, username);
                         } catch (Throwable e) {
                             failed++;
                             XposedBridge.log("(IE|Post|DL) item failed: " + e);
@@ -1535,8 +1662,6 @@ public class FeedVideoDownloadHook {
         try {
             Object result = obj.getClass().getMethod("getUsername").invoke(obj);
             if (result instanceof String s && !s.isEmpty() && s.matches("[a-zA-Z0-9._]{1,30}")) {
-                XposedBridge.log("(IE|DL|Username) getUsername() hit on "
-                        + obj.getClass().getName() + " → " + s);
                 return s;
             }
         } catch (Throwable ignored) {}
@@ -1676,11 +1801,13 @@ public class FeedVideoDownloadHook {
         XposedBridge.log("(IE|DL) startDirectDownload file=" + fn);
         Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
-            try (OutputStream out = openOutputStream(ctx, fn, isVideo, currentDownloadUsername)) {
-                downloadToStream(url, out);
-                mainHandler.post(() -> Toast.makeText(ctx,
-                        isVideo ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
-                        Toast.LENGTH_SHORT).show());
+            try {
+                boolean delegated = downloadAndSave(ctx, url, fn, isVideo, currentDownloadUsername);
+                if (!delegated) {
+                    mainHandler.post(() -> Toast.makeText(ctx,
+                            isVideo ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
+                            Toast.LENGTH_SHORT).show());
+                }
             } catch (Throwable e) {
                 XposedBridge.log("(IE|DL) download failed: " + e.getClass().getSimpleName() + ": " + e.getMessage());
                 mainHandler.post(() -> Toast.makeText(ctx,
@@ -1692,6 +1819,23 @@ public class FeedVideoDownloadHook {
     private void downloadAndMerge(Context ctx, String videoUrl, String audioUrl) {
         Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_merging_video_audio), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
+            // Companion always holds the SAF permission — delegate whenever a URI is set.
+            String uri = FeatureFlags.downloaderCustomUri.isEmpty()
+                    ? readCompanionUri()
+                    : FeatureFlags.downloaderCustomUri;
+
+            if (!uri.isEmpty()) {
+                String fn = buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, true);
+                try {
+                    delegateUrlToCompanionApp(ctx, videoUrl, audioUrl, fn, true, currentDownloadUsername);
+                } catch (Throwable e) {
+                    XposedBridge.log("(IE|DL) merge delegate failed: " + e.getMessage());
+                    mainHandler.post(() -> startDirectDownload(ctx, videoUrl, true));
+                }
+                return;
+            }
+
+            // No custom folder — merge locally and save via openOutputStream.
             File tv = null, ta = null, merged = null;
             try {
                 File cache = ctx.getCacheDir();

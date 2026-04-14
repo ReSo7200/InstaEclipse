@@ -857,7 +857,15 @@ public class DialogUtils {
     private static void showDownloaderSettings(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        layout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_downloader_folder), () -> showFolderPickerDialog(context)));
+        String folderRaw = FeatureFlags.downloaderCustomPath.isEmpty()
+                ? android.os.Environment.getExternalStorageDirectory().getAbsolutePath()
+                        + "/Download/InstaEclipse"
+                : FeatureFlags.downloaderCustomPath;
+        // Strip everything up to and including the primary storage root ("…/0/")
+        // so "/storage/emulated/0/Download/InstaEclipse" → "Download/InstaEclipse"
+        String folderDisplay = folderRaw.replaceFirst("^.*/0/", "");
+        layout.addView(createInfoSection(context,
+                I18n.t(context, R.string.ig_dialog_downloader_folder), folderDisplay));
 
         ToggleRow usernameFolderSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_downloader_username_subfolder), FeatureFlags.downloaderUsernameFolder);
         ToggleRow timestampSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_downloader_add_timestamp), FeatureFlags.downloaderAddTimestamp);
@@ -876,15 +884,6 @@ public class DialogUtils {
         layout.addView(timestampSwitch);
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_downloader_settings), layout, () -> {});
-    }
-
-    private static void showFolderPickerDialog(Context context) {
-        Activity activity = unwrapActivity(context);
-        if (activity != null) {
-            UIHookManager.launchFolderPicker(activity);
-        } else {
-            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_downloader_cannot_open_picker), Toast.LENGTH_SHORT).show();
-        }
     }
 
     private static Activity unwrapActivity(Context context) {
@@ -1184,6 +1183,34 @@ public class DialogUtils {
         row.addView(labelView);
         row.addView(chevron);
         row.setOnClickListener(v -> onClick.run());
+        return row;
+    }
+
+    private static View createInfoSection(Context context, String label, String value) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(40, 24, 32, 24);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView labelView = new TextView(context);
+        labelView.setText(label);
+        labelView.setTextSize(17);
+        labelView.setTextColor(Color.WHITE);
+        labelView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        TextView valueView = new TextView(context);
+        valueView.setText(value);
+        valueView.setTextSize(13);
+        valueView.setTextColor(Color.parseColor("#8E8E93"));
+        valueView.setMaxLines(1);
+        valueView.setEllipsize(android.text.TextUtils.TruncateAt.START);
+        valueView.setPadding(16, 0, 0, 0);
+        // weight=1 / width=0: value fills remaining space and truncates at start if too long
+        valueView.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        row.addView(labelView);
+        row.addView(valueView);
         return row;
     }
 

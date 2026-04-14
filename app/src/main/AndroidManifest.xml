@@ -35,6 +35,14 @@
             android:exported="true"
             android:theme="@style/Theme.InstaEclipse" />
 
+        <!-- Companion-app service: receives downloaded file (via ParcelFileDescriptor) from the
+             Xposed module (running in Instagram's process) and writes it to the SAF folder
+             whose permission belongs to the companion app. -->
+        <service
+            android:name=".mods.media.DownloadSaveService"
+            android:exported="true"
+            android:foregroundServiceType="dataSync" />
+
         <!-- Xposed Meta-data -->
         <meta-data
             android:name="xposedmodule"
@@ -66,6 +74,13 @@
     <!-- For Android 11+ broad storage access -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+
+    <!-- Foreground service (required API 28+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- dataSync foreground service type (required API 34+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Post notifications (required API 33+ to show download progress) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 
 </manifest>

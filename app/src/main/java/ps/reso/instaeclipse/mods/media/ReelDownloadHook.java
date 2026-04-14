@@ -52,6 +52,7 @@ public class ReelDownloadHook {
                         onOptionsBuilt(param);
                     }
                 });
+                XposedBridge.log("(IE|Reel) ✅ hooked: " + hookMethod.getDeclaringClass().getName() + "." + hookMethod.getName());
                 return;
             }
         }
@@ -97,6 +98,7 @@ public class ReelDownloadHook {
                     onOptionsBuilt(param);
                 }
             });
+            XposedBridge.log("(IE|Reel) ✅ hooked: " + hookMethod.getDeclaringClass().getName() + "." + hookMethod.getName());
 
         } catch (Throwable t) {
             XposedBridge.log("(IE|Reel) ❌ install: " + t);
@@ -341,10 +343,12 @@ public class ReelDownloadHook {
             final String finalUser = username;
             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_reel), Toast.LENGTH_SHORT).show();
             FeedVideoDownloadHook.executor.submit(() -> {
-                try (OutputStream out = FeedVideoDownloadHook.openOutputStream(ctx, fn, true, finalUser)) {
-                    FeedVideoDownloadHook.downloadToStream(finalUrl, out);
-                    FeedVideoDownloadHook.mainHandler.post(() ->
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_saved), Toast.LENGTH_SHORT).show());
+                try {
+                    boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, finalUrl, fn, true, finalUser);
+                    if (!delegated) {
+                        FeedVideoDownloadHook.mainHandler.post(() ->
+                                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_saved), Toast.LENGTH_SHORT).show());
+                    }
                 } catch (Throwable e) {
                     FeedVideoDownloadHook.mainHandler.post(() ->
                             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_failed, e.getMessage()), Toast.LENGTH_SHORT).show());

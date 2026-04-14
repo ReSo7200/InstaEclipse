@@ -262,7 +262,7 @@
     <string name="ig_dialog_downloader_reels">Download Reels</string>
     <string name="ig_dialog_downloader_profiles">Download Profile Pictures</string>
     <string name="ig_dialog_downloader_folder">📁 Download Folder</string>
-    <string name="ig_dialog_downloader_username_subfolder">Save in Username Subfolder</string>
+<string name="ig_dialog_downloader_username_subfolder">Save in Username Subfolder</string>
     <string name="ig_dialog_downloader_add_timestamp">Add Timestamp to Filename</string>
     <string name="ig_dialog_downloader_cannot_open_picker">Cannot open folder picker here</string>
 

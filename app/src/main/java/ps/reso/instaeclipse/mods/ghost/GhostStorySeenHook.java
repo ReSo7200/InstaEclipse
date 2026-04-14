@@ -31,6 +31,7 @@ public class GhostStorySeenHook {
             Method cached = DexKitCache.loadMethod("GhostStorySeen", Module.hostClassLoader);
             if (cached != null) {
                 XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("(InstaEclipse | StoryBlock): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
                 FeatureStatusTracker.setHooked("GhostStories");
                 return;
             }

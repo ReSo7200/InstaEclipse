@@ -28,6 +28,7 @@ public class DisableStoryFlippingHook {
             Method cached = DexKitCache.loadMethod("StoryFlipping", Module.hostClassLoader);
             if (cached != null) {
                 XposedBridge.hookMethod(cached, HOOK);
+                XposedBridge.log("(InstaEclipse | StoryFlipping): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
                 return;
             }
         }

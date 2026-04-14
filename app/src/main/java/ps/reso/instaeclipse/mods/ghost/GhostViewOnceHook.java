@@ -23,6 +23,7 @@ public class GhostViewOnceHook {
             Method cached = DexKitCache.loadMethod("GhostViewOnce", Module.hostClassLoader);
             if (cached != null) {
                 XposedBridge.hookMethod(cached, buildViewOnceHook());
+                XposedBridge.log("(InstaEclipse | ViewOnce): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
                 FeatureStatusTracker.setHooked("GhostViewOnce");
                 return;
             }

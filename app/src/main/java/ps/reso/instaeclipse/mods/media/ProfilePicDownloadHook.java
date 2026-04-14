@@ -98,11 +98,12 @@ public class ProfilePicDownloadHook {
 
                 Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_profile_pic), Toast.LENGTH_SHORT).show();
                 new Thread(() -> {
-                    try (OutputStream out = FeedVideoDownloadHook.openOutputStream(
-                            ctx, filename, false, username)) {
-                        downloadToStream(url, out);
-                        mainHandler.post(() -> Toast.makeText(ctx,
-                                I18n.t(ctx, R.string.ig_toast_profile_pic_saved), Toast.LENGTH_SHORT).show());
+                    try {
+                        boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, filename, false, username);
+                        if (!delegated) {
+                            mainHandler.post(() -> Toast.makeText(ctx,
+                                    I18n.t(ctx, R.string.ig_toast_profile_pic_saved), Toast.LENGTH_SHORT).show());
+                        }
                     } catch (Throwable e) {
                         XposedBridge.log("(IE|ProfileDL) ❌ download: " + e.getMessage());
                         mainHandler.post(() -> Toast.makeText(ctx,
