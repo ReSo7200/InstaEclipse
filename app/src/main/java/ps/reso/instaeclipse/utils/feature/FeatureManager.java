@@ -35,6 +35,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("GhostViewOnce");
         }
 
+        if (FeatureFlags.enableUnlimitedReplays) {
+            FeatureStatusTracker.setEnabled("UnlimitedReplays");
+        } else {
+            FeatureStatusTracker.setDisabled("UnlimitedReplays");
+        }
+
         if (FeatureFlags.isGhostStory) {
             FeatureStatusTracker.setEnabled("GhostStories");
         } else {
@@ -47,17 +53,77 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("GhostLive");
         }
 
-        // Miscellaneous
-        if (FeatureFlags.showFollowerToast) {
-            FeatureStatusTracker.setEnabled("ShowFollowerToast");
+        if (FeatureFlags.allowScreenshots) {
+            FeatureStatusTracker.setEnabled("AllowScreenshots");
         } else {
-            FeatureStatusTracker.setDisabled("ShowFollowerToast");
+            FeatureStatusTracker.setDisabled("AllowScreenshots");
         }
 
+        if (FeatureFlags.keepEphemeralMessages) {
+            FeatureStatusTracker.setEnabled("KeepEphemeralMessages");
+        } else {
+            FeatureStatusTracker.setDisabled("KeepEphemeralMessages");
+        }
+
+        if (FeatureFlags.permanentViewMode) {
+            FeatureStatusTracker.setEnabled("PermanentViewMode");
+        } else {
+            FeatureStatusTracker.setDisabled("PermanentViewMode");
+        }
+
+        // Miscellaneous
         if (FeatureFlags.disableTrackingLinks) {
             FeatureStatusTracker.setEnabled("DisableTrackingLinks");
         } else {
             FeatureStatusTracker.setDisabled("DisableTrackingLinks");
+        }
+
+        if (FeatureFlags.showFollowerToast) {
+            FeatureStatusTracker.setEnabled("FollowerToast");
+        } else {
+            FeatureStatusTracker.setDisabled("FollowerToast");
+        }
+
+        if (FeatureFlags.enableStoryMentions) {
+            FeatureStatusTracker.setEnabled("StoryMentions");
+        } else {
+            FeatureStatusTracker.setDisabled("StoryMentions");
+        }
+
+        if (FeatureFlags.disableDiscoverPeople) {
+            FeatureStatusTracker.setEnabled("DisableDiscoverPeople");
+        } else {
+            FeatureStatusTracker.setDisabled("DisableDiscoverPeople");
+        }
+
+        if (FeatureFlags.removeBuildExpiredPopup) {
+            FeatureStatusTracker.setEnabled("RemoveBuildExpiredPopup");
+        } else {
+            FeatureStatusTracker.setDisabled("RemoveBuildExpiredPopup");
+        }
+
+        if (FeatureFlags.enablePostDownload) {
+            FeatureStatusTracker.setEnabled("PostDownload");
+        } else {
+            FeatureStatusTracker.setDisabled("PostDownload");
+        }
+
+        if (FeatureFlags.enableStoryDownload) {
+            FeatureStatusTracker.setEnabled("StoryDownload");
+        } else {
+            FeatureStatusTracker.setDisabled("StoryDownload");
+        }
+
+        if (FeatureFlags.enableReelDownload) {
+            FeatureStatusTracker.setEnabled("ReelDownload");
+        } else {
+            FeatureStatusTracker.setDisabled("ReelDownload");
+        }
+
+        if (FeatureFlags.enableProfileDownload) {
+            FeatureStatusTracker.setEnabled("ProfileDownload");
+        } else {
+            FeatureStatusTracker.setDisabled("ProfileDownload");
         }
     }
 }

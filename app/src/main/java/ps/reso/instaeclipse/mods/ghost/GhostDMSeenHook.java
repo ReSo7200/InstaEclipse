@@ -13,14 +13,33 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
 /**
  * Handles Ghost Mode for Direct Messages (DM) in Instagram.
  */
-public class SeenState {
+public class GhostDMSeenHook {
     public void handleSeenBlock(DexKitBridge bridge) {
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (FeatureFlags.isGhostSeen) param.setResult(null);
+            }
+        };
+
+        // Cache hit — skip DexKit
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("GhostSeen", Module.hostClassLoader);
+            if (cached != null) {
+                XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("(InstaEclipse | GhostModeSeen): ✅ Hooked: " + cached.getDeclaringClass().getName() + "." + cached.getName());
+                FeatureStatusTracker.setHooked("GhostSeen");
+                return;
+            }
+        }
+
         try {
             // Step 1: Find all methods containing "mark_thread_seen-"
             List<MethodData> methods = bridge.findMethod(FindMethod.create()
@@ -50,20 +69,8 @@ public class SeenState {
                         && paramTypes.size() >= 3) {
 
                     try {
-                        XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() {
-                            @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
-                                /*
-                                Debug purposes
-                                XposedBridge.log("(InstaEclipse | GhostModeSeen): 🚫 Blocked seen ping from: " +
-                                        method.getClassName() + "." + method.getName());
-                                */
-                                // ✅ Only block if GhostSeen is active
-                                if (FeatureFlags.isGhostSeen) {
-                                    param.setResult(null);
-                                }
-                            }
-                        });
+                        DexKitCache.saveMethod("GhostSeen", reflectMethod);
+                        XposedBridge.hookMethod(reflectMethod, hook);
 
                         XposedBridge.log("(InstaEclipse | GhostModeSeen): ✅ Hooked: " +
                                 method.getClassName() + "." + method.getName());

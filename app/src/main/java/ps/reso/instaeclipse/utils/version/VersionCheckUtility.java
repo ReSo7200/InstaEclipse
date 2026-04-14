@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class VersionCheckUtility {
 
-    private static final String CURRENT_VERSION = "0.4.5"; // Current version
+    private static final String CURRENT_VERSION = "0.5.0"; // Current version
     private static final String VERSION_CHECK_URL = "https://raw.githubusercontent.com/ReSo7200/InstaEclipse/refs/heads/main/version.json"; // JSON URL
 
     public static void checkForUpdates(Context context) {

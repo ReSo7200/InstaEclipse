@@ -1,0 +1,90 @@
+name: Bug Report
+description: Report a bug or broken feature
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Before you continue
+        > **Failure to complete all checkboxes may result in your issue being closed and you being temporarily blocked from opening new issues.**
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Pre-submission checklist
+      description: You must check every box before submitting.
+      options:
+        - label: I have searched [existing issues](https://github.com/ReSo7200/InstaEclipse/issues) and this is **not a duplicate**.
+          required: true
+        - label: I am using Instagram from **APKMirror**, not the Google Play Store.
+          required: true
+        - label: I have tried **disabling and re-enabling** the module in LSPosed/LSPatch and force-stopping Instagram.
+          required: true
+        - label: I have read the [FAQ](https://github.com/ReSo7200/InstaEclipse#-faq) and my issue is not covered there.
+          required: true
+        - label: I understand that submitting duplicate issues or ignoring this checklist may result in being blocked from the repo.
+          required: true
+
+  - type: input
+    id: instaeclipse_version
+    attributes:
+      label: InstaEclipse Version
+      placeholder: e.g. v0.5.0
+    validations:
+      required: true
+
+  - type: input
+    id: instagram_version
+    attributes:
+      label: Instagram Version
+      placeholder: e.g. 360.0.0.0.85 (from APKMirror)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: root_method
+    attributes:
+      label: Setup Method
+      options:
+        - Root — LSPosed (JingMatrix fork)
+        - Root — LSPosed (other fork)
+        - No Root — LSPatch (JingMatrix fork)
+        - No Root — LSPatch (other)
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device & Android Version
+      placeholder: e.g. Pixel 8 — Android 15
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly. What did you expect to happen, and what actually happened?
+      placeholder: When I try to ... it does ... instead of ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Instagram
+        2. Long-press search icon
+        3. Enable ...
+        4. See ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (if available)
+      description: Paste any relevant LSPosed logs here.
+      render: text

@@ -108,4 +108,205 @@
     <string name="download_apk">تحميل ملف APK</string>
     <string name="how_to_use">كيفية الاستخدام</string>
     <string name="module_not_working_title">هل لا تزال الوحدة معطلة؟</string>
+    <string name="module_not_working_description" translatable="false"><![CDATA[إذا كنت تملك صلاحيات <b>الروت</b> جرّب استخدام <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed من JingMatrix</a><br/><br/>إذا كنت <b>بدون روت</b> ثبّت <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch من JingMatrix</a> ثم اتبع <a href="https://t.me/instaEclipse_discussion/158/5149">هذا الدليل</a>]]></string>
+
+    <!-- Dialog strings -->
+    <string name="ig_dialog_close">إغلاق</string>
+    <string name="ig_dialog_enable_disable_all">تفعيل/تعطيل الكل</string>
+    <string name="ig_dialog_error">خطأ</string>
+    <string name="ig_dialog_ok">موافق</string>
+    <string name="ig_dialog_yes">نعم</string>
+    <string name="ig_dialog_cancel">إلغاء</string>
+    <string name="ig_dialog_menu_dev_options">خيارات المطور 🎛</string>
+    <string name="ig_dialog_menu_ghost_settings">إعدادات وضع الشبح 👻</string>
+    <string name="ig_dialog_menu_ad_analytics">حظر الإعلانات/التحليلات 🛡</string>
+    <string name="ig_dialog_menu_distraction_free">إنستغرام بلا إلهاء 🧘</string>
+    <string name="ig_dialog_menu_misc">ميزات متنوعة ⚙</string>
+    <string name="ig_dialog_menu_downloader">التنزيل 📥</string>
+    <string name="ig_dialog_menu_backup_restore">النسخ الاحتياطي والاستعادة 💾</string>
+    <string name="ig_dialog_menu_about">حول ℹ️</string>
+    <string name="ig_dialog_menu_restart">إعادة تشغيل التطبيق 🔁</string>
+    <string name="ig_dialog_section_dev_options">خيارات المطور 🎛</string>
+    <string name="ig_dialog_section_ghost_mode">وضع الشبح 👻</string>
+    <string name="ig_dialog_section_ad_analytics">حظر الإعلانات/التحليلات 🛡️</string>
+    <string name="ig_dialog_section_distraction_free">إنستغرام بلا إلهاء 🧘</string>
+    <string name="ig_dialog_section_misc">متنوع ⚙️</string>
+    <string name="ig_dialog_section_downloader">التنزيل 📥</string>
+    <string name="ig_dialog_section_downloader_settings">إعدادات التنزيل ⚙️</string>
+    <string name="ig_dialog_section_backup_restore">النسخ الاحتياطي والاستعادة 💾</string>
+    <string name="ig_dialog_section_about">حول</string>
+    <string name="ig_dialog_section_restart">إعادة تشغيل التطبيق</string>
+    <string name="ig_dialog_section_quick_toggle">تخصيص التبديل السريع 🛠️</string>
+    <string name="ig_dialog_dev_enable">تفعيل وضع المطور</string>
+    <string name="ig_dialog_dev_import">استيراد إعدادات المطور</string>
+    <string name="ig_dialog_dev_export">تصدير إعدادات المطور</string>
+    <string name="ig_dialog_dev_remove_build_expired">إزالة نافذة انتهاء صلاحية الإصدار</string>
+    <string name="ig_dialog_unable_open_ui">تعذر فتح واجهة InstaEclipse.</string>
+    <string name="ig_dialog_instagram_not_ready">إنستغرام غير مفتوح أو غير جاهز.</string>
+    <string name="ig_dialog_mc_overrides_not_found">ملف mc_overrides.json غير موجود.</string>
+    <string name="ig_dialog_failed_read_config">فشل قراءة الإعدادات: %1$s</string>
+    <string name="export_no_config_data">لم يتم استلام بيانات الإعداد.</string>
+    <string name="export_config_success">تم تصدير الإعداد بنجاح.</string>
+    <string name="export_config_failed">فشل الحفظ: %1$s</string>
+    <string name="export_invalid_uri">عنوان URI غير صالح</string>
+    <string name="ig_toast_config_imported">✅ تم استيراد الإعداد.</string>
+    <string name="ig_toast_config_import_failed">❌ فشل استيراد الإعداد.</string>
+
+    <!-- JsonImportActivity -->
+    <string name="json_select_config">اختر ملف JSON</string>
+    <string name="json_target_not_specified">❌ لم يتم تحديد التطبيق المستهدف.</string>
+    <string name="json_sent">✅ تم الإرسال إلى إنستغرام.</string>
+    <string name="json_not_valid">❌ الملف ليس JSON صالحاً.</string>
+    <string name="json_read_failed">❌ فشل قراءة الملف: %1$s</string>
+    <string name="json_cancelled">تم الإلغاء أو لم يتم اختيار ملف.</string>
+    <string name="ig_dialog_ghost_hide_dm_seen">إخفاء رؤية الرسائل المباشرة</string>
+    <string name="ig_dialog_ghost_hide_typing">إخفاء مؤشر الكتابة</string>
+    <string name="ig_dialog_ghost_hide_story_views">إخفاء مشاهدات القصص</string>
+    <string name="ig_dialog_ghost_hide_live_presence">إخفاء الحضور في البث المباشر</string>
+    <string name="ig_dialog_ghost_allow_screenshots_dms">السماح بلقطات الشاشة في الرسائل المباشرة</string>
+    <string name="ig_dialog_ghost_bypass_screenshot">تجاوز كشف لقطات الشاشة</string>
+    <string name="ig_dialog_ghost_hide_view_once">إخفاء فتح الرسائل المرئية لمرة</string>
+    <string name="ig_dialog_ghost_unlimited_replays">تشغيل غير محدود للمشاركات المؤقتة</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ تحويل الوسائط المؤقتة إلى دائمة</string>
+    <string name="ig_dialog_ghost_keep_disappearing">الاحتفاظ بالرسائل المختفية</string>
+    <string name="ig_dialog_customize_quick_toggle">تخصيص التبديل السريع 🛠</string>
+    <string name="ig_dialog_quick_hide_seen">تضمين إخفاء رؤية الرسائل المباشرة</string>
+    <string name="ig_dialog_quick_hide_typing">تضمين إخفاء مؤشر الكتابة</string>
+    <string name="ig_dialog_quick_disable_screenshot">تضمين تجاوز كشف لقطات الشاشة</string>
+    <string name="ig_dialog_quick_hide_view_once">تضمين إخفاء فتح الرسائل المرئية لمرة</string>
+    <string name="ig_dialog_quick_hide_story_seen">تضمين إخفاء مشاهدات القصص</string>
+    <string name="ig_dialog_quick_hide_live_seen">تضمين إخفاء الحضور في البث المباشر</string>
+    <string name="ig_dialog_quick_keep_ephemeral">تضمين الاحتفاظ بالرسائل المختفية</string>
+    <string name="ig_dialog_quick_unlimited_replays">تضمين تشغيل غير محدود للمشاركات المؤقتة</string>
+    <string name="ig_dialog_quick_permanent_view">تضمين تحويل الوسائط المؤقتة إلى دائمة</string>
+    <string name="ig_dialog_quick_allow_screenshots">تضمين السماح بلقطات الشاشة في الرسائل المباشرة</string>
+    <string name="ig_dialog_ad_block_ads">حظر الإعلانات</string>
+    <string name="ig_dialog_ad_block_analytics">حظر التحليلات</string>
+    <string name="ig_dialog_ad_disable_tracking">تعطيل روابط التتبع</string>
+    <string name="ig_dialog_distraction_extreme_mode">الوضع المتطرف 🔒 (لا رجعة حتى إعادة التثبيت)</string>
+    <string name="ig_dialog_distraction_disable_stories">تعطيل القصص</string>
+    <string name="ig_dialog_distraction_disable_feed">تعطيل المحتوى الرئيسي</string>
+    <string name="ig_dialog_distraction_disable_reels">تعطيل الريلز</string>
+    <string name="ig_dialog_distraction_disable_reels_except_dm">تعطيل الريلز إلا في الرسائل المباشرة</string>
+    <string name="ig_dialog_distraction_disable_explore">تعطيل الاستكشاف</string>
+    <string name="ig_dialog_distraction_disable_comments">تعطيل التعليقات</string>
+    <string name="ig_dialog_distraction_extreme_title">تفعيل وضع الاغلاق</string>
+    <string name="ig_dialog_distraction_extreme_message">بمجرد التفعيل، لن تتمكن من تعطيل وضع بلا إلهاء حتى تعيد تثبيت التطبيق. هل تريد المتابعة؟</string>
+    <string name="ig_dialog_misc_disable_story_autoswipe">تعطيل التمرير التلقائي للقصص</string>
+    <string name="ig_dialog_misc_disable_video_autoplay">تعطيل التشغيل التلقائي للفيديو</string>
+    <string name="ig_dialog_misc_disable_repost">تعطيل إعادة النشر</string>
+    <string name="ig_dialog_misc_show_feature_toasts">عرض إشعارات الميزات</string>
+    <string name="ig_dialog_misc_show_follower_toast">عرض إشعار المتابعة</string>
+    <string name="ig_dialog_misc_view_story_mentions">عرض الإشارات في القصص</string>
+    <string name="ig_dialog_misc_disable_discover_people">تعطيل اكتشاف الأشخاص</string>
+    <string name="ig_dialog_misc_copy_comment">نسخ التعليق</string>
+
+    <!-- Comment Copy dialog -->
+    <string name="ig_comment_copy_title">نسخ التعليق</string>
+    <string name="ig_comment_copy_full">نسخ التعليق كاملاً</string>
+    <string name="ig_comment_select_part">تحديد جزء للنسخ</string>
+    <string name="ig_comment_select_title">تحديد للنسخ</string>
+    <string name="ig_comment_copy_selected">نسخ المحدد</string>
+    <string name="ig_toast_comment_copied">✅ تم النسخ إلى الحافظة!</string>
+    <string name="ig_dialog_downloader_settings">إعدادات التنزيل ⚙</string>
+    <string name="ig_dialog_downloader_posts">تنزيل المنشورات</string>
+    <string name="ig_dialog_downloader_stories">تنزيل القصص</string>
+    <string name="ig_dialog_downloader_reels">تنزيل الريلز</string>
+    <string name="ig_dialog_downloader_profiles">تنزيل صور الملف الشخصي</string>
+    <string name="ig_dialog_downloader_folder">مجلد التنزيل 📁</string>
+    <string name="ig_dialog_downloader_username_subfolder">الحفظ في مجلد فرعي باسم المستخدم</string>
+    <string name="ig_dialog_downloader_add_timestamp">إضافة الطابع الزمني إلى اسم الملف</string>
+    <string name="ig_dialog_downloader_cannot_open_picker">لا يمكن فتح منتقي المجلدات هنا</string>
+    <string name="ig_dialog_backup_settings">نسخ الإعدادات احتياطياً</string>
+    <string name="ig_dialog_restore_settings">استعادة الإعدادات</string>
+    <string name="ig_dialog_backup_failed">فشل إنشاء النسخة الاحتياطية: %1$s</string>
+    <string name="ig_dialog_about_github">GitHub</string>
+    <string name="ig_dialog_about_telegram">Telegram</string>
+    <string name="ig_dialog_restart_message">مسح ذاكرة التطبيق وإعادة التشغيل؟ ⚠️</string>
+    <string name="ig_dialog_restart_now">إعادة التشغيل الآن</string>
+    <string name="ig_dialog_restart_not_found">تعذر العثور على التطبيق لإعادة التشغيل.</string>
+    <string name="ig_dialog_restart_failed">فشلت إعادة التشغيل: %1$s</string>
+
+    <!-- Toast: Ghost mode -->
+    <string name="ig_toast_ghost_no_options">لم يتم تحديد أي خيارات لوضع الشبح!</string>
+    <string name="ig_toast_ghost_enabled">تم تفعيل وضع الشبح</string>
+    <string name="ig_toast_ghost_disabled">تم تعطيل وضع الشبح</string>
+    <string name="ig_toast_seen_sent">✅ تم إرسال الرؤية</string>
+    <string name="ig_toast_channel_seen_sent">✅ تم إرسال قراءة القناة</string>
+
+    <!-- Toast: Follower status -->
+    <string name="ig_toast_follows_you">يتابعك ✅</string>
+    <string name="ig_toast_not_follows_you">لا يتابعك ❌</string>
+
+    <!-- Toast: App settings -->
+    <string name="ig_toast_settings_applied">تم تطبيق الإعدادات!</string>
+    <string name="ig_toast_restart_manual">يرجى إغلاق Instagram يدويًا لتطبيق التغييرات.</string>
+    <string name="ig_toast_settings_restored">تمت استعادة الإعدادات بنجاح.</string>
+    <string name="ig_toast_restore_failed">فشل الاستعادة: %1$s</string>
+
+    <!-- Toast: Download folder -->
+    <string name="ig_toast_download_folder_set">مجلد التنزيل: %1$s</string>
+    <string name="ig_toast_download_folder_updated">تم تحديث مجلد التنزيل!</string>
+    <string name="ig_toast_download_folder_reset">تمت إعادة تعيين مجلد التنزيل إلى الافتراضي</string>
+
+    <!-- Toast: Downloader -->
+    <string name="ig_toast_downloading">جارٍ التنزيل…</string>
+    <string name="ig_toast_downloading_video">جارٍ تنزيل الفيديو…</string>
+    <string name="ig_toast_downloading_photo">جارٍ تنزيل الصورة…</string>
+    <string name="ig_toast_video_saved">تم حفظ الفيديو في مجلد InstaEclipse</string>
+    <string name="ig_toast_photo_saved">تم حفظ الصورة في مجلد InstaEclipse</string>
+    <string name="ig_toast_saved">تم الحفظ في مجلد InstaEclipse</string>
+    <string name="ig_toast_download_failed">فشل التنزيل: %1$s</string>
+    <string name="ig_toast_downloading_reel">جارٍ تنزيل الريل…</string>
+    <string name="ig_toast_reel_saved">تم حفظ الريل في مجلد InstaEclipse</string>
+    <string name="ig_toast_reel_failed">فشل تنزيل الريل: %1$s</string>
+    <string name="ig_toast_reel_url_not_found">لم يتم العثور على رابط الريل</string>
+    <string name="ig_toast_post_url_not_found">لم يتم العثور على رابط المنشور</string>
+    <string name="ig_toast_no_media_for_post">لم يتم العثور على وسائط لهذا المنشور</string>
+    <string name="ig_toast_no_media">لم يتم العثور على وسائط</string>
+    <string name="ig_toast_downloading_story_video">جارٍ تنزيل فيديو القصة…</string>
+    <string name="ig_toast_downloading_story_photo">جارٍ تنزيل صورة القصة…</string>
+    <string name="ig_toast_story_saved">تم حفظ القصة في مجلد InstaEclipse</string>
+    <string name="ig_toast_story_url_not_found">لم يتم العثور على رابط القصة</string>
+    <string name="ig_toast_downloading_profile_pic">جارٍ تنزيل صورة الملف الشخصي…</string>
+    <string name="ig_toast_profile_pic_saved">تم حفظ صورة الملف الشخصي!</string>
+    <string name="ig_toast_profile_pic_url_not_found">تعذر الحصول على رابط صورة الملف الشخصي</string>
+    <string name="ig_toast_merging_video_audio">جارٍ دمج الفيديو والصوت…</string>
+    <string name="ig_toast_downloading_n_items">جارٍ تنزيل %1$d عنصر…</string>
+    <string name="ig_toast_downloading_all_n_items">جارٍ تنزيل جميع %1$d عناصر…</string>
+    <string name="ig_toast_all_items_saved">تم حفظ جميع %1$d عناصر في مجلد InstaEclipse</string>
+    <string name="ig_toast_items_partial_saved">تم حفظ %1$d من %2$d (%3$d فشل)</string>
+    <string name="ig_toast_no_reel_url_scroll">لم يتم العثور على رابط الريل — قم بالتمرير أولًا</string>
+    <string name="ig_dl_title">تنزيل</string>
+    <string name="ig_dl_carousel_subtitle">كاروسيل • %1$d عنصر</string>
+    <string name="ig_dl_carousel_current">تنزيل الحالي (%1$d من %2$d)</string>
+    <string name="ig_dl_carousel_all">تنزيل جميع %1$d عناصر</string>
+    <string name="ig_btn_view_mentions">عرض الإشارات</string>
+    <string name="ig_toast_mention_copied">تم نسخ @%1$s</string>
+    <string name="ig_toast_all_mentions_copied">تم نسخ جميع الإشارات</string>
+
+    <string name="back">رجوع</string>
+    <string name="apply_changes">تطبيق التغييرات</string>
+
+    <!-- features fragment section headers -->
+    <string name="feat_categories">الفئات:</string>
+    <string name="feat_tools">الأدوات:</string>
+    <string name="feat_features">الميزات:</string>
+    <string name="feat_config">الإعدادات:</string>
+    <string name="feat_options">الخيارات:</string>
+    <string name="feat_quick_toggle">التبديل السريع:</string>
+    <string name="feat_danger_zone">المنطقة الخطرة:</string>
+    <string name="feat_download_folder">مجلد التنزيل:</string>
+    <string name="feat_downloader_set_folder">📂 تحديد موقع مجلد التنزيل</string>
+    <string name="feat_downloader_selected">📂 المحدد: %1$s</string>
+    <string name="feat_downloader_reset_folder">🗑 إعادة تعيين مجلد التنزيل</string>
+
+    <!-- multiple versions -->
+    <string name="multiple_versions_detected">⚠️ تم اكتشاف إصدارات متعددة</string>
+
+    <!-- Story mentions dialog -->
+    <string name="ig_mention_dialog_title">إشارات القصة</string>
+    <string name="ig_mention_subtitle">%1$d إشارة • انقر للنسخ</string>
+    <string name="ig_mention_no_mentions">لم يتم العثور على إشارات في هذه القصة</string>
+    <string name="ig_mention_copy_all">نسخ الكل</string>
 </resources>

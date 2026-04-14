@@ -1,30 +1,28 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
+    <string name="version" translatable="false">v0.5 Beta</string>
     <string name="home">דף הבית</string>
     <string name="features">תכונות</string>
     <string name="help">עזרה</string>
+    <string name="instagram_version">גרסה</string>
 
     <!-- home -->
-    <string name="instagram_version">גרסה</string>
+    <string name="back">חזרה</string>
+    <string name="apply_changes">החל שינויים</string>
+    <string name="multiple_versions_detected">⚠️ זוהו מספר גרסאות</string>
     <string name="module_disabled">המודול אינו מופעל. נא להפעיל אותו.</string>
-
     <string name="module_status">סטטוס המודול:</string>
-
     <string name="module_status_disabled">סטטוס המודול: אינו מופעל</string>
     <string name="request_enable_module">נא להפעיל את המודול בXposed.</string>
-
     <string name="module_status_enabled_no_root">סטטוס המודול: מופעל )בלי גישה לRoot)</string>
     <string name="request_enable_root">גישה לRoot נדרש עבור תכונת הauto-restart. הפעלה מחדש ידנית נדרשת.</string>
-
     <string name="module_status_enabled">סטטוס המודול: תקין</string>
     <string name="module_active">המודול תקין ועובד.</string>
-
     <string name="checking_instagram">בודק אינסטגרם</string>
     <string name="installed_instagram_version">אינסטגרם מותקן</string>
     <string name="not_installed_instagram">אינסטגרם אינו מותקן</string>
     <string name="error_instagram">שגיאה במהלך בדיקת סטטוס אינסטגרם</string>
-
     <string name="launch_instagram">הפעל אינסטגרם</string>
     <string name="download_apk">הורדת APK</string>
     <string name="how_to_use">הוראות שימוש</string>
@@ -33,6 +31,8 @@
     <string name="special_thanks">תודה מיוחדת</string>
 
     <!-- Don't translate! -->
+    <string name="instagram_logo" translatable="false">Instagram Logo</string>
+    <string name="instagram_info" translatable="false">instagram_info</string>
 
     <!-- help -->
     <string name="help_amp_troubleshooting">עזרה &amp; פתירת בעיות</string>
@@ -40,8 +40,12 @@
     <string name="go_to_github">פתיחת GitHub</string>
     <string name="find_support">מציאת תמיכה.</string>
     <string name="go_to_telegram">פתיחת Telegram</string>
+    <string name="instaeclipse_telegram_group" translatable="false">InstaEclipse Telegram Group</string>
 
     <!-- Don't translate! -->
+    <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
+    <string name="github">GitHub</string>
+    <string name="telegram">Telegram</string>
 
     <!-- faq -->
     <string name="frequently_asked_questions">שאלות נפוצות</string>
@@ -54,6 +58,20 @@
 
     <!-- guide -->
     <string name="module_not_working_title">המודול עדיין לא עובד?</string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[If you are <b>rooted</b> try using <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>If you are <b>not rooted</b> install <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> then follow <a href="https://t.me/instaEclipse_discussion/158/5149">this guide</a>]]></string>
+
+    <!-- features fragment section headers -->
+    <string name="feat_categories">קטגוריות:</string>
+    <string name="feat_tools">כלים:</string>
+    <string name="feat_features">תכונות:</string>
+    <string name="feat_config">הגדרות:</string>
+    <string name="feat_options">אפשרויות:</string>
+    <string name="feat_quick_toggle">החלפה מהירה:</string>
+    <string name="feat_danger_zone">אזור מסוכן:</string>
+    <string name="feat_download_folder">תיקיית הורדות:</string>
+    <string name="feat_downloader_set_folder">📂 הגדר מיקום תיקיית הורדות</string>
+    <string name="feat_downloader_selected">📂 נבחר: %1$s</string>
+    <string name="feat_downloader_reset_folder">🗑 אפס תיקיית הורדות</string>
 
     <!-- features -->
     <string name="developer_options">הגדרות מפתחים</string>
@@ -61,10 +79,10 @@
     <string name="distraction_free">ללא הסחות דעת</string>
     <string name="remove_ads">מחיקת פרסומות</string>
     <string name="remove_analytics">מחיקת אנליטיקות</string>
-
     <string name="enable_disable_all">הפעלה/השבתת הכל</string>
 
     <!-- Don't translate! -->
+    <string name="hint" translatable="false">Hint</string>
 
     <!-- ghost -->
     <string name="ghost_mode_options">הגדרות מצב רפאים</string>
@@ -80,13 +98,15 @@
     <string name="developer_options_guide">מדריך הגדרות מפתחים</string>
     <string name="dev_options_version_req">נא להשתמש רק על גרסאות Beta או Alpha בלבד!</string>
     <string name="dev_options_req">נא לוודא שאתם כבר מחוברים לחשבון שלכם!</string>
-
     <string name="dev_options_1">1. לפתוח אינסטגרם וללחוץ ארוך על כפתור עמוד הבית.</string>
     <string name="dev_options_2">2. לגשת להגדרת מפתחים > הגדרות MetaConfig &amp; Overrides.</string>
     <string name="dev_options_3">3. לחפש \'Employee\' ולהפעיל את ההגדרות הבאות:</string>
     <string name="dev_options_4">4. לסוף, השבת את ההגדרות מפתחים מהמודול כדי למנות קריסות אפליקציה.</string>
 
     <!-- Don't translate! -->
+    <string name="is_employee" translatable="false">• is employee</string>
+    <string name="is_employee_or_test_user" translatable="false">• is employee or test user</string>
+    <string name="employee_options" translatable="false">• employee options</string>
 
     <!-- distraction free -->
     <string name="distraction_free_options">הגדרות מצב "ללא הסחות דעת"</string>
@@ -106,5 +126,220 @@
 
     <!-- contributor card -->
     <string name="contributor_name">שם התורם</string>
+
+    <!-- ================================================================ -->
+    <!-- Dialog strings — used in the host (Instagram) process via I18n   -->
+    <!-- ================================================================ -->
+
+    <!-- Common -->
+    <string name="ig_dialog_title" translatable="false">InstaEclipse 🌘</string>
+    <string name="ig_dialog_close">סגור</string>
+    <string name="ig_dialog_enable_disable_all">הפעלה/השבתת הכל</string>
+    <string name="ig_dialog_error">שגיאה</string>
+    <string name="ig_dialog_ok">אישור</string>
+    <string name="ig_dialog_yes">כן</string>
+    <string name="ig_dialog_cancel">ביטול</string>
+
+    <!-- Main menu items -->
+    <string name="ig_dialog_menu_dev_options">🎛 הגדרות מפתחים</string>
+    <string name="ig_dialog_menu_ghost_settings">👻 הגדרות מצב רפאים</string>
+    <string name="ig_dialog_menu_ad_analytics">🛡 חסימת פרסומות/אנליטיקות</string>
+    <string name="ig_dialog_menu_distraction_free">🧘 אינסטגרם ללא הסחות דעת</string>
+    <string name="ig_dialog_menu_misc">⚙ תכונות נוספות</string>
+    <string name="ig_dialog_menu_downloader">📥 הורדה</string>
+    <string name="ig_dialog_menu_backup_restore">💾 גיבוי &amp; שחזור</string>
+    <string name="ig_dialog_menu_about">ℹ️ אודות</string>
+    <string name="ig_dialog_menu_restart">🔁 הפעל מחדש את האפליקציה</string>
+
+    <!-- Section titles -->
+    <string name="ig_dialog_section_dev_options">הגדרות מפתחים 🎛</string>
+    <string name="ig_dialog_section_ghost_mode">מצב רפאים 👻</string>
+    <string name="ig_dialog_section_ad_analytics">חסימת פרסומות/אנליטיקות 🛡️</string>
+    <string name="ig_dialog_section_distraction_free">אינסטגרם ללא הסחות דעת 🧘</string>
+    <string name="ig_dialog_section_misc">שונות ⚙️</string>
+    <string name="ig_dialog_section_downloader">הורדה 📥</string>
+    <string name="ig_dialog_section_downloader_settings">הגדרות הורדה ⚙️</string>
+    <string name="ig_dialog_section_backup_restore">גיבוי &amp; שחזור 💾</string>
+    <string name="ig_dialog_section_about">אודות</string>
+    <string name="ig_dialog_section_restart">הפעל מחדש את האפליקציה</string>
+    <string name="ig_dialog_section_quick_toggle">התאם אישית החלפה מהירה 🛠️</string>
+
+    <!-- Developer options -->
+    <string name="ig_dialog_dev_enable">הפעל מצב מפתחים</string>
+    <string name="ig_dialog_dev_import">ייבא הגדרות מפתחים</string>
+    <string name="ig_dialog_dev_export">ייצא הגדרות מפתחים</string>
+    <string name="ig_dialog_dev_remove_build_expired">הסר חלונית Build Expired</string>
+    <string name="ig_dialog_unable_open_ui">לא ניתן לפתוח את ממשק InstaEclipse.</string>
+    <string name="ig_dialog_instagram_not_ready">אינסטגרם אינו פתוח או מוכן.</string>
+    <string name="ig_dialog_mc_overrides_not_found">mc_overrides.json לא נמצא.</string>
+    <string name="ig_dialog_failed_read_config">נכשל בקריאת הגדרות: %1$s</string>
+    <string name="export_no_config_data">לא התקבלו נתוני הגדרות.</string>
+    <string name="export_config_success">ההגדרות יוצאו בהצלחה.</string>
+    <string name="export_config_failed">נכשל בשמירה: %1$s</string>
+    <string name="export_invalid_uri">URI לא תקין</string>
+    <string name="ig_toast_config_imported">✅ ההגדרות יובאו.</string>
+    <string name="ig_toast_config_import_failed">❌ נכשל בייבוא הגדרות.</string>
+
+    <!-- JsonImportActivity -->
+    <string name="json_select_config">בחר קובץ JSON</string>
+    <string name="json_target_not_specified">❌ חבילת יעד לא צוינה.</string>
+    <string name="json_sent">✅ נשלח לאינסטגרם.</string>
+    <string name="json_not_valid">❌ קובץ JSON לא תקין.</string>
+    <string name="json_read_failed">❌ נכשל בקריאת קובץ: %1$s</string>
+    <string name="json_cancelled">בוטל או לא נבחר קובץ.</string>
+
+    <!-- Ghost Mode options -->
+    <string name="ig_dialog_ghost_hide_dm_seen">הסתר קריאת הודעות</string>
+    <string name="ig_dialog_ghost_hide_typing">הסתר מחוון הקלדה</string>
+    <string name="ig_dialog_ghost_hide_story_views">הסתר צפיות בסטורי</string>
+    <string name="ig_dialog_ghost_hide_live_presence">הסתר נוכחות בLive</string>
+    <string name="ig_dialog_ghost_allow_screenshots_dms">אפשר צילומי מסך בהודעות</string>
+    <string name="ig_dialog_ghost_bypass_screenshot">עקוף זיהוי צילום מסך</string>
+    <string name="ig_dialog_ghost_hide_view_once">הסתר פתיחת מדיה חד-פעמית</string>
+    <string name="ig_dialog_ghost_unlimited_replays">צפיות חוזרות ללא הגבלה</string>
+    <string name="ig_dialog_ghost_permanent_view_once">⚠️ מדיה חד-פעמית קבועה</string>
+    <string name="ig_dialog_ghost_keep_disappearing">שמור הודעות נעלמות</string>
+    <string name="ig_dialog_customize_quick_toggle">🛠 התאם אישית החלפה מהירה</string>
+
+    <!-- Quick Toggle options -->
+    <string name="ig_dialog_quick_hide_seen">כלול הסתר קריאת הודעות</string>
+    <string name="ig_dialog_quick_hide_typing">כלול הסתר מחוון הקלדה</string>
+    <string name="ig_dialog_quick_disable_screenshot">כלול עקוף זיהוי צילום מסך</string>
+    <string name="ig_dialog_quick_hide_view_once">כלול הסתר פתיחת מדיה חד-פעמית</string>
+    <string name="ig_dialog_quick_hide_story_seen">כלול הסתר צפיות בסטורי</string>
+    <string name="ig_dialog_quick_hide_live_seen">כלול הסתר נוכחות בLive</string>
+    <string name="ig_dialog_quick_keep_ephemeral">כלול שמור הודעות נעלמות</string>
+    <string name="ig_dialog_quick_unlimited_replays">כלול צפיות חוזרות ללא הגבלה</string>
+    <string name="ig_dialog_quick_permanent_view">כלול מדיה חד-פעמית קבועה</string>
+    <string name="ig_dialog_quick_allow_screenshots">כלול אפשר צילומי מסך בהודעות</string>
+
+    <!-- Ad / Analytics options -->
+    <string name="ig_dialog_ad_block_ads">חסום פרסומות</string>
+    <string name="ig_dialog_ad_block_analytics">חסום אנליטיקות</string>
+    <string name="ig_dialog_ad_disable_tracking">השבת קישורי מעקב</string>
+
+    <!-- Distraction-Free options -->
+    <string name="ig_dialog_distraction_extreme_mode">מצב קיצוני 🔒 (בלתי הפיך עד להתקנה מחדש)</string>
+    <string name="ig_dialog_distraction_disable_stories">השבת Stories</string>
+    <string name="ig_dialog_distraction_disable_feed">השבת פיד</string>
+    <string name="ig_dialog_distraction_disable_reels">השבת ריילז</string>
+    <string name="ig_dialog_distraction_disable_reels_except_dm">השבת ריילז מלבד בהודעות</string>
+    <string name="ig_dialog_distraction_disable_explore">השבת Explore</string>
+    <string name="ig_dialog_distraction_disable_comments">השבת תגובות</string>
+    <string name="ig_dialog_distraction_extreme_title">הפעל מצב קיצוני?</string>
+    <string name="ig_dialog_distraction_extreme_message">לאחר הפעלה, לא ניתן להשבית את מצב ללא הסחות דעת עד להתקנה מחדש של האפליקציה. להמשיך?</string>
+
+    <!-- Miscellaneous options -->
+    <string name="ig_dialog_misc_disable_story_autoswipe">השבת מעבר אוטומטי בין סטורי</string>
+    <string name="ig_dialog_misc_disable_video_autoplay">השבת ניגון אוטומטי של סרטונים</string>
+    <string name="ig_dialog_misc_disable_repost">השבת שיתוף מחדש</string>
+    <string name="ig_dialog_misc_show_feature_toasts">הצג הודעות תכונות</string>
+    <string name="ig_dialog_misc_show_follower_toast">הצג הודעת עוקב</string>
+    <string name="ig_dialog_misc_view_story_mentions">צפה באזכורי סטורי</string>
+    <string name="ig_dialog_misc_disable_discover_people">השבת הצעות אנשים</string>
+    <string name="ig_dialog_misc_copy_comment">העתק תגובה</string>
+
+    <!-- Comment Copy dialog -->
+    <string name="ig_comment_copy_title">העתק תגובה</string>
+    <string name="ig_comment_copy_full">העתק תגובה מלאה</string>
+    <string name="ig_comment_select_part">בחר חלק להעתקה</string>
+    <string name="ig_comment_select_title">בחר להעתקה</string>
+    <string name="ig_comment_copy_selected">העתק נבחר</string>
+    <string name="ig_toast_comment_copied">✅ הועתק ללוח!</string>
+
+    <!-- Downloader options -->
+    <string name="ig_dialog_downloader_settings">⚙ הגדרות הורדה</string>
+    <string name="ig_dialog_downloader_posts">הורד פוסטים</string>
+    <string name="ig_dialog_downloader_stories">הורד סטוריז</string>
+    <string name="ig_dialog_downloader_reels">הורד ריילז</string>
+    <string name="ig_dialog_downloader_profiles">הורד תמונות פרופיל</string>
+    <string name="ig_dialog_downloader_folder">📁 תיקיית הורדות</string>
+    <string name="ig_dialog_downloader_username_subfolder">שמור בתיקיית משנה של משתמש</string>
+    <string name="ig_dialog_downloader_add_timestamp">הוסף חותמת זמן לשם קובץ</string>
+    <string name="ig_dialog_downloader_cannot_open_picker">לא ניתן לפתוח בורר תיקיות כאן</string>
+
+    <!-- Backup &amp; Restore -->
+    <string name="ig_dialog_backup_settings">גבה הגדרות</string>
+    <string name="ig_dialog_restore_settings">שחזר הגדרות</string>
+    <string name="ig_dialog_backup_failed">נכשל ביצירת גיבוי: %1$s</string>
+
+    <!-- About -->
+    <string name="ig_dialog_about_created_by" translatable="false">Created by @reso7200</string>
+    <string name="ig_dialog_about_github">GitHub</string>
+    <string name="ig_dialog_about_telegram">Telegram</string>
+
+    <!-- Restart -->
+    <string name="ig_dialog_restart_message">⚠️ נקה cache ואתחל?</string>
+    <string name="ig_dialog_restart_now">אתחל עכשיו</string>
+    <string name="ig_dialog_restart_not_found">לא נמצאה האפליקציה לאתחול.</string>
+    <string name="ig_dialog_restart_failed">האתחול נכשל: %1$s</string>
+
+    <!-- Toast: Ghost mode quick toggle -->
+    <string name="ig_toast_ghost_no_options">לא נבחרו אפשרויות מצב רפאים!</string>
+    <string name="ig_toast_ghost_enabled">מצב רפאים הופעל</string>
+    <string name="ig_toast_ghost_disabled">מצב רפאים הושבת</string>
+    <string name="ig_toast_seen_sent">✅ נקראה נשלחה</string>
+    <string name="ig_toast_channel_seen_sent">✅ נקראה ערוץ נשלחה</string>
+
+    <!-- Toast: Follower status -->
+    <string name="ig_toast_follows_you">עוקב אחריך ✅</string>
+    <string name="ig_toast_not_follows_you">לא עוקב אחריך ❌</string>
+
+    <!-- Toast: App settings -->
+    <string name="ig_toast_settings_applied">ההגדרות הוחלו!</string>
+    <string name="ig_toast_restart_manual">נא לסגור את אינסטגרם ידנית כדי שהשינויים ייכנסו לתוקף.</string>
+    <string name="ig_toast_settings_restored">ההגדרות שוחזרו בהצלחה.</string>
+    <string name="ig_toast_restore_failed">השחזור נכשל: %1$s</string>
+
+    <!-- Toast: Download folder -->
+    <string name="ig_toast_download_folder_set">תיקיית הורדות: %1$s</string>
+    <string name="ig_toast_download_folder_updated">תיקיית הורדות עודכנה!</string>
+    <string name="ig_toast_download_folder_reset">תיקיית הורדות אופסה לברירת מחדל</string>
+
+    <!-- Toast: Downloader feedback -->
+    <string name="ig_toast_downloading">מוריד…</string>
+    <string name="ig_toast_downloading_video">מוריד סרטון…</string>
+    <string name="ig_toast_downloading_photo">מוריד תמונה…</string>
+    <string name="ig_toast_video_saved">הסרטון נשמר לתיקיית InstaEclipse</string>
+    <string name="ig_toast_photo_saved">התמונה נשמרה לתיקיית InstaEclipse</string>
+    <string name="ig_toast_saved">נשמר לתיקיית InstaEclipse</string>
+    <string name="ig_toast_download_failed">ההורדה נכשלה: %1$s</string>
+    <string name="ig_toast_downloading_reel">מוריד ריל…</string>
+    <string name="ig_toast_reel_saved">הריל נשמר לתיקיית InstaEclipse</string>
+    <string name="ig_toast_reel_failed">הורדת ריל נכשלה: %1$s</string>
+    <string name="ig_toast_reel_url_not_found">כתובת URL של ריל לא נמצאה</string>
+    <string name="ig_toast_post_url_not_found">כתובת URL של פוסט לא נמצאה</string>
+    <string name="ig_toast_no_media_for_post">לא נמצא מדיה לפוסט זה</string>
+    <string name="ig_toast_no_media">לא נמצא מדיה</string>
+    <string name="ig_toast_downloading_story_video">מוריד סרטון סטורי…</string>
+    <string name="ig_toast_downloading_story_photo">מוריד תמונת סטורי…</string>
+    <string name="ig_toast_story_saved">הסטורי נשמר לתיקיית InstaEclipse</string>
+    <string name="ig_toast_story_url_not_found">כתובת URL של סטורי לא נמצאה</string>
+    <string name="ig_toast_downloading_profile_pic">מוריד תמונת פרופיל…</string>
+    <string name="ig_toast_profile_pic_saved">תמונת הפרופיל נשמרה!</string>
+    <string name="ig_toast_profile_pic_url_not_found">לא ניתן לקבל כתובת URL של תמונת פרופיל</string>
+    <string name="ig_toast_merging_video_audio">ממזג וידאו + אודיו…</string>
+    <string name="ig_toast_downloading_n_items">מוריד %1$d פריטים…</string>
+    <string name="ig_toast_downloading_all_n_items">מוריד את כל %1$d הפריטים…</string>
+    <string name="ig_toast_all_items_saved">כל %1$d הפריטים נשמרו לתיקיית InstaEclipse</string>
+    <string name="ig_toast_items_partial_saved">%1$d מתוך %2$d פריטים נשמרו (%3$d נכשלו)</string>
+    <string name="ig_toast_no_reel_url_scroll">כתובת URL של ריל לא נמצאה — גלול את הריל תחילה</string>
+
+    <!-- Downloader carousel UI -->
+    <string name="ig_dl_title">הורד</string>
+    <string name="ig_dl_carousel_subtitle">קרוסלה • %1$d פריטים</string>
+    <string name="ig_dl_carousel_current">הורד נוכחי (%1$d מתוך %2$d)</string>
+    <string name="ig_dl_carousel_all">הורד את כל %1$d הפריטים</string>
+
+    <!-- Story mentions -->
+    <string name="ig_btn_view_mentions">צפה באזכורים</string>
+    <string name="ig_toast_mention_copied">@%1$s הועתק</string>
+    <string name="ig_toast_all_mentions_copied">כל האזכורים הועתקו</string>
+
+    <!-- Story mentions dialog -->
+    <string name="ig_mention_dialog_title">אזכורי סטורי</string>
+    <string name="ig_mention_subtitle">%1$d אזכור(ים) • הקש להעתקה</string>
+    <string name="ig_mention_no_mentions">לא נמצאו אזכורים בסטורי זה</string>
+    <string name="ig_mention_copy_all">העתק הכל</string>
 
 </resources>

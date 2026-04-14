@@ -2,21 +2,5 @@
 <resources>
     <string-array name="target_app">
         <item>com.instagram.android</item>
-        <item>com.instagold.android</item>
-        <item>com.instaflux.app</item>
-        <item>com.myinsta.android</item>
-        <item>cc.honista.app</item>
-        <item>com.instaprime.android</item>
-        <item>com.instafel.android</item>
-        <item>com.instadm.android</item>
-        <item>com.dfistagram.android</item>
-        <item>com.Instander.android</item>
-        <item>com.aero.instagram</item>
-        <item>com.instapro.android</item>
-        <item>com.instaflow.android</item>
-        <item>com.instagram1.android</item>
-        <item>com.instagram2.android</item>
-        <item>com.instagramclone.android</item>
-        <item>com.instaclone.android</item>
     </string-array>
 </resources>

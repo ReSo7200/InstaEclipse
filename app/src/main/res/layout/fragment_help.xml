@@ -5,25 +5,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="?attr/colorSurface"
     android:fillViewport="true"
-    android:padding="16dp">
+    android:scrollbars="none">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:padding="16dp">
 
         <!-- FAQ Section -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/faq_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#262626"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:strokeWidth="0dp">
 
             <LinearLayout
@@ -37,8 +38,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/frequently_asked_questions"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
 
@@ -47,45 +48,44 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/faq_1"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="8dp"
                     tools:ignore="HardcodedText" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/faq_2"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="8dp" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/faq_3"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="8dp" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/faq_4"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="8dp" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/faq_5"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginBottom="8dp" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/faq_6"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp" />
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -94,10 +94,10 @@
             android:id="@+id/module_not_working_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#262626"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:strokeWidth="0dp">
 
             <LinearLayout
@@ -111,8 +111,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/module_not_working_title"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold"
                     android:layout_marginBottom="10dp" />
 
@@ -121,12 +121,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/module_not_working_description"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp" />
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Community Links -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -145,7 +145,7 @@
                     android:layout_height="58dp"
                     android:layout_marginEnd="20dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#1F1F24"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
                     app:strokeWidth="0dp"
                     android:clickable="true"
@@ -157,7 +157,8 @@
                         android:layout_height="40dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_github_logo"
-                        app:tint="@color/white"
+                        app:tint="?attr/colorOnSurface"
+                        android:layoutDirection="ltr"
                         android:contentDescription="@string/go_to_github" />
                 </com.google.android.material.card.MaterialCardView>
 
@@ -179,7 +180,8 @@
                         android:layout_height="40dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_telegram_logo"
-                        app:tint="@color/white"
+                        app:tint="@android:color/white"
+                        android:layoutDirection="ltr"
                         android:contentDescription="@string/go_to_telegram" />
                 </com.google.android.material.card.MaterialCardView>
 

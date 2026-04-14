@@ -11,11 +11,19 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 
-public class AutoPlayDisable {
+public class DisableVideoAutoPlayHook {
 
     public void handleAutoPlayDisable(DexKitBridge bridge) {
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("AutoPlayDisable", Module.hostClassLoader);
+            if (cached != null) {
+                hookMethod(cached);
+                return;
+            }
+        }
         try {
             findAndHookDynamicMethod(bridge);
         } catch (Exception e) {
@@ -57,23 +65,21 @@ public class AutoPlayDisable {
     private void hookMethod(MethodData method) {
         try {
             Method targetMethod = method.getMethodInstance(Module.hostClassLoader);
-
-            // Step 3: Hook the method dynamically
-            XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    if (FeatureFlags.disableVideoAutoPlay) {
-                        // If disableVideoAutoPlay is true, force return true
-                        param.setResult(true);
-                    }
-                }
-            });
-
+            DexKitCache.saveMethod("AutoPlayDisable", targetMethod);
+            hookMethod(targetMethod);
             XposedBridge.log("(InstaEclipse | AutoPlayDisable): ✅ Hooked (dynamic check): " +
                     method.getClassName() + "." + method.getName());
-
         } catch (Exception e) {
             XposedBridge.log("(InstaEclipse | AutoPlayDisable): ❌ Error hooking method: " + e.getMessage());
         }
+    }
+
+    private void hookMethod(Method targetMethod) {
+        XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                if (FeatureFlags.disableVideoAutoPlay) param.setResult(true);
+            }
+        });
     }
 }

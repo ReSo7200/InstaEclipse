@@ -8,11 +8,11 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import ps.reso.instaeclipse.mods.misc.FollowStatusHook;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
-import ps.reso.instaeclipse.utils.tracker.FollowIndicatorTracker;
 
-public class Interceptor {
+public class IGNetworkInterceptor {
 
     public void handleInterceptor(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
@@ -38,7 +38,7 @@ public class Interceptor {
                 }
             }
 
-            // Dynamically identify the URI field in c5aE
+            // Dynamically identify the URI field in the request object
             if (random_param_1 != null) {
                 for (Field field : random_param_1.getDeclaredFields()) {
                     if (field.getType().equals(URI.class)) {
@@ -55,14 +55,19 @@ public class Interceptor {
                         random_param_1, random_param_2, random_param_3, new XC_MethodHook() {
                             @Override
                             protected void beforeHookedMethod(MethodHookParam param) {
-                                Object requestObj = param.args[0]; // Dynamic object
+                                Object requestObj = param.args[0];
                                 URI uri = (URI) XposedHelpers.getObjectField(requestObj, finalUriFieldName);
 
                                 if (uri != null && uri.getPath() != null) {
-                                    // Check all conditions passed in as predicates
                                     boolean shouldDrop = false;
 
                                     // Ghost Mode URIs
+                                    if (FeatureFlags.isGhostSeen) {
+                                        shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened");
+                                    }
+                                    if (FeatureFlags.keepEphemeralMessages) {
+                                        shouldDrop |= uri.getPath().contains("/mark_ephemeral_item_ranges_viewed");
+                                    }
                                     if (FeatureFlags.isGhostScreenshot) {
                                         shouldDrop |= uri.getPath().endsWith("/screenshot/") || uri.getPath().endsWith("/ephemeral_screenshot/");
                                     }
@@ -72,6 +77,7 @@ public class Interceptor {
                                     }
                                     if (FeatureFlags.isGhostStory) {
                                         shouldDrop |= uri.getPath().contains("/api/v2/media/seen/");
+                                        FeatureStatusTracker.setHooked("GhostStories");
                                     }
                                     if (FeatureFlags.isGhostLive) {
                                         shouldDrop |= uri.getPath().contains("/heartbeat_and_get_viewer_count/");
@@ -134,45 +140,34 @@ public class Interceptor {
                                     if (FeatureFlags.disableRepost) {
                                         shouldDrop |= uri.getPath().contains("/media/create_note/");
                                     }
+                                    if (FeatureFlags.disableDiscoverPeople) {
+                                        shouldDrop |= uri.getPath().contains("/discover/ayml/");
+                                        shouldDrop |= uri.getPath().contains("discover/chaining/");
+                                        FeatureStatusTracker.setHooked("DisableDiscoverPeople");
+                                    }
 
                                     if (shouldDrop) {
-                                        // XposedBridge.log("the URI was blocked: " + uri.getPath());
-                                        // Modify the URI to divert the request to a harmless endpoint
                                         try {
                                             URI fakeUri = new URI("https", "127.0.0.1", "/404", null);
                                             XposedHelpers.setObjectField(requestObj, finalUriFieldName, fakeUri);
-                                            // XposedBridge.log("🚫 [InstaEclipse] Changed URI to: " + fakeUri);
-                                        } catch (Exception e) {
-                                            // XposedBridge.log("❌ [InstaEclipse] Failed to modify URI: " + e.getMessage());
-                                        }
+                                        } catch (Exception ignored) {}
                                     }
-                                    /*
-                                     DEV Purposes
-                                    else {
-                                        XposedBridge.log("Logging: " + uri.getHost() + uri.getPath());
-                                    }
-                                     */
 
+                                    // Follow status
                                     if (FeatureFlags.showFollowerToast) {
-                                        if (uri.getPath() != null && uri.getPath().startsWith("/api/v1/friendships/show/")) {
-                                            String[] parts = uri.getPath().split("/");
-                                            if (parts.length >= 5) {
-                                                // Extracted ID from /api/v1/friendships/show/{id}
-                                                FollowIndicatorTracker.currentlyViewedUserId = parts[5];
-                                            }
-                                        }
+                                        FeatureStatusTracker.setHooked("FollowerToast");
+                                        FollowStatusHook.handleRequest(uri, param.args);
                                     }
-
                                 }
                             }
                         }
                 );
             } else {
-                XposedBridge.log("Could not resolve required classes or fields.");
+                XposedBridge.log("(InstaEclipse | Interceptor): Could not resolve required classes or fields.");
             }
 
         } catch (Exception e) {
-            XposedBridge.log("Error in interceptor: " + e.getMessage());
+            XposedBridge.log("(InstaEclipse | Interceptor): ❌ " + e.getMessage());
         }
     }
 }

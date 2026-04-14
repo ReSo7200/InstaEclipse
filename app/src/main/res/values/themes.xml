@@ -1,21 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.InstaEclipse" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
+        <item name="android:navigationBarColor">?attr/colorSurfaceContainer</item>
 
-    <style name="Theme.InstaEclipse" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-
-        <!-- Primary branding color -->
         <item name="colorPrimary">@color/accent_blue</item>
-
-        <!-- Darker version of the primary branding color -->
-        <item name="colorPrimaryDark">@color/accent_blue</item>
-
-        <!-- Accent color for widget highlights -->
-        <item name="colorAccent">@color/gray</item>
-
-        <!-- Control the color of the switch thumb and track -->
-        <item name="colorControlActivated">@color/accent_blue</item>
-        <item name="colorControlNormal">@color/gray</item>
-        <item name="colorControlHighlight">@color/gray</item>
+        <item name="colorSecondary">@color/gray</item>
     </style>
 </resources>
-

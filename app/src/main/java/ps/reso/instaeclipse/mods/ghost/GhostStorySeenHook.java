@@ -13,12 +13,30 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
-public class StorySeen {
+public class GhostStorySeenHook {
 
     public void handleStorySeenBlock(DexKitBridge bridge) {
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (FeatureFlags.isGhostStory) param.setResult(null);
+            }
+        };
+
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("GhostStorySeen", Module.hostClassLoader);
+            if (cached != null) {
+                XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("(InstaEclipse | StoryBlock): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
+                FeatureStatusTracker.setHooked("GhostStories");
+                return;
+            }
+        }
+
         try {
             // Step 1: Find methods containing the string "media/seen/"
             List<MethodData> methods = bridge.findMethod(FindMethod.create()
@@ -48,14 +66,8 @@ public class StorySeen {
                         paramTypes.size() == 0) {
 
                     try {
-                        XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() {
-                            @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
-                                if (FeatureFlags.isGhostStory) {
-                                    param.setResult(null); // Block if GhostStory is enabled
-                                }
-                            }
-                        });
+                        DexKitCache.saveMethod("GhostStorySeen", reflectMethod);
+                        XposedBridge.hookMethod(reflectMethod, hook);
 
                         XposedBridge.log("(InstaEclipse | StoryBlock): ✅ Hooked (dynamic check): " +
                                 method.getClassName() + "." + method.getName());

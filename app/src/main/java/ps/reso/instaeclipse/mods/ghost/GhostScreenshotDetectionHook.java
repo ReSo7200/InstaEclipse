@@ -15,12 +15,30 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
-public class ScreenshotDetection {
+public class GhostScreenshotDetectionHook {
 
     public void handleScreenshotBlock(DexKitBridge bridge) {
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                if (FeatureFlags.isGhostScreenshot) param.setResult(null);
+            }
+        };
+
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("GhostScreenshot", Module.hostClassLoader);
+            if (cached != null) {
+                XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("(InstaEclipse | ScreenshotBlock): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
+                FeatureStatusTracker.setHooked("GhostScreenshot");
+                return;
+            }
+        }
+
         try {
             // Step 1: Find class referencing "ScreenshotNotificationManager"
             List<ClassData> classes = bridge.findClass(FindClass.create()
@@ -49,15 +67,8 @@ public class ScreenshotDetection {
 
                         try {
                             Method targetMethod = method.getMethodInstance(Module.hostClassLoader);
-
-                            XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
-                                @Override
-                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                    if (FeatureFlags.isGhostScreenshot) {
-                                        param.setResult(null); // Block logic
-                                    }
-                                }
-                            });
+                            DexKitCache.saveMethod("GhostScreenshot", targetMethod);
+                            XposedBridge.hookMethod(targetMethod, hook);
 
                             XposedBridge.log("(InstaEclipse | ScreenshotBlock): ✅ Hooked (dynamic check): " +
                                     method.getClassName() + "." + method.getName());

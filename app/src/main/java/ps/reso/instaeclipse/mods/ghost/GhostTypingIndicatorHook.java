@@ -13,12 +13,30 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
+import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
-public class TypingStatus {
+public class GhostTypingIndicatorHook {
 
     public void handleTypingBlock(DexKitBridge bridge) {
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (FeatureFlags.isGhostTyping) param.setResult(null);
+            }
+        };
+
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("GhostTyping", Module.hostClassLoader);
+            if (cached != null) {
+                XposedBridge.hookMethod(cached, hook);
+                XposedBridge.log("(InstaEclipse | TypingBlock): ✅ Hooked (dynamic check): " + cached.getDeclaringClass().getName() + "." + cached.getName());
+                FeatureStatusTracker.setHooked("GhostTyping");
+                return;
+            }
+        }
+
         try {
             // Step 1: Find methods containing the string "is_typing_indicator_enabled"
             List<MethodData> methods = bridge.findMethod(FindMethod.create()
@@ -51,16 +69,8 @@ public class TypingStatus {
                         String.valueOf(paramTypes.get(1)).contains("boolean")) {
 
                     try {
-                        // Step 3: Hook method dynamically
-                        XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() {
-                            @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
-                                if (FeatureFlags.isGhostTyping) {
-                                    // If ghost typing is enabled, block typing ping
-                                    param.setResult(null);
-                                }
-                            }
-                        });
+                        DexKitCache.saveMethod("GhostTyping", reflectMethod);
+                        XposedBridge.hookMethod(reflectMethod, hook);
 
                         XposedBridge.log("(InstaEclipse | TypingBlock): ✅ Hooked (dynamic check): " +
                                 method.getClassName() + "." + method.getName());
