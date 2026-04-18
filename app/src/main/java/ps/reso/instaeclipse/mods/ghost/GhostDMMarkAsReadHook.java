@@ -28,23 +28,31 @@ public class GhostDMMarkAsReadHook {
         this.moduleSourceDir = moduleSourceDir;
     }
 
+    // Cached once on first use — resource IDs are constant for a given app install.
+    private static volatile int sCachedContainerId = 0;
+
     public void install(ClassLoader classLoader) {
         try {
             XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
+                    // Bail immediately if the feature is off — this hook fires for every
+                    // view attachment in the entire app, so the fast path must be trivial.
+                    if (!FeatureFlags.isGhostSeen) return;
+
                     View view = (View) param.thisObject;
-                    Context context = view.getContext();
 
-                    @SuppressLint("DiscouragedApi")
-                    int containerId = context.getResources().getIdentifier(
-                            "row_thread_composer_buttons_container", "id", context.getPackageName());
-
-                    // When we find the button container, we target its PARENT
-                    if (view.getId() == containerId && view.getParent() instanceof ViewGroup parent) {
-                        if (!FeatureFlags.isGhostSeen) return;
-                        injectIndependentButton(parent, view);
+                    if (sCachedContainerId == 0) {
+                        @SuppressLint("DiscouragedApi")
+                        int id = view.getContext().getResources().getIdentifier(
+                                "row_thread_composer_buttons_container", "id",
+                                view.getContext().getPackageName());
+                        sCachedContainerId = id;
                     }
+
+                    if (sCachedContainerId == 0 || view.getId() != sCachedContainerId) return;
+                    if (!(view.getParent() instanceof ViewGroup parent)) return;
+                    injectIndependentButton(parent, view);
                 }
             });
         } catch (Throwable t) {

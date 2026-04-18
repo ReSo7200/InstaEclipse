@@ -1,11 +1,5 @@
 package ps.reso.instaeclipse.mods.ui.utils;
 
-import static ps.reso.instaeclipse.mods.ghost.ui.GhostEmojiManager.addGhostEmojiNextToInbox;
-import static ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity;
-import static ps.reso.instaeclipse.mods.ui.UIHookManager.setupHooks;
-
-import android.app.Activity;
-
 import org.luckypray.dexkit.DexKitBridge;
 import org.luckypray.dexkit.query.FindMethod;
 import org.luckypray.dexkit.query.matchers.MethodMatcher;
@@ -20,7 +14,6 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
-import ps.reso.instaeclipse.utils.ghost.GhostModeUtils;
 
 public class BottomSheetHookUtil {
 
@@ -72,21 +65,12 @@ public class BottomSheetHookUtil {
     }
 
     private static void hookMethod(Method reflectMethod) {
-        XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) {
-                final Activity activity = getCurrentActivity();
-                if (activity != null) {
-                    activity.runOnUiThread(() -> {
-                        try {
-                            setupHooks(activity);
-                            addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
-                        } catch (Exception ignored) {
-                        }
-                    });
-                }
-            }
-        });
+        // This getter is called on every navigation action, layout pass, and scroll
+        // event — it is a hot path. We do NOT post any work to the main thread here.
+        // onCreate and onResume hooks are responsible for all UI setup and ghost emoji
+        // updates. This hook exists only to locate the method; its body is intentionally
+        // empty to avoid any per-call overhead.
+        XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() { });
         XposedBridge.log("(InstaEclipse | BottomSheet): ✅ Hooked: " + reflectMethod.getDeclaringClass().getName() + "." + reflectMethod.getName());
     }
 }
