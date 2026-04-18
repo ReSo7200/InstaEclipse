@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -36,6 +37,8 @@ import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.toast.CustomToast;
 
 public class UIHookManager {
+
+    private static final String INSTAGRAM_MAIN_ACTIVITY = "com.instagram.mainactivity.InstagramMainActivity";
 
     @SuppressLint("StaticFieldLeak")
     private static Activity currentActivity;
@@ -136,7 +139,7 @@ public class UIHookManager {
             // Precise search for the standard onCreate(Bundle) signature
             var methods = Module.dexKitBridge.findMethod(create()
                     .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                            .declaredClass("com.instagram.mainactivity.InstagramMainActivity")
+                            .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
                             .name("onCreate")
                             .paramTypes("android.os.Bundle")
                             .returnType("void")
@@ -148,7 +151,7 @@ public class UIHookManager {
                 XposedBridge.log("(InstaEclipse): ⚠️ Specific onCreate not found, searching by signature...");
                 methods = Module.dexKitBridge.findMethod(create()
                         .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                                .declaredClass("com.instagram.mainactivity.InstagramMainActivity")
+                                .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
                                 .paramTypes("android.os.Bundle")
                                 .returnType("void")
                         )
@@ -156,11 +159,11 @@ public class UIHookManager {
             }
 
             if (!methods.isEmpty()) {
-                // Get the first match
-                var methodData = methods.get(0);
-                java.lang.reflect.Method targetMethod = methodData.getMethodInstance(classLoader);
-
-                XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
+                String methodName = methods.get(0).getName();
+                if (methodName == null || methodName.isEmpty()) {
+                    XposedBridge.log("(InstaEclipse): ❌ Invalid onCreate method name discovered");
+                } else {
+                    XposedHelpers.findAndHookMethod(INSTAGRAM_MAIN_ACTIVITY, classLoader, methodName, Bundle.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         final Activity activity = (Activity) param.thisObject;
@@ -199,7 +202,8 @@ public class UIHookManager {
                             }
                         });
                     }
-                });
+                    });
+                } // end else (valid methodName)
             } else {
                 XposedBridge.log("(InstaEclipse): ❌ Failed to find any onCreate candidate in InstagramMainActivity");
             }
@@ -211,7 +215,7 @@ public class UIHookManager {
         try {
             List<MethodData> candidates = Module.dexKitBridge.findMethod(org.luckypray.dexkit.query.FindMethod.create()
                     .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                            .declaredClass("com.instagram.mainactivity.InstagramMainActivity")
+                            .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
                             .modifiers(java.lang.reflect.Modifier.PUBLIC)
                             .paramCount(0)
                             .returnType("void")
@@ -220,6 +224,8 @@ public class UIHookManager {
 
             for (MethodData methodData : candidates) {
                 String methodName = methodData.getName();
+
+                if (methodName == null || methodName.isEmpty()) continue;
 
                 // Skip constructors and static initializers
                 if (methodName.contains("<init>") || methodName.contains("<clinit>")) {
@@ -231,8 +237,7 @@ public class UIHookManager {
                     continue;
                 }
 
-                java.lang.reflect.Method targetMethod = methodData.getMethodInstance(classLoader);
-                XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
+                XposedHelpers.findAndHookMethod(INSTAGRAM_MAIN_ACTIVITY, classLoader, methodName, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) {
                         final Activity activity = (Activity) param.thisObject;
