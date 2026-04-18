@@ -122,6 +122,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Tərtibatçı Seçimləri</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Kölgə Rejimi Ayarları</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Reklam/Analitika Bloku</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Təmiz Lent</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Diqqəti Dağıtmayan Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ Müxtəlif Xüsusiyyətlər</string>
     <string name="ig_dialog_menu_downloader">📥 Yükləyici</string>
@@ -131,6 +132,7 @@
     <string name="ig_dialog_section_dev_options">Tərtibatçı Seçimləri 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Kölgə Rejimi 👻</string>
     <string name="ig_dialog_section_ad_analytics">Reklam/Analitika Bloku 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Təmiz Lent ✨</string>
     <string name="ig_dialog_section_distraction_free">Diqqəti Dağıtmayan Instagram 🧘</string>
     <string name="ig_dialog_section_misc">Müxtəlif ⚙️</string>
     <string name="ig_dialog_section_downloader">Yükləyici 📥</string>
@@ -184,6 +186,7 @@
     <string name="ig_dialog_quick_allow_screenshots">DM-lərdə Ekran Görüntüsünə İcazə Verməyi Daxil Et</string>
     <string name="ig_dialog_ad_block_ads">Reklamları Blokla</string>
     <string name="ig_dialog_ad_block_analytics">Analitikanı Blokla</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Lentdəki tövsiyələri gizlət</string>
     <string name="ig_dialog_ad_disable_tracking">İzləmə Bağlantılarını Deaktiv Et</string>
     <string name="ig_dialog_distraction_extreme_mode">Ekstremal Rejim 🔒 (Yenidən quraşdıranadək geri alınmaz)</string>
     <string name="ig_dialog_distraction_disable_stories">Hekayələri Deaktiv Et</string>

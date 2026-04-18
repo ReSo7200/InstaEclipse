@@ -594,6 +594,7 @@ public class FeaturesFragment extends Fragment {
                 createNav(getString(R.string.ig_dialog_menu_dev_options), this::loadDevMenu),
                 createNav(getString(R.string.ig_dialog_menu_ghost_settings), this::loadGhostMenu),
                 createNav(getString(R.string.ig_dialog_menu_ad_analytics), this::loadAdsMenu),
+                createNav(getString(R.string.ig_dialog_menu_clean_feed), this::loadCleanFeedMenu),
                 createNav(getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu),
                 createNav(getString(R.string.ig_dialog_menu_misc), this::loadMiscMenu),
                 createNav(getString(R.string.ig_dialog_menu_downloader), this::loadDownloaderMenu)
@@ -699,6 +700,18 @@ public class FeaturesFragment extends Fragment {
 
         showMenu(getString(R.string.ig_dialog_section_ad_analytics), defs);
         currentMenu = "ads";
+    }
+
+    private void loadCleanFeedMenu() {
+        List<Object> defs = new ArrayList<>();
+
+        defs.add(getString(R.string.feat_features));
+        defs.add(Arrays.asList(
+                createSwitch(getString(R.string.ig_dialog_clean_feed_hide_suggested), "hideSuggestionsInFeed")
+        ));
+
+        showMenu(getString(R.string.ig_dialog_section_clean_feed), defs);
+        currentMenu = "cleanfeed";
     }
 
     private void loadDistractionMenu() {

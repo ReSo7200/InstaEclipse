@@ -149,6 +149,7 @@
     <string name="ig_dialog_cancel">Cancel</string>
 
     <!-- Main menu items -->
+    <string name="ig_dialog_menu_clean_feed">✨ Clean Feed</string>
     <string name="ig_dialog_menu_dev_options">🎛 Developer Options</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Ghost Mode Settings</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Ad/Analytics Block</string>
@@ -160,6 +161,7 @@
     <string name="ig_dialog_menu_restart">🔁 Restart App</string>
 
     <!-- Section titles -->
+    <string name="ig_dialog_section_clean_feed">Clean Feed ✨</string>
     <string name="ig_dialog_section_dev_options">Developer Options 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Ghost Mode 👻</string>
     <string name="ig_dialog_section_ad_analytics">Ad/Analytics Block 🛡️</string>
@@ -236,6 +238,9 @@
     <string name="ig_dialog_distraction_disable_comments">Disable Comments</string>
     <string name="ig_dialog_distraction_extreme_title">Activate Extreme Mode?</string>
     <string name="ig_dialog_distraction_extreme_message">Once activated, you cannot disable Distraction-Free Mode until you reinstall the app. Continue?</string>
+
+    <!-- Clean Feed options -->
+    <string name="ig_dialog_clean_feed_hide_suggested">Hide Suggestions in Feed</string>
 
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Disable Story Auto-Swipe</string>

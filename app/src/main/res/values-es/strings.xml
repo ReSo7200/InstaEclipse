@@ -124,6 +124,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Opciones de desarrollador</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Configuración del modo fantasma</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Bloqueo de anuncios/analíticas</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Feed limpio</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram sin distracciones</string>
     <string name="ig_dialog_menu_misc">⚙ Funciones adicionales</string>
     <string name="ig_dialog_menu_downloader">📥 Descargador</string>
@@ -133,6 +134,7 @@
     <string name="ig_dialog_section_dev_options">Opciones de desarrollador 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Modo fantasma 👻</string>
     <string name="ig_dialog_section_ad_analytics">Bloqueo de anuncios/analíticas 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Feed limpio ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram sin distracciones 🧘</string>
     <string name="ig_dialog_section_misc">Miscelánea ⚙️</string>
     <string name="ig_dialog_section_downloader">Descargador 📥</string>
@@ -186,6 +188,7 @@
     <string name="ig_dialog_quick_allow_screenshots">Incluir permitir capturas en mensajes directos</string>
     <string name="ig_dialog_ad_block_ads">Bloquear anuncios</string>
     <string name="ig_dialog_ad_block_analytics">Bloquear analíticas</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Ocultar sugerencias en el feed</string>
     <string name="ig_dialog_ad_disable_tracking">Desactivar enlaces de rastreo</string>
     <string name="ig_dialog_distraction_extreme_mode">Modo extremo 🔒 (Irreversible hasta reinstalar)</string>
     <string name="ig_dialog_distraction_disable_stories">Desactivar historias</string>

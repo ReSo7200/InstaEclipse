@@ -56,6 +56,9 @@ public class SettingsManager {
         editor.putBoolean("disableExplore", FeatureFlags.disableExplore);
         editor.putBoolean("disableComments", FeatureFlags.disableComments);
 
+        // Clean Feed
+        editor.putBoolean("hideSuggestionsInFeed", FeatureFlags.hideSuggestionsInFeed);
+
         // Ads
         editor.putBoolean("isAdBlockEnabled", FeatureFlags.isAdBlockEnabled);
         editor.putBoolean("isAnalyticsBlocked", FeatureFlags.isAnalyticsBlocked);
@@ -127,6 +130,9 @@ public class SettingsManager {
         FeatureFlags.disableReelsExceptDM = prefs.getBoolean("disableReelsExceptDM", false);
         FeatureFlags.disableExplore = prefs.getBoolean("disableExplore", false);
         FeatureFlags.disableComments = prefs.getBoolean("disableComments", false);
+
+        // Clean Feed
+        FeatureFlags.hideSuggestionsInFeed = prefs.getBoolean("hideSuggestionsInFeed", false);
 
         // Ads
         FeatureFlags.isAdBlockEnabled = prefs.getBoolean("isAdBlockEnabled", false);

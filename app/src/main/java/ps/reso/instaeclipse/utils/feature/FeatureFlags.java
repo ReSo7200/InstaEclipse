@@ -60,6 +60,9 @@ public class FeatureFlags {
     public static boolean removeBuildExpiredPopup = false;
     public static boolean enableCopyComment = false;
 
+    // Clean Feed
+    public static boolean hideSuggestionsInFeed = false;
+
     // Downloader
     public static boolean enablePostDownload = false;
     public static boolean enableStoryDownload = false;

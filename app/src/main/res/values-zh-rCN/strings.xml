@@ -145,6 +145,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 开发者选项</string>
     <string name="ig_dialog_menu_ghost_settings">👻 幽灵模式设置</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 屏蔽广告/分析</string>
+    <string name="ig_dialog_menu_clean_feed">✨ 纯净动态</string>
     <string name="ig_dialog_menu_distraction_free">🧘 无干扰 Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ 其他功能</string>
     <string name="ig_dialog_menu_downloader">📥 下载器</string>
@@ -156,6 +157,7 @@
     <string name="ig_dialog_section_dev_options">开发者选项 🎛</string>
     <string name="ig_dialog_section_ghost_mode">幽灵模式 👻</string>
     <string name="ig_dialog_section_ad_analytics">屏蔽广告/分析 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">纯净动态 ✨</string>
     <string name="ig_dialog_section_distraction_free">无干扰 Instagram 🧘</string>
     <string name="ig_dialog_section_misc">杂项 ⚙️</string>
     <string name="ig_dialog_section_downloader">下载器 📥</string>
@@ -217,6 +219,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">屏蔽广告</string>
     <string name="ig_dialog_ad_block_analytics">屏蔽分析</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">隐藏动态中的推荐内容</string>
     <string name="ig_dialog_ad_disable_tracking">禁用追踪链接</string>
 
     <!-- Distraction-Free options -->

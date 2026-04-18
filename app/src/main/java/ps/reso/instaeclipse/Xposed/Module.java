@@ -23,6 +23,8 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ps.reso.instaeclipse.mods.ads.AdBlocker;
+import ps.reso.instaeclipse.mods.feed.HideSuggestedFeedItemsHook;
+import ps.reso.instaeclipse.mods.feed.ReelsClientHook;
 import ps.reso.instaeclipse.mods.ads.TrackingLinkDisable;
 import ps.reso.instaeclipse.mods.devops.BuildExpiredPopupHook;
 import ps.reso.instaeclipse.mods.devops.DevOptionsUnlockHook;
@@ -235,6 +237,20 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         new GhostStorySeenHook().handleStorySeenBlock(dexKitBridge); // Story Seen
                     } catch (Throwable ignored) {
                         XposedBridge.log("(InstaEclipse | GhostStorySeen): ❌ Failed to hook");
+                    }
+
+                    // Hide in-feed widget units (suggested users panels, surveys, carousels, etc.)
+                    try {
+                        new HideSuggestedFeedItemsHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        XposedBridge.log("(InstaEclipse | HideSuggested): ❌ Failed to hook");
+                    }
+
+                    // Client-side reels blocker (intercepts the reels viewer)
+                    try {
+                        new ReelsClientHook().install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        XposedBridge.log("(InstaEclipse | ReelsClient): ❌ Failed to hook");
                     }
 
                     // Ads Blocker

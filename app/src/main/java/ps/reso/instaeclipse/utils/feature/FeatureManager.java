@@ -71,6 +71,13 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("PermanentViewMode");
         }
 
+        // Clean Feed
+        if (FeatureFlags.hideSuggestionsInFeed) {
+            FeatureStatusTracker.setEnabled("HideSuggestionsInFeed");
+        } else {
+            FeatureStatusTracker.setDisabled("HideSuggestionsInFeed");
+        }
+
         // Miscellaneous
         if (FeatureFlags.disableTrackingLinks) {
             FeatureStatusTracker.setEnabled("DisableTrackingLinks");

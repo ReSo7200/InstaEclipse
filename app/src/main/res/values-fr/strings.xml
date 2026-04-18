@@ -144,6 +144,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Options Développeurs</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Paramètres Mode Fantôme</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Blocage Pubs/Analytics</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Fil propre</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram Sans Distractions</string>
     <string name="ig_dialog_menu_misc">⚙ Fonctions Diverses</string>
     <string name="ig_dialog_menu_downloader">📥 Téléchargeur</string>
@@ -155,6 +156,7 @@
     <string name="ig_dialog_section_dev_options">Options Développeurs 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Mode Fantôme 👻</string>
     <string name="ig_dialog_section_ad_analytics">Blocage Pubs/Analytics 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Fil propre ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram Sans Distractions 🧘</string>
     <string name="ig_dialog_section_misc">Divers ⚙️</string>
     <string name="ig_dialog_section_downloader">Téléchargeur 📥</string>
@@ -216,6 +218,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">Bloquer les pubs</string>
     <string name="ig_dialog_ad_block_analytics">Bloquer les analytics</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Masquer les suggestions dans le fil</string>
     <string name="ig_dialog_ad_disable_tracking">Désactiver liens de suivi</string>
 
     <!-- Distraction-Free options -->

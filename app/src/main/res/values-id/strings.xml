@@ -144,6 +144,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Opsi Pengembang</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Pengaturan Mode Hantu</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Blokir Iklan/Analitik</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Feed Bersih</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram Bebas Gangguan</string>
     <string name="ig_dialog_menu_misc">⚙ Fitur Lainnya</string>
     <string name="ig_dialog_menu_downloader">📥 Pengunduh</string>
@@ -155,6 +156,7 @@
     <string name="ig_dialog_section_dev_options">Opsi Pengembang 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Mode Hantu 👻</string>
     <string name="ig_dialog_section_ad_analytics">Blokir Iklan/Analitik 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Feed Bersih ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram Bebas Gangguan 🧘</string>
     <string name="ig_dialog_section_misc">Lainnya ⚙️</string>
     <string name="ig_dialog_section_downloader">Pengunduh 📥</string>
@@ -216,6 +218,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">Blokir Iklan</string>
     <string name="ig_dialog_ad_block_analytics">Blokir Analitik</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Sembunyikan saran di feed</string>
     <string name="ig_dialog_ad_disable_tracking">Nonaktifkan Tautan Pelacakan</string>
 
     <!-- Distraction-Free options -->

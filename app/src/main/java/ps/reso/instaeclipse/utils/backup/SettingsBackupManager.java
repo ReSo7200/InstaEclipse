@@ -42,6 +42,9 @@ public class SettingsBackupManager {
         s.put("quickTogglePermanentView",FeatureFlags.quickTogglePermanentView);
         s.put("quickToggleAllowScreenshots", FeatureFlags.quickToggleAllowScreenshots);
 
+        // Clean Feed
+        s.put("hideSuggestionsInFeed",      FeatureFlags.hideSuggestionsInFeed);
+
         // Ads
         s.put("isAdBlockEnabled",        FeatureFlags.isAdBlockEnabled);
         s.put("isAnalyticsBlocked",      FeatureFlags.isAnalyticsBlocked);
@@ -113,6 +116,8 @@ public class SettingsBackupManager {
         if (s.has("quickToggleReplays"))     FeatureFlags.quickToggleReplays     = s.getBoolean("quickToggleReplays");
         if (s.has("quickTogglePermanentView")) FeatureFlags.quickTogglePermanentView = s.getBoolean("quickTogglePermanentView");
         if (s.has("quickToggleAllowScreenshots")) FeatureFlags.quickToggleAllowScreenshots = s.getBoolean("quickToggleAllowScreenshots");
+
+        if (s.has("hideSuggestionsInFeed"))     FeatureFlags.hideSuggestionsInFeed     = s.getBoolean("hideSuggestionsInFeed");
 
         if (s.has("isAdBlockEnabled"))       FeatureFlags.isAdBlockEnabled       = s.getBoolean("isAdBlockEnabled");
         if (s.has("isAnalyticsBlocked"))     FeatureFlags.isAnalyticsBlocked     = s.getBoolean("isAnalyticsBlocked");

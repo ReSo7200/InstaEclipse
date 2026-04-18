@@ -145,6 +145,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Επιλογές Προγραμματιστών</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Ρυθμίσεις Αόρατης Λειτουργίας</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Αποκλεισμός Διαφημίσεων/Αναλυτικών</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Καθαρό Feed</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram Χωρίς Περισπασμούς</string>
     <string name="ig_dialog_menu_misc">⚙ Διάφορες Λειτουργίες</string>
     <string name="ig_dialog_menu_downloader">📥 Λήψη</string>
@@ -156,6 +157,7 @@
     <string name="ig_dialog_section_dev_options">Επιλογές Προγραμματιστών 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Αόρατη Λειτουργία 👻</string>
     <string name="ig_dialog_section_ad_analytics">Αποκλεισμός Διαφημίσεων/Αναλυτικών 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Καθαρό Feed ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram Χωρίς Περισπασμούς 🧘</string>
     <string name="ig_dialog_section_misc">Διάφορα ⚙️</string>
     <string name="ig_dialog_section_downloader">Λήψη 📥</string>
@@ -217,6 +219,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">Αποκλεισμός Διαφημίσεων</string>
     <string name="ig_dialog_ad_block_analytics">Αποκλεισμός Αναλυτικών</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Απόκρυψη προτάσεων στο feed</string>
     <string name="ig_dialog_ad_disable_tracking">Απενεργοποίηση Συνδέσμων Παρακολούθησης</string>
 
     <!-- Distraction-Free options -->

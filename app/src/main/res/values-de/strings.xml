@@ -127,6 +127,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Entwickleroptionen</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Geistermodus-Einstellungen</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Werbung/Analytics blockieren</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Sauberer Feed</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Ablenkungsfreies Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ Weitere Funktionen</string>
     <string name="ig_dialog_menu_downloader">📥 Downloader</string>
@@ -136,6 +137,7 @@
     <string name="ig_dialog_section_dev_options">Entwickleroptionen 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Geistermodus 👻</string>
     <string name="ig_dialog_section_ad_analytics">Werbung/Analytics blockieren 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Sauberer Feed ✨</string>
     <string name="ig_dialog_section_distraction_free">Ablenkungsfreies Instagram 🧘</string>
     <string name="ig_dialog_section_misc">Sonstiges ⚙️</string>
     <string name="ig_dialog_section_downloader">Downloader 📥</string>
@@ -189,6 +191,7 @@
     <string name="ig_dialog_quick_allow_screenshots">Screenshots in DMs erlauben einschließen</string>
     <string name="ig_dialog_ad_block_ads">Werbung blockieren</string>
     <string name="ig_dialog_ad_block_analytics">Analytics blockieren</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Vorschläge im Feed ausblenden</string>
     <string name="ig_dialog_ad_disable_tracking">Tracking-Links deaktivieren</string>
     <string name="ig_dialog_distraction_extreme_mode">Extremmodus 🔒 (Nicht rückgängig bis zur Neuinstallation)</string>
     <string name="ig_dialog_distraction_disable_stories">Stories deaktivieren</string>

@@ -122,6 +122,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Параметры разработчика</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Настройки режима призрака</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Блокировка рекламы/аналитики</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Чистая лента</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram без отвлечений</string>
     <string name="ig_dialog_menu_misc">⚙ Прочие функции</string>
     <string name="ig_dialog_menu_downloader">📥 Загрузчик</string>
@@ -131,6 +132,7 @@
     <string name="ig_dialog_section_dev_options">Параметры разработчика 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Режим призрака 👻</string>
     <string name="ig_dialog_section_ad_analytics">Блокировка рекламы/аналитики 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Чистая лента ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram без отвлечений 🧘</string>
     <string name="ig_dialog_section_misc">Прочее ⚙️</string>
     <string name="ig_dialog_section_downloader">Загрузчик 📥</string>
@@ -184,6 +186,7 @@
     <string name="ig_dialog_quick_allow_screenshots">Включить разрешение скриншотов в личных сообщениях</string>
     <string name="ig_dialog_ad_block_ads">Блокировать рекламу</string>
     <string name="ig_dialog_ad_block_analytics">Блокировать аналитику</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Скрыть предложения в ленте</string>
     <string name="ig_dialog_ad_disable_tracking">Отключить ссылки отслеживания</string>
     <string name="ig_dialog_distraction_extreme_mode">Экстремальный режим 🔒 (Необратимо до переустановки)</string>
     <string name="ig_dialog_distraction_disable_stories">Отключить истории</string>

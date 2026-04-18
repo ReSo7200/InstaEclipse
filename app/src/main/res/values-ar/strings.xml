@@ -120,6 +120,7 @@
     <string name="ig_dialog_menu_dev_options">خيارات المطور 🎛</string>
     <string name="ig_dialog_menu_ghost_settings">إعدادات وضع الشبح 👻</string>
     <string name="ig_dialog_menu_ad_analytics">حظر الإعلانات/التحليلات 🛡</string>
+    <string name="ig_dialog_menu_clean_feed">✨ خلاصة نظيفة</string>
     <string name="ig_dialog_menu_distraction_free">إنستغرام بلا إلهاء 🧘</string>
     <string name="ig_dialog_menu_misc">ميزات متنوعة ⚙</string>
     <string name="ig_dialog_menu_downloader">التنزيل 📥</string>
@@ -129,6 +130,7 @@
     <string name="ig_dialog_section_dev_options">خيارات المطور 🎛</string>
     <string name="ig_dialog_section_ghost_mode">وضع الشبح 👻</string>
     <string name="ig_dialog_section_ad_analytics">حظر الإعلانات/التحليلات 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">خلاصة نظيفة ✨</string>
     <string name="ig_dialog_section_distraction_free">إنستغرام بلا إلهاء 🧘</string>
     <string name="ig_dialog_section_misc">متنوع ⚙️</string>
     <string name="ig_dialog_section_downloader">التنزيل 📥</string>
@@ -182,6 +184,7 @@
     <string name="ig_dialog_quick_allow_screenshots">تضمين السماح بلقطات الشاشة في الرسائل المباشرة</string>
     <string name="ig_dialog_ad_block_ads">حظر الإعلانات</string>
     <string name="ig_dialog_ad_block_analytics">حظر التحليلات</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">إخفاء الاقتراحات في الخلاصة</string>
     <string name="ig_dialog_ad_disable_tracking">تعطيل روابط التتبع</string>
     <string name="ig_dialog_distraction_extreme_mode">الوضع المتطرف 🔒 (لا رجعة حتى إعادة التثبيت)</string>
     <string name="ig_dialog_distraction_disable_stories">تعطيل القصص</string>

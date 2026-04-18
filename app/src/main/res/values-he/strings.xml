@@ -144,6 +144,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 הגדרות מפתחים</string>
     <string name="ig_dialog_menu_ghost_settings">👻 הגדרות מצב רפאים</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 חסימת פרסומות/אנליטיקות</string>
+    <string name="ig_dialog_menu_clean_feed">✨ עדכון נקי</string>
     <string name="ig_dialog_menu_distraction_free">🧘 אינסטגרם ללא הסחות דעת</string>
     <string name="ig_dialog_menu_misc">⚙ תכונות נוספות</string>
     <string name="ig_dialog_menu_downloader">📥 הורדה</string>
@@ -155,6 +156,7 @@
     <string name="ig_dialog_section_dev_options">הגדרות מפתחים 🎛</string>
     <string name="ig_dialog_section_ghost_mode">מצב רפאים 👻</string>
     <string name="ig_dialog_section_ad_analytics">חסימת פרסומות/אנליטיקות 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">עדכון נקי ✨</string>
     <string name="ig_dialog_section_distraction_free">אינסטגרם ללא הסחות דעת 🧘</string>
     <string name="ig_dialog_section_misc">שונות ⚙️</string>
     <string name="ig_dialog_section_downloader">הורדה 📥</string>
@@ -216,6 +218,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">חסום פרסומות</string>
     <string name="ig_dialog_ad_block_analytics">חסום אנליטיקות</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">הסתר הצעות בעדכון</string>
     <string name="ig_dialog_ad_disable_tracking">השבת קישורי מעקב</string>
 
     <!-- Distraction-Free options -->

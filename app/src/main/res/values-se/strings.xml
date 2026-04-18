@@ -121,6 +121,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Utvecklaralternativ</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Spöklägeinställningar</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Blockera annonser/analys</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Rent flöde</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram utan distraktioner</string>
     <string name="ig_dialog_menu_misc">⚙ Övriga funktioner</string>
     <string name="ig_dialog_menu_downloader">📥 Nedladdare</string>
@@ -130,6 +131,7 @@
     <string name="ig_dialog_section_dev_options">Utvecklaralternativ 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Spökläge 👻</string>
     <string name="ig_dialog_section_ad_analytics">Blockera annonser/analys 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Rent flöde ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram utan distraktioner 🧘</string>
     <string name="ig_dialog_section_misc">Övrigt ⚙️</string>
     <string name="ig_dialog_section_downloader">Nedladdare 📥</string>
@@ -183,6 +185,7 @@
     <string name="ig_dialog_quick_allow_screenshots">Inkludera tillåt skärmdumpar i direktmeddelanden</string>
     <string name="ig_dialog_ad_block_ads">Blockera annonser</string>
     <string name="ig_dialog_ad_block_analytics">Blockera analys</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Dölj förslag i flödet</string>
     <string name="ig_dialog_ad_disable_tracking">Inaktivera spårningslänkar</string>
     <string name="ig_dialog_distraction_extreme_mode">Extremläge 🔒 (Oåterkalleligt tills ominstallation)</string>
     <string name="ig_dialog_distraction_disable_stories">Inaktivera Stories</string>

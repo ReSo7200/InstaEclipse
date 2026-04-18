@@ -105,6 +105,9 @@ public class DialogUtils {
         // 3 - Distraction-Free Instagram => OPEN PAGE
         mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_distraction_free), () -> showDistractionOptions(context)));
 
+        // 3b - Clean Feed => OPEN PAGE
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_clean_feed), () -> showCleanFeedOptions(context)));
+
         // 4 - Misc Features => OPEN PAGE
         mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_misc), () -> showMiscOptions(context)));
 
@@ -718,6 +721,22 @@ public class DialogUtils {
             }
             onlyInDMSwitch.setEnabled(disableReelsSwitch.isChecked());
         });
+    }
+
+
+    private static void showCleanFeedOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+
+        ToggleRow hideSuggestedSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_clean_feed_hide_suggested), FeatureFlags.hideSuggestionsInFeed);
+
+        hideSuggestedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.hideSuggestionsInFeed = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+
+        layout.addView(hideSuggestedSwitch);
+
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clean_feed), layout, () -> {});
     }
 
 

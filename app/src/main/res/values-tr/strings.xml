@@ -122,6 +122,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Geliştirici Seçenekleri</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Hayalet Modu Ayarları</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Reklam/Analitik Engeli</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Temiz Akış</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Dikkat Dağıtıcısız Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ Çeşitli Özellikler</string>
     <string name="ig_dialog_menu_downloader">📥 İndirici</string>
@@ -131,6 +132,7 @@
     <string name="ig_dialog_section_dev_options">Geliştirici Seçenekleri 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Hayalet Modu 👻</string>
     <string name="ig_dialog_section_ad_analytics">Reklam/Analitik Engeli 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Temiz Akış ✨</string>
     <string name="ig_dialog_section_distraction_free">Dikkat Dağıtıcısız Instagram 🧘</string>
     <string name="ig_dialog_section_misc">Çeşitli ⚙️</string>
     <string name="ig_dialog_section_downloader">İndirici 📥</string>
@@ -184,6 +186,7 @@
     <string name="ig_dialog_quick_allow_screenshots">DM\'lerde Ekran Görüntüsüne İzin Vermeyi Dahil Et</string>
     <string name="ig_dialog_ad_block_ads">Reklamları Engelle</string>
     <string name="ig_dialog_ad_block_analytics">Analitiği Engelle</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Akıştaki önerileri gizle</string>
     <string name="ig_dialog_ad_disable_tracking">Takip Bağlantılarını Devre Dışı Bırak</string>
     <string name="ig_dialog_distraction_extreme_mode">Aşırı Mod 🔒 (Yeniden yükleyene kadar geri alınamaz)</string>
     <string name="ig_dialog_distraction_disable_stories">Hikayeleri Devre Dışı Bırak</string>
