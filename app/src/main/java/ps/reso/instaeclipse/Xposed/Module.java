@@ -1,7 +1,5 @@
 package ps.reso.instaeclipse.Xposed;
 
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,7 +18,6 @@ import java.util.Map;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -95,22 +92,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         // Ensure preferences are loaded
 
 
-        // Hook into your module
-        if (lpparam.packageName.equals(CommonUtils.MY_PACKAGE_NAME)) {
-            try {
-                if (dexKitBridge == null) {
-                    System.load(moduleLibDir + "/libdexkit.so");
-                    dexKitBridge = DexKitBridge.create(moduleSourceDir);
-                }
-
-                // Hook your module
-                hookOwnModule(lpparam);
-
-            } catch (Exception e) {
-                XposedBridge.log("(InstaEclipse): Failed to initialize DexKitBridge for InstaEclipse: " + e.getMessage());
-            }
-        }
-
         // Hook into Instagram and its clones
         if (SUPPORTED_PACKAGES.contains(lpparam.packageName)) {
             try {
@@ -133,15 +114,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             } catch (Exception e) {
                 XposedBridge.log("(InstaEclipse): Failed to initialize DexKitBridge for " + lpparam.packageName + ": " + e.getMessage());
             }
-        }
-    }
-
-    private void hookOwnModule(XC_LoadPackage.LoadPackageParam lpparam) {
-        try {
-            findAndHookMethod(CommonUtils.MY_PACKAGE_NAME + ".MainActivity", lpparam.classLoader, "isModuleActive", XC_MethodReplacement.returnConstant(true));
-            // XposedBridge.log("InstaEclipse | Successfully hooked isModuleActive().");
-        } catch (Exception e) {
-            XposedBridge.log("(InstaEclipse): Failed to hook MainActivity: " + e.getMessage());
         }
     }
 
