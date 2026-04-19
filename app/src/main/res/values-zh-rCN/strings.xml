@@ -351,4 +351,16 @@
     <string name="ig_mention_no_mentions">此限时动态中未找到提及</string>
     <string name="ig_mention_copy_all">复制全部</string>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">未设置下载文件夹</string>
+    <string name="ig_toast_file_saved">已保存：%1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse 已加载 🎯</string>
+
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">有可用更新</string>
+    <string name="ig_update_message">新版本（%1$s）已发布，是否立即更新？</string>
+    <string name="ig_update_button">更新</string>
+    <string name="ig_update_later">稍后</string>
+    <string name="ig_update_error_message">检查更新失败，请稍后重试。</string>
 </resources>

@@ -15,6 +15,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
+import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
 public class DisableDoubleTapLikeHook {
 
@@ -41,6 +42,7 @@ public class DisableDoubleTapLikeHook {
                 XposedBridge.hookMethod(feedCached, HOOK);
                 XposedBridge.hookMethod(reelsCached, HOOK);
                 XposedBridge.log("(InstaEclipse | DoubleTapLike): ✅ Hooked (cached)");
+                FeatureStatusTracker.setHooked("DisableDoubleTapLike");
                 return;
             }
         }
@@ -64,6 +66,7 @@ public class DisableDoubleTapLikeHook {
                 DexKitCache.saveMethod("DoubleTapLike", m);
                 XposedBridge.hookMethod(m, HOOK);
                 XposedBridge.log("(InstaEclipse | DoubleTapLike): ✅ Feed hooked on " + md.getClassName() + "." + md.getMethodName());
+                FeatureStatusTracker.setHooked("DisableDoubleTapLike");
                 break;
             } catch (Exception e) {
                 XposedBridge.log("(InstaEclipse | DoubleTapLike): ❌ Feed: " + e.getMessage());

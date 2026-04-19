@@ -319,5 +319,16 @@
     <string name="ig_mention_subtitle">%1$d упомин. • нажмите для копирования</string>
     <string name="ig_mention_no_mentions">В этой истории не найдено упоминаний</string>
     <string name="ig_mention_copy_all">Копировать все</string>
-</resources>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">Папка загрузки не задана</string>
+    <string name="ig_toast_file_saved">Сохранено: %1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse загружен 🎯</string>
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Доступно обновление</string>
+    <string name="ig_update_message">Доступна новая версия (%1$s). Обновить сейчас?</string>
+    <string name="ig_update_button">Обновить</string>
+    <string name="ig_update_later">Позже</string>
+    <string name="ig_update_error_message">Не удалось проверить обновления. Повторите попытку позже.</string>
+</resources>

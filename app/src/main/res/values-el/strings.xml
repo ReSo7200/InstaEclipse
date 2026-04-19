@@ -351,4 +351,16 @@
     <string name="ig_mention_no_mentions">Δεν βρέθηκαν αναφορές σε αυτή την ιστορία</string>
     <string name="ig_mention_copy_all">Αντιγραφή Όλων</string>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">Δεν έχει οριστεί φάκελος λήψεων</string>
+    <string name="ig_toast_file_saved">Αποθηκεύτηκε: %1$s</string>
+    <string name="ig_toast_features_loaded">Το InstaEclipse φορτώθηκε 🎯</string>
+
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Διαθέσιμη ενημέρωση</string>
+    <string name="ig_update_message">Μια νέα έκδοση (%1$s) είναι διαθέσιμη. Θέλετε να ενημερώσετε τώρα;</string>
+    <string name="ig_update_button">Ενημέρωση</string>
+    <string name="ig_update_later">Αργότερα</string>
+    <string name="ig_update_error_message">Αποτυχία ελέγχου ενημερώσεων. Δοκιμάστε ξανά αργότερα.</string>
 </resources>

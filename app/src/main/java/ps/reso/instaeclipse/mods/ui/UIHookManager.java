@@ -186,9 +186,9 @@ public class UIHookManager {
                                         if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
                                             CustomToast.toastShown = true;
 
-                                            StringBuilder sb = new StringBuilder("InstaEclipse Loaded 🎯\n");
+                                            StringBuilder sb = new StringBuilder(I18n.t(activity, R.string.ig_toast_features_loaded)).append("\n");
                                             for (Map.Entry<String, Boolean> entry : FeatureStatusTracker.getStatus().entrySet()) {
-                                                sb.append(entry.getValue() ? "✅ " : "❌ ").append(entry.getKey()).append("\n");
+                                                sb.append(entry.getValue() ? "✅ " : "❌ ").append(FeatureStatusTracker.getLabel(activity, entry.getKey())).append("\n");
                                             }
                                             CustomToast.showCustomToast(activity.getApplicationContext(), sb.toString().trim());
                                         }
