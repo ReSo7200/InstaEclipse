@@ -233,6 +233,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ App-Cache leeren und neu starten?</string>
+    <string name="ig_dialog_clear_cache">🔄 Hooks-Cache leeren</string>
+    <string name="ig_dialog_section_clear_cache">Hooks-Cache leeren</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Dies zwingt InstaEclipse beim nächsten Start, Instagram erneut zu scannen. Die App wird neu gestartet.</string>
+    <string name="ig_dialog_clear_cache_now">Cache leeren &amp; neu starten</string>
     <string name="ig_dialog_restart_now">Jetzt neu starten</string>
     <string name="ig_dialog_restart_not_found">Die App zum Neustart konnte nicht gefunden werden.</string>
     <string name="ig_dialog_restart_failed">Neustart fehlgeschlagen: %1$s</string>

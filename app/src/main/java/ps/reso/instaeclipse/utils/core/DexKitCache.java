@@ -68,6 +68,17 @@ public class DexKitCache {
         return cacheValid;
     }
 
+    /**
+     * Wipes all cached descriptors and marks the cache invalid for this session.
+     * DexKit will re-run its full search on the next Instagram restart.
+     */
+    public static void clearCache() {
+        if (prefs == null) return;
+        prefs.edit().clear().apply();
+        cacheValid = false;
+        XposedBridge.log("(DexKitCache) Cache manually cleared — DexKit will re-run on next launch");
+    }
+
     // ── Single method ────────────────────────────────────────────────────────
 
     public static void saveMethod(String key, Method m) {

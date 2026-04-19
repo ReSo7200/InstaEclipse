@@ -227,6 +227,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ Rensa appcachen och starta om?</string>
+    <string name="ig_dialog_clear_cache">🔄 Rensa Hooks-cache</string>
+    <string name="ig_dialog_section_clear_cache">Rensa Hooks-cache</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Detta tvingar InstaEclipse att skanna om Instagram vid nästa start. Appen startas om.</string>
+    <string name="ig_dialog_clear_cache_now">Rensa cache &amp; starta om</string>
     <string name="ig_dialog_restart_now">Starta om nu</string>
     <string name="ig_dialog_restart_not_found">Kunde inte hitta appen för omstart.</string>
     <string name="ig_dialog_restart_failed">Omstart misslyckades: %1$s</string>

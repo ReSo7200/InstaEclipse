@@ -235,6 +235,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ 清除應用程式快取並重新啟動？</string>
+    <string name="ig_dialog_clear_cache">🔄 清除 Hooks 快取</string>
+    <string name="ig_dialog_section_clear_cache">清除 Hooks 快取</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ 這將強制 InstaEclipse 在下次啟動時重新掃描 Instagram。應用程式將重新啟動。</string>
+    <string name="ig_dialog_clear_cache_now">清除快取並重啟</string>
     <string name="ig_dialog_restart_now">立即重新啟動</string>
     <string name="ig_dialog_restart_not_found">找不到要重新啟動的應用程式。</string>
     <string name="ig_dialog_restart_failed">重新啟動失敗：%1$s</string>

@@ -273,6 +273,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ Vider le cache et redémarrer ?</string>
+    <string name="ig_dialog_clear_cache">🔄 Vider le Cache des Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Vider le Cache des Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Cela forcera InstaEclipse à re-scanner Instagram au prochain démarrage. L\'application redémarrera.</string>
+    <string name="ig_dialog_clear_cache_now">Vider le Cache &amp; Redémarrer</string>
     <string name="ig_dialog_restart_now">Redémarrer Maintenant</string>
     <string name="ig_dialog_restart_not_found">Impossible de trouver l\'app pour redémarrer.</string>
     <string name="ig_dialog_restart_failed">Échec du redémarrage : %1$s</string>

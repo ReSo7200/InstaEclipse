@@ -228,6 +228,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ Очистить кэш приложения и перезапустить?</string>
+    <string name="ig_dialog_clear_cache">🔄 Очистить кэш хуков</string>
+    <string name="ig_dialog_section_clear_cache">Очистить кэш хуков</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ InstaEclipse повторно просканирует Instagram при следующем запуске. Приложение перезапустится.</string>
+    <string name="ig_dialog_clear_cache_now">Очистить кэш и перезапустить</string>
     <string name="ig_dialog_restart_now">Перезапустить сейчас</string>
     <string name="ig_dialog_restart_not_found">Не удалось найти приложение для перезапуска.</string>
     <string name="ig_dialog_restart_failed">Перезапуск не удался: %1$s</string>

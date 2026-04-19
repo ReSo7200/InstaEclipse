@@ -274,6 +274,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ 清除应用缓存并重启？</string>
+    <string name="ig_dialog_clear_cache">🔄 清除 Hooks 缓存</string>
+    <string name="ig_dialog_section_clear_cache">清除 Hooks 缓存</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ 这将强制 InstaEclipse 在下次启动时重新扫描 Instagram。应用将重新启动。</string>
+    <string name="ig_dialog_clear_cache_now">清除缓存并重启</string>
     <string name="ig_dialog_restart_now">立即重启</string>
     <string name="ig_dialog_restart_not_found">找不到要重启的应用。</string>
     <string name="ig_dialog_restart_failed">重启失败：%1$s</string>

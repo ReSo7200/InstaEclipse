@@ -230,6 +230,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ ¿Limpiar caché de la app y reiniciar?</string>
+    <string name="ig_dialog_clear_cache">🔄 Borrar Caché de Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Borrar Caché de Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Esto obligará a InstaEclipse a re-escanear Instagram en el próximo inicio. La app se reiniciará.</string>
+    <string name="ig_dialog_clear_cache_now">Borrar Caché &amp; Reiniciar</string>
     <string name="ig_dialog_restart_now">Reiniciar ahora</string>
     <string name="ig_dialog_restart_not_found">No se pudo encontrar la aplicación para reiniciar.</string>
     <string name="ig_dialog_restart_failed">Error al reiniciar: %1$s</string>

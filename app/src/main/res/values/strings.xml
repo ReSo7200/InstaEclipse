@@ -179,6 +179,10 @@
     <string name="ig_dialog_dev_import">Import Dev Config</string>
     <string name="ig_dialog_dev_export">Export Dev Config</string>
     <string name="ig_dialog_dev_remove_build_expired">Remove Build Expired Popup</string>
+    <string name="ig_dialog_clear_cache">🔄 Clear Hooks Cache</string>
+    <string name="ig_dialog_section_clear_cache">Clear Hooks Cache</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ This will force InstaEclipse to re-scan Instagram on next launch. The app will restart.</string>
+    <string name="ig_dialog_clear_cache_now">Clear Cache &amp; Restart</string>
     <string name="ig_dialog_unable_open_ui">Unable to open InstaEclipse UI.</string>
     <string name="ig_dialog_instagram_not_ready">Instagram is not open or ready.</string>
     <string name="ig_dialog_mc_overrides_not_found">mc_overrides.json not found.</string>

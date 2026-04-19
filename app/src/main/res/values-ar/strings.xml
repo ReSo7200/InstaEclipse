@@ -184,7 +184,7 @@
     <string name="ig_dialog_quick_allow_screenshots">تضمين السماح بلقطات الشاشة في الرسائل المباشرة</string>
     <string name="ig_dialog_ad_block_ads">حظر الإعلانات</string>
     <string name="ig_dialog_ad_block_analytics">حظر التحليلات</string>
-    <string name="ig_dialog_clean_feed_hide_suggested">إخفاء الاقتراحات في الخلاصة</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">إخفاء الاقتراحات في الفيد</string>
     <string name="ig_dialog_ad_disable_tracking">تعطيل روابط التتبع</string>
     <string name="ig_dialog_distraction_extreme_mode">الوضع المتطرف 🔒 (لا رجعة حتى إعادة التثبيت)</string>
     <string name="ig_dialog_distraction_disable_stories">تعطيل القصص</string>
@@ -226,6 +226,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">مسح ذاكرة التطبيق وإعادة التشغيل؟ ⚠️</string>
+    <string name="ig_dialog_clear_cache">🔄 مسح الكاش</string>
+    <string name="ig_dialog_section_clear_cache">مسح الكاش</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ سيؤدي هذا إلى إعادة فحص إنستغرام عند التشغيل التالي. سيتم إعادة تشغيل التطبيق.</string>
+    <string name="ig_dialog_clear_cache_now">مسح الكاش وإعادة التشغيل</string>
     <string name="ig_dialog_restart_now">إعادة التشغيل الآن</string>
     <string name="ig_dialog_restart_not_found">تعذر العثور على التطبيق لإعادة التشغيل.</string>
     <string name="ig_dialog_restart_failed">فشلت إعادة التشغيل: %1$s</string>

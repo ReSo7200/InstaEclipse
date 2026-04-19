@@ -273,6 +273,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ נקה cache ואתחל?</string>
+    <string name="ig_dialog_clear_cache">🔄 נקה מטמון Hooks</string>
+    <string name="ig_dialog_section_clear_cache">נקה מטמון Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ פעולה זו תאלץ את InstaEclipse לסרוק מחדש את אינסטגרם בהפעלה הבאה. האפליקציה תופעל מחדש.</string>
+    <string name="ig_dialog_clear_cache_now">נקה מטמון &amp; הפעל מחדש</string>
     <string name="ig_dialog_restart_now">אתחל עכשיו</string>
     <string name="ig_dialog_restart_not_found">לא נמצאה האפליקציה לאתחול.</string>
     <string name="ig_dialog_restart_failed">האתחול נכשל: %1$s</string>

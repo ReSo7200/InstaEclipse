@@ -228,6 +228,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ Tətbiqin keşini təmizlə və yenidən başlat?</string>
+    <string name="ig_dialog_clear_cache">🔄 Hook Önbelleğini Temizle</string>
+    <string name="ig_dialog_section_clear_cache">Hook Önbelleğini Temizle</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Bu, InstaEclipse-in növbəti işə salınmada Instagram-ı yenidən skan etməsinə məcbur edəcək. Tətbiq yenidən başlayacaq.</string>
+    <string name="ig_dialog_clear_cache_now">Önbelleği Temizle və Yenidən Başlat</string>
     <string name="ig_dialog_restart_now">İndi Yenidən Başlat</string>
     <string name="ig_dialog_restart_not_found">Yenidən başlatmaq üçün tətbiq tapılmadı.</string>
     <string name="ig_dialog_restart_failed">Yenidən başlatma uğursuz oldu: %1$s</string>

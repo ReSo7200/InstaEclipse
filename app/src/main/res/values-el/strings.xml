@@ -274,6 +274,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ Εκκαθάριση cache εφαρμογής και επανεκκίνηση;</string>
+    <string name="ig_dialog_clear_cache">🔄 Εκκαθάριση Cache Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Εκκαθάριση Cache Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Αυτό θα αναγκάσει το InstaEclipse να επανασαρώσει το Instagram κατά την επόμενη εκκίνηση. Η εφαρμογή θα επανεκκινηθεί.</string>
+    <string name="ig_dialog_clear_cache_now">Εκκαθάριση Cache &amp; Επανεκκίνηση</string>
     <string name="ig_dialog_restart_now">Επανεκκίνηση Τώρα</string>
     <string name="ig_dialog_restart_not_found">Αδύνατη εύρεση εφαρμογής για επανεκκίνηση.</string>
     <string name="ig_dialog_restart_failed">Αποτυχία επανεκκίνησης: %1$s</string>

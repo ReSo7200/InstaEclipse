@@ -273,6 +273,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ Hapus cache aplikasi dan mulai ulang?</string>
+    <string name="ig_dialog_clear_cache">🔄 Bersihkan Cache Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Bersihkan Cache Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Ini akan memaksa InstaEclipse untuk memindai ulang Instagram saat peluncuran berikutnya. Aplikasi akan dimulai ulang.</string>
+    <string name="ig_dialog_clear_cache_now">Bersihkan Cache &amp; Mulai Ulang</string>
     <string name="ig_dialog_restart_now">Mulai Ulang Sekarang</string>
     <string name="ig_dialog_restart_not_found">Tidak dapat menemukan aplikasi untuk dimulai ulang.</string>
     <string name="ig_dialog_restart_failed">Mulai ulang gagal: %1$s</string>

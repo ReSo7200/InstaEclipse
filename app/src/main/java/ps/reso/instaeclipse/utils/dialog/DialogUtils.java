@@ -123,6 +123,9 @@ public class DialogUtils {
         // 9 - Restart Instagram => OPEN PAGE
         mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_restart), () -> showRestartSection(context)));
 
+        // 10 - Clear Hooks Cache => OPEN PAGE
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_clear_cache), () -> showClearCacheSection(context)));
+
         mainLayout.addView(createDivider(context));
 
         // Footer Credit
@@ -1023,6 +1026,28 @@ public class DialogUtils {
         });
     }
 
+
+    private static void showClearCacheSection(Context context) {
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(60, 40, 60, 40);
+        layout.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        TextView message = new TextView(context);
+        message.setText(I18n.t(context, R.string.ig_dialog_clear_cache_message));
+        message.setTextColor(Color.WHITE);
+        message.setTextSize(16f);
+        message.setGravity(Gravity.CENTER);
+        message.setPadding(0, 0, 0, 30);
+
+        layout.addView(message);
+        layout.addView(createActionRow(context, "🗑", I18n.t(context, R.string.ig_dialog_clear_cache_now), "#FF9F0A", v -> {
+            ps.reso.instaeclipse.utils.core.DexKitCache.clearCache();
+            restartApp(context);
+        }));
+
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clear_cache), layout, () -> {});
+    }
 
     // ==== HELPERS ====
 
