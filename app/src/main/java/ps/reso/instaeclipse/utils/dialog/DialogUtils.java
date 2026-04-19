@@ -105,6 +105,9 @@ public class DialogUtils {
         // 3 - Distraction-Free Instagram => OPEN PAGE
         mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_distraction_free), () -> showDistractionOptions(context)));
 
+        // 3b - Clean Feed => OPEN PAGE
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_clean_feed), () -> showCleanFeedOptions(context)));
+
         // 4 - Misc Features => OPEN PAGE
         mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_misc), () -> showMiscOptions(context)));
 
@@ -119,6 +122,9 @@ public class DialogUtils {
 
         // 9 - Restart Instagram => OPEN PAGE
         mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_menu_restart), () -> showRestartSection(context)));
+
+        // 10 - Clear Hooks Cache => OPEN PAGE
+        mainLayout.addView(createClickableSection(context, I18n.t(context, R.string.ig_dialog_clear_cache), () -> showClearCacheSection(context)));
 
         mainLayout.addView(createDivider(context));
 
@@ -721,6 +727,22 @@ public class DialogUtils {
     }
 
 
+    private static void showCleanFeedOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+
+        ToggleRow hideSuggestedSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_clean_feed_hide_suggested), FeatureFlags.hideSuggestionsInFeed);
+
+        hideSuggestedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.hideSuggestionsInFeed = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+
+        layout.addView(hideSuggestedSwitch);
+
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clean_feed), layout, () -> {});
+    }
+
+
     private static void showMiscOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
@@ -733,7 +755,8 @@ public class DialogUtils {
                 createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_show_follower_toast),     FeatureFlags.showFollowerToast),
                 createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_view_story_mentions),     FeatureFlags.enableStoryMentions),
                 createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_disable_discover_people), FeatureFlags.disableDiscoverPeople),
-                createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_copy_comment),            FeatureFlags.enableCopyComment)
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_copy_comment),            FeatureFlags.enableCopyComment),
+                createSwitch(context, I18n.t(context, R.string.ig_dialog_misc_disable_double_tap_like), FeatureFlags.disableDoubleTapLike)
         };
 
         // Create Enable/Disable All switch
@@ -781,6 +804,9 @@ public class DialogUtils {
                         break;
                     case 7:
                         FeatureFlags.enableCopyComment = isChecked;
+                        break;
+                    case 8:
+                        FeatureFlags.disableDoubleTapLike = isChecked;
                         break;
                 }
 
@@ -1004,6 +1030,28 @@ public class DialogUtils {
         });
     }
 
+
+    private static void showClearCacheSection(Context context) {
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(60, 40, 60, 40);
+        layout.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        TextView message = new TextView(context);
+        message.setText(I18n.t(context, R.string.ig_dialog_clear_cache_message));
+        message.setTextColor(Color.WHITE);
+        message.setTextSize(16f);
+        message.setGravity(Gravity.CENTER);
+        message.setPadding(0, 0, 0, 30);
+
+        layout.addView(message);
+        layout.addView(createActionRow(context, "🗑", I18n.t(context, R.string.ig_dialog_clear_cache_now), "#FF9F0A", v -> {
+            ps.reso.instaeclipse.utils.core.DexKitCache.clearCache();
+            restartApp(context);
+        }));
+
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clear_cache), layout, () -> {});
+    }
 
     // ==== HELPERS ====
 

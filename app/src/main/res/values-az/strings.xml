@@ -122,6 +122,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Tərtibatçı Seçimləri</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Kölgə Rejimi Ayarları</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Reklam/Analitika Bloku</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Təmiz Lent</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Diqqəti Dağıtmayan Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ Müxtəlif Xüsusiyyətlər</string>
     <string name="ig_dialog_menu_downloader">📥 Yükləyici</string>
@@ -131,6 +132,7 @@
     <string name="ig_dialog_section_dev_options">Tərtibatçı Seçimləri 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Kölgə Rejimi 👻</string>
     <string name="ig_dialog_section_ad_analytics">Reklam/Analitika Bloku 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Təmiz Lent ✨</string>
     <string name="ig_dialog_section_distraction_free">Diqqəti Dağıtmayan Instagram 🧘</string>
     <string name="ig_dialog_section_misc">Müxtəlif ⚙️</string>
     <string name="ig_dialog_section_downloader">Yükləyici 📥</string>
@@ -184,6 +186,7 @@
     <string name="ig_dialog_quick_allow_screenshots">DM-lərdə Ekran Görüntüsünə İcazə Verməyi Daxil Et</string>
     <string name="ig_dialog_ad_block_ads">Reklamları Blokla</string>
     <string name="ig_dialog_ad_block_analytics">Analitikanı Blokla</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Lentdəki tövsiyələri gizlət</string>
     <string name="ig_dialog_ad_disable_tracking">İzləmə Bağlantılarını Deaktiv Et</string>
     <string name="ig_dialog_distraction_extreme_mode">Ekstremal Rejim 🔒 (Yenidən quraşdıranadək geri alınmaz)</string>
     <string name="ig_dialog_distraction_disable_stories">Hekayələri Deaktiv Et</string>
@@ -202,6 +205,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Hekayə Qeydlərini Gör</string>
     <string name="ig_dialog_misc_disable_discover_people">Tanış Tapma Xüsusiyyətini Deaktiv Et</string>
     <string name="ig_dialog_misc_copy_comment">Şərhi Kopyala</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">İkiqat toxunuşla bəyənməni deaktiv et</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Şərhi Kopyala</string>
@@ -225,6 +229,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ Tətbiqin keşini təmizlə və yenidən başlat?</string>
+    <string name="ig_dialog_clear_cache">🔄 Hook Önbelleğini Temizle</string>
+    <string name="ig_dialog_section_clear_cache">Hook Önbelleğini Temizle</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Bu, InstaEclipse-in növbəti işə salınmada Instagram-ı yenidən skan etməsinə məcbur edəcək. Tətbiq yenidən başlayacaq.</string>
+    <string name="ig_dialog_clear_cache_now">Önbelleği Temizle və Yenidən Başlat</string>
     <string name="ig_dialog_restart_now">İndi Yenidən Başlat</string>
     <string name="ig_dialog_restart_not_found">Yenidən başlatmaq üçün tətbiq tapılmadı.</string>
     <string name="ig_dialog_restart_failed">Yenidən başlatma uğursuz oldu: %1$s</string>
@@ -311,4 +319,16 @@
     <string name="ig_mention_subtitle">%1$d qeyd • kopyalamaq üçün tıkla</string>
     <string name="ig_mention_no_mentions">Bu hekayədə qeyd tapılmadı</string>
     <string name="ig_mention_copy_all">Hamısını Kopyala</string>
+
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">Yükləmə qovluğu təyin edilməyib</string>
+    <string name="ig_toast_file_saved">Saxlanıldı: %1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse yükləndi 🎯</string>
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Yeniləmə mövcuddur</string>
+    <string name="ig_update_message">Yeni versiya (%1$s) mövcuddur. İndi yeniləmək istəyirsiniz?</string>
+    <string name="ig_update_button">Yenilə</string>
+    <string name="ig_update_later">Sonra</string>
+    <string name="ig_update_error_message">Yeniləmələri yoxlamaq mümkün olmadı. Zəhmət olmasa sonra yenidən cəhd edin.</string>
 </resources>

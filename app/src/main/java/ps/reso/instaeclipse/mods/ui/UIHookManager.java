@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -37,75 +38,99 @@ import ps.reso.instaeclipse.utils.toast.CustomToast;
 
 public class UIHookManager {
 
+    private static final String INSTAGRAM_MAIN_ACTIVITY = "com.instagram.mainactivity.InstagramMainActivity";
+
     @SuppressLint("StaticFieldLeak")
     private static Activity currentActivity;
     public static Activity getCurrentActivity() {
         return currentActivity;
     }
 
-    private static boolean isAnyGhostOptionEnabled() {
-        return GhostModeUtils.isGhostModeActive();
+    /**
+     * Activities that already have a pending OnGlobalLayoutListener registered.
+     * Used only to prevent duplicate listener registrations when the search view
+     * is not yet visible at setup time.
+     */
+    private static final java.util.WeakHashMap<Activity, Boolean> sGlobalListenerPending =
+            new java.util.WeakHashMap<>();
+    /**
+     * Tracks whether the GlobalLayoutListener path has completed for an activity,
+     * so we don't keep registering new listeners on every resume after search is found.
+     */
+    private static final java.util.WeakHashMap<Activity, Boolean> sSearchWiringDone =
+            new java.util.WeakHashMap<>();
+
+    // Resource IDs are constant for a given IG install — cache them statically.
+    private static volatile int sSearchTabId = 0;
+    private static volatile int sActionBarEndId = 0;
+    private static volatile int sInboxButtonId = 0;
+    private static volatile int sDirectTabId = 0;
+
+    @SuppressLint("DiscouragedApi")
+    private static void ensureIdsCached(Activity activity) {
+        if (sSearchTabId != 0 && sActionBarEndId != 0
+                && sInboxButtonId != 0 && sDirectTabId != 0) return;
+        String pkg = activity.getPackageName();
+        android.content.res.Resources res = activity.getResources();
+        if (sSearchTabId == 0)
+            sSearchTabId = res.getIdentifier("search_tab", "id", pkg);
+        if (sActionBarEndId == 0)
+            sActionBarEndId = res.getIdentifier("action_bar_end_action_buttons", "id", pkg);
+        if (sInboxButtonId == 0)
+            sInboxButtonId = res.getIdentifier("action_bar_inbox_button", "id", pkg);
+        if (sDirectTabId == 0)
+            sDirectTabId = res.getIdentifier("direct_tab", "id", pkg);
     }
 
     public static void setupHooks(Activity activity) {
-        // Hook Search Tab (open InstaEclipse Settings)
-        String[] possibleSearch = {"search_tab", "action_bar_end_action_buttons"};
-
-        for (String id : possibleSearch) {
-            @SuppressLint("DiscouragedApi")
-            int viewId = activity.getResources().getIdentifier(id, "id", activity.getPackageName());
-            View view = activity.findViewById(viewId);
-
-            if (view != null) {
-                processSearchView(activity, view, id);
-            } else {
-                // VIEW NOT FOUND YET: Wait for the layout to change and try again
-                final View decorView = activity.getWindow().getDecorView();
-                decorView.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        View lateView = activity.findViewById(viewId);
-                        if (lateView != null) {
-                            processSearchView(activity, lateView, id);
-                            // Remove listener so we don't keep calling this unnecessarily
-                            decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        }
-                    }
-                });
-            }
-        }
-
-        // Hook Inbox Button (toggle Ghost Quick Options)
-        String[] possibleIds = {"action_bar_inbox_button", "direct_tab"};
-
-        for (String id : possibleIds) {
-            @SuppressLint("DiscouragedApi") int viewId = activity.getResources().getIdentifier(id, "id", activity.getPackageName());
-            View view = activity.findViewById(viewId);
-            if (view != null) {
-                hookLongPress(activity, id, v -> {
-                    GhostModeUtils.toggleSelectedGhostOptions(activity);
-                    VibrationUtil.vibrate(activity);
-                    return true;
-                });
-                break;
-            }
-        }
-
+        // Ghost emoji visibility must update on every resume (reflects current ghost state).
         addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
 
-    }
+        // Cache resource IDs once per IG install (string table lookup is non-trivial).
+        ensureIdsCached(activity);
 
-    // Hook long press method
-    private static void hookLongPress(Activity activity, String viewName, View.OnLongClickListener listener) {
-        try {
-            @SuppressLint("DiscouragedApi") int viewId = activity.getResources().getIdentifier(viewName, "id", activity.getPackageName());
-            View view = activity.findViewById(viewId);
-
-            if (view != null) {
-                view.setOnLongClickListener(listener);
-            }
-        } catch (Exception ignored) {
+        // Always re-apply the search long-press listener. Instagram may overwrite it after
+        // a config change (e.g. when InstaEclipse settings are toggled), so we cannot skip
+        // this on resume — we just avoid the expensive getIdentifier() call via the cache.
+        boolean anySearchFound = false;
+        if (sSearchTabId != 0) {
+            View v = activity.findViewById(sSearchTabId);
+            if (v != null) { processSearchView(activity, v, "search_tab"); anySearchFound = true; }
         }
+        if (!anySearchFound && sActionBarEndId != 0) {
+            View v = activity.findViewById(sActionBarEndId);
+            if (v != null) { processSearchView(activity, v, "action_bar_end_action_buttons"); anySearchFound = true; }
+        }
+
+        // Register at most ONE GlobalLayoutListener per activity to retry search wiring
+        // when the view isn't inflated yet. Skip if we already found search, if a listener
+        // is already pending, or if the listener already completed successfully.
+        if (!anySearchFound
+                && !Boolean.TRUE.equals(sGlobalListenerPending.get(activity))
+                && !Boolean.TRUE.equals(sSearchWiringDone.get(activity))) {
+            sGlobalListenerPending.put(activity, true);
+            final View decorView = activity.getWindow().getDecorView();
+            decorView.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    boolean found = false;
+                    if (sSearchTabId != 0) {
+                        View lateView = activity.findViewById(sSearchTabId);
+                        if (lateView != null) { processSearchView(activity, lateView, "search_tab"); found = true; }
+                    }
+                    if (!found && sActionBarEndId != 0) {
+                        View lateView = activity.findViewById(sActionBarEndId);
+                        if (lateView != null) { processSearchView(activity, lateView, "action_bar_end_action_buttons"); found = true; }
+                    }
+                    if (found) {
+                        decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        sGlobalListenerPending.remove(activity);
+                        sSearchWiringDone.put(activity, true);
+                    }
+                }
+            });
+        }
+
     }
 
     public void mainActivity(ClassLoader classLoader) {
@@ -114,7 +139,7 @@ public class UIHookManager {
             // Precise search for the standard onCreate(Bundle) signature
             var methods = Module.dexKitBridge.findMethod(create()
                     .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                            .declaredClass("com.instagram.mainactivity.InstagramMainActivity")
+                            .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
                             .name("onCreate")
                             .paramTypes("android.os.Bundle")
                             .returnType("void")
@@ -126,7 +151,7 @@ public class UIHookManager {
                 XposedBridge.log("(InstaEclipse): ⚠️ Specific onCreate not found, searching by signature...");
                 methods = Module.dexKitBridge.findMethod(create()
                         .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                                .declaredClass("com.instagram.mainactivity.InstagramMainActivity")
+                                .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
                                 .paramTypes("android.os.Bundle")
                                 .returnType("void")
                         )
@@ -134,11 +159,11 @@ public class UIHookManager {
             }
 
             if (!methods.isEmpty()) {
-                // Get the first match
-                var methodData = methods.get(0);
-                java.lang.reflect.Method targetMethod = methodData.getMethodInstance(classLoader);
-
-                XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
+                String methodName = methods.get(0).getName();
+                if (methodName == null || methodName.isEmpty()) {
+                    XposedBridge.log("(InstaEclipse): ❌ Invalid onCreate method name discovered");
+                } else {
+                    XposedHelpers.findAndHookMethod(INSTAGRAM_MAIN_ACTIVITY, classLoader, methodName, Bundle.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         final Activity activity = (Activity) param.thisObject;
@@ -155,15 +180,15 @@ public class UIHookManager {
                                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                                     try {
                                         // Add the Ghost Emoji next to Inbox
-                                        addGhostEmojiNextToInbox(activity, isAnyGhostOptionEnabled());
+                                        addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
 
                                         // 3. Show Success Toast
                                         if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
                                             CustomToast.toastShown = true;
 
-                                            StringBuilder sb = new StringBuilder("InstaEclipse Loaded 🎯\n");
+                                            StringBuilder sb = new StringBuilder(I18n.t(activity, R.string.ig_toast_features_loaded)).append("\n");
                                             for (Map.Entry<String, Boolean> entry : FeatureStatusTracker.getStatus().entrySet()) {
-                                                sb.append(entry.getValue() ? "✅ " : "❌ ").append(entry.getKey()).append("\n");
+                                                sb.append(entry.getValue() ? "✅ " : "❌ ").append(FeatureStatusTracker.getLabel(activity, entry.getKey())).append("\n");
                                             }
                                             CustomToast.showCustomToast(activity.getApplicationContext(), sb.toString().trim());
                                         }
@@ -177,7 +202,8 @@ public class UIHookManager {
                             }
                         });
                     }
-                });
+                    });
+                } // end else (valid methodName)
             } else {
                 XposedBridge.log("(InstaEclipse): ❌ Failed to find any onCreate candidate in InstagramMainActivity");
             }
@@ -189,7 +215,7 @@ public class UIHookManager {
         try {
             List<MethodData> candidates = Module.dexKitBridge.findMethod(org.luckypray.dexkit.query.FindMethod.create()
                     .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                            .declaredClass("com.instagram.mainactivity.InstagramMainActivity")
+                            .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
                             .modifiers(java.lang.reflect.Modifier.PUBLIC)
                             .paramCount(0)
                             .returnType("void")
@@ -198,6 +224,8 @@ public class UIHookManager {
 
             for (MethodData methodData : candidates) {
                 String methodName = methodData.getName();
+
+                if (methodName == null || methodName.isEmpty()) continue;
 
                 // Skip constructors and static initializers
                 if (methodName.contains("<init>") || methodName.contains("<clinit>")) {
@@ -209,8 +237,7 @@ public class UIHookManager {
                     continue;
                 }
 
-                java.lang.reflect.Method targetMethod = methodData.getMethodInstance(classLoader);
-                XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
+                XposedHelpers.findAndHookMethod(INSTAGRAM_MAIN_ACTIVITY, classLoader, methodName, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) {
                         final Activity activity = (Activity) param.thisObject;
@@ -218,7 +245,6 @@ public class UIHookManager {
                         activity.runOnUiThread(() -> {
                             try {
                                 setupHooks(activity);
-                                addGhostEmojiNextToInbox(activity, isAnyGhostOptionEnabled());
                             } catch (Exception e) {
                                 XposedBridge.log("(InstaEclipse) UI Error: " + e);
                             }
@@ -233,6 +259,27 @@ public class UIHookManager {
 
         // Hook getBottomSheetNavigator - Instagram Main
         BottomSheetHookUtil.hookBottomSheetNavigator(Module.dexKitBridge);
+
+        // Hook View.performLongClick — inbox long-press override.
+        // setOnLongClickListener is unreliable when Instagram has a parent-level touch
+        // interceptor or a custom view that overrides long-press dispatch. Hooking
+        // performLongClick() fires BEFORE any listener/interceptor chain and lets us
+        // fully own the event by returning true via setResult.
+        // This only fires when the user actually long-presses something — not a hot path.
+        XposedHelpers.findAndHookMethod(View.class, "performLongClick", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (sInboxButtonId == 0 && sDirectTabId == 0) return;
+                View view = (View) param.thisObject;
+                int id = view.getId();
+                if (id != sInboxButtonId && id != sDirectTabId) return;
+                Activity activity = currentActivity;
+                if (activity == null) return;
+                GhostModeUtils.toggleSelectedGhostOptions(activity);
+                VibrationUtil.vibrate(activity);
+                param.setResult(true); // consume — skip Instagram's handler entirely
+            }
+        });
 
         // Hook onResume - Model
         XposedHelpers.findAndHookMethod("com.instagram.modal.ModalActivity", classLoader, "onResume", new XC_MethodHook() {

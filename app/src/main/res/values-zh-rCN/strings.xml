@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--  app wide  -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.5 Beta</string>
+    <string name="version" translatable="false">v0.5.1 Beta</string>
     <string name="home">首页</string>
     <string name="features">功能</string>
     <string name="help">帮助</string>
@@ -145,6 +145,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 开发者选项</string>
     <string name="ig_dialog_menu_ghost_settings">👻 幽灵模式设置</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 屏蔽广告/分析</string>
+    <string name="ig_dialog_menu_clean_feed">✨ 纯净动态</string>
     <string name="ig_dialog_menu_distraction_free">🧘 无干扰 Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ 其他功能</string>
     <string name="ig_dialog_menu_downloader">📥 下载器</string>
@@ -156,6 +157,7 @@
     <string name="ig_dialog_section_dev_options">开发者选项 🎛</string>
     <string name="ig_dialog_section_ghost_mode">幽灵模式 👻</string>
     <string name="ig_dialog_section_ad_analytics">屏蔽广告/分析 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">纯净动态 ✨</string>
     <string name="ig_dialog_section_distraction_free">无干扰 Instagram 🧘</string>
     <string name="ig_dialog_section_misc">杂项 ⚙️</string>
     <string name="ig_dialog_section_downloader">下载器 📥</string>
@@ -217,6 +219,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">屏蔽广告</string>
     <string name="ig_dialog_ad_block_analytics">屏蔽分析</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">隐藏动态中的推荐内容</string>
     <string name="ig_dialog_ad_disable_tracking">禁用追踪链接</string>
 
     <!-- Distraction-Free options -->
@@ -239,6 +242,7 @@
     <string name="ig_dialog_misc_view_story_mentions">查看限时动态提及</string>
     <string name="ig_dialog_misc_disable_discover_people">禁用发现好友</string>
     <string name="ig_dialog_misc_copy_comment">复制评论</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">禁用双击点赞</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">复制评论</string>
@@ -271,6 +275,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ 清除应用缓存并重启？</string>
+    <string name="ig_dialog_clear_cache">🔄 清除 Hooks 缓存</string>
+    <string name="ig_dialog_section_clear_cache">清除 Hooks 缓存</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ 这将强制 InstaEclipse 在下次启动时重新扫描 Instagram。应用将重新启动。</string>
+    <string name="ig_dialog_clear_cache_now">清除缓存并重启</string>
     <string name="ig_dialog_restart_now">立即重启</string>
     <string name="ig_dialog_restart_not_found">找不到要重启的应用。</string>
     <string name="ig_dialog_restart_failed">重启失败：%1$s</string>
@@ -343,4 +351,16 @@
     <string name="ig_mention_no_mentions">此限时动态中未找到提及</string>
     <string name="ig_mention_copy_all">复制全部</string>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">未设置下载文件夹</string>
+    <string name="ig_toast_file_saved">已保存：%1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse 已加载 🎯</string>
+
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">有可用更新</string>
+    <string name="ig_update_message">新版本（%1$s）已发布，是否立即更新？</string>
+    <string name="ig_update_button">更新</string>
+    <string name="ig_update_later">稍后</string>
+    <string name="ig_update_error_message">检查更新失败，请稍后重试。</string>
 </resources>

@@ -47,7 +47,7 @@ public class ProfilePicDownloadHook {
     public static void install() {
         // Mark status before hook setup so the toast shows correctly
         if (FeatureFlags.enableProfileDownload) {
-            FeatureStatusTracker.setEnabled("ProfileDownload");
+            FeatureStatusTracker.setEnabled("ProfileDownload", R.string.ig_dialog_downloader_profiles);
             FeatureStatusTracker.setHooked("ProfileDownload");
         }
 

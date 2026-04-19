@@ -1,7 +1,5 @@
 package ps.reso.instaeclipse.Xposed;
 
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,12 +18,13 @@ import java.util.Map;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import ps.reso.instaeclipse.mods.ads.AdBlocker;
+import ps.reso.instaeclipse.mods.feed.HideSuggestedFeedItemsHook;
+import ps.reso.instaeclipse.mods.feed.ReelsClientHook;
 import ps.reso.instaeclipse.mods.ads.TrackingLinkDisable;
 import ps.reso.instaeclipse.mods.devops.BuildExpiredPopupHook;
 import ps.reso.instaeclipse.mods.devops.DevOptionsUnlockHook;
@@ -46,6 +45,7 @@ import ps.reso.instaeclipse.mods.media.ProfilePicDownloadHook;
 import ps.reso.instaeclipse.mods.media.ReelDownloadHook;
 import ps.reso.instaeclipse.mods.media.StoryDownloadHook;
 import ps.reso.instaeclipse.mods.misc.CommentCopyHook;
+import ps.reso.instaeclipse.mods.misc.DisableDoubleTapLikeHook;
 import ps.reso.instaeclipse.mods.misc.DisableStoryFlippingHook;
 import ps.reso.instaeclipse.mods.misc.DisableVideoAutoPlayHook;
 import ps.reso.instaeclipse.mods.misc.StoryMentionHook;
@@ -95,22 +95,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         // Ensure preferences are loaded
 
 
-        // Hook into your module
-        if (lpparam.packageName.equals(CommonUtils.MY_PACKAGE_NAME)) {
-            try {
-                if (dexKitBridge == null) {
-                    System.load(moduleLibDir + "/libdexkit.so");
-                    dexKitBridge = DexKitBridge.create(moduleSourceDir);
-                }
-
-                // Hook your module
-                hookOwnModule(lpparam);
-
-            } catch (Exception e) {
-                XposedBridge.log("(InstaEclipse): Failed to initialize DexKitBridge for InstaEclipse: " + e.getMessage());
-            }
-        }
-
         // Hook into Instagram and its clones
         if (SUPPORTED_PACKAGES.contains(lpparam.packageName)) {
             try {
@@ -133,15 +117,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             } catch (Exception e) {
                 XposedBridge.log("(InstaEclipse): Failed to initialize DexKitBridge for " + lpparam.packageName + ": " + e.getMessage());
             }
-        }
-    }
-
-    private void hookOwnModule(XC_LoadPackage.LoadPackageParam lpparam) {
-        try {
-            findAndHookMethod(CommonUtils.MY_PACKAGE_NAME + ".MainActivity", lpparam.classLoader, "isModuleActive", XC_MethodReplacement.returnConstant(true));
-            // XposedBridge.log("InstaEclipse | Successfully hooked isModuleActive().");
-        } catch (Exception e) {
-            XposedBridge.log("(InstaEclipse): Failed to hook MainActivity: " + e.getMessage());
         }
     }
 
@@ -265,6 +240,20 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         XposedBridge.log("(InstaEclipse | GhostStorySeen): ❌ Failed to hook");
                     }
 
+                    // Hide in-feed widget units (suggested users panels, surveys, carousels, etc.)
+                    try {
+                        new HideSuggestedFeedItemsHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        XposedBridge.log("(InstaEclipse | HideSuggested): ❌ Failed to hook");
+                    }
+
+                    // Client-side reels blocker (intercepts the reels viewer)
+                    try {
+                        new ReelsClientHook().install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        XposedBridge.log("(InstaEclipse | ReelsClient): ❌ Failed to hook");
+                    }
+
                     // Ads Blocker
                     try {
                         new AdBlocker().disableSponsoredContent(dexKitBridge, hostClassLoader);
@@ -298,6 +287,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         new CommentCopyHook().install(lpparam.classLoader);
                     } catch (Throwable ignored) {
                         XposedBridge.log("(InstaEclipse | CopyComment): ❌ Failed to hook");
+                    }
+
+                    // Disable Double Tap to Like
+                    try {
+                        new DisableDoubleTapLikeHook().install(dexKitBridge, lpparam.classLoader);
+                    } catch (Throwable ignored) {
+                        XposedBridge.log("(InstaEclipse | DoubleTapLike): ❌ Failed to hook");
                     }
 
                     try {

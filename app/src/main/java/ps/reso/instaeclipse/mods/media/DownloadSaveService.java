@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import androidx.documentfile.provider.DocumentFile;
 
+import ps.reso.instaeclipse.R;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -85,7 +87,7 @@ public class DownloadSaveService extends Service {
         boolean usernameFolder  = cache.getBoolean("downloaderUsernameFolder", false);
 
         if (saveUri.isEmpty()) {
-            showToast("InstaEclipse: no download folder set");
+            showToast(getString(R.string.ig_toast_no_download_folder));
             stopSelf(startId);
             return START_NOT_STICKY;
         }
@@ -101,10 +103,10 @@ public class DownloadSaveService extends Service {
                         ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
                         : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
                 postDoneNotification(sid, "Saved: " + fFile, fMime, savedUri);
-                showToast("Saved: " + fFile);
+                showToast(getString(R.string.ig_toast_file_saved, fFile));
             } catch (Throwable e) {
                 postDoneNotification(sid, "Download failed: " + e.getMessage(), null, null);
-                showToast("Save failed: " + e.getMessage());
+                showToast(getString(R.string.ig_toast_download_failed, e.getMessage()));
             } finally {
                 stopSelf(sid);
             }

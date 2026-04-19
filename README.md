@@ -82,6 +82,17 @@ It uses [DexKit](https://github.com/LuckyPray/DexKit) for dynamic class/method d
 </details>
 
 <details>
+<summary><b>✨ Clean Feed</b> — See only what matters</summary>
+
+<br/>
+
+| Feature | Description |
+|---|---|
+| Hide Suggestions in Feed | Remove suggested posts, reels widgets, and other non-followed content from your feed |
+
+</details>
+
+<details>
 <summary><b>🛡️ Ad & Analytics Blocking</b> — Browse without being tracked</summary>
 
 <br/>
@@ -117,6 +128,7 @@ It uses [DexKit](https://github.com/LuckyPray/DexKit) for dynamic class/method d
 | Copy Comment | Copy any comment text with one tap |
 | View Story Mentions | See all @mentions in a story at once |
 | Disable Discover People | Remove the "People you may know" section |
+| Disable Double Tap to Like | Prevent accidentally liking posts and reels by double tapping |
 
 </details>
 
@@ -166,6 +178,9 @@ Force stop Instagram, then reopen it.
 **4. Open InstaEclipse**
 Inside Instagram, **long-press the search icon** to open the InstaEclipse menu.
 
+ > [!CAUTION]
+> **Hide My Applist users:** Do **not** add InstaEclipse to the hidden apps list. InstaEclipse must remain visible to Instagram — hiding it will cause crashes or features to stop working entirely.
+
 ---
 
 ### 🟡 No Root — LSPatch
@@ -208,6 +223,9 @@ Force stop Instagram and clear its cache after enabling.
 
 **Not working on the Google Play version?**
 Download Instagram from [APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/) instead.
+
+**Some features not working even after enabling them?**
+Certain Instagram internal configurations can silently break specific features. A ready-to-use config that fixes known issues is available on Telegram — [**grab it here**](https://t.me/InstaEclipse/52).
 
 **Still stuck?**
 Join the [Telegram group](https://t.me/instaEclipse_discussion) and ask — someone will help.

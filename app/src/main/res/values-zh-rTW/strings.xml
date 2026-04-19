@@ -129,6 +129,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 開發者選項</string>
     <string name="ig_dialog_menu_ghost_settings">👻 幽靈模式設定</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 廣告/分析封鎖</string>
+    <string name="ig_dialog_menu_clean_feed">✨ 純淨動態</string>
     <string name="ig_dialog_menu_distraction_free">🧘 無干擾 Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ 其他功能</string>
     <string name="ig_dialog_menu_downloader">📥 下載器</string>
@@ -138,6 +139,7 @@
     <string name="ig_dialog_section_dev_options">開發者選項 🎛</string>
     <string name="ig_dialog_section_ghost_mode">幽靈模式 👻</string>
     <string name="ig_dialog_section_ad_analytics">廣告/分析封鎖 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">純淨動態 ✨</string>
     <string name="ig_dialog_section_distraction_free">無干擾 Instagram 🧘</string>
     <string name="ig_dialog_section_misc">其他 ⚙️</string>
     <string name="ig_dialog_section_downloader">下載器 📥</string>
@@ -191,6 +193,7 @@
     <string name="ig_dialog_quick_allow_screenshots">包含允許在私訊中截圖</string>
     <string name="ig_dialog_ad_block_ads">封鎖廣告</string>
     <string name="ig_dialog_ad_block_analytics">封鎖分析</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">隱藏動態中的推薦內容</string>
     <string name="ig_dialog_ad_disable_tracking">停用追蹤連結</string>
     <string name="ig_dialog_distraction_extreme_mode">極端模式 🔒（重新安裝前不可逆）</string>
     <string name="ig_dialog_distraction_disable_stories">停用限時動態</string>
@@ -209,6 +212,7 @@
     <string name="ig_dialog_misc_view_story_mentions">查看限時動態提及</string>
     <string name="ig_dialog_misc_disable_discover_people">停用探索用戶</string>
     <string name="ig_dialog_misc_copy_comment">複製留言</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">停用雙擊點讚</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">複製留言</string>
@@ -232,6 +236,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ 清除應用程式快取並重新啟動？</string>
+    <string name="ig_dialog_clear_cache">🔄 清除 Hooks 快取</string>
+    <string name="ig_dialog_section_clear_cache">清除 Hooks 快取</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ 這將強制 InstaEclipse 在下次啟動時重新掃描 Instagram。應用程式將重新啟動。</string>
+    <string name="ig_dialog_clear_cache_now">清除快取並重啟</string>
     <string name="ig_dialog_restart_now">立即重新啟動</string>
     <string name="ig_dialog_restart_not_found">找不到要重新啟動的應用程式。</string>
     <string name="ig_dialog_restart_failed">重新啟動失敗：%1$s</string>
@@ -319,4 +327,16 @@
     <string name="ig_mention_no_mentions">此限時動態中未發現提及</string>
     <string name="ig_mention_copy_all">全部複製</string>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">未設定下載資料夾</string>
+    <string name="ig_toast_file_saved">已儲存：%1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse 已載入 🎯</string>
+
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">有可用更新</string>
+    <string name="ig_update_message">新版本（%1$s）已發布，是否立即更新？</string>
+    <string name="ig_update_button">更新</string>
+    <string name="ig_update_later">稍後</string>
+    <string name="ig_update_error_message">檢查更新失敗，請稍後重試。</string>
 </resources>

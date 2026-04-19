@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.5 Beta</string>
+    <string name="version" translatable="false">v0.5.1 Beta</string>
     <string name="home">Αρχική</string>
     <string name="features">Λειτουργίες</string>
     <string name="help">Βοήθεια</string>
@@ -145,6 +145,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Επιλογές Προγραμματιστών</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Ρυθμίσεις Αόρατης Λειτουργίας</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Αποκλεισμός Διαφημίσεων/Αναλυτικών</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Καθαρό Feed</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram Χωρίς Περισπασμούς</string>
     <string name="ig_dialog_menu_misc">⚙ Διάφορες Λειτουργίες</string>
     <string name="ig_dialog_menu_downloader">📥 Λήψη</string>
@@ -156,6 +157,7 @@
     <string name="ig_dialog_section_dev_options">Επιλογές Προγραμματιστών 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Αόρατη Λειτουργία 👻</string>
     <string name="ig_dialog_section_ad_analytics">Αποκλεισμός Διαφημίσεων/Αναλυτικών 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Καθαρό Feed ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram Χωρίς Περισπασμούς 🧘</string>
     <string name="ig_dialog_section_misc">Διάφορα ⚙️</string>
     <string name="ig_dialog_section_downloader">Λήψη 📥</string>
@@ -217,6 +219,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">Αποκλεισμός Διαφημίσεων</string>
     <string name="ig_dialog_ad_block_analytics">Αποκλεισμός Αναλυτικών</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Απόκρυψη προτάσεων στο feed</string>
     <string name="ig_dialog_ad_disable_tracking">Απενεργοποίηση Συνδέσμων Παρακολούθησης</string>
 
     <!-- Distraction-Free options -->
@@ -239,6 +242,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Προβολή Αναφορών Story</string>
     <string name="ig_dialog_misc_disable_discover_people">Απενεργοποίηση Προτάσεων Χρηστών</string>
     <string name="ig_dialog_misc_copy_comment">Αντιγραφή Σχολίου</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Απενεργοποίηση διπλού αγγίγματος για Like</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Αντιγραφή Σχολίου</string>
@@ -271,6 +275,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ Εκκαθάριση cache εφαρμογής και επανεκκίνηση;</string>
+    <string name="ig_dialog_clear_cache">🔄 Εκκαθάριση Cache Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Εκκαθάριση Cache Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Αυτό θα αναγκάσει το InstaEclipse να επανασαρώσει το Instagram κατά την επόμενη εκκίνηση. Η εφαρμογή θα επανεκκινηθεί.</string>
+    <string name="ig_dialog_clear_cache_now">Εκκαθάριση Cache &amp; Επανεκκίνηση</string>
     <string name="ig_dialog_restart_now">Επανεκκίνηση Τώρα</string>
     <string name="ig_dialog_restart_not_found">Αδύνατη εύρεση εφαρμογής για επανεκκίνηση.</string>
     <string name="ig_dialog_restart_failed">Αποτυχία επανεκκίνησης: %1$s</string>
@@ -343,4 +351,16 @@
     <string name="ig_mention_no_mentions">Δεν βρέθηκαν αναφορές σε αυτή την ιστορία</string>
     <string name="ig_mention_copy_all">Αντιγραφή Όλων</string>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">Δεν έχει οριστεί φάκελος λήψεων</string>
+    <string name="ig_toast_file_saved">Αποθηκεύτηκε: %1$s</string>
+    <string name="ig_toast_features_loaded">Το InstaEclipse φορτώθηκε 🎯</string>
+
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Διαθέσιμη ενημέρωση</string>
+    <string name="ig_update_message">Μια νέα έκδοση (%1$s) είναι διαθέσιμη. Θέλετε να ενημερώσετε τώρα;</string>
+    <string name="ig_update_button">Ενημέρωση</string>
+    <string name="ig_update_later">Αργότερα</string>
+    <string name="ig_update_error_message">Αποτυχία ελέγχου ενημερώσεων. Δοκιμάστε ξανά αργότερα.</string>
 </resources>

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import ps.reso.instaeclipse.R;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 
@@ -15,7 +17,7 @@ import java.net.URL;
 
 public class VersionCheckUtility {
 
-    private static final String CURRENT_VERSION = "0.5.0"; // Current version
+    private static final String CURRENT_VERSION = "0.5.1"; // Current version
     private static final String VERSION_CHECK_URL = "https://raw.githubusercontent.com/ReSo7200/InstaEclipse/refs/heads/main/version.json"; // JSON URL
 
     public static void checkForUpdates(Context context) {
@@ -62,25 +64,21 @@ public class VersionCheckUtility {
 
     private static void showUpdateDialog(Context context, String updateUrl, String newVersion) {
         new MaterialAlertDialogBuilder(context)
-                .setTitle("Update Available")
-                .setMessage("A new version (" + newVersion + ") is available. Would you like to update now?")
-                .setPositiveButton("Update", (dialogInterface, which) -> {
-                    // Open the update URL in the browser
+                .setTitle(context.getString(R.string.ig_update_title))
+                .setMessage(context.getString(R.string.ig_update_message, newVersion))
+                .setPositiveButton(context.getString(R.string.ig_update_button), (dialogInterface, which) -> {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
                     context.startActivity(browserIntent);
                 })
-                .setNegativeButton("Later", (dialogInterface, which) -> {
-                    // Dismiss the dialog
-                    dialogInterface.dismiss();
-                })
+                .setNegativeButton(context.getString(R.string.ig_update_later), (dialogInterface, which) -> dialogInterface.dismiss())
                 .show();
     }
 
     private static void showErrorDialog(Context context) {
         new MaterialAlertDialogBuilder(context)
-                .setTitle("Error")
-                .setMessage("Failed to check for updates. Please try again later.")
-                .setPositiveButton("OK", (dialogInterface, which) -> dialogInterface.dismiss())
+                .setTitle(context.getString(R.string.ig_dialog_error))
+                .setMessage(context.getString(R.string.ig_update_error_message))
+                .setPositiveButton(context.getString(R.string.ig_dialog_ok), (dialogInterface, which) -> dialogInterface.dismiss())
                 .show();
     }
 }

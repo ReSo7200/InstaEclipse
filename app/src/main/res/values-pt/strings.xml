@@ -121,6 +121,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Opções de desenvolvedor</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Configurações do modo fantasma</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Bloquear anúncios/análises</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Feed limpo</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram sem distrações</string>
     <string name="ig_dialog_menu_misc">⚙ Funções diversas</string>
     <string name="ig_dialog_menu_downloader">📥 Transferidor</string>
@@ -130,6 +131,7 @@
     <string name="ig_dialog_section_dev_options">Opções de desenvolvedor 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Modo fantasma 👻</string>
     <string name="ig_dialog_section_ad_analytics">Bloquear anúncios/análises 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Feed limpo ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram sem distrações 🧘</string>
     <string name="ig_dialog_section_misc">Miscelânea ⚙️</string>
     <string name="ig_dialog_section_downloader">Transferidor 📥</string>
@@ -183,6 +185,7 @@
     <string name="ig_dialog_quick_allow_screenshots">Incluir permitir capturas de ecrã em mensagens diretas</string>
     <string name="ig_dialog_ad_block_ads">Bloquear anúncios</string>
     <string name="ig_dialog_ad_block_analytics">Bloquear análises</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Ocultar sugestões no feed</string>
     <string name="ig_dialog_ad_disable_tracking">Desativar links de rastreamento</string>
     <string name="ig_dialog_distraction_extreme_mode">Modo extremo 🔒 (Irreversível até reinstalar)</string>
     <string name="ig_dialog_distraction_disable_stories">Desativar stories</string>
@@ -201,6 +204,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Ver menções em stories</string>
     <string name="ig_dialog_misc_disable_discover_people">Desativar descobrir pessoas</string>
     <string name="ig_dialog_misc_copy_comment">Copiar comentário</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Desativar toque duplo para curtir</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Copiar comentário</string>
@@ -224,6 +228,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ Limpar cache da aplicação e reiniciar?</string>
+    <string name="ig_dialog_clear_cache">🔄 Limpar Cache de Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Limpar Cache de Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Isso forçará o InstaEclipse a re-escanear o Instagram na próxima inicialização. O app será reiniciado.</string>
+    <string name="ig_dialog_clear_cache_now">Limpar Cache &amp; Reiniciar</string>
     <string name="ig_dialog_restart_now">Reiniciar agora</string>
     <string name="ig_dialog_restart_not_found">Não foi possível encontrar a aplicação para reiniciar.</string>
     <string name="ig_dialog_restart_failed">Falha ao reiniciar: %1$s</string>
@@ -310,4 +318,16 @@
     <string name="ig_mention_subtitle">%1$d menção(ões) • toque para copiar</string>
     <string name="ig_mention_no_mentions">Nenhuma menção encontrada nesta história</string>
     <string name="ig_mention_copy_all">Copiar tudo</string>
+
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">Nenhuma pasta de transferência definida</string>
+    <string name="ig_toast_file_saved">Guardado: %1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse carregado 🎯</string>
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Atualização disponível</string>
+    <string name="ig_update_message">Uma nova versão (%1$s) está disponível. Deseja atualizar agora?</string>
+    <string name="ig_update_button">Atualizar</string>
+    <string name="ig_update_later">Mais tarde</string>
+    <string name="ig_update_error_message">Falha ao verificar atualizações. Tente novamente mais tarde.</string>
 </resources>

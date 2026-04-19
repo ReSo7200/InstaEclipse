@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.5 Beta</string>
+    <string name="version" translatable="false">v0.5.1 Beta</string>
     <string name="home">Menu</string>
     <string name="features">Fonctionnalités</string>
     <string name="help">Aide</string>
@@ -144,6 +144,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Options Développeurs</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Paramètres Mode Fantôme</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Blocage Pubs/Analytics</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Fil propre</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Instagram Sans Distractions</string>
     <string name="ig_dialog_menu_misc">⚙ Fonctions Diverses</string>
     <string name="ig_dialog_menu_downloader">📥 Téléchargeur</string>
@@ -155,6 +156,7 @@
     <string name="ig_dialog_section_dev_options">Options Développeurs 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Mode Fantôme 👻</string>
     <string name="ig_dialog_section_ad_analytics">Blocage Pubs/Analytics 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Fil propre ✨</string>
     <string name="ig_dialog_section_distraction_free">Instagram Sans Distractions 🧘</string>
     <string name="ig_dialog_section_misc">Divers ⚙️</string>
     <string name="ig_dialog_section_downloader">Téléchargeur 📥</string>
@@ -216,6 +218,7 @@
     <!-- Ad / Analytics options -->
     <string name="ig_dialog_ad_block_ads">Bloquer les pubs</string>
     <string name="ig_dialog_ad_block_analytics">Bloquer les analytics</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Masquer les suggestions dans le fil</string>
     <string name="ig_dialog_ad_disable_tracking">Désactiver liens de suivi</string>
 
     <!-- Distraction-Free options -->
@@ -238,6 +241,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Voir Mentions de Story</string>
     <string name="ig_dialog_misc_disable_discover_people">Désactiver Suggestions de personnes</string>
     <string name="ig_dialog_misc_copy_comment">Copier Commentaire</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Désactiver le double tap pour liker</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Copier Commentaire</string>
@@ -270,6 +274,10 @@
 
     <!-- Restart -->
     <string name="ig_dialog_restart_message">⚠️ Vider le cache et redémarrer ?</string>
+    <string name="ig_dialog_clear_cache">🔄 Vider le Cache des Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Vider le Cache des Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Cela forcera InstaEclipse à re-scanner Instagram au prochain démarrage. L\'application redémarrera.</string>
+    <string name="ig_dialog_clear_cache_now">Vider le Cache &amp; Redémarrer</string>
     <string name="ig_dialog_restart_now">Redémarrer Maintenant</string>
     <string name="ig_dialog_restart_not_found">Impossible de trouver l\'app pour redémarrer.</string>
     <string name="ig_dialog_restart_failed">Échec du redémarrage : %1$s</string>
@@ -342,4 +350,16 @@
     <string name="ig_mention_no_mentions">Aucune mention trouvée dans cette story</string>
     <string name="ig_mention_copy_all">Tout copier</string>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">Aucun dossier de téléchargement défini</string>
+    <string name="ig_toast_file_saved">Enregistré : %1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse chargé 🎯</string>
+
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Mise à jour disponible</string>
+    <string name="ig_update_message">Une nouvelle version (%1$s) est disponible. Voulez-vous mettre à jour maintenant ?</string>
+    <string name="ig_update_button">Mettre à jour</string>
+    <string name="ig_update_later">Plus tard</string>
+    <string name="ig_update_error_message">Échec de la vérification des mises à jour. Réessayez plus tard.</string>
 </resources>

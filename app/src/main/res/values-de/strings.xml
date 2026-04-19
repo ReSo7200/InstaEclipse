@@ -127,6 +127,7 @@
     <string name="ig_dialog_menu_dev_options">🎛 Entwickleroptionen</string>
     <string name="ig_dialog_menu_ghost_settings">👻 Geistermodus-Einstellungen</string>
     <string name="ig_dialog_menu_ad_analytics">🛡 Werbung/Analytics blockieren</string>
+    <string name="ig_dialog_menu_clean_feed">✨ Sauberer Feed</string>
     <string name="ig_dialog_menu_distraction_free">🧘 Ablenkungsfreies Instagram</string>
     <string name="ig_dialog_menu_misc">⚙ Weitere Funktionen</string>
     <string name="ig_dialog_menu_downloader">📥 Downloader</string>
@@ -136,6 +137,7 @@
     <string name="ig_dialog_section_dev_options">Entwickleroptionen 🎛</string>
     <string name="ig_dialog_section_ghost_mode">Geistermodus 👻</string>
     <string name="ig_dialog_section_ad_analytics">Werbung/Analytics blockieren 🛡️</string>
+    <string name="ig_dialog_section_clean_feed">Sauberer Feed ✨</string>
     <string name="ig_dialog_section_distraction_free">Ablenkungsfreies Instagram 🧘</string>
     <string name="ig_dialog_section_misc">Sonstiges ⚙️</string>
     <string name="ig_dialog_section_downloader">Downloader 📥</string>
@@ -189,6 +191,7 @@
     <string name="ig_dialog_quick_allow_screenshots">Screenshots in DMs erlauben einschließen</string>
     <string name="ig_dialog_ad_block_ads">Werbung blockieren</string>
     <string name="ig_dialog_ad_block_analytics">Analytics blockieren</string>
+    <string name="ig_dialog_clean_feed_hide_suggested">Vorschläge im Feed ausblenden</string>
     <string name="ig_dialog_ad_disable_tracking">Tracking-Links deaktivieren</string>
     <string name="ig_dialog_distraction_extreme_mode">Extremmodus 🔒 (Nicht rückgängig bis zur Neuinstallation)</string>
     <string name="ig_dialog_distraction_disable_stories">Stories deaktivieren</string>
@@ -207,6 +210,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Story-Erwähnungen anzeigen</string>
     <string name="ig_dialog_misc_disable_discover_people">„Menschen entdecken" deaktivieren</string>
     <string name="ig_dialog_misc_copy_comment">Kommentar kopieren</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Doppeltippen zum Liken deaktivieren</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Kommentar kopieren</string>
@@ -230,6 +234,10 @@
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
     <string name="ig_dialog_restart_message">⚠️ App-Cache leeren und neu starten?</string>
+    <string name="ig_dialog_clear_cache">🔄 Hooks-Cache leeren</string>
+    <string name="ig_dialog_section_clear_cache">Hooks-Cache leeren</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Dies zwingt InstaEclipse beim nächsten Start, Instagram erneut zu scannen. Die App wird neu gestartet.</string>
+    <string name="ig_dialog_clear_cache_now">Cache leeren &amp; neu starten</string>
     <string name="ig_dialog_restart_now">Jetzt neu starten</string>
     <string name="ig_dialog_restart_not_found">Die App zum Neustart konnte nicht gefunden werden.</string>
     <string name="ig_dialog_restart_failed">Neustart fehlgeschlagen: %1$s</string>
@@ -317,4 +325,16 @@
     <string name="ig_mention_no_mentions">Keine Erwähnungen in dieser Story gefunden</string>
     <string name="ig_mention_copy_all">Alle kopieren</string>
 
+    <!-- Toast: Downloader (service) -->
+    <string name="ig_toast_no_download_folder">Kein Download-Ordner festgelegt</string>
+    <string name="ig_toast_file_saved">Gespeichert: %1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse geladen 🎯</string>
+
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Update verfügbar</string>
+    <string name="ig_update_message">Eine neue Version (%1$s) ist verfügbar. Jetzt aktualisieren?</string>
+    <string name="ig_update_button">Aktualisieren</string>
+    <string name="ig_update_later">Später</string>
+    <string name="ig_update_error_message">Update-Prüfung fehlgeschlagen. Bitte später erneut versuchen.</string>
 </resources>
