@@ -255,6 +255,7 @@
     <string name="ig_dialog_misc_view_story_mentions">View Story Mentions</string>
     <string name="ig_dialog_misc_disable_discover_people">Disable Discover People</string>
     <string name="ig_dialog_misc_copy_comment">Copy Comment</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Disable Double Tap to Like</string>
 
     <!-- Comment Copy dialog (runs in IG process) -->
     <string name="ig_comment_copy_title">Copy Comment</string>

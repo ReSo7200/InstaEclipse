@@ -132,5 +132,11 @@ public class FeatureManager {
         } else {
             FeatureStatusTracker.setDisabled("ProfileDownload");
         }
+
+        if (FeatureFlags.disableDoubleTapLike) {
+            FeatureStatusTracker.setEnabled("DisableDoubleTapLike");
+        } else {
+            FeatureStatusTracker.setDisabled("DisableDoubleTapLike");
+        }
     }
 }

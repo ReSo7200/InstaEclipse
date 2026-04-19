@@ -204,6 +204,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Ver menções em stories</string>
     <string name="ig_dialog_misc_disable_discover_people">Desativar descobrir pessoas</string>
     <string name="ig_dialog_misc_copy_comment">Copiar comentário</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Desativar toque duplo para curtir</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Copiar comentário</string>

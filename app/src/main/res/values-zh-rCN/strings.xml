@@ -242,6 +242,7 @@
     <string name="ig_dialog_misc_view_story_mentions">查看限时动态提及</string>
     <string name="ig_dialog_misc_disable_discover_people">禁用发现好友</string>
     <string name="ig_dialog_misc_copy_comment">复制评论</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">禁用双击点赞</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">复制评论</string>

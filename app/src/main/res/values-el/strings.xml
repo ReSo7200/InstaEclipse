@@ -242,6 +242,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Προβολή Αναφορών Story</string>
     <string name="ig_dialog_misc_disable_discover_people">Απενεργοποίηση Προτάσεων Χρηστών</string>
     <string name="ig_dialog_misc_copy_comment">Αντιγραφή Σχολίου</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Απενεργοποίηση διπλού αγγίγματος για Like</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Αντιγραφή Σχολίου</string>

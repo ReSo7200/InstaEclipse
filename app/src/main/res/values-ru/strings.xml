@@ -205,6 +205,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Просматривать упоминания в историях</string>
     <string name="ig_dialog_misc_disable_discover_people">Отключить рекомендации людей</string>
     <string name="ig_dialog_misc_copy_comment">Копировать комментарий</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Отключить двойное нажатие для лайка</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Копировать комментарий</string>

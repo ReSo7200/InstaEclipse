@@ -212,6 +212,7 @@
     <string name="ig_dialog_misc_view_story_mentions">查看限時動態提及</string>
     <string name="ig_dialog_misc_disable_discover_people">停用探索用戶</string>
     <string name="ig_dialog_misc_copy_comment">複製留言</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">停用雙擊點讚</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">複製留言</string>

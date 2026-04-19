@@ -241,6 +241,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Lihat Sebutan Story</string>
     <string name="ig_dialog_misc_disable_discover_people">Nonaktifkan Temukan Orang</string>
     <string name="ig_dialog_misc_copy_comment">Salin Komentar</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Nonaktifkan Ketuk Dua Kali untuk Suka</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Salin Komentar</string>

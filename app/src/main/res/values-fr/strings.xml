@@ -241,6 +241,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Voir Mentions de Story</string>
     <string name="ig_dialog_misc_disable_discover_people">Désactiver Suggestions de personnes</string>
     <string name="ig_dialog_misc_copy_comment">Copier Commentaire</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Désactiver le double tap pour liker</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Copier Commentaire</string>

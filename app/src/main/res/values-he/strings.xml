@@ -241,6 +241,7 @@
     <string name="ig_dialog_misc_view_story_mentions">צפה באזכורי סטורי</string>
     <string name="ig_dialog_misc_disable_discover_people">השבת הצעות אנשים</string>
     <string name="ig_dialog_misc_copy_comment">העתק תגובה</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">השבת הקשה כפולה לסימון לייק</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">העתק תגובה</string>

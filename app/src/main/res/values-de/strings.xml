@@ -210,6 +210,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Story-Erwähnungen anzeigen</string>
     <string name="ig_dialog_misc_disable_discover_people">„Menschen entdecken" deaktivieren</string>
     <string name="ig_dialog_misc_copy_comment">Kommentar kopieren</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Doppeltippen zum Liken deaktivieren</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Kommentar kopieren</string>

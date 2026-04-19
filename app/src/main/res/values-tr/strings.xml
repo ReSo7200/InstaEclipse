@@ -205,6 +205,7 @@
     <string name="ig_dialog_misc_view_story_mentions">Hikaye Bahsetmelerini Görüntüle</string>
     <string name="ig_dialog_misc_disable_discover_people">Kişileri Keşfet\'i Devre Dışı Bırak</string>
     <string name="ig_dialog_misc_copy_comment">Yorumu Kopyala</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Çift Dokunuşla Beğenmeyi Devre Dışı Bırak</string>
 
     <!-- Comment Copy dialog -->
     <string name="ig_comment_copy_title">Yorumu Kopyala</string>
