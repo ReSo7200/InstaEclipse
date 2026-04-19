@@ -128,6 +128,7 @@ It uses [DexKit](https://github.com/LuckyPray/DexKit) for dynamic class/method d
 | Copy Comment | Copy any comment text with one tap |
 | View Story Mentions | See all @mentions in a story at once |
 | Disable Discover People | Remove the "People you may know" section |
+| Disable Double Tap to Like | Prevent accidentally liking posts and reels by double tapping |
 
 </details>
 
@@ -176,6 +177,9 @@ Force stop Instagram, then reopen it.
 
 **4. Open InstaEclipse**
 Inside Instagram, **long-press the search icon** to open the InstaEclipse menu.
+
+ > [!CAUTION]
+> **Hide My Applist users:** Do **not** add InstaEclipse to the hidden apps list. InstaEclipse must remain visible to Instagram — hiding it will cause crashes or features to stop working entirely.
 
 ---
 
