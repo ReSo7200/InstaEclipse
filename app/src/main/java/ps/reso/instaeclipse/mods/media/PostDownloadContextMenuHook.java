@@ -461,18 +461,38 @@ public class PostDownloadContextMenuHook {
     }
 
     private static Object findMedia(Object obj) {
-        if (obj == null) return null;
+        return findMediaDepth(obj, 0);
+    }
+
+    private static Object findMediaDepth(Object obj, int depth) {
+        if (obj == null || depth > 2) return null;
         Class<?> cls = obj.getClass();
+        if (cls.isPrimitive() || cls.getName().startsWith("java.") || cls.getName().startsWith("android."))
+            return null;
+
+        List<Object> nextLevel = depth < 2 ? new ArrayList<>() : null;
+
         while (cls != null && cls != Object.class) {
             for (Field f : cls.getDeclaredFields()) {
+                if (f.getType().isPrimitive()) continue;
                 f.setAccessible(true);
                 try {
                     Object v = f.get(obj);
-                    if (v != null && v.getClass().getName().equals("com.instagram.feed.media.Media"))
-                        return v;
+                    if (v == null) continue;
+                    String name = v.getClass().getName();
+                    if (name.equals("com.instagram.feed.media.Media")) return v;
+                    if (nextLevel != null && !name.startsWith("java.") && !name.startsWith("android."))
+                        nextLevel.add(v);
                 } catch (Throwable ignored) {}
             }
             cls = cls.getSuperclass();
+        }
+
+        if (nextLevel != null) {
+            for (Object child : nextLevel) {
+                Object found = findMediaDepth(child, depth + 1);
+                if (found != null) return found;
+            }
         }
         return null;
     }
