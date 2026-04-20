@@ -18,22 +18,27 @@ public class TrackingLinkDisable {
 
                         if (FeatureFlags.disableTrackingLinks) {
                             ClipData clipData = (ClipData) param.args[0];
-                            if (clipData == null || clipData.getItemCount() == 0 || clipData.getItemAt(0) == null || clipData.getItemAt(0).getText() == null) {
-                                return;
-                            }
-                            String x = clipData.getItemAt(0).getText().toString();
-                            if (x.contains("https://www.instagram.com/") && (x.contains("igsh=") || (x.contains("ig_rid=")))) { // Global
-                                param.args[0] = ClipData.newPlainText("URL", x.replaceAll("\\?.*", ""));
-                            } else if (x.contains("https://www.instagram.com/") && x.contains("?utm_source=")) { // Stories
-                                param.args[0] = ClipData.newPlainText("URL", x.replaceAll("\\?utm_source=.*", ""));
-                            }
-                            else if (x.contains("https://www.instagram.com/") && x.contains("?story_media_id=")){ // Highlights
-                                param.args[0] = ClipData.newPlainText("URL", x.replaceAll("\\?story_media_id=.*", ""));
-                            }
-                            // Saved-by rule: match saved-by or saved_by anywhere in query
-                            else if (x.contains("https://www.instagram.com/") &&
-                                    x.matches("(?i).*saved[-_]by.*")) {
-                                param.args[0] = ClipData.newPlainText("URL", x.replaceAll("\\?.*", ""));
+                            if (clipData == null || clipData.getItemCount() == 0) return;
+                            
+                            Item item = clipData.getItemAt(0);
+                            if (item == null || item.getText() == null) return;
+                            
+                            String url = item.getText().toString();
+                            
+                            // Only process Instagram links
+                            if (url.contains("https://www.instagram.com/")) {
+                                // Combined regex for: igsh, ig_rid, utm_source, story_media_id, or saved[-_]by
+                                boolean hasTracking = url.contains("igsh=") || 
+                                                      url.contains("ig_rid=") || 
+                                                      url.contains("utm_source=") || 
+                                                      url.contains("story_media_id=") || 
+                                                      url.matches("(?i).*saved[-_]by.*");
+                                
+                                if (hasTracking) {
+                                    // Strip everything from the first '?' onwards
+                                    String cleanUrl = url.replaceAll("\\?.*", "");
+                                    param.args[0] = ClipData.newPlainText("URL", cleanUrl);
+                                }
                             }
                         }
 
