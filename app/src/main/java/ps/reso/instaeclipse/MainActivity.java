@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import ps.reso.instaeclipse.fragments.FeaturesFragment;
@@ -36,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
+        }
+
+        // Prevent status bar color changes on scroll
+        AppBarLayout appBarLayout = findViewById(R.id.app_bar_layout);
+        if (appBarLayout != null) {
+            appBarLayout.setExpanded(true, false);
+            appBarLayout.setLiftOnScroll(false);
         }
 
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
