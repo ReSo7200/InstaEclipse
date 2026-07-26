@@ -16,7 +16,7 @@
     <string name="module_status">Stan modułu:</string>
 
     <string name="module_status_disabled">Stan modułu: Wyłączony</string>
-    <string name="request_enable_module">Włącz ten moduł w aplikacji Xposed Installer.</string>
+    <string name="request_enable_module">Włącz moduł w aplikacji Xposed Installer.</string>
 
     <string name="module_status_enabled_no_root">Stan modułu: Włączony (bez uprawnień roota)</string>
     <string name="request_enable_root">Automatyczny restart wymaga uprawnień root. Wymagany jest restart ręczny.</string>
@@ -55,16 +55,16 @@
 
     <!-- faq -->
     <string name="frequently_asked_questions">Często zadawane pytania</string>
-    <string name="faq_1"><b>1. Nie działa lub zawiesza się przy wersji z Google Play?</b>\n- Użyj plików APK z APKMirror</string>
+    <string name="faq_1"><b>1. Wersja ze Sklepu Play nie działa stabilnie?</b>\n- Użyj plików APK z APKMirror</string>
     <string name="faq_2"><b>2. Moduł nie jest włączony?</b>\n- Wyłącz i włącz moduł w LSPosed.</string>
-    <string name="faq_3"><b>3. Funkcje nie działają?</b>\n- Wymuś zatrzymanie i uruchom ponownie Instagrama.</string>
-    <string name="faq_4"><b>4. Opcje dewelopera powodują awarię?</b>\n- Postępuj zgodnie z instrukcją dot. opcji dewelopera.</string>
+    <string name="faq_3"><b>3. Wybrane funkcje nie działają?</b>\n- Wymuś zatrzymanie i uruchom ponownie Instagrama.</string>
+    <string name="faq_4"><b>4. Opcje dewelopera powodują awarie?</b>\n- Postępuj zgodnie z instrukcją dot. opcji dewelopera.</string>
     <string name="faq_5"><b>5. Opcje dewelopera mają dziwne znaki lub liczby?</b>\n- Użyj wersji Beta lub Alpha, bo wersje Stable mają obfuskację.</string>
-    <string name="faq_6"><b>6. Instagram bez rozproszeń włączony, ale zawartość wciąż się pokazuje?</b>\n- Wymuś zatrzymanie Instagrama i wyczyść pamięć podręczną.</string>
+    <string name="faq_6"><b>6. Instagram bez rozproszeń włączony, ale rozpraszacze nie zniknęły?</b>\n- Wymuś zatrzymanie Instagrama i wyczyść jego pamięć podręczną.</string>
 
     <!-- guide -->
-    <string name="module_not_working_title">Moduł wciąż nie działa?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jeśli jesteś <b>rooted</b>, spróbuj użyć <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed od JingMatrix</a><br/><br/>Jeśli <b>nie masz roota</b>, zainstaluj <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch od JingMatrix</a>, a następnie postępuj zgodnie z <a href="https://t.me/instaEclipse_discussion/158/5149">tym poradnikiem</a>]]></string>
+    <string name="module_not_working_title">Moduł wciąż odmawia współpracy?</string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jeśli <b>masz roota</b>, spróbuj użyć <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed od JingMatrix</a><br/><br/>Jeśli <b>nie masz roota</b>, zainstaluj <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch od JingMatrix</a>, a następnie postępuj zgodnie z <a href="https://t.me/instaEclipse_discussion/158/5149">tym poradnikiem</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">Kategorie:</string>
@@ -80,11 +80,11 @@
     <string name="feat_downloader_reset_folder">Przywróć domyślne miejsce zapisu</string>
 
     <!-- features -->
-    <string name="developer_options">Opcje dewelopera</string>
+    <string name="developer_options">Opcje deweloperskie</string>
     <string name="ghost_mode">Tryb ducha</string>
-    <string name="distraction_free">Bez rozproszeń</string>
-    <string name="remove_ads">Usuń reklamy</string>
-    <string name="remove_analytics">Usuń analitykę</string>
+    <string name="distraction_free">Tryb bez rozproszeń</string>
+    <string name="remove_ads">Blokowanie reklam</string>
+    <string name="remove_analytics">Wyłączanie analityki</string>
 
     <string name="enable_disable_all">Przełącz wszystkie</string>
 
@@ -158,7 +158,7 @@
     <string name="ig_dialog_menu_downloader">Pobieranie</string>
     <string name="ig_dialog_menu_location">Lokalizacja</string>
     <string name="ig_dialog_menu_quality">Jakość wideo</string>
-    <string name="ig_dialog_menu_theme">Własny motyw</string>
+    <string name="ig_dialog_menu_theme">Niestandardowy motyw</string>
 
     <!-- Logging -->
     <string name="logging">Logi</string>
@@ -169,8 +169,8 @@
     <string name="logging_instagram">Instagram</string>
     <string name="logging_instagram_timeout">Instagram nie odpowiedział na czas. Wyświetlanie tylko logów aplikacji.</string>
     <string name="logging_no_target">Najpierw zainstaluj obsługiwaną aplikację Instagram.</string>
-    <string name="logging_empty_reply">(pusty bufor — otwórz Instagrama z włączonym modułem)</string>
-    <string name="logging_placeholder">Brak załadowanych logów.</string>
+    <string name="logging_empty_reply">(pusty bufor - otwórz Instagrama z włączonym modułem)</string>
+    <string name="logging_placeholder">Nie załadowano jeszcze żadnych logów.</string>
     <string name="logging_lines_format">%1$d linii</string>
     <string name="ig_dialog_menu_backup_restore">Kopia zapasowa i przywracanie</string>
     <string name="ig_dialog_menu_about">O module</string>
@@ -188,18 +188,18 @@
 
     <!-- Video Quality -->
     <string name="ig_dialog_quality_force_reels">Wymuś jakość rolek</string>
-    <string name="ig_dialog_quality_auto">Automatyczna</string>
+    <string name="ig_dialog_quality_auto">Auto</string>
     <string name="ig_dialog_quality_360">360p</string>
     <string name="ig_dialog_quality_480">480p</string>
     <string name="ig_dialog_quality_720">720p</string>
     <string name="ig_dialog_quality_1080">1080p</string>
 
     <!-- Custom Theme -->
-    <string name="theme_title">Własny motyw</string>
-    <string name="theme_enable">Włącz własny motyw</string>
+    <string name="theme_title">Niestandardowy motyw</string>
+    <string name="theme_enable">Włącz niestandardowy motyw</string>
     <string name="theme_customize">Dostosuj motyw…</string>
     <string name="theme_section_presets">Gotowe motywy</string>
-    <string name="theme_section_custom">Kolory niestandardowe</string>
+    <string name="theme_section_custom">Niestandardowe kolory</string>
     <string name="theme_collapse_section">Zwiń sekcję</string>
     <string name="theme_expand_section">Rozwiń sekcję</string>
     <string name="theme_reset_custom">Przywróć domyślne</string>
@@ -223,24 +223,24 @@
     <string name="theme_slot_link">Link</string>
     <string name="theme_slot_error">Błąd</string>
     <string name="theme_slot_destructive">Destrukcyjny</string>
-    <string name="ig_dialog_quality_max">Maksymalna dostępna</string>
+    <string name="ig_dialog_quality_max">Najwyższa</string>
 
     <!-- Location Spoof -->
-    <string name="ig_dialog_location_spoof_enable">Podmień lokalizację GPS</string>
-    <string name="ig_dialog_location_pick">Wybierz lokalizację na mapie</string>
-    <string name="ig_dialog_location_unset">Nie ustawiono lokalizacji</string>
-    <string name="ig_dialog_location_current">Obecnie: %1$.4f, %2$.4f</string>
+    <string name="ig_dialog_location_spoof_enable">Sfałszuj lokalizację GPS</string>
+    <string name="ig_dialog_location_pick">Wybierz na mapie</string>
+    <string name="ig_dialog_location_unset">nie ustawiono</string>
+    <string name="ig_dialog_location_current">ustawiono: %1$.4f, %2$.4f</string>
     <string name="loc_picker_title">Wybierz lokalizację</string>
     <string name="loc_picker_search_hint">Wyszukaj miasto, adres lub miejsce</string>
     <string name="loc_picker_use">Użyj tej lokalizacji</string>
-    <string name="loc_picker_search_failed">Nie znaleziono lokalizacji</string>
+    <string name="loc_picker_search_failed">Nie znaleziono tego miejsca</string>
     <string name="loc_picker_search_error">Wyszukiwanie nie powiodło się: %1$s</string>
     <string name="ig_dialog_section_downloader">Pobieranie</string>
     <string name="ig_dialog_section_downloader_settings">Ustawienia pobierania</string>
     <string name="ig_dialog_section_backup_restore">Kopia zapasowa i przywracanie</string>
     <string name="ig_dialog_section_about">Informacje</string>
     <string name="ig_dialog_section_restart">Uruchom ponownie aplikację</string>
-    <string name="ig_dialog_section_quick_toggle">Dostosuj skrót</string>
+    <string name="ig_dialog_section_quick_toggle">Funkcje skrótu</string>
 
     <!-- Developer options -->
     <string name="ig_dialog_dev_enable">Włącz tryb dewelopera</string>
@@ -316,12 +316,12 @@
 
     <!-- Clean Feed options -->
     <string name="ig_dialog_clean_feed_hide_suggested">Ukryj sugestie w Dla Ciebie</string>
-    <string name="ig_dialog_clean_feed_hide_threads">Ukryj sugestie Threads</string>
+    <string name="ig_dialog_clean_feed_hide_threads">Ukryj sugestie z Threads</string>
 
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Wyłącz automatyczne przewijanie relacji</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Wyłącz autoodtwarzanie wideo</string>
-    <string name="ig_dialog_misc_spoof_last_seen">Zamroź status ostatniej aktywności</string>
+    <string name="ig_dialog_misc_spoof_last_seen">Zamroź status aktywności</string>
     <string name="ig_dialog_misc_disable_repost">Wyłącz reposty</string>
     <string name="ig_dialog_misc_show_feature_toasts">Komunikat o funkcjach</string>
     <string name="ig_dialog_misc_show_follower_toast">Komunikat o obserwowaniu</string>
@@ -329,23 +329,23 @@
     <string name="ig_dialog_misc_disable_discover_people">Wyłącz propozycje znajomych</string>
     <string name="ig_dialog_misc_copy_comment">Kopiowanie komentarzy</string>
     <string name="ig_dialog_misc_disable_double_tap_like">Wyłącz polubienie dwukrotnym naciśnięciem</string>
-    <string name="ig_dialog_misc_copy_caption">Kopiowanie podpisów</string>
-    <string name="ig_dialog_misc_photo_zoom">Powiększanie zdjęć (długie naciśnięcie)</string>
+    <string name="ig_dialog_misc_copy_caption">Kopiowanie opisów</string>
+    <string name="ig_dialog_misc_photo_zoom">Powiększanie zdjęć (przytrzymaniem)</string>
 
     <!-- Comment Copy dialog (runs in IG process) -->
     <string name="ig_comment_copy_title">Skopiuj komentarz</string>
-    <string name="ig_comment_copy_full">Skopiuj pełny komentarz</string>
+    <string name="ig_comment_copy_full">Skopiuj całość</string>
     <string name="ig_comment_select_part">Wybierz część do skopiowania</string>
     <string name="ig_comment_select_title">Zaznacz, aby skopiować</string>
     <string name="ig_comment_copy_selected">Skopiuj zaznaczone</string>
     <string name="ig_toast_comment_copied">✅ Skopiowano do schowka!</string>
 
     <!-- Caption Copy menu + dialog (runs in IG process) -->
-    <string name="ig_caption_copy_menu_item">Skopiuj podpis</string>
-    <string name="ig_caption_copy_title">Skopiuj podpis</string>
-    <string name="ig_caption_copy_full">Skopiuj cały podpis</string>
-    <string name="ig_caption_copy_none">Brak podpisu w tym poście</string>
-    <string name="ig_caption_copied">✅ Podpis skopiowany do schowka!</string>
+    <string name="ig_caption_copy_menu_item">Skopiuj opis</string>
+    <string name="ig_caption_copy_title">Skopiuj opis</string>
+    <string name="ig_caption_copy_full">Skopiuj całość</string>
+    <string name="ig_caption_copy_none">Ten post nie posiada opisu</string>
+    <string name="ig_caption_copied">✅ Skopiowano opis do schowka!</string>
 
     <!-- Downloader options -->
     <string name="ig_dialog_downloader_settings">Ustawienia pobierania</string>
@@ -442,7 +442,7 @@
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">Oznaczeni na tej relacji</string>
     <string name="ig_mention_subtitle">Wzmianki: %1$d • naciśnij, aby skopiować</string>
-    <string name="ig_mention_no_mentions">Nie znaleziono wzmianek na tej relacji</string>
+    <string name="ig_mention_no_mentions">Nie znaleziono żadnych wzmianek na tej relacji</string>
     <string name="ig_mention_copy_all">Skopiuj wszystkie</string>
 
     <!-- Update check dialog -->
