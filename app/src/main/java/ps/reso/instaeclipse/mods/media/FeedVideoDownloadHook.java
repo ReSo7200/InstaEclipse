@@ -107,6 +107,11 @@ public class FeedVideoDownloadHook {
     private static Method   dictUserGetter;    // () -> UserClass on MutableMediaDictIntf
     // userUsernameGetter lives in UserUtils — resolved here and stored there
 
+    // Pando field ids are the Java String hash of the field name, so these stay valid
+    // across Instagram builds: "username".hashCode() / "full_name".hashCode().
+    private static final int USERNAME_FIELD_HASH  = -265713450;
+    private static final int FULL_NAME_FIELD_HASH = -1677176261;
+
     // ── Uri.parse fallback buffer ─────────────────────────────────────────────
     private static final class UrlEntry {
         final String url; final long time;
@@ -931,16 +936,18 @@ public class FeedVideoDownloadHook {
      * from the LiveTreeMediaDict without guessing obfuscated method names.
      */
     private static void resolveUsernameGetter(DexKitBridge bridge, ClassLoader classLoader) {
-        // Cache hit: restore userClass and userUsernameGetter without DexKit
+        // Cache hit: restore userClass and userUsernameGetter without DexKit. Both must be
+        // present — with the getter missing, UserUtils falls back to scanning User for any
+        // lowercase String, which is how the display name got picked in the first place.
+        // Key bumped to _v2: an existing cache would otherwise restore the display-name
+        // getter this method used to resolve.
         if (DexKitCache.isCacheValid()) {
             String cachedClassName = DexKitCache.loadString("UserClass");
-            Method cachedGetter    = DexKitCache.loadMethod("UsernameGetter", classLoader);
-            if (cachedClassName != null) {
+            Method cachedGetter    = DexKitCache.loadMethod("UsernameGetter_v2", classLoader);
+            if (cachedClassName != null && cachedGetter != null) {
                 try {
                     userClass = classLoader.loadClass(cachedClassName);
-                    if (cachedGetter != null) {
-                        UserUtils.userUsernameGetter = cachedGetter;
-                    }
+                    UserUtils.userUsernameGetter = cachedGetter;
                     resolveDictUserGetter(bridge, classLoader);
                     return;
                 } catch (Throwable ignored) {}
@@ -962,21 +969,38 @@ public class FeedVideoDownloadHook {
             DexKitCache.saveString("UserClass", userClass.getName());
             ModuleLog.line("(IE|DL|Username) userClass=" + userClass.getName());
 
-            // Resolve the username getter on User via the stable GraphQL field ID -265713450.
+            // Resolve the username getter on User via the "username" Pando field id.
+            //
+            // That id alone is not enough: User also has a display-name getter that
+            // reads username and falls back to full_name, so two methods match and
+            // get(0) returned the display-name one. Nothing downstream can tell them
+            // apart afterwards — UserUtils.isValidUsername() accepts any lowercase
+            // string, so an all-lowercase display name passes as a handle and every
+            // download lands in a folder named after it. Drop the candidates that also
+            // read full_name; the one left is the plain username getter.
             try {
-                List<MethodData> ugMethods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .declaredClass("com.instagram.user.model.User")
-                                .returnType("java.lang.String")
-                                .paramCount(0)
-                                .usingNumbers(-265713450)));
+                List<MethodData> ugMethods = findUserFieldGetters(bridge, USERNAME_FIELD_HASH);
+
+                if (ugMethods.size() > 1) {
+                    Set<String> readsFullName = new HashSet<>();
+                    for (MethodData md : findUserFieldGetters(bridge, FULL_NAME_FIELD_HASH)) {
+                        readsFullName.add(md.getDescriptor());
+                    }
+                    List<MethodData> pure = new ArrayList<>();
+                    for (MethodData md : ugMethods) {
+                        if (!readsFullName.contains(md.getDescriptor())) pure.add(md);
+                    }
+                    // Only narrow when it leaves something — never down to nothing.
+                    if (!pure.isEmpty()) ugMethods = pure;
+                }
+
                 if (!ugMethods.isEmpty()) {
                     UserUtils.userUsernameGetter = ugMethods.get(0).getMethodInstance(classLoader);
                     UserUtils.userUsernameGetter.setAccessible(true);
-                    DexKitCache.saveMethod("UsernameGetter", UserUtils.userUsernameGetter);
+                    DexKitCache.saveMethod("UsernameGetter_v2", UserUtils.userUsernameGetter);
                     ModuleLog.line("(IE|DL|Username) userUsernameGetter=" + UserUtils.userUsernameGetter.getName());
                 } else {
-                    ModuleLog.line("(IE|DL|Username) ❌ userUsernameGetter not found via -265713450");
+                    ModuleLog.line("(IE|DL|Username) ❌ userUsernameGetter not found");
                 }
             } catch (Throwable t) {
                 ModuleLog.line("(IE|DL|Username) ❌ userUsernameGetter resolution: " + t);
@@ -987,6 +1011,16 @@ public class FeedVideoDownloadHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|DL|Username) ❌ resolveUsernameGetter: " + t);
         }
+    }
+
+    /** Zero-arg String getters on User that read the Pando field with the given id. */
+    private static List<MethodData> findUserFieldGetters(DexKitBridge bridge, int fieldHash) {
+        return bridge.findMethod(FindMethod.create()
+                .matcher(MethodMatcher.create()
+                        .declaredClass("com.instagram.user.model.User")
+                        .returnType("java.lang.String")
+                        .paramCount(0)
+                        .usingNumbers(fieldHash)));
     }
 
     private static void resolveDictUserGetter(DexKitBridge bridge, ClassLoader classLoader) {
