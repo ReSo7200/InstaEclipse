@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- app wide -->
+    <string name="app_name">InstaEclipse</string>
+    <string name="home">Trang chủ</string>
+    <string name="features">Tính năng</string>
+    <string name="help">Trợ giúp</string>
+    <string name="instagram_version">Phiên bản</string>
+
+    <!-- home -->
+    <string name="back">Quay lại</string>
+    <string name="apply_changes">Áp dụng thay đổi</string>
+    <string name="multiple_versions_detected">⚠️ Phát hiện nhiều phiên bản Instagram</string>
+    <string name="module_disabled">Module chưa được kích hoạt. Vui lòng bật module trong LSPosed.</string>
+
+    <string name="module_status">Trạng thái Module:</string>
+
+    <string name="module_status_disabled">Trạng thái Module: Đã tắt</string>
+    <string name="request_enable_module">Vui lòng kích hoạt module trong trình quản lý Xposed/LSPosed.</string>
+
+    <string name="module_status_enabled_no_root">Trạng thái Module: Đã bật (Không có quyền Root)</string>
+    <string name="request_enable_root">Cần quyền Root để ứng dụng tự khởi động lại. Hiện tại cần khởi động lại thủ công.</string>
+
+    <string name="module_status_enabled">Trạng thái Module: Đã bật</string>
+    <string name="module_active">Module đang hoạt động bình thường.</string>
+
+    <string name="checking_instagram">Đang kiểm tra Instagram…</string>
+    <string name="installed_instagram_version">Đã cài đặt Instagram</string>
+    <string name="not_installed_instagram">Chưa cài đặt Instagram</string>
+    <string name="error_instagram">Lỗi khi kiểm tra trạng thái Instagram</string>
+
+    <string name="launch_instagram">Mở Instagram</string>
+    <string name="download_apk">Tải tập tin APK</string>
+    <string name="how_to_use">Hướng dẫn sử dụng</string>
+    <string name="usage_instructions">Nhấn giữ biểu tượng Tìm kiếm để mở menu tùy chỉnh trong Instagram</string>
+    <string name="contributors">Người đóng góp</string>
+    <string name="special_thanks">Lời cảm ơn đặc biệt</string>
+
+    <!-- help -->
+    <string name="help_amp_troubleshooting">Trợ giúp &amp; Khắc phục lỗi</string>
+    <string name="find_updates_and_documentation">Tìm bản cập nhật mới nhất và tài liệu hướng dẫn.</string>
+    <string name="go_to_github">Truy cập GitHub</string>
+    <string name="find_support">Kênh hỗ trợ cộng đồng.</string>
+    <string name="go_to_telegram">Truy cập Telegram</string>
+
+    <!-- faq -->
+    <string name="frequently_asked_questions">Câu hỏi thường gặp (FAQ)</string>
+    <string name="faq_1"><b>1. Không hoạt động hoặc văng app khi dùng bản Google Play?</b>\n- Hãy tải và cài đặt bản APK từ APKMirror</string>
+    <string name="faq_2"><b>2. Module báo chưa bật?</b>\n- Hãy tắt rồi bật lại module trong LSPosed, sau đó khởi động lại thiết bị.</string>
+    <string name="faq_3"><b>3. Tính năng không có hiệu lực?</b>\n- Buộc dừng (Force Stop) và mở lại ứng dụng Instagram.</string>
+    <string name="faq_4"><b>4. Tùy chọn nhà phát triển gây văng ứng dụng?</b>\n- Hãy làm theo đúng các bước trong hướng dẫn Tùy chọn nhà phát triển.</string>
+    <string name="faq_5"><b>5. Tùy chọn nhà phát triển hiển thị ký tự hoặc số lạ?</b>\n- Hãy sử dụng bản Instagram Beta hoặc Alpha (bản Stable đã bị mã hóa ký danh).</string>
+    <string name="faq_6"><b>6. Đã bật Distraction Free nhưng nội dung vẫn hiển thị?</b>\n- Hãy buộc dừng Instagram và xóa bộ nhớ đệm (cache).</string>
+
+    <!-- guide -->
+    <string name="module_not_working_title">Module vẫn chưa hoạt động?</string>
+
+    <!-- features fragment section headers -->
+    <string name="feat_categories">Danh mục:</string>
+    <string name="feat_tools">Công cụ:</string>
+    <string name="feat_features">Tính năng:</string>
+    <string name="feat_config">Cấu hình:</string>
+    <string name="feat_options">Tùy chọn:</string>
+    <string name="feat_quick_toggle">Bật / Tắt nhanh:</string>
+    <string name="feat_danger_zone">Vùng nguy hiểm:</string>
+    <string name="feat_download_folder">Thư mục tải xuống:</string>
+    <string name="feat_downloader_set_folder">Chọn vị trí lưu thư mục tải xuống</string>
+    <string name="feat_downloader_selected">Đã chọn: %1$s</string>
+    <string name="feat_downloader_reset_folder">Khôi phục thư mục tải xuống mặc định</string>
+
+    <!-- features -->
+    <string name="developer_options">Tùy chọn nhà phát triển</string>
+    <string name="ghost_mode">Chế độ Ẩn danh (Ghost Mode)</string>
+    <string name="distraction_free">Trải nghiệm Tập trung (Distraction Free)</string>
+    <string name="remove_ads">Chặn quảng cáo</string>
+    <string name="remove_analytics">Chặn theo dõi &amp; Phân tích</string>
+
+    <string name="enable_disable_all">Bật / Tắt tất cả</string>
+
+    <!-- ghost -->
+    <string name="ghost_mode_options">Cài đặt Chế độ Ẩn danh</string>
+    <string name="typing">Đang soạn tin</string>
+    <string name="story">Tin (Story)</string>
+    <string name="view_once">Xem một lần</string>
+    <string name="live">Phát trực tiếp (Live)</string>
+    <string name="direct_messages">Tin nhắn trực tiếp (DM)</string>
+    <string name="disable_typing">Ẩn trạng thái đang soạn tin</string>
+    <string name="screen_shot">Chụp ảnh màn hình</string>
+
+    <!-- developer_options -->
+    <string name="developer_options_guide">Hướng dẫn Tùy chọn nhà phát triển</string>
+    <string name="dev_options_version_req">Lưu ý: Chỉ áp dụng cho các phiên bản Instagram Beta/Alpha!</string>
+    <string name="dev_options_req">Đảm bảo bạn đã đăng nhập tài khoản trước khi thực hiện!</string>
+
+    <string name="dev_options_1">1. Mở Instagram và nhấn giữ biểu tượng Trang chủ (Home).</string>
+    <string name="dev_options_2">2. Truy cập Developer Options > MetaConfig Settings &amp; Overrides.</string>
+    <string name="dev_options_3">3. Tìm kiếm từ khóa \'Employee\' và kích hoạt các tùy chọn sau:</string>
+    <string name="dev_options_4">4. Cuối cùng, tắt Tùy chọn nhà phát triển trong module để tránh văng ứng dụng.</string>
+
+    <!-- distraction free -->
+    <string name="distraction_free_options">Tùy chọn Trải nghiệm Tập trung</string>
+    <string name="disable_stories">Ẩn Bảng tin Tin (Stories)</string>
+    <string name="disable_feed">Ẩn Bảng tin chính (Feed)</string>
+    <string name="disable_reels">Ẩn Thước phim (Reels)</string>
+    <string name="disable_explore">Ẩn trang Khám phá (Explore)</string>
+    <string name="disable_comments">Ẩn phần Bình luận</string>
+
+    <!-- Miscellaneous -->
+    <string name="misc">Tính năng mở rộng</string>
+    <string name="miscellaneous_options">Tùy chọn Mở rộng</string>
+    <string name="story_flipping">Tắt tự động chuyển Story</string>
+    <string name="video_autoplay">Tắt tự động phát Video</string>
+    <string name="follower_toast">Hiển thị thông báo trạng thái Theo dõi</string>
+    <string name="hooked_methods_toast">Hiển thị thông báo tính năng đã kích hoạt</string>
+
+    <!-- contributor card -->
+    <string name="contributor_name">Tên người đóng góp</string>
+
+    <!-- Dialog strings -->
+    <string name="ig_dialog_close">Đóng</string>
+    <string name="ig_dialog_enable_disable_all">Bật / Tắt tất cả</string>
+    <string name="ig_dialog_error">Lỗi</string>
+    <string name="ig_dialog_ok">Đồng ý</string>
+    <string name="ig_dialog_yes">Có</string>
+    <string name="ig_dialog_cancel">Hủy</string>
+
+    <!-- Main menu items -->
+    <string name="ig_dialog_menu_clean_feed">Làm sạch Bảng tin</string>
+    <string name="ig_dialog_menu_dev_options">Tùy chọn nhà phát triển</string>
+    <string name="ig_dialog_menu_ghost_settings">Cài đặt Chế độ Ẩn danh</string>
+    <string name="ig_dialog_menu_ad_analytics">Chặn Quảng cáo &amp; Phân tích</string>
+    <string name="ig_dialog_menu_distraction_free">Instagram Không xao nhãng</string>
+    <string name="ig_dialog_menu_misc">Tính năng mở rộng</string>
+    <string name="ig_dialog_menu_downloader">Trình tải xuống</string>
+    <string name="ig_dialog_menu_location">Giả lập vị trí GPS</string>
+    <string name="ig_dialog_menu_quality">Chất lượng Video Reels</string>
+    <string name="ig_dialog_menu_theme">Giao diện tùy chỉnh</string>
+
+    <!-- Logging -->
+    <string name="logging">Nhật ký hệ thống (Logs)</string>
+    <string name="logging_clear">Xóa</string>
+    <string name="logging_copy">Sao chép</string>
+    <string name="logging_copied">Đã sao chép vào bộ nhớ tạm</string>
+    <string name="logging_companion">InstaEclipse</string>
+    <string name="logging_instagram">Instagram</string>
+    <string name="logging_instagram_timeout">Instagram không phản hồi kịp thời. Chỉ hiển thị nhật ký ứng dụng.</string>
+    <string name="logging_no_target">Vui lòng cài đặt ứng dụng Instagram được hỗ trợ trước.</string>
+    <string name="logging_empty_reply">(bộ nhớ đệm trống - hãy mở Instagram khi module đã được bật)</string>
+    <string name="logging_placeholder">Chưa có nhật ký nào được tải.</string>
+    <string name="logging_lines_format">%1$d dòng</string>
+    <string name="ig_dialog_menu_backup_restore">Sao lưu &amp; Khôi phục</string>
+    <string name="ig_dialog_menu_about">Giới thiệu</string>
+    <string name="ig_dialog_menu_restart">Khởi động lại Instagram</string>
+
+    <!-- Section titles -->
+    <string name="ig_dialog_section_clean_feed">Làm sạch Bảng tin</string>
+    <string name="ig_dialog_section_dev_options">Tùy chọn nhà phát triển</string>
+    <string name="ig_dialog_section_ghost_mode">Chế độ Ẩn danh</string>
+    <string name="ig_dialog_section_ad_analytics">Chặn Quảng cáo &amp; Phân tích</string>
+    <string name="ig_dialog_section_distraction_free">Instagram Không xao nhãng</string>
+    <string name="ig_dialog_section_misc">Tùy chọn mở rộng</string>
+    <string name="ig_dialog_section_location">Giả lập vị trí GPS</string>
+    <string name="ig_dialog_section_quality">Chất lượng Video Reels</string>
+
+    <!-- Video Quality -->
+    <string name="ig_dialog_quality_force_reels">Ép độ phân giải phát Reels</string>
+    <string name="ig_dialog_quality_auto">Tự động</string>
+    <string name="ig_dialog_quality_360">360p</string>
+    <string name="ig_dialog_quality_480">480p</string>
+    <string name="ig_dialog_quality_720">720p</string>
+    <string name="ig_dialog_quality_1080">1080p</string>
+
+    <!-- Custom Theme -->
+    <string name="theme_title">Giao diện tùy chỉnh</string>
+    <string name="theme_enable">Bật giao diện tùy chỉnh</string>
+    <string name="theme_customize">Tùy chỉnh màu sắc…</string>
+    <string name="theme_section_presets">Bộ màu mẫu (Presets)</string>
+    <string name="theme_section_custom">Tùy chỉnh màu chi tiết</string>
+    <string name="theme_collapse_section">Thu gọn mục</string>
+    <string name="theme_expand_section">Mở rộng mục</string>
+    <string name="theme_reset_custom">Khôi phục mặc định</string>
+    <string name="theme_saved">Đã lưu giao diện</string>
+    <string name="theme_pick_color">Chọn màu sắc</string>
+    <string name="theme_apply_color">Áp dụng</string>
+    <string name="theme_rgba_format">R %1$d  G %2$d  B %3$d  A %4$d</string>
+    <string name="theme_alpha_format">Độ trong suốt: %1$d%%</string>
+    <string name="theme_slot_background">Màu nền</string>
+    <string name="theme_slot_surface">Màu bề mặt (Surface)</string>
+    <string name="theme_slot_primary_text">Màu chữ chính</string>
+    <string name="theme_slot_secondary_text">Màu chữ phụ</string>
+    <string name="theme_slot_accent">Màu điểm nhấn</string>
+    <string name="theme_slot_button">Màu nút bấm</string>
+    <string name="theme_slot_icon">Màu biểu tượng</string>
+    <string name="theme_slot_glyph">Màu ký hiệu</string>
+    <string name="theme_slot_divider">Màu đường phân cách</string>
+    <string name="theme_slot_border">Màu viền</string>
+    <string name="theme_slot_status_bar">Màu thanh trạng thái</string>
+    <string name="theme_slot_navigation">Màu thanh điều hướng</string>
+    <string name="theme_slot_link">Màu liên kết</string>
+    <string name="theme_slot_error">Màu báo lỗi</string>
+    <string name="theme_slot_destructive">Màu hành động nguy hiểm</string>
+    <string name="ig_dialog_quality_max">Cao nhất có thể</string>
+
+    <!-- Location Spoof -->
+    <string name="ig_dialog_location_spoof_enable">Bật giả lập vị trí GPS</string>
+    <string name="ig_dialog_location_pick">Chọn vị trí trên bản đồ</string>
+    <string name="ig_dialog_location_unset">Chưa thiết lập vị trí</string>
+    <string name="ig_dialog_location_current">Tọa độ hiện tại: %1$.4f, %2$.4f</string>
+    <string name="loc_picker_title">Chọn vị trí</string>
+    <string name="loc_picker_search_hint">Tìm thành phố, địa chỉ hoặc địa điểm</string>
+    <string name="loc_picker_use">Sử dụng vị trí này</string>
+    <string name="loc_picker_search_failed">Không tìm thấy vị trí</string>
+    <string name="loc_picker_search_error">Tìm kiếm thất bại: %1$s</string>
+    <string name="ig_dialog_section_downloader">Trình tải xuống</string>
+    <string name="ig_dialog_section_downloader_settings">Cài đặt Trình tải xuống</string>
+    <string name="ig_dialog_section_backup_restore">Sao lưu &amp; Khôi phục</string>
+    <string name="ig_dialog_section_about">Giới thiệu</string>
+    <string name="ig_dialog_section_restart">Khởi động lại Instagram</string>
+    <string name="ig_dialog_section_quick_toggle">Tùy chỉnh menu Bật/Tắt nhanh</string>
+
+    <!-- Developer options -->
+    <string name="ig_dialog_dev_enable">Bật Chế độ nhà phát triển</string>
+    <string name="ig_dialog_dev_import">Nhập tệp cấu hình Dev</string>
+    <string name="ig_dialog_dev_export">Xuất tệp cấu hình Dev</string>
+    <string name="ig_dialog_dev_restore_default_config">Khôi phục cấu hình mặc định</string>
+    <string name="ig_dialog_dev_restore_default_config_confirm">Thao tác này sẽ ghi đè cấu hình Dev hiện tại bằng cấu hình mặc định. Tiếp tục?</string>
+    <string name="ig_toast_default_config_restored">✅ Đã khôi phục cấu hình mặc định.</string>
+    <string name="ig_dialog_dev_remove_build_expired">Chặn thông báo hết hạn bản Build</string>
+    <string name="ig_dialog_clear_cache">Xóa bộ nhớ đệm Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Xóa bộ nhớ đệm Hooks</string>
+    <string name="ig_dialog_clear_cache_message">⚠️ Thao tác này sẽ buộc InstaEclipse quét lại Instagram ở lần mở tiếp theo. Ứng dụng sẽ tự khởi động lại.</string>
+    <string name="ig_dialog_clear_cache_now">Xóa bộ nhớ đệm &amp; Khởi động lại</string>
+    <string name="ig_dialog_unable_open_ui">Không thể mở giao diện InstaEclipse.</string>
+    <string name="ig_dialog_instagram_not_ready">Instagram chưa được mở hoặc chưa sẵn sàng.</string>
+    <string name="ig_dialog_mc_overrides_not_found">Không tìm thấy tệp mc_overrides.json.</string>
+    <string name="ig_dialog_failed_read_config">Không thể đọc tệp cấu hình: %1$s</string>
+    <string name="export_no_config_data">Không nhận được dữ liệu cấu hình.</string>
+    <string name="export_config_success">Đã xuất cấu hình thành công.</string>
+    <string name="export_config_failed">Lưu tệp thất bại: %1$s</string>
+    <string name="export_invalid_uri">Đường dẫn URI không hợp lệ</string>
+    <string name="ig_toast_config_imported">✅ Đã nhập cấu hình thành công.</string>
+    <string name="ig_toast_config_import_failed">❌ Nhập cấu hình thất bại.</string>
+
+    <!-- JsonImportActivity -->
+    <string name="json_select_config">Chọn tệp JSON cấu hình</string>
+    <string name="json_target_not_specified">❌ Chưa xác định ứng dụng mục tiêu.</string>
+    <string name="json_sent">✅ Đã gửi tới Instagram.</string>
+    <string name="json_not_valid">❌ Tệp JSON không hợp lệ.</string>
+    <string name="json_read_failed">❌ Không thể đọc tệp: %1$s</string>
+    <string name="json_cancelled">Đã hủy hoặc không có tệp nào được chọn.</string>
+
+    <!-- Ghost Mode options -->
+    <string name="ig_dialog_ghost_hide_dm_seen">Ẩn Đã xem tin nhắn (Hide DM Seen)</string>
+    <string name="ig_dialog_ghost_hide_typing">Ẩn trạng thái Đang soạn tin</string>
+    <string name="ig_dialog_ghost_hide_story_views">Ẩn xem Tin (Hide Story Views)</string>
+    <string name="ig_dialog_ghost_hide_live_presence">Ẩn sự hiện diện khi xem Live</string>
+    <string name="ig_dialog_ghost_allow_screenshots_dms">Cho phép chụp ảnh màn hình trong DM</string>
+    <string name="ig_dialog_ghost_bypass_screenshot">Bỏ qua phát hiện chụp ảnh màn hình</string>
+    <string name="ig_dialog_ghost_hide_view_once">Ẩn trạng thái đã mở phương tiện Xem 1 lần</string>
+    <string name="ig_dialog_ghost_unlimited_replays">Xem lại phương tiện Xem 1 lần không giới hạn</string>
+    <string name="ig_dialog_ghost_permanent_view_once">Giữ vĩnh viễn phương tiện Xem 1 lần (Thử nghiệm)</string>
+    <string name="ig_dialog_ghost_keep_disappearing">Giữ lại tin nhắn tự biến mất</string>
+    <string name="ig_dialog_customize_quick_toggle">Tùy chỉnh menu Bật/Tắt nhanh</string>
+
+    <!-- Quick Toggle options -->
+    <string name="ig_dialog_quick_hide_seen">Bao gồm Ẩn đã xem DM</string>
+    <string name="ig_dialog_quick_hide_typing">Bao gồm Ẩn trạng thái đang soạn tin</string>
+    <string name="ig_dialog_quick_disable_screenshot">Bao gồm Bỏ qua phát hiện chụp màn hình</string>
+    <string name="ig_dialog_quick_hide_view_once">Bao gồm Ẩn đã mở phương tiện Xem 1 lần</string>
+    <string name="ig_dialog_quick_hide_story_seen">Bao gồm Ẩn đã xem Story</string>
+    <string name="ig_dialog_quick_hide_live_seen">Bao gồm Ẩn sự hiện diện xem Live</string>
+    <string name="ig_dialog_quick_keep_ephemeral">Bao gồm Giữ tin nhắn tự biến mất</string>
+    <string name="ig_dialog_quick_unlimited_replays">Bao gồm Xem lại phương tiện Xem 1 lần không giới hạn</string>
+    <string name="ig_dialog_quick_permanent_view">Bao gồm Giữ vĩnh viễn phương tiện Xem 1 lần</string>
+    <string name="ig_dialog_quick_allow_screenshots">Bao gồm Cho phép chụp màn hình DM</string>
+
+    <!-- Ad / Analytics options -->
+    <string name="ig_dialog_ad_block_ads">Chặn quảng cáo</string>
+    <string name="ig_dialog_ad_block_analytics">Chặn dữ liệu theo dõi &amp; phân tích</string>
+    <string name="ig_dialog_ad_disable_tracking">Loại bỏ liên kết theo dõi (Tracking Links)</string>
+
+    <!-- Distraction-Free options -->
+    <string name="ig_dialog_distraction_extreme_mode">Chế độ Nghiêm ngặt (Cần gỡ app và cài lại để tắt)</string>
+    <string name="ig_dialog_distraction_disable_stories">Ẩn Story</string>
+    <string name="ig_dialog_distraction_disable_feed">Ẩn Bảng tin</string>
+    <string name="ig_dialog_distraction_disable_reels">Ẩn Reels</string>
+    <string name="ig_dialog_distraction_disable_reels_except_dm">Ẩn Reels (Trừ trong tin nhắn DM)</string>
+    <string name="ig_dialog_distraction_disable_explore">Ẩn trang Khám phá</string>
+    <string name="ig_dialog_distraction_disable_comments">Ẩn phần Bình luận</string>
+    <string name="ig_dialog_distraction_extreme_title">Kích hoạt Chế độ Nghiêm ngặt?</string>
+    <string name="ig_dialog_distraction_extreme_message">Khi đã bật, bạn không thể tắt Chế độ Tập trung cho đến khi gỡ ứng dụng và cài đặt lại. Bạn có chắc chắn tiếp tục?</string>
+
+    <!-- Clean Feed options -->
+    <string name="ig_dialog_clean_feed_hide_suggested">Ẩn gợi ý bài viết trên Bảng tin</string>
+    <string name="ig_dialog_clean_feed_hide_threads">Ẩn gợi ý bài viết từ Threads</string>
+
+    <!-- Miscellaneous options -->
+    <string name="ig_dialog_misc_disable_story_autoswipe">Tắt tự động chuyển Story</string>
+    <string name="ig_dialog_misc_disable_video_autoplay">Tắt tự động phát Video</string>
+    <string name="ig_dialog_misc_spoof_last_seen">Đóng đống trạng thái hoạt động (Freeze Last Seen)</string>
+    <string name="ig_dialog_misc_disable_repost">Ẩn nút Đăng lại (Repost)</string>
+    <string name="ig_dialog_misc_show_feature_toasts">Hiển thị thông báo trạng thái tính năng</string>
+    <string name="ig_dialog_misc_show_follower_toast">Hiển thị thông báo trạng thái theo dõi</string>
+    <string name="ig_dialog_misc_view_story_mentions">Xem danh sách nhắc tên trong Story</string>
+    <string name="ig_dialog_misc_disable_discover_people">Ẩn mục Khám phá mọi người</string>
+    <string name="ig_dialog_misc_copy_comment">Sao chép nội dung bình luận</string>
+    <string name="ig_dialog_misc_disable_double_tap_like">Tắt nhấn 2 lần để Thích</string>
+    <string name="ig_dialog_misc_copy_caption">Sao chép chú thích bài viết</string>
+    <string name="ig_dialog_misc_photo_zoom">Phóng to hình ảnh (Nhấn giữ)</string>
+
+    <!-- Comment Copy dialog (runs in IG process) -->
+    <string name="ig_comment_copy_title">Sao chép bình luận</string>
+    <string name="ig_comment_copy_full">Sao chép toàn bộ bình luận</string>
+    <string name="ig_comment_select_part">Chọn đoạn văn bản để sao chép</string>
+    <string name="ig_comment_select_title">Chọn nội dung sao chép</string>
+    <string name="ig_comment_copy_selected">Sao chép đoạn đã chọn</string>
+    <string name="ig_toast_comment_copied">✅ Đã sao chép vào bộ nhớ tạm!</string>
+
+    <!-- Caption Copy menu + dialog (runs in IG process) -->
+    <string name="ig_caption_copy_menu_item">Sao chép chú thích</string>
+    <string name="ig_caption_copy_title">Sao chép chú thích</string>
+    <string name="ig_caption_copy_full">Sao chép toàn bộ chú thích</string>
+    <string name="ig_caption_copy_none">Bài viết này không có chú thích</string>
+    <string name="ig_caption_copied">✅ Đã sao chép chú thích vào bộ nhớ tạm!</string>
+
+    <!-- Downloader options -->
+    <string name="ig_dialog_downloader_settings">Cài đặt Trình tải xuống</string>
+    <string name="ig_dialog_downloader_posts">Tải xuống Bài viết</string>
+    <string name="ig_dialog_downloader_stories">Tải xuống Story</string>
+    <string name="ig_dialog_downloader_reels">Tải xuống Reels</string>
+    <string name="ig_dialog_downloader_profiles">Tải xuống Ảnh đại diện</string>
+    <string name="ig_dialog_downloader_folder">Thư mục lưu tải xuống</string>
+    <string name="ig_dialog_downloader_username_subfolder">Tạo thư mục con theo tên người dùng</string>
+    <string name="ig_dialog_downloader_add_timestamp">Thêm mốc thời gian vào tên tệp</string>
+    <string name="ig_dialog_downloader_cannot_open_picker">Không thể mở trình chọn thư mục tại màn hình này</string>
+
+    <!-- Backup &amp; Restore -->
+    <string name="ig_dialog_backup_settings">Sao lưu cài đặt</string>
+    <string name="ig_dialog_restore_settings">Khôi phục cài đặt</string>
+    <string name="ig_dialog_backup_failed">Tạo bản sao lưu thất bại: %1$s</string>
+
+    <!-- About -->
+    <string name="ig_dialog_about_github">GitHub</string>
+    <string name="ig_dialog_about_telegram">Telegram</string>
+
+    <!-- Restart -->
+    <string name="ig_dialog_restart_message">⚠️ Xóa bộ nhớ đệm và khởi động lại ứng dụng Instagram?</string>
+    <string name="ig_dialog_restart_now">Khởi động lại ngay</string>
+    <string name="ig_dialog_restart_not_found">Không tìm thấy ứng dụng Instagram để khởi động lại.</string>
+    <string name="ig_dialog_restart_failed">Khởi động lại thất bại: %1$s</string>
+
+    <!-- Toast: Ghost mode quick toggle -->
+    <string name="ig_toast_ghost_no_options">Chưa chọn tùy chọn Chế độ Ẩn danh nào!</string>
+    <string name="ig_toast_ghost_enabled">Đã bật Chế độ Ẩn danh</string>
+    <string name="ig_toast_ghost_disabled">Đã tắt Chế độ Ẩn danh</string>
+    <string name="ig_toast_seen_sent">✅ Đã gửi trạng thái Đã xem</string>
+    <string name="ig_toast_channel_seen_sent">✅ Đã gửi trạng thái Đã xem kênh</string>
+
+    <!-- Toast: Follower status -->
+    <string name="ig_toast_follows_you">đang theo dõi bạn ✅</string>
+    <string name="ig_toast_not_follows_you">không theo dõi bạn ❌</string>
+
+    <!-- Toast: App settings -->
+    <string name="ig_toast_settings_applied">Đã áp dụng cài đặt thành công!</string>
+    <string name="ig_toast_restart_manual">Vui lòng đóng ứng dụng Instagram thủ công để các thay đổi có hiệu lực.</string>
+    <string name="ig_toast_settings_restored">Đã khôi phục cài đặt thành công.</string>
+    <string name="ig_toast_restore_failed">Khôi phục thất bại: %1$s</string>
+
+    <!-- Toast: Download folder -->
+    <string name="ig_toast_download_folder_set">Thư mục tải xuống: %1$s</string>
+    <string name="ig_toast_download_folder_updated">Đã cập nhật thư mục tải xuống!</string>
+    <string name="ig_toast_download_folder_reset">Đã đặt lại thư mục tải xuống về Mặc định</string>
+
+    <!-- Toast: Downloader feedback -->
+    <string name="ig_toast_downloading">Đang tải xuống…</string>
+    <string name="ig_toast_downloading_video">Đang tải video…</string>
+    <string name="ig_toast_downloading_photo">Đang tải hình ảnh…</string>
+    <string name="ig_toast_video_saved">Đã lưu video vào thư mục InstaEclipse</string>
+    <string name="ig_toast_photo_saved">Đã lưu hình ảnh vào thư mục InstaEclipse</string>
+    <string name="ig_toast_saved">Đã lưu vào thư mục InstaEclipse</string>
+    <string name="ig_toast_download_failed">Tải xuống thất bại: %1$s</string>
+    <string name="ig_toast_downloading_reel">Đang tải Reel…</string>
+    <string name="ig_toast_reel_saved">Đã lưu Reel vào thư mục InstaEclipse</string>
+    <string name="ig_toast_reel_failed">Tải Reel thất bại: %1$s</string>
+    <string name="ig_toast_reel_url_not_found">Không tìm thấy liên kết Reel</string>
+    <string name="ig_toast_post_url_not_found">Không tìm thấy liên kết bài viết</string>
+    <string name="ig_toast_no_media_for_post">Không tìm thấy hình ảnh/video nào cho bài viết này</string>
+    <string name="ig_toast_no_media">Không tìm thấy phương tiện nào</string>
+    <string name="ig_toast_downloading_story_video">Đang tải video Story…</string>
+    <string name="ig_toast_downloading_story_photo">Đang tải ảnh Story…</string>
+    <string name="ig_toast_story_saved">Đã lưu Story vào thư mục InstaEclipse</string>
+    <string name="ig_toast_story_url_not_found">Không tìm thấy liên kết Story</string>
+    <string name="ig_toast_downloading_profile_pic">Đang tải ảnh đại diện…</string>
+    <string name="ig_toast_profile_pic_saved">Đã lưu ảnh đại diện thành công!</string>
+    <string name="ig_toast_profile_pic_url_not_found">Không thể lấy liên kết ảnh đại diện</string>
+    <string name="ig_toast_merging_video_audio">Đang hợp nhất video và âm thanh…</string>
+    <string name="ig_toast_downloading_n_items">Đang tải xuống %1$d mục…</string>
+    <string name="ig_toast_downloading_all_n_items">Đang tải xuống tất cả %1$d mục…</string>
+    <string name="ig_toast_all_items_saved">Đã lưu tất cả %1$d mục vào thư mục InstaEclipse</string>
+    <string name="ig_toast_items_partial_saved">Đã lưu %1$d / %2$d mục (%3$d mục thất bại)</string>
+    <string name="ig_toast_no_reel_url_scroll">Không tìm thấy liên kết Reel — hãy vuốt xem Reel trước</string>
+    <string name="ig_toast_no_download_folder">Chưa chọn thư mục tải xuống</string>
+    <string name="ig_toast_file_saved">Đã lưu: %1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse đã sẵn sàng 🎯</string>
+
+    <!-- Downloader carousel UI -->
+    <string name="ig_dl_title">Tải xuống</string>
+    <string name="ig_dl_carousel_subtitle">Bộ sưu tập • %1$d mục</string>
+    <string name="ig_dl_carousel_current">Tải mục hiện tại (%1$d / %2$d)</string>
+    <string name="ig_dl_carousel_all">Tải xuống tất cả %1$d mục</string>
+
+    <!-- Story mentions -->
+    <string name="ig_btn_view_mentions">Xem các tài khoản được nhắc tên</string>
+    <string name="ig_toast_mention_copied">Đã sao chép @%1$s</string>
+    <string name="ig_toast_all_mentions_copied">Đã sao chép tất cả thẻ nhắc tên</string>
+
+    <!-- Story mentions dialog -->
+    <string name="ig_mention_dialog_title">Tài khoản được nhắc tên trong Story</string>
+    <string name="ig_mention_subtitle">%1$d tài khoản được nhắc tên • Chạm để sao chép</string>
+    <string name="ig_mention_no_mentions">Không tìm thấy tài khoản nào được nhắc tên trong Story này</string>
+    <string name="ig_mention_copy_all">Sao chép tất cả</string>
+
+    <!-- Update check dialog -->
+    <string name="ig_update_title">Có phiên bản cập nhật mới</string>
+    <string name="ig_update_message">Phiên bản mới (%1$s) đã sẵn sàng. Bạn có muốn cập nhật ngay bây giờ không?</string>
+    <string name="ig_update_button">Cập nhật ngay</string>
+    <string name="ig_update_later">Để sau</string>
+    <string name="ig_update_error_message">Không thể kiểm tra bản cập nhật. Vui lòng thử lại sau.</string>
+</resources>
