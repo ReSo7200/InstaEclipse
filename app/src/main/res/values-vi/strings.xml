@@ -99,7 +99,7 @@
 
     <!-- distraction free -->
     <string name="distraction_free_options">Tùy chọn Trải nghiệm Tập trung</string>
-    <string name="disable_stories">Ẩn Bảng tin Tin (Stories)</string>
+    <string name="disable_stories">Ẩn Stories</string>
     <string name="disable_feed">Ẩn Bảng tin chính (Feed)</string>
     <string name="disable_reels">Ẩn Thước phim (Reels)</string>
     <string name="disable_explore">Ẩn trang Khám phá (Explore)</string>
@@ -250,15 +250,15 @@
     <string name="json_cancelled">Đã hủy hoặc không có tệp nào được chọn.</string>
 
     <!-- Ghost Mode options -->
-    <string name="ig_dialog_ghost_hide_dm_seen">Ẩn Đã xem tin nhắn (Hide DM Seen)</string>
+    <string name="ig_dialog_ghost_hide_dm_seen">Ẩn trạng thái Đã xem trong DM</string>
     <string name="ig_dialog_ghost_hide_typing">Ẩn trạng thái Đang soạn tin</string>
     <string name="ig_dialog_ghost_hide_story_views">Ẩn xem Tin (Hide Story Views)</string>
     <string name="ig_dialog_ghost_hide_live_presence">Ẩn sự hiện diện khi xem Live</string>
     <string name="ig_dialog_ghost_allow_screenshots_dms">Cho phép chụp ảnh màn hình trong DM</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Bỏ qua phát hiện chụp ảnh màn hình</string>
-    <string name="ig_dialog_ghost_hide_view_once">Ẩn trạng thái đã mở phương tiện Xem 1 lần</string>
+    <string name="ig_dialog_ghost_hide_view_once">Ẩn trạng thái mở media Xem 1 lần</string>
     <string name="ig_dialog_ghost_unlimited_replays">Xem lại phương tiện Xem 1 lần không giới hạn</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Giữ vĩnh viễn phương tiện Xem 1 lần (Thử nghiệm)</string>
+    <string name="ig_dialog_ghost_permanent_view_once">Lưu vĩnh viễn media Xem 1 lần (thử nghiệm)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Giữ lại tin nhắn tự biến mất</string>
     <string name="ig_dialog_customize_quick_toggle">Tùy chỉnh menu Bật/Tắt nhanh</string>
 
@@ -297,7 +297,7 @@
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Tắt tự động chuyển Story</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Tắt tự động phát Video</string>
-    <string name="ig_dialog_misc_spoof_last_seen">Đóng đống trạng thái hoạt động (Freeze Last Seen)</string>
+    <string name="ig_dialog_misc_spoof_last_seen">Đóng băng trạng thái hoạt động (Freeze Last Seen)</string>
     <string name="ig_dialog_misc_disable_repost">Ẩn nút Đăng lại (Repost)</string>
     <string name="ig_dialog_misc_show_feature_toasts">Hiển thị thông báo trạng thái tính năng</string>
     <string name="ig_dialog_misc_show_follower_toast">Hiển thị thông báo trạng thái theo dõi</string>
