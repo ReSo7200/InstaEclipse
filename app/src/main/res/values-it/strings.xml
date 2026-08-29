@@ -1,0 +1,5 @@
+<resources>
+    <string name="ig_story_download_choice_title">Scarica storia</string>
+    <string name="ig_story_download_photo">Scarica foto</string>
+    <string name="ig_story_download_video_music">Scarica video con musica</string>
+</resources>

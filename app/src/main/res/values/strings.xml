@@ -434,6 +434,11 @@
     <string name="ig_dl_carousel_current">Download current (%1$d of %2$d)</string>
     <string name="ig_dl_carousel_all">Download all %1$d items</string>
 
+    <!-- Story download format -->
+    <string name="ig_story_download_choice_title">Download story</string>
+    <string name="ig_story_download_photo">Download photo</string>
+    <string name="ig_story_download_video_music">Download video with music</string>
+
     <!-- Story mentions -->
     <string name="ig_btn_view_mentions">View Mentions</string>
     <string name="ig_toast_mention_copied">@%1$s copied</string>
