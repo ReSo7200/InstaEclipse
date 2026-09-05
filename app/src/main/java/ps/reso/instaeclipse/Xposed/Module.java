@@ -99,31 +99,30 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
-        // Ensure preferences are loaded
+        if (!SUPPORTED_PACKAGES.contains(lpparam.packageName)
+                || !lpparam.packageName.equals(lpparam.processName)) {
+            return;
+        }
 
+        try {
+            if (dexKitBridge == null) {
+                // Load the .so file from your module (if not already loaded)
+                System.load(moduleLibDir + "/libdexkit.so");
+                // ModuleLog.line("libdexkit.so loaded successfully.");
 
-        // Hook into Instagram and its clones
-        if (SUPPORTED_PACKAGES.contains(lpparam.packageName)) {
-            try {
-                if (dexKitBridge == null) {
-                    // Load the .so file from your module (if not already loaded)
-                    System.load(moduleLibDir + "/libdexkit.so");
-                    // ModuleLog.line("libdexkit.so loaded successfully.");
-
-                    // Initialize DexKitBridge with the target app's APK
-                    dexKitBridge = DexKitBridge.create(lpparam.appInfo.sourceDir);
-                    // ModuleLog.line("DexKitBridge initialized with target APK: " + lpparam.appInfo.sourceDir);
-                }
-
-                // Use the target app's ClassLoader
-                hostClassLoader = lpparam.classLoader;
-
-                // Call the method to hook the target app
-                hookInstagram(lpparam);
-
-            } catch (Exception e) {
-                ModuleLog.line("(InstaEclipse): Failed to initialize DexKitBridge for " + lpparam.packageName + ": " + e.getMessage());
+                // Initialize DexKitBridge with the target app's APK
+                dexKitBridge = DexKitBridge.create(lpparam.appInfo.sourceDir);
+                // ModuleLog.line("DexKitBridge initialized with target APK: " + lpparam.appInfo.sourceDir);
             }
+
+            // Use the target app's ClassLoader
+            hostClassLoader = lpparam.classLoader;
+
+            // Call the method to hook the target app
+            hookInstagram(lpparam);
+
+        } catch (Exception e) {
+            ModuleLog.line("(InstaEclipse): Failed to initialize DexKitBridge for " + lpparam.packageName + ": " + e.getMessage());
         }
     }
 
