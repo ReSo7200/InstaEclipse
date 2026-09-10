@@ -695,7 +695,9 @@ public class FeedVideoDownloadHook {
         if (item == null) return false;
         if (videoVersionIntfClass != null && videoVersionIntfClass.isInstance(item)) return true;
         String name = item.getClass().getName().toLowerCase(Locale.US);
-        return name.contains("videoversion") || name.contains("video_version");
+        // "videourl" covers modern IG (442+/447) com.instagram.model.mediasize.VideoUrlImpl.
+        return name.contains("videoversion") || name.contains("video_version")
+                || name.contains("videourl");
     }
 
     private static boolean isVideoVersionsList(List<?> items) {
@@ -806,6 +808,39 @@ public class FeedVideoDownloadHook {
         if (url != null && isCdnMediaUrl(url)) {
             rememberVideoUrl(url);
             return url;
+        }
+        // Modern Instagram (442+/447): the version element is
+        // com.instagram.model.mediasize.VideoUrlImpl, whose interface exposes no
+        // getUrl():String — the CDN URL is stored in a plain String field instead.
+        // Reflect the item's String fields and pick the one that is a CDN media URL.
+        String fieldUrl = videoUrlFromStringFields(item);
+        if (fieldUrl != null) {
+            rememberVideoUrl(fieldUrl);
+            return fieldUrl;
+        }
+        return null;
+    }
+
+    /**
+     * Fallback URL extraction for modern video-version models (e.g. VideoUrlImpl) that keep the
+     * CDN URL in a String field rather than exposing a getUrl() accessor. Walks the item's
+     * declared String fields across its class hierarchy and returns the first CDN media URL.
+     * Version-agnostic: matches by URL shape ({@link #isCdnMediaUrl}), not by obfuscated name.
+     */
+    private static String videoUrlFromStringFields(Object item) {
+        if (item == null) return null;
+        Class<?> cls = item.getClass();
+        while (cls != null && cls != Object.class) {
+            for (Field f : cls.getDeclaredFields()) {
+                if (f.getType() != String.class
+                        || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                try {
+                    f.setAccessible(true);
+                    Object v = f.get(item);
+                    if (v instanceof String s && isCdnMediaUrl(s)) return s;
+                } catch (Throwable ignored) {}
+            }
+            cls = cls.getSuperclass();
         }
         return null;
     }
