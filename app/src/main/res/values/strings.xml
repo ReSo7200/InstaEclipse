@@ -282,7 +282,7 @@
     <string name="ig_dialog_ghost_bypass_screenshot">Bypass Screenshot Detection</string>
     <string name="ig_dialog_ghost_hide_view_once">Hide View Once Opened</string>
     <string name="ig_dialog_ghost_unlimited_replays">Unlimited View-Once Replays</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Permanent View Once Media (Unstable)</string>
+    <string name="ig_dialog_ghost_permanent_view_once">Show View-Once/Twice as Normal Media</string>
     <string name="ig_dialog_ghost_keep_disappearing">Keep Disappearing Messages</string>
     <string name="ig_dialog_customize_quick_toggle">Customize Quick Toggle</string>
 
@@ -295,7 +295,7 @@
     <string name="ig_dialog_quick_hide_live_seen">Include Hide Live Presence</string>
     <string name="ig_dialog_quick_keep_ephemeral">Include Keep Disappearing Messages</string>
     <string name="ig_dialog_quick_unlimited_replays">Include Unlimited View-Once Replays</string>
-    <string name="ig_dialog_quick_permanent_view">Include Permanent View Once Media (Unstable)</string>
+    <string name="ig_dialog_quick_permanent_view">Include Show View-Once/Twice as Normal Media</string>
     <string name="ig_dialog_quick_allow_screenshots">Include Allow Screenshots in DMs</string>
 
     <!-- Ad / Analytics options -->
