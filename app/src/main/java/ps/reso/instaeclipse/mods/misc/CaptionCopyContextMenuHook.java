@@ -33,12 +33,12 @@ import org.luckypray.dexkit.query.matchers.MethodMatcher;
 import org.luckypray.dexkit.result.ClassData;
 import org.luckypray.dexkit.result.MethodData;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -174,23 +174,41 @@ public class CaptionCopyContextMenuHook {
         }
 
         try {
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create()
-                            .declaredClass("com.instagram.feed.media.LiveTreeMediaDict")
-                            .paramCount(0)
-                            .usingEqStrings(List.of("caption"))));
+            // The caption getter (0-arg, object-returning, guarded by the "caption" string)
+            // moved from LiveTreeMediaDict (<=436) onto com.instagram.feed.media.Media itself
+            // in the 442+ media-model refactor. Try the current home first, then the legacy
+            // class. Only stable com.instagram.feed.media.* class names are used — never an
+            // obfuscated X.* name (those change every Instagram version).
+            String[] declClassCandidates = {
+                    "com.instagram.feed.media.Media",             // 442+ (447: Media caption getter)
+                    "com.instagram.feed.media.LiveTreeMediaDict"  // 436 and earlier
+            };
 
-            for (MethodData md : results) {
-                if (md.getName().equals("<clinit>")) continue;
+            for (String declClass : declClassCandidates) {
+                List<MethodData> results;
                 try {
-                    Method m = md.getMethodInstance(classLoader);
-                    if (m.getReturnType() == void.class || m.getReturnType().isPrimitive()) continue;
-                    m.setAccessible(true);
-                    captionGetter = m;
-                    DexKitCache.saveMethod("CaptionGetter", m);
-                    ModuleLog.line("(IE|Caption) ✅ captionGetter=" + m.getName());
-                    return;
-                } catch (Throwable ignored) {}
+                    results = bridge.findMethod(FindMethod.create()
+                            .matcher(MethodMatcher.create()
+                                    .declaredClass(declClass)
+                                    .paramCount(0)
+                                    .usingEqStrings(List.of("caption"))));
+                } catch (Throwable ignored) {
+                    continue; // class absent on this build
+                }
+
+                for (MethodData md : results) {
+                    if (md.getName().equals("<clinit>")) continue;
+                    try {
+                        Method m = md.getMethodInstance(classLoader);
+                        if (m.getParameterCount() != 0) continue;   // excludes the setter
+                        if (m.getReturnType() == void.class || m.getReturnType().isPrimitive()) continue;
+                        m.setAccessible(true);
+                        captionGetter = m;
+                        DexKitCache.saveMethod("CaptionGetter", m);
+                        ModuleLog.line("(IE|Caption) ✅ captionGetter=" + declClass + "." + m.getName());
+                        return;
+                    } catch (Throwable ignored) {}
+                }
             }
             ModuleLog.line("(IE|Caption) ❌ captionGetter not found");
         } catch (Throwable t) {
@@ -201,37 +219,63 @@ public class CaptionCopyContextMenuHook {
     private static String extractCaptionText(Object media) {
         if (media == null || captionGetter == null) return null;
         try {
-            Object dict = null;
-            for (Field f : media.getClass().getDeclaredFields()) {
-                if (f.getType().getName().equals("com.instagram.feed.media.LiveTreeMediaDict")) {
-                    f.setAccessible(true);
-                    dict = f.get(media);
-                    break;
+            // The receiver depends on where the getter is declared:
+            //   442+ : declared on Media itself      -> invoke on `media` directly
+            //   <=436: declared on LiveTreeMediaDict -> find that dict field on `media`
+            Class<?> owner = captionGetter.getDeclaringClass();
+            Object receiver;
+            if (owner.isInstance(media)) {
+                receiver = media;
+            } else {
+                receiver = null;
+                Class<?> cls = media.getClass();
+                outer:
+                while (cls != null && cls != Object.class) {
+                    for (Field f : cls.getDeclaredFields()) {
+                        if (owner.isAssignableFrom(f.getType())) {
+                            f.setAccessible(true);
+                            Object v = f.get(media);
+                            if (v != null) { receiver = v; break outer; }
+                        }
+                    }
+                    cls = cls.getSuperclass();
                 }
+                if (receiver == null) return null;
             }
-            if (dict == null) return null;
 
-            Object captionObj = captionGetter.invoke(dict);
+            Object captionObj = captionGetter.invoke(receiver);
             if (captionObj == null) return null;
 
+            // Longest-plausible-string heuristic over the caption wrapper. Scan zero-arg
+            // String getters AND String fields so it works whether the text is exposed as a
+            // getter or a bare field (the 442+ caption object shape is not name-stable).
             String bestVal = null;
             for (Method m : captionObj.getClass().getMethods()) {
-                if (m.getParameterCount() != 0) continue;
-                if (m.getReturnType() != String.class) continue;
-                try {
-                    String val = (String) m.invoke(captionObj);
-                    if (val == null || val.isEmpty()) continue;
-                    if (val.matches("\\d+")) continue;
-                    if (val.matches("\\d+_\\d+")) continue;
-                    if (val.startsWith("http")) continue;
-                    if (bestVal == null || val.length() > bestVal.length()) bestVal = val;
-                } catch (Throwable ignored) {}
+                if (m.getParameterCount() != 0 || m.getReturnType() != String.class) continue;
+                try { bestVal = pickCaption(bestVal, (String) m.invoke(captionObj)); }
+                catch (Throwable ignored) {}
+            }
+            Class<?> c = captionObj.getClass();
+            while (c != null && c != Object.class) {
+                for (Field f : c.getDeclaredFields()) {
+                    if (f.getType() != String.class) continue;
+                    try { f.setAccessible(true); bestVal = pickCaption(bestVal, (String) f.get(captionObj)); }
+                    catch (Throwable ignored) {}
+                }
+                c = c.getSuperclass();
             }
             return bestVal;
         } catch (Throwable t) {
             ModuleLog.line("(IE|Caption) ❌ extractCaptionText: " + t);
             return null;
         }
+    }
+
+    /** Longest-plausible caption picker: rejects numeric ids and URLs, keeps the longest. */
+    private static String pickCaption(String best, String val) {
+        if (val == null || val.isEmpty()) return best;
+        if (val.matches("\\d+") || val.matches("\\d+_\\d+") || val.startsWith("http")) return best;
+        return (best == null || val.length() > best.length()) ? val : best;
     }
 
     // ── Step 3: find MediaOptionsOverflowMenuCreator + its add-button method ─
@@ -593,34 +637,23 @@ public class CaptionCopyContextMenuHook {
     private static void installReelLabelOverrideHook(DexKitBridge bridge, ClassLoader classLoader) {
         if (mediaOptionEnumClass == null || copyCaptionOptionValue == null) return;
 
+        XC_MethodHook labelHook = makeBuilderLabelHook();
+
         if (DexKitCache.isCacheValid()) {
-            boolean any = false;
-            String rowClassName = DexKitCache.loadString("ReelRowClassName");
-            if (rowClassName != null) {
-                try {
-                    Class<?> rowClass = classLoader.loadClass(rowClassName);
-                    Constructor<?> ctor = rowClass.getDeclaredConstructor(
-                            View.OnClickListener.class, CharSequence.class, String.class);
-                    ctor.setAccessible(true);
-                    XposedBridge.hookMethod(ctor, makeCtorLabelHook());
-                    any = true;
-                } catch (Throwable ignored) {}
-            }
-            Method cachedAdd = DexKitCache.loadMethod("ReelRowAddMethod", classLoader);
-            if (cachedAdd != null) {
-                try {
-                    cachedAdd.setAccessible(true);
-                    XposedBridge.hookMethod(cachedAdd, makeAddMethodLabelHook());
-                    any = true;
-                } catch (Throwable ignored) {}
-            }
-            if (any) {
-                ModuleLog.line("(IE|Caption) ✅ reel label override (cached)");
+            List<Method> cached = DexKitCache.loadMethods("ReelRowBuilders", classLoader);
+            if (cached != null && !cached.isEmpty()) {
+                for (Method m : cached) {
+                    try { m.setAccessible(true); XposedBridge.hookMethod(m, labelHook); }
+                    catch (Throwable ignored) {}
+                }
+                ModuleLog.line("(IE|Caption) ✅ reel label override (cached), "
+                        + cached.size() + " builder(s)");
                 return;
             }
         }
 
         try {
+            // 1) Label resolver (X.0AOs.A02) — anchored on its unique string.
             List<MethodData> resolverResults = bridge.findMethod(FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingEqStrings(List.of(
@@ -631,74 +664,70 @@ public class CaptionCopyContextMenuHook {
             }
             Method labelResolver = resolverResults.get(0).getMethodInstance(classLoader);
 
+            // 2) Row-adder methods (X.0AOr.A0P) — invoke the resolver AND take a MediaOption$Option.
             List<MethodData> adderResults = bridge.findMethod(FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("void")
                             .addInvoke(MethodMatcher.create(labelResolver))));
 
-            List<Method> adderCandidates = new ArrayList<>();
+            List<Method> hooked = new ArrayList<>();
+            Set<Method> seen = new HashSet<>();
             for (MethodData md : adderResults) {
+                Method rowAdder;
+                try { rowAdder = md.getMethodInstance(classLoader); }
+                catch (Throwable ignored) { continue; }
+
+                boolean takesOption = false;
+                for (Class<?> p : rowAdder.getParameterTypes())
+                    if (p == mediaOptionEnumClass) { takesOption = true; break; }
+                if (!takesOption) continue;
+
+                // 3) Row builders (LX/0458.A00 / .A01) — the void methods this adder CALLS.
+                List<MethodData> builderResults;
                 try {
-                    Method m = md.getMethodInstance(classLoader);
-                    for (Class<?> p : m.getParameterTypes()) {
-                        if (p == mediaOptionEnumClass) { adderCandidates.add(m); break; }
-                    }
-                } catch (Throwable ignored) {}
+                    builderResults = bridge.findMethod(FindMethod.create()
+                            .matcher(MethodMatcher.create()
+                                    .returnType("void")
+                                    .addCaller(MethodMatcher.create(rowAdder))));
+                } catch (Throwable ignored) { continue; }
+
+                for (MethodData bmd : builderResults) {
+                    Method bm;
+                    try { bm = bmd.getMethodInstance(classLoader); }
+                    catch (Throwable ignored) { continue; }
+                    if (!isRowBuilderShape(bm)) continue;
+                    if (!seen.add(bm)) continue;
+                    try {
+                        bm.setAccessible(true);
+                        XposedBridge.hookMethod(bm, labelHook);
+                        hooked.add(bm);
+                        ModuleLog.line("(IE|Caption) ✅ reel label override on "
+                                + bm.getDeclaringClass().getName() + "." + bm.getName());
+                    } catch (Throwable ignored) {}
+                }
             }
 
-            boolean hookedAny = false;
-            for (Method rowAdder : adderCandidates) {
-                // Variant A: row-adder directly constructs a (OnClickListener, CharSequence, String) row.
-                try {
-                    List<MethodData> ctorResults = bridge.findMethod(FindMethod.create()
-                            .matcher(MethodMatcher.create()
-                                    .paramTypes("android.view.View$OnClickListener",
-                                            "java.lang.CharSequence", "java.lang.String")
-                                    .addCaller(MethodMatcher.create(rowAdder))));
-                    for (MethodData md : ctorResults) {
-                        if (!md.getName().equals("<init>")) continue;
-                        Class<?> rowClass = classLoader.loadClass(md.getClassName());
-                        Constructor<?> ctor = rowClass.getDeclaredConstructor(
-                                View.OnClickListener.class, CharSequence.class, String.class);
-                        ctor.setAccessible(true);
-                        XposedBridge.hookMethod(ctor, makeCtorLabelHook());
-                        DexKitCache.saveString("ReelRowClassName", rowClass.getName());
-                        ModuleLog.line("(IE|Caption) ✅ reel label override (ctor) on " + rowClass.getName());
-                        hookedAny = true;
-                        break;
-                    }
-                } catch (Throwable ignored) {}
-
-                // Variant B: row-adder calls a QIa-style (Context, OnClickListener, String, String,
-                // float, int, int, boolean, boolean, boolean, boolean) row-add method.
-                try {
-                    List<MethodData> addResults = bridge.findMethod(FindMethod.create()
-                            .matcher(MethodMatcher.create()
-                                    .paramTypes("android.content.Context",
-                                            "android.view.View$OnClickListener",
-                                            "java.lang.String", "java.lang.String",
-                                            "float", "int", "int",
-                                            "boolean", "boolean", "boolean", "boolean")
-                                    .addCaller(MethodMatcher.create(rowAdder))));
-                    for (MethodData md : addResults) {
-                        Method addMethod = md.getMethodInstance(classLoader);
-                        addMethod.setAccessible(true);
-                        XposedBridge.hookMethod(addMethod, makeAddMethodLabelHook());
-                        DexKitCache.saveMethod("ReelRowAddMethod", addMethod);
-                        ModuleLog.line("(IE|Caption) ✅ reel label override (addMethod) on "
-                                + addMethod.getDeclaringClass().getName());
-                        hookedAny = true;
-                        break;
-                    }
-                } catch (Throwable ignored) {}
-            }
-
-            if (!hookedAny) {
-                ModuleLog.line("(IE|Caption) ❌ no reel row-building call found for any row-adder");
+            if (hooked.isEmpty()) {
+                ModuleLog.line("(IE|Caption) ❌ no reel row-builder methods found");
+            } else {
+                DexKitCache.saveMethods("ReelRowBuilders", hooked);
             }
         } catch (Throwable t) {
             ModuleLog.line("(IE|Caption) ❌ installReelLabelOverrideHook discovery: " + t);
         }
+    }
+
+    // Builder shape: void; first param Context; second param View.OnClickListener; >=1 String
+    // param (the title). Matches LX/0458.A00 (carrier's path) and .A01 on 447; harmless on any
+    // other match because the hook is a no-op unless our carrier listener is present.
+    private static boolean isRowBuilderShape(Method m) {
+        if (m.getReturnType() != void.class) return false;
+        Class<?>[] p = m.getParameterTypes();
+        if (p.length < 4) return false;
+        if (!Context.class.isAssignableFrom(p[0])) return false;
+        if (!View.OnClickListener.class.isAssignableFrom(p[1])) return false;
+        for (Class<?> c : p) if (c == String.class) return true;
+        return false;
     }
 
     private static Object findCarrierOptionOnListener(Object listener) {
@@ -721,40 +750,41 @@ public class CaptionCopyContextMenuHook {
         return null;
     }
 
-    // Variant A target: (View.OnClickListener listener, CharSequence label, String subtitle)
-    private static XC_MethodHook makeCtorLabelHook() {
+    // Fires for every reel-menu row builder; no-op unless one of the args is the click-listener
+    // wrapping our exact carrier enum. Then it replaces the row title (the first String arg after
+    // the last OnClickListener arg — index 3 for both LX/0458.A00 and .A01 on 447) with "Copy Caption".
+    private static XC_MethodHook makeBuilderLabelHook() {
         return new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 try {
-                    Object option = findCarrierOptionOnListener(param.args[0]);
-                    if (option != copyCaptionOptionValue) return;
+                    Object[] args = param.args;
+                    if (args == null) return;
 
-                    Activity ctx = currentActivity;
+                    boolean ours = false;
+                    int lastListenerIdx = -1;
+                    for (int i = 0; i < args.length; i++) {
+                        Object a = args[i];
+                        if (a instanceof View.OnClickListener) {
+                            lastListenerIdx = i;
+                            if (!ours && findCarrierOptionOnListener(a) == copyCaptionOptionValue)
+                                ours = true;
+                        }
+                    }
+                    if (!ours || lastListenerIdx < 0) return;
+
+                    int titleIdx = -1;
+                    for (int i = lastListenerIdx + 1; i < args.length; i++) {
+                        if (args[i] instanceof CharSequence) { titleIdx = i; break; }
+                    }
+                    if (titleIdx < 0) return;
+
+                    Context ctx = (args[0] instanceof Context c) ? c : currentActivity;
                     if (ctx == null) return;
-                    param.args[1] = I18n.t(ctx, R.string.ig_caption_copy_menu_item);
-                } catch (Throwable t) {
-                    ModuleLog.line("(IE|Caption) ❌ reel label override (ctor): " + t);
-                }
-            }
-        };
-    }
 
-    // Variant B target: (Context ctx, OnClickListener listener, String title, String subtitle, ...)
-    private static XC_MethodHook makeAddMethodLabelHook() {
-        return new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
-                try {
-                    Object option = findCarrierOptionOnListener(param.args[1]);
-                    if (option != copyCaptionOptionValue) return;
-
-                    Activity ctx = currentActivity;
-                    if (ctx == null) return;
-                    String label = I18n.t(ctx, R.string.ig_caption_copy_menu_item);
-                    param.args[2] = label;
+                    args[titleIdx] = I18n.t(ctx, R.string.ig_caption_copy_menu_item);
                 } catch (Throwable t) {
-                    ModuleLog.line("(IE|Caption) ❌ reel label override (addMethod): " + t);
+                    ModuleLog.line("(IE|Caption) ❌ reel label override (builder): " + t);
                 }
             }
         };
