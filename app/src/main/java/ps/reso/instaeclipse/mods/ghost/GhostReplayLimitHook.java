@@ -43,20 +43,39 @@ public class GhostReplayLimitHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            // The update method used to be uniquely anchored by two strings, but IG 447 dropped
+            // the word "Visual" from "Visual message is missing from thread entry", so the
+            // two-string AND-query no longer resolves. The method survived with the SAME stable
+            // signature, so anchor on that instead:
+            //   declared-synchronized void (com.instagram.model.direct.DirectThreadKey, String, String, boolean)
+            // Resolve the DM thread-store class via a string it still contains on 436+447
+            // ("Entry should exist before function call"), then match the signature within it.
+            // com.instagram.model.direct.DirectThreadKey is a stable class name; no X.* is hardcoded.
+            List<MethodData> anchor = bridge.findMethod(FindMethod.create()
                     .matcher(MethodMatcher.create()
-                            .usingStrings("Entry should exist before function call",
-                                    "Visual message is missing from thread entry")));
+                            .usingStrings("Entry should exist before function call")));
 
-            for (MethodData md : methods) {
-                try {
-                    Method m = md.getMethodInstance(classLoader);
+            java.util.LinkedHashSet<Class<?>> candidates = new java.util.LinkedHashSet<>();
+            for (MethodData md : anchor) {
+                try { candidates.add(md.getMethodInstance(classLoader).getDeclaringClass()); }
+                catch (Throwable ignored) {}
+            }
+
+            for (Class<?> c : candidates) {
+                for (Method m : c.getDeclaredMethods()) {
                     if (m.getReturnType() != void.class) continue;
+                    if (!java.lang.reflect.Modifier.isSynchronized(m.getModifiers())) continue;
+                    Class<?>[] p = m.getParameterTypes();
+                    if (p.length != 4) continue;
+                    if (!p[0].getName().equals("com.instagram.model.direct.DirectThreadKey")) continue;
+                    if (p[1] != String.class || p[2] != String.class || p[3] != boolean.class) continue;
+                    m.setAccessible(true);
                     DexKitCache.saveMethod("Replays_update", m);
                     XposedBridge.hookMethod(m, hook);
-                    ModuleLog.line("(IE|Replays) ✅ update hook → " + md.getClassName() + "." + md.getName());
+                    ModuleLog.line("(IE|Replays) ✅ update hook → "
+                            + m.getDeclaringClass().getName() + "." + m.getName());
                     return;
-                } catch (Throwable ignored) {}
+                }
             }
             ModuleLog.line("(IE|Replays) ❌ update method not found");
         } catch (Throwable t) {
