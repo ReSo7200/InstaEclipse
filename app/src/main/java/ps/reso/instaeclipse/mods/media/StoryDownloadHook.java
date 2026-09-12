@@ -177,55 +177,33 @@ public class StoryDownloadHook {
     // afterHookedMethod: appends our "Download" entry to the returned CharSequence[] array.
 
     private void installButtonInjectorHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = DexKitCache.isCacheValid()
-                ? DexKitCache.loadMethod("StoryDownload_button", classLoader) : null;
-
-        if (method == null) {
-            try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .usingStrings("[INTERNAL] Pause Playback")
-                                .paramCount(1)));
-
-                if (methods.isEmpty()) {
-                    ModuleLog.line("(IE|Story) ❌ Button builder method not found");
-                    return;
-                }
-
-                for (MethodData md : methods) {
-                    try {
-                        Method m = md.getMethodInstance(classLoader);
-                        if (m.getReturnType().isArray() &&
-                                CharSequence.class.isAssignableFrom(m.getReturnType().getComponentType())) {
-                            method = m;
-                            break;
-                        }
-                    } catch (Throwable ignored) {}
-                }
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|Story) ❌ Button builder DexKit: " + t);
+        // Hook EVERY CharSequence[]-returning candidate behind the "[INTERNAL] Pause Playback"
+        // anchor — NOT just the first 1-arg one. Instagram builds the option list with a DIFFERENT
+        // method for your OWN story (a 3-arg static helper: Delete/Archive/Save video/…) than for
+        // someone else's (1-arg: Report/Mute/AI info). Filtering paramCount(1) + first-match only
+        // ever caught the others'-story builder, so Download never appeared on your own stories.
+        // Own-story Download matters because it grabs the rendered video_version and KEEPS the
+        // music, which IG's native Save drops. (Ported from PR #200 by izadiegizabal.) Anchored on
+        // the stable string only, so it stays valid across versions; static + instance both accepted.
+        try {
+            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create()
+                            .usingStrings("[INTERNAL] Pause Playback")));
+            if (methods.isEmpty()) {
+                ModuleLog.line("(IE|Story) ❌ Button builder method not found");
                 return;
             }
-        }
 
-        if (method == null) {
-            ModuleLog.line("(IE|Story) ❌ No CharSequence[] return type candidate found");
-            return;
-        }
-        DexKitCache.saveMethod("StoryDownload_button", method);
-
-        try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
+            XC_MethodHook injector = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     if (!FeatureFlags.enableStoryDownload) return;
-                    CharSequence[] original = (CharSequence[]) param.getResult();
-                    if (original == null) return;
+                    if (!(param.getResult() instanceof CharSequence[] original) || original == null) return;
 
                     // Guard: don't inject twice
                     String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
                     for (CharSequence cs : original) {
-                        if (dlLabel.contentEquals(cs)) return;
+                        if (cs != null && dlLabel.contentEquals(cs)) return;
                     }
 
                     CharSequence[] extended = new CharSequence[original.length + 1];
@@ -233,10 +211,23 @@ public class StoryDownloadHook {
                     extended[original.length] = dlLabel;
                     param.setResult(extended);
                 }
-            });
+            };
 
+            int hooked = 0;
+            for (MethodData md : methods) {
+                try {
+                    Method m = md.getMethodInstance(classLoader);
+                    Class<?> rt = m.getReturnType();
+                    if (rt.isArray() && CharSequence.class.isAssignableFrom(rt.getComponentType())) {
+                        XposedBridge.hookMethod(m, injector);
+                        hooked++;
+                    }
+                } catch (Throwable ignored) {}
+            }
+            ModuleLog.line("(IE|Story) button injector hooked " + hooked + " builder(s)");
+            if (hooked == 0) ModuleLog.line("(IE|Story) ❌ No CharSequence[] return type candidate found");
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Story) ❌ Button builder hook: " + t);
+            ModuleLog.line("(IE|Story) ❌ Button builder DexKit: " + t);
         }
     }
 
@@ -249,83 +240,102 @@ public class StoryDownloadHook {
     // from fields on 'this' or same-class params.
 
     private void installClickHandlerHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = DexKitCache.isCacheValid()
-                ? DexKitCache.loadMethod("StoryDownload_click", classLoader) : null;
+        // Anchor ONLY on the common "[INTERNAL] Pause Playback" string and hook EVERY void
+        // dispatcher behind it. The old matcher also required "explore_viewer" +
+        // "mute_friend_reel" — but those exist ONLY on someone-else's-story dispatcher, so the
+        // self-story handler could never match and Download did nothing on your own stories.
+        // The self-story dispatcher is a STATIC helper (takes the outer class as a param), so we
+        // must not exclude statics. Our runtime label check (tapped == "Download") gates it, so
+        // hooking the extra dispatchers is harmless. (Ported from PR #200 by izadiegizabal.)
+        List<MethodData> methods;
+        try {
+            methods = bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create()
+                            .returnType("void")
+                            .usingStrings("[INTERNAL] Pause Playback")));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Story) ❌ Click handler DexKit: " + t);
+            return;
+        }
+        if (methods == null || methods.isEmpty()) {
+            ModuleLog.line("(IE|Story) ❌ Click handler not found");
+            return;
+        }
 
-        if (method == null) {
-            try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .returnType("void")
-                                .usingStrings("explore_viewer",
-                                        "friendships/mute_friend_reel/%s/",
-                                        "[INTERNAL] Pause Playback")));
+        XC_MethodHook clickHook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.enableStoryDownload) return;
 
-                if (methods.isEmpty()) {
-                    ModuleLog.line("(IE|Story) ❌ Click handler not found");
+                // 1. Find which button was tapped
+                CharSequence tapped = null;
+                for (Object arg : param.args) {
+                    if (arg instanceof CharSequence cs) { tapped = cs; break; }
+                }
+                String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
+                if (tapped == null || !dlLabel.contentEquals(tapped)) return;
+
+                // 2. Consume the event — Instagram won't process an option it didn't add
+                param.setResult(null);
+
+                // 3. Locate the ReelItem holder — 'this' or any same-class param (self-story
+                //    passes the outer class as an argument).
+                Object holder = findReelItemHolder(param);
+                Object effectiveHolder = holder != null ? holder : param.thisObject;
+
+                // 4. Context — the self-story dispatcher passes the ReelItem and the Context on
+                //    SEPARATE args, so search 'this' AND every argument, not just the holder.
+                Context ctx = findContextAcrossParam(param, effectiveHolder);
+                if (ctx == null) {
+                    ModuleLog.line("(IE|Story) ❌ Context not found");
                     return;
                 }
-                method = methods.get(0).getMethodInstance(classLoader);
-                DexKitCache.saveMethod("StoryDownload_click", method);
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|Story) ❌ Click handler DexKit: " + t);
-                return;
-            }
-        }
 
-        try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
-
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    if (!FeatureFlags.enableStoryDownload) return;
-
-                    // 1. Find which button was tapped
-                    CharSequence tapped = null;
-                    for (Object arg : param.args) {
-                        if (arg instanceof CharSequence cs) { tapped = cs; break; }
-                    }
-                    String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
-                    if (tapped == null || !dlLabel.contentEquals(tapped)) return;
-
-                    // 2. Consume the event — Instagram won't process an option it didn't add
-                    param.setResult(null);
-
-                    // 3. Locate the object that holds ReelItem — it is either 'this' or a
-                    //    parameter of the same declaring class (piko's smali shows the latter).
-                    Object holder = findReelItemHolder(param);
-                    ModuleLog.line("(IE|Story) holder=" + (holder != null ? holder.getClass().getName() : "null"));
-
-                    // 4. Extract the Context
-                    Context ctx = findContext(holder != null ? holder : param.thisObject);
-                    if (ctx == null) {
-                        ModuleLog.line("(IE|Story) ❌ Context not found");
-                        return;
-                    }
-
-                    // 5. Extract story URL via ReelItem → media object field graph
-                    Object effectiveHolder = holder != null ? holder : param.thisObject;
-                    StoryMediaOptions media = extractStoryMediaOptions(ctx, effectiveHolder);
-                    ModuleLog.line("(IE|Story) variants image="
-                            + (media != null && media.imageUrl != null)
-                            + " video=" + (media != null && media.videoUrl != null));
-
-                    if (media == null) {
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    String username = extractUsernameFromReelItemHolder(effectiveHolder);
-                    String mediaId = extractMediaIdFromReelItemHolder(effectiveHolder);
-                    handleStoryMedia(ctx, media, username, mediaId);
+                // 5. Extract story URL via ReelItem → media object field graph
+                StoryMediaOptions media = extractStoryMediaOptions(ctx, effectiveHolder);
+                if (media == null) {
+                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            });
 
-            FeatureStatusTracker.setHooked("StoryDownload");
+                String username = extractUsernameFromReelItemHolder(effectiveHolder);
+                String mediaId = extractMediaIdFromReelItemHolder(effectiveHolder);
+                handleStoryMedia(ctx, media, username, mediaId);
+            }
+        };
 
-        } catch (Throwable t) {
-            ModuleLog.line("(IE|Story) ❌ Click handler hook: " + t);
+        int hooked = 0;
+        for (MethodData md : methods) {
+            try {
+                Method m = md.getMethodInstance(classLoader);
+                if (m.getParameterCount() == 0) continue; // dispatchers receive the tapped label
+                XposedBridge.hookMethod(m, clickHook);
+                hooked++;
+            } catch (Throwable ignored) {}
         }
+        if (hooked == 0) {
+            ModuleLog.line("(IE|Story) ❌ no click dispatcher hooked");
+            return;
+        }
+        ModuleLog.line("(IE|Story) click handler hooked " + hooked + " dispatcher(s)");
+        FeatureStatusTracker.setHooked("StoryDownload");
+    }
+
+    /** Context lookup for the click dispatcher: try the ReelItem holder, then 'this', then each
+     *  argument (self-story passes the Context on a separate arg, or an arg may BE a Context). */
+    private static Context findContextAcrossParam(XC_MethodHook.MethodHookParam param, Object preferred) {
+        Context c = findContext(preferred);
+        if (c != null) return c;
+        if (param.thisObject != preferred) {
+            c = findContext(param.thisObject);
+            if (c != null) return c;
+        }
+        for (Object arg : param.args) {
+            if (arg instanceof Context ctx) return ctx;
+            c = findContext(arg);
+            if (c != null) return c;
+        }
+        return null;
     }
 
     // ── URL extraction ────────────────────────────────────────────────────────
