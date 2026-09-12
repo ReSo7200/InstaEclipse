@@ -1347,7 +1347,16 @@ public class FeedVideoDownloadHook {
             DexKitCache.saveString("UserClass", userClass.getName());
             ModuleLog.line("(IE|DL|Username) userClass=" + userClass.getName());
 
-            // Resolve the username getter on User via the stable GraphQL field ID -265713450.
+            // Resolve the username getter on User via the stable GraphQL field ID -265713450
+            // (== "username".hashCode(), a JDK-fixed constant → valid across builds).
+            //
+            // NOTE: that same id matches TWO zero-arg String getters on User — the real
+            // `username` getter, AND a display-name getter that reads `username` first and falls
+            // back to `full_name`. Picking get(0) can land on the display-name one, so downloads
+            // get filed under the display name instead of the handle (only visible when the
+            // display name is all-lowercase, so it passes the handle regex). Disambiguate by
+            // dropping any candidate that ALSO references the `full_name` field id — the pure
+            // username getter never reads full_name. (Fix ported from PR #200 by izadiegizabal.)
             try {
                 List<MethodData> ugMethods = bridge.findMethod(FindMethod.create()
                         .matcher(MethodMatcher.create()
@@ -1356,10 +1365,29 @@ public class FeedVideoDownloadHook {
                                 .paramCount(0)
                                 .usingNumbers(-265713450)));
                 if (!ugMethods.isEmpty()) {
-                    UserUtils.userUsernameGetter = ugMethods.get(0).getMethodInstance(classLoader);
+                    // Candidates that ALSO read full_name = the display-name getter → exclude.
+                    java.util.Set<String> readsFullName = new java.util.HashSet<>();
+                    try {
+                        for (MethodData md : bridge.findMethod(FindMethod.create()
+                                .matcher(MethodMatcher.create()
+                                        .declaredClass("com.instagram.user.model.User")
+                                        .returnType("java.lang.String")
+                                        .paramCount(0)
+                                        .usingNumbers(-265713450, "full_name".hashCode())))) {
+                            readsFullName.add(md.toString());
+                        }
+                    } catch (Throwable ignored) {}
+
+                    MethodData chosen = null;
+                    for (MethodData md : ugMethods) {
+                        if (!readsFullName.contains(md.toString())) { chosen = md; break; }
+                    }
+                    if (chosen == null) chosen = ugMethods.get(0); // fallback: better than nothing
+                    UserUtils.userUsernameGetter = chosen.getMethodInstance(classLoader);
                     UserUtils.userUsernameGetter.setAccessible(true);
                     DexKitCache.saveMethod("UsernameGetter", UserUtils.userUsernameGetter);
-                    ModuleLog.line("(IE|DL|Username) userUsernameGetter=" + UserUtils.userUsernameGetter.getName());
+                    ModuleLog.line("(IE|DL|Username) userUsernameGetter=" + UserUtils.userUsernameGetter.getName()
+                            + " (excluded " + readsFullName.size() + " full_name getter(s))");
                 } else {
                     ModuleLog.line("(IE|DL|Username) ❌ userUsernameGetter not found via -265713450");
                 }
@@ -2178,13 +2206,22 @@ public class FeedVideoDownloadHook {
     // on screen at once, so we don't guess — we let the user choose).
 
     static void copyLinkToClipboard(Context ctx, String url) {
-        try {
-            ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-            cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", url));
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
-        } catch (Throwable t) {
-            ModuleLog.line("(IE|Post) ❌ copyLinkToClipboard: " + t);
-        }
+        // Defer the actual setPrimaryClip: writing the clipboard synchronously re-enters IG's own
+        // OnPrimaryClipChangedListener on the main thread. On a carousel that collides with IG's
+        // realtime request-stream executor being torn down (the visible slide's prefetch scope),
+        // and IG's native TigonRepeatingForwardingRequestToken then schedules on the dead executor
+        // → RejectedExecutionException (a fatal in IG's own code, not ours). Posting the write a
+        // beat later (past the ~200ms clip-listener debounce + the sheet-dismiss frame) moves it
+        // out of that teardown window. Framework-only; clipboard contents unchanged.
+        mainHandler.postDelayed(() -> {
+            try {
+                ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+                cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", url));
+                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|Post) ❌ copyLinkToClipboard: " + t);
+            }
+        }, 350);
     }
 
     @SuppressLint("DefaultLocale")
@@ -2275,13 +2312,18 @@ public class FeedVideoDownloadHook {
                 dialog.dismiss();
                 StringBuilder sb = new StringBuilder();
                 for (String u : urls) sb.append(u).append('\n');
-                try {
-                    ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-                    cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", sb.toString().trim()));
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
-                } catch (Throwable t) {
-                    ModuleLog.line("(IE|Post) ❌ copy all links: " + t);
-                }
+                final String allText = sb.toString().trim();
+                // Deferred like copyLinkToClipboard — keep the clipboard write out of the
+                // carousel realtime-stream teardown window (see that method's note).
+                mainHandler.postDelayed(() -> {
+                    try {
+                        ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+                        cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", allText));
+                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
+                    } catch (Throwable t) {
+                        ModuleLog.line("(IE|Post) ❌ copy all links: " + t);
+                    }
+                }, 350);
             });
             sheet.addView(btnAll);
 
