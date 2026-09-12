@@ -87,6 +87,13 @@ public class UIHookManager {
         // Ghost emoji visibility must update on every resume (reflects current ghost state).
         addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
 
+        // Auto-clear IG cache if it has grown past the configured size (throttled internally).
+        ps.reso.instaeclipse.utils.core.CacheAutoClear.maybeClear(activity);
+
+        // Lock DMs: arm the inbox passcode watcher on the main activity (its onCreate is
+        // obfuscated, so a direct hook fails — this runs from the module's resolved main hook).
+        ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.watchActivity(activity);
+
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
 

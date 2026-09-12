@@ -4,7 +4,9 @@ import android.content.Context;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import ps.reso.instaeclipse.utils.i18n.I18n;
 
@@ -12,8 +14,14 @@ public class FeatureStatusTracker {
     private static final Map<String, Boolean> features = Collections.synchronizedMap(new HashMap<>());
     private static final Map<String, Integer> labels   = Collections.synchronizedMap(new HashMap<>());
 
+    // Names whose hook has installed. Kept independently of `features` so that a later
+    // setEnabled() (e.g. the companion-sync re-runs refreshFeatureStatus after hooks are
+    // already installed) can't wipe the hooked state back to a ❌ in the load toast. Xposed
+    // hooks persist for the process, so once hooked, a feature stays hooked.
+    private static final Set<String> hooked = Collections.synchronizedSet(new HashSet<>());
+
     public static void setEnabled(String name, int labelResId) {
-        features.put(name, false);
+        features.put(name, hooked.contains(name));   // preserve hooked state across re-registration
         labels.put(name, labelResId);
     }
 
@@ -23,6 +31,7 @@ public class FeatureStatusTracker {
     }
 
     public static void setHooked(String name) {
+        hooked.add(name);
         if (features.containsKey(name)) {
             features.put(name, true);
         }

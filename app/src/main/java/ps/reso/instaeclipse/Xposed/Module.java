@@ -36,7 +36,8 @@ import ps.reso.instaeclipse.mods.ghost.GhostDMMarkAsReadHook;
 import ps.reso.instaeclipse.mods.ghost.GhostDMSeenHook;
 import ps.reso.instaeclipse.mods.ghost.GhostEphemeralKeepHook;
 import ps.reso.instaeclipse.mods.ghost.GhostPermanentViewHook;
-import ps.reso.instaeclipse.mods.ghost.GhostReplayLimitHook;
+import ps.reso.instaeclipse.mods.ghost.ViewOnceBadgeHook;
+import ps.reso.instaeclipse.mods.ghost.KeepUnsentMessagesHook;
 import ps.reso.instaeclipse.mods.ghost.GhostScreenshotDetectionHook;
 import ps.reso.instaeclipse.mods.ghost.GhostStorySeenHook;
 import ps.reso.instaeclipse.mods.ghost.GhostTypingIndicatorHook;
@@ -240,15 +241,47 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
 
                     try {
-                        new GhostReplayLimitHook().install(dexKitBridge, lpparam.classLoader);
-                    } catch (Throwable ignored) {
-                        ModuleLog.line("(InstaEclipse | UnlimitedReplays): ❌ Failed to hook");
-                    }
-
-                    try {
                         new GhostStorySeenHook().handleStorySeenBlock(dexKitBridge); // Story Seen
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | GhostStorySeen): ❌ Failed to hook");
+                    }
+
+                    try {
+                        new KeepUnsentMessagesHook().install(dexKitBridge, lpparam.classLoader); // Keep Unsent
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | KeepUnsent): ❌ Failed to hook");
+                    }
+
+                    try {
+                        new ps.reso.instaeclipse.mods.ghost.UnsentThreadButtonHook().install(lpparam.classLoader); // per-thread unsent button
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | UnsentBtn): ❌ Failed to hook");
+                    }
+
+                    try {
+                        new ps.reso.instaeclipse.mods.ghost.HideChatsHook().install(dexKitBridge, lpparam.classLoader); // Hide Specific Chats
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | HideChats): ❌ Failed to hook");
+                    }
+
+                    try {
+                        new ps.reso.instaeclipse.mods.ui.CustomFontHook().install(lpparam.classLoader); // Custom UI font
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | CustomFont): ❌ Failed to hook");
+                    }
+
+                    try {
+                        ps.reso.instaeclipse.mods.ui.RemoveMetaAIHook metaAi = new ps.reso.instaeclipse.mods.ui.RemoveMetaAIHook();
+                        metaAi.install(lpparam.classLoader);              // composer/search XML layouts
+                        metaAi.installReels(dexKitBridge, lpparam.classLoader); // reels Litho unit (#179)
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | RemoveMetaAI): ❌ Failed to hook");
+                    }
+
+                    try {
+                        new ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook().install(lpparam.classLoader); // Lock DMs (#182)
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | LockDMs): ❌ Failed to hook");
                     }
 
                     // Hide in-feed widget units (suggested users panels, surveys, carousels, etc.)
@@ -363,6 +396,20 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | PostDownload): ❌ Failed to hook");
                     }
 
+                    // Save Instants (#184) — long-press a received Instant (quicksnap) to save it
+                    try {
+                        new ps.reso.instaeclipse.mods.media.InstantSaveHook().install(lpparam.classLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | InstantSave): ❌ Failed to hook");
+                    }
+
+                    // Upload Instants from gallery (#199) — swap gallery bitmap into quicksnap send
+                    try {
+                        new ps.reso.instaeclipse.mods.media.InstantUploadHook().install(lpparam.classLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | InstantUpload): ❌ Failed to hook");
+                    }
+
                     // Keep Ephemeral Messages
                     try {
                         new GhostEphemeralKeepHook().install(dexKitBridge, lpparam.classLoader);
@@ -375,6 +422,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         new GhostPermanentViewHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ViewOnceMedia): ❌ Failed to hook");
+                    }
+
+                    // Restore IG's native view-once/twice corner icon when Permanent View is on
+                    try {
+                        new ViewOnceBadgeHook().install(dexKitBridge, lpparam.classLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | VOBadge): ❌ Failed to hook");
                     }
 
                     // Story Download
