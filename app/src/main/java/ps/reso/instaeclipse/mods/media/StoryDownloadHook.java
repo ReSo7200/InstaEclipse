@@ -2,9 +2,23 @@ package ps.reso.instaeclipse.mods.media;
 
 import android.app.AlertDialog;
 import android.app.AndroidAppHelper;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.luckypray.dexkit.DexKitBridge;
@@ -884,20 +898,124 @@ public class StoryDownloadHook {
         }
 
         try {
-            new AlertDialog.Builder(ctx)
-                    .setTitle(I18n.t(ctx, R.string.ig_story_download_choice_title))
-                    .setItems(labels.toArray(new CharSequence[0]), (dialog, which) -> {
-                        if (which < 0 || which >= choices.size()) return;
-                        StoryMedia choice = choices.get(which);
-                        startDownload(ctx, choice.url, choice.video, username, mediaId);
-                    })
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show();
+            float dp = ctx.getResources().getDisplayMetrics().density;
+            boolean dk = (ctx.getResources().getConfiguration().uiMode
+                    & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+
+            int sheetBg   = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
+            int cardBg    = dk ? Color.parseColor("#2C2C2E") : Color.parseColor("#FFFFFF");
+            int textPrim  = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
+            int textSec   = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
+            int handleClr = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
+
+            LinearLayout sheet = new LinearLayout(ctx);
+            sheet.setOrientation(LinearLayout.VERTICAL);
+            sheet.setBackground(roundRect(sheetBg, 20, ctx, dp));
+            int hPad = (int) (20 * dp);
+            sheet.setPadding(hPad, (int) (12 * dp), hPad, (int) (28 * dp));
+
+            // Grab handle
+            View handle = new View(ctx);
+            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams((int) (40 * dp), (int) (4 * dp));
+            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
+            handleLp.bottomMargin = (int) (16 * dp);
+            handle.setLayoutParams(handleLp);
+            handle.setBackground(roundRect(handleClr, 2, ctx, dp));
+            sheet.addView(handle);
+
+            // Title
+            TextView title = new TextView(ctx);
+            title.setText(I18n.t(ctx, R.string.ig_story_download_choice_title));
+            title.setTextColor(textPrim);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+            title.setTypeface(null, Typeface.BOLD);
+            sheet.addView(title);
+
+            // Subtitle
+            TextView subtitle = new TextView(ctx);
+            subtitle.setText(I18n.t(ctx, R.string.ig_story_download_choice_subtitle));
+            subtitle.setTextColor(textSec);
+            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            subLp.topMargin = (int) (2 * dp);
+            subLp.bottomMargin = (int) (14 * dp);
+            subtitle.setLayoutParams(subLp);
+            sheet.addView(subtitle);
+
+            final Dialog dialog = new Dialog(ctx);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            // One tappable card row per available format (📷 photo / 🎬 video with music).
+            for (int i = 0; i < choices.size(); i++) {
+                final StoryMedia choice = choices.get(i);
+                TextView row = new TextView(ctx);
+                row.setText((choice.video ? "🎬  " : "📷  ") + labels.get(i));
+                row.setTextColor(textPrim);
+                row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                row.setTypeface(null, Typeface.BOLD);
+                int rowPad = (int) (16 * dp);
+                row.setPadding(rowPad, rowPad, rowPad, rowPad);
+                row.setBackground(roundRect(cardBg, 12, ctx, dp));
+                LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                rowLp.bottomMargin = (int) (8 * dp);
+                row.setLayoutParams(rowLp);
+                row.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    startDownload(ctx, choice.url, choice.video, username, mediaId);
+                });
+                sheet.addView(row);
+            }
+
+            // Cancel pill
+            Button cancel = makePillButton(ctx, ctx.getString(android.R.string.cancel), cardBg, textPrim, dp);
+            cancel.setOnClickListener(v -> dialog.dismiss());
+            sheet.addView(cancel);
+
+            dialog.setContentView(sheet);
+            Window w = dialog.getWindow();
+            if (w != null) {
+                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                w.setGravity(Gravity.BOTTOM);
+                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                WindowManager.LayoutParams wlp = w.getAttributes();
+                int margin = (int) (12 * dp);
+                wlp.x = margin;
+                wlp.y = margin;
+                w.setAttributes(wlp);
+            }
+            dialog.show();
         } catch (Throwable t) {
             ModuleLog.line("(IE|Story) format dialog failed: " + t);
             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed,
                     t.getMessage()), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /** Rounded-rect drawable (matches the story-mention sheet styling). */
+    private static GradientDrawable roundRect(int color, float radiusDp, Context ctx, float dp) {
+        GradientDrawable d = new GradientDrawable();
+        d.setColor(color);
+        d.setCornerRadius(radiusDp * dp);
+        return d;
+    }
+
+    /** Pill button (matches the story-mention sheet styling). */
+    private static Button makePillButton(Context ctx, String label, int bgColor, int textColor, float dp) {
+        Button btn = new Button(ctx);
+        btn.setText(label);
+        btn.setTextColor(textColor);
+        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        btn.setTypeface(null, Typeface.BOLD);
+        btn.setBackground(roundRect(bgColor, 14, ctx, dp));
+        btn.setAllCaps(false);
+        btn.setPadding((int) (20 * dp), (int) (14 * dp), (int) (20 * dp), (int) (14 * dp));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = (int) (10 * dp);
+        btn.setLayoutParams(lp);
+        return btn;
     }
 
     private void startDownload(Context ctx, String url, boolean isVideo,
