@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 public class IGNetworkInterceptor {
 
+
     public void handleInterceptor(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
             ClassLoader classLoader = lpparam.classLoader;
@@ -62,6 +63,7 @@ public class IGNetworkInterceptor {
                                 if (uri != null && uri.getPath() != null) {
                                     boolean shouldDrop = false;
 
+
                                     // Ghost Mode URIs
                                     if (FeatureFlags.isGhostSeen) {
                                         shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened");
@@ -77,12 +79,23 @@ public class IGNetworkInterceptor {
                                         shouldDrop |= (uri.getPath().contains("/direct") && uri.getPath().endsWith("/item_seen/"));
                                     }
                                     if (FeatureFlags.isGhostStory) {
-                                        shouldDrop |= uri.getPath().contains("/api/v2/media/seen/");
+                                        // Version-agnostic: getPath() excludes the ?reel=... query, so it
+                                        // reads /api/vN/media/seen/ on both old (v2) and new (447: v1) builds.
+                                        shouldDrop |= uri.getPath().contains("/media/seen/");
                                         FeatureStatusTracker.setHooked("GhostStories");
                                     }
                                     if (FeatureFlags.isGhostLive) {
                                         shouldDrop |= uri.getPath().contains("/heartbeat_and_get_viewer_count/");
                                         FeatureStatusTracker.setHooked("GhostLive");
+                                    }
+                                    // Remove Meta AI (#179): stop Meta AI from replying/loading.
+                                    if (FeatureFlags.removeMetaAI) {
+                                        String p = uri.getPath();
+                                        shouldDrop |= p.contains("/ig_meta_ai_side_chat_send_contextual_query/")
+                                                || p.contains("/ig_meta_ai_side_chat_new_session/")
+                                                || p.contains("/create_ig_meta_ai_side_chat/")
+                                                || p.contains("/genai/response")
+                                                || (uri.getHost() != null && uri.getHost().contains("aistudio.instagram.com"));
                                     }
 
                                     // Distraction Free
