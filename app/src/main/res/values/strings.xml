@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.6.0</string>
+    <string name="version" translatable="false">v0.7.0</string>
     <string name="home">Home</string>
     <string name="features">Features</string>
     <string name="help">Help</string>
@@ -52,6 +52,7 @@
     <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
     <string name="github">GitHub</string>
     <string name="telegram">Telegram</string>
+    <string name="help_community">Community</string>
 
     <!-- faq -->
     <string name="frequently_asked_questions">Frequently Asked Questions</string>
@@ -69,6 +70,10 @@
     <!-- features fragment section headers -->
     <string name="feat_categories">Categories:</string>
     <string name="feat_tools">Tools:</string>
+    <string name="feat_group_appearance">Appearance</string>
+    <string name="feat_group_privacy">Privacy</string>
+    <string name="feat_group_media">Media</string>
+    <string name="feat_group_tools">Tools</string>
     <string name="feat_features">Features:</string>
     <string name="feat_config">Config:</string>
     <string name="feat_options">Options:</string>
@@ -141,6 +146,7 @@
 
     <!-- Common -->
     <string name="ig_dialog_title" translatable="false">InstaEclipse 🌘</string>
+    <string name="ig_dialog_subtitle">Tap a section to configure</string>
     <string name="ig_dialog_close">Close</string>
     <string name="ig_dialog_enable_disable_all">Enable/Disable All</string>
     <string name="ig_dialog_error">Error</string>
@@ -200,6 +206,8 @@
     <string name="theme_customize">Customize Theme…</string>
     <string name="theme_section_presets">Presets</string>
     <string name="theme_section_custom">Custom Colors</string>
+    <string name="theme_section_colors">Colors</string>
+    <string name="theme_section_fonts">Fonts &amp; Emoji</string>
     <string name="theme_collapse_section">Collapse section</string>
     <string name="theme_expand_section">Expand section</string>
     <string name="theme_reset_custom">Reset to Default</string>
@@ -281,9 +289,61 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Allow Screenshots in DMs</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Bypass Screenshot Detection</string>
     <string name="ig_dialog_ghost_hide_view_once">Hide View Once Opened</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Unlimited View-Once Replays</string>
-    <string name="ig_dialog_ghost_permanent_view_once">Show View-Once/Twice as Normal Media</string>
+    <string name="ig_dialog_ghost_permanent_view_once">Unlock View-Once/Twice</string>
     <string name="ig_dialog_ghost_keep_disappearing">Keep Disappearing Messages</string>
+    <string name="ig_dialog_ghost_keep_unsent">Keep Unsent Messages</string>
+    <string name="ig_dialog_unsent_title">Unsent Messages</string>
+    <string name="ig_dialog_unsent_clear">Clear this chat\'s log</string>
+    <string name="ig_dialog_unsent_export">Export as JSON</string>
+    <string name="ig_dialog_unsent_exported">Saved to %1$s</string>
+    <string name="ig_dialog_auto_clear_cache">Auto-clear cache when large</string>
+    <string name="ig_dialog_auto_clear_cache_size">Clear above: %1$d MB (tap to change)</string>
+    <string name="ig_dialog_section_auto_clear_cache">Auto-Clear Cache</string>
+    <string name="ig_dialog_auto_clear_cache_desc">Clears Instagram\'s media cache when you leave the app, if it\'s over the chosen size. Only cache is cleared (Instagram rebuilds it) — your data, logins and downloads are never touched.</string>
+    <string name="ig_dialog_misc_remove_meta_ai">Remove Meta AI</string>
+    <string name="ig_dialog_misc_lock_dms">Lock DMs</string>
+    <string name="ig_dialog_misc_lock_dms_set">Set / change code</string>
+    <string name="ig_dialog_misc_lock_dms_hint">Enter a numeric code</string>
+    <string name="ig_dialog_misc_lock_dms_saved">Code saved</string>
+    <string name="ig_dialog_misc_lock_dms_cleared">Code cleared</string>
+    <string name="ig_dialog_misc_lock_dms_current">Enter current code</string>
+    <string name="ig_dialog_misc_lock_dms_wrong">Wrong current passcode</string>
+    <string name="ig_dialog_misc_lock_dms_disable">Enter code to disable lock</string>
+    <string name="ig_dialog_misc_lock_dms_always">Re-lock every time you leave</string>
+    <string name="ig_dialog_misc_lock_whole_app">Lock whole app</string>
+    <string name="ig_dialog_misc_lock_section">Lock</string>
+    <string name="ig_dialog_misc_lock_fingerprint">Use fingerprint to unlock</string>
+    <string name="ig_hide_chats_title">Hide Specific Chats</string>
+    <string name="ig_dialog_misc_hide_chats">Hide Specific Chats</string>
+    <string name="ig_hide_chats_manage">Manage hidden chats</string>
+    <string name="ig_hide_chats_empty">No hidden chats. Open a chat and tap the eye-off button to hide it.</string>
+    <string name="ig_hide_chats_unhide">Unhide</string>
+    <string name="ig_hide_chats_hint">To hide a chat, open it and tap the eye-off button in the thread header.</string>
+    <string name="ig_lock_passcode_hint">Set your passcode from inside Instagram (open the InstaEclipse menu → Lock).</string>
+    <string name="ig_theme_font_hint">Pick your font &amp; emoji files from inside Instagram (InstaEclipse menu → Custom Theme).</string>
+    <string name="ig_hide_chat_hidden">Chat hidden — it will disappear from your inbox</string>
+    <string name="ig_hide_chat_unhidden">Chat unhidden</string>
+    <string name="ig_hide_chat_no_thread">Couldn\'t identify this chat</string>
+    <string name="ig_story_cache_title">Cache Stories (24h)</string>
+    <string name="ig_dialog_misc_cache_stories">Cache Stories for 24h</string>
+    <string name="ig_story_cache_view">View cached stories</string>
+    <string name="ig_story_cache_empty">No cached stories yet. Turn this on, then view some stories — they\'ll be kept here for 24 hours.</string>
+    <string name="ig_story_cache_clear">Clear cached stories</string>
+    <string name="ig_story_cache_count">%1$d cached stories</string>
+    <string name="ig_story_cache_saving">Saving cached story…</string>
+    <string name="ig_story_cache_saved">Cached story saved</string>
+    <string name="ig_story_cache_save_fail">Couldn\'t save cached story</string>
+    <string name="ig_custom_font_title">Custom Font</string>
+    <string name="ig_dialog_misc_custom_font">Custom Font</string>
+    <string name="ig_custom_font_pick">Pick font file (.ttf / .otf)</string>
+    <string name="ig_custom_emoji_title">Custom Emoji</string>
+    <string name="ig_dialog_misc_custom_emoji">Custom Emoji</string>
+    <string name="ig_custom_emoji_pick">Pick emoji font (.ttf / .otf)</string>
+    <string name="ig_dialog_unsent_clear_confirm">Delete this chat\'s saved unsent messages? This cannot be undone.</string>
+    <string name="ig_dialog_unsent_clear_yes">Clear</string>
+    <string name="ig_dialog_unsent_cleared">Unsent log cleared</string>
+    <string name="ig_dialog_unsent_empty">No unsent messages captured yet</string>
+    <string name="ig_dialog_unsent_unknown_chat">Unknown chat</string>
     <string name="ig_dialog_customize_quick_toggle">Customize Quick Toggle</string>
 
     <!-- Quick Toggle options -->
@@ -294,8 +354,7 @@
     <string name="ig_dialog_quick_hide_story_seen">Include Hide Story Views</string>
     <string name="ig_dialog_quick_hide_live_seen">Include Hide Live Presence</string>
     <string name="ig_dialog_quick_keep_ephemeral">Include Keep Disappearing Messages</string>
-    <string name="ig_dialog_quick_unlimited_replays">Include Unlimited View-Once Replays</string>
-    <string name="ig_dialog_quick_permanent_view">Include Show View-Once/Twice as Normal Media</string>
+    <string name="ig_dialog_quick_permanent_view">Include Unlock View-Once/Twice</string>
     <string name="ig_dialog_quick_allow_screenshots">Include Allow Screenshots in DMs</string>
 
     <!-- Ad / Analytics options -->
@@ -357,6 +416,24 @@
 <string name="ig_dialog_downloader_username_subfolder">Save in Username Subfolder</string>
     <string name="ig_dialog_downloader_add_timestamp">Add Timestamp to Filename</string>
     <string name="ig_dialog_downloader_cannot_open_picker">Cannot open folder picker here</string>
+    <string name="ig_dialog_downloader_copy_link">Copy Media Link</string>
+    <string name="ig_copy_link_title">Copy Media Link</string>
+    <string name="ig_copy_link_copied">Media link copied to clipboard</string>
+    <string name="ig_copy_link_none">No media link found for this post</string>
+    <string name="ig_copy_link_slide">Slide %1$d of %2$d</string>
+    <string name="ig_copy_link_all">Copy all %1$d links</string>
+    <string name="ig_copy_link_copied_all">%1$d media links copied</string>
+    <string name="ig_instant_save_title">Save Instants</string>
+    <string name="ig_dialog_misc_save_instants">Save Instants (long-press to save)</string>
+    <string name="ig_instant_saving">Saving Instant…</string>
+    <string name="ig_instant_saved">Instant saved</string>
+    <string name="ig_instant_save_none">No Instant media found</string>
+    <string name="ig_instant_upload_title">Upload Instant from Gallery</string>
+    <string name="ig_dialog_misc_upload_instants">Upload Instant from Gallery</string>
+    <string name="ig_instant_upload_chip">🖼 Gallery</string>
+    <string name="ig_instant_upload_chip_ready">✓ Ready — tap shutter</string>
+    <string name="ig_instant_upload_ready">Picked! Tap the shutter to send it as an Instant</string>
+    <string name="ig_instant_upload_fail">Couldn\'t load that image</string>
 
     <!-- Backup &amp; Restore -->
     <string name="ig_dialog_backup_settings">Backup Settings</string>

@@ -40,6 +40,7 @@
                 android:text="@string/app_name"
                 android:textAppearance="?attr/textAppearanceTitleLarge"
                 android:textStyle="bold"
+                android:letterSpacing="0.01"
                 android:textColor="?attr/colorOnSurface" />
 
             <TextView
@@ -47,11 +48,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_version_chip"
                 android:text="@string/version"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textAppearance="?attr/textAppearanceLabelMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:paddingEnd="16dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
                 tools:ignore="RtlSymmetry" />
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>

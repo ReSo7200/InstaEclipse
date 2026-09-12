@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.InstaEclipse" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
-        <item name="android:statusBarColor">?attr/colorSurface</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
-        <item name="android:navigationBarColor">?attr/colorSurfaceContainer</item>
+    <!-- 0.7: fixed, branded dark scheme (no Dynamic Colors) so the companion app carries the same
+         identity as the in-IG dialog sheet regardless of the device wallpaper. -->
+    <style name="Theme.InstaEclipse" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- System bars: dark surfaces need light (white) icons, so the *light bar* flags stay false. -->
+        <item name="android:statusBarColor">@color/ie_surface</item>
+        <item name="android:navigationBarColor">@color/ie_surface_container</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
 
-        <item name="colorPrimary">@color/accent_blue</item>
-        <item name="colorSecondary">@color/gray</item>
+        <!-- Primary / accent -->
+        <item name="colorPrimary">@color/ie_primary</item>
+        <item name="colorOnPrimary">@color/ie_on_primary</item>
+        <item name="colorPrimaryContainer">@color/ie_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ie_on_primary_container</item>
+
+        <item name="colorSecondary">@color/ie_secondary</item>
+        <item name="colorOnSecondary">@color/ie_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/ie_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/ie_on_secondary_container</item>
+
+        <item name="colorTertiary">@color/ie_tertiary</item>
+        <item name="colorOnTertiary">@color/ie_on_tertiary</item>
+        <item name="colorTertiaryContainer">@color/ie_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/ie_on_tertiary_container</item>
+
+        <!-- Surfaces / background -->
+        <item name="android:colorBackground">@color/ie_background</item>
+        <item name="colorOnBackground">@color/ie_on_surface</item>
+        <item name="colorSurface">@color/ie_surface</item>
+        <item name="colorOnSurface">@color/ie_on_surface</item>
+        <item name="colorSurfaceVariant">@color/ie_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/ie_on_surface_variant</item>
+        <item name="colorSurfaceContainerLowest">@color/ie_surface_lowest</item>
+        <item name="colorSurfaceContainerLow">@color/ie_surface_low</item>
+        <item name="colorSurfaceContainer">@color/ie_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/ie_surface_high</item>
+        <item name="colorSurfaceContainerHighest">@color/ie_surface_highest</item>
+
+        <!-- Lines / errors -->
+        <item name="colorOutline">@color/ie_outline</item>
+        <item name="colorOutlineVariant">@color/ie_outline_variant</item>
+        <item name="colorError">@color/ie_error</item>
+        <item name="colorOnError">@color/ie_on_error</item>
     </style>
 </resources>
