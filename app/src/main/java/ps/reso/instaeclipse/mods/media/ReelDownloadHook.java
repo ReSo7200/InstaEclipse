@@ -167,27 +167,33 @@ public class ReelDownloadHook {
     // app-wide click-handler hook already covers whatever dispatches its click.
     private static void installReduceOptionsListPatch(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            Object downloadOption = null;
+            Object downloadOption = null, copyLinkOption = null;
             Class<?> optionClass = classLoader.loadClass("com.instagram.feed.media.mediaoption.MediaOption$Option");
             for (Object v : (Object[]) optionClass.getMethod("values").invoke(null)) {
-                if (v.toString().equals("DOWNLOAD")) { downloadOption = v; break; }
+                String n = v.toString();
+                if (n.equals("DOWNLOAD")) downloadOption = v;
+                else if (n.equals("COPY_LINK")) copyLinkOption = v;
             }
-            if (downloadOption == null) {
-                ModuleLog.line("(IE|Reel) ❌ DOWNLOAD enum value not found");
+            if (downloadOption == null && copyLinkOption == null) {
+                ModuleLog.line("(IE|Reel) ❌ DOWNLOAD/COPY_LINK enum values not found");
                 return;
             }
             final Object download = downloadOption;
+            final Object copyLink = copyLinkOption;   // #117 — clicks handled by PostDownloadContextMenuHook
 
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
-                    if (!FeatureFlags.enableReelDownload) return;
+                    boolean wantDl = FeatureFlags.enableReelDownload && download != null;
+                    boolean wantCl = FeatureFlags.copyMediaLink && copyLink != null;
+                    if (!wantDl && !wantCl) return;
                     try {
                         Object result = param.getResult();
-                        if (result instanceof List<?> list && !list.contains(download)) {
+                        if (result instanceof List<?> list) {
                             @SuppressWarnings("unchecked")
                             List<Object> mutable = (List<Object>) list;
-                            mutable.add(download);
+                            if (wantDl && !mutable.contains(download)) mutable.add(download);
+                            if (wantCl && !mutable.contains(copyLink)) mutable.add(copyLink);
                         }
                     } catch (Throwable t) {
                         ModuleLog.line("(IE|Reel) ❌ options-list patch failed: " + t);

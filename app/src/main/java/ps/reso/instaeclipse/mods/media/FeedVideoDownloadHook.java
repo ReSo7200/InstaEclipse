@@ -3,6 +3,8 @@ package ps.reso.instaeclipse.mods.media;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -32,6 +34,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -99,6 +102,7 @@ public class FeedVideoDownloadHook {
     private static final List<Method> resolvedVideoVersionsGetters = new ArrayList<>();
     private static Method resolvedIsVideoMethod;
     private static Method   methodImageUrl;         // MediaExtKt: static (Context, Media) -> String
+    private static Method   carouselMediaGetter;    // Media."carousel_media" getter: () -> List<Media> (IG 447+)
 
     // VideoVersionIntf – stable public interface with getUrl()
     static Class<?> videoVersionIntfClass;
@@ -1057,6 +1061,7 @@ public class FeedVideoDownloadHook {
     public static void installVideoUrlCaptureHook(DexKitBridge bridge, ClassLoader classLoader) {
         discoverDynamicMediaModel(bridge, classLoader);
         resolveVideoVersionsGetters(bridge, classLoader);
+        resolveCarouselGetter(bridge, classLoader);
         resolveIsVideoMethod(bridge, classLoader);
         XC_MethodHook urlHook = new XC_MethodHook() {
             @Override
@@ -1220,6 +1225,52 @@ public class FeedVideoDownloadHook {
                     + resolvedVideoVersionsGetters.size());
         } catch (Throwable t) {
             ModuleLog.line("(IE|DL|DexKit) video_versions getter resolution failed: " + t);
+        }
+    }
+
+    /**
+     * Resolves the carousel-children accessor. On IG 447 the separate media-dictionary model
+     * (MutableMediaDictIntf / LiveTreeMediaDict) was collapsed into com.instagram.feed.media.Media
+     * itself, so the legacy dict-harvested carouselCandidates are empty and carousels were
+     * collapsing to a single URL. The accessor is the no-arg List method anchored by the stable
+     * Pando string "carousel_media"; it returns one child Media per slide. Anchored on that string
+     * (no obfuscated X.* name), cached, and prepended to carouselCandidates. Absent on older builds
+     * (they keep using the dict path), so this stays backward-compatible.
+     */
+    private static void resolveCarouselGetter(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                Method cached = DexKitCache.loadMethod("MediaDownload_CarouselGetter", classLoader);
+                if (cached != null) {
+                    cached.setAccessible(true);
+                    carouselMediaGetter = cached;
+                }
+            }
+            if (carouselMediaGetter == null) {
+                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                        .matcher(MethodMatcher.create()
+                                .paramCount(0)
+                                .returnType("java.util.List")
+                                .usingEqStrings(List.of("carousel_media"))));
+                for (MethodData md : results) {
+                    try {
+                        Method m = md.getMethodInstance(classLoader);
+                        if (!List.class.isAssignableFrom(m.getReturnType())) continue;
+                        m.setAccessible(true);
+                        carouselMediaGetter = m;
+                        DexKitCache.saveMethod("MediaDownload_CarouselGetter", m);
+                        break;
+                    } catch (Throwable ignored) {}
+                }
+            }
+            if (carouselMediaGetter != null && !carouselCandidates.contains(carouselMediaGetter)) {
+                carouselCandidates.add(0, carouselMediaGetter);
+            }
+            ModuleLog.line("(IE|DL|DexKit) carousel getter="
+                    + (carouselMediaGetter == null ? "not found"
+                       : carouselMediaGetter.getDeclaringClass().getName() + "." + carouselMediaGetter.getName()));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|DexKit) carousel getter resolution failed: " + t);
         }
     }
 
@@ -1654,6 +1705,25 @@ public class FeedVideoDownloadHook {
     }
 
     /**
+     * Public helper: copies an already-downloaded LOCAL file into the gallery/download destination
+     * off the UI thread, with success/failure toasts. Used by the cached-story viewer (cross-package).
+     */
+    public static void saveLocalFileToGallery(Context ctx, String localPath, String author,
+                                              String id, boolean video, String okMsg, String failMsg) {
+        executor.submit(() -> {
+            try {
+                File src = new File(localPath);
+                if (!src.exists()) return;
+                String fn = buildFilename(author, "story", id, video);
+                saveFileToDestination(ctx, src, fn, video, author);
+                mainHandler.post(() -> android.widget.Toast.makeText(ctx, okMsg, android.widget.Toast.LENGTH_SHORT).show());
+            } catch (Throwable t) {
+                mainHandler.post(() -> android.widget.Toast.makeText(ctx, failMsg, android.widget.Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    /**
      * Reads the companion app's latest SAF URI from its shared prefs WITHOUT overwriting
      * FeatureFlags — callers decide what to do with the value.
      */
@@ -1767,6 +1837,13 @@ public class FeedVideoDownloadHook {
     static List<String> extractAllUrlsFromMedia(Context ctx, Object media) {
         if (media == null) return new ArrayList<>();
 
+        // Step 0 (IG 447+): carousel-first. Must run BEFORE the single-video short-circuit —
+        // otherwise a carousel that contains a video collapses to one URL (the graph walk in
+        // bestVideoUrlFromMedia returns the first video/audio it finds anywhere). Only fires
+        // when the "carousel_media" accessor resolved (absent on older builds → falls through).
+        List<String> carousel = extractCarouselUrls(ctx, media);
+        if (carousel != null && carousel.size() >= 2) return carousel;
+
         // Step A: single video
         String videoUrl = bestVideoUrlFromMedia(media);
         if (videoUrl != null) return new ArrayList<>(List.of(videoUrl));
@@ -1844,6 +1921,45 @@ public class FeedVideoDownloadHook {
         if (!cdnUrls.isEmpty()) return new ArrayList<>(List.of(cdnUrls.get(0)));
 
         return new ArrayList<>();
+    }
+
+    /**
+     * IG 447+ carousel extraction: reads one child Media per slide via the "carousel_media"
+     * accessor and resolves each slide's own URL (video slide → its video_versions; photo slide
+     * → its image). Returns null when this isn't a carousel or the accessor is unavailable, so
+     * the caller falls back to the legacy single-media / dict-based paths.
+     */
+    private static List<String> extractCarouselUrls(Context ctx, Object media) {
+        if (carouselMediaGetter == null) return null;
+        try {
+            Object owner = carouselMediaGetter.getDeclaringClass().isInstance(media)
+                    ? media
+                    : MediaModelResolver.findObjectOfType(
+                            media, carouselMediaGetter.getDeclaringClass(), 5);
+            if (owner == null) return null;
+
+            Object listObj = carouselMediaGetter.invoke(owner);
+            if (!(listObj instanceof List<?> items) || items.size() < 2) return null;
+
+            List<String> urls = new ArrayList<>();
+            for (Object child : items) {
+                if (child == null) continue;
+                String v = bestVideoUrlFromMedia(child);
+                if (v != null) { urls.add(v); continue; }
+                String img = imageUrlFromMedia(ctx, child);
+                if (img != null) { urls.add(img); continue; }
+                if (methodImageUrl != null && ctx != null) {
+                    try {
+                        Object r = methodImageUrl.invoke(null, ctx, child);
+                        if (r instanceof String s && isCdnMediaUrl(s)) urls.add(s);
+                    } catch (Throwable ignored) {}
+                }
+            }
+            return urls;
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Post) extractCarouselUrls: " + t);
+            return null;
+        }
     }
 
     /**
@@ -2051,6 +2167,140 @@ public class FeedVideoDownloadHook {
 
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ showCarouselBottomSheet: " + t);
+        }
+    }
+
+    // ── Copy Media Link (#117) ────────────────────────────────────────────────
+    //
+    // Single URL (reel / single post) → copy straight to clipboard. Carousel → a chooser
+    // sheet with one pill per slide plus "copy all", so the user picks the exact slide
+    // (the visible-slide index can't be resolved reliably when several feed carousels are
+    // on screen at once, so we don't guess — we let the user choose).
+
+    static void copyLinkToClipboard(Context ctx, String url) {
+        try {
+            ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", url));
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Post) ❌ copyLinkToClipboard: " + t);
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    static void showCopyLinkSheet(Context ctx, List<String> urls) {
+        if (urls == null || urls.isEmpty()) {
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (urls.size() == 1) { copyLinkToClipboard(ctx, urls.get(0)); return; }
+
+        try {
+            float dp   = ctx.getResources().getDisplayMetrics().density;
+            boolean dk = isDarkTheme(ctx);
+
+            int sheetBg    = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
+            int textPrim   = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
+            int textSec    = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
+            int accentBg   = Color.parseColor("#0A84FF");
+            int secondBg   = dk ? Color.parseColor("#3A3A3C") : Color.parseColor("#E5E5EA");
+            int secondText = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
+            int handleClr  = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
+
+            final int n = urls.size();
+
+            LinearLayout sheet = new LinearLayout(ctx);
+            sheet.setOrientation(LinearLayout.VERTICAL);
+            sheet.setBackground(roundRect(sheetBg, 20, ctx));
+            int hPad = (int)(20 * dp);
+            sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
+
+            View handle = new View(ctx);
+            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams((int)(40 * dp), (int)(4 * dp));
+            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
+            handleLp.bottomMargin = (int)(16 * dp);
+            handle.setLayoutParams(handleLp);
+            handle.setBackground(roundRect(handleClr, 2, ctx));
+            sheet.addView(handle);
+
+            TextView title = new TextView(ctx);
+            title.setText(I18n.t(ctx, R.string.ig_copy_link_title));
+            title.setTextColor(textPrim);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+            title.setTypeface(null, Typeface.BOLD);
+            sheet.addView(title);
+
+            TextView subtitle = new TextView(ctx);
+            subtitle.setText(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n));
+            subtitle.setTextColor(textSec);
+            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            subLp.bottomMargin = (int)(10 * dp);
+            subtitle.setLayoutParams(subLp);
+            sheet.addView(subtitle);
+
+            Dialog dialog = new Dialog(ctx);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            // One pill per slide (scrollable, capped height for long carousels)
+            LinearLayout pillList = new LinearLayout(ctx);
+            pillList.setOrientation(LinearLayout.VERTICAL);
+            for (int i = 0; i < n; i++) {
+                final int idx = i;
+                Button b = makePillButton(ctx,
+                        I18n.t(ctx, R.string.ig_copy_link_slide, i + 1, n), secondBg, secondText, dp);
+                b.setOnClickListener(v -> { dialog.dismiss(); copyLinkToClipboard(ctx, urls.get(idx)); });
+                pillList.addView(b);
+            }
+            ScrollView scroller = new ScrollView(ctx);
+            scroller.addView(pillList);
+            LinearLayout.LayoutParams svLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            svLp.weight = 1f;
+            scroller.setLayoutParams(svLp);
+            // Cap so many slides don't push the "copy all" pill off-screen
+            scroller.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                int cap = (int)(300 * dp);
+                if (scroller.getHeight() > cap && scroller.getLayoutParams().height != cap) {
+                    scroller.getLayoutParams().height = cap;
+                    scroller.requestLayout();
+                }
+            });
+            sheet.addView(scroller);
+
+            Button btnAll = makePillButton(ctx, I18n.t(ctx, R.string.ig_copy_link_all, n),
+                    accentBg, Color.WHITE, dp);
+            btnAll.setOnClickListener(v -> {
+                dialog.dismiss();
+                StringBuilder sb = new StringBuilder();
+                for (String u : urls) sb.append(u).append('\n');
+                try {
+                    ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+                    cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", sb.toString().trim()));
+                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
+                } catch (Throwable t) {
+                    ModuleLog.line("(IE|Post) ❌ copy all links: " + t);
+                }
+            });
+            sheet.addView(btnAll);
+
+            dialog.setContentView(sheet);
+            Window w = dialog.getWindow();
+            if (w != null) {
+                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                w.setGravity(Gravity.BOTTOM);
+                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                WindowManager.LayoutParams wlp = w.getAttributes();
+                int margin = (int)(12 * dp);
+                wlp.x = margin;
+                wlp.y = margin;
+                w.setAttributes(wlp);
+            }
+            dialog.show();
+
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Post) ❌ showCopyLinkSheet: " + t);
         }
     }
 

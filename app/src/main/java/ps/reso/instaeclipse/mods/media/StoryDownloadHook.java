@@ -72,6 +72,89 @@ public class StoryDownloadHook {
 
         installButtonInjectorHook(bridge, classLoader);
         installClickHandlerHook(bridge, classLoader);
+        resolveExpiringGetter(bridge, classLoader);
+        installStoryCaptureHook(bridge, classLoader);
+    }
+
+    // ── Story cache: capture each VIEWED story (per-page bind, fires for every story shown) ──
+    private static java.lang.reflect.Method expiringGetter; // Media."expiring_at" getter, () -> Long
+
+    private void resolveExpiringGetter(DexKitBridge bridge, ClassLoader cl) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                java.lang.reflect.Method c = DexKitCache.loadMethod("StoryCache_expiring", cl);
+                if (c != null) { c.setAccessible(true); expiringGetter = c; return; }
+            }
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .declaredClass("com.instagram.feed.media.Media").paramCount(0)
+                    .returnType("java.lang.Long").usingStrings("expiring_at")))) {
+                try {
+                    java.lang.reflect.Method m = md.getMethodInstance(cl);
+                    m.setAccessible(true); expiringGetter = m;
+                    DexKitCache.saveMethod("StoryCache_expiring", m);
+                    break;
+                } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) { ModuleLog.line("(IE|StoryCache) expiring getter: " + t); }
+    }
+
+    /**
+     * Hooks the story viewer's per-page bind (ReelViewerFragment.onCurrentActiveItemBound — anchored
+     * by that stable string; the method name is obfuscated) which fires for EVERY story shown. Its
+     * first ReelItem param is the current story; we record it to the 24h cache.
+     */
+    private void installStoryCaptureHook(DexKitBridge bridge, ClassLoader cl) {
+        XC_MethodHook capture = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (!FeatureFlags.cacheStories) return;
+                Object reelItem = null;
+                for (Object a : p.args) {
+                    if (a != null && a.getClass().getName().equals("com.instagram.model.reels.ReelItem")) { reelItem = a; break; }
+                }
+                if (reelItem != null) captureFromReelItem(reelItem);
+            }
+        };
+        try {
+            int n = 0;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("ReelViewerFragment.onCurrentActiveItemBound")))) {
+                try { XposedBridge.hookMethod(md.getMethodInstance(cl), capture); n++; } catch (Throwable ignored) {}
+            }
+            if (n > 0 && FeatureFlags.cacheStories) FeatureStatusTracker.setHooked("CacheStories");
+            ModuleLog.line("(IE|StoryCache) capture hook: " + n + " method(s)");
+        } catch (Throwable t) { ModuleLog.line("(IE|StoryCache) ⚠️ capture hook: " + t.getMessage()); }
+    }
+
+    private void captureFromReelItem(Object reelItem) {
+        try {
+            Object media = findMediaObject(reelItem);
+            if (media == null) return;
+            Context ctx = AndroidAppHelper.currentApplication();
+            String id;
+            try {
+                Object rid = reelItem.getClass().getMethod("getId").invoke(reelItem);
+                id = (rid instanceof String s && !s.isEmpty()) ? s.split("_")[0] : null;
+            } catch (Throwable t) { id = null; }
+            if (id == null || ps.reso.instaeclipse.utils.media.StoryCache.has(id)) return;
+            List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
+            if (urls == null || urls.isEmpty()) return;
+            final String url = urls.get(0);
+            final boolean video = FeedVideoDownloadHook.isVideoUrl(url);
+            // Use the ReelItem-based username resolver (handles a ReelItem passed directly) — the
+            // media-dictionary resolver doesn't populate for story media, giving "unknown".
+            String author = extractUsernameFromReelItemHolder(reelItem);
+            if (author == null || author.isEmpty()) author = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
+            long expiring = 0;
+            if (expiringGetter != null) {
+                try {
+                    Object v = expiringGetter.invoke(media);
+                    if (v instanceof Long l && l > 0) expiring = l < 100000000000L ? l * 1000L : l; // sec→ms
+                } catch (Throwable ignored) {}
+            }
+            final String fid = id, fauthor = author; final long fexp = expiring;
+            FeedVideoDownloadHook.executor.submit(() ->
+                    ps.reso.instaeclipse.utils.media.StoryCache.capture(fid, fauthor, url, video, fexp));
+        } catch (Throwable t) { ModuleLog.line("(IE|StoryCache) captureFromReelItem: " + t); }
     }
 
     // ── Hook 1: inject "Download" into the story options button list ──────────
@@ -142,6 +225,7 @@ public class StoryDownloadHook {
             ModuleLog.line("(IE|Story) ❌ Button builder hook: " + t);
         }
     }
+
 
     // ── Hook 2: handle click on our "Download" option ────────────────────────
     //
