@@ -10,7 +10,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.color.DynamicColors;
 
 import ps.reso.instaeclipse.fragments.FeaturesFragment;
 import ps.reso.instaeclipse.fragments.HelpFragment;
@@ -24,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DynamicColors.applyToActivityIfAvailable(this);
-
+        // NOTE: intentionally NOT applying DynamicColors — 0.7 ships a fixed branded dark palette
+        // (see Theme.InstaEclipse); adopting the wallpaper palette here would override the brand.
         super.onCreate(savedInstanceState);
         Logging.init(this, "instaeclipse_companion.log");
         VersionCheckUtility.checkForUpdates(this);

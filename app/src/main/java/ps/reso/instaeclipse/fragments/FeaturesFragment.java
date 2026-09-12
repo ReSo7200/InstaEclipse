@@ -688,26 +688,39 @@ public class FeaturesFragment extends Fragment {
     private void loadMainMenu() {
         List<Object> defs = new ArrayList<>();
 
-        defs.add(getString(R.string.feat_categories));
+        // Grouped to match the in-IG dialog: Appearance / Privacy / Media / Tools.
+        final String A_APPEARANCE = "#FF375F", A_PRIVACY = "#5E5CE6", A_MEDIA = "#FF9F0A", A_TOOLS = "#8E8E93";
+
+        defs.add(getString(R.string.feat_group_appearance));
         defs.add(Arrays.asList(
-                createNav(R.drawable.ic_tune, "#0A84FF", getString(R.string.ig_dialog_menu_dev_options), this::loadDevMenu),
-                createNav(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_menu_ghost_settings), this::loadGhostMenu),
-                createNav(R.drawable.ic_shield, "#FF453A", getString(R.string.ig_dialog_menu_ad_analytics), this::loadAdsMenu),
-                createNav(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_menu_clean_feed), this::loadCleanFeedMenu),
-                createNav(R.drawable.ic_block, "#30D158", getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu),
-                createNav(R.drawable.ic_settings_gear, "#BF5AF2", getString(R.string.ig_dialog_menu_misc), this::loadMiscMenu),
-                createNav(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_menu_downloader), this::loadDownloaderMenu),
-                createNav(R.drawable.ic_pin, "#FFD60A", getString(R.string.ig_dialog_menu_location), this::loadLocationMenu),
-                createNav(R.drawable.ic_movie, "#32D74B", getString(R.string.ig_dialog_menu_quality), this::loadQualityMenu),
-                createNav(R.drawable.ic_palette, "#FF2D55", getString(R.string.ig_dialog_menu_theme), this::loadThemeMenu)
+                createNav(R.drawable.ic_palette, A_APPEARANCE, getString(R.string.ig_dialog_menu_theme), this::loadThemeMenu),
+                createNav(R.drawable.ic_movie, A_APPEARANCE, getString(R.string.ig_dialog_menu_quality), this::loadQualityMenu),
+                createNav(R.drawable.ic_sparkle, A_APPEARANCE, getString(R.string.ig_dialog_menu_clean_feed), this::loadCleanFeedMenu)
         ));
 
-        defs.add(getString(R.string.feat_tools));
+        defs.add(getString(R.string.feat_group_privacy));
         defs.add(Arrays.asList(
-                createClickable(R.drawable.ic_save, "#30D158", getString(R.string.ig_dialog_backup_settings), this::backupSettings),
-                createClickable(R.drawable.ic_folder, "#0A84FF", getString(R.string.ig_dialog_restore_settings), this::restoreSettings),
-                createClickable(R.drawable.ic_info, "#8E8E93", getString(R.string.ig_dialog_menu_about), this::showAboutDialog),
-                createClickable(R.drawable.ic_restart, "#FF453A", getString(R.string.ig_dialog_menu_restart), this::restartInstagram)
+                createNav(R.drawable.ic_eye, A_PRIVACY, getString(R.string.ig_dialog_menu_ghost_settings), this::loadGhostMenu),
+                createNav(R.drawable.ic_shield, A_PRIVACY, getString(R.string.ig_dialog_misc_lock_section), this::loadLockMenu),
+                createNav(R.drawable.ic_eye_off, A_PRIVACY, getString(R.string.ig_hide_chats_title), this::loadHideChatsMenu),
+                createNav(R.drawable.ic_block, A_PRIVACY, getString(R.string.ig_dialog_menu_ad_analytics), this::loadAdsMenu),
+                createNav(R.drawable.ic_notification, A_PRIVACY, getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu)
+        ));
+
+        defs.add(getString(R.string.feat_group_media));
+        defs.add(Arrays.asList(
+                createNav(R.drawable.ic_download, A_MEDIA, getString(R.string.ig_dialog_menu_downloader), this::loadDownloaderMenu),
+                createNav(R.drawable.ic_pin, A_MEDIA, getString(R.string.ig_dialog_menu_location), this::loadLocationMenu)
+        ));
+
+        defs.add(getString(R.string.feat_group_tools));
+        defs.add(Arrays.asList(
+                createNav(R.drawable.ic_settings_gear, A_TOOLS, getString(R.string.ig_dialog_menu_misc), this::loadMiscMenu),
+                createNav(R.drawable.ic_tune, A_TOOLS, getString(R.string.ig_dialog_menu_dev_options), this::loadDevMenu),
+                createClickable(R.drawable.ic_save, A_TOOLS, getString(R.string.ig_dialog_backup_settings), this::backupSettings),
+                createClickable(R.drawable.ic_folder, A_TOOLS, getString(R.string.ig_dialog_restore_settings), this::restoreSettings),
+                createClickable(R.drawable.ic_restart, A_TOOLS, getString(R.string.ig_dialog_menu_restart), this::restartInstagram),
+                createClickable(R.drawable.ic_info, A_TOOLS, getString(R.string.ig_dialog_menu_about), this::showAboutDialog)
         ));
 
         showMenu(getString(R.string.features), defs);
@@ -745,7 +758,7 @@ public class FeaturesFragment extends Fragment {
                 createMasterSwitch(getString(R.string.ig_dialog_enable_disable_all), Arrays.asList(
                         "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive",
                         "allowScreenshots", "isGhostScreenshot", "isGhostViewOnce",
-                        "enableUnlimitedReplays", "permanentViewMode", "keepEphemeralMessages"
+                        "permanentViewMode", "keepEphemeralMessages", "keepUnsentMessages"
                 )),
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_dm_seen), "isGhostSeen"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_typing), "isGhostTyping"),
@@ -754,9 +767,9 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_ghost_allow_screenshots_dms), "allowScreenshots"),
                 createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_ghost_bypass_screenshot), "isGhostScreenshot"),
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_view_once), "isGhostViewOnce"),
-                createSwitch(R.drawable.ic_restart, "#5E5CE6", getString(R.string.ig_dialog_ghost_unlimited_replays), "enableUnlimitedReplays"),
                 createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_ghost_permanent_view_once), "permanentViewMode"),
-                createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_dialog_ghost_keep_disappearing), "keepEphemeralMessages")
+                createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_dialog_ghost_keep_disappearing), "keepEphemeralMessages"),
+                createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_keep_unsent), "keepUnsentMessages")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_ghost_mode), defs);
@@ -771,7 +784,7 @@ public class FeaturesFragment extends Fragment {
                 createMasterSwitch(getString(R.string.ig_dialog_enable_disable_all), Arrays.asList(
                         "quickToggleSeen", "quickToggleTyping", "quickToggleScreenshot",
                         "quickToggleViewOnce", "quickToggleStory", "quickToggleLive",
-                        "quickToggleEphemeral", "quickToggleReplays", "quickTogglePermanentView",
+                        "quickToggleEphemeral", "quickTogglePermanentView",
                         "quickToggleAllowScreenshots"
                 )),
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_seen), "quickToggleSeen"),
@@ -781,7 +794,6 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_story_ring, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_story_seen), "quickToggleStory"),
                 createSwitch(R.drawable.ic_live, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_live_seen), "quickToggleLive"),
                 createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_dialog_quick_keep_ephemeral), "quickToggleEphemeral"),
-                createSwitch(R.drawable.ic_restart, "#5E5CE6", getString(R.string.ig_dialog_quick_unlimited_replays), "quickToggleReplays"),
                 createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_quick_permanent_view), "quickTogglePermanentView"),
                 createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_quick_allow_screenshots), "quickToggleAllowScreenshots")
         ));
@@ -881,7 +893,7 @@ public class FeaturesFragment extends Fragment {
                 createMasterSwitch(getString(R.string.ig_dialog_enable_disable_all), Arrays.asList(
                         "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
                         "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
-                        "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom"
+                        "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI"
                 )),
                 createSwitch(R.drawable.ic_story_ring, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
@@ -894,11 +906,46 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_content_copy, "#BF5AF2", getString(R.string.ig_dialog_misc_copy_comment), "enableCopyComment"),
                 createSwitch(R.drawable.ic_heart, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_double_tap_like), "disableDoubleTapLike"),
                 createSwitch(R.drawable.ic_content_copy, "#BF5AF2", getString(R.string.ig_dialog_misc_copy_caption), "enableCaptionCopy"),
-                createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_photo_zoom), "enablePhotoZoom")
+                createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_photo_zoom), "enablePhotoZoom"),
+                createSwitch(R.drawable.ic_sparkle, "#BF5AF2", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_misc), defs);
         currentMenu = "misc";
+    }
+
+    /** Lock (Privacy). Companion app only toggles the persisted flags — the passcode itself is set
+     *  from inside Instagram (the module has no passcode field here). */
+    private void loadLockMenu() {
+        List<Object> defs = new ArrayList<>();
+
+        defs.add(getString(R.string.feat_features));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_dms), "lockDirectMessages"),
+                createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_whole_app), "lockWholeApp"),
+                createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_fingerprint), "lockUseFingerprint")
+        ));
+
+        // Note: setting the passcode itself is done from inside Instagram.
+
+        showMenu(getString(R.string.ig_dialog_misc_lock_section), defs);
+        currentMenu = "lock";
+    }
+
+    /** Hide Specific Chats (Privacy). The companion app toggles the feature; hiding/unhiding a
+     *  specific chat is done from inside Instagram. */
+    private void loadHideChatsMenu() {
+        List<Object> defs = new ArrayList<>();
+
+        defs.add(getString(R.string.feat_features));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats")
+        ));
+
+        // Note: hiding/unhiding a specific chat is done from inside Instagram.
+
+        showMenu(getString(R.string.ig_hide_chats_title), defs);
+        currentMenu = "hidechats";
     }
 
     private void loadLocationMenu() {
@@ -933,13 +980,21 @@ public class FeaturesFragment extends Fragment {
     private void loadThemeMenu() {
         List<Object> defs = new ArrayList<>();
 
-        defs.add(getString(R.string.feat_features));
-        defs.add(Arrays.asList(createSwitch(R.drawable.ic_palette, "#FF2D55", getString(R.string.theme_enable), "customThemeEnabled")));
+        defs.add(getString(R.string.theme_section_colors));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_enable), "customThemeEnabled"),
+                createClickable(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_customize), () ->
+                        themeCustomizerLauncher.launch(new Intent(requireContext(), ThemeCustomizerActivity.class)))
+        ));
 
-        defs.add(getString(R.string.feat_options));
-        defs.add(Arrays.asList(createClickable(R.drawable.ic_palette, "#FF2D55",
-                getString(R.string.theme_customize), () ->
-                        themeCustomizerLauncher.launch(new Intent(requireContext(), ThemeCustomizerActivity.class)))));
+        // Fonts & Emoji now live under Custom Theme (mirrors the in-IG dialog). File pickers run
+        // inside Instagram; here the companion app only toggles the flags.
+        defs.add(getString(R.string.theme_section_fonts));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.ig_dialog_misc_custom_font), "customFontEnabled"),
+                createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.ig_dialog_misc_custom_emoji), "customEmojiEnabled")
+        ));
+        // Note: font & emoji files are picked from inside Instagram.
 
         showMenu(getString(R.string.theme_title), defs);
         currentMenu = "theme";
@@ -1017,7 +1072,11 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_options));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_folder, "#FF9F0A", getString(R.string.ig_dialog_downloader_username_subfolder), "downloaderUsernameFolder"),
-                createSwitch(R.drawable.ic_timer, "#FF9F0A", getString(R.string.ig_dialog_downloader_add_timestamp), "downloaderAddTimestamp")
+                createSwitch(R.drawable.ic_timer, "#FF9F0A", getString(R.string.ig_dialog_downloader_add_timestamp), "downloaderAddTimestamp"),
+                createSwitch(R.drawable.ic_link, "#FF9F0A", getString(R.string.ig_dialog_downloader_copy_link), "copyMediaLink"),
+                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_save_instants), "saveInstants"),
+                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_upload_instants), "uploadInstants"),
+                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_cache_stories), "cacheStories")
         ));
 
         String customPath = localCache.getString("downloaderCustomPath", "");
