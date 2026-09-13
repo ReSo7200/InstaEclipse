@@ -137,6 +137,127 @@ public class RemoveMetaAIHook {
         installVideoAttribution(bridge, classLoader);     // Meta AI attribution subtitle (video posts)
         installReelsOverflowGate(bridge, classLoader);    // reel ⋮ "Ask Meta AI" entrypoint
         installMenuOptionFilter(bridge, classLoader);     // GEN_AI MediaOption rows in overflow menus
+        installSearchSerpMetaAiHcm(bridge, classLoader);  // "Ask Meta AI" card in search results (446+)
+        installReelContentDeepDive(bridge, classLoader);  // reel "Ask Meta AI about this" (Content Deep Dive)
+    }
+
+    /**
+     * Reel "Ask Meta AI about this" — the Content Deep Dive prompt/entry (446+, Litho; appears in the
+     * reel more-options sheet and as a pill). It is NOT a MediaOption row, so the menu-option filter
+     * can't reach it. Kill it at the data layer instead: force its eligibility gate
+     * (ClipsMediaInfoComponent.shouldShowContentDeepDivePrompt) to false and no-op its prompt-data
+     * fetcher — with no eligibility and no prompt data, neither the pill nor the menu entry is built.
+     * Anchored on stable trace-marker strings (classes are obfuscated). Both are gated on the flag.
+     */
+    private void installReelContentDeepDive(DexKitBridge bridge, ClassLoader cl) {
+        // Gate: shouldShowContentDeepDivePrompt(...) -> force false. Return type may be boolean OR
+        // boxed Boolean, so decide at runtime from the hooked method's actual return type (never
+        // clobber a non-boolean return).
+        XC_MethodHook forceFalse = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam p) {
+                if (!FeatureFlags.removeMetaAI) return;
+                try {
+                    Class<?> rt = ((java.lang.reflect.Method) p.method).getReturnType();
+                    if (rt == boolean.class || rt == Boolean.class) p.setResult(false);
+                } catch (Throwable ignored) {}
+            }
+        };
+        hookByMarker(bridge, cl, forceFalse,
+                "android_purge_26_q3_ClipsMediaInfoComponent_shouldShowContentDeepDivePrompt",
+                "cdd-should-show", null);
+        // Also blank the Content Deep Dive UI-state builder (getUiState) — belt and braces if the
+        // gate lives elsewhere: with an empty/blanked ui-state the pill/entry has nothing to show.
+        XC_MethodHook blankUiState = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (!FeatureFlags.removeMetaAI) return;
+                Object r = p.getResult();
+                if (r == null) return;
+                try {
+                    for (java.lang.reflect.Field f : r.getClass().getDeclaredFields()) {
+                        if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                        f.setAccessible(true);
+                        if (f.get(r) != null) f.set(r, "");
+                    }
+                } catch (Throwable ignored) {}
+            }
+        };
+        hookByMarker(bridge, cl, blankUiState,
+                "android_purge_26_q3_ContentDeepDiveUseCase_getUiState", "cdd-uistate", null);
+        // Fetcher: skip fetching prompt data so there is nothing to render.
+        XC_MethodHook skip = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam p) {
+                if (FeatureFlags.removeMetaAI) p.setResult(null);
+            }
+        };
+        hookByMarker(bridge, cl, skip,
+                "android_purge_26_q3_ClipsContentDeepDivePromptFetcher_fetchContentDeepDivePromptDataForMediaIds",
+                "cdd-fetch", null);
+
+        // The reel ⋮ more-options menu adds the Meta AI ("GenAI info") row via
+        // ClipsOrganicMediaItemViewMoreOptionsController.maybeAddGenAIInfoRow(...). Skip that method
+        // so the row is never appended. Only skip if it's void (a side-effecting row-adder) — never
+        // clobber a method that returns a value the caller uses.
+        XC_MethodHook skipIfVoid = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam p) {
+                if (!FeatureFlags.removeMetaAI) return;
+                try {
+                    if (((java.lang.reflect.Method) p.method).getReturnType() == void.class) p.setResult(null);
+                } catch (Throwable ignored) {}
+            }
+        };
+        hookByMarker(bridge, cl, skipIfVoid,
+                "android_purge_26_q3_ClipsOrganicMediaItemViewMoreOptionsController_maybeAddGenAIInfoRow",
+                "reel-menu-genai-row", null);
+    }
+
+    /** Hook every method carrying a trace-marker string; if returnTypeFilter is non-null, only hook
+     *  methods with that return type (guards the force-false against non-boolean overloads). */
+    private void hookByMarker(DexKitBridge bridge, ClassLoader cl, XC_MethodHook hook,
+                              String marker, String label, String returnTypeFilter) {
+        int n = 0;
+        try {
+            MethodMatcher mm = MethodMatcher.create().usingStrings(marker);
+            if (returnTypeFilter != null) mm = mm.returnType(returnTypeFilter);
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(mm))) {
+                try { XposedBridge.hookMethod(md.getMethodInstance(cl), hook); n++; } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ " + label + ": " + t.getMessage());
+        }
+        ModuleLog.line("(IE|RemoveMetaAI) " + label + ": " + n + " method(s)");
+    }
+
+    /**
+     * Search-results "Ask Meta AI" HCM card (IG 446+, Litho-rendered — not XML-inflatable). The
+     * card's data comes from ClipsTopSerpDataSource.createDefaultMetaAIHcmFetchResults(...); if that
+     * produces no results, no card is shown. We anchor on the method's stable trace-marker string
+     * (the class itself is obfuscated) and empty its result at runtime. Only collection/map results
+     * are cleared; anything else is left untouched (and its type logged) so we never break the SERP.
+     */
+    private void installSearchSerpMetaAiHcm(DexKitBridge bridge, ClassLoader cl) {
+        XC_MethodHook neuter = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (!FeatureFlags.removeMetaAI) return;
+                Object r = p.getResult();
+                if (r == null) return;
+                try {
+                    if (r instanceof java.util.Collection) { ((java.util.Collection<?>) r).clear(); }
+                    else if (r instanceof java.util.Map) { ((java.util.Map<?, ?>) r).clear(); }
+                    else if (r instanceof Object[]) { p.setResult(java.util.Arrays.copyOf((Object[]) r, 0)); }
+                    else { ModuleLog.probe("(IE|RemoveMetaAI) serp-hcm result type=" + r.getClass().getName()); }
+                } catch (Throwable ignored) {}
+            }
+        };
+        int n = 0;
+        try {
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("android_purge_26_q2_ClipsTopSerpDataSource_createDefaultMetaAIHcmFetchResults")))) {
+                try { XposedBridge.hookMethod(md.getMethodInstance(cl), neuter); n++; } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ search-serp-hcm: " + t.getMessage());
+        }
+        ModuleLog.line("(IE|RemoveMetaAI) search-serp-hcm: " + n + " method(s)");
     }
 
     /**
@@ -155,6 +276,7 @@ public class RemoveMetaAIHook {
         String[] anchors = {
                 "android_purge_26_q3_MetaAiClipsEligibilityFetcher_fetchEligibility",
                 "android_purge_26_q3_MetaAiClipsEligibilityFetcher_onClipsItemsRequestFinished",
+                "android_purge_26_q3_MetaAiClipsEligibilityFetcher_onClipsItemsRequestSuccess", // IG 446+
         };
         int n = 0;
         java.util.Set<String> hooked = new HashSet<>();
@@ -283,17 +405,27 @@ public class RemoveMetaAIHook {
                 } catch (Throwable ignored) {}
             }
         };
-        // Reel options list (ArrayList referencing PLAYBACK_CONTROLS + UNSAVE).
+        // Any option-list builder that references the GEN_AI_INFO enum field is, by construction, a
+        // menu that can contain the Meta AI item — post overflow, reel ⋮, or otherwise. Anchoring on
+        // that single stable field (rather than a specific neighbour-field combo) catches every
+        // surface across builds; IG 446 moved the reel ⋮ menu to a different builder than the old
+        // PLAYBACK_CONTROLS+UNSAVE ArrayList, which is why the narrow reel matcher missed it.
+        // Anchor on every Meta-AI menu enum constant: GEN_AI_INFO (post overflow), GEN_AI, and
+        // CONTENT_DEEP_DIVE — the reel ⋮ "Ask Meta AI about this" entry (its prompt string is
+        // meta_ai_content_deep_dive_prompt_v2), which neither GEN_AI anchor caught.
+        for (String constName : new String[]{"GEN_AI_INFO", "GEN_AI", "CONTENT_DEEP_DIVE"}) {
+            String field = od + "->" + constName + ":" + od;
+            hookBuilder(bridge, cl, filter, FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType("java.util.List").addUsingField(field)), "list-" + constName);
+            hookBuilder(bridge, cl, filter, FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType("java.util.ArrayList").addUsingField(field)), "arraylist-" + constName);
+        }
+        // Reel options list (ArrayList referencing PLAYBACK_CONTROLS + UNSAVE) — kept for builds
+        // where the reel menu builder does not statically reference GEN_AI_INFO.
         hookBuilder(bridge, cl, filter, FindMethod.create().matcher(MethodMatcher.create()
                 .returnType("java.util.ArrayList")
                 .addUsingField(od + "->PLAYBACK_CONTROLS:" + od)
                 .addUsingField(od + "->UNSAVE:" + od)), "reel-options");
-        // Shared overflow allowlist ((boolean)->List referencing REPORT + HIDE_OPTIONS + GEN_AI_INFO).
-        hookBuilder(bridge, cl, filter, FindMethod.create().matcher(MethodMatcher.create()
-                .paramTypes("boolean").returnType("java.util.List")
-                .addUsingField(od + "->REPORT:" + od)
-                .addUsingField(od + "->HIDE_OPTIONS:" + od)
-                .addUsingField(od + "->GEN_AI_INFO:" + od)), "overflow-allowlist");
     }
 
     private void hookBuilder(DexKitBridge bridge, ClassLoader cl, XC_MethodHook hook, FindMethod q, String label) {
@@ -311,7 +443,8 @@ public class RemoveMetaAIHook {
     private static boolean isMetaAiOption(String name) {
         String n = name.toUpperCase();
         return n.contains("GEN_AI") || n.contains("GENAI") || n.contains("META_AI")
-                || n.contains("METAAI") || n.contains("ASK_META");
+                || n.contains("METAAI") || n.contains("ASK_META")
+                || n.contains("CONTENT_DEEP_DIVE"); // reel ⋮ "Ask Meta AI about this" (446+)
     }
 
     private static void collapse(View v) {
