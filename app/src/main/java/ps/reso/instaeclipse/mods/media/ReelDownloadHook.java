@@ -71,18 +71,42 @@ public class ReelDownloadHook {
                 return;
             }
 
-            controllerClass = methods.get(0).getMethodInstance(classLoader).getDeclaringClass();
+            // The controller string can be referenced from more than one method; collect every
+            // distinct declaring class and pick whichever actually carries the options-builder.
+            java.util.LinkedHashSet<Class<?>> candidates = new java.util.LinkedHashSet<>();
+            for (var md : methods) {
+                try { candidates.add(md.getMethodInstance(classLoader).getDeclaringClass()); }
+                catch (Throwable ignored) {}
+            }
+            ModuleLog.line("(IE|Reel) string matches=" + methods.size()
+                    + " candidateClasses=" + candidates.size());
 
-            // Find the options-builder method: void(com.instagram.feed.media.Media, <ButtonAdder>)
+            // Options-builder: void(com.instagram.feed.media.Media, <ButtonAdder>), where the
+            // ButtonAdder param exposes an (Context, OnClickListener, String, int) add method.
+            // Prefer that precise shape; fall back to the first void(Media, non-primitive).
             Method target = null;
-            for (Method m : controllerClass.getDeclaredMethods()) {
-                if (m.getReturnType() != void.class) continue;
-                Class<?>[] params = m.getParameterTypes();
-                if (params.length < 2) continue;
-                if (!params[0].getName().equals("com.instagram.feed.media.Media")) continue;
-                if (params[1].isPrimitive() || params[1] == String.class) continue;
-                target = m;
-                break;
+            Method fallback = null;
+            for (Class<?> cand : candidates) {
+                int voidMedia = 0;
+                for (Method m : cand.getDeclaredMethods()) {
+                    if (m.getReturnType() != void.class) continue;
+                    Class<?>[] params = m.getParameterTypes();
+                    if (params.length < 2) continue;
+                    if (!params[0].getName().equals("com.instagram.feed.media.Media")) continue;
+                    if (params[1].isPrimitive() || params[1] == String.class) continue;
+                    voidMedia++;
+                    if (fallback == null) fallback = m;
+                    if (hasButtonAdderMethod(params[1])) { target = m; break; }
+                }
+                if (voidMedia > 0) {
+                    ModuleLog.line("(IE|Reel) candidate " + cand.getName()
+                            + " void(Media,X)=" + voidMedia);
+                }
+                if (target != null) { controllerClass = cand; break; }
+            }
+            if (target == null && fallback != null) {
+                target = fallback;
+                controllerClass = fallback.getDeclaringClass();
             }
 
             if (target == null) {
@@ -109,6 +133,25 @@ public class ReelDownloadHook {
         }
     }
 
+    /**
+     * True when {@code adder} exposes the reel-menu button-adder method
+     * {@code (Context, View.OnClickListener, String, int)} — the same shape
+     * {@link #onOptionsBuilt} invokes. Identifies the correct options-builder overload
+     * structurally, so it survives obfuscated renames across Instagram versions.
+     */
+    private static boolean hasButtonAdderMethod(Class<?> adder) {
+        if (adder == null) return false;
+        for (Method m : adder.getDeclaredMethods()) {
+            Class<?>[] p = m.getParameterTypes();
+            if (p.length == 4
+                    && Context.class.isAssignableFrom(p[0])
+                    && View.OnClickListener.class.isAssignableFrom(p[1])
+                    && p[2] == String.class
+                    && p[3] == int.class) return true;
+        }
+        return false;
+    }
+
     // ── Reduced options-list patch ──────────────────────────────────────────────
     //
     // IG's newer, simplified reel overflow menu builds its option list via one
@@ -124,27 +167,33 @@ public class ReelDownloadHook {
     // app-wide click-handler hook already covers whatever dispatches its click.
     private static void installReduceOptionsListPatch(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            Object downloadOption = null;
+            Object downloadOption = null, copyLinkOption = null;
             Class<?> optionClass = classLoader.loadClass("com.instagram.feed.media.mediaoption.MediaOption$Option");
             for (Object v : (Object[]) optionClass.getMethod("values").invoke(null)) {
-                if (v.toString().equals("DOWNLOAD")) { downloadOption = v; break; }
+                String n = v.toString();
+                if (n.equals("DOWNLOAD")) downloadOption = v;
+                else if (n.equals("COPY_LINK")) copyLinkOption = v;
             }
-            if (downloadOption == null) {
-                ModuleLog.line("(IE|Reel) ❌ DOWNLOAD enum value not found");
+            if (downloadOption == null && copyLinkOption == null) {
+                ModuleLog.line("(IE|Reel) ❌ DOWNLOAD/COPY_LINK enum values not found");
                 return;
             }
             final Object download = downloadOption;
+            final Object copyLink = copyLinkOption;   // #117 — clicks handled by PostDownloadContextMenuHook
 
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
-                    if (!FeatureFlags.enableReelDownload) return;
+                    boolean wantDl = FeatureFlags.enableReelDownload && download != null;
+                    boolean wantCl = FeatureFlags.copyMediaLink && copyLink != null;
+                    if (!wantDl && !wantCl) return;
                     try {
                         Object result = param.getResult();
-                        if (result instanceof List<?> list && !list.contains(download)) {
+                        if (result instanceof List<?> list) {
                             @SuppressWarnings("unchecked")
                             List<Object> mutable = (List<Object>) list;
-                            mutable.add(download);
+                            if (wantDl && !mutable.contains(download)) mutable.add(download);
+                            if (wantCl && !mutable.contains(copyLink)) mutable.add(copyLink);
                         }
                     } catch (Throwable t) {
                         ModuleLog.line("(IE|Reel) ❌ options-list patch failed: " + t);

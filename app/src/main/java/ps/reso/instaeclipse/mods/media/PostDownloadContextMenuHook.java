@@ -54,6 +54,7 @@ public class PostDownloadContextMenuHook {
     // com.instagram.feed.media.mediaoption.MediaOption$Option — stable public enum
     private static Class<?> mediaOptionEnumClass;
     private static Object   downloadOptionValue;     // MediaOption$Option.DOWNLOAD
+    private static Object   copyLinkOptionValue;     // MediaOption$Option.COPY_LINK (#117)
 
     // Obfuscated creator class found via "MediaOptionsOverflowMenuCreator" string
     private static Class<?> menuCreatorClass;
@@ -95,12 +96,17 @@ public class PostDownloadContextMenuHook {
                     "com.instagram.feed.media.mediaoption.MediaOption$Option");
             Object[] values = (Object[]) mediaOptionEnumClass.getMethod("values").invoke(null);
             for (Object v : values) {
-                if (downloadOptionValue == null && v.toString().equals("DOWNLOAD")) {
+                String name = v.toString();
+                if (downloadOptionValue == null && name.equals("DOWNLOAD")) {
                     downloadOptionValue = v;
+                } else if (copyLinkOptionValue == null && name.equals("COPY_LINK")) {
+                    copyLinkOptionValue = v;
                 }
             }
             if (downloadOptionValue == null)
                 ModuleLog.line("(IE|Post) ❌ DOWNLOAD enum value not found");
+            if (copyLinkOptionValue == null)
+                ModuleLog.line("(IE|Post) ❌ COPY_LINK enum value not found");
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ loadMediaOptionEnum: " + t);
         }
@@ -243,7 +249,8 @@ public class PostDownloadContextMenuHook {
     // ── Hook A: intercept every addButton call, inject Download once per menu ─
 
     private static void installAddButtonHook() {
-        if (addButtonMethod == null || downloadOptionValue == null || enumNormalValue == null) {
+        if (addButtonMethod == null || enumNormalValue == null
+                || (downloadOptionValue == null && copyLinkOptionValue == null)) {
             ModuleLog.line("(IE|Post) ❌ Cannot install addButton hook — prerequisites missing");
             return;
         }
@@ -253,16 +260,26 @@ public class PostDownloadContextMenuHook {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 if (Boolean.TRUE.equals(sAddingDownload.get())) return;
-                if (!FeatureFlags.enablePostDownload) return;
-                // Suppress Instagram's own native DOWNLOAD button — we add ours instead
-                if (param.args[idxOption] == downloadOptionValue) param.setResult(null);
+                Object opt = param.args[idxOption];
+                // Suppress IG's own native rows — we inject our own versions instead
+                if (FeatureFlags.enablePostDownload && opt == downloadOptionValue) {
+                    param.setResult(null);
+                } else if (FeatureFlags.copyMediaLink && opt == copyLinkOptionValue) {
+                    param.setResult(null);
+                }
             }
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.enablePostDownload) return;
                 if (Boolean.TRUE.equals(sAddingDownload.get())) return;
-                if (param.args[idxOption] == downloadOptionValue) return;
+
+                boolean wantDownload = FeatureFlags.enablePostDownload && downloadOptionValue != null;
+                boolean wantCopyLink = FeatureFlags.copyMediaLink && copyLinkOptionValue != null;
+                if (!wantDownload && !wantCopyLink) return;
+
+                // Don't react to our own target option types (suppressed in beforeHook)
+                Object opt = param.args[idxOption];
+                if (opt == downloadOptionValue || opt == copyLinkOptionValue) return;
 
                 Object self = param.args[idxSelf];
                 boolean alreadyProcessed;
@@ -272,25 +289,32 @@ public class PostDownloadContextMenuHook {
                 }
                 if (alreadyProcessed) return;
 
-                Object[] callArgs = new Object[addButtonMethod.getParameterCount()];
-                System.arraycopy(param.args, 0, callArgs, 0, callArgs.length);
-                callArgs[idxEnum]   = enumNormalValue;
-                callArgs[idxOption] = downloadOptionValue;
-                callArgs[idxText]   = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
-
-                sAddingDownload.set(true);
-                try {
-                    addButtonMethod.invoke(null, callArgs);
-                } catch (Throwable t) {
-                    ModuleLog.line("(IE|Post) ❌ addButton invoke failed: " + t);
-                } finally {
-                    sAddingDownload.set(false);
-                }
+                if (wantDownload) injectRow(param, downloadOptionValue, R.string.ig_dl_title);
+                if (wantCopyLink) injectRow(param, copyLinkOptionValue, R.string.ig_copy_link_title);
             }
         });
 
-        FeatureStatusTracker.setHooked("PostDownload");
-        ModuleLog.line("(IE|Post) ✅ Post download hook installed");
+        if (downloadOptionValue != null) FeatureStatusTracker.setHooked("PostDownload");
+        if (copyLinkOptionValue != null) FeatureStatusTracker.setHooked("CopyMediaLink");
+        ModuleLog.line("(IE|Post) ✅ Post menu inject hook installed");
+    }
+
+    /** Adds one button (Download / Copy Media Link) to the menu currently being built. */
+    private static void injectRow(XC_MethodHook.MethodHookParam param, Object optionValue, int labelResId) {
+        Object[] callArgs = new Object[addButtonMethod.getParameterCount()];
+        System.arraycopy(param.args, 0, callArgs, 0, callArgs.length);
+        callArgs[idxEnum]   = enumNormalValue;
+        callArgs[idxOption] = optionValue;
+        callArgs[idxText]   = I18n.t(AndroidAppHelper.currentApplication(), labelResId);
+
+        sAddingDownload.set(true);
+        try {
+            addButtonMethod.invoke(null, callArgs);
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Post) ❌ addButton invoke failed: " + t);
+        } finally {
+            sAddingDownload.set(false);
+        }
     }
 
     // ── Hook B: click handler ─────────────────────────────────────────────────
@@ -302,7 +326,7 @@ public class PostDownloadContextMenuHook {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.enablePostDownload) return;
+                if (!FeatureFlags.enablePostDownload && !FeatureFlags.copyMediaLink) return;
                 onOptionClicked(param);
             }
         };
@@ -385,13 +409,19 @@ public class PostDownloadContextMenuHook {
         XC_MethodHook allowlistHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (downloadOptionValue == null) return;
                 try {
                     Object result = param.getResult();
                     if (!(result instanceof List<?> original)) return;
-                    if (original.contains(downloadOptionValue)) return;
+
+                    boolean addDownload = FeatureFlags.enablePostDownload && downloadOptionValue != null
+                            && !original.contains(downloadOptionValue);
+                    boolean addCopyLink = FeatureFlags.copyMediaLink && copyLinkOptionValue != null
+                            && !original.contains(copyLinkOptionValue);
+                    if (!addDownload && !addCopyLink) return;
+
                     List<Object> patched = new ArrayList<>(original);
-                    patched.add(downloadOptionValue);
+                    if (addDownload) patched.add(downloadOptionValue);
+                    if (addCopyLink) patched.add(copyLinkOptionValue);
                     param.setResult(patched);
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Post) ❌ allowlist patch failed: " + t);
@@ -452,13 +482,18 @@ public class PostDownloadContextMenuHook {
             }
             if (clicked == null) {
                 for (Object a : param.args) {
-                    if (a != null && a.getClass().isEnum() && a.toString().contains("DOWNLOAD")) {
+                    if (a != null && a.getClass().isEnum()
+                            && (a.toString().contains("DOWNLOAD") || a.toString().contains("COPY_LINK"))) {
                         clicked = a; break;
                     }
                 }
             }
+            if (clicked == null) return;
 
-            if (clicked == null || !clicked.toString().equals("DOWNLOAD")) return;
+            String option = clicked.toString();
+            boolean isDownload = option.equals("DOWNLOAD") && FeatureFlags.enablePostDownload;
+            boolean isCopyLink = option.equals("COPY_LINK") && FeatureFlags.copyMediaLink;
+            if (!isDownload && !isCopyLink) return;
 
             param.setResult(null); // consume the event
 
@@ -478,7 +513,8 @@ public class PostDownloadContextMenuHook {
                 return;
             }
 
-            triggerDownload(ctx, media, thisObj);
+            if (isCopyLink) triggerCopyLink(ctx, media, thisObj);
+            else            triggerDownload(ctx, media, thisObj);
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ onOptionClicked: " + t);
         }
@@ -514,6 +550,23 @@ public class PostDownloadContextMenuHook {
         final String finalId   = mediaId;
         FeedVideoDownloadHook.mainHandler.post(() ->
                 FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx));
+    }
+
+    // ── Copy Media Link (#117) ────────────────────────────────────────────────
+    //
+    // Copies the direct CDN url of the currently-visible slide to the clipboard.
+    // Reuses the same URL extraction + carousel-index resolution as the downloader
+    // so the copied link always matches the slide the user is looking at.
+
+    private static void triggerCopyLink(Context ctx, Object media, Object clickHandler) {
+        List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
+        if (urls == null || urls.isEmpty()) {
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // Single URL copies straight to clipboard; a carousel shows a per-slide chooser
+        // (see showCopyLinkSheet — the visible slide can't be resolved reliably in the feed).
+        FeedVideoDownloadHook.mainHandler.post(() -> FeedVideoDownloadHook.showCopyLinkSheet(ctx, urls));
     }
 
     /**

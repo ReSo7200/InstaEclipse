@@ -13,7 +13,36 @@
 
 
     <!-- Bottom Navigation Colors -->
-    <color name="bottom_nav_icon">#B0BEC5</color>
-    <color name="bottom_nav_icon_active">#448AFF</color>
+    <color name="bottom_nav_icon">#8A8A93</color>
+    <color name="bottom_nav_icon_active">#9B99FF</color>
     <color name="purple_200">#9C27B0</color>
+
+    <!-- ==== 0.7 brand palette (fixed dark, mirrors the in-IG dialog sheet) ==== -->
+    <color name="ie_primary">#9B99FF</color>            <!-- indigo accent -->
+    <color name="ie_on_primary">#1B1930</color>
+    <color name="ie_primary_container">#302E5E</color>
+    <color name="ie_on_primary_container">#E2E0FF</color>
+    <color name="ie_secondary">#C7C5F5</color>
+    <color name="ie_on_secondary">#1E1D30</color>
+    <color name="ie_secondary_container">#2C2B45</color>
+    <color name="ie_on_secondary_container">#E4E2FF</color>
+    <color name="ie_tertiary">#FF8199</color>            <!-- pink accent -->
+    <color name="ie_on_tertiary">#3A0E1B</color>
+    <color name="ie_tertiary_container">#5C1E2C</color>
+    <color name="ie_on_tertiary_container">#FFD9E0</color>
+
+    <color name="ie_background">#17171B</color>
+    <color name="ie_surface">#17171B</color>
+    <color name="ie_on_surface">#F2F2F5</color>
+    <color name="ie_surface_variant">#2C2C34</color>
+    <color name="ie_on_surface_variant">#B8B8C0</color>
+    <color name="ie_surface_lowest">#121216</color>
+    <color name="ie_surface_low">#1C1C22</color>
+    <color name="ie_surface_container">#202027</color>
+    <color name="ie_surface_high">#26262E</color>
+    <color name="ie_surface_highest">#303038</color>
+    <color name="ie_outline">#45454F</color>
+    <color name="ie_outline_variant">#2C2C34</color>
+    <color name="ie_error">#FF6B60</color>
+    <color name="ie_on_error">#3A0906</color>
 </resources>

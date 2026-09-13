@@ -21,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="?attr/colorPrimaryContainer"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
 
@@ -111,17 +112,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
+            android:minHeight="52dp"
             android:text="@string/launch_instagram"
-            app:cornerRadius="12dp" />
+            android:textSize="15sp"
+            app:icon="@drawable/ic_instagram_logo"
+            app:iconGravity="textStart"
+            app:cornerRadius="16dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/download_instagram_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
+            android:minHeight="52dp"
             android:text="@string/download_apk"
+            android:textSize="15sp"
             style="@style/Widget.Material3.Button.TonalButton"
-            app:cornerRadius="12dp" />
+            app:icon="@drawable/ic_download"
+            app:iconGravity="textStart"
+            app:cornerRadius="16dp" />
 
         <!-- How to Use Card -->
         <com.google.android.material.card.MaterialCardView
@@ -130,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
 
@@ -180,7 +189,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
 
@@ -202,7 +211,7 @@
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold" />
 
-                <HorizontalScrollView
+                <ps.reso.instaeclipse.utils.ui.LoopScrollView
                     android:id="@+id/contributors_scroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -215,7 +224,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:paddingEnd="4dp" />
-                </HorizontalScrollView>
+                </ps.reso.instaeclipse.utils.ui.LoopScrollView>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -224,7 +233,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
 
@@ -246,7 +255,7 @@
                     android:textColor="?attr/colorOnSurface"
                     android:textStyle="bold" />
 
-                <HorizontalScrollView
+                <ps.reso.instaeclipse.utils.ui.LoopScrollView
                     android:id="@+id/special_thanks_scroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -259,7 +268,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:paddingEnd="4dp" />
-                </HorizontalScrollView>
+                </ps.reso.instaeclipse.utils.ui.LoopScrollView>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

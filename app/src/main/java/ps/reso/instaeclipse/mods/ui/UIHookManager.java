@@ -87,6 +87,18 @@ public class UIHookManager {
         // Ghost emoji visibility must update on every resume (reflects current ghost state).
         addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
 
+        // Auto-clear IG cache if it has grown past the configured size (throttled internally).
+        ps.reso.instaeclipse.utils.core.CacheAutoClear.maybeClear(activity);
+
+        // Lock DMs: arm the inbox passcode watcher on the main activity (its onCreate is
+        // obfuscated, so a direct hook fails — this runs from the module's resolved main hook).
+        ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.watchActivity(activity);
+
+        // Remove Meta AI: collapse the "About this reel" Content Deep Dive section (AI summary +
+        // "Ask Meta AI…" composer) inside the reel/post action sheet. It is a Litho-rendered
+        // section not reachable via the option/builder hooks, so we strip it at the view level.
+        ps.reso.instaeclipse.mods.ui.RemoveMetaAIHook.watchActionSheet(activity);
+
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
 
@@ -187,11 +199,12 @@ public class UIHookManager {
                                         if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
                                             CustomToast.toastShown = true;
 
-                                            StringBuilder sb = new StringBuilder(I18n.t(activity, R.string.ig_toast_features_loaded)).append("\n");
-                                            for (Map.Entry<String, Boolean> entry : FeatureStatusTracker.getStatus().entrySet()) {
-                                                sb.append(entry.getValue() ? "✅ " : "❌ ").append(FeatureStatusTracker.getLabel(activity, entry.getKey())).append("\n");
-                                            }
-                                            CustomToast.showCustomToast(activity.getApplicationContext(), sb.toString().trim());
+                                            // Pass the raw KEY -> hooked map; showFeatureGrid resolves
+                                            // each key's label and groups it into a category itself.
+                                            java.util.LinkedHashMap<String, Boolean> status =
+                                                    new java.util.LinkedHashMap<>(FeatureStatusTracker.getStatus());
+                                            CustomToast.showFeatureGrid(activity.getApplicationContext(),
+                                                    I18n.t(activity, R.string.ig_toast_features_loaded), status);
                                         }
                                     } catch (Exception innerE) {
                                         ModuleLog.line("(InstaEclipse): UI Injection Error: " + innerE.getMessage());

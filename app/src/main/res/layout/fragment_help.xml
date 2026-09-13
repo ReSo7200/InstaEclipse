@@ -13,16 +13,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp">
 
-        <!-- FAQ Section -->
+        <!-- ===== FAQ ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/frequently_asked_questions"
+            android:textAppearance="@style/IeSectionLabel" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/faq_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:strokeWidth="0dp">
@@ -31,121 +42,142 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
 
-                <TextView
-                    android:id="@+id/faq_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/frequently_asked_questions"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <!-- FAQ Items -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:text="@string/faq_1"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginBottom="8dp"
+                    android:lineSpacingMultiplier="1.15"
                     tools:ignore="HardcodedText" />
+
+                <View style="@style/IeHairline" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:text="@string/faq_2"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginBottom="8dp" />
+                    android:lineSpacingMultiplier="1.15" />
+
+                <View style="@style/IeHairline" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:text="@string/faq_3"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginBottom="8dp" />
+                    android:lineSpacingMultiplier="1.15" />
+
+                <View style="@style/IeHairline" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:text="@string/faq_4"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginBottom="8dp" />
+                    android:lineSpacingMultiplier="1.15" />
+
+                <View style="@style/IeHairline" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:text="@string/faq_5"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    android:layout_marginBottom="8dp" />
+                    android:lineSpacingMultiplier="1.15" />
+
+                <View style="@style/IeHairline" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:text="@string/faq_6"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:lineSpacingMultiplier="1.15" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Module Not Working Section -->
+        <!-- ===== Troubleshooting ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/module_not_working_title"
+            android:textAppearance="@style/IeSectionLabel" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/module_not_working_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:strokeWidth="0dp">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/module_not_working_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/module_not_working_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/module_not_working_title"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="10dp" />
-
-                <TextView
-                    android:id="@+id/module_not_working_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/module_not_working_description"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-            </LinearLayout>
+                android:padding="18dp"
+                android:text="@string/module_not_working_description"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:lineSpacingMultiplier="1.15" />
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Community Links -->
+        <!-- ===== Community ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/help_community"
+            android:textAppearance="@style/IeSectionLabel" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:gravity="center">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                tools:ignore="UselessParent">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginEnd="28dp">
 
-                <!-- GitHub Circular Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/github_card"
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_width="62dp"
+                    android:layout_height="62dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
                     app:strokeWidth="0dp"
                     android:clickable="true"
@@ -153,8 +185,8 @@
                     android:foreground="?attr/selectableItemBackgroundBorderless">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_github_logo"
                         app:tint="?attr/colorOnSurface"
@@ -162,11 +194,25 @@
                         android:contentDescription="@string/go_to_github" />
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Telegram Circular Card -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/github"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/telegram_card"
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
+                    android:layout_width="62dp"
+                    android:layout_height="62dp"
                     app:cardElevation="0dp"
                     app:cardBackgroundColor="#31A6DE"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
@@ -176,8 +222,8 @@
                     android:foreground="?attr/selectableItemBackgroundBorderless">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_telegram_logo"
                         app:tint="@android:color/white"
@@ -185,6 +231,13 @@
                         android:contentDescription="@string/go_to_telegram" />
                 </com.google.android.material.card.MaterialCardView>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/telegram"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
 
         </LinearLayout>

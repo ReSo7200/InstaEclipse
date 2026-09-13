@@ -36,8 +36,21 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  */
 public class ForceReelQualityHook {
 
-    private static final String DICT_CLASS = "com.instagram.feed.media.LiveTreeMediaDict";
-    private static final String VIDEO_VERSION_CLASS = "com.instagram.model.mediasize.ImmutablePandoVideoVersion";
+    // IG 442+ renamed both model classes. Central media class: LiveTreeMediaDict -> Media.
+    // Per-version class: model.mediasize.ImmutablePandoVideoVersion -> api.schemas.ImmutablePandoVideoVersion.
+    // Try the new name first, fall back to the old one so 436 and 447 both resolve.
+    private static final String[] DICT_CLASS_CANDIDATES = {
+            "com.instagram.feed.media.Media",             // IG 442+ (447)
+            "com.instagram.feed.media.LiveTreeMediaDict"  // IG <=441 (436)
+    };
+    private static final String[] VIDEO_VERSION_CLASS_CANDIDATES = {
+            "com.instagram.api.schemas.ImmutablePandoVideoVersion",      // IG 442+ (447)
+            "com.instagram.model.mediasize.ImmutablePandoVideoVersion"   // IG <=441 (436)
+    };
+    // The height getter embeds getOptional...ByHashCode / A2E(hash, idx) where hash is the
+    // JDK-fixed String.hashCode("height") (== -0x48c76ed9). Identical const in 436 and 447,
+    // so it is matched via DexKit rather than by the per-version obfuscated method name or
+    // the volatile Pando index.
     private static final int HEIGHT_HASH = "height".hashCode();
 
     private static final String CACHE_GETTER_KEY = "ForceReelQuality_VideoVersionsGetter";
@@ -96,7 +109,9 @@ public class ForceReelQualityHook {
             // with multiple qualities is actually intercepted — the status toast is built
             // ~1.5s after launch, before any video is guaranteed to have loaded yet.
             FeatureStatusTracker.setHooked("ForceReelQuality");
-            ModuleLog.line("(InstaEclipse | ForceReelQuality): ✅ Hooked " + DICT_CLASS
+            ModuleLog.line("(InstaEclipse | ForceReelQuality): ✅ Hooked "
+                    + videoVersionsGetter.getDeclaringClass().getName()
+                    + "#" + videoVersionsGetter.getName()
                     + " (height=" + heightGetterName + ")");
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ install – " + t);
@@ -104,38 +119,42 @@ public class ForceReelQualityHook {
     }
 
     private static Method resolveVideoVersionsGetter(DexKitBridge bridge, ClassLoader classLoader) {
-        try {
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create()
-                            .declaredClass(DICT_CLASS)
-                            .paramCount(0)
-                            .usingEqStrings(List.of("video_versions"))));
+        for (String dictClass : DICT_CLASS_CANDIDATES) {
+            try {
+                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                        .matcher(MethodMatcher.create()
+                                .declaredClass(dictClass)
+                                .paramCount(0)
+                                .usingEqStrings(List.of("video_versions"))));
 
-            for (MethodData md : results) {
-                try {
-                    Method m = md.getMethodInstance(classLoader);
-                    if (m.getReturnType() != List.class) continue;
-                    return m;
-                } catch (Throwable ignored) {}
+                for (MethodData md : results) {
+                    try {
+                        Method m = md.getMethodInstance(classLoader);
+                        if (m.getReturnType() != List.class) continue;
+                        return m;
+                    } catch (Throwable ignored) {}
+                }
+            } catch (Throwable t) {
+                ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ resolveVideoVersionsGetter[" + dictClass + "] – " + t);
             }
-        } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ resolveVideoVersionsGetter – " + t);
         }
         return null;
     }
 
     private static String resolveHeightGetterName(DexKitBridge bridge, ClassLoader classLoader) {
-        try {
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create()
-                            .declaredClass(VIDEO_VERSION_CLASS)
-                            .paramCount(0)
-                            .returnType("java.lang.Integer")
-                            .usingNumbers(List.of(HEIGHT_HASH))));
+        for (String versionClass : VIDEO_VERSION_CLASS_CANDIDATES) {
+            try {
+                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                        .matcher(MethodMatcher.create()
+                                .declaredClass(versionClass)
+                                .paramCount(0)
+                                .returnType("java.lang.Integer")
+                                .usingNumbers(List.of(HEIGHT_HASH))));
 
-            if (!results.isEmpty()) return results.get(0).getName();
-        } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ resolveHeightGetterName – " + t);
+                if (!results.isEmpty()) return results.get(0).getName();
+            } catch (Throwable t) {
+                ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ resolveHeightGetterName[" + versionClass + "] – " + t);
+            }
         }
         return null;
     }

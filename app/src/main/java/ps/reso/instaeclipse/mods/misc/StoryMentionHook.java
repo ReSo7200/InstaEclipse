@@ -87,21 +87,38 @@ public class StoryMentionHook {
         }
 
         try {
-            List<MethodData> getters = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create()
-                            .declaredClass("com.instagram.feed.media.LiveTreeMediaDict")
-                            .paramCount(0)
-                            .usingEqStrings(List.of("reel_mentions"))));
-            for (MethodData md : getters) {
-                if (md.getName().equals("<clinit>")) continue;
+            // The paramCount-0 List getter guarded by the "reel_mentions" JSON key used to live
+            // on LiveTreeMediaDict (<=436), but IG 442+ folded the live-tree model into
+            // com.instagram.feed.media.Media, so the same getter now sits directly on Media.
+            // Try the current home first, then the legacy class. Only stable
+            // com.instagram.feed.media.* class names + the JSON key are used — never an X.* name.
+            String[] mediaClasses = {
+                    "com.instagram.feed.media.Media",             // 442+ (447: Media reel_mentions getter)
+                    "com.instagram.feed.media.LiveTreeMediaDict"  // 436 and earlier
+            };
+            outer:
+            for (String cls : mediaClasses) {
+                List<MethodData> getters;
                 try {
-                    Method m = md.getMethodInstance(classLoader);
-                    if (!List.class.isAssignableFrom(m.getReturnType())) continue;
-                    m.setAccessible(true);
-                    rawMentionsGetter = m;
-                    DexKitCache.saveMethod("MentionsRawGetter", m);
-                    break;
-                } catch (Throwable ignored) {}
+                    getters = bridge.findMethod(FindMethod.create()
+                            .matcher(MethodMatcher.create()
+                                    .declaredClass(cls)
+                                    .paramCount(0)
+                                    .usingEqStrings(List.of("reel_mentions"))));
+                } catch (Throwable ignored) {
+                    continue; // class absent on this build
+                }
+                for (MethodData md : getters) {
+                    if (md.getName().equals("<clinit>")) continue;
+                    try {
+                        Method m = md.getMethodInstance(classLoader);
+                        if (!List.class.isAssignableFrom(m.getReturnType())) continue;
+                        m.setAccessible(true);
+                        rawMentionsGetter = m;
+                        DexKitCache.saveMethod("MentionsRawGetter", m);
+                        break outer;
+                    } catch (Throwable ignored) {}
+                }
             }
             if (rawMentionsGetter == null) ModuleLog.line("(IE|Mention) ❌ rawMentionsGetter not found");
         } catch (Throwable t) {
@@ -305,13 +322,17 @@ public class StoryMentionHook {
                 return usernames;
             }
 
-            Object dict = findFieldByType(media, "com.instagram.feed.media.LiveTreeMediaDict");
-            if (dict == null) {
-                ModuleLog.line("(IE|Mention) ❌ LiveTreeMediaDict not found on media");
+            // The getter may be declared directly on Media (442+) or on a sub-dict field of
+            // Media (<=436). Derive the receiver from the resolved getter's own declaring class
+            // instead of hardcoding a class name.
+            Class<?> owner = rawMentionsGetter.getDeclaringClass();
+            Object receiver = owner.isInstance(media) ? media : findFieldByType(media, owner.getName());
+            if (receiver == null) {
+                ModuleLog.line("(IE|Mention) ❌ mention receiver (" + owner.getName() + ") not found on media");
                 return usernames;
             }
 
-            Object rawResult = rawMentionsGetter.invoke(dict);
+            Object rawResult = rawMentionsGetter.invoke(receiver);
             if (!(rawResult instanceof List<?> raw) || raw.isEmpty()) return usernames;
 
             Object convertedResult = mentionsConverter.invoke(null, raw);

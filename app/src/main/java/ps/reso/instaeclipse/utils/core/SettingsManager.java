@@ -27,12 +27,22 @@ public class SettingsManager {
         editor.putBoolean("isGhostTyping", FeatureFlags.isGhostTyping);
         editor.putBoolean("isGhostScreenshot", FeatureFlags.isGhostScreenshot);
         editor.putBoolean("isGhostViewOnce", FeatureFlags.isGhostViewOnce);
-        editor.putBoolean("enableUnlimitedReplays", FeatureFlags.enableUnlimitedReplays);
         editor.putBoolean("isGhostStory", FeatureFlags.isGhostStory);
         editor.putBoolean("isGhostLive", FeatureFlags.isGhostLive);
         editor.putBoolean("allowScreenshots", FeatureFlags.allowScreenshots);
         editor.putBoolean("keepEphemeralMessages", FeatureFlags.keepEphemeralMessages);
         editor.putBoolean("permanentViewMode", FeatureFlags.permanentViewMode);
+        editor.putBoolean("keepUnsentMessages", FeatureFlags.keepUnsentMessages);
+        editor.putBoolean("autoClearCache", FeatureFlags.autoClearCache);
+        editor.putInt("autoClearCacheSizeMb", FeatureFlags.autoClearCacheSizeMb);
+        editor.putBoolean("removeMetaAI", FeatureFlags.removeMetaAI);
+        editor.putBoolean("lockDirectMessages", FeatureFlags.lockDirectMessages);
+        editor.putString("lockDirectPasscode", FeatureFlags.lockDirectPasscode);
+        editor.putString("lockDirectSalt", FeatureFlags.lockDirectSalt);
+        editor.putBoolean("lockDirectAlways", FeatureFlags.lockDirectAlways);
+        editor.putBoolean("lockWholeApp", FeatureFlags.lockWholeApp);
+        editor.putBoolean("hideSpecificChats", FeatureFlags.hideSpecificChats);
+        editor.putBoolean("lockUseFingerprint", FeatureFlags.lockUseFingerprint);
 
         // Quick Toggles
         editor.putBoolean("quickToggleSeen", FeatureFlags.quickToggleSeen);
@@ -42,7 +52,6 @@ public class SettingsManager {
         editor.putBoolean("quickToggleStory", FeatureFlags.quickToggleStory);
         editor.putBoolean("quickToggleLive", FeatureFlags.quickToggleLive);
         editor.putBoolean("quickToggleEphemeral", FeatureFlags.quickToggleEphemeral);
-        editor.putBoolean("quickToggleReplays", FeatureFlags.quickToggleReplays);
         editor.putBoolean("quickTogglePermanentView", FeatureFlags.quickTogglePermanentView);
         editor.putBoolean("quickToggleAllowScreenshots", FeatureFlags.quickToggleAllowScreenshots);
 
@@ -90,6 +99,14 @@ public class SettingsManager {
         editor.putBoolean("enableProfileDownload", FeatureFlags.enableProfileDownload);
         editor.putBoolean("downloaderUsernameFolder", FeatureFlags.downloaderUsernameFolder);
         editor.putBoolean("downloaderAddTimestamp", FeatureFlags.downloaderAddTimestamp);
+        editor.putBoolean("copyMediaLink", FeatureFlags.copyMediaLink);
+        editor.putBoolean("saveInstants", FeatureFlags.saveInstants);
+        editor.putBoolean("uploadInstants", FeatureFlags.uploadInstants);
+        editor.putBoolean("cacheStories", FeatureFlags.cacheStories);
+        editor.putBoolean("customFontEnabled", FeatureFlags.customFontEnabled);
+        editor.putString("customFontPath", FeatureFlags.customFontPath);
+        editor.putBoolean("customEmojiEnabled", FeatureFlags.customEmojiEnabled);
+        editor.putString("customEmojiPath", FeatureFlags.customEmojiPath);
         editor.putString("downloaderCustomPath", FeatureFlags.downloaderCustomPath);
         editor.putString("downloaderCustomUri",  FeatureFlags.downloaderCustomUri);
 
@@ -116,12 +133,22 @@ public class SettingsManager {
         FeatureFlags.isGhostTyping = prefs.getBoolean("isGhostTyping", false);
         FeatureFlags.isGhostScreenshot = prefs.getBoolean("isGhostScreenshot", false);
         FeatureFlags.isGhostViewOnce = prefs.getBoolean("isGhostViewOnce", false);
-        FeatureFlags.enableUnlimitedReplays = prefs.getBoolean("enableUnlimitedReplays", false);
         FeatureFlags.isGhostStory = prefs.getBoolean("isGhostStory", false);
         FeatureFlags.isGhostLive = prefs.getBoolean("isGhostLive", false);
         FeatureFlags.allowScreenshots = prefs.getBoolean("allowScreenshots", false);
         FeatureFlags.keepEphemeralMessages = prefs.getBoolean("keepEphemeralMessages", false);
         FeatureFlags.permanentViewMode = prefs.getBoolean("permanentViewMode", false);
+        FeatureFlags.keepUnsentMessages = prefs.getBoolean("keepUnsentMessages", false);
+        FeatureFlags.autoClearCache = prefs.getBoolean("autoClearCache", false);
+        FeatureFlags.autoClearCacheSizeMb = prefs.getInt("autoClearCacheSizeMb", 500);
+        FeatureFlags.removeMetaAI = prefs.getBoolean("removeMetaAI", false);
+        FeatureFlags.lockDirectMessages = prefs.getBoolean("lockDirectMessages", false);
+        FeatureFlags.lockDirectPasscode = prefs.getString("lockDirectPasscode", "");
+        FeatureFlags.lockDirectSalt = prefs.getString("lockDirectSalt", "");
+        FeatureFlags.lockDirectAlways = prefs.getBoolean("lockDirectAlways", false);
+        FeatureFlags.lockWholeApp = prefs.getBoolean("lockWholeApp", false);
+        FeatureFlags.hideSpecificChats = prefs.getBoolean("hideSpecificChats", false);
+        FeatureFlags.lockUseFingerprint = prefs.getBoolean("lockUseFingerprint", true);
 
         // Quick Toggles
         FeatureFlags.quickToggleSeen = prefs.getBoolean("quickToggleSeen", false);
@@ -131,7 +158,6 @@ public class SettingsManager {
         FeatureFlags.quickToggleStory = prefs.getBoolean("quickToggleStory", false);
         FeatureFlags.quickToggleLive = prefs.getBoolean("quickToggleLive", false);
         FeatureFlags.quickToggleEphemeral = prefs.getBoolean("quickToggleEphemeral", false);
-        FeatureFlags.quickToggleReplays = prefs.getBoolean("quickToggleReplays", false);
         FeatureFlags.quickTogglePermanentView = prefs.getBoolean("quickTogglePermanentView", false);
         FeatureFlags.quickToggleAllowScreenshots = prefs.getBoolean("quickToggleAllowScreenshots", false);
 
@@ -179,6 +205,14 @@ public class SettingsManager {
         FeatureFlags.enableProfileDownload = prefs.getBoolean("enableProfileDownload", false);
         FeatureFlags.downloaderUsernameFolder = prefs.getBoolean("downloaderUsernameFolder", false);
         FeatureFlags.downloaderAddTimestamp   = prefs.getBoolean("downloaderAddTimestamp", false);
+        FeatureFlags.copyMediaLink            = prefs.getBoolean("copyMediaLink", false);
+        FeatureFlags.saveInstants             = prefs.getBoolean("saveInstants", false);
+        FeatureFlags.uploadInstants           = prefs.getBoolean("uploadInstants", false);
+        FeatureFlags.cacheStories             = prefs.getBoolean("cacheStories", false);
+        FeatureFlags.customFontEnabled        = prefs.getBoolean("customFontEnabled", false);
+        FeatureFlags.customFontPath           = prefs.getString("customFontPath", "");
+        FeatureFlags.customEmojiEnabled       = prefs.getBoolean("customEmojiEnabled", false);
+        FeatureFlags.customEmojiPath          = prefs.getString("customEmojiPath", "");
         FeatureFlags.downloaderCustomPath     = prefs.getString("downloaderCustomPath", "");
         FeatureFlags.downloaderCustomUri      = prefs.getString("downloaderCustomUri",  "");
 

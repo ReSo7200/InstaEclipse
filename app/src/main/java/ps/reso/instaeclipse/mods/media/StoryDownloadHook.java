@@ -1,9 +1,24 @@
 package ps.reso.instaeclipse.mods.media;
 
+import android.app.AlertDialog;
 import android.app.AndroidAppHelper;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.luckypray.dexkit.DexKitBridge;
@@ -39,9 +54,27 @@ public class StoryDownloadHook {
 
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    // Username + media ID resolved at download trigger time
-    private volatile String currentStoryUsername = null;
-    private volatile String currentStoryMediaId  = null;
+    private static final class StoryMedia {
+        final String url;
+        final boolean video;
+
+        StoryMedia(String url, boolean video) {
+            this.url = url;
+            this.video = video;
+        }
+    }
+
+    private static final class StoryMediaOptions {
+        final String imageUrl;
+        final String videoUrl;
+        final boolean modelSaysVideo;
+
+        StoryMediaOptions(String imageUrl, String videoUrl, boolean modelSaysVideo) {
+            this.imageUrl = imageUrl;
+            this.videoUrl = videoUrl;
+            this.modelSaysVideo = modelSaysVideo;
+        }
+    }
 
     // ── Entry point ──────────────────────────────────────────────────────────
 
@@ -53,6 +86,89 @@ public class StoryDownloadHook {
 
         installButtonInjectorHook(bridge, classLoader);
         installClickHandlerHook(bridge, classLoader);
+        resolveExpiringGetter(bridge, classLoader);
+        installStoryCaptureHook(bridge, classLoader);
+    }
+
+    // ── Story cache: capture each VIEWED story (per-page bind, fires for every story shown) ──
+    private static java.lang.reflect.Method expiringGetter; // Media."expiring_at" getter, () -> Long
+
+    private void resolveExpiringGetter(DexKitBridge bridge, ClassLoader cl) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                java.lang.reflect.Method c = DexKitCache.loadMethod("StoryCache_expiring", cl);
+                if (c != null) { c.setAccessible(true); expiringGetter = c; return; }
+            }
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .declaredClass("com.instagram.feed.media.Media").paramCount(0)
+                    .returnType("java.lang.Long").usingStrings("expiring_at")))) {
+                try {
+                    java.lang.reflect.Method m = md.getMethodInstance(cl);
+                    m.setAccessible(true); expiringGetter = m;
+                    DexKitCache.saveMethod("StoryCache_expiring", m);
+                    break;
+                } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) { ModuleLog.line("(IE|StoryCache) expiring getter: " + t); }
+    }
+
+    /**
+     * Hooks the story viewer's per-page bind (ReelViewerFragment.onCurrentActiveItemBound — anchored
+     * by that stable string; the method name is obfuscated) which fires for EVERY story shown. Its
+     * first ReelItem param is the current story; we record it to the 24h cache.
+     */
+    private void installStoryCaptureHook(DexKitBridge bridge, ClassLoader cl) {
+        XC_MethodHook capture = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) {
+                if (!FeatureFlags.cacheStories) return;
+                Object reelItem = null;
+                for (Object a : p.args) {
+                    if (a != null && a.getClass().getName().equals("com.instagram.model.reels.ReelItem")) { reelItem = a; break; }
+                }
+                if (reelItem != null) captureFromReelItem(reelItem);
+            }
+        };
+        try {
+            int n = 0;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("ReelViewerFragment.onCurrentActiveItemBound")))) {
+                try { XposedBridge.hookMethod(md.getMethodInstance(cl), capture); n++; } catch (Throwable ignored) {}
+            }
+            if (n > 0 && FeatureFlags.cacheStories) FeatureStatusTracker.setHooked("CacheStories");
+            ModuleLog.line("(IE|StoryCache) capture hook: " + n + " method(s)");
+        } catch (Throwable t) { ModuleLog.line("(IE|StoryCache) ⚠️ capture hook: " + t.getMessage()); }
+    }
+
+    private void captureFromReelItem(Object reelItem) {
+        try {
+            Object media = findMediaObject(reelItem);
+            if (media == null) return;
+            Context ctx = AndroidAppHelper.currentApplication();
+            String id;
+            try {
+                Object rid = reelItem.getClass().getMethod("getId").invoke(reelItem);
+                id = (rid instanceof String s && !s.isEmpty()) ? s.split("_")[0] : null;
+            } catch (Throwable t) { id = null; }
+            if (id == null || ps.reso.instaeclipse.utils.media.StoryCache.has(id)) return;
+            List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
+            if (urls == null || urls.isEmpty()) return;
+            final String url = urls.get(0);
+            final boolean video = FeedVideoDownloadHook.isVideoUrl(url);
+            // Use the ReelItem-based username resolver (handles a ReelItem passed directly) — the
+            // media-dictionary resolver doesn't populate for story media, giving "unknown".
+            String author = extractUsernameFromReelItemHolder(reelItem);
+            if (author == null || author.isEmpty()) author = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
+            long expiring = 0;
+            if (expiringGetter != null) {
+                try {
+                    Object v = expiringGetter.invoke(media);
+                    if (v instanceof Long l && l > 0) expiring = l < 100000000000L ? l * 1000L : l; // sec→ms
+                } catch (Throwable ignored) {}
+            }
+            final String fid = id, fauthor = author; final long fexp = expiring;
+            FeedVideoDownloadHook.executor.submit(() ->
+                    ps.reso.instaeclipse.utils.media.StoryCache.capture(fid, fauthor, url, video, fexp));
+        } catch (Throwable t) { ModuleLog.line("(IE|StoryCache) captureFromReelItem: " + t); }
     }
 
     // ── Hook 1: inject "Download" into the story options button list ──────────
@@ -61,55 +177,33 @@ public class StoryDownloadHook {
     // afterHookedMethod: appends our "Download" entry to the returned CharSequence[] array.
 
     private void installButtonInjectorHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = DexKitCache.isCacheValid()
-                ? DexKitCache.loadMethod("StoryDownload_button", classLoader) : null;
-
-        if (method == null) {
-            try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .usingStrings("[INTERNAL] Pause Playback")
-                                .paramCount(1)));
-
-                if (methods.isEmpty()) {
-                    ModuleLog.line("(IE|Story) ❌ Button builder method not found");
-                    return;
-                }
-
-                for (MethodData md : methods) {
-                    try {
-                        Method m = md.getMethodInstance(classLoader);
-                        if (m.getReturnType().isArray() &&
-                                CharSequence.class.isAssignableFrom(m.getReturnType().getComponentType())) {
-                            method = m;
-                            break;
-                        }
-                    } catch (Throwable ignored) {}
-                }
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|Story) ❌ Button builder DexKit: " + t);
+        // Hook EVERY CharSequence[]-returning candidate behind the "[INTERNAL] Pause Playback"
+        // anchor — NOT just the first 1-arg one. Instagram builds the option list with a DIFFERENT
+        // method for your OWN story (a 3-arg static helper: Delete/Archive/Save video/…) than for
+        // someone else's (1-arg: Report/Mute/AI info). Filtering paramCount(1) + first-match only
+        // ever caught the others'-story builder, so Download never appeared on your own stories.
+        // Own-story Download matters because it grabs the rendered video_version and KEEPS the
+        // music, which IG's native Save drops. (Ported from PR #200 by izadiegizabal.) Anchored on
+        // the stable string only, so it stays valid across versions; static + instance both accepted.
+        try {
+            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create()
+                            .usingStrings("[INTERNAL] Pause Playback")));
+            if (methods.isEmpty()) {
+                ModuleLog.line("(IE|Story) ❌ Button builder method not found");
                 return;
             }
-        }
 
-        if (method == null) {
-            ModuleLog.line("(IE|Story) ❌ No CharSequence[] return type candidate found");
-            return;
-        }
-        DexKitCache.saveMethod("StoryDownload_button", method);
-
-        try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
+            XC_MethodHook injector = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     if (!FeatureFlags.enableStoryDownload) return;
-                    CharSequence[] original = (CharSequence[]) param.getResult();
-                    if (original == null) return;
+                    if (!(param.getResult() instanceof CharSequence[] original) || original == null) return;
 
                     // Guard: don't inject twice
                     String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
                     for (CharSequence cs : original) {
-                        if (dlLabel.contentEquals(cs)) return;
+                        if (cs != null && dlLabel.contentEquals(cs)) return;
                     }
 
                     CharSequence[] extended = new CharSequence[original.length + 1];
@@ -117,12 +211,26 @@ public class StoryDownloadHook {
                     extended[original.length] = dlLabel;
                     param.setResult(extended);
                 }
-            });
+            };
 
+            int hooked = 0;
+            for (MethodData md : methods) {
+                try {
+                    Method m = md.getMethodInstance(classLoader);
+                    Class<?> rt = m.getReturnType();
+                    if (rt.isArray() && CharSequence.class.isAssignableFrom(rt.getComponentType())) {
+                        XposedBridge.hookMethod(m, injector);
+                        hooked++;
+                    }
+                } catch (Throwable ignored) {}
+            }
+            ModuleLog.line("(IE|Story) button injector hooked " + hooked + " builder(s)");
+            if (hooked == 0) ModuleLog.line("(IE|Story) ❌ No CharSequence[] return type candidate found");
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Story) ❌ Button builder hook: " + t);
+            ModuleLog.line("(IE|Story) ❌ Button builder DexKit: " + t);
         }
     }
+
 
     // ── Hook 2: handle click on our "Download" option ────────────────────────
     //
@@ -132,81 +240,102 @@ public class StoryDownloadHook {
     // from fields on 'this' or same-class params.
 
     private void installClickHandlerHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = DexKitCache.isCacheValid()
-                ? DexKitCache.loadMethod("StoryDownload_click", classLoader) : null;
+        // Anchor ONLY on the common "[INTERNAL] Pause Playback" string and hook EVERY void
+        // dispatcher behind it. The old matcher also required "explore_viewer" +
+        // "mute_friend_reel" — but those exist ONLY on someone-else's-story dispatcher, so the
+        // self-story handler could never match and Download did nothing on your own stories.
+        // The self-story dispatcher is a STATIC helper (takes the outer class as a param), so we
+        // must not exclude statics. Our runtime label check (tapped == "Download") gates it, so
+        // hooking the extra dispatchers is harmless. (Ported from PR #200 by izadiegizabal.)
+        List<MethodData> methods;
+        try {
+            methods = bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create()
+                            .returnType("void")
+                            .usingStrings("[INTERNAL] Pause Playback")));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Story) ❌ Click handler DexKit: " + t);
+            return;
+        }
+        if (methods == null || methods.isEmpty()) {
+            ModuleLog.line("(IE|Story) ❌ Click handler not found");
+            return;
+        }
 
-        if (method == null) {
-            try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .returnType("void")
-                                .usingStrings("explore_viewer",
-                                        "friendships/mute_friend_reel/%s/",
-                                        "[INTERNAL] Pause Playback")));
+        XC_MethodHook clickHook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.enableStoryDownload) return;
 
-                if (methods.isEmpty()) {
-                    ModuleLog.line("(IE|Story) ❌ Click handler not found");
+                // 1. Find which button was tapped
+                CharSequence tapped = null;
+                for (Object arg : param.args) {
+                    if (arg instanceof CharSequence cs) { tapped = cs; break; }
+                }
+                String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
+                if (tapped == null || !dlLabel.contentEquals(tapped)) return;
+
+                // 2. Consume the event — Instagram won't process an option it didn't add
+                param.setResult(null);
+
+                // 3. Locate the ReelItem holder — 'this' or any same-class param (self-story
+                //    passes the outer class as an argument).
+                Object holder = findReelItemHolder(param);
+                Object effectiveHolder = holder != null ? holder : param.thisObject;
+
+                // 4. Context — the self-story dispatcher passes the ReelItem and the Context on
+                //    SEPARATE args, so search 'this' AND every argument, not just the holder.
+                Context ctx = findContextAcrossParam(param, effectiveHolder);
+                if (ctx == null) {
+                    ModuleLog.line("(IE|Story) ❌ Context not found");
                     return;
                 }
-                method = methods.get(0).getMethodInstance(classLoader);
-                DexKitCache.saveMethod("StoryDownload_click", method);
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|Story) ❌ Click handler DexKit: " + t);
-                return;
-            }
-        }
 
-        try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
-
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    if (!FeatureFlags.enableStoryDownload) return;
-
-                    // 1. Find which button was tapped
-                    CharSequence tapped = null;
-                    for (Object arg : param.args) {
-                        if (arg instanceof CharSequence cs) { tapped = cs; break; }
-                    }
-                    String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
-                    if (tapped == null || !dlLabel.contentEquals(tapped)) return;
-
-                    // 2. Consume the event — Instagram won't process an option it didn't add
-                    param.setResult(null);
-
-                    // 3. Locate the object that holds ReelItem — it is either 'this' or a
-                    //    parameter of the same declaring class (piko's smali shows the latter).
-                    Object holder = findReelItemHolder(param);
-                    ModuleLog.line("(IE|Story) holder=" + (holder != null ? holder.getClass().getName() : "null"));
-
-                    // 4. Extract the Context
-                    Context ctx = findContext(holder != null ? holder : param.thisObject);
-                    if (ctx == null) {
-                        ModuleLog.line("(IE|Story) ❌ Context not found");
-                        return;
-                    }
-
-                    // 5. Extract story URL via ReelItem → media object field graph
-                    String url = extractStoryUrl(holder != null ? holder : param.thisObject);
-                    ModuleLog.line("(IE|Story) url=" + url);
-
-                    if (url == null || url.isEmpty()) {
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    Object effectiveHolder = holder != null ? holder : param.thisObject;
-                    currentStoryUsername = extractUsernameFromReelItemHolder(effectiveHolder);
-                    currentStoryMediaId  = extractMediaIdFromReelItemHolder(effectiveHolder);
-                    startDownload(ctx, url, isVideoUrl(url));
+                // 5. Extract story URL via ReelItem → media object field graph
+                StoryMediaOptions media = extractStoryMediaOptions(ctx, effectiveHolder);
+                if (media == null) {
+                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            });
 
-            FeatureStatusTracker.setHooked("StoryDownload");
+                String username = extractUsernameFromReelItemHolder(effectiveHolder);
+                String mediaId = extractMediaIdFromReelItemHolder(effectiveHolder);
+                handleStoryMedia(ctx, media, username, mediaId);
+            }
+        };
 
-        } catch (Throwable t) {
-            ModuleLog.line("(IE|Story) ❌ Click handler hook: " + t);
+        int hooked = 0;
+        for (MethodData md : methods) {
+            try {
+                Method m = md.getMethodInstance(classLoader);
+                if (m.getParameterCount() == 0) continue; // dispatchers receive the tapped label
+                XposedBridge.hookMethod(m, clickHook);
+                hooked++;
+            } catch (Throwable ignored) {}
         }
+        if (hooked == 0) {
+            ModuleLog.line("(IE|Story) ❌ no click dispatcher hooked");
+            return;
+        }
+        ModuleLog.line("(IE|Story) click handler hooked " + hooked + " dispatcher(s)");
+        FeatureStatusTracker.setHooked("StoryDownload");
+    }
+
+    /** Context lookup for the click dispatcher: try the ReelItem holder, then 'this', then each
+     *  argument (self-story passes the Context on a separate arg, or an arg may BE a Context). */
+    private static Context findContextAcrossParam(XC_MethodHook.MethodHookParam param, Object preferred) {
+        Context c = findContext(preferred);
+        if (c != null) return c;
+        if (param.thisObject != preferred) {
+            c = findContext(param.thisObject);
+            if (c != null) return c;
+        }
+        for (Object arg : param.args) {
+            if (arg instanceof Context ctx) return ctx;
+            c = findContext(arg);
+            if (c != null) return c;
+        }
+        return null;
     }
 
     // ── URL extraction ────────────────────────────────────────────────────────
@@ -238,14 +367,18 @@ public class StoryDownloadHook {
     }
 
     /**
-     * Extracts the story media URL from the holder object.
+     * Extracts every downloadable representation from the holder object.
      *   1. Reads the ReelItem field from the holder.
      *   2. Searches for VideoVersionIntf → video URL (videos).
      *   3. Searches for image Candidate objects (CDN URL + width int + height int) and
      *      picks the one with the largest pixel area (photos).
      *   4. Falls back to raw CDN string scan with area-based ranking.
+     *
+     * A photo story with music commonly exposes both image_versions2 (the original
+     * still) and video_versions (the rendered story with audio). Do not return after
+     * finding the MP4: keeping both URLs is what lets the user choose the JPG instead.
      */
-    private static String extractStoryUrl(Object holder) {
+    private static StoryMediaOptions extractStoryMediaOptions(Context ctx, Object holder) {
         if (holder == null) return null;
         try {
             Object reelItem = readFieldByTypeName(holder, "com.instagram.model.reels.ReelItem");
@@ -253,36 +386,102 @@ public class StoryDownloadHook {
                     (reelItem != null ? reelItem.getClass().getName() : "null"));
 
             Object target = reelItem != null ? reelItem : holder;
+            Object mediaObject = findMediaObject(target);
+            Object modelTarget = mediaObject != null ? mediaObject : target;
+            boolean modelSaysVideo = FeedVideoDownloadHook.isMediaVideo(modelTarget)
+                    || (modelTarget != target && FeedVideoDownloadHook.isMediaVideo(target));
 
-            // Try video URL via VideoVersionIntf scan
-            if (videoVersionIntfClass != null && videoVersionGetUrl != null) {
-                String videoUrl = findVideoUrl(target,
-                        Collections.newSetFromMap(new IdentityHashMap<>()), 0);
-                if (videoUrl != null) return videoUrl;
+            // Use the same source-aware extractor as feed/reels first. It understands
+            // Pando video_versions getters whose URLs no longer expose a video-looking path.
+            String videoUrl = FeedVideoDownloadHook.bestVideoUrlFromMedia(modelTarget);
+            if (videoUrl == null && modelTarget != target) {
+                videoUrl = FeedVideoDownloadHook.bestVideoUrlFromMedia(target);
             }
 
-            // For photo stories: walk the graph looking for image Candidate objects.
+            // Try video URL via VideoVersionIntf scan
+            if (videoUrl == null && videoVersionIntfClass != null && videoVersionGetUrl != null) {
+                videoUrl = findVideoUrl(target,
+                        Collections.newSetFromMap(new IdentityHashMap<>()), 0);
+                if (videoUrl != null) {
+                    FeedVideoDownloadHook.rememberVideoUrl(videoUrl);
+                }
+            }
+
+            // MediaExtKt knows the canonical image_versions2 URL and avoids choosing a
+            // smaller music-sticker/album-art image when a Media object is available.
+            String imageUrl = mediaObject != null
+                    ? FeedVideoDownloadHook.imageUrlFromMedia(ctx, mediaObject) : null;
+            if (imageUrl != null && FeedVideoDownloadHook.isVideoUrl(imageUrl)) {
+                imageUrl = null;
+            }
+
+            // Walk the graph looking for image Candidate objects when the canonical
+            // Media helper is unavailable.
             // A Candidate has a CDN URL string field + at least two int fields with
             // plausible pixel dimensions. Field names are obfuscated so we match by type
             // and value range. Pick the candidate with the largest width×height area.
-            List<CandidateInfo> candidates = new ArrayList<>();
-            collectImageCandidates(target, candidates,
-                    Collections.newSetFromMap(new IdentityHashMap<>()), 0);
-            ModuleLog.line("(IE|Story) imageCandidates=" + candidates.size());
-            if (!candidates.isEmpty()) {
-                candidates.sort((a, b) -> Integer.compare(b.area, a.area));
-                ModuleLog.line("(IE|Story) bestCandidate area=" + candidates.get(0).area
-                        + " url=" + candidates.get(0).url.substring(0, Math.min(80, candidates.get(0).url.length())));
-                return candidates.get(0).url;
+            if (imageUrl == null) {
+                List<CandidateInfo> candidates = new ArrayList<>();
+                collectImageCandidates(target, candidates,
+                        Collections.newSetFromMap(new IdentityHashMap<>()), 0);
+                ModuleLog.line("(IE|Story) imageCandidates=" + candidates.size());
+                if (!candidates.isEmpty()) {
+                    candidates.sort((a, b) -> Integer.compare(b.area, a.area));
+                    imageUrl = candidates.get(0).url;
+                    ModuleLog.line("(IE|Story) bestCandidate area=" + candidates.get(0).area);
+                }
             }
 
-            // Last resort: raw CDN string scan
+            // Last resort: split a raw CDN scan into image and video candidates. This
+            // never silently labels an image cover as a video (the issue #204 failure).
             List<String> cdnUrls = new ArrayList<>();
             scanCdnUrls(target, cdnUrls, 0, Collections.newSetFromMap(new IdentityHashMap<>()));
-            if (!cdnUrls.isEmpty()) return pickBestUrl(cdnUrls);
+            List<String> imageUrls = new ArrayList<>();
+            for (String candidate : cdnUrls) {
+                if (FeedVideoDownloadHook.isVideoUrl(candidate)) {
+                    if (videoUrl == null) {
+                        videoUrl = candidate;
+                        FeedVideoDownloadHook.rememberVideoUrl(candidate);
+                    }
+                } else {
+                    imageUrls.add(candidate);
+                }
+            }
+            if (imageUrl == null && !imageUrls.isEmpty()) imageUrl = pickBestUrl(imageUrls);
+
+            if (imageUrl == null && videoUrl == null) return null;
+            return new StoryMediaOptions(imageUrl, videoUrl, modelSaysVideo);
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Story) extractStoryUrl error: " + t);
+            ModuleLog.line("(IE|Story) extractStoryMediaOptions error: " + t);
+        }
+        return null;
+    }
+
+    /** Resolves the Media nested in ReelItem without relying on obfuscated method names. */
+    private static Object findMediaObject(Object obj) {
+        if (obj == null) return null;
+        if (obj.getClass().getName().equals("com.instagram.feed.media.Media")) return obj;
+
+        Object direct = readFieldByTypeName(obj, "com.instagram.feed.media.Media");
+        if (direct != null) return direct;
+
+        Class<?> cls = obj.getClass();
+        while (cls != null && cls != Object.class) {
+            for (Method method : cls.getDeclaredMethods()) {
+                if (method.getParameterCount() != 0
+                        || java.lang.reflect.Modifier.isStatic(method.getModifiers())) continue;
+                Class<?> returnType = method.getReturnType();
+                if (returnType.isPrimitive() || returnType == String.class
+                        || returnType == void.class) continue;
+                try {
+                    method.setAccessible(true);
+                    Object result = method.invoke(obj);
+                    if (result != null && result.getClass().getName()
+                            .equals("com.instagram.feed.media.Media")) return result;
+                } catch (Throwable ignored) {}
+            }
+            cls = cls.getSuperclass();
         }
         return null;
     }
@@ -310,7 +509,10 @@ public class StoryDownloadHook {
         if (videoVersionIntfClass.isInstance(obj)) {
             try {
                 String url = (String) videoVersionGetUrl.invoke(obj);
-                if (url != null && isCdnUrl(url)) return url;
+                if (url != null && isCdnUrl(url)) {
+                    FeedVideoDownloadHook.rememberVideoUrl(url);
+                    return url;
+                }
             } catch (Throwable ignored) {}
         }
 
@@ -322,6 +524,7 @@ public class StoryDownloadHook {
         while (cls != null && cls != Object.class) {
             for (Field f : cls.getDeclaredFields()) {
                 try {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     Object val = f.get(obj);
                     if (val == null) continue;
@@ -330,7 +533,10 @@ public class StoryDownloadHook {
                             if (videoVersionIntfClass.isInstance(elem)) {
                                 try {
                                     String url = (String) videoVersionGetUrl.invoke(elem);
-                                    if (url != null && isCdnUrl(url)) return url;
+                                    if (url != null && isCdnUrl(url)) {
+                                        FeedVideoDownloadHook.rememberVideoUrl(url);
+                                        return url;
+                                    }
                                 } catch (Throwable ignored) {}
                             }
                         }
@@ -360,6 +566,7 @@ public class StoryDownloadHook {
         while (cls != null && cls != Object.class) {
             for (Field f : cls.getDeclaredFields()) {
                 try {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     Object val = f.get(obj);
                     if (val == null) continue;
@@ -414,6 +621,7 @@ public class StoryDownloadHook {
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
             for (Field f : cls.getDeclaredFields()) {
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 try {
                     if (f.getType() == String.class) {
@@ -468,6 +676,7 @@ public class StoryDownloadHook {
         while (cls != null && cls != Object.class) {
             for (Field f : cls.getDeclaredFields()) {
                 try {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     Object val = f.get(obj);
                     if (val == null) continue;
@@ -516,7 +725,7 @@ public class StoryDownloadHook {
     }
 
     private static boolean isVideoUrl(String url) {
-        return url.contains("t50.") || url.contains("/o1/");
+        return FeedVideoDownloadHook.isVideoUrl(url);
     }
 
     /**
@@ -670,14 +879,164 @@ public class StoryDownloadHook {
 
     // ── Download dispatch ─────────────────────────────────────────────────────
 
-    private void startDownload(Context ctx, String url, boolean isVideo) {
-        String fn = FeedVideoDownloadHook.buildFilename(currentStoryUsername, "story", currentStoryMediaId, isVideo);
-        ModuleLog.line("(IE|Story|DL) username=" + currentStoryUsername + " mediaId=" + currentStoryMediaId
+    private void handleStoryMedia(Context ctx, StoryMediaOptions media,
+                                  String username, String mediaId) {
+        StoryDownloadChoicePolicy.Decision decision = StoryDownloadChoicePolicy.decide(
+                media.imageUrl != null, media.videoUrl != null, media.modelSaysVideo);
+        switch (decision) {
+            case DOWNLOAD_PHOTO -> startDownload(ctx, media.imageUrl, false, username, mediaId);
+            case DOWNLOAD_VIDEO -> startDownload(ctx, media.videoUrl, true, username, mediaId);
+            case ASK -> showStoryFormatDialog(ctx, media, username, mediaId);
+            case NOT_FOUND -> Toast.makeText(ctx,
+                    I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showStoryFormatDialog(Context ctx, StoryMediaOptions media,
+                                       String username, String mediaId) {
+        List<CharSequence> labels = new ArrayList<>();
+        List<StoryMedia> choices = new ArrayList<>();
+
+        // Photo first: this is the requested path for photo stories carrying music.
+        if (media.imageUrl != null) {
+            labels.add(I18n.t(ctx, R.string.ig_story_download_photo));
+            choices.add(new StoryMedia(media.imageUrl, false));
+        }
+        if (media.videoUrl != null) {
+            labels.add(I18n.t(ctx, R.string.ig_story_download_video_music));
+            choices.add(new StoryMedia(media.videoUrl, true));
+        }
+
+        try {
+            float dp = ctx.getResources().getDisplayMetrics().density;
+            boolean dk = (ctx.getResources().getConfiguration().uiMode
+                    & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+
+            int sheetBg   = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
+            int cardBg    = dk ? Color.parseColor("#2C2C2E") : Color.parseColor("#FFFFFF");
+            int textPrim  = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
+            int textSec   = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
+            int handleClr = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
+
+            LinearLayout sheet = new LinearLayout(ctx);
+            sheet.setOrientation(LinearLayout.VERTICAL);
+            sheet.setBackground(roundRect(sheetBg, 20, ctx, dp));
+            int hPad = (int) (20 * dp);
+            sheet.setPadding(hPad, (int) (12 * dp), hPad, (int) (28 * dp));
+
+            // Grab handle
+            View handle = new View(ctx);
+            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams((int) (40 * dp), (int) (4 * dp));
+            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
+            handleLp.bottomMargin = (int) (16 * dp);
+            handle.setLayoutParams(handleLp);
+            handle.setBackground(roundRect(handleClr, 2, ctx, dp));
+            sheet.addView(handle);
+
+            // Title
+            TextView title = new TextView(ctx);
+            title.setText(I18n.t(ctx, R.string.ig_story_download_choice_title));
+            title.setTextColor(textPrim);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+            title.setTypeface(null, Typeface.BOLD);
+            sheet.addView(title);
+
+            // Subtitle
+            TextView subtitle = new TextView(ctx);
+            subtitle.setText(I18n.t(ctx, R.string.ig_story_download_choice_subtitle));
+            subtitle.setTextColor(textSec);
+            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            subLp.topMargin = (int) (2 * dp);
+            subLp.bottomMargin = (int) (14 * dp);
+            subtitle.setLayoutParams(subLp);
+            sheet.addView(subtitle);
+
+            final Dialog dialog = new Dialog(ctx);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            // One tappable card row per available format (📷 photo / 🎬 video with music).
+            for (int i = 0; i < choices.size(); i++) {
+                final StoryMedia choice = choices.get(i);
+                TextView row = new TextView(ctx);
+                row.setText((choice.video ? "🎬  " : "📷  ") + labels.get(i));
+                row.setTextColor(textPrim);
+                row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                row.setTypeface(null, Typeface.BOLD);
+                int rowPad = (int) (16 * dp);
+                row.setPadding(rowPad, rowPad, rowPad, rowPad);
+                row.setBackground(roundRect(cardBg, 12, ctx, dp));
+                LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                rowLp.bottomMargin = (int) (8 * dp);
+                row.setLayoutParams(rowLp);
+                row.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    startDownload(ctx, choice.url, choice.video, username, mediaId);
+                });
+                sheet.addView(row);
+            }
+
+            // Cancel pill
+            Button cancel = makePillButton(ctx, ctx.getString(android.R.string.cancel), cardBg, textPrim, dp);
+            cancel.setOnClickListener(v -> dialog.dismiss());
+            sheet.addView(cancel);
+
+            dialog.setContentView(sheet);
+            Window w = dialog.getWindow();
+            if (w != null) {
+                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                w.setGravity(Gravity.BOTTOM);
+                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                WindowManager.LayoutParams wlp = w.getAttributes();
+                int margin = (int) (12 * dp);
+                wlp.x = margin;
+                wlp.y = margin;
+                w.setAttributes(wlp);
+            }
+            dialog.show();
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Story) format dialog failed: " + t);
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed,
+                    t.getMessage()), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /** Rounded-rect drawable (matches the story-mention sheet styling). */
+    private static GradientDrawable roundRect(int color, float radiusDp, Context ctx, float dp) {
+        GradientDrawable d = new GradientDrawable();
+        d.setColor(color);
+        d.setCornerRadius(radiusDp * dp);
+        return d;
+    }
+
+    /** Pill button (matches the story-mention sheet styling). */
+    private static Button makePillButton(Context ctx, String label, int bgColor, int textColor, float dp) {
+        Button btn = new Button(ctx);
+        btn.setText(label);
+        btn.setTextColor(textColor);
+        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        btn.setTypeface(null, Typeface.BOLD);
+        btn.setBackground(roundRect(bgColor, 14, ctx, dp));
+        btn.setAllCaps(false);
+        btn.setPadding((int) (20 * dp), (int) (14 * dp), (int) (20 * dp), (int) (14 * dp));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = (int) (10 * dp);
+        btn.setLayoutParams(lp);
+        return btn;
+    }
+
+    private void startDownload(Context ctx, String url, boolean isVideo,
+                               String username, String mediaId) {
+        String fn = FeedVideoDownloadHook.buildFilename(username, "story", mediaId, isVideo);
+        ModuleLog.line("(IE|Story|DL) username=" + username + " mediaId=" + mediaId
                 + " file=" + fn);
         Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_story_video) : I18n.t(ctx, R.string.ig_toast_downloading_story_photo), Toast.LENGTH_SHORT).show();
         mainHandler.post(() -> new Thread(() -> {
             try {
-                boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, isVideo, currentStoryUsername);
+                boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, isVideo, username);
                 if (!delegated) {
                     mainHandler.post(() -> Toast.makeText(ctx,
                             I18n.t(ctx, R.string.ig_toast_story_saved), Toast.LENGTH_SHORT).show());

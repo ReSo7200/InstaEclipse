@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.documentfile.provider.DocumentFile;
 
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,6 +62,18 @@ public class DownloadSaveService extends Service {
     private long lastNotifMs  = 0;
     private int  lastNotifPct = -1;
 
+    private static final class SavedMedia {
+        final Uri uri;
+        final String filename;
+        final String mimeType;
+
+        SavedMedia(Uri uri, String filename, String mimeType) {
+            this.uri = uri;
+            this.filename = filename;
+            this.mimeType = mimeType;
+        }
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -99,11 +112,11 @@ public class DownloadSaveService extends Service {
 
         new Thread(() -> {
             try {
-                Uri savedUri = fAudio != null
+                SavedMedia saved = fAudio != null
                         ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
                         : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
-                postDoneNotification(sid, "Saved: " + fFile, fMime, savedUri);
-                showToast(getString(R.string.ig_toast_file_saved, fFile));
+                postDoneNotification(sid, "Saved: " + saved.filename, saved.mimeType, saved.uri);
+                showToast(getString(R.string.ig_toast_file_saved, saved.filename));
             } catch (Throwable e) {
                 postDoneNotification(sid, "Download failed: " + e.getMessage(), null, null);
                 showToast(getString(R.string.ig_toast_download_failed, e.getMessage()));
@@ -117,14 +130,13 @@ public class DownloadSaveService extends Service {
 
     // ── Download helpers ──────────────────────────────────────────────────────
 
-    private Uri downloadAndSave(String url, String filename, String mimeType,
-                                String saveUri, String username, boolean usernameFolder)
+    private SavedMedia downloadAndSave(String url, String filename, String mimeType,
+                                       String saveUri, String username, boolean usernameFolder)
             throws Exception {
-        File tmp = File.createTempFile("ie_dl_", mimeType.contains("video") ? ".mp4" : ".jpg",
-                getCacheDir());
+        File tmp = File.createTempFile("ie_dl_", ".bin", getCacheDir());
         try {
             pushProgress("Downloading…", 0, 100, false);
-            downloadToFile(url, tmp, (done, total) -> {
+            String responseType = downloadToFile(url, tmp, (done, total) -> {
                 if (total > 0) {
                     int pct = (int) (done * 95 / total);
                     maybeUpdateProgress("Downloading…", pct, 100);
@@ -132,17 +144,23 @@ public class DownloadSaveService extends Service {
                     maybeUpdateProgress("Downloading…", 0, 0, true);
                 }
             });
+            MediaTypeDetector.Result detected = MediaTypeDetector.resolve(
+                    tmp, responseType, mimeType, filename);
+            ModuleLog.line("(IE|DL|Type) requested=" + mimeType + " response=" + responseType
+                    + " detected=" + detected.kind + " file=" + detected.filename);
             pushProgress("Saving…", 97, 100, false);
-            return writeViaSaf(tmp, filename, mimeType, saveUri, username, usernameFolder);
+            Uri uri = writeViaSaf(tmp, detected.filename, detected.mimeType,
+                    saveUri, username, usernameFolder);
+            return new SavedMedia(uri, detected.filename, detected.mimeType);
         } finally {
             //noinspection ResultOfMethodCallIgnored
             tmp.delete();
         }
     }
 
-    private Uri downloadMergeAndSave(String videoUrl, String audioUrl, String filename,
-                                     String mimeType, String saveUri,
-                                     String username, boolean usernameFolder)
+    private SavedMedia downloadMergeAndSave(String videoUrl, String audioUrl, String filename,
+                                            String mimeType, String saveUri,
+                                            String username, boolean usernameFolder)
             throws Exception {
         File cacheDir = getCacheDir();
         long ts = System.currentTimeMillis();
@@ -173,7 +191,11 @@ public class DownloadSaveService extends Service {
             mergeVideoAudio(tv.getAbsolutePath(), ta.getAbsolutePath(), out.getAbsolutePath());
 
             pushProgress("Saving…", 97, 100, false);
-            return writeViaSaf(out, filename, mimeType, saveUri, username, usernameFolder);
+            String corrected = MediaTypeDetector.withCorrectExtension(
+                    filename, MediaTypeDetector.Kind.VIDEO);
+            Uri uri = writeViaSaf(out, corrected, "video/mp4",
+                    saveUri, username, usernameFolder);
+            return new SavedMedia(uri, corrected, "video/mp4");
         } finally {
             //noinspection ResultOfMethodCallIgnored
             tv.delete();
@@ -221,11 +243,12 @@ public class DownloadSaveService extends Service {
         void onProgress(long bytesRead, long totalBytes);
     }
 
-    private static void downloadToFile(String url, File dest, ProgressCallback cb)
+    private static String downloadToFile(String url, File dest, ProgressCallback cb)
             throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestProperty("User-Agent", UA);
         conn.connect();
+        String contentType = conn.getContentType();
         long total = conn.getContentLengthLong(); // -1 if server doesn't send Content-Length
         try (InputStream in = conn.getInputStream();
              FileOutputStream fos = new FileOutputStream(dest)) {
@@ -240,6 +263,7 @@ public class DownloadSaveService extends Service {
         } finally {
             conn.disconnect();
         }
+        return contentType;
     }
 
     private static void mergeVideoAudio(String vp, String ap, String op) throws Exception {

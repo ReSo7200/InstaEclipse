@@ -8,5 +8,7 @@
     android:paddingTop="24dp"
     android:paddingBottom="8dp"
     android:textStyle="bold"
+    android:textAllCaps="true"
+    android:letterSpacing="0.06"
     android:textColor="?attr/colorPrimary"
-    android:textAppearance="?attr/textAppearanceTitleSmall" />
+    android:textAppearance="?attr/textAppearanceLabelLarge" />

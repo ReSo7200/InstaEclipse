@@ -11,12 +11,28 @@ public class FeatureFlags {
     public static boolean isGhostTyping = false;
     public static boolean isGhostScreenshot = false;
     public static boolean isGhostViewOnce = false;
-    public static boolean enableUnlimitedReplays = false;
     public static boolean isGhostStory = false;
     public static boolean isGhostLive = false;
     public static boolean allowScreenshots = false;
     public static boolean keepEphemeralMessages = false;
     public static boolean permanentViewMode = false;
+    public static boolean keepUnsentMessages = false;
+
+    // Auto-clear cache
+    public static boolean autoClearCache = false;
+    public static int autoClearCacheSizeMb = 100;
+
+    // Remove Meta AI (#179)
+    public static boolean removeMetaAI = false;
+
+    // Lock DMs (#182) — passcode stored as salted SHA-256 hash (never plaintext)
+    public static boolean lockDirectMessages = false;
+    public static String lockDirectPasscode = "";
+    public static String lockDirectSalt = ""; // per-install random salt; "" = legacy unsalted
+    public static boolean lockDirectAlways = false; // re-lock whenever leaving the inbox (not just on app close)
+    public static boolean lockWholeApp = false; // lock the ENTIRE app on launch/return (same passcode as Lock DMs)
+    public static boolean lockUseFingerprint = true; // offer biometric unlock when the device has one enrolled
+    public static boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
 
     // Which ghost mode features the quick toggle will control
     public static boolean quickToggleSeen = false;
@@ -26,7 +42,6 @@ public class FeatureFlags {
     public static boolean quickToggleStory = false;
     public static boolean quickToggleLive = false;
     public static boolean quickToggleEphemeral = false;
-    public static boolean quickToggleReplays = false;
     public static boolean quickTogglePermanentView = false;
     public static boolean quickToggleAllowScreenshots = false;
 
@@ -88,6 +103,14 @@ public class FeatureFlags {
     public static boolean enableProfileDownload = false;
     public static boolean downloaderUsernameFolder = false;
     public static boolean downloaderAddTimestamp = false;
+    public static boolean copyMediaLink = false;      // #117 — inject "Copy Media Link" (direct CDN url) into the post ⋮ menu
+    public static boolean saveInstants = false;        // #184 — long-press a received Instant (quicksnap) to save it
+    public static boolean uploadInstants = false;      // #199 — send an Instant from gallery (bitmap-swap into quicksnap send)
+    public static boolean cacheStories = false;        // cache viewed stories locally for 24h (survive expiry/deletion)
+    public static boolean customFontEnabled = false;   // replace IG's UI text font with a user .ttf/.otf
+    public static String  customFontPath = "";         // path to the user-picked font in the module's filesDir
+    public static boolean customEmojiEnabled = false;  // replace IG's emoji font (needs an EmojiCompat-format .ttf)
+    public static String  customEmojiPath = "";        // path to the user-picked EmojiCompat emoji font
     public static String  downloaderCustomPath = "";   // human-readable display path
     public static String  downloaderCustomUri  = "";   // SAF tree URI string for actual writes
 }

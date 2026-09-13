@@ -20,7 +20,6 @@ public class GhostModeUtils {
         if (FeatureFlags.quickToggleStory && FeatureFlags.isGhostStory) return true;
         if (FeatureFlags.quickToggleLive && FeatureFlags.isGhostLive) return true;
         if (FeatureFlags.quickToggleEphemeral && FeatureFlags.keepEphemeralMessages) return true;
-        if (FeatureFlags.quickToggleReplays && FeatureFlags.enableUnlimitedReplays) return true;
         if (FeatureFlags.quickTogglePermanentView && FeatureFlags.permanentViewMode) return true;
         return FeatureFlags.quickToggleAllowScreenshots && FeatureFlags.allowScreenshots;
     }
@@ -58,10 +57,6 @@ public class GhostModeUtils {
             anySelected = true;
             if (FeatureFlags.keepEphemeralMessages) shouldDisable = true;
         }
-        if (FeatureFlags.quickToggleReplays) {
-            anySelected = true;
-            if (FeatureFlags.enableUnlimitedReplays) shouldDisable = true;
-        }
         if (FeatureFlags.quickTogglePermanentView) {
             anySelected = true;
             if (FeatureFlags.permanentViewMode) shouldDisable = true;
@@ -89,7 +84,6 @@ public class GhostModeUtils {
         if (FeatureFlags.quickToggleStory) FeatureFlags.isGhostStory = newState;
         if (FeatureFlags.quickToggleLive) FeatureFlags.isGhostLive = newState;
         if (FeatureFlags.quickToggleEphemeral) FeatureFlags.keepEphemeralMessages = newState;
-        if (FeatureFlags.quickToggleReplays) FeatureFlags.enableUnlimitedReplays = newState;
         if (FeatureFlags.quickTogglePermanentView) FeatureFlags.permanentViewMode = newState;
         if (FeatureFlags.quickToggleAllowScreenshots) FeatureFlags.allowScreenshots = newState;
 

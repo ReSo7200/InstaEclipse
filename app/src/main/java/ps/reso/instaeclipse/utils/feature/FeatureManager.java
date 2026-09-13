@@ -37,11 +37,6 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("GhostViewOnce");
         }
 
-        if (FeatureFlags.enableUnlimitedReplays) {
-            FeatureStatusTracker.setEnabled("UnlimitedReplays", R.string.ig_dialog_ghost_unlimited_replays);
-        } else {
-            FeatureStatusTracker.setDisabled("UnlimitedReplays");
-        }
 
         if (FeatureFlags.isGhostStory) {
             FeatureStatusTracker.setEnabled("GhostStories", R.string.ig_dialog_ghost_hide_story_views);
@@ -73,6 +68,34 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("PermanentViewMode");
         }
 
+        if (FeatureFlags.keepUnsentMessages) {
+            FeatureStatusTracker.setEnabled("KeepUnsentMessages", R.string.ig_dialog_ghost_keep_unsent);
+        } else {
+            FeatureStatusTracker.setDisabled("KeepUnsentMessages");
+        }
+
+        // Auto-Clear Cache is a filesystem operation (clears IG's cache dirs on background),
+        // not an Instagram-code hook, so it has no meaningful ✅/❌ "hooked" state — intentionally
+        // omitted from the load toast (it was always showing a ❌ despite working).
+
+        if (FeatureFlags.removeMetaAI) {
+            FeatureStatusTracker.setEnabled("RemoveMetaAI", R.string.ig_dialog_misc_remove_meta_ai);
+        } else {
+            FeatureStatusTracker.setDisabled("RemoveMetaAI");
+        }
+
+        if (FeatureFlags.lockDirectMessages) {
+            FeatureStatusTracker.setEnabled("LockDirectMessages", R.string.ig_dialog_misc_lock_dms);
+        } else {
+            FeatureStatusTracker.setDisabled("LockDirectMessages");
+        }
+
+        if (FeatureFlags.hideSpecificChats) {
+            FeatureStatusTracker.setEnabled("HideSpecificChats", R.string.ig_hide_chats_title);
+        } else {
+            FeatureStatusTracker.setDisabled("HideSpecificChats");
+        }
+
         // Clean Feed
         if (FeatureFlags.hideSuggestionsInFeed) {
             FeatureStatusTracker.setEnabled("HideSuggestionsInFeed", R.string.ig_dialog_clean_feed_hide_suggested);
@@ -85,6 +108,7 @@ public class FeatureManager {
         } else {
             FeatureStatusTracker.setDisabled("HideThreadsSuggestions");
         }
+
 
         // Miscellaneous
         if (FeatureFlags.disableTrackingLinks) {
@@ -145,6 +169,42 @@ public class FeatureManager {
             FeatureStatusTracker.setEnabled("PostDownload", R.string.ig_dialog_downloader_posts);
         } else {
             FeatureStatusTracker.setDisabled("PostDownload");
+        }
+
+        if (FeatureFlags.copyMediaLink) {
+            FeatureStatusTracker.setEnabled("CopyMediaLink", R.string.ig_copy_link_title);
+        } else {
+            FeatureStatusTracker.setDisabled("CopyMediaLink");
+        }
+
+        if (FeatureFlags.saveInstants) {
+            FeatureStatusTracker.setEnabled("SaveInstants", R.string.ig_instant_save_title);
+        } else {
+            FeatureStatusTracker.setDisabled("SaveInstants");
+        }
+
+        if (FeatureFlags.uploadInstants) {
+            FeatureStatusTracker.setEnabled("UploadInstants", R.string.ig_instant_upload_title);
+        } else {
+            FeatureStatusTracker.setDisabled("UploadInstants");
+        }
+
+        if (FeatureFlags.cacheStories) {
+            FeatureStatusTracker.setEnabled("CacheStories", R.string.ig_story_cache_title);
+        } else {
+            FeatureStatusTracker.setDisabled("CacheStories");
+        }
+
+        if (FeatureFlags.customFontEnabled) {
+            FeatureStatusTracker.setEnabled("CustomFont", R.string.ig_custom_font_title);
+        } else {
+            FeatureStatusTracker.setDisabled("CustomFont");
+        }
+
+        if (FeatureFlags.customEmojiEnabled) {
+            FeatureStatusTracker.setEnabled("CustomEmoji", R.string.ig_custom_emoji_title);
+        } else {
+            FeatureStatusTracker.setDisabled("CustomEmoji");
         }
 
         if (FeatureFlags.enableStoryDownload) {
