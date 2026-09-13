@@ -466,6 +466,15 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | Interceptor): ❌ Failed to hook");
                     }
 
+                    // Crash guard: drop tasks rejected by already-shut-down executors (carousel/
+                    // realtime teardown race on IG 446+/447.0.0.39+) instead of letting AbortPolicy
+                    // throw and hard-crash the app.
+                    try {
+                        new ps.reso.instaeclipse.mods.core.TerminatedExecutorGuard().install(lpparam.classLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | ExecGuard): ❌ Failed to hook");
+                    }
+
                 }
 
             });
