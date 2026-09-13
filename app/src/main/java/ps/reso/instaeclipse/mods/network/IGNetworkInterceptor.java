@@ -138,14 +138,18 @@ public class IGNetworkInterceptor {
                                     if (FeatureFlags.disableFeed) {
                                         shouldDrop |= uri.getPath().endsWith("/feed/timeline/");
                                     }
-                                    if (FeatureFlags.disableReels && !FeatureFlags.disableReelsExceptDM) {
+                                    // Full Disable Reels takes precedence over the except-DM exception:
+                                    // when it is on, every clips endpoint is dropped — including
+                                    // /api/v1/clips/items/ that loads a reel opened from a DM.
+                                    if (FeatureFlags.disableReels) {
                                         shouldDrop |= uri.getPath().endsWith("/qp/batch_fetch/")
                                                 || uri.getPath().contains("api/v1/clips")
                                                 || uri.getPath().contains("clips")
                                                 || uri.getPath().contains("mixed_media")
                                                 || uri.getPath().contains("mixed_media/discover/stream/");
                                     }
-                                    if (FeatureFlags.disableReelsExceptDM) {
+                                    // Except-DM mode only applies when full Disable Reels is OFF.
+                                    if (FeatureFlags.disableReelsExceptDM && !FeatureFlags.disableReels) {
                                         if (uri.getPath().startsWith("/api/v1/direct_v2/")) {
                                             return;
                                         }
