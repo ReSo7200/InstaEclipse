@@ -183,14 +183,18 @@ public class FeedVideoDownloadHook {
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            if (!FeatureFlags.enablePostDownload) return;
-                            String s = (String) param.args[0];
-                            if (s == null || !isCdnMediaUrl(s)) return;
-                            synchronized (urlBuffer) {
-                                if (!urlBuffer.isEmpty() && urlBuffer.peekFirst().url.equals(s))
-                                    return;
-                                urlBuffer.addFirst(new UrlEntry(s));
-                                while (urlBuffer.size() > MAX_URLS) urlBuffer.removeLast();
+                            try {
+                                if (!FeatureFlags.enablePostDownload) return;
+                                if (param.args.length == 0 || !(param.args[0] instanceof String s)) return;
+                                if (!isCdnMediaUrl(s)) return;
+                                synchronized (urlBuffer) {
+                                    if (!urlBuffer.isEmpty() && urlBuffer.peekFirst().url.equals(s))
+                                        return;
+                                    urlBuffer.addFirst(new UrlEntry(s));
+                                    while (urlBuffer.size() > MAX_URLS) urlBuffer.removeLast();
+                                }
+                            } catch (Throwable ignored) {
+                                // Uri.parse runs app-wide; never let our buffer logic crash a caller.
                             }
                         }
                     });

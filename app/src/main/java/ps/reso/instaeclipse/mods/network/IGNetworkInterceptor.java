@@ -57,10 +57,12 @@ public class IGNetworkInterceptor {
                         random_param_1, random_param_2, random_param_3, new XC_MethodHook() {
                             @Override
                             protected void beforeHookedMethod(MethodHookParam param) {
+                              try {
                                 Object requestObj = param.args[0];
                                 URI uri = (URI) XposedHelpers.getObjectField(requestObj, finalUriFieldName);
 
                                 if (uri != null && uri.getPath() != null) {
+                                    final String host = uri.getHost(); // null for opaque/relative URIs — guard before use
                                     boolean shouldDrop = false;
 
 
@@ -129,7 +131,7 @@ public class IGNetworkInterceptor {
                                     if (FeatureFlags.disableExplore) {
                                         shouldDrop |= uri.getPath().contains("/discover/topical_explore")
                                                 || uri.getPath().contains("/discover/topical_explore_stream")
-                                                || (uri.getHost().contains("i.instagram.com") && uri.getPath().contains("/api/v1/fbsearch/top_serp/"));
+                                                || (host != null && host.contains("i.instagram.com") && uri.getPath().contains("/api/v1/fbsearch/top_serp/"));
                                     }
                                     if (FeatureFlags.disableComments) {
                                         shouldDrop |= uri.getPath().contains("/api/v1/media/") && uri.getPath().contains("comments/");
@@ -145,8 +147,8 @@ public class IGNetworkInterceptor {
 
                                     // Analytics
                                     if (FeatureFlags.isAnalyticsBlocked) {
-                                        shouldDrop |= uri.getHost().contains("graph.instagram.com")
-                                                || uri.getHost().contains("graph.facebook.com")
+                                        shouldDrop |= (host != null && (host.contains("graph.instagram.com")
+                                                || host.contains("graph.facebook.com")))
                                                 || uri.getPath().contains("/logging_client_events");
                                     }
 
@@ -163,9 +165,10 @@ public class IGNetworkInterceptor {
                                                 || p.contains("/presence/");
                                         FeatureStatusTracker.setHooked("SpoofLastSeen");
                                     }
-                                    if (FeatureFlags.disableRepost) {
-                                        shouldDrop |= uri.getPath().contains("/media/create_note/");
-                                    }
+                                    // NOTE: Disable Repost is handled at the UI/action level in
+                                    // mods.ui.DisableRepostHook — NOT here. Dropping the repost network
+                                    // request is ineffective because IG applies the repost optimistically
+                                    // client-side, so the repost completes even when the request is dropped.
                                     if (FeatureFlags.disableDiscoverPeople) {
                                         shouldDrop |= uri.getPath().contains("/discover/ayml/");
                                         shouldDrop |= uri.getPath().contains("discover/chaining/");
@@ -185,6 +188,9 @@ public class IGNetworkInterceptor {
                                         FollowStatusHook.handleRequest(uri, param.args);
                                     }
                                 }
+                              } catch (Throwable ignored) {
+                                  // A malformed/opaque request must never crash IG's network dispatch.
+                              }
                             }
                         }
                 );
