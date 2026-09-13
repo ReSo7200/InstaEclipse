@@ -45,6 +45,7 @@ public class GhostTypingIndicatorHook {
 
             if (methods.isEmpty()) {
                 ModuleLog.line("(InstaEclipse | TypingBlock): ❌ No methods found containing 'is_typing_indicator_enabled'");
+                if (FeatureFlags.isGhostTyping) FeatureStatusTracker.setBroken("GhostTyping");
                 return;
             }
 
@@ -94,6 +95,7 @@ public class GhostTypingIndicatorHook {
             }
 
             ModuleLog.line("(InstaEclipse | TypingBlock): ❌ No candidate matched the expected method shape");
+            if (FeatureFlags.isGhostTyping) FeatureStatusTracker.setBroken("GhostTyping");
 
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse | TypingBlock): ❌ Exception: " + t.getMessage());

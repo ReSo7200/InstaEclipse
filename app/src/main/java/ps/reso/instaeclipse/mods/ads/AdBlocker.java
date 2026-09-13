@@ -78,6 +78,7 @@ public class AdBlocker {
             }
 
             ModuleLog.line("(InstaEclipse | AdBlocker): ❌ No valid methods hooked (all markers exhausted).");
+            if (FeatureFlags.isAdBlockEnabled) FeatureStatusTracker.setBroken("AdBlocker");
 
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse | AdBlocker): ❌ Exception: " + t.getMessage());

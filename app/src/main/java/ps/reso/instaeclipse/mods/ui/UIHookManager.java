@@ -194,11 +194,12 @@ public class UIHookManager {
                                         if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
                                             CustomToast.toastShown = true;
 
-                                            StringBuilder sb = new StringBuilder(I18n.t(activity, R.string.ig_toast_features_loaded)).append("\n");
-                                            for (Map.Entry<String, Boolean> entry : FeatureStatusTracker.getStatus().entrySet()) {
-                                                sb.append(entry.getValue() ? "✅ " : "❌ ").append(FeatureStatusTracker.getLabel(activity, entry.getKey())).append("\n");
-                                            }
-                                            CustomToast.showCustomToast(activity.getApplicationContext(), sb.toString().trim());
+                                            // Pass the raw KEY -> hooked map; showFeatureGrid resolves
+                                            // each key's label and groups it into a category itself.
+                                            java.util.LinkedHashMap<String, Boolean> status =
+                                                    new java.util.LinkedHashMap<>(FeatureStatusTracker.getStatus());
+                                            CustomToast.showFeatureGrid(activity.getApplicationContext(),
+                                                    I18n.t(activity, R.string.ig_toast_features_loaded), status);
                                         }
                                     } catch (Exception innerE) {
                                         ModuleLog.line("(InstaEclipse): UI Injection Error: " + innerE.getMessage());
