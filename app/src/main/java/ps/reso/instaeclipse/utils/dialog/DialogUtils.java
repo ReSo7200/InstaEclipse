@@ -1016,12 +1016,16 @@ public class DialogUtils {
             updateExtremeSwitchEnabled.run();
         });
 
-        // Parent-child logic for Reels
+        // Parent-child logic for Reels. Set the live FeatureFlag immediately (not only on dialog
+        // dismiss) so the network interceptor picks up the change on the very next request — no
+        // Instagram restart needed to switch the option.
         disableReelsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.disableReels = isChecked;
             onlyInDMSwitch.setEnabled(isChecked);
             if (!isChecked) {
                 onlyInDMSwitch.setChecked(false);
                 onlyInDMSwitch.setEnabled(false);
+                FeatureFlags.disableReelsExceptDM = false;
             }
             updateMasterSwitch(enableAllSwitch, switches, disableReelsSwitch, onlyInDMSwitch);
             updateExtremeSwitchEnabled.run();
@@ -1030,17 +1034,23 @@ public class DialogUtils {
 
         // Child logic for "Except in DMs"
         onlyInDMSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.disableReelsExceptDM = isChecked;
             if (isChecked && !disableReelsSwitch.isChecked()) {
                 disableReelsSwitch.setChecked(true);
+                FeatureFlags.disableReels = true;
             }
             updateMasterSwitch(enableAllSwitch, switches, disableReelsSwitch, onlyInDMSwitch);
             updateExtremeSwitchEnabled.run();
             SettingsManager.saveAllFlags();
         });
 
-        // All other switches
+        // All other switches — set the matching live FeatureFlag immediately too.
         for (ToggleRow s : new ToggleRow[]{disableStoriesSwitch, disableFeedSwitch, disableExploreSwitch, disableCommentsSwitch}) {
             s.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (s == disableStoriesSwitch) FeatureFlags.disableStories = isChecked;
+                else if (s == disableFeedSwitch) FeatureFlags.disableFeed = isChecked;
+                else if (s == disableExploreSwitch) FeatureFlags.disableExplore = isChecked;
+                else if (s == disableCommentsSwitch) FeatureFlags.disableComments = isChecked;
                 updateMasterSwitch(enableAllSwitch, switches, disableReelsSwitch, onlyInDMSwitch);
                 updateExtremeSwitchEnabled.run();
                 SettingsManager.saveAllFlags();
