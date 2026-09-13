@@ -140,16 +140,18 @@ public class IGNetworkInterceptor {
                                     }
                                     // Full Disable Reels takes precedence over the except-DM exception:
                                     // when it is on, every clips endpoint is dropped — including
-                                    // /api/v1/clips/items/ that loads a reel opened from a DM.
-                                    if (FeatureFlags.disableReels) {
+                                    // "Allow in DM" (disableReelsExceptDM) is the switch that controls DM
+                                    // reels: when it is ON, DM-opened reels (/api/v1/clips/items/) are
+                                    // allowed and only the reels feed/discover is dropped; when it is OFF,
+                                    // full Disable Reels drops every clips endpoint including clips/items/.
+                                    if (FeatureFlags.disableReels && !FeatureFlags.disableReelsExceptDM) {
                                         shouldDrop |= uri.getPath().endsWith("/qp/batch_fetch/")
                                                 || uri.getPath().contains("api/v1/clips")
                                                 || uri.getPath().contains("clips")
                                                 || uri.getPath().contains("mixed_media")
                                                 || uri.getPath().contains("mixed_media/discover/stream/");
                                     }
-                                    // Except-DM mode only applies when full Disable Reels is OFF.
-                                    if (FeatureFlags.disableReelsExceptDM && !FeatureFlags.disableReels) {
+                                    if (FeatureFlags.disableReelsExceptDM) {
                                         if (uri.getPath().startsWith("/api/v1/direct_v2/")) {
                                             return;
                                         }
