@@ -278,6 +278,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | RemoveMetaAI): ❌ Failed to hook");
                     }
 
+                    // Disable Repost (feed + reels) — UI/action level; network drop is ineffective
+                    try {
+                        new ps.reso.instaeclipse.mods.ui.DisableRepostHook().install(dexKitBridge, lpparam.classLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | DisableRepost): ❌ Failed to hook");
+                    }
+
                     try {
                         new ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook().install(lpparam.classLoader); // Lock DMs (#182)
                     } catch (Throwable ignored) {
