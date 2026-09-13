@@ -114,6 +114,11 @@ public class FeedVideoDownloadHook {
     // User class + the method on MutableMediaDictIntf that returns it — resolved via DexKit
     private static Class<?> userClass;
     private static Method   dictUserGetter;    // () -> UserClass on MutableMediaDictIntf
+    // IG 446+/447.0.0.39+ removed MutableMediaDictIntf/LiveTreeMediaDict — the author getters moved
+    // directly onto com.instagram.feed.media.Media as lazy Pando accessors (e.g. A3P reads the
+    // "user" field via getOptionalTreeValueByHashCode(3599307)). This getter is invoked directly on
+    // the Media object. Resolved via the stable Pando field-id 3599307 (== "user".hashCode()).
+    private static Method   mediaAuthorGetter; // () -> UserClass on com.instagram.feed.media.Media
     // userUsernameGetter lives in UserUtils — resolved here and stored there
 
     // ── Uri.parse fallback buffer ─────────────────────────────────────────────
@@ -1331,6 +1336,7 @@ public class FeedVideoDownloadHook {
                         UserUtils.userUsernameGetter = cachedGetter;
                     }
                     resolveDictUserGetter(bridge, classLoader);
+                    resolveMediaAuthorGetter(bridge, classLoader);
                     return;
                 } catch (Throwable ignored) {}
             }
@@ -1400,9 +1406,47 @@ public class FeedVideoDownloadHook {
             }
 
             resolveDictUserGetter(bridge, classLoader);
+            resolveMediaAuthorGetter(bridge, classLoader);
 
         } catch (Throwable t) {
             ModuleLog.line("(IE|DL|Username) ❌ resolveUsernameGetter: " + t);
+        }
+    }
+
+    /**
+     * IG 446+/447.0.0.39+ dropped the MutableMediaDictIntf/LiveTreeMediaDict split and moved the
+     * author accessors straight onto com.instagram.feed.media.Media as lazy Pando getters. The post
+     * (and reel) author is the zero-arg User-returning getter that reads the Pando "user" field,
+     * identified by the field-id literal 3599307 (== "user".hashCode(), a JDK-stable constant). We
+     * invoke it directly on the Media object. On older builds that lack such a getter this resolves
+     * to nothing and the existing dict-based path is used unchanged.
+     */
+    private static void resolveMediaAuthorGetter(DexKitBridge bridge, ClassLoader classLoader) {
+        if (mediaAuthorGetter != null || userClass == null) return;
+
+        if (DexKitCache.isCacheValid()) {
+            Method cached = DexKitCache.loadMethod("MediaAuthorGetter", classLoader);
+            if (cached != null) { mediaAuthorGetter = cached; return; }
+        }
+
+        try {
+            List<MethodData> res = bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create()
+                            .declaredClass("com.instagram.feed.media.Media")
+                            .paramCount(0)
+                            .returnType(userClass.getName())
+                            .usingNumbers(3599307)));
+            if (!res.isEmpty()) {
+                Method m = res.get(0).getMethodInstance(classLoader);
+                m.setAccessible(true);
+                mediaAuthorGetter = m;
+                DexKitCache.saveMethod("MediaAuthorGetter", m);
+                ModuleLog.line("(IE|DL|Username) ✅ mediaAuthorGetter (Media.\"user\"): " + m.getName());
+            } else {
+                ModuleLog.line("(IE|DL|Username) mediaAuthorGetter: no Media \"user\" getter (older build)");
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|Username) ❌ mediaAuthorGetter: " + t);
         }
     }
 
@@ -1508,6 +1552,20 @@ public class FeedVideoDownloadHook {
         }
 
         if (media == null) return null;
+
+        // TIER 0: Media-direct author getter (IG 446+/447.0.0.39+). The author accessors moved onto
+        // com.instagram.feed.media.Media itself as lazy Pando getters; invoke the "user" one directly
+        // on the media object. These getters materialise the User on demand, so the field-scan tiers
+        // below cannot find it until it's been called once — this must run first.
+        if (mediaAuthorGetter != null && mediaClass != null && mediaClass.isInstance(media)) {
+            try {
+                Object userObj = mediaAuthorGetter.invoke(media);
+                if (userObj != null) {
+                    String name = UserUtils.callUsernameGetter(userObj);
+                    if (name != null) return name;
+                }
+            } catch (Throwable ignored) {}
+        }
 
         // TIER 1: Use the resolved Dictionary Getter
         if (dictUserGetter != null
@@ -2355,14 +2413,27 @@ public class FeedVideoDownloadHook {
      * using the DexKit-resolved dictUserGetter. Used by StoryDownloadHook.
      */
     static String extractUsernameFromMediaObject(Object media) {
-        if (media == null || dictUserGetter == null
-                || (mutableMediaDictIntfClass == null && liveTreeMediaDictClass == null)) return null;
-        try {
-            Object dictIntf = findMediaDictionary(media);
-            if (dictIntf == null) return null;
-            Object user = dictUserGetter.invoke(dictIntf);
-            return UserUtils.callUsernameGetter(user);
-        } catch (Throwable ignored) {}
+        if (media == null) return null;
+        // IG 446+/447.0.0.39+: author getter lives directly on Media (see resolveMediaAuthorGetter).
+        if (mediaAuthorGetter != null && mediaClass != null && mediaClass.isInstance(media)) {
+            try {
+                Object user = mediaAuthorGetter.invoke(media);
+                String name = UserUtils.callUsernameGetter(user);
+                if (name != null) return name;
+            } catch (Throwable ignored) {}
+        }
+        // Older builds: author getter on the MutableMediaDictIntf/LiveTreeMediaDict object.
+        if (dictUserGetter != null
+                && (mutableMediaDictIntfClass != null || liveTreeMediaDictClass != null)) {
+            try {
+                Object dictIntf = findMediaDictionary(media);
+                if (dictIntf != null) {
+                    Object user = dictUserGetter.invoke(dictIntf);
+                    String name = UserUtils.callUsernameGetter(user);
+                    if (name != null) return name;
+                }
+            } catch (Throwable ignored) {}
+        }
         return null;
     }
 
