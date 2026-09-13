@@ -15,6 +15,33 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 public class IGNetworkInterceptor {
 
+    private static final URI FAKE_URI = URI.create("https://127.0.0.1/404");
+    private static final String FAKE_URL = "https://127.0.0.1/404";
+
+    /**
+     * Neutralise a dropped request by redirecting it to a dead local URL. IG 446+/447.0.0.39+ keeps
+     * the request URL in MULTIPLE fields on the request object (e.g. a String copy plus two java.net.URI
+     * copies), and the actual dispatch reads one of the copies — not necessarily the single URI field
+     * we resolve for inspection. Rewriting only that one field is silently ignored, so the request
+     * still goes out. Rewrite EVERY url-bearing field: every java.net.URI field, and every String
+     * field that currently holds this request's URL (matched by the original value / same path).
+     */
+    private static void neutralizeUrlFields(Object requestObj, URI original) {
+        String orig = original.toString();
+        String origPath = original.getPath();
+        for (java.lang.reflect.Field f : requestObj.getClass().getDeclaredFields()) {
+            try {
+                f.setAccessible(true);
+                Object v = f.get(requestObj);
+                if (v instanceof URI) {
+                    f.set(requestObj, FAKE_URI);
+                } else if (v instanceof String s && s.startsWith("http")
+                        && (s.equals(orig) || (origPath != null && !origPath.isEmpty() && s.contains(origPath)))) {
+                    f.set(requestObj, FAKE_URL);
+                }
+            } catch (Throwable ignored) {}
+        }
+    }
 
     public void handleInterceptor(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
@@ -176,10 +203,7 @@ public class IGNetworkInterceptor {
                                     }
 
                                     if (shouldDrop) {
-                                        try {
-                                            URI fakeUri = new URI("https", "127.0.0.1", "/404", null);
-                                            XposedHelpers.setObjectField(requestObj, finalUriFieldName, fakeUri);
-                                        } catch (Exception ignored) {}
+                                        neutralizeUrlFields(requestObj, uri);
                                     }
 
                                     // Follow status
