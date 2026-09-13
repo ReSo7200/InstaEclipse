@@ -18,7 +18,17 @@ public final class ModuleLog {
 
     private static final String TAG = "InstaEclipse";
 
+    /** Verbose/debug logging. Off by default so per-event PROBE/DEBUG chatter and the stack-walk
+     *  they trigger don't ship in release. Normal status lines (line()) always log. */
+    public static volatile boolean verbose = false;
+
     private ModuleLog() {}
+
+    /** Debug-only line: logs nothing unless {@link #verbose} is on. Use for high-frequency or
+     *  sensitive PROBE/DEBUG output so it stays out of release logs by default. */
+    public static void probe(String msg) {
+        if (verbose) line(msg);
+    }
 
     private static String getCallerInfo() {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();

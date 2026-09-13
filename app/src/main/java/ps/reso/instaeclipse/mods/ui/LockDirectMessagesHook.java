@@ -77,7 +77,7 @@ public class LockDirectMessagesHook {
         searchBarId    = r.getIdentifier("direct_inbox_action_bar", "id", pkg);
         nullStateId    = r.getIdentifier("inbox_refreshable_thread_list_recyclerview", "id", pkg);
         threadHeaderId = r.getIdentifier("direct_thread_header", "id", pkg);
-        ModuleLog.line("(IE|LockDMs|PROBE) ids searchBar=" + searchBarId + " nullState=" + nullStateId
+        ModuleLog.probe("(IE|LockDMs|PROBE) ids searchBar=" + searchBarId + " nullState=" + nullStateId
                 + " threadHeader=" + threadHeaderId);
     }
 
@@ -91,7 +91,7 @@ public class LockDirectMessagesHook {
                 showOverlay(a, true);
             }
             ensureIds(a);
-            ModuleLog.line("(IE|LockDMs|PROBE) armed flag=" + FeatureFlags.lockDirectMessages
+            ModuleLog.probe("(IE|LockDMs|PROBE) armed flag=" + FeatureFlags.lockDirectMessages
                     + " passLen=" + (FeatureFlags.lockDirectPasscode == null ? -1 : FeatureFlags.lockDirectPasscode.length())
                     + " unlocked=" + unlockedThisSession);
             final View decor = a.getWindow().getDecorView();
@@ -164,7 +164,7 @@ public class LockDirectMessagesHook {
         long now = System.currentTimeMillis();
         if (now - lastGateLog > 1500) {
             lastGateLog = now;
-            ModuleLog.line("(IE|LockDMs|PROBE) gate act=" + a.getClass().getSimpleName()
+            ModuleLog.probe("(IE|LockDMs|PROBE) gate act=" + a.getClass().getSimpleName()
                     + " onThread=" + onThread + " searchBar=" + sb + " nullState=" + ns);
         }
         if (!onInbox) return false;

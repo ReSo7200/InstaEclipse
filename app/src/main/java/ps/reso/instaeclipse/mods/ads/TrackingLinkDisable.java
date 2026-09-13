@@ -32,7 +32,7 @@ public class TrackingLinkDisable {
                         if (clipData == null || clipData.getItemCount() == 0) return;
                         ClipData.Item item = clipData.getItemAt(0);
                         if (item == null || item.getText() == null) return;
-                        ps.reso.instaeclipse.utils.log.ModuleLog.line("(IE|Track|PROBE) setPrimaryClip: " + item.getText());
+                        ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) setPrimaryClip intercepted");
                         String cleaned = stripIfTracking(item.getText().toString());
                         if (cleaned != null) param.args[0] = ClipData.newPlainText("URL", cleaned);
                     }
@@ -46,7 +46,7 @@ public class TrackingLinkDisable {
                 protected void beforeHookedMethod(MethodHookParam param) {
                     if (!FeatureFlags.disableTrackingLinks) return;
                     if (param.args[0] == null) return;
-                    ps.reso.instaeclipse.utils.log.ModuleLog.line("(IE|Track|PROBE) setText: " + param.args[0]);
+                    ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) setText intercepted");
                     String cleaned = stripIfTracking(param.args[0].toString());
                     if (cleaned != null) param.args[0] = cleaned;
                 }
@@ -60,7 +60,7 @@ public class TrackingLinkDisable {
                 if (!FeatureFlags.disableTrackingLinks) return;
                 if (!(param.args[0] instanceof String) || param.args[1] == null) return;
                 if (!Intent.EXTRA_TEXT.equals(param.args[0])) return;
-                ps.reso.instaeclipse.utils.log.ModuleLog.line("(IE|Track|PROBE) EXTRA_TEXT: " + param.args[1]);
+                ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) EXTRA_TEXT intercepted");
                 String cleaned = stripIfTracking(param.args[1].toString());
                 if (cleaned != null) param.args[1] = cleaned;
             }
@@ -100,7 +100,7 @@ public class TrackingLinkDisable {
         try {
             CharSequence text = target.getCharSequenceExtra(Intent.EXTRA_TEXT);
             if (text != null) {
-                ps.reso.instaeclipse.utils.log.ModuleLog.line("(IE|Track|PROBE) chooser EXTRA_TEXT: " + text);
+                ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) chooser EXTRA_TEXT intercepted");
                 String cleaned = stripIfTracking(text.toString());
                 if (cleaned != null) target.putExtra(Intent.EXTRA_TEXT, cleaned);
             }
