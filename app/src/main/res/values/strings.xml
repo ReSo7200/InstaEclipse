@@ -329,6 +329,8 @@
     <string name="ig_story_cache_view">View cached stories</string>
     <string name="ig_story_cache_empty">No cached stories yet. Turn this on, then view some stories — they\'ll be kept here for 24 hours.</string>
     <string name="ig_story_cache_clear">Clear cached stories</string>
+    <string name="ig_story_cache_clear_confirm">Delete all cached stories? This cannot be undone.</string>
+    <string name="ig_story_cache_cleared">Cached stories cleared</string>
     <string name="ig_story_cache_count">%1$d cached stories</string>
     <string name="ig_story_cache_saving">Saving cached story…</string>
     <string name="ig_story_cache_saved">Cached story saved</string>

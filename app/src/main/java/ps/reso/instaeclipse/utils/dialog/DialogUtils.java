@@ -1798,8 +1798,20 @@ public class DialogUtils {
         layout.addView(foldersCard);
         layout.addView(createActionRow(context, R.drawable.ic_delete, I18n.t(context, R.string.ig_story_cache_clear),
                 "#FF453A", v -> {
-                    ps.reso.instaeclipse.utils.media.StoryCache.clearAll();
-                    Toast.makeText(context, I18n.t(context, R.string.ig_story_cache_clear), Toast.LENGTH_SHORT).show();
+                    // Confirm before permanently deleting every cached story, then refresh the view.
+                    try {
+                        Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
+                        new AlertDialog.Builder(themed)
+                                .setTitle(I18n.t(context, R.string.ig_story_cache_clear))
+                                .setMessage(I18n.t(context, R.string.ig_story_cache_clear_confirm))
+                                .setNegativeButton(android.R.string.cancel, null)
+                                .setPositiveButton(I18n.t(context, R.string.ig_story_cache_clear), (d, w) -> {
+                                    ps.reso.instaeclipse.utils.media.StoryCache.clearAll();
+                                    Toast.makeText(context, I18n.t(context, R.string.ig_story_cache_cleared), Toast.LENGTH_SHORT).show();
+                                    showCachedStories(context); // refresh so the deleted rows disappear
+                                })
+                                .show();
+                    } catch (Throwable ignored) {}
                 }));
         showSectionDialog(context, I18n.t(context, R.string.ig_story_cache_view), layout, () -> {});
     }
