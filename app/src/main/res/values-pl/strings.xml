@@ -281,7 +281,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Zezwól na zrzuty ekranu w wiadomościach prywatnych</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Obejdź wykrywanie zrzutów ekranu</string>
     <string name="ig_dialog_ghost_hide_view_once">Ukryj otwarcie jednorazowych wiadomości</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Nielimitowane odtwarzanie wiadomości jednorazowych</string>
     <string name="ig_dialog_ghost_permanent_view_once">Trwałe multimedia jednorazowe (Niestabilne)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Zachowuj znikające wiadomości</string>
     <string name="ig_dialog_customize_quick_toggle">Dostosuj funkcje skrótu</string>
@@ -294,7 +293,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Włącz: Ukryj wyświetlenie relacji</string>
     <string name="ig_dialog_quick_hide_live_seen">Włącz: Ukryj obecność na Live</string>
     <string name="ig_dialog_quick_keep_ephemeral">Włącz: Zachowuj znikające wiadomości</string>
-    <string name="ig_dialog_quick_unlimited_replays">Włącz: Nielimitowane odtwarzanie jednorazowych wiadomości</string>
     <string name="ig_dialog_quick_permanent_view">Włącz: Trwałe multimedia jednorazowe (Niestabilne)</string>
     <string name="ig_dialog_quick_allow_screenshots">Włącz: Zezwól na zrzuty ekranu w wiadomościach prywatnych</string>
 

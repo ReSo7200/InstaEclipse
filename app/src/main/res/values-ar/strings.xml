@@ -171,7 +171,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">السماح بلقطات الشاشة في الرسائل المباشرة</string>
     <string name="ig_dialog_ghost_bypass_screenshot">تجاوز كشف لقطات الشاشة</string>
     <string name="ig_dialog_ghost_hide_view_once">إخفاء فتح الرسائل المرئية لمرة</string>
-    <string name="ig_dialog_ghost_unlimited_replays">تشغيل غير محدود للمشاركات المؤقتة</string>
     <string name="ig_dialog_ghost_permanent_view_once">تحويل الوسائط المؤقتة إلى دائمة (غير مستقر)</string>
     <string name="ig_dialog_ghost_keep_disappearing">الاحتفاظ بالرسائل المختفية</string>
     <string name="ig_dialog_customize_quick_toggle">تخصيص التبديل السريع</string>
@@ -182,7 +181,6 @@
     <string name="ig_dialog_quick_hide_story_seen">تضمين إخفاء مشاهدات القصص</string>
     <string name="ig_dialog_quick_hide_live_seen">تضمين إخفاء الحضور في البث المباشر</string>
     <string name="ig_dialog_quick_keep_ephemeral">تضمين الاحتفاظ بالرسائل المختفية</string>
-    <string name="ig_dialog_quick_unlimited_replays">تضمين تشغيل غير محدود للمشاركات المؤقتة</string>
     <string name="ig_dialog_quick_permanent_view">تضمين تحويل الوسائط المؤقتة إلى دائمة (غير مستقر)</string>
     <string name="ig_dialog_quick_allow_screenshots">تضمين السماح بلقطات الشاشة في الرسائل المباشرة</string>
     <string name="ig_dialog_ad_block_ads">حظر الإعلانات</string>

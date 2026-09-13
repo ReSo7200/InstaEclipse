@@ -172,7 +172,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Permitir capturas de ecrã em mensagens diretas</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Contornar deteção de capturas de ecrã</string>
     <string name="ig_dialog_ghost_hide_view_once">Ocultar abertura de mensagens temporárias</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Repetições ilimitadas de visualização única</string>
     <string name="ig_dialog_ghost_permanent_view_once">Tornar mídia temporária permanente (Instável)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Guardar mensagens que desaparecem</string>
     <string name="ig_dialog_customize_quick_toggle">Personalizar ativação rápida</string>
@@ -183,7 +182,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Incluir ocultar visualizações de stories</string>
     <string name="ig_dialog_quick_hide_live_seen">Incluir ocultar presença em live</string>
     <string name="ig_dialog_quick_keep_ephemeral">Incluir guardar mensagens que desaparecem</string>
-    <string name="ig_dialog_quick_unlimited_replays">Incluir repetições ilimitadas de visualização única</string>
     <string name="ig_dialog_quick_permanent_view">Incluir tornar mídia temporária permanente (Instável)</string>
     <string name="ig_dialog_quick_allow_screenshots">Incluir permitir capturas de ecrã em mensagens diretas</string>
     <string name="ig_dialog_ad_block_ads">Bloquear anúncios</string>

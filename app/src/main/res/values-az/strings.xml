@@ -173,7 +173,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">DM-lərdə Ekran Görüntüsünə İcazə Ver</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Ekran Görüntüsü Aşkarlanmasını Atla</string>
     <string name="ig_dialog_ghost_hide_view_once">Bir Dəfəlik Baxış Açılmasını Gizlət</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Limitsiz Oynatma</string>
     <string name="ig_dialog_ghost_permanent_view_once">Müvəqqəti Medianı Daimi Et (Qeyri-sabit)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Yox Olan Mesajları Saxla</string>
     <string name="ig_dialog_customize_quick_toggle">Sürətli Keçidi Fərdiləşdir</string>
@@ -184,7 +183,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Hekayə Baxışlarını Gizlətməni Daxil Et</string>
     <string name="ig_dialog_quick_hide_live_seen">Canlı Yayın Varlığını Gizlətməni Daxil Et</string>
     <string name="ig_dialog_quick_keep_ephemeral">Yox Olan Mesajları Saxlamağı Daxil Et</string>
-    <string name="ig_dialog_quick_unlimited_replays">Limitsiz Oynatmanı Daxil Et</string>
     <string name="ig_dialog_quick_permanent_view">Müvəqqəti Medianı Daimi Etməyi Daxil Et (Qeyri-sabit)</string>
     <string name="ig_dialog_quick_allow_screenshots">DM-lərdə Ekran Görüntüsünə İcazə Verməyi Daxil Et</string>
     <string name="ig_dialog_ad_block_ads">Reklamları Blokla</string>

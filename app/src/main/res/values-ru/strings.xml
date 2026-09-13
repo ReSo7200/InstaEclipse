@@ -173,7 +173,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Разрешить скриншоты в личных сообщениях</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Обойти обнаружение скриншотов</string>
     <string name="ig_dialog_ghost_hide_view_once">Скрыть открытие одноразовых сообщений</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Неограниченное воспроизведение</string>
     <string name="ig_dialog_ghost_permanent_view_once">Сохранить временные медиа навсегда (Нестабильно)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Сохранять исчезающие сообщения</string>
     <string name="ig_dialog_customize_quick_toggle">Настроить быстрое переключение</string>
@@ -184,7 +183,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Включить скрытие просмотров историй</string>
     <string name="ig_dialog_quick_hide_live_seen">Включить скрытие присутствия в прямом эфире</string>
     <string name="ig_dialog_quick_keep_ephemeral">Включить сохранение исчезающих сообщений</string>
-    <string name="ig_dialog_quick_unlimited_replays">Включить неограниченное воспроизведение</string>
     <string name="ig_dialog_quick_permanent_view">Включить сохранение временных медиа навсегда (Нестабильно)</string>
     <string name="ig_dialog_quick_allow_screenshots">Включить разрешение скриншотов в личных сообщениях</string>
     <string name="ig_dialog_ad_block_ads">Блокировать рекламу</string>

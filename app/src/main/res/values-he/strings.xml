@@ -201,7 +201,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">אפשר צילומי מסך בהודעות</string>
     <string name="ig_dialog_ghost_bypass_screenshot">עקוף זיהוי צילום מסך</string>
     <string name="ig_dialog_ghost_hide_view_once">הסתר פתיחת מדיה חד-פעמית</string>
-    <string name="ig_dialog_ghost_unlimited_replays">צפיות חוזרות ללא הגבלה</string>
     <string name="ig_dialog_ghost_permanent_view_once">מדיה חד-פעמית קבועה (לא יציב)</string>
     <string name="ig_dialog_ghost_keep_disappearing">שמור הודעות נעלמות</string>
     <string name="ig_dialog_customize_quick_toggle">התאם אישית החלפה מהירה</string>
@@ -214,7 +213,6 @@
     <string name="ig_dialog_quick_hide_story_seen">כלול הסתר צפיות בסטורי</string>
     <string name="ig_dialog_quick_hide_live_seen">כלול הסתר נוכחות בLive</string>
     <string name="ig_dialog_quick_keep_ephemeral">כלול שמור הודעות נעלמות</string>
-    <string name="ig_dialog_quick_unlimited_replays">כלול צפיות חוזרות ללא הגבלה</string>
     <string name="ig_dialog_quick_permanent_view">כלול מדיה חד-פעמית קבועה (לא יציב)</string>
     <string name="ig_dialog_quick_allow_screenshots">כלול אפשר צילומי מסך בהודעות</string>
 

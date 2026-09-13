@@ -173,7 +173,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">DM\'lerde Ekran Görüntüsüne İzin Ver</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Ekran Görüntüsü Tespitini Atla</string>
     <string name="ig_dialog_ghost_hide_view_once">Bir Kez Görüntüle Açılmasını Gizle</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Sınırsız Tekrar İzleme</string>
     <string name="ig_dialog_ghost_permanent_view_once">Geçici Medyayı Kalıcı Yap (Kararsız)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Kaybolan Mesajları Sakla</string>
     <string name="ig_dialog_customize_quick_toggle">Hızlı Geçişi Özelleştir</string>
@@ -184,7 +183,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Hikaye Görüntülemeyi Gizlemeyi Dahil Et</string>
     <string name="ig_dialog_quick_hide_live_seen">Canlı Yayın Varlığını Gizlemeyi Dahil Et</string>
     <string name="ig_dialog_quick_keep_ephemeral">Kaybolan Mesajları Saklamayı Dahil Et</string>
-    <string name="ig_dialog_quick_unlimited_replays">Sınırsız Tekrar İzlemeyi Dahil Et</string>
     <string name="ig_dialog_quick_permanent_view">Geçici Medyayı Kalıcı Yapmayı Dahil Et (Kararsız)</string>
     <string name="ig_dialog_quick_allow_screenshots">DM\'lerde Ekran Görüntüsüne İzin Vermeyi Dahil Et</string>
     <string name="ig_dialog_ad_block_ads">Reklamları Engelle</string>

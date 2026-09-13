@@ -172,7 +172,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Tillåt skärmdumpar i direktmeddelanden</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Kringgå skärmdumpsdetektering</string>
     <string name="ig_dialog_ghost_hide_view_once">Dölj öppning av engångsmeddelanden</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Obegränsade uppspelningar</string>
     <string name="ig_dialog_ghost_permanent_view_once">Gör tillfälliga medier permanenta (Instabil)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Behåll försvinnande meddelanden</string>
     <string name="ig_dialog_customize_quick_toggle">Anpassa snabbväxling</string>
@@ -183,7 +182,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Inkludera dölj Story-visningar</string>
     <string name="ig_dialog_quick_hide_live_seen">Inkludera dölj live-närvaro</string>
     <string name="ig_dialog_quick_keep_ephemeral">Inkludera behåll försvinnande meddelanden</string>
-    <string name="ig_dialog_quick_unlimited_replays">Inkludera obegränsade uppspelningar</string>
     <string name="ig_dialog_quick_permanent_view">Inkludera gör tillfälliga medier permanenta (Instabil)</string>
     <string name="ig_dialog_quick_allow_screenshots">Inkludera tillåt skärmdumpar i direktmeddelanden</string>
     <string name="ig_dialog_ad_block_ads">Blockera annonser</string>

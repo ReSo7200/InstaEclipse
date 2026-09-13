@@ -180,7 +180,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">允許在私訊中截圖</string>
     <string name="ig_dialog_ghost_bypass_screenshot">繞過截圖偵測</string>
     <string name="ig_dialog_ghost_hide_view_once">隱藏限看一次開啟</string>
-    <string name="ig_dialog_ghost_unlimited_replays">無限重播限看一次</string>
     <string name="ig_dialog_ghost_permanent_view_once">將限看媒體轉為永久 (不穩定)</string>
     <string name="ig_dialog_ghost_keep_disappearing">保留消失訊息</string>
     <string name="ig_dialog_customize_quick_toggle">自訂快速切換</string>
@@ -191,7 +190,6 @@
     <string name="ig_dialog_quick_hide_story_seen">包含隱藏限時動態觀看</string>
     <string name="ig_dialog_quick_hide_live_seen">包含隱藏直播在線</string>
     <string name="ig_dialog_quick_keep_ephemeral">包含保留消失訊息</string>
-    <string name="ig_dialog_quick_unlimited_replays">包含無限重播限看一次</string>
     <string name="ig_dialog_quick_permanent_view">包含將限看媒體轉為永久 (不穩定)</string>
     <string name="ig_dialog_quick_allow_screenshots">包含允許在私訊中截圖</string>
     <string name="ig_dialog_ad_block_ads">封鎖廣告</string>

@@ -201,7 +201,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Izinkan Tangkapan Layar di DM</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Lewati Deteksi Tangkapan Layar</string>
     <string name="ig_dialog_ghost_hide_view_once">Sembunyikan Pembukaan Sekali Lihat</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Putar Ulang Sekali Lihat Tanpa Batas</string>
     <string name="ig_dialog_ghost_permanent_view_once">Media Sekali Lihat Permanen (Tidak Stabil)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Simpan Pesan yang Menghilang</string>
     <string name="ig_dialog_customize_quick_toggle">Sesuaikan Sakelar Cepat</string>
@@ -214,7 +213,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Sertakan Sembunyikan Tampilan Story</string>
     <string name="ig_dialog_quick_hide_live_seen">Sertakan Sembunyikan Kehadiran Live</string>
     <string name="ig_dialog_quick_keep_ephemeral">Sertakan Simpan Pesan yang Menghilang</string>
-    <string name="ig_dialog_quick_unlimited_replays">Sertakan Putar Ulang Sekali Lihat Tanpa Batas</string>
     <string name="ig_dialog_quick_permanent_view">Sertakan Media Sekali Lihat Permanen (Tidak Stabil)</string>
     <string name="ig_dialog_quick_allow_screenshots">Sertakan Izinkan Tangkapan Layar di DM</string>
 

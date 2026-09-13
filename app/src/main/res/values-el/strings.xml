@@ -202,7 +202,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Επιτροπή Στιγμιοτύπων σε DM</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Παράκαμψη Εντοπισμού Στιγμιοτύπων</string>
     <string name="ig_dialog_ghost_hide_view_once">Απόκρυψη Ανοίγματος Μηνύματος μιας Χρήσης</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Απεριόριστες Επαναλήψεις μιας Χρήσης</string>
     <string name="ig_dialog_ghost_permanent_view_once">Μόνιμα Αρχεία μιας Χρήσης (Ασταθές)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Διατήρηση Εξαφανιζόμενων Μηνυμάτων</string>
     <string name="ig_dialog_customize_quick_toggle">Προσαρμογή Γρήγορης Εναλλαγής</string>
@@ -215,7 +214,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Συμπερίληψη Απόκρυψης Προβολών Story</string>
     <string name="ig_dialog_quick_hide_live_seen">Συμπερίληψη Απόκρυψης Παρουσίας σε Live</string>
     <string name="ig_dialog_quick_keep_ephemeral">Συμπερίληψη Διατήρησης Εξαφανιζόμενων Μηνυμάτων</string>
-    <string name="ig_dialog_quick_unlimited_replays">Συμπερίληψη Απεριόριστων Επαναλήψεων μιας Χρήσης</string>
     <string name="ig_dialog_quick_permanent_view">Συμπερίληψη Μόνιμων Αρχείων μιας Χρήσης (Ασταθές)</string>
     <string name="ig_dialog_quick_allow_screenshots">Συμπερίληψη Επιτροπής Στιγμιοτύπων σε DM</string>
 

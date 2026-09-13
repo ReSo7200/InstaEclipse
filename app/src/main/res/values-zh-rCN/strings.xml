@@ -202,7 +202,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">允许在私信中截图</string>
     <string name="ig_dialog_ghost_bypass_screenshot">绕过截图检测</string>
     <string name="ig_dialog_ghost_hide_view_once">隐藏查看一次已读状态</string>
-    <string name="ig_dialog_ghost_unlimited_replays">无限重播查看一次媒体</string>
     <string name="ig_dialog_ghost_permanent_view_once">永久查看一次媒体 (不稳定)</string>
     <string name="ig_dialog_ghost_keep_disappearing">保留阅后即焚消息</string>
     <string name="ig_dialog_customize_quick_toggle">自定义快速切换</string>
@@ -215,7 +214,6 @@
     <string name="ig_dialog_quick_hide_story_seen">包含隐藏限时动态观看记录</string>
     <string name="ig_dialog_quick_hide_live_seen">包含隐藏直播在线状态</string>
     <string name="ig_dialog_quick_keep_ephemeral">包含保留阅后即焚消息</string>
-    <string name="ig_dialog_quick_unlimited_replays">包含无限重播查看一次媒体</string>
     <string name="ig_dialog_quick_permanent_view">包含永久查看一次媒体 (不稳定)</string>
     <string name="ig_dialog_quick_allow_screenshots">包含允许在私信中截图</string>
 
