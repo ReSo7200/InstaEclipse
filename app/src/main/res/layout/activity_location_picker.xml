@@ -2,7 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout android:fitsSystemWindows="true" android:layout_width="match_parent" android:layout_height="match_parent"
   xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.google.android.material.appbar.AppBarLayout android:fitsSystemWindows="true" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?actionBarSize" app:navigationIcon="@drawable/ic_chevron_right" app:title="@string/loc_picker_title" app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+        <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?actionBarSize" app:navigationIcon="@drawable/ic_arrow_back" app:title="@string/loc_picker_title" app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
     </com.google.android.material.appbar.AppBarLayout>
     <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent" app:layout_behavior="@string/appbar_scrolling_view_behavior">
         <org.osmdroid.views.MapView android:id="@+id/map" android:layout_width="match_parent" android:layout_height="match_parent" />
