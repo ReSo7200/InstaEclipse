@@ -742,9 +742,12 @@ public class DialogUtils {
         for (java.util.Map.Entry<String, java.util.List<ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry>> t : byThread.entrySet()) {
             final String threadId = t.getKey();
             final int count = t.getValue().size();
-            String name = nameFor.get(threadId);
+            // Prefer the live resolved thread name (updated from the header on every thread open) over
+            // the per-entry sender captured at log time — the latter can be stale/wrong (e.g. a token
+            // grabbed before the name resolved), and the live map is always the most current label.
+            String name = ps.reso.instaeclipse.utils.ghost.ThreadNames.get(threadId);
             if (name == null || name.isEmpty()) {
-                name = ps.reso.instaeclipse.utils.ghost.ThreadNames.get(threadId); // persisted on thread open
+                name = nameFor.get(threadId); // stored per-entry sender fallback
             }
             if (name == null || name.isEmpty()) {
                 name = threadId.isEmpty() ? I18n.t(context, R.string.ig_dialog_unsent_unknown_chat) : threadId;

@@ -1,5 +1,6 @@
 package ps.reso.instaeclipse.mods.ghost;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -155,15 +156,38 @@ public class KeepUnsentMessagesHook {
                     if (a == null) return;
                     View root = a.getWindow() != null ? a.getWindow().getDecorView() : null;
                     if (!(root instanceof ViewGroup)) return;
-                    String name = findHandle((ViewGroup) root);
+                    String name = findThreadName(a, (ViewGroup) root);
                     if (name != null) ThreadNames.put(threadId, name);
                 } catch (Throwable ignored) {}
             }, 600);
         } catch (Throwable ignored) {}
     }
 
+    /** Resolve the DM thread's display name. Prefer the stable header title view
+     *  (com.instagram.android:id/header_title — a Button/TextView holding e.g. "just abdul"), since
+     *  the display name can contain spaces the handle regex would reject; fall back to the
+     *  handle-token scan only if that view is absent. */
+    @SuppressLint("DiscouragedApi")
+    private static String findThreadName(android.app.Activity a, ViewGroup root) {
+        try {
+            int titleId = a.getResources().getIdentifier("header_title", "id", a.getPackageName());
+            if (titleId != 0) {
+                View t = root.findViewById(titleId);
+                if (t instanceof android.widget.TextView tv) {
+                    CharSequence cs = tv.getText();
+                    if (cs != null) {
+                        String s = cs.toString().trim();
+                        if (!s.isEmpty()) return s;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+        return findHandle(root);
+    }
+
     /** Depth-first scan for a handle-like TextView token (@username style: letters/digits/._), the
-     *  DM thread header's title. Bounded so it stays cheap on a large view tree. */
+     *  DM thread header's title. Bounded so it stays cheap on a large view tree. Requires at least
+     *  one letter so a stray all-digit token (timestamp, count) is never mistaken for a name. */
     private static String findHandle(ViewGroup vg) {
         java.util.ArrayDeque<View> stack = new java.util.ArrayDeque<>();
         stack.push(vg);
@@ -175,7 +199,8 @@ public class KeepUnsentMessagesHook {
                 CharSequence cs = ((android.widget.TextView) v).getText();
                 if (cs != null) {
                     String s = cs.toString().trim();
-                    if (s.matches("[a-zA-Z0-9._]{2,30}")) return s; // handle-like
+                    // handle-like AND contains at least one letter (never an all-digit count/time)
+                    if (s.matches("[a-zA-Z0-9._]{2,30}") && s.matches(".*[a-zA-Z].*")) return s;
                 }
             } else if (v instanceof ViewGroup) {
                 ViewGroup g = (ViewGroup) v;
@@ -386,7 +411,7 @@ public class KeepUnsentMessagesHook {
             // Embed the chat's username (best-effort) so the Unsent viewer can show it per folder.
             String who = ThreadNames.get(threadId);
             ps.reso.instaeclipse.utils.ghost.UnsentLog.add(threadId, who, val); // persistent per-thread log
-            ModuleLog.line("(IE|KeepUnsent) ✅ logged (thread=" + threadId + "): " + (val.length() > 24 ? val.substring(0, 24) + "…" : val));
+            ModuleLog.line("(IE|KeepUnsent) ✅ logged (thread=" + threadId + " who=" + who + "): " + (val.length() > 24 ? val.substring(0, 24) + "…" : val));
         } catch (Throwable t) {
             markedIds.remove(id);
             ModuleLog.line("(IE|KeepUnsent) ⚠️ log failed: " + t.getMessage());
