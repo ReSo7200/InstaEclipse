@@ -99,6 +99,10 @@ public class UIHookManager {
         // section not reachable via the option/builder hooks, so we strip it at the view level.
         ps.reso.instaeclipse.mods.ui.RemoveMetaAIHook.watchActionSheet(activity);
 
+        // Distraction Free: collapse the story tray / Reels tab at the view level (the network drop
+        // alone leaves IG's cached stories/reels visible on IG 447.0.0.39+).
+        ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.watchActivity(activity);
+
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
 
