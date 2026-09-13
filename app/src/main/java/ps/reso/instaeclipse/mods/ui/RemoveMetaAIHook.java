@@ -1,6 +1,7 @@
 package ps.reso.instaeclipse.mods.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -452,5 +453,98 @@ public class RemoveMetaAIHook {
         v.setVisibility(View.GONE);
         ViewGroup.LayoutParams lp = v.getLayoutParams();
         if (lp != null) { lp.height = 0; lp.width = 0; v.setLayoutParams(lp); }
+    }
+
+    // ── Reel/post action-sheet "About this reel" Content Deep Dive section (view-level) ──────────
+
+    private static final java.util.Set<View> watchedSheetDecors =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    /** Arm a one-time global-layout listener that collapses the Content Deep Dive section whenever
+     *  a reel/post action sheet is shown. Called from UIHookManager.setupHooks on every resume. */
+    public static void watchActionSheet(Activity a) {
+        if (a == null || !FeatureFlags.removeMetaAI) return;
+        try {
+            final View decor = a.getWindow() != null ? a.getWindow().getDecorView() : null;
+            if (decor == null || !watchedSheetDecors.add(decor)) return;
+            decor.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                if (FeatureFlags.removeMetaAI) sweepActionSheet(decor);
+            });
+        } catch (Throwable ignored) {}
+    }
+
+    @SuppressLint("DiscouragedApi")
+    private static void sweepActionSheet(View root) {
+        try {
+            Resources res = root.getResources();
+            String pkg = root.getContext().getPackageName();
+            int composerId = res.getIdentifier("row_thread_composer_container", "id", pkg);
+            int sheetId = res.getIdentifier("action_sheet_container", "id", pkg);
+            if (composerId == 0) return;
+            java.util.List<View> composers = new java.util.ArrayList<>();
+            findViewsById(root, composerId, composers);
+            for (View composer : composers) {
+                // Only inside an action sheet — never the DM thread composer.
+                if (sheetId != 0 && findAncestorById(composer, sheetId) == null) continue;
+                View recycler = findAncestorOfClass(composer, "RecyclerView");
+                if (!(recycler instanceof ViewGroup rv)) { collapse(composer); continue; }
+                // Find the recycler item (direct child of the RecyclerView) that holds the composer.
+                View item = composer;
+                while (item.getParent() != rv && item.getParent() instanceof View p) item = p;
+                if (item.getParent() != rv) { collapse(composer); continue; }
+                int idx = rv.indexOfChild(item);
+                collapse(item); // the "Ask Meta AI…" composer row
+                // Collapse the section's header + summary directly above it: contiguous
+                // non-clickable, text-bearing items. Stop at the first interactive (action) row.
+                for (int i = idx - 1; i >= 0 && i >= idx - 3; i--) {
+                    View sib = rv.getChildAt(i);
+                    if (sib == null || sib.getVisibility() == View.GONE) continue;
+                    if (isInteractive(sib) || !containsVisibleText(sib)) break;
+                    collapse(sib);
+                }
+                FeatureStatusTracker.setHooked("RemoveMetaAI");
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    private static void findViewsById(View v, int id, java.util.List<View> out) {
+        if (v == null) return;
+        if (v.getId() == id) out.add(v);
+        if (v instanceof ViewGroup vg)
+            for (int i = 0; i < vg.getChildCount(); i++) findViewsById(vg.getChildAt(i), id, out);
+    }
+
+    private static View findAncestorById(View v, int id) {
+        for (android.view.ViewParent p = v.getParent(); p instanceof View pv; p = pv.getParent())
+            if (pv.getId() == id) return pv;
+        return null;
+    }
+
+    private static View findAncestorOfClass(View v, String simpleNameContains) {
+        for (android.view.ViewParent p = v.getParent(); p instanceof View pv; p = pv.getParent())
+            if (pv.getClass().getName().contains(simpleNameContains)) return pv;
+        return null;
+    }
+
+    /** True if the subtree has any clickable/focusable control (i.e. an action row, not text). */
+    private static boolean isInteractive(View v) {
+        if (v == null) return false;
+        if ((v.isClickable() || v.isLongClickable()) && !(v instanceof android.widget.TextView)) return true;
+        if (v instanceof android.widget.Button || v instanceof android.widget.ImageButton
+                || v instanceof android.widget.Switch) return true;
+        if (v instanceof ViewGroup vg)
+            for (int i = 0; i < vg.getChildCount(); i++) if (isInteractive(vg.getChildAt(i))) return true;
+        return false;
+    }
+
+    private static boolean containsVisibleText(View v) {
+        if (v == null || v.getVisibility() == View.GONE) return false;
+        if (v instanceof android.widget.TextView tv) {
+            CharSequence t = tv.getText();
+            return t != null && t.length() > 0;
+        }
+        if (v instanceof ViewGroup vg)
+            for (int i = 0; i < vg.getChildCount(); i++) if (containsVisibleText(vg.getChildAt(i))) return true;
+        return false;
     }
 }

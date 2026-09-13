@@ -94,6 +94,11 @@ public class UIHookManager {
         // obfuscated, so a direct hook fails — this runs from the module's resolved main hook).
         ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.watchActivity(activity);
 
+        // Remove Meta AI: collapse the "About this reel" Content Deep Dive section (AI summary +
+        // "Ask Meta AI…" composer) inside the reel/post action sheet. It is a Litho-rendered
+        // section not reachable via the option/builder hooks, so we strip it at the view level.
+        ps.reso.instaeclipse.mods.ui.RemoveMetaAIHook.watchActionSheet(activity);
+
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
 

@@ -397,6 +397,14 @@ public class CaptionCopyContextMenuHook {
         } catch (Throwable ignored) {}
     }
 
+    /** A MediaOption$Option enum name that represents a Meta AI menu row (GEN_AI_INFO / GEN_AI /
+     *  CONTENT_DEEP_DIVE = "Ask Meta AI about this", etc.). Kept in sync with RemoveMetaAIHook. */
+    private static boolean isMetaAiMenuOption(String name) {
+        String n = name.toUpperCase();
+        return n.contains("GEN_AI") || n.contains("GENAI") || n.contains("META_AI")
+                || n.contains("METAAI") || n.contains("ASK_META") || n.contains("CONTENT_DEEP_DIVE");
+    }
+
     // ── Hook A: intercept every addButton call, inject Copy Caption once per menu ─
 
     private static void installAddButtonHook() {
@@ -406,6 +414,22 @@ public class CaptionCopyContextMenuHook {
         }
 
         XposedBridge.hookMethod(addButtonMethod, new XC_MethodHook() {
+
+            // Remove Meta AI (446+): the reel/post ⋮ menu "Ask Meta AI about this" row is added
+            // through this same addButton choke point, carrying a Meta-AI MediaOption$Option at
+            // idxOption. Drop that single add when Remove Meta AI is on — only if addButton is void
+            // (a side-effecting row-adder), never clobbering a chaining return.
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.removeMetaAI) return;
+                try {
+                    Object opt = param.args[idxOption];
+                    if (opt != null && isMetaAiMenuOption(opt.toString())
+                            && ((Method) param.method).getReturnType() == void.class) {
+                        param.setResult(null); // skip the original add -> row never appears
+                    }
+                } catch (Throwable ignored) {}
+            }
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
