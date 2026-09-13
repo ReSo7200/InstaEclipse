@@ -495,4 +495,6 @@
     <string name="ig_story_download_choice_subtitle">選擇要儲存的格式</string>
     <string name="ig_story_download_photo">下載相片</string>
     <string name="ig_story_download_video_music">下載含音樂的影片</string>
+    <string name="ig_story_cache_clear_confirm">刪除所有已快取的限時動態？此操作無法復原。</string>
+    <string name="ig_story_cache_cleared">已清除快取的限時動態</string>
 </resources>

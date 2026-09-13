@@ -489,4 +489,6 @@
     <string name="ig_story_download_choice_subtitle">Saxlamaq üçün format seçin</string>
     <string name="ig_story_download_photo">Fotonu yüklə</string>
     <string name="ig_story_download_video_music">Videonu musiqi ilə yüklə</string>
+    <string name="ig_story_cache_clear_confirm">Bütün keşlənmiş hekayələr silinsin? Bu geri qaytarıla bilməz.</string>
+    <string name="ig_story_cache_cleared">Keşlənmiş hekayələr silindi</string>
 </resources>

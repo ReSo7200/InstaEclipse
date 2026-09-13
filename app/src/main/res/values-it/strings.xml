@@ -417,4 +417,6 @@
     <string name="ig_update_button">Aggiorna</string>
     <string name="ig_update_later">Più tardi</string>
     <string name="ig_update_error_message">Impossibile verificare gli aggiornamenti. Riprova più tardi.</string>
+    <string name="ig_story_cache_clear_confirm">Eliminare tutte le storie in cache? L\'operazione non può essere annullata.</string>
+    <string name="ig_story_cache_cleared">Storie in cache eliminate</string>
 </resources>

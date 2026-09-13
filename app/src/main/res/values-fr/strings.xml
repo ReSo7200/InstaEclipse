@@ -520,4 +520,6 @@
     <string name="ig_story_download_choice_subtitle">Choisissez un format d\'enregistrement</string>
     <string name="ig_story_download_photo">Télécharger la photo</string>
     <string name="ig_story_download_video_music">Télécharger la vidéo avec musique</string>
+    <string name="ig_story_cache_clear_confirm">Supprimer toutes les stories en cache ? Cette action est irréversible.</string>
+    <string name="ig_story_cache_cleared">Stories en cache supprimées</string>
 </resources>

@@ -486,4 +486,6 @@
     <string name="ig_story_download_choice_subtitle">Escolha um formato para guardar</string>
     <string name="ig_story_download_photo">Transferir foto</string>
     <string name="ig_story_download_video_music">Transferir vídeo com música</string>
+    <string name="ig_story_cache_clear_confirm">Eliminar todas as stories em cache? Esta ação não pode ser anulada.</string>
+    <string name="ig_story_cache_cleared">Stories em cache eliminadas</string>
 </resources>

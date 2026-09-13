@@ -486,4 +486,6 @@
     <string name="ig_story_download_choice_subtitle">Välj ett format att spara</string>
     <string name="ig_story_download_photo">Ladda ned foto</string>
     <string name="ig_story_download_video_music">Ladda ned video med musik</string>
+    <string name="ig_story_cache_clear_confirm">Ta bort alla cachade stories? Detta kan inte ångras.</string>
+    <string name="ig_story_cache_cleared">Cachade stories borttagna</string>
 </resources>

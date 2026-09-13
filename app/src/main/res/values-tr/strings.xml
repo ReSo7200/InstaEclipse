@@ -487,4 +487,6 @@
     <string name="ig_story_download_choice_subtitle">Kaydetmek için bir biçim seçin</string>
     <string name="ig_story_download_photo">Fotoğraf indir</string>
     <string name="ig_story_download_video_music">Videoyu müzikle indir</string>
+    <string name="ig_story_cache_clear_confirm">Önbelleğe alınan tüm hikayeler silinsin mi? Bu işlem geri alınamaz.</string>
+    <string name="ig_story_cache_cleared">Önbelleğe alınan hikayeler silindi</string>
 </resources>

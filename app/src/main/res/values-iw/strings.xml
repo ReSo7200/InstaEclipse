@@ -518,4 +518,6 @@
     <string name="ig_story_download_choice_subtitle">בחר פורמט לשמירה</string>
     <string name="ig_story_download_photo">הורד תמונה</string>
     <string name="ig_story_download_video_music">הורד וידאו עם מוזיקה</string>
+    <string name="ig_story_cache_clear_confirm">למחוק את כל הסטוריז השמורים? לא ניתן לבטל פעולה זו.</string>
+    <string name="ig_story_cache_cleared">הסטוריז השמורים נמחקו</string>
 </resources>

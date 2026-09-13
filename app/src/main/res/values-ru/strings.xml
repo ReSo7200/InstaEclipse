@@ -487,4 +487,6 @@
     <string name="ig_story_download_choice_subtitle">Выберите формат для сохранения</string>
     <string name="ig_story_download_photo">Скачать фото</string>
     <string name="ig_story_download_video_music">Скачать видео с музыкой</string>
+    <string name="ig_story_cache_clear_confirm">Удалить все кэшированные истории? Это действие нельзя отменить.</string>
+    <string name="ig_story_cache_cleared">Кэшированные истории удалены</string>
 </resources>

@@ -485,4 +485,6 @@
     <string name="ig_story_download_choice_subtitle">اختر صيغة للحفظ</string>
     <string name="ig_story_download_photo">تنزيل الصورة</string>
     <string name="ig_story_download_video_music">تنزيل الفيديو مع الموسيقى</string>
+    <string name="ig_story_cache_clear_confirm">حذف كل القصص المخزنة مؤقتًا؟ لا يمكن التراجع عن ذلك.</string>
+    <string name="ig_story_cache_cleared">تم مسح القصص المخزنة مؤقتًا</string>
 </resources>

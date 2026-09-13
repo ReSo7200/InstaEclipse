@@ -495,4 +495,6 @@
     <string name="ig_story_download_choice_subtitle">Format zum Speichern wählen</string>
     <string name="ig_story_download_photo">Foto herunterladen</string>
     <string name="ig_story_download_video_music">Video mit Musik herunterladen</string>
+    <string name="ig_story_cache_clear_confirm">Alle zwischengespeicherten Storys löschen? Das lässt sich nicht rückgängig machen.</string>
+    <string name="ig_story_cache_cleared">Zwischengespeicherte Storys gelöscht</string>
 </resources>
