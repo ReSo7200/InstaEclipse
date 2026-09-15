@@ -227,7 +227,7 @@ InstaEclipse is designed to keep up with Instagram automatically, but no module 
 | | |
 |---|---|
 | **Latest tested version** | `447.0.0.21.81` |
-| **Recommended build** | Beta or Alpha, from [APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/) |
+| **Recommended build** | Beta or Alpha, from [APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-447-0-0-21-81-release/) |
 | **Auto-compatibility** | Yes, classes and methods are resolved at runtime with DexKit |
 
 ---
