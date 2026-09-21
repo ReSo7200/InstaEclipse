@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.6.0</string>
+    <string name="version" translatable="false">v0.7.0</string>
     <string name="home">Beranda</string>
     <string name="features">Fitur</string>
     <string name="help">Bantuan</string>
@@ -16,7 +16,7 @@
     <string name="module_status_disabled">Status Modul: Dinonaktifkan</string>
     <string name="request_enable_module">Silakan aktifkan modul di Xposed Installer.</string>
     <string name="module_status_enabled_no_root">Status Modul: Diaktifkan (Tanpa Akses Root)</string>
-    <string name="request_enable_root">Akses root diperlukan untuk memulai ulang otomatis. Diperlukan restart manual.</string>
+    <string name="request_enable_root">Akses root diperlukan untuk memulai ulang otomatis. Diperlukan mulai ulang manual.</string>
     <string name="module_status_enabled">Status Modul: Diaktifkan</string>
     <string name="module_active">Modul aktif dan berfungsi.</string>
     <string name="checking_instagram">Memeriksa Instagram</string>
@@ -46,19 +46,20 @@
     <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
     <string name="github">GitHub</string>
     <string name="telegram">Telegram</string>
+    <string name="help_community">Komunitas</string>
 
     <!-- faq -->
     <string name="frequently_asked_questions">Pertanyaan yang Sering Diajukan</string>
-    <string name="faq_1"><b>1. Tidak berfungsi/crash saat menggunakan Versi Google Play?</b>\n- Gunakan APK dari APKMirror</string>
+    <string name="faq_1"><b>1. Tidak berfungsi/mogok saat menggunakan Versi Google Play?</b>\n- Gunakan APK dari APKMirror</string>
     <string name="faq_2"><b>2. Modul tidak aktif?</b>\n- Nonaktifkan dan aktifkan kembali modul di LSPosed.</string>
     <string name="faq_3"><b>3. Fitur tidak berfungsi?</b>\n- Paksa berhenti dan mulai ulang Instagram.</string>
-    <string name="faq_4"><b>4. Opsi pengembang menyebabkan crash?</b>\n- Ikuti panduan opsi pengembang.</string>
+    <string name="faq_4"><b>4. Opsi pengembang menyebabkan mogok?</b>\n- Ikuti panduan opsi pengembang.</string>
     <string name="faq_5"><b>5. Opsi pengembang memiliki label atau angka yang aneh?</b>\n- Gunakan versi Beta atau Alpha karena versi Stabil memiliki obfuskasi.</string>
-    <string name="faq_6"><b>6. Mode Bebas Gangguan diaktifkan tetapi konten masih muncul?</b>\n- Paksa berhenti Instagram dan bersihkan cache-nya.</string>
+    <string name="faq_6"><b>6. Mode Bebas Gangguan diaktifkan tetapi konten masih muncul?</b>\n- Paksa berhenti Instagram dan bersihkan tembolok-nya.</string>
 
     <!-- guide -->
     <string name="module_not_working_title">Modul masih tidak berfungsi?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jika Anda memiliki <b>root</b>, coba gunakan <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed dari JingMatrix</a><br/><br/>Jika Anda <b>tidak memiliki root</b>, instal <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch dari JingMatrix</a> lalu ikuti <a href="https://t.me/instaEclipse_discussion/158/5149">panduan ini</a>]]></string>
+    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jika Anda memiliki <b>root</b>, coba gunakan <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed dari JingMatrix</a><br/><br/>Jika Anda <b>tidak memiliki root</b>, pasang <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch dari JingMatrix</a> lalu ikuti <a href="https://t.me/instaEclipse_discussion/158/5149">panduan ini</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">Kategori:</string>
@@ -71,7 +72,7 @@
     <string name="feat_download_folder">Folder Unduhan:</string>
     <string name="feat_downloader_set_folder">Atur Lokasi Folder Unduhan</string>
     <string name="feat_downloader_selected">Dipilih: %1$s</string>
-    <string name="feat_downloader_reset_folder">Reset Folder Unduhan</string>
+    <string name="feat_downloader_reset_folder">Setel Ulang Folder Unduhan</string>
 
     <!-- features -->
     <string name="developer_options">Opsi Pengembang</string>
@@ -89,7 +90,7 @@
     <string name="typing">Mengetik</string>
     <string name="story">Story</string>
     <string name="view_once">Sekali Lihat</string>
-    <string name="live">Live</string>
+    <string name="live">Siaran Langsung</string>
     <string name="direct_messages">Pesan Langsung</string>
     <string name="disable_typing">Mengetik</string>
     <string name="screen_shot">Tangkapan Layar</string>
@@ -99,9 +100,9 @@
     <string name="dev_options_version_req">Gunakan hanya pada versi Beta/Alpha!</string>
     <string name="dev_options_req">Pastikan Anda sudah masuk terlebih dahulu!</string>
     <string name="dev_options_1">1. Buka Instagram dan tahan tombol Beranda.</string>
-    <string name="dev_options_2">2. Arahkan ke Opsi Pengembang > Pengaturan &amp; Penggantian MetaConfig.</string>
+    <string name="dev_options_2">2. Arahkan ke Opsi Pengembang &gt; Pengaturan &amp; Penggantian MetaConfig.</string>
     <string name="dev_options_3">3. Cari \'Employee\' dan aktifkan opsi berikut:</string>
-    <string name="dev_options_4">4. Terakhir, nonaktifkan Opsi Pengembang dari modul untuk mencegah aplikasi crash.</string>
+    <string name="dev_options_4">4. Terakhir, nonaktifkan Opsi Pengembang dari modul untuk mencegah aplikasi mogok.</string>
 
     <!-- Don't translate! -->
     <string name="is_employee" translatable="false">• is employee</string>
@@ -133,6 +134,7 @@
 
     <!-- Common -->
     <string name="ig_dialog_title" translatable="false">InstaEclipse 🌘</string>
+    <string name="ig_dialog_subtitle">Ketuk bagian untuk mengonfigurasi</string>
     <string name="ig_dialog_close">Tutup</string>
     <string name="ig_dialog_enable_disable_all">Aktifkan/Nonaktifkan Semua</string>
     <string name="ig_dialog_error">Kesalahan</string>
@@ -148,6 +150,9 @@
     <string name="ig_dialog_menu_distraction_free">Instagram Bebas Gangguan</string>
     <string name="ig_dialog_menu_misc">Fitur Lainnya</string>
     <string name="ig_dialog_menu_downloader">Pengunduh</string>
+    <string name="ig_dialog_menu_location">Lokasi</string>
+    <string name="ig_dialog_menu_quality">Kualitas Video</string>
+    <string name="ig_dialog_menu_theme">Tema Kustom</string>
     <string name="ig_dialog_menu_backup_restore">Cadangan &amp; Pemulihan</string>
     <string name="ig_dialog_menu_about">Tentang</string>
     <string name="ig_dialog_menu_restart">Mulai Ulang Aplikasi</string>
@@ -165,14 +170,17 @@
     <string name="ig_dialog_section_about">Tentang</string>
     <string name="ig_dialog_section_restart">Mulai Ulang Aplikasi</string>
     <string name="ig_dialog_section_quick_toggle">Sesuaikan Sakelar Cepat</string>
+    <string name="ig_dialog_section_location">Lokasi</string>
+    <string name="ig_dialog_section_quality">Kualitas Video</string>
+    <string name="ig_dialog_section_auto_clear_cache">Bersihkan Tembolok Otomatis</string>
 
     <!-- Developer options -->
     <string name="ig_dialog_dev_enable">Aktifkan Mode Pengembang</string>
     <string name="ig_dialog_dev_import">Impor Konfigurasi Dev</string>
     <string name="ig_dialog_dev_export">Ekspor Konfigurasi Dev</string>
-    <string name="ig_dialog_dev_restore_default_config">Pulihkan ke Konfigurasi Default</string>
-    <string name="ig_dialog_dev_restore_default_config_confirm">Ini akan menimpa Konfigurasi Dev saat ini dengan konfigurasi default bawaan. Lanjutkan?</string>
-    <string name="ig_toast_default_config_restored">✅ Konfigurasi default berhasil dipulihkan.</string>
+    <string name="ig_dialog_dev_restore_default_config">Pulihkan ke Konfigurasi Bawaan</string>
+    <string name="ig_dialog_dev_restore_default_config_confirm">Ini akan menimpa Konfigurasi Dev saat ini dengan konfigurasi bawaan. Lanjutkan?</string>
+    <string name="ig_toast_default_config_restored">✅ Konfigurasi bawaan berhasil dipulihkan.</string>
     <string name="ig_dialog_dev_remove_build_expired">Hapus Popup Build Kedaluwarsa</string>
     <string name="ig_dialog_unable_open_ui">Tidak dapat membuka antarmuka InstaEclipse.</string>
     <string name="ig_dialog_instagram_not_ready">Instagram tidak terbuka atau belum siap.</string>
@@ -181,7 +189,7 @@
     <string name="export_no_config_data">Tidak ada data konfigurasi yang diterima.</string>
     <string name="export_config_success">Konfigurasi berhasil diekspor.</string>
     <string name="export_config_failed">Gagal menyimpan: %1$s</string>
-    <string name="export_invalid_uri">URI tidak valid</string>
+    <string name="export_invalid_uri">URI tidak absah</string>
     <string name="ig_toast_config_imported">✅ Konfigurasi diimpor.</string>
     <string name="ig_toast_config_import_failed">❌ Gagal mengimpor konfigurasi.</string>
 
@@ -189,19 +197,18 @@
     <string name="json_select_config">Pilih File JSON</string>
     <string name="json_target_not_specified">❌ Paket target tidak ditentukan.</string>
     <string name="json_sent">✅ Dikirim ke Instagram.</string>
-    <string name="json_not_valid">❌ Bukan file JSON yang valid.</string>
-    <string name="json_read_failed">❌ Gagal membaca file: %1$s</string>
-    <string name="json_cancelled">Dibatalkan atau tidak ada file yang dipilih.</string>
+    <string name="json_not_valid">❌ Bukan berkas JSON yang absah.</string>
+    <string name="json_read_failed">❌ Gagal membaca berkas: %1$s</string>
+    <string name="json_cancelled">Dibatalkan atau tidak ada berkas yang dipilih.</string>
 
     <!-- Ghost Mode options -->
     <string name="ig_dialog_ghost_hide_dm_seen">Sembunyikan Tanda Baca DM</string>
     <string name="ig_dialog_ghost_hide_typing">Sembunyikan Indikator Mengetik</string>
     <string name="ig_dialog_ghost_hide_story_views">Sembunyikan Tampilan Story</string>
-    <string name="ig_dialog_ghost_hide_live_presence">Sembunyikan Kehadiran Live</string>
+    <string name="ig_dialog_ghost_hide_live_presence">Sembunyikan Kehadiran Siaran Langsung</string>
     <string name="ig_dialog_ghost_allow_screenshots_dms">Izinkan Tangkapan Layar di DM</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Lewati Deteksi Tangkapan Layar</string>
     <string name="ig_dialog_ghost_hide_view_once">Sembunyikan Pembukaan Sekali Lihat</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Putar Ulang Sekali Lihat Tanpa Batas</string>
     <string name="ig_dialog_ghost_permanent_view_once">Media Sekali Lihat Permanen (Tidak Stabil)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Simpan Pesan yang Menghilang</string>
     <string name="ig_dialog_customize_quick_toggle">Sesuaikan Sakelar Cepat</string>
@@ -212,9 +219,8 @@
     <string name="ig_dialog_quick_disable_screenshot">Sertakan Lewati Deteksi Tangkapan Layar</string>
     <string name="ig_dialog_quick_hide_view_once">Sertakan Sembunyikan Pembukaan Sekali Lihat</string>
     <string name="ig_dialog_quick_hide_story_seen">Sertakan Sembunyikan Tampilan Story</string>
-    <string name="ig_dialog_quick_hide_live_seen">Sertakan Sembunyikan Kehadiran Live</string>
+    <string name="ig_dialog_quick_hide_live_seen">Sertakan Sembunyikan Kehadiran Siaran Langsung</string>
     <string name="ig_dialog_quick_keep_ephemeral">Sertakan Simpan Pesan yang Menghilang</string>
-    <string name="ig_dialog_quick_unlimited_replays">Sertakan Putar Ulang Sekali Lihat Tanpa Batas</string>
     <string name="ig_dialog_quick_permanent_view">Sertakan Media Sekali Lihat Permanen (Tidak Stabil)</string>
     <string name="ig_dialog_quick_allow_screenshots">Sertakan Izinkan Tangkapan Layar di DM</string>
 
@@ -225,7 +231,7 @@
     <string name="ig_dialog_ad_disable_tracking">Nonaktifkan Tautan Pelacakan</string>
 
     <!-- Distraction-Free options -->
-    <string name="ig_dialog_distraction_extreme_mode">Mode Ekstrem (Tidak dapat dipulihkan hingga reinstall)</string>
+    <string name="ig_dialog_distraction_extreme_mode">Mode Ekstrem (Tidak dapat dipulihkan sampai pasang ulang)</string>
     <string name="ig_dialog_distraction_disable_stories">Nonaktifkan Story</string>
     <string name="ig_dialog_distraction_disable_feed">Nonaktifkan Feed</string>
     <string name="ig_dialog_distraction_disable_reels">Nonaktifkan Reels</string>
@@ -233,7 +239,11 @@
     <string name="ig_dialog_distraction_disable_explore">Nonaktifkan Explore</string>
     <string name="ig_dialog_distraction_disable_comments">Nonaktifkan Komentar</string>
     <string name="ig_dialog_distraction_extreme_title">Aktifkan Mode Ekstrem?</string>
-    <string name="ig_dialog_distraction_extreme_message">Setelah diaktifkan, Anda tidak dapat menonaktifkan Mode Bebas Gangguan hingga menginstal ulang aplikasi. Lanjutkan?</string>
+    <string name="ig_dialog_distraction_extreme_message">Setelah diaktifkan, Anda tidak dapat menonaktifkan Mode Bebas Gangguan sampai memasang ulang aplikasi. Lanjutkan?</string>
+
+    <!-- Clean Feed options -->
+    <string name="ig_dialog_clean_feed_hide_suggested">Sembunyikan saran di feed</string>
+    <string name="ig_dialog_clean_feed_hide_threads">Sembunyikan Saran Threads</string>
 
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Nonaktifkan Auto-Geser Story</string>
@@ -245,25 +255,103 @@
     <string name="ig_dialog_misc_disable_discover_people">Nonaktifkan Temukan Orang</string>
     <string name="ig_dialog_misc_copy_comment">Salin Komentar</string>
     <string name="ig_dialog_misc_disable_double_tap_like">Nonaktifkan Ketuk Dua Kali untuk Suka</string>
+    <string name="ig_dialog_misc_copy_caption">Salin Keterangan</string>
+    <string name="ig_dialog_misc_photo_zoom">Perbesar Foto (Tahan Lama)</string>
+    <string name="ig_dialog_misc_spoof_last_seen">Palsukan Terakhir Dilihat (bekukan)</string>
+    <string name="ig_dialog_misc_lock_dms">Kunci DM</string>
+    <string name="ig_dialog_misc_lock_dms_set">Atur / ubah kode</string>
+    <string name="ig_dialog_misc_lock_dms_hint">Masukkan kode numerik</string>
+    <string name="ig_dialog_misc_lock_dms_saved">Kode disimpan</string>
+    <string name="ig_dialog_misc_lock_dms_cleared">Kode dihapus</string>
+    <string name="ig_dialog_misc_lock_dms_current">Masukkan kode saat ini</string>
+    <string name="ig_dialog_misc_lock_dms_wrong">Kode saat ini salah</string>
+    <string name="ig_dialog_misc_lock_dms_disable">Masukkan kode untuk menonaktifkan kunci</string>
+    <string name="ig_dialog_misc_lock_dms_always">Kunci ulang setiap kali Anda keluar</string>
+    <string name="ig_dialog_misc_lock_whole_app">Kunci seluruh aplikasi</string>
+    <string name="ig_dialog_misc_lock_section">Kunci</string>
+    <string name="ig_dialog_misc_lock_fingerprint">Gunakan sidik jari untuk membuka kunci</string>
+    <string name="ig_hide_chats_title">Sembunyikan Obrolan Tertentu</string>
+    <string name="ig_dialog_misc_hide_chats">Sembunyikan Obrolan Tertentu</string>
+    <string name="ig_hide_chats_manage">Kelola obrolan tersembunyi</string>
+    <string name="ig_hide_chats_empty">Belum ada obrolan tersembunyi. Buka obrolan dan ketuk tombol mata-dicoret untuk menyembunyikannya.</string>
+    <string name="ig_hide_chats_unhide">Tampilkan</string>
+    <string name="ig_hide_chats_hint">Untuk menyembunyikan obrolan, buka obrolan tersebut dan ketuk tombol mata-dicoret di header percakapan.</string>
+    <string name="ig_lock_passcode_hint">Atur kode sandi Anda dari dalam Instagram (buka menu InstaEclipse → Kunci).</string>
+    <string name="ig_theme_font_hint">Pilih file font &amp; emoji Anda dari dalam Instagram (menu InstaEclipse → Tema Kustom).</string>
+    <string name="ig_hide_chat_hidden">Obrolan disembunyikan — akan hilang dari kotak masuk Anda</string>
+    <string name="ig_hide_chat_unhidden">Obrolan ditampilkan kembali</string>
+    <string name="ig_hide_chat_no_thread">Tidak dapat mengidentifikasi obrolan ini</string>
+    <string name="ig_dialog_misc_cache_stories">Simpan Story ke Tembolok selama 24 jam</string>
+    <string name="ig_story_cache_title">Simpan Story ke Tembolok (24 jam)</string>
+    <string name="ig_story_cache_view">Lihat story tersimpan</string>
+    <string name="ig_story_cache_empty">Belum ada story tersimpan. Aktifkan ini, lalu lihat beberapa story — story akan disimpan di sini selama 24 jam.</string>
+    <string name="ig_story_cache_clear">Bersihkan story tersimpan</string>
+    <string name="ig_story_cache_clear_confirm">Hapus semua Story yang di-cache? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="ig_story_cache_cleared">Story yang di-tembolok dihapus</string>
+    <string name="ig_story_cache_count">%1$d story tersimpan</string>
+    <string name="ig_story_cache_saving">Menyimpan story…</string>
+    <string name="ig_story_cache_saved">Story tersimpan</string>
+    <string name="ig_story_cache_save_fail">Tidak dapat menyimpan story</string>
+    <string name="ig_custom_font_title">Font Kustom</string>
+    <string name="ig_dialog_misc_custom_font">Font Kustom</string>
+    <string name="ig_custom_font_pick">Pilih file font (.ttf / .otf)</string>
+    <string name="ig_custom_emoji_title">Emoji Kustom</string>
+    <string name="ig_dialog_misc_custom_emoji">Emoji Kustom</string>
+    <string name="ig_custom_emoji_pick">Pilih font emoji (.ttf / .otf)</string>
+    <string name="ig_dialog_misc_remove_meta_ai">Hapus Meta AI</string>
+    <string name="ig_dialog_unsent_clear_confirm">Hapus pesan tidak terkirim yang tersimpan untuk obrolan ini? Ini tidak dapat dibatalkan.</string>
+    <string name="ig_dialog_unsent_clear_yes">Bersihkan</string>
+    <string name="ig_dialog_unsent_cleared">Log pesan tidak terkirim dibersihkan</string>
+    <string name="ig_dialog_unsent_empty">Belum ada pesan tidak terkirim yang tertangkap</string>
+    <string name="ig_dialog_unsent_unknown_chat">Obrolan tidak dikenal</string>
 
-    <!-- Comment Copy dialog -->
+    <!-- Comment Copy dialog (runs in IG process) -->
     <string name="ig_comment_copy_title">Salin Komentar</string>
     <string name="ig_comment_copy_full">Salin Komentar Lengkap</string>
     <string name="ig_comment_select_part">Pilih Bagian untuk Disalin</string>
     <string name="ig_comment_select_title">Pilih untuk Disalin</string>
     <string name="ig_comment_copy_selected">Salin yang Dipilih</string>
-    <string name="ig_toast_comment_copied">✅ Disalin ke clipboard!</string>
+    <string name="ig_toast_comment_copied">✅ Disalin ke papan klip!</string>
+
+    <!-- Caption Copy menu + dialog (runs in IG process) -->
+    <string name="ig_caption_copy_menu_item">Salin Keterangan</string>
+    <string name="ig_caption_copy_title">Salin Keterangan</string>
+    <string name="ig_caption_copy_full">Salin Keterangan Lengkap</string>
+    <string name="ig_caption_copy_none">Tidak ada keterangan pada pos ini</string>
+    <string name="ig_caption_copied">✅ Keterangan disalin ke papan klip!</string>
 
     <!-- Downloader options -->
     <string name="ig_dialog_downloader_settings">Pengaturan Pengunduh</string>
-    <string name="ig_dialog_downloader_posts">Unduh Postingan</string>
+    <string name="ig_dialog_downloader_posts">Unduh Pos</string>
     <string name="ig_dialog_downloader_stories">Unduh Story</string>
     <string name="ig_dialog_downloader_reels">Unduh Reels</string>
     <string name="ig_dialog_downloader_profiles">Unduh Foto Profil</string>
     <string name="ig_dialog_downloader_folder">Folder Unduhan</string>
     <string name="ig_dialog_downloader_username_subfolder">Simpan di Subfolder Nama Pengguna</string>
-    <string name="ig_dialog_downloader_add_timestamp">Tambahkan Stempel Waktu ke Nama File</string>
+    <string name="ig_dialog_downloader_add_timestamp">Tambahkan Cap Waktu ke Nama Berkas</string>
     <string name="ig_dialog_downloader_cannot_open_picker">Tidak dapat membuka pemilih folder di sini</string>
+    <string name="ig_dialog_downloader_copy_link">Salin Tautan Media</string>
+    <string name="ig_copy_link_title">Salin Tautan Media</string>
+    <string name="ig_copy_link_copied">Tautan media disalin ke clipboard</string>
+    <string name="ig_copy_link_none">Tidak ada tautan media untuk postingan ini</string>
+    <string name="ig_copy_link_slide">Slide %1$d dari %2$d</string>
+    <string name="ig_copy_link_all">Salin semua %1$d tautan</string>
+    <string name="ig_copy_link_copied_all">%1$d tautan media disalin</string>
+
+    <!-- Instant Save/Upload -->
+    <string name="ig_instant_save_title">Simpan Instants</string>
+    <string name="ig_dialog_misc_save_instants">Simpan Instants (tekan lama untuk menyimpan)</string>
+    <string name="ig_instant_saving">Menyimpan Instant…</string>
+    <string name="ig_instant_saved">Instant tersimpan</string>
+    <string name="ig_instant_save_none">Tidak ada media Instant ditemukan</string>
+    <string name="ig_instant_upload_title">Unggah Instant dari Galeri</string>
+    <string name="ig_dialog_misc_upload_instants">Unggah Instant dari Galeri</string>
+    <string name="ig_instant_upload_chip">🖼 Galeri</string>
+    <string name="ig_instant_upload_chip_ready">✓ Siap — ketuk tombol rana</string>
+    <string name="ig_instant_upload_ready">Dipilih! Ketuk tombol rana untuk mengirimnya sebagai Instant</string>
+    <string name="ig_instant_upload_fail">Tidak dapat memuat gambar itu</string>
+
+    
 
     <!-- Backup &amp; Restore -->
     <string name="ig_dialog_backup_settings">Cadangkan Pengaturan</string>
@@ -276,14 +364,17 @@
     <string name="ig_dialog_about_telegram">Telegram</string>
 
     <!-- Restart -->
-    <string name="ig_dialog_restart_message">⚠️ Hapus cache aplikasi dan mulai ulang?</string>
-    <string name="ig_dialog_clear_cache">Bersihkan Cache Hooks</string>
-    <string name="ig_dialog_section_clear_cache">Bersihkan Cache Hooks</string>
+    <string name="ig_dialog_restart_message">⚠️ Bersihkan tembolok aplikasi dan mulai ulang?</string>
+    <string name="ig_dialog_clear_cache">Bersihkan Tembolok Hooks</string>
+    <string name="ig_dialog_section_clear_cache">Bersihkan Tembolok Hooks</string>
     <string name="ig_dialog_clear_cache_message">⚠️ Ini akan memaksa InstaEclipse untuk memindai ulang Instagram saat peluncuran berikutnya. Aplikasi akan dimulai ulang.</string>
-    <string name="ig_dialog_clear_cache_now">Bersihkan Cache &amp; Mulai Ulang</string>
+    <string name="ig_dialog_clear_cache_now">Bersihkan Tembolok &amp; Mulai Ulang</string>
     <string name="ig_dialog_restart_now">Mulai Ulang Sekarang</string>
     <string name="ig_dialog_restart_not_found">Tidak dapat menemukan aplikasi untuk dimulai ulang.</string>
     <string name="ig_dialog_restart_failed">Mulai ulang gagal: %1$s</string>
+    <string name="ig_dialog_auto_clear_cache">Bersihkan tembolok otomatis saat besar</string>
+    <string name="ig_dialog_auto_clear_cache_size">Bersihkan di atas: %1$d MB (ketuk untuk mengubah)</string>
+    <string name="ig_dialog_auto_clear_cache_desc">Membersihkan tembolok media Instagram saat Anda meninggalkan aplikasi, jika melebihi ukuran yang dipilih. Hanya tembolok yang dibersihkan (Instagram membangunkannya kembali) — data, login, dan unduhan Anda tidak pernah tersentuh.</string>
 
     <!-- Toast: Ghost mode quick toggle -->
     <string name="ig_toast_ghost_no_options">Tidak ada opsi Mode Hantu yang dipilih!</string>
@@ -305,7 +396,7 @@
     <!-- Toast: Download folder -->
     <string name="ig_toast_download_folder_set">Folder unduhan: %1$s</string>
     <string name="ig_toast_download_folder_updated">Folder unduhan diperbarui!</string>
-    <string name="ig_toast_download_folder_reset">Folder unduhan direset ke Default</string>
+    <string name="ig_toast_download_folder_reset">Folder unduhan disetel ulang ke bawaan</string>
 
     <!-- Toast: Downloader feedback -->
     <string name="ig_toast_downloading">Mengunduh…</string>
@@ -319,28 +410,31 @@
     <string name="ig_toast_reel_saved">Reel disimpan ke folder InstaEclipse</string>
     <string name="ig_toast_reel_failed">Unduhan reel gagal: %1$s</string>
     <string name="ig_toast_reel_url_not_found">URL reel tidak ditemukan</string>
-    <string name="ig_toast_post_url_not_found">URL postingan tidak ditemukan</string>
-    <string name="ig_toast_no_media_for_post">Tidak ada media ditemukan untuk postingan ini</string>
-    <string name="ig_toast_no_media">Tidak ada media ditemukan</string>
+    <string name="ig_toast_post_url_not_found">URL pos tidak ditemukan</string>
+    <string name="ig_toast_no_media_for_post">Tidak ada media ditemukan untuk pos ini</string>
+    <string name="ig_toast_no_media">Tidak ada media yang ditemukan</string>
     <string name="ig_toast_downloading_story_video">Mengunduh video story…</string>
     <string name="ig_toast_downloading_story_photo">Mengunduh foto story…</string>
     <string name="ig_toast_story_saved">Story disimpan ke folder InstaEclipse</string>
     <string name="ig_toast_story_url_not_found">URL story tidak ditemukan</string>
     <string name="ig_toast_downloading_profile_pic">Mengunduh foto profil…</string>
-    <string name="ig_toast_profile_pic_saved">Foto profil disimpan!</string>
-    <string name="ig_toast_profile_pic_url_not_found">Tidak dapat mendapatkan URL foto profil</string>
+    <string name="ig_toast_profile_pic_saved">Foto profil tersimpan!</string>
+    <string name="ig_toast_profile_pic_url_not_found">Tidak dapat memperoleh URL foto profil</string>
     <string name="ig_toast_merging_video_audio">Menggabungkan video + audio…</string>
-    <string name="ig_toast_downloading_n_items">Mengunduh %1$d item…</string>
-    <string name="ig_toast_downloading_all_n_items">Mengunduh semua %1$d item…</string>
-    <string name="ig_toast_all_items_saved">Semua %1$d item disimpan ke folder InstaEclipse</string>
-    <string name="ig_toast_items_partial_saved">%1$d dari %2$d item disimpan (%3$d gagal)</string>
+    <string name="ig_toast_downloading_n_items">Mengunduh %1$d butir…</string>
+    <string name="ig_toast_downloading_all_n_items">Mengunduh semua %1$d butir…</string>
+    <string name="ig_toast_all_items_saved">Semua %1$d butir disimpan ke folder InstaEclipse</string>
+    <string name="ig_toast_items_partial_saved">%1$d dari %2$d butir disimpan (%3$d gagal)</string>
     <string name="ig_toast_no_reel_url_scroll">URL reel tidak ditemukan — gulir reel terlebih dahulu</string>
+    <string name="ig_toast_no_download_folder">Folder unduhan belum diatur</string>
+    <string name="ig_toast_file_saved">Tersimpan: %1$s</string>
+    <string name="ig_toast_features_loaded">InstaEclipse Dimuat 🎯</string>
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">Unduh</string>
-    <string name="ig_dl_carousel_subtitle">Carousel • %1$d item</string>
+    <string name="ig_dl_carousel_subtitle">Carousel • %1$d butir</string>
     <string name="ig_dl_carousel_current">Unduh saat ini (%1$d dari %2$d)</string>
-    <string name="ig_dl_carousel_all">Unduh semua %1$d item</string>
+    <string name="ig_dl_carousel_all">Unduh semua %1$d butir</string>
 
     <!-- Story mentions -->
     <string name="ig_btn_view_mentions">Lihat Sebutan</string>
@@ -353,18 +447,13 @@
     <string name="ig_mention_no_mentions">Tidak ada sebutan ditemukan dalam story ini</string>
     <string name="ig_mention_copy_all">Salin Semua</string>
 
-    <!-- Toast: Downloader (service) -->
-    <string name="ig_toast_no_download_folder">Folder unduhan belum diatur</string>
-    <string name="ig_toast_file_saved">Tersimpan: %1$s</string>
-    <string name="ig_toast_features_loaded">InstaEclipse dimuat 🎯</string>
-
-
     <!-- Update check dialog -->
     <string name="ig_update_title">Pembaruan Tersedia</string>
     <string name="ig_update_message">Versi baru (%1$s) tersedia. Apakah Anda ingin memperbarui sekarang?</string>
     <string name="ig_update_button">Perbarui</string>
     <string name="ig_update_later">Nanti</string>
     <string name="ig_update_error_message">Gagal memeriksa pembaruan. Silakan coba lagi nanti.</string>
+
     <!-- Custom Theme -->
     <string name="ig_dialog_menu_theme">Tema Kustom</string>
     <string name="theme_title">Tema Kustom</string>
@@ -372,9 +461,11 @@
     <string name="theme_customize">Sesuaikan Tema…</string>
     <string name="theme_section_presets">Preset</string>
     <string name="theme_section_custom">Warna Kustom</string>
+    <string name="theme_section_colors">Warna</string>
+    <string name="theme_section_fonts">Font &amp; Emoji</string>
     <string name="theme_collapse_section">Ciutkan bagian</string>
     <string name="theme_expand_section">Perluas bagian</string>
-    <string name="theme_reset_custom">Setel Ulang ke Default</string>
+    <string name="theme_reset_custom">Setel Ulang ke Bawaan</string>
     <string name="theme_saved">Tema disimpan</string>
     <string name="theme_pick_color">Pilih warna</string>
     <string name="theme_apply_color">Terapkan</string>
@@ -395,4 +486,17 @@
     <string name="theme_slot_link">Tautan</string>
     <string name="theme_slot_error">Kesalahan</string>
     <string name="theme_slot_destructive">Destruktif</string>
+
+    <!-- Logging -->
+    <string name="logging">Log</string>
+    <string name="logging_clear">Bersihkan</string>
+    <string name="logging_copy">Salin</string>
+    <string name="logging_copied">Disalin ke papan klip</string>
+    <string name="logging_companion">InstaEclipse</string>
+    <string name="logging_instagram">Instagram</string>
+    <string name="logging_instagram_timeout">Instagram tidak merespons tepat waktu. Hanya menampilkan log pendamping.</string>
+    <string name="logging_no_target">Pasang aplikasi Instagram yang didukung terlebih dahulu.</string>
+    <string name="logging_empty_reply">(tembolok kosong — buka Instagram dengan modul yang diaktifkan)</string>
+    <string name="logging_placeholder">Belum ada log yang dimuat.</string>
+    <string name="logging_lines_format">%1$d baris</string>
 </resources>
