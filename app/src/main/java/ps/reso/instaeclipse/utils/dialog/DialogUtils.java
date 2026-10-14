@@ -1075,6 +1075,29 @@ public class DialogUtils {
         }
         layout.addView(groupCard);
 
+        // Customize navigation bar (#238) — independent of the toggles above / extreme mode.
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_nav_tabs_title)));
+        LinearLayout navCard = card(context);
+        ToggleRow navTab0 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_home), FeatureFlags.hideTabHome);
+        navTab0.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabHome = c; SettingsManager.saveAllFlags(); });
+        navCard.addView(navTab0);
+        ToggleRow navTab1 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_reels), FeatureFlags.hideTabReels);
+        navTab1.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabReels = c; SettingsManager.saveAllFlags(); });
+        navCard.addView(navTab1);
+        ToggleRow navTab2 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_create), FeatureFlags.hideTabCreate);
+        navTab2.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabCreate = c; SettingsManager.saveAllFlags(); });
+        navCard.addView(navTab2);
+        ToggleRow navTab3 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_messages), FeatureFlags.hideTabMessages);
+        navTab3.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabMessages = c; SettingsManager.saveAllFlags(); });
+        navCard.addView(navTab3);
+        ToggleRow navTab4 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_activity), FeatureFlags.hideTabActivity);
+        navTab4.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabActivity = c; SettingsManager.saveAllFlags(); });
+        navCard.addView(navTab4);
+        ToggleRow navTab5 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_profile), FeatureFlags.hideTabProfile);
+        navTab5.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabProfile = c; SettingsManager.saveAllFlags(); });
+        navCard.addView(navTab5);
+        layout.addView(navCard);
+
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {
             FeatureFlags.disableStories = disableStoriesSwitch.isChecked();
             FeatureFlags.disableFeed = disableFeedSwitch.isChecked();
@@ -1229,7 +1252,8 @@ public class DialogUtils {
                 createSwitch(context, R.drawable.ic_content_copy, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_copy_caption),            FeatureFlags.enableCaptionCopy),
                 createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_photo_zoom),               FeatureFlags.enablePhotoZoom),
                 createSwitch(context, R.drawable.ic_timer, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_spoof_last_seen),          FeatureFlags.spoofLastSeen),
-                createSwitch(context, R.drawable.ic_sparkle, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_remove_meta_ai),        FeatureFlags.removeMetaAI)
+                createSwitch(context, R.drawable.ic_sparkle, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_remove_meta_ai),        FeatureFlags.removeMetaAI),
+                createSwitch(context, R.drawable.ic_block, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_hide_share_create_group), FeatureFlags.hideShareCreateGroup)
                 // Lock controls moved to their own grouped "Lock" card below (see buildLockCard).
         };
 
@@ -1293,6 +1317,9 @@ public class DialogUtils {
                         break;
                     case 12:
                         FeatureFlags.removeMetaAI = isChecked;
+                        break;
+                    case 13:
+                        FeatureFlags.hideShareCreateGroup = isChecked;
                         break;
                 }
 

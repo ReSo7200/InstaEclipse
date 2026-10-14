@@ -30,6 +30,29 @@ public class DistractionFreeUIHook {
     private static int trayId = 0;      // reels_tray_container (story tray)
     private static int clipsTabId = 0;  // clips_tab (Reels bottom-nav tab)
 
+    // Customize navigation bar (#238): bottom-nav tab ids (stable names, present 436 → 451). The
+    // search tab is deliberately not offered — long-pressing it opens the InstaEclipse settings.
+    private static final String[] NAV_TAB_NAMES =
+            {"feed_tab", "clips_tab", "creation_tab", "direct_tab", "news_tab", "profile_tab"};
+    private static final int[] navTabIds = new int[NAV_TAB_NAMES.length];
+
+    private static boolean navTabHidden(int index) {
+        switch (index) {
+            case 0: return FeatureFlags.hideTabHome;
+            case 1: return FeatureFlags.hideTabReels;
+            case 2: return FeatureFlags.hideTabCreate;
+            case 3: return FeatureFlags.hideTabMessages;
+            case 4: return FeatureFlags.hideTabActivity;
+            case 5: return FeatureFlags.hideTabProfile;
+            default: return false;
+        }
+    }
+
+    private static boolean anyNavTabHidden() {
+        for (int i = 0; i < NAV_TAB_NAMES.length; i++) if (navTabHidden(i)) return true;
+        return false;
+    }
+
     private static final java.util.Set<View> watchedDecors =
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
@@ -42,7 +65,7 @@ public class DistractionFreeUIHook {
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
     private static boolean anyFlag() {
-        return FeatureFlags.disableStories || FeatureFlags.disableReels;
+        return FeatureFlags.disableStories || FeatureFlags.disableReels || anyNavTabHidden();
     }
 
     @SuppressLint("DiscouragedApi")
@@ -53,6 +76,8 @@ public class DistractionFreeUIHook {
             String pkg = a.getPackageName();
             trayId = res.getIdentifier("reels_tray_container", "id", pkg);
             clipsTabId = res.getIdentifier("clips_tab", "id", pkg);
+            for (int i = 0; i < NAV_TAB_NAMES.length; i++)
+                navTabIds[i] = res.getIdentifier(NAV_TAB_NAMES[i], "id", pkg);
             idsResolved = true;
             ModuleLog.line("(IE|DistractUI) resolved: tray=" + trayId + " clipsTab=" + clipsTabId);
         } catch (Throwable ignored) {}
@@ -83,6 +108,8 @@ public class DistractionFreeUIHook {
             if (!(root instanceof ViewGroup)) return;
             if (FeatureFlags.disableStories && trayId != 0) collapseAllById((ViewGroup) root, trayId);
             if (FeatureFlags.disableReels && clipsTabId != 0) collapseAllById((ViewGroup) root, clipsTabId);
+            for (int i = 0; i < NAV_TAB_NAMES.length; i++)
+                if (navTabIds[i] != 0 && navTabHidden(i)) collapseAllById((ViewGroup) root, navTabIds[i]);
         } catch (Throwable ignored) {}
     }
 

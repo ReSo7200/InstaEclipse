@@ -384,12 +384,20 @@
     <string name="ig_dialog_clean_feed_hide_suggested">Hide Suggestions in Feed</string>
     <string name="ig_dialog_clean_feed_hide_threads">Hide Threads Suggestions</string>
     <string name="ig_dialog_clean_feed_hide_liked">Hide Posts You Already Liked</string>
+    <string name="ig_nav_tabs_title">Hide navigation tabs</string>
+    <string name="ig_nav_tab_home">Hide Home tab</string>
+    <string name="ig_nav_tab_reels">Hide Reels tab</string>
+    <string name="ig_nav_tab_create">Hide Create tab</string>
+    <string name="ig_nav_tab_messages">Hide Messages tab</string>
+    <string name="ig_nav_tab_activity">Hide Activity tab</string>
+    <string name="ig_nav_tab_profile">Hide Profile tab</string>
 
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Disable Story Auto-Swipe</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Disable Video Autoplay</string>
     <string name="ig_dialog_misc_spoof_last_seen">Spoof Last Seen (freeze)</string>
     <string name="ig_dialog_misc_disable_repost">Disable Repost</string>
+    <string name="ig_dialog_misc_hide_share_create_group">Hide \"Create group\" on Share Sheet</string>
     <string name="ig_dialog_misc_show_feature_toasts">Show Feature Toasts</string>
     <string name="ig_dialog_misc_show_follower_toast">Show Follower Toast</string>
     <string name="ig_dialog_misc_view_story_mentions">View Story Mentions</string>

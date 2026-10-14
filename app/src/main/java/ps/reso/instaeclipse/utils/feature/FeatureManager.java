@@ -123,6 +123,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("DisableTrackingLinks");
         }
 
+        if (FeatureFlags.hideShareCreateGroup) {
+            FeatureStatusTracker.setEnabled("HideShareCreateGroup", R.string.ig_dialog_misc_hide_share_create_group);
+        } else {
+            FeatureStatusTracker.setDisabled("HideShareCreateGroup");
+        }
+
         if (FeatureFlags.openLinksExternally) {
             FeatureStatusTracker.setEnabled("OpenLinksExternally", R.string.ig_dialog_open_links_externally);
         } else {

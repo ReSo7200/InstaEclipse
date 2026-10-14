@@ -70,6 +70,12 @@ public class SettingsManager {
         editor.putBoolean("hideSuggestionsInFeed", FeatureFlags.hideSuggestionsInFeed);
         editor.putBoolean("hideThreadsSuggestions", FeatureFlags.hideThreadsSuggestions);
         editor.putBoolean("hideLikedPosts", FeatureFlags.hideLikedPosts);
+        editor.putBoolean("hideTabHome", FeatureFlags.hideTabHome);
+        editor.putBoolean("hideTabReels", FeatureFlags.hideTabReels);
+        editor.putBoolean("hideTabCreate", FeatureFlags.hideTabCreate);
+        editor.putBoolean("hideTabMessages", FeatureFlags.hideTabMessages);
+        editor.putBoolean("hideTabActivity", FeatureFlags.hideTabActivity);
+        editor.putBoolean("hideTabProfile", FeatureFlags.hideTabProfile);
 
         // Ads
         editor.putBoolean("isAdBlockEnabled", FeatureFlags.isAdBlockEnabled);
@@ -87,6 +93,7 @@ public class SettingsManager {
         editor.putString("spoofLng", String.valueOf(FeatureFlags.spoofLng));
         editor.putInt("forceReelQuality", FeatureFlags.forceReelQuality);
         editor.putBoolean("disableRepost", FeatureFlags.disableRepost);
+        editor.putBoolean("hideShareCreateGroup", FeatureFlags.hideShareCreateGroup);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
         editor.putBoolean("showFeatureToasts", FeatureFlags.showFeatureToasts);
         editor.putBoolean("enableStoryMentions", FeatureFlags.enableStoryMentions);
@@ -180,6 +187,12 @@ public class SettingsManager {
         FeatureFlags.hideSuggestionsInFeed = prefs.getBoolean("hideSuggestionsInFeed", false);
         FeatureFlags.hideThreadsSuggestions = prefs.getBoolean("hideThreadsSuggestions", false);
         FeatureFlags.hideLikedPosts = prefs.getBoolean("hideLikedPosts", false);
+        FeatureFlags.hideTabHome = prefs.getBoolean("hideTabHome", false);
+        FeatureFlags.hideTabReels = prefs.getBoolean("hideTabReels", false);
+        FeatureFlags.hideTabCreate = prefs.getBoolean("hideTabCreate", false);
+        FeatureFlags.hideTabMessages = prefs.getBoolean("hideTabMessages", false);
+        FeatureFlags.hideTabActivity = prefs.getBoolean("hideTabActivity", false);
+        FeatureFlags.hideTabProfile = prefs.getBoolean("hideTabProfile", false);
 
         // Ads
         FeatureFlags.isAdBlockEnabled = prefs.getBoolean("isAdBlockEnabled", false);
@@ -197,6 +210,7 @@ public class SettingsManager {
         FeatureFlags.spoofLng = readDoublePref(prefs, "spoofLng", 0.0);
         FeatureFlags.forceReelQuality = prefs.getInt("forceReelQuality", 0);
         FeatureFlags.disableRepost = prefs.getBoolean("disableRepost", false);
+        FeatureFlags.hideShareCreateGroup = prefs.getBoolean("hideShareCreateGroup", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);
         FeatureFlags.showFeatureToasts = prefs.getBoolean("showFeatureToasts", false);
         FeatureFlags.enableStoryMentions = prefs.getBoolean("enableStoryMentions", false);

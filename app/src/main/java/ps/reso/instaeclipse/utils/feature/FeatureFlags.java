@@ -32,6 +32,13 @@ public class FeatureFlags {
     public static boolean lockDirectAlways = false; // re-lock whenever leaving the inbox (not just on app close)
     public static boolean lockWholeApp = false; // lock the ENTIRE app on launch/return (same passcode as Lock DMs)
     public static boolean lockUseFingerprint = true; // offer biometric unlock when the device has one enrolled
+    // Customize navigation bar (#238): hide individual bottom-nav tabs.
+    public static boolean hideTabHome = false;
+    public static boolean hideTabReels = false;
+    public static boolean hideTabCreate = false;
+    public static boolean hideTabMessages = false;
+    public static boolean hideTabActivity = false;
+    public static boolean hideTabProfile = false;
     public static boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
     public static boolean hideChatButtonStealth = false; // no eye icon; long-press the chat header to hide (#221)
@@ -72,6 +79,7 @@ public class FeatureFlags {
     public static boolean showFollowerToast = false;
     public static boolean showFeatureToasts = false;
     public static boolean disableRepost = false;
+    public static boolean hideShareCreateGroup = false; // hide "Create group" on the DM share sheet (#240)
 
 
     public static boolean enableStoryMentions = false;

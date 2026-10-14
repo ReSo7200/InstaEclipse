@@ -312,6 +312,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | TrackingLinkDisable): ❌ Failed to hook");
                     }
 
+                    // Hide "Create group" on the DM share sheet (#240)
+                    try {
+                        new ps.reso.instaeclipse.mods.ui.ShareSheetCleanupHook().install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | ShareSheet): ❌ Failed to hook");
+                    }
+
                     // Open links in the external browser (#229)
                     try {
                         new ps.reso.instaeclipse.mods.misc.ExternalBrowserHook().install();

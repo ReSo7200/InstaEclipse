@@ -45,6 +45,12 @@ public class SettingsBackupManager {
         s.put("hideSuggestionsInFeed",      FeatureFlags.hideSuggestionsInFeed);
         s.put("hideThreadsSuggestions",     FeatureFlags.hideThreadsSuggestions);
         s.put("hideLikedPosts",             FeatureFlags.hideLikedPosts);
+        s.put("hideTabHome", FeatureFlags.hideTabHome);
+        s.put("hideTabReels", FeatureFlags.hideTabReels);
+        s.put("hideTabCreate", FeatureFlags.hideTabCreate);
+        s.put("hideTabMessages", FeatureFlags.hideTabMessages);
+        s.put("hideTabActivity", FeatureFlags.hideTabActivity);
+        s.put("hideTabProfile", FeatureFlags.hideTabProfile);
 
         // Ads
         s.put("isAdBlockEnabled",        FeatureFlags.isAdBlockEnabled);
@@ -71,6 +77,7 @@ public class SettingsBackupManager {
         s.put("spoofLng",                String.valueOf(FeatureFlags.spoofLng));
         s.put("forceReelQuality",        FeatureFlags.forceReelQuality);
         s.put("disableRepost",           FeatureFlags.disableRepost);
+        s.put("hideShareCreateGroup",    FeatureFlags.hideShareCreateGroup);
         s.put("showFollowerToast",       FeatureFlags.showFollowerToast);
         s.put("showFeatureToasts",       FeatureFlags.showFeatureToasts);
         s.put("enableStoryMentions",     FeatureFlags.enableStoryMentions);
@@ -129,6 +136,12 @@ public class SettingsBackupManager {
         if (s.has("hideSuggestionsInFeed"))     FeatureFlags.hideSuggestionsInFeed     = s.getBoolean("hideSuggestionsInFeed");
         if (s.has("hideThreadsSuggestions"))    FeatureFlags.hideThreadsSuggestions    = s.getBoolean("hideThreadsSuggestions");
         if (s.has("hideLikedPosts"))            FeatureFlags.hideLikedPosts            = s.getBoolean("hideLikedPosts");
+        if (s.has("hideTabHome")) FeatureFlags.hideTabHome = s.getBoolean("hideTabHome");
+        if (s.has("hideTabReels")) FeatureFlags.hideTabReels = s.getBoolean("hideTabReels");
+        if (s.has("hideTabCreate")) FeatureFlags.hideTabCreate = s.getBoolean("hideTabCreate");
+        if (s.has("hideTabMessages")) FeatureFlags.hideTabMessages = s.getBoolean("hideTabMessages");
+        if (s.has("hideTabActivity")) FeatureFlags.hideTabActivity = s.getBoolean("hideTabActivity");
+        if (s.has("hideTabProfile")) FeatureFlags.hideTabProfile = s.getBoolean("hideTabProfile");
 
         if (s.has("isAdBlockEnabled"))       FeatureFlags.isAdBlockEnabled       = s.getBoolean("isAdBlockEnabled");
         if (s.has("isAnalyticsBlocked"))     FeatureFlags.isAnalyticsBlocked     = s.getBoolean("isAnalyticsBlocked");
@@ -152,6 +165,7 @@ public class SettingsBackupManager {
         if (s.has("spoofLng"))               FeatureFlags.spoofLng               = parseDouble(s.get("spoofLng"), 0.0);
         if (s.has("forceReelQuality"))        FeatureFlags.forceReelQuality       = s.getInt("forceReelQuality");
         if (s.has("disableRepost"))          FeatureFlags.disableRepost          = s.getBoolean("disableRepost");
+        if (s.has("hideShareCreateGroup"))   FeatureFlags.hideShareCreateGroup   = s.getBoolean("hideShareCreateGroup");
         if (s.has("showFollowerToast"))      FeatureFlags.showFollowerToast      = s.getBoolean("showFollowerToast");
         if (s.has("showFeatureToasts"))      FeatureFlags.showFeatureToasts      = s.getBoolean("showFeatureToasts");
         if (s.has("enableStoryMentions"))    FeatureFlags.enableStoryMentions    = s.getBoolean("enableStoryMentions");

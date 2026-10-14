@@ -870,6 +870,17 @@ public class FeaturesFragment extends Fragment {
                 createSwitchLockedByExtreme(R.drawable.ic_chat, "#30D158", getString(R.string.ig_dialog_distraction_disable_comments), "disableComments")
         ));
 
+        // Customize navigation bar (#238)
+        defs.add(getString(R.string.ig_nav_tabs_title));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_home), "hideTabHome"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_reels), "hideTabReels"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_create), "hideTabCreate"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_messages), "hideTabMessages"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_activity), "hideTabActivity"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_profile), "hideTabProfile")
+        ));
+
         showMenu(getString(R.string.ig_dialog_section_distraction_free), defs);
         currentMenu = "distract";
     }
@@ -895,7 +906,8 @@ public class FeaturesFragment extends Fragment {
                 createMasterSwitch(getString(R.string.ig_dialog_enable_disable_all), Arrays.asList(
                         "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
                         "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
-                        "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI"
+                        "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
+                        "hideShareCreateGroup"
                 )),
                 createSwitch(R.drawable.ic_story_ring, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
@@ -909,7 +921,8 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_heart, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_double_tap_like), "disableDoubleTapLike"),
                 createSwitch(R.drawable.ic_content_copy, "#BF5AF2", getString(R.string.ig_dialog_misc_copy_caption), "enableCaptionCopy"),
                 createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_photo_zoom), "enablePhotoZoom"),
-                createSwitch(R.drawable.ic_sparkle, "#BF5AF2", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI")
+                createSwitch(R.drawable.ic_sparkle, "#BF5AF2", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI"),
+                createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_share_create_group), "hideShareCreateGroup")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_misc), defs);
