@@ -197,18 +197,26 @@ public class StoryDownloadHook {
             XC_MethodHook injector = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
-                    if (!FeatureFlags.enableStoryDownload) return;
+                    if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory) return;
                     if (!(param.getResult() instanceof CharSequence[] original) || original == null) return;
 
-                    // Guard: don't inject twice
-                    String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
-                    for (CharSequence cs : original) {
-                        if (cs != null && dlLabel.contentEquals(cs)) return;
-                    }
+                    java.util.List<CharSequence> add = new java.util.ArrayList<>();
+                    if (FeatureFlags.enableStoryDownload)
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title));
+                    // Selective "Mark as seen" (#226): only meaningful while Hide Story Views is on.
+                    if (FeatureFlags.isGhostStory)
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen));
 
-                    CharSequence[] extended = new CharSequence[original.length + 1];
+                    // Guard: don't inject twice
+                    for (CharSequence cs : original) {
+                        if (cs == null) continue;
+                        add.removeIf(a -> a.toString().contentEquals(cs));
+                    }
+                    if (add.isEmpty()) return;
+
+                    CharSequence[] extended = new CharSequence[original.length + add.size()];
                     System.arraycopy(original, 0, extended, 0, original.length);
-                    extended[original.length] = dlLabel;
+                    for (int i = 0; i < add.size(); i++) extended[original.length + i] = add.get(i);
                     param.setResult(extended);
                 }
             };
@@ -265,15 +273,32 @@ public class StoryDownloadHook {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.enableStoryDownload) return;
+                if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory) return;
 
                 // 1. Find which button was tapped
                 CharSequence tapped = null;
                 for (Object arg : param.args) {
                     if (arg instanceof CharSequence cs) { tapped = cs; break; }
                 }
+                if (tapped == null) return;
+
+                // Selective "Mark as seen" (#226)
+                String seenLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen);
+                if (FeatureFlags.isGhostStory && seenLabel.contentEquals(tapped)) {
+                    param.setResult(null);
+                    Object holder = findReelItemHolder(param);
+                    Object effective = holder != null ? holder : param.thisObject;
+                    Context ctx = findContextAcrossParam(param, effective);
+                    String id = extractMediaIdFromReelItemHolder(effective);
+                    int n = ps.reso.instaeclipse.mods.ghost.GhostStorySeenHook.markSeen(id);
+                    if (ctx != null) Toast.makeText(ctx, I18n.t(ctx, n > 0
+                            ? R.string.ig_story_marked_seen : R.string.ig_story_mark_seen_none), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!FeatureFlags.enableStoryDownload) return;
                 String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
-                if (tapped == null || !dlLabel.contentEquals(tapped)) return;
+                if (!dlLabel.contentEquals(tapped)) return;
 
                 // 2. Consume the event — Instagram won't process an option it didn't add
                 param.setResult(null);
