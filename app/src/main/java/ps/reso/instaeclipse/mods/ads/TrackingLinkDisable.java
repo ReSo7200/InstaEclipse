@@ -8,7 +8,8 @@ import de.robv.android.xposed.XposedHelpers;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 
-// Strips Instagram tracking params (igshid/igsh/utm_*) from links the user copies or shares.
+// Strips Instagram tracking params (igshid/igsh/utm_*) from links the user copies or shares —
+// only the tracking keys; other params such as img_index are kept (#252, TrackingParamStripper).
 // Covers three framework paths (all obfuscation-proof, no IG class names):
 //   1. android.content.ClipboardManager.setPrimaryClip - modern clipboard copies.
 //   2. android.text.ClipboardManager.setText - IG's in-app "Copy link" action sheet (legacy API
@@ -112,24 +113,7 @@ public class TrackingLinkDisable {
         } catch (Throwable ignored) {}
     }
 
-    /**
-     * Returns the URL with its query string removed if it's an Instagram link carrying tracking
-     * params, else null (no change needed). Tracking params can appear anywhere in the query, so
-     * once we confirm one is present we cut the whole "?..." -- matching the module's prior behavior.
-     */
-    private static String stripIfTracking(String url) {
-        if (url == null || !url.contains("instagram.com/")) return null;
-        boolean hasTracking = url.contains("igshid=")
-                || url.contains("igsh=")
-                || url.contains("ig_rid=")
-                || url.contains("ig_mid=")
-                || url.contains("stkn=")
-                || url.contains("utm_source=")
-                || url.contains("utm_medium=")
-                || url.contains("utm_campaign=")
-                || url.contains("story_media_id=")
-                || url.matches("(?i).*saved[-_]by.*");
-        if (!hasTracking) return null;
-        return url.replaceAll("\\?.*", "");
+    private static String stripIfTracking(String text) {
+        return TrackingParamStripper.strip(text);
     }
 }
