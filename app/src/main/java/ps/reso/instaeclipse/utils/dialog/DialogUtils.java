@@ -886,7 +886,9 @@ public class DialogUtils {
 
         ToggleRow trackingLinks = createSwitch(context, R.drawable.ic_link, "#FF453A", I18n.t(context, R.string.ig_dialog_ad_disable_tracking), FeatureFlags.disableTrackingLinks);
 
-        ToggleRow[] switches = new ToggleRow[]{adBlock, analytics, trackingLinks};
+        ToggleRow externalLinks = createSwitch(context, R.drawable.ic_link, "#FF453A", I18n.t(context, R.string.ig_dialog_open_links_externally), FeatureFlags.openLinksExternally);
+
+        ToggleRow[] switches = new ToggleRow[]{adBlock, analytics, trackingLinks, externalLinks};
 
         // Create Enable/Disable All switch
         ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
@@ -914,6 +916,7 @@ public class DialogUtils {
                 if (index == 0) FeatureFlags.isAdBlockEnabled = isChecked;
                 if (index == 1) FeatureFlags.isAnalyticsBlocked = isChecked;
                 if (index == 2) FeatureFlags.disableTrackingLinks = isChecked;
+                if (index == 3) FeatureFlags.openLinksExternally = isChecked;
 
                 // Save immediately
                 SettingsManager.saveAllFlags();
@@ -1327,6 +1330,13 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         hideCard.addView(hideChats);
+        ToggleRow stealth = createSwitch(context, R.drawable.ic_eye_off, A_PRIVACY,
+                I18n.t(context, R.string.ig_hide_chats_stealth), FeatureFlags.hideChatButtonStealth);
+        stealth.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.hideChatButtonStealth = checked;
+            SettingsManager.saveAllFlags();
+        });
+        hideCard.addView(stealth);
         hideCard.addView(createActionRow(context, R.drawable.ic_eye,
                 I18n.t(context, R.string.ig_hide_chats_manage), A_PRIVACY, v -> showHiddenChats(context)));
         layout.addView(hideCard);

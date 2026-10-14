@@ -49,6 +49,7 @@ public class SettingsBackupManager {
         s.put("isAdBlockEnabled",        FeatureFlags.isAdBlockEnabled);
         s.put("isAnalyticsBlocked",      FeatureFlags.isAnalyticsBlocked);
         s.put("disableTrackingLinks",    FeatureFlags.disableTrackingLinks);
+        s.put("openLinksExternally",     FeatureFlags.openLinksExternally);
 
         // Distraction Free
         s.put("isExtremeMode",           FeatureFlags.isExtremeMode);
@@ -130,6 +131,7 @@ public class SettingsBackupManager {
         if (s.has("isAdBlockEnabled"))       FeatureFlags.isAdBlockEnabled       = s.getBoolean("isAdBlockEnabled");
         if (s.has("isAnalyticsBlocked"))     FeatureFlags.isAnalyticsBlocked     = s.getBoolean("isAnalyticsBlocked");
         if (s.has("disableTrackingLinks"))   FeatureFlags.disableTrackingLinks   = s.getBoolean("disableTrackingLinks");
+        if (s.has("openLinksExternally"))    FeatureFlags.openLinksExternally    = s.getBoolean("openLinksExternally");
 
         if (s.has("isExtremeMode"))          FeatureFlags.isExtremeMode          = s.getBoolean("isExtremeMode");
         if (s.has("disableStories"))         FeatureFlags.disableStories         = s.getBoolean("disableStories");

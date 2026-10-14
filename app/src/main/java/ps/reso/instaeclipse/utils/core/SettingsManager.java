@@ -42,6 +42,7 @@ public class SettingsManager {
         editor.putBoolean("lockDirectAlways", FeatureFlags.lockDirectAlways);
         editor.putBoolean("lockWholeApp", FeatureFlags.lockWholeApp);
         editor.putBoolean("hideSpecificChats", FeatureFlags.hideSpecificChats);
+        editor.putBoolean("hideChatButtonStealth", FeatureFlags.hideChatButtonStealth);
         editor.putBoolean("lockUseFingerprint", FeatureFlags.lockUseFingerprint);
 
         // Quick Toggles
@@ -73,6 +74,7 @@ public class SettingsManager {
         editor.putBoolean("isAdBlockEnabled", FeatureFlags.isAdBlockEnabled);
         editor.putBoolean("isAnalyticsBlocked", FeatureFlags.isAnalyticsBlocked);
         editor.putBoolean("disableTrackingLinks", FeatureFlags.disableTrackingLinks);
+        editor.putBoolean("openLinksExternally", FeatureFlags.openLinksExternally);
 
         // Misc
         editor.putBoolean("isMiscEnabled", FeatureFlags.isMiscEnabled);
@@ -148,6 +150,7 @@ public class SettingsManager {
         FeatureFlags.lockDirectAlways = prefs.getBoolean("lockDirectAlways", false);
         FeatureFlags.lockWholeApp = prefs.getBoolean("lockWholeApp", false);
         FeatureFlags.hideSpecificChats = prefs.getBoolean("hideSpecificChats", false);
+        FeatureFlags.hideChatButtonStealth = prefs.getBoolean("hideChatButtonStealth", false);
         FeatureFlags.lockUseFingerprint = prefs.getBoolean("lockUseFingerprint", true);
 
         // Quick Toggles
@@ -179,6 +182,7 @@ public class SettingsManager {
         FeatureFlags.isAdBlockEnabled = prefs.getBoolean("isAdBlockEnabled", false);
         FeatureFlags.isAnalyticsBlocked = prefs.getBoolean("isAnalyticsBlocked", false);
         FeatureFlags.disableTrackingLinks = prefs.getBoolean("disableTrackingLinks", false);
+        FeatureFlags.openLinksExternally = prefs.getBoolean("openLinksExternally", false);
 
         // Misc
         FeatureFlags.isMiscEnabled = prefs.getBoolean("isMiscEnabled", false);

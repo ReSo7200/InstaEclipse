@@ -117,6 +117,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("DisableTrackingLinks");
         }
 
+        if (FeatureFlags.openLinksExternally) {
+            FeatureStatusTracker.setEnabled("OpenLinksExternally", R.string.ig_dialog_open_links_externally);
+        } else {
+            FeatureStatusTracker.setDisabled("OpenLinksExternally");
+        }
+
         if (FeatureFlags.showFollowerToast) {
             FeatureStatusTracker.setEnabled("FollowerToast", R.string.ig_dialog_misc_show_follower_toast);
         } else {

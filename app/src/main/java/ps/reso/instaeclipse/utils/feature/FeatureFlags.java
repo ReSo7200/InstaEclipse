@@ -33,6 +33,7 @@ public class FeatureFlags {
     public static boolean lockWholeApp = false; // lock the ENTIRE app on launch/return (same passcode as Lock DMs)
     public static boolean lockUseFingerprint = true; // offer biometric unlock when the device has one enrolled
     public static boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
+    public static boolean hideChatButtonStealth = false; // no eye icon; long-press the chat header to hide (#221)
 
     // Which ghost mode features the quick toggle will control
     public static boolean quickToggleSeen = false;
@@ -60,6 +61,7 @@ public class FeatureFlags {
     public static boolean isAdBlockEnabled = false;
     public static boolean isAnalyticsBlocked = false;
     public static boolean disableTrackingLinks = false;
+    public static boolean openLinksExternally = false;
 
     // Misc Options
     public static boolean isMiscEnabled = false;

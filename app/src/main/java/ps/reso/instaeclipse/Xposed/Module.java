@@ -312,6 +312,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | TrackingLinkDisable): ❌ Failed to hook");
                     }
 
+                    // Open links in the external browser (#229)
+                    try {
+                        new ps.reso.instaeclipse.mods.misc.ExternalBrowserHook().install();
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | ExternalBrowser): ❌ Failed to hook");
+                    }
+
                     // Miscellaneous
                     try {
                         new DisableStoryFlippingHook().handleStoryFlippingDisable(dexKitBridge); // Story Flipping

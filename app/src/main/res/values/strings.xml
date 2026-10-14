@@ -314,6 +314,7 @@
     <string name="ig_dialog_misc_lock_section">Lock</string>
     <string name="ig_dialog_misc_lock_fingerprint">Use fingerprint to unlock</string>
     <string name="ig_hide_chats_title">Hide Specific Chats</string>
+    <string name="ig_hide_chats_stealth">Stealth: no eye icon (long-press the chat name to hide)</string>
     <string name="ig_dialog_misc_hide_chats">Hide Specific Chats</string>
     <string name="ig_hide_chats_manage">Manage hidden chats</string>
     <string name="ig_hide_chats_empty">No hidden chats. Open a chat and tap the eye-off button to hide it.</string>
@@ -363,6 +364,7 @@
     <string name="ig_dialog_ad_block_ads">Block Ads</string>
     <string name="ig_dialog_ad_block_analytics">Block Analytics</string>
     <string name="ig_dialog_ad_disable_tracking">Disable Tracking Links</string>
+    <string name="ig_dialog_open_links_externally">Open Links in External Browser</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">Extreme Mode (Irreversible until reinstall)</string>

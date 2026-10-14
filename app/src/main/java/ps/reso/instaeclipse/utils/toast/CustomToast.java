@@ -66,7 +66,7 @@ public class CustomToast {
             case "GhostViewOnce": case "GhostScreenshot": case "AllowScreenshots":
             case "KeepEphemeralMessages": case "KeepUnsentMessages": case "PermanentViewMode":
             case "LockDirectMessages": case "HideSpecificChats": case "AdBlocker":
-            case "DisableTrackingLinks": case "RemoveMetaAI": case "SpoofLastSeen":
+            case "DisableTrackingLinks": case "OpenLinksExternally": case "RemoveMetaAI": case "SpoofLastSeen":
             case "DisableDiscoverPeople":
                 return "Privacy";
             case "PostDownload": case "ReelDownload": case "StoryDownload": case "ProfileDownload":
