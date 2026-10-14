@@ -908,7 +908,7 @@ public class FeaturesFragment extends Fragment {
                         "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
                         "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
                         "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
-                        "hideShareCreateGroup"
+                        "hideShareCreateGroup", "exactTimestamps"
                 )),
                 createSwitch(R.drawable.ic_story_ring, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
@@ -923,7 +923,8 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_content_copy, "#BF5AF2", getString(R.string.ig_dialog_misc_copy_caption), "enableCaptionCopy"),
                 createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_photo_zoom), "enablePhotoZoom"),
                 createSwitch(R.drawable.ic_sparkle, "#BF5AF2", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI"),
-                createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_share_create_group), "hideShareCreateGroup")
+                createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_share_create_group), "hideShareCreateGroup"),
+                createSwitch(R.drawable.ic_timer, "#BF5AF2", getString(R.string.ig_dialog_misc_exact_timestamps), "exactTimestamps")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_misc), defs);

@@ -312,6 +312,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | TrackingLinkDisable): ❌ Failed to hook");
                     }
 
+                    // Exact timestamps instead of "3h ago" (#232)
+                    try {
+                        new ps.reso.instaeclipse.mods.misc.ExactTimestampHook().install(dexKitBridge);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | ExactTime): ❌ Failed to hook");
+                    }
+
                     // Hide "Create group" on the DM share sheet (#240)
                     try {
                         new ps.reso.instaeclipse.mods.ui.ShareSheetCleanupHook().install(hostClassLoader);

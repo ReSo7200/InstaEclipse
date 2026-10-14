@@ -123,6 +123,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("DisableTrackingLinks");
         }
 
+        if (FeatureFlags.exactTimestamps) {
+            FeatureStatusTracker.setEnabled("ExactTimestamps", R.string.ig_dialog_misc_exact_timestamps);
+        } else {
+            FeatureStatusTracker.setDisabled("ExactTimestamps");
+        }
+
         if (FeatureFlags.hideShareCreateGroup) {
             FeatureStatusTracker.setEnabled("HideShareCreateGroup", R.string.ig_dialog_misc_hide_share_create_group);
         } else {

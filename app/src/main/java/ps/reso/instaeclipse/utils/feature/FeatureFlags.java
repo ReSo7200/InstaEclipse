@@ -82,6 +82,7 @@ public class FeatureFlags {
     public static boolean showFollowerToast = false;
     public static boolean showFeatureToasts = false;
     public static boolean disableRepost = false;
+    public static boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)
     public static boolean hideShareCreateGroup = false; // hide "Create group" on the DM share sheet (#240)
 
 
