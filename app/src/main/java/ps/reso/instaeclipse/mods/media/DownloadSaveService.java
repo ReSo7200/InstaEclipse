@@ -144,8 +144,10 @@ public class DownloadSaveService extends Service {
                     maybeUpdateProgress("Downloading…", 0, 0, true);
                 }
             });
-            MediaTypeDetector.Result detected = MediaTypeDetector.resolve(
-                    tmp, responseType, mimeType, filename);
+            // Audio-only (#234): an .m4a is an MP4 container and would be sniffed as video — keep it.
+            MediaTypeDetector.Result detected = mimeType != null && mimeType.startsWith("audio/")
+                    ? new MediaTypeDetector.Result(MediaTypeDetector.Kind.UNKNOWN, mimeType, filename)
+                    : MediaTypeDetector.resolve(tmp, responseType, mimeType, filename);
             ModuleLog.line("(IE|DL|Type) requested=" + mimeType + " response=" + responseType
                     + " detected=" + detected.kind + " file=" + detected.filename);
             pushProgress("Saving…", 97, 100, false);

@@ -103,6 +103,7 @@ public class FeedVideoDownloadHook {
     private static Method resolvedIsVideoMethod;
     private static Method   methodImageUrl;         // MediaExtKt: static (Context, Media) -> String
     private static Method   carouselMediaGetter;    // Media."carousel_media" getter: () -> List<Media> (IG 447+)
+    private static Method   dashManifestGetter;     // "video_dash_manifest" getter: () -> String (Media 447+, LiveTreeMediaDict <= 446)
 
     // VideoVersionIntf – stable public interface with getUrl()
     static Class<?> videoVersionIntfClass;
@@ -1071,6 +1072,7 @@ public class FeedVideoDownloadHook {
         discoverDynamicMediaModel(bridge, classLoader);
         resolveVideoVersionsGetters(bridge, classLoader);
         resolveCarouselGetter(bridge, classLoader);
+        resolveDashManifestGetter(bridge, classLoader);
         resolveIsVideoMethod(bridge, classLoader);
         XC_MethodHook urlHook = new XC_MethodHook() {
             @Override
@@ -1281,6 +1283,133 @@ public class FeedVideoDownloadHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|DL|DexKit) carousel getter resolution failed: " + t);
         }
+    }
+
+    /** Audio-only download (#234): the DASH manifest accessor, anchored like has_liked / carousel. */
+    private static void resolveDashManifestGetter(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                Method cached = DexKitCache.loadMethod("MediaDownload_DashManifest", classLoader);
+                if (cached != null) { cached.setAccessible(true); dashManifestGetter = cached; return; }
+            }
+            for (String owner : new String[]{"com.instagram.feed.media.Media",
+                    "com.instagram.feed.media.LiveTreeMediaDict"}) {
+                List<MethodData> found;
+                try {
+                    found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                            .declaredClass(owner)
+                            .paramCount(0)
+                            .returnType("java.lang.String")
+                            .usingEqStrings(List.of("video_dash_manifest"))));
+                } catch (Throwable t) { continue; }
+                if (found.size() != 1) continue;
+                Method m = found.get(0).getMethodInstance(classLoader);
+                m.setAccessible(true);
+                dashManifestGetter = m;
+                DexKitCache.saveMethod("MediaDownload_DashManifest", m);
+                break;
+            }
+            ModuleLog.line("(IE|DL|DexKit) dash manifest getter="
+                    + (dashManifestGetter == null ? "not found"
+                       : dashManifestGetter.getDeclaringClass().getName() + "." + dashManifestGetter.getName()));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|DexKit) dash manifest getter failed: " + t);
+        }
+    }
+
+    /** Audio track URL of a video/reel (from its DASH manifest), or null (photos, no manifest). */
+    static String extractAudioUrl(Object media) {
+        Method getter = dashManifestGetter;
+        if (media == null || getter == null) return null;
+        try {
+            Object target = media;
+            Class<?> owner = getter.getDeclaringClass();
+            if (!owner.isInstance(media)) {
+                target = null;
+                for (Field f : media.getClass().getDeclaredFields()) {
+                    if (!owner.isAssignableFrom(f.getType())) continue;
+                    f.setAccessible(true);
+                    target = f.get(media);
+                    break;
+                }
+                if (target == null) return null;
+            }
+            Object manifest = getter.invoke(target);
+            return manifest instanceof String s ? DashAudio.audioUrl(s) : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /**
+     * When "Offer audio-only download" is on and the media has an audio track, asks Video / Audio
+     * only; otherwise just runs {@code videoAction} (the normal download path, unchanged).
+     */
+    static void offerAudioOrRun(Context ctx, Object media, String username, String mediaId,
+                                String type, Runnable videoAction) {
+        String audio = FeatureFlags.offerAudioDownload ? extractAudioUrl(media) : null;
+        if (audio == null) { videoAction.run(); return; }
+        Context host = ctx instanceof android.app.Activity ? ctx
+                : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (host == null) { videoAction.run(); return; }
+        final String user = username != null ? username : type;
+        String[] items = {I18n.t(host, R.string.ig_download_choice_video), I18n.t(host, R.string.ig_download_choice_audio)};
+        mainHandler.post(() -> {
+            try {
+                new android.app.AlertDialog.Builder(new android.view.ContextThemeWrapper(host,
+                        android.R.style.Theme_DeviceDefault_Dialog_Alert))
+                        .setTitle(I18n.t(host, R.string.ig_download_choice_title))
+                        .setItems(items, (d, which) -> {
+                            if (which == 0) { videoAction.run(); return; }
+                            String fn = buildFilename(user, type + "_audio", mediaId, true)
+                                    .replaceAll("\\.mp4$", ".m4a");
+                            downloadAudio(host, audio, fn, user);
+                        })
+                        .show();
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|DL|Audio) chooser failed: " + t);
+                videoAction.run();
+            }
+        });
+    }
+
+    /** Saves an audio-only (.m4a) stream; same destinations as other downloads. */
+    static void downloadAudio(Context ctx, String url, String filename, String username) {
+        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
+        executor.submit(() -> {
+            try {
+                String uri = FeatureFlags.downloaderCustomUri.isEmpty()
+                        ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
+                if (!uri.isEmpty()) {
+                    android.content.Intent intent = new android.content.Intent();
+                    intent.setClassName("ps.reso.instaeclipse",
+                            "ps.reso.instaeclipse.mods.media.DownloadSaveService");
+                    intent.putExtra("url", url);
+                    intent.putExtra("filename", filename);
+                    intent.putExtra("mimeType", "audio/mp4");
+                    intent.putExtra("username", username);
+                    ctx.startForegroundService(intent);
+                    return;
+                }
+                File temp = File.createTempFile("ie_dl_", ".m4a", ctx.getCacheDir());
+                try {
+                    downloadToFileAndGetType(url, temp);
+                    try (FileInputStream in = new FileInputStream(temp);
+                         OutputStream out = openOutputStream(ctx, filename, "audio/mp4", username)) {
+                        byte[] buf = new byte[32768]; int n;
+                        while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+                    }
+                } finally {
+                    //noinspection ResultOfMethodCallIgnored
+                    temp.delete();
+                }
+                mainHandler.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_audio_saved), Toast.LENGTH_SHORT).show());
+            } catch (Throwable e) {
+                ModuleLog.line("(IE|DL|Audio) failed: " + e);
+                mainHandler.post(() -> Toast.makeText(ctx,
+                        I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private static void resolveIsVideoMethod(DexKitBridge bridge, ClassLoader classLoader) {
@@ -1649,7 +1778,11 @@ public class FeedVideoDownloadHook {
      */
     static OutputStream openOutputStream(Context ctx, String filename, boolean isVideo, String username)
             throws Exception {
-        String mimeType = isVideo ? "video/mp4" : "image/jpeg";
+        return openOutputStream(ctx, filename, isVideo ? "video/mp4" : "image/jpeg", username);
+    }
+
+    static OutputStream openOutputStream(Context ctx, String filename, String mimeType, String username)
+            throws Exception {
 
         // 1. Raw path — preferred when set; bypasses SAF authority entirely
         if (!FeatureFlags.downloaderCustomPath.isEmpty()) {

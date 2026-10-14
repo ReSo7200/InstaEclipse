@@ -554,8 +554,10 @@ public class PostDownloadContextMenuHook {
 
         final String finalUser = username;
         final String finalId   = mediaId;
-        FeedVideoDownloadHook.mainHandler.post(() ->
-                FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx));
+        // Audio-only option (#234) — only asks when enabled and the media has an audio track.
+        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, finalUser, finalId, "post", () ->
+                FeedVideoDownloadHook.mainHandler.post(() ->
+                        FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx)));
     }
 
     // ── Copy Media Link (#117) ────────────────────────────────────────────────

@@ -39,6 +39,7 @@ public class FeatureFlags {
     public static boolean hideTabMessages = false;
     public static boolean hideTabActivity = false;
     public static boolean hideTabProfile = false;
+    public static boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)
     public static boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
     public static boolean hideChatButtonStealth = false; // no eye icon; long-press the chat header to hide (#221)
