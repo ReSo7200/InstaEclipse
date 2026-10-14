@@ -16,9 +16,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.mods.ui.utils.LifecycleHookUtil;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
+import ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker;
 import ps.reso.instaeclipse.utils.ghost.UnsentLog;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -35,25 +35,29 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 public class UnsentThreadButtonHook {
 
     private static final String TAG = "ie_unsent_btn";
+    private static final java.util.Set<View> pendingDecors =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
     private static int threadHeaderId, actionBarEndId, tagKeyId, backButtonId, leftContainerId, threadTitleId, threadSubtitleId;
 
     public void install(ClassLoader classLoader) {
-        XC_MethodHook resume = new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.keepUnsentMessages) return;
-                final Activity activity = (Activity) param.thisObject;
-                activity.runOnUiThread(() -> registerListener(activity));
-            }
-        };
+        // IG 448+ moved onResume off InstagramMainActivity into IgFragmentActivity, so a plain
+        // findAndHookMethod throws there; LifecycleHookUtil hooks the declaring class instead.
         for (String act : new String[]{"com.instagram.modal.ModalActivity",
                 "com.instagram.mainactivity.InstagramMainActivity"}) {
             try {
-                XposedHelpers.findAndHookMethod(act, classLoader, "onResume", resume);
+                LifecycleHookUtil.hookAfter(classLoader, act, "onResume", (activity, param) -> {
+                    if (!FeatureFlags.keepUnsentMessages) return;
+                    activity.runOnUiThread(() -> registerListener(activity));
+                });
             } catch (Throwable t) {
-                ModuleLog.line("(IE|UnsentBtn) ⚠️ hook " + act + ": " + t.getMessage());
+                ModuleLog.line("(IE|UnsentBtn) ⚠️ hook " + act + ": " + t);
             }
         }
+        // Thread opened as a fragment inside the main activity fires no activity onResume.
+        CurrentThreadTracker.install(classLoader);
+        CurrentThreadTracker.addListener((activity, threadId) -> {
+            if (FeatureFlags.keepUnsentMessages) registerListener(activity);
+        });
         ModuleLog.line("(IE|UnsentBtn) ✅ installed");
     }
 
@@ -117,9 +121,13 @@ public class UnsentThreadButtonHook {
             ensureIds(activity);
             if (tryInject(activity)) return;
             final View decor = activity.getWindow().getDecorView();
+            // One pending listener per window: registerListener runs on every activity resume and
+            // every thread-fragment resume, and listeners used to pile up on the main activity.
+            if (!pendingDecors.add(decor)) return;
             decor.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override public void onGlobalLayout() {
                     if (tryInject(activity)) {
+                        pendingDecors.remove(decor);
                         try { decor.getViewTreeObserver().removeOnGlobalLayoutListener(this); } catch (Throwable ignored) {}
                     }
                 }
@@ -182,11 +190,13 @@ public class UnsentThreadButtonHook {
             final View headerRoot = header;
             // Capture the thread id AT INJECTION (thread just opened, before any refresh churn),
             // bound to THIS button — a stable per-thread fallback if the live read fails.
-            final String[] bound = { KeepUnsentMessagesHook.currentThreadId };
+            final String[] bound = { CurrentThreadTracker.currentThreadId() != null
+                    ? CurrentThreadTracker.currentThreadId() : KeepUnsentMessagesHook.currentThreadId };
             btn.setOnClickListener(v -> {
                 // PRIMARY: read the actually-open thread from the foreground fragment (immune to
                 // background igThreadIgid churn). Fallbacks: id bound at open, then tracked, then tags.
-                String threadId = resolveFromActivity(activity);
+                String threadId = CurrentThreadTracker.currentThreadId();
+                if (threadId == null) threadId = resolveFromActivity(activity);
                 if (threadId == null) threadId = bound[0];
                 if (threadId == null) threadId = KeepUnsentMessagesHook.currentThreadId;
                 if (threadId == null) threadId = resolveThreadId(headerRoot);

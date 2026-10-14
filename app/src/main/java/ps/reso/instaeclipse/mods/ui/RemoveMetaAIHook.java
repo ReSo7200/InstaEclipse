@@ -342,6 +342,13 @@ public class RemoveMetaAIHook {
     // a different method that doesn't consult this gate, so they're unaffected.
     private static final long META_AI_GATE_ID_1 = 0x81111100005b47L;
     private static final long META_AI_GATE_ID_2 = 0x81106e000057c2L;
+    // IG 451.0.0.20.80: same gate (X.05cD.A0B — "A && !B" over two MobileConfig booleans, the first
+    // boolean(UserSession) the reel sheet's getBottomSheetHeaderItems builder calls), new ids.
+    // Re-derive on a new build: find the builder via the marker
+    // "android_purge_26_q3_ClipsOrganicMediaItemViewMoreOptionsController_getBottomSheetHeaderItems"
+    // and read the const-wide ids of the first (UserSession)Z it invokes.
+    private static final long META_AI_GATE_451_ID_1 = 0x8110d700005b5bL;
+    private static final long META_AI_GATE_451_ID_2 = 0x81103500005795L;
 
     private void installReelsOverflowGate(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook forceFalse = new XC_MethodHook() {
@@ -349,7 +356,8 @@ public class RemoveMetaAIHook {
                 if (FeatureFlags.removeMetaAI) param.setResult(false);
             }
         };
-        int n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_1, META_AI_GATE_ID_2});
+        int n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_451_ID_1, META_AI_GATE_451_ID_2});
+        if (n == 0) n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_1, META_AI_GATE_ID_2});
         if (n == 0) n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_1});
         if (n == 0) n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_2});
         ModuleLog.line("(IE|RemoveMetaAI) reels-overflow gate: " + n + " method(s)");

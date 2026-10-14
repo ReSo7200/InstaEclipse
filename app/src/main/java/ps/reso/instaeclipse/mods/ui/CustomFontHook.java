@@ -297,6 +297,10 @@ public class CustomFontHook {
      * EmojiCompat in the FAILED state where process() is a no-op.
      */
     private void installEmojiHook(final ClassLoader cl) {
+        // Version-proof path first: the androidx.emoji2 FontRequestMetadataLoader worker run() is
+        // anchored by emoji2's own library strings (X.00aO.run on IG 451). The hardcoded X.00aC#EXz
+        // below matched a single build only (it is an ANR reporter on 447.0.0.1 and absent on 451).
+        if (installEmojiWorkerHook(cl)) return;
         try {
             Class<?> c00aC = XposedHelpers.findClass("X.00aC", cl);       // metadata loader
             final Class<?> c00Zv = XposedHelpers.findClass("X.00Zv", cl); // callback
@@ -315,6 +319,71 @@ public class CustomFontHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|Emoji) ⚠️ install: " + t.getMessage());
         }
+    }
+
+    private boolean installEmojiWorkerHook(final ClassLoader cl) {
+        try {
+            if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return false;
+            java.util.List<org.luckypray.dexkit.result.MethodData> found =
+                    ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findMethod(
+                            org.luckypray.dexkit.query.FindMethod.create().matcher(
+                                    org.luckypray.dexkit.query.matchers.MethodMatcher.create()
+                                            .name("run")
+                                            .usingStrings("fetchFonts failed (", "EmojiCompat.MetadataRepo.create")));
+            int n = 0;
+            for (org.luckypray.dexkit.result.MethodData md : found) {
+                java.lang.reflect.Method run = md.getMethodInstance(cl);
+                de.robv.android.xposed.XposedBridge.hookMethod(run, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        if (!FeatureFlags.customEmojiEnabled) return;
+                        try {
+                            if (failEmojiLoad(p.thisObject, 0)) {
+                                p.setResult(null);
+                                ModuleLog.line("(IE|Emoji) EmojiCompat disabled — emoji via font fallback");
+                            }
+                        } catch (Throwable ignored) {}
+                    }
+                });
+                n++;
+            }
+            if (n == 0) return false;
+            if (FeatureFlags.customEmojiEnabled) FeatureStatusTracker.setHooked("CustomEmoji");
+            ModuleLog.line("(IE|Emoji) ✅ hook installed (emoji2 loader worker x" + n + ")");
+            return true;
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Emoji) ⚠️ worker hook: " + t.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Finds the MetadataRepoLoaderCallback reachable from the worker (worker -> loader -> callback,
+     * depth ≤ 2) — an abstract class with a void (Throwable) method (onFailed) — and calls onFailed.
+     */
+    private static boolean failEmojiLoad(Object obj, int depth) throws Exception {
+        if (obj == null || depth > 2) return false;
+        for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+                Class<?> t = f.getType();
+                if (!t.getName().startsWith("X.")) continue;
+                f.setAccessible(true);
+                Object v = f.get(obj);
+                if (v == null) continue;
+                if (java.lang.reflect.Modifier.isAbstract(t.getModifiers()) && !t.isInterface()) {
+                    for (java.lang.reflect.Method m : t.getDeclaredMethods()) {
+                        Class<?>[] pt = m.getParameterTypes();
+                        if (m.getReturnType() == void.class && pt.length == 1 && pt[0] == Throwable.class) {
+                            m.setAccessible(true);
+                            m.invoke(v, new Exception("ie: emoji via fallback"));
+                            return true;
+                        }
+                    }
+                }
+                if (failEmojiLoad(v, depth + 1)) return true;
+            }
+        }
+        return false;
     }
 
     /** Saves the picked emoji font (any loadable .ttf/.otf; rendered via the fallback typeface). */

@@ -35,8 +35,14 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  */
 public class InstantSaveHook {
 
-    private static final String VIEWER_LAMBDA =
-            "com.instagram.quicksnap.viewer.compose.QuickSnapMediaViewerScreenKt$QuickSnapMediaViewerScreen$16$1$8$1";
+    // Compose renumbers this lambda between builds ($16$1$8$1 on 447, $16$1$11$1 on 451). Known
+    // names first (newest first), then a DexKit search by the ctor's stable non-obfuscated types.
+    private static final String VIEWER_PREFIX =
+            "com.instagram.quicksnap.viewer.compose.QuickSnapMediaViewerScreenKt$QuickSnapMediaViewerScreen$";
+    private static final String[] VIEWER_LAMBDAS = {
+            VIEWER_PREFIX + "16$1$11$1",
+            VIEWER_PREFIX + "16$1$8$1",
+    };
     private static final String LONGPRESS_LAMBDA =
             "com.instagram.quicksnap.viewer.compose.PointerTouchKt$handleTapAndLongPressWithRelease$2$1$1$1";
 
@@ -51,7 +57,11 @@ public class InstantSaveHook {
     /** Hook the current-card coroutine ctor and cache arg[6]'s Media (field A01). */
     private void cacheCurrentInstant(ClassLoader cl) {
         try {
-            Class<?> lambda = XposedHelpers.findClass(VIEWER_LAMBDA, cl);
+            Class<?> lambda = resolveViewerLambda(cl);
+            if (lambda == null) {
+                ModuleLog.line("(IE|InstantSave) ⚠️ viewer cache: viewer lambda not found");
+                return;
+            }
             for (java.lang.reflect.Constructor<?> c : lambda.getDeclaredConstructors()) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) {
@@ -62,10 +72,49 @@ public class InstantSaveHook {
                     }
                 });
             }
-            ModuleLog.line("(IE|InstantSave) ✅ viewer cache hooked");
+            ModuleLog.line("(IE|InstantSave) ✅ viewer cache hooked: " + lambda.getName());
         } catch (Throwable t) {
             ModuleLog.line("(IE|InstantSave) ⚠️ viewer cache: " + t.getMessage());
         }
+    }
+
+    private static Class<?> resolveViewerLambda(ClassLoader cl) {
+        for (String name : VIEWER_LAMBDAS) {
+            try {
+                Class<?> c = Class.forName(name, false, cl);
+                if (isViewerLambda(c)) return c;
+            } catch (Throwable ignored) {}
+        }
+        try {
+            if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return null;
+            for (org.luckypray.dexkit.result.ClassData cd : ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findClass(
+                    org.luckypray.dexkit.query.FindClass.create().matcher(
+                            org.luckypray.dexkit.query.matchers.ClassMatcher.create().className(
+                                    VIEWER_PREFIX, org.luckypray.dexkit.query.enums.StringMatchType.StartsWith)))) {
+                if (cd.getName().contains("cardCenter")) continue;
+                try {
+                    Class<?> c = cd.getInstance(cl);
+                    if (isViewerLambda(c)) return c;
+                } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|InstantSave) ⚠️ viewer lambda search: " + t.getMessage());
+        }
+        return null;
+    }
+
+    /** The current-card coroutine: a ctor taking UserSession + AnimatedParticleEffectState (447/451). */
+    private static boolean isViewerLambda(Class<?> c) {
+        for (java.lang.reflect.Constructor<?> k : c.getDeclaredConstructors()) {
+            boolean session = false, particles = false;
+            for (Class<?> t : k.getParameterTypes()) {
+                String n = t.getName();
+                if (n.equals("com.instagram.common.session.UserSession")) session = true;
+                if (n.endsWith(".AnimatedParticleEffectState")) particles = true;
+            }
+            if (session && particles) return true;
+        }
+        return false;
     }
 
     /**

@@ -33,7 +33,12 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 public class FeedPhotoZoomHook {
 
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
-    private static final String VIEW_CLASS = "com.instagram.feed.widget.IgProgressImageView";
+    // IG 448+ moved the view to common.ui.widget.imageview; the legacy feed.widget name is kept
+    // as a fallback for older builds. Same API in both (onAttachedToWindow + getIgImageView).
+    private static final String[] VIEW_CLASSES = {
+            "com.instagram.common.ui.widget.imageview.IgProgressImageView",
+            "com.instagram.feed.widget.IgProgressImageView",
+    };
 
     // IgProgressImageView is a shared, general-purpose component — reused for feed rows,
     // DM media previews, and story frames alike — so it carries no identity of its own.
@@ -43,7 +48,18 @@ public class FeedPhotoZoomHook {
 
     public void install(ClassLoader classLoader) {
         try {
-            Class<?> viewClass = classLoader.loadClass(VIEW_CLASS);
+            Class<?> viewClass = null;
+            for (String name : VIEW_CLASSES) {
+                try {
+                    viewClass = classLoader.loadClass(name);
+                    break;
+                } catch (ClassNotFoundException ignored) {
+                }
+            }
+            if (viewClass == null) {
+                ModuleLog.line("(IE|PhotoZoom) ❌ IgProgressImageView not found");
+                return;
+            }
 
             // Hooked at onAttachedToWindow, not the constructor: the view has no parent yet
             // at construction time, so the feed-row ancestor check below would always fail.
@@ -85,7 +101,7 @@ public class FeedPhotoZoomHook {
             });
 
             FeatureStatusTracker.setHooked("PhotoZoom");
-            ModuleLog.line("(IE|PhotoZoom) ✅ hook installed");
+            ModuleLog.line("(IE|PhotoZoom) ✅ hook installed on " + viewClass.getName());
         } catch (Throwable t) {
             ModuleLog.line("(IE|PhotoZoom) ❌ install: " + t);
         }

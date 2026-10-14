@@ -66,15 +66,30 @@ public class InstantUploadHook {
     private void hookSwap(ClassLoader cl) {
         try {
             Class<?> vm = XposedHelpers.findClass(VM_CLASS, cl);
-            Method a02 = null;
+            java.util.List<Method> targets = new java.util.ArrayList<>();
+            // Legacy (<= 447): static (Context, Bitmap, Bitmap, VM, ...) capture handler.
             for (Method m : vm.getDeclaredMethods()) {
                 if (!Modifier.isStatic(m.getModifiers())) continue;
                 int bmp = 0;
                 for (Class<?> t : m.getParameterTypes()) if (t == Bitmap.class) bmp++;
-                if (bmp >= 2) { a02 = m; break; }
+                if (bmp >= 2) { targets.add(m); break; }
             }
-            if (a02 == null) { ModuleLog.line("(IE|InstantUpload) ⚠️ A02 not found"); return; }
-            XposedBridge.hookMethod(a02, new XC_MethodHook() {
+            // IG 451: the second Bitmap became a holder object; the capture handlers are static
+            // (Context, Bitmap, ..., QuickSnapCameraViewModel, ...) -> Object (suspend), called from
+            // QuickSnapCameraViewModel$onCaptured$*. Hook every such handler; the first one to
+            // run consumes pendingBitmap, so a capture is swapped exactly once.
+            if (targets.isEmpty()) {
+                for (Method m : vm.getDeclaredMethods()) {
+                    if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != Object.class) continue;
+                    Class<?>[] pt = m.getParameterTypes();
+                    if (pt.length < 4 || pt[0] != android.content.Context.class || pt[1] != Bitmap.class) continue;
+                    boolean hasVm = false;
+                    for (Class<?> t : pt) if (t == vm) hasVm = true;
+                    if (hasVm) targets.add(m);
+                }
+            }
+            if (targets.isEmpty()) { ModuleLog.line("(IE|InstantUpload) ⚠️ A02 not found"); return; }
+            XC_MethodHook swap = new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) {
                     try {
                         if (!(p.args[1] instanceof Bitmap)) return; // suspend re-entry passes nulls
@@ -85,7 +100,9 @@ public class InstantUploadHook {
                         }
                         if (FeatureFlags.uploadInstants && pendingBitmap != null) {
                             p.args[1] = pendingBitmap;
-                            if (p.args[2] != null)
+                            // Only on builds where arg2 is the second capture Bitmap (<= 447);
+                            // on 451 it is a non-Bitmap holder and must be left untouched.
+                            if (p.args.length > 2 && p.args[2] instanceof Bitmap)
                                 p.args[2] = pendingBitmap.copy(pendingBitmap.getConfig(), false);
                             pendingBitmap = null;
                             FeedVideoDownloadHook.mainHandler.post(InstantUploadHook::removeChip);
@@ -95,9 +112,10 @@ public class InstantUploadHook {
                         ModuleLog.line("(IE|InstantUpload) ❌ swap: " + t);
                     }
                 }
-            });
+            };
+            for (Method m : targets) XposedBridge.hookMethod(m, swap);
             FeatureStatusTracker.setHooked("UploadInstants");
-            ModuleLog.line("(IE|InstantUpload) ✅ A02 hooked");
+            ModuleLog.line("(IE|InstantUpload) ✅ capture handler hooked: " + targets.size());
         } catch (Throwable t) {
             ModuleLog.line("(IE|InstantUpload) ⚠️ swap install: " + t.getMessage());
         }

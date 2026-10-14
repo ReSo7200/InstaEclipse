@@ -33,6 +33,14 @@ public class DistractionFreeUIHook {
     private static final java.util.Set<View> watchedDecors =
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
+    // Global layout fires many times per second on the main feed (video, animations). Walking the
+    // whole decor tree on every pass was a measurable battery drain (#257), so sweeps triggered by
+    // layout are coalesced: at most one pending sweep per window, run SWEEP_DEBOUNCE_MS later.
+    private static final long SWEEP_DEBOUNCE_MS = 400;
+    private static final android.os.Handler MAIN = new android.os.Handler(android.os.Looper.getMainLooper());
+    private static final java.util.Set<View> pendingSweeps =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
     private static boolean anyFlag() {
         return FeatureFlags.disableStories || FeatureFlags.disableReels;
     }
@@ -60,7 +68,11 @@ public class DistractionFreeUIHook {
             final View decor = a.getWindow() != null ? a.getWindow().getDecorView() : null;
             if (decor == null || !watchedDecors.add(decor)) return;
             decor.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                if (anyFlag()) sweep(a);
+                if (!anyFlag() || !pendingSweeps.add(decor)) return;
+                MAIN.postDelayed(() -> {
+                    pendingSweeps.remove(decor);
+                    if (anyFlag()) sweep(a);
+                }, SWEEP_DEBOUNCE_MS);
             });
         } catch (Throwable ignored) {}
     }

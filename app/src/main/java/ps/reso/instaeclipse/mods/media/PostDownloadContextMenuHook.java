@@ -326,7 +326,8 @@ public class PostDownloadContextMenuHook {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.enablePostDownload && !FeatureFlags.copyMediaLink) return;
+                if (!FeatureFlags.enablePostDownload && !FeatureFlags.enableReelDownload
+                        && !FeatureFlags.copyMediaLink) return;
                 onOptionClicked(param);
             }
         };
@@ -491,7 +492,12 @@ public class PostDownloadContextMenuHook {
             if (clicked == null) return;
 
             String option = clicked.toString();
-            boolean isDownload = option.equals("DOWNLOAD") && FeatureFlags.enablePostDownload;
+            // ReelDownloadHook adds DOWNLOAD to the reel menu (and unlocks IG's native row) when
+            // REEL download is on. If we only consumed the tap for POST download, a reel tap with
+            // only Reel download enabled fell through to Instagram's own save flow, which burns in
+            // a watermark (#256). Route it to the module's clean downloader for either toggle.
+            boolean isDownload = option.equals("DOWNLOAD")
+                    && (FeatureFlags.enablePostDownload || FeatureFlags.enableReelDownload);
             boolean isCopyLink = option.equals("COPY_LINK") && FeatureFlags.copyMediaLink;
             if (!isDownload && !isCopyLink) return;
 

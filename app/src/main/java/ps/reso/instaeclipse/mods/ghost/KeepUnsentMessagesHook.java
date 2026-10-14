@@ -112,6 +112,13 @@ public class KeepUnsentMessagesHook {
     /** Track the open thread: the (DirectThreadKey, boolean)->void "igThreadIgid" method fires
      *  when a thread becomes visible; stash its DirectThreadKey id. */
     private void hookCurrentThread(DexKitBridge bridge, ClassLoader classLoader) {
+        // Version-proof source: the resumed thread fragment's DirectThreadKey. On IG 451 the
+        // "igThreadIgid" string below no longer sits on a (DirectThreadKey, boolean) method.
+        ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.install(classLoader);
+        ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.addListener((activity, id) -> {
+            currentThreadId = id;
+            rememberThreadName(id);
+        });
         try {
             List<MethodData> methods = bridge.findMethod(FindMethod.create()
                     .matcher(MethodMatcher.create()
