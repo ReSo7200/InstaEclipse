@@ -1342,33 +1342,44 @@ public class FeedVideoDownloadHook {
     }
 
     /**
-     * When "Offer audio-only download" is on and the media has an audio track, asks Video / Audio
-     * only; otherwise just runs {@code videoAction} (the normal download path, unchanged).
+     * Optional download chooser. Offers "Audio only" (#234, when enabled and the media has an audio
+     * track) and "Copy image to clipboard" (#228, when enabled and {@code imageUrl} is a photo) next
+     * to the normal download. With neither applicable it just runs {@code downloadAction}, so the
+     * default download path is unchanged.
      */
-    static void offerAudioOrRun(Context ctx, Object media, String username, String mediaId,
-                                String type, Runnable videoAction) {
-        String audio = FeatureFlags.offerAudioDownload ? extractAudioUrl(media) : null;
-        if (audio == null) { videoAction.run(); return; }
+    static void offerAudioOrRun(Context ctx, Object media, String imageUrl, String username, String mediaId,
+                                String type, Runnable downloadAction) {
+        final String audio = FeatureFlags.offerAudioDownload ? extractAudioUrl(media) : null;
+        final String image = FeatureFlags.offerCopyImage && imageUrl != null && !isVideoUrl(imageUrl)
+                ? imageUrl : null;
+        if (audio == null && image == null) { downloadAction.run(); return; }
         Context host = ctx instanceof android.app.Activity ? ctx
                 : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-        if (host == null) { videoAction.run(); return; }
+        if (host == null) { downloadAction.run(); return; }
         final String user = username != null ? username : type;
-        String[] items = {I18n.t(host, R.string.ig_download_choice_video), I18n.t(host, R.string.ig_download_choice_audio)};
+        java.util.List<String> labels = new ArrayList<>();
+        java.util.List<Runnable> actions = new ArrayList<>();
+        labels.add(I18n.t(host, audio != null ? R.string.ig_download_choice_video : R.string.ig_download_choice_save));
+        actions.add(downloadAction);
+        if (audio != null) {
+            labels.add(I18n.t(host, R.string.ig_download_choice_audio));
+            actions.add(() -> downloadAudio(host, audio,
+                    buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user));
+        }
+        if (image != null) {
+            labels.add(I18n.t(host, R.string.ig_download_choice_copy_image));
+            actions.add(() -> ImageClipboard.copy(host, image));
+        }
         mainHandler.post(() -> {
             try {
                 new android.app.AlertDialog.Builder(new android.view.ContextThemeWrapper(host,
                         android.R.style.Theme_DeviceDefault_Dialog_Alert))
                         .setTitle(I18n.t(host, R.string.ig_download_choice_title))
-                        .setItems(items, (d, which) -> {
-                            if (which == 0) { videoAction.run(); return; }
-                            String fn = buildFilename(user, type + "_audio", mediaId, true)
-                                    .replaceAll("\\.mp4$", ".m4a");
-                            downloadAudio(host, audio, fn, user);
-                        })
+                        .setItems(labels.toArray(new String[0]), (d, which) -> actions.get(which).run())
                         .show();
             } catch (Throwable t) {
-                ModuleLog.line("(IE|DL|Audio) chooser failed: " + t);
-                videoAction.run();
+                ModuleLog.line("(IE|DL) chooser failed: " + t);
+                downloadAction.run();
             }
         });
     }
@@ -2796,7 +2807,7 @@ public class FeedVideoDownloadHook {
         downloadToFileAndGetType(url, dest);
     }
 
-    private static String downloadToFileAndGetType(String url, File dest) throws Exception {
+    static String downloadToFileAndGetType(String url, File dest) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();

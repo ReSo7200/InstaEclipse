@@ -539,7 +539,7 @@ public class ReelDownloadHook {
             if (v instanceof String s && !s.isEmpty()) id = s;
         } catch (Throwable ignored) {}
         // Audio-only option (#234) — only asks when enabled and the reel has an audio track.
-        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, user != null ? user : "reel", id, "reel",
+        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, null, user != null ? user : "reel", id, "reel",
                 () -> startReelVideoDownload(ctx, media, controller));
     }
 

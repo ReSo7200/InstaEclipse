@@ -555,7 +555,9 @@ public class PostDownloadContextMenuHook {
         final String finalUser = username;
         final String finalId   = mediaId;
         // Audio-only option (#234) — only asks when enabled and the media has an audio track.
-        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, finalUser, finalId, "post", () ->
+        // Copy-image (#228) acts on the slide being viewed.
+        String shownUrl = urls.isEmpty() ? null : urls.get(carouselIdx >= 0 && carouselIdx < urls.size() ? carouselIdx : 0);
+        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, shownUrl, finalUser, finalId, "post", () ->
                 FeedVideoDownloadHook.mainHandler.post(() ->
                         FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx)));
     }

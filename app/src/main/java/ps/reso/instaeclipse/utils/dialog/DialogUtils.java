@@ -1887,6 +1887,13 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         copyLinkCard.addView(audioSwitch);
+        ToggleRow copyImageSwitch = createSwitch(context, R.drawable.ic_content_copy, "#FF9F0A",
+                I18n.t(context, R.string.ig_dialog_downloader_offer_copy_image), FeatureFlags.offerCopyImage);
+        copyImageSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.offerCopyImage = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        copyLinkCard.addView(copyImageSwitch);
         copyLinkCard.addView(saveInstantsSwitch);
         copyLinkCard.addView(uploadInstantsSwitch);
 
