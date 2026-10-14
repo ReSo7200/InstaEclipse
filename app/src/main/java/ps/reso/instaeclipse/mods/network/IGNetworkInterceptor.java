@@ -131,7 +131,8 @@ public class IGNetworkInterceptor {
 
                                     // Ghost Mode URIs
                                     if (FeatureFlags.isGhostSeen) {
-                                        shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened");
+                                        shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened")
+                                                && !ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist.pathMentionsAllowed(uri.getPath());
                                     }
                                     if (FeatureFlags.keepEphemeralMessages) {
                                         shouldDrop |= uri.getPath().contains("/mark_ephemeral_item_ranges_viewed");

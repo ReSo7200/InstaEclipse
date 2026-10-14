@@ -16,6 +16,7 @@ import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
+import ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 /**
@@ -26,7 +27,16 @@ public class GhostDMSeenHook {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                if (FeatureFlags.isGhostSeen) param.setResult(null);
+                if (!FeatureFlags.isGhostSeen) return;
+                // Per-chat whitelist (#227): the sender's first String arg is the thread id
+                // ("mark_thread_seen-" + thread_id on 447/451) — let whitelisted chats through.
+                for (Object a : param.args) {
+                    if (a instanceof String s) {
+                        if (ReadReceiptWhitelist.isAllowed(s)) return;
+                        break;
+                    }
+                }
+                param.setResult(null);
             }
         };
 

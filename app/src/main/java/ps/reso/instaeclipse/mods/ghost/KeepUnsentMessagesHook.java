@@ -117,7 +117,7 @@ public class KeepUnsentMessagesHook {
         ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.install(classLoader);
         ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.addListener((activity, id) -> {
             currentThreadId = id;
-            rememberThreadName(id);
+            rememberThreadName(id, activity);
         });
         try {
             List<MethodData> methods = bridge.findMethod(FindMethod.create()
@@ -155,11 +155,16 @@ public class KeepUnsentMessagesHook {
      *  persist it as threadId -> name, so the Unsent Messages folders can label chats by username
      *  instead of an opaque id. Posted with a delay so the thread header has laid out. */
     private static void rememberThreadName(final String threadId) {
+        rememberThreadName(threadId, null);
+    }
+
+    /** @param host the activity hosting the thread (ModalActivity or the main one), if known. */
+    private static void rememberThreadName(final String threadId, final android.app.Activity host) {
         try {
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                 try {
                     if (!threadId.equals(currentThreadId)) return; // user moved on
-                    android.app.Activity a = UIHookManager.getCurrentActivity();
+                    android.app.Activity a = host != null ? host : UIHookManager.getCurrentActivity();
                     if (a == null) return;
                     View root = a.getWindow() != null ? a.getWindow().getDecorView() : null;
                     if (!(root instanceof ViewGroup)) return;

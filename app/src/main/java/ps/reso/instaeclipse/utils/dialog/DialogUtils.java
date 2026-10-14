@@ -795,6 +795,7 @@ public class DialogUtils {
 
         layout.addView(createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ig_dialog_unsent_title), "#5E5CE6", v -> showUnsentMessages(context)));
         layout.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_customize_quick_toggle), "#5E5CE6", v -> showGhostQuickToggleOptions(context)));
+        layout.addView(createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_read_receipts_title), "#5E5CE6", v -> showReadReceiptWhitelist(context)));
 
         ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
@@ -1390,6 +1391,38 @@ public class DialogUtils {
             c = ((android.content.ContextWrapper) c).getBaseContext();
         }
         return null;
+    }
+
+    /**
+     * Per-chat read-receipt whitelist (#227): chats listed here still get "Seen" while Hide DM Seen
+     * is on. Candidates are the chats opened while the module was active (ThreadNames); whitelisted
+     * ones are listed first.
+     */
+    private static void showReadReceiptWhitelist(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+        java.util.Map<String, String> allowed = ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist.all();
+        java.util.LinkedHashMap<String, String> rows = new java.util.LinkedHashMap<>(allowed);
+        for (java.util.Map.Entry<String, String> e : ps.reso.instaeclipse.utils.ghost.ThreadNames.all().entrySet()) {
+            if (!rows.containsKey(e.getKey())) rows.put(e.getKey(), e.getValue());
+        }
+        layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ig_read_receipts_hint)));
+        if (rows.isEmpty()) {
+            layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ig_read_receipts_empty)));
+        } else {
+            LinearLayout cardView = card(context);
+            for (java.util.Map.Entry<String, String> e : rows.entrySet()) {
+                final String id = e.getKey();
+                String known = ps.reso.instaeclipse.utils.ghost.ThreadNames.get(id);
+                final String label = !known.isEmpty() ? known
+                        : (e.getValue() == null || e.getValue().isEmpty() ? id : e.getValue());
+                ToggleRow row = createSwitch(context, R.drawable.ic_chat, "#5E5CE6", label, allowed.containsKey(id));
+                row.setOnCheckedChangeListener((b, checked) ->
+                        ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist.set(id, label, checked));
+                cardView.addView(row);
+            }
+            layout.addView(cardView);
+        }
+        showSectionDialog(context, I18n.t(context, R.string.ig_read_receipts_title), layout, () -> {});
     }
 
     /** Manager listing hidden chats with per-row unhide buttons. */

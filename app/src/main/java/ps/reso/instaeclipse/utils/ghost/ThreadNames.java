@@ -76,6 +76,12 @@ public class ThreadNames {
         persist();
     }
 
+    /** Snapshot of every known thread id -> name (chats opened while the module was active). */
+    public static synchronized Map<String, String> all() {
+        ensureLoaded();
+        return new java.util.LinkedHashMap<>(cache);
+    }
+
     /** Best-known name for a thread id, or "" if unknown. */
     public static synchronized String get(String threadId) {
         if (threadId == null) return "";
