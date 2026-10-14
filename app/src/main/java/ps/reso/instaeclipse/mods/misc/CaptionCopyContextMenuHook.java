@@ -1053,6 +1053,15 @@ public class CaptionCopyContextMenuHook {
                 });
                 sheet.addView(btnSelect);
 
+                // Translate (#233): hand the text to the user's translation app.
+                Button btnTranslate = makeButton(ctx,
+                        I18n.t(ctx, R.string.ig_translate_text), secondBg, secondText, dp);
+                btnTranslate.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    ps.reso.instaeclipse.utils.core.TextTranslator.translate(ctx, text);
+                });
+                sheet.addView(btnTranslate);
+
                 dialog.setContentView(sheet);
                 Window w = dialog.getWindow();
                 if (w != null) {
