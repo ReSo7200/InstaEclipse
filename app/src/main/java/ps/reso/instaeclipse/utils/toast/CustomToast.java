@@ -60,7 +60,7 @@ public class CustomToast {
     private static String categoryOf(String key) {
         switch (key) {
             case "CustomTheme": case "CustomFont": case "CustomEmoji": case "ForceReelQuality":
-            case "HideSuggestionsInFeed": case "HideThreadsSuggestions":
+            case "HideSuggestionsInFeed": case "HideThreadsSuggestions": case "HideLikedPosts":
                 return "Appearance";
             case "GhostSeen": case "GhostTyping": case "GhostStories": case "GhostLive":
             case "GhostViewOnce": case "GhostScreenshot": case "AllowScreenshots":

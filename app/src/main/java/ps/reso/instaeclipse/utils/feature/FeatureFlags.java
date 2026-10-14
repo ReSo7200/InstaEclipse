@@ -32,6 +32,7 @@ public class FeatureFlags {
     public static boolean lockDirectAlways = false; // re-lock whenever leaving the inbox (not just on app close)
     public static boolean lockWholeApp = false; // lock the ENTIRE app on launch/return (same passcode as Lock DMs)
     public static boolean lockUseFingerprint = true; // offer biometric unlock when the device has one enrolled
+    public static boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
     public static boolean hideChatButtonStealth = false; // no eye icon; long-press the chat header to hide (#221)
 

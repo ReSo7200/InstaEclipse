@@ -1131,6 +1131,15 @@ public class DialogUtils {
 
         layout.addView(hideThreadsSwitch);
 
+        ToggleRow hideLikedSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_liked), FeatureFlags.hideLikedPosts);
+
+        hideLikedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.hideLikedPosts = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+
+        layout.addView(hideLikedSwitch);
+
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clean_feed), layout, () -> {});
     }
 

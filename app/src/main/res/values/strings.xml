@@ -383,6 +383,7 @@
     <!-- Clean Feed options -->
     <string name="ig_dialog_clean_feed_hide_suggested">Hide Suggestions in Feed</string>
     <string name="ig_dialog_clean_feed_hide_threads">Hide Threads Suggestions</string>
+    <string name="ig_dialog_clean_feed_hide_liked">Hide Posts You Already Liked</string>
 
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Disable Story Auto-Swipe</string>

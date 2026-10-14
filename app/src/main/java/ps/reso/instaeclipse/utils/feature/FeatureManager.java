@@ -109,6 +109,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("HideThreadsSuggestions");
         }
 
+        if (FeatureFlags.hideLikedPosts) {
+            FeatureStatusTracker.setEnabled("HideLikedPosts", R.string.ig_dialog_clean_feed_hide_liked);
+        } else {
+            FeatureStatusTracker.setDisabled("HideLikedPosts");
+        }
+
 
         // Miscellaneous
         if (FeatureFlags.disableTrackingLinks) {
