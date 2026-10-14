@@ -42,18 +42,24 @@ public class UnsentThreadButtonHook {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
                 if (!FeatureFlags.keepUnsentMessages) return;
+                // Guard in case a superclass was hooked that triggers for a different activity
+                if (!(param.thisObject instanceof Activity)) return;
                 final Activity activity = (Activity) param.thisObject;
+                String name = activity.getClass().getName();
+                if (!name.contains("ModalActivity") && !name.contains("InstagramMainActivity")) return;
+
                 activity.runOnUiThread(() -> registerListener(activity));
             }
         };
-        for (String act : new String[]{"com.instagram.modal.ModalActivity",
-                "com.instagram.mainactivity.InstagramMainActivity"}) {
-            try {
-                XposedHelpers.findAndHookMethod(act, classLoader, "onResume", resume);
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|UnsentBtn) ⚠️ hook " + act + ": " + t.getMessage());
-            }
-        }
+
+        ps.reso.instaeclipse.utils.core.ActivityHookHelper.hookOnResume(
+                classLoader,
+                "IE|UnsentBtn",
+                resume,
+                "com.instagram.modal.ModalActivity",
+                "com.instagram.mainactivity.InstagramMainActivity"
+        );
+
         ModuleLog.line("(IE|UnsentBtn) ✅ installed");
     }
 
@@ -184,14 +190,18 @@ public class UnsentThreadButtonHook {
             // bound to THIS button — a stable per-thread fallback if the live read fails.
             final String[] bound = { KeepUnsentMessagesHook.currentThreadId };
             btn.setOnClickListener(v -> {
-                // PRIMARY: read the actually-open thread from the foreground fragment (immune to
-                // background igThreadIgid churn). Fallbacks: id bound at open, then tracked, then tags.
-                String threadId = resolveFromActivity(activity);
-                if (threadId == null) threadId = bound[0];
-                if (threadId == null) threadId = KeepUnsentMessagesHook.currentThreadId;
-                if (threadId == null) threadId = resolveThreadId(headerRoot);
-                ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
-                ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
+                String threadId = ps.reso.instaeclipse.utils.ghost.ThreadIdResolver.resolveThreadId(
+                        "IE|UnsentBtn",
+                        activity,
+                        bound[0],
+                        KeepUnsentMessagesHook.currentThreadId,
+                        headerRoot,
+                        tagKeyId
+                );
+
+                if (threadId != null) {
+                    ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
+                }
             });
             try { target.addView(btn, Math.min(insertAt, target.getChildCount())); }
             catch (Throwable t) { target.addView(btn); }
@@ -201,128 +211,6 @@ public class UnsentThreadButtonHook {
             ModuleLog.line("(IE|UnsentBtn) ⚠️ inject: " + t.getMessage());
             return false;
         }
-    }
-
-
-    /**
-     * Read the open thread's id from the thread ACTIVITY itself. A DM thread runs in its own
-     * ModalActivity, launched with that thread's DirectThreadKey, so the key lives in the
-     * activity's intent extras / object graph for the activity's whole lifetime — immune to
-     * background igThreadIgid churn and header rebuilds during a refresh. Name-agnostic (matched by
-     * class name containing "DirectThreadKey"), so obfuscation doesn't matter.
-     */
-    private String resolveFromActivity(Activity activity) {
-        try {
-            // 1. Intent extras (fastest, cleanest — the thread key is usually passed here).
-            android.os.Bundle ex = activity.getIntent() != null ? activity.getIntent().getExtras() : null;
-            if (ex != null) {
-                for (String k : ex.keySet()) {
-                    Object dtk = scanForDirectThreadKey(ex.get(k), 0,
-                            java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()), 4);
-                    if (dtk != null) { String id = firstStringField(dtk); if (id != null) return id; }
-                }
-            }
-            // 2. The activity object graph (its hosted thread fragment holds the key).
-            Object dtk = scanForDirectThreadKey(activity, 0,
-                    java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()), 6);
-            return dtk != null ? firstStringField(dtk) : null;
-        } catch (Throwable t) { return null; }
-    }
-
-    /** Find a DirectThreadKey instance in obj's field graph (depth-limited, package-pruned). */
-    private Object scanForDirectThreadKey(Object obj, int depth, java.util.Set<Object> seen, int maxDepth) {
-        if (obj == null || depth > maxDepth || !seen.add(obj)) return null;
-        String cn = obj.getClass().getName();
-        if (cn.contains("DirectThreadKey")) return obj;
-        // Only descend through IG/obfuscated objects and android Bundles; prune framework/JDK.
-        boolean descendable = cn.startsWith("X.") || cn.startsWith("com.instagram.")
-                || obj instanceof android.os.Bundle;
-        if (!descendable) return null;
-        if (obj instanceof android.os.Bundle) {
-            try {
-                android.os.Bundle b = (android.os.Bundle) obj;
-                for (String k : b.keySet()) {
-                    Object r = scanForDirectThreadKey(b.get(k), depth + 1, seen, maxDepth);
-                    if (r != null) return r;
-                }
-            } catch (Throwable ignored) {}
-            return null;
-        }
-        try {
-            for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
-                    if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
-                    f.setAccessible(true);
-                    Object v;
-                    try { v = f.get(obj); } catch (Throwable e) { continue; }
-                    if (v == null) continue;
-                    if (v.getClass().getName().contains("DirectThreadKey")) return v;
-                    Object r = scanForDirectThreadKey(v, depth + 1, seen, maxDepth);
-                    if (r != null) return r;
-                }
-            }
-        } catch (Throwable ignored) {}
-        return null;
-    }
-
-    /** PROBE: walk the header + ancestors, read the thread tag key and any DirectThreadKey, log all. */
-    private String resolveThreadId(View header) {
-        String found = null;
-        View v = header;
-        int up = 0;
-        while (v != null && up++ < 8) {
-            try {
-                if (tagKeyId != 0) {
-                    Object t = v.getTag(tagKeyId);
-                    if (t != null) {
-                        ModuleLog.line("(IE|UnsentBtn|PROBE) tagKey on " + v.getClass().getSimpleName()
-                                + " = " + t.getClass().getName());
-                        String id = threadIdFromAny(t);
-                        if (id != null && found == null) found = id;
-                    }
-                }
-                Object plain = v.getTag();
-                if (plain != null) {
-                    String id = threadIdFromAny(plain);
-                    if (id != null && found == null) found = id;
-                }
-            } catch (Throwable ignored) {}
-            v = (v.getParent() instanceof View) ? (View) v.getParent() : null;
-        }
-        return found;
-    }
-
-    /** If obj is (or contains) a DirectThreadKey, return its thread id (first non-empty String field). */
-    private String threadIdFromAny(Object obj) {
-        if (obj == null) return null;
-        String cn = obj.getClass().getName();
-        if (cn.contains("DirectThreadKey")) return firstStringField(obj);
-        // shallow: some tags wrap the key
-        try {
-            for (Field f : obj.getClass().getDeclaredFields()) {
-                if (Modifier.isStatic(f.getModifiers())) continue;
-                if (f.getType().getName().contains("DirectThreadKey")) {
-                    f.setAccessible(true);
-                    Object k = f.get(obj);
-                    if (k != null) return firstStringField(k);
-                }
-            }
-        } catch (Throwable ignored) {}
-        return null;
-    }
-
-    private String firstStringField(Object o) {
-        try {
-            for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
-                    if (f.getType() != String.class || Modifier.isStatic(f.getModifiers())) continue;
-                    f.setAccessible(true);
-                    Object val = f.get(o);
-                    if (val instanceof String && !((String) val).isEmpty()) return (String) val;
-                }
-            }
-        } catch (Throwable ignored) {}
-        return null;
     }
 
     private static int dp(Activity a, int v) {

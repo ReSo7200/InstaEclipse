@@ -77,20 +77,9 @@ public class KeepUnsentMessagesHook {
                 @Override protected boolean removeEldestEntry(java.util.Map.Entry<String, String> e) { return size() > 500; }
             });
 
-    /** Extract the thread id string from a DirectThreadKey (first non-empty String field). */
+    /** Extract the thread id string from a DirectThreadKey using the shared resolver. */
     private static String threadIdOf(Object dtk) {
-        if (dtk == null) return null;
-        try {
-            for (Class<?> c = dtk.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
-                    if (f.getType() != String.class || Modifier.isStatic(f.getModifiers())) continue;
-                    f.setAccessible(true);
-                    Object v = f.get(dtk);
-                    if (v instanceof String && !((String) v).isEmpty()) return (String) v;
-                }
-            }
-        } catch (Throwable ignored) {}
-        return null;
+        return ps.reso.instaeclipse.utils.ghost.ThreadIdResolver.threadIdOf(dtk);
     }
 
     /** Cached kept-message objects, SCOPED PER thread-store instance (the 01gH passed to reconcile),
