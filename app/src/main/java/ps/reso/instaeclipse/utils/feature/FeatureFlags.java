@@ -39,6 +39,7 @@ public class FeatureFlags {
     public static boolean hideTabMessages = false;
     public static boolean hideTabActivity = false;
     public static boolean hideTabProfile = false;
+    public static boolean markUnsentInThread = false; // prefix kept unsent messages with a marker in the chat (#222)
     public static boolean offerCopyImage = false; // offer "Copy image to clipboard" when downloading a photo (#228)
     public static boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)
     public static boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)

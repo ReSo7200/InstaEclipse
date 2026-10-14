@@ -72,6 +72,7 @@ public class SettingsManager {
         editor.putBoolean("hideLikedPosts", FeatureFlags.hideLikedPosts);
         editor.putBoolean("offerAudioDownload", FeatureFlags.offerAudioDownload);
         editor.putBoolean("offerCopyImage", FeatureFlags.offerCopyImage);
+        editor.putBoolean("markUnsentInThread", FeatureFlags.markUnsentInThread);
         editor.putBoolean("hideTabHome", FeatureFlags.hideTabHome);
         editor.putBoolean("hideTabReels", FeatureFlags.hideTabReels);
         editor.putBoolean("hideTabCreate", FeatureFlags.hideTabCreate);
@@ -191,6 +192,7 @@ public class SettingsManager {
         FeatureFlags.hideLikedPosts = prefs.getBoolean("hideLikedPosts", false);
         FeatureFlags.offerAudioDownload = prefs.getBoolean("offerAudioDownload", false);
         FeatureFlags.offerCopyImage = prefs.getBoolean("offerCopyImage", false);
+        FeatureFlags.markUnsentInThread = prefs.getBoolean("markUnsentInThread", false);
         FeatureFlags.hideTabHome = prefs.getBoolean("hideTabHome", false);
         FeatureFlags.hideTabReels = prefs.getBoolean("hideTabReels", false);
         FeatureFlags.hideTabCreate = prefs.getBoolean("hideTabCreate", false);

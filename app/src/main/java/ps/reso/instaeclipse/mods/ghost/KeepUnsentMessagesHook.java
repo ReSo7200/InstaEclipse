@@ -402,6 +402,8 @@ public class KeepUnsentMessagesHook {
     }
 
     private static final String UNSENT_PREFIX = "Unsent: ";
+    // Optional in-thread marker (#222), prepended to the kept message's text when enabled.
+    private static final String UNSENT_MARK = "\uD83D\uDEAB Unsent \u00B7 ";
     /** Ids whose text we've already marked, so we prepend the marker exactly once. */
     private static final Set<String> markedIds = Collections.synchronizedSet(new java.util.HashSet<>());
 
@@ -424,6 +426,15 @@ public class KeepUnsentMessagesHook {
             String who = ThreadNames.get(threadId);
             ps.reso.instaeclipse.utils.ghost.UnsentLog.add(threadId, who, val); // persistent per-thread log
             ModuleLog.line("(IE|KeepUnsent) ✅ logged (thread=" + threadId + " who=" + who + "): " + (val.length() > 24 ? val.substring(0, 24) + "…" : val));
+            // Visual indicator in the chat itself (#222, opt-in): the kept message object is the one
+            // IG keeps rendering, so prefixing its body field shows the marker on the bubble.
+            if (FeatureFlags.markUnsentInThread && !val.startsWith(UNSENT_MARK)) {
+                try {
+                    ((Field) best[1]).set(best[0], UNSENT_MARK + val);
+                } catch (Throwable t) {
+                    ModuleLog.line("(IE|KeepUnsent) ⚠️ marker: " + t.getMessage());
+                }
+            }
         } catch (Throwable t) {
             markedIds.remove(id);
             ModuleLog.line("(IE|KeepUnsent) ⚠️ log failed: " + t.getMessage());
@@ -453,7 +464,7 @@ public class KeepUnsentMessagesHook {
     }
 
     private static boolean looksLikeBody(String s) {
-        if (s == null || s.length() < 2 || s.startsWith(UNSENT_PREFIX)) return false;
+        if (s == null || s.length() < 2 || s.startsWith(UNSENT_PREFIX) || s.startsWith(UNSENT_MARK)) return false;
         if (s.startsWith("mid.") || s.contains("://") || s.contains("cdn")) return false;
         if (s.matches("[0-9]+") || s.matches("[a-z0-9_]+")) return false;   // ids / snake_case tokens
         // Reject enum/type tokens: strings with letters that are ALL uppercase (TEXT, ACTION_LOG,

@@ -796,6 +796,13 @@ public class DialogUtils {
         layout.addView(createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ig_dialog_unsent_title), "#5E5CE6", v -> showUnsentMessages(context)));
         layout.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_customize_quick_toggle), "#5E5CE6", v -> showGhostQuickToggleOptions(context)));
         layout.addView(createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_read_receipts_title), "#5E5CE6", v -> showReadReceiptWhitelist(context)));
+        ToggleRow markUnsent = createSwitch(context, R.drawable.ic_chat, "#5E5CE6",
+                I18n.t(context, R.string.ig_dialog_ghost_mark_unsent), FeatureFlags.markUnsentInThread);
+        markUnsent.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.markUnsentInThread = checked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(markUnsent);
 
         ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
