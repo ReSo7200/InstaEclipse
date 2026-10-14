@@ -986,7 +986,10 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_enable), "customThemeEnabled"),
                 createClickable(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_customize), () ->
-                        themeCustomizerLauncher.launch(new Intent(requireContext(), ThemeCustomizerActivity.class)))
+                        themeCustomizerLauncher.launch(new Intent(requireContext(), ThemeCustomizerActivity.class))),
+                createClickable(R.drawable.ic_palette, "#FF375F",
+                        getString(R.string.theme_light_mode) + ": " + lightModeLabel(localCache.getInt("themeLightPresetId", 0)),
+                        this::pickLightModeTheme)
         ));
 
         // Fonts & Emoji now live under Custom Theme (mirrors the in-IG dialog). File pickers run
@@ -1000,6 +1003,43 @@ public class FeaturesFragment extends Fragment {
 
         showMenu(getString(R.string.theme_title), defs);
         currentMenu = "theme";
+    }
+
+    private String lightModeLabel(int value) {
+        if (value == 0) return getString(R.string.theme_light_same);
+        if (value == -1) return getString(R.string.theme_light_stock);
+        return ps.reso.instaeclipse.mods.ui.theme.ThemePresets.getDisplayName(requireContext(), value);
+    }
+
+    /** Light-mode behaviour of the custom theme (#251). */
+    private void pickLightModeTheme() {
+        final int[] values = ps.reso.instaeclipse.mods.ui.theme.ThemePresets.lightModeChoices();
+        int current = localCache.getInt("themeLightPresetId", 0);
+        String[] labels = new String[values.length];
+        int sel = 0;
+        for (int i = 0; i < values.length; i++) {
+            labels[i] = lightModeLabel(values[i]);
+            if (values[i] == current) sel = i;
+        }
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.theme_light_mode))
+                .setSingleChoiceItems(labels, sel, (dialog, which) -> {
+                    int value = values[which];
+                    SharedPreferences.Editor ed = localCache.edit();
+                    ed.putInt("themeLightPresetId", value);
+                    ed.commit();
+                    makeLocalCacheWorldReadable();
+
+                    Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
+                    b.putExtra("key", "themeLightPresetId");
+                    b.putExtra("value", value);
+                    requireContext().sendBroadcast(b);
+
+                    dialog.dismiss();
+                    loadThemeMenu();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private String qualityLabel(int h) {

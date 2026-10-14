@@ -92,6 +92,9 @@ public class FeatureFlags {
     // Custom Theme (themePresetId: 0 = custom palette from themePaletteJson, else a built-in preset id)
     public static boolean customThemeEnabled = false;
     public static int themePresetId = 1;
+    // Light-mode behaviour (#251): 0 = same theme in light & dark, -1 = stock Instagram in light
+    // mode (theme only in dark mode), >0 = this built-in preset in light mode.
+    public static int themeLightPresetId = 0;
     public static String themePaletteJson = "";
 
     // Clean Feed

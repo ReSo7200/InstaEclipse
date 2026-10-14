@@ -86,5 +86,14 @@ public final class ThemePresets {
         return PRESET_NAMES.length > 0 ? PRESET_NAMES[0] : "";
     }
 
+    /** Values for the light-mode picker (#251): same theme, stock Instagram, then every preset. */
+    public static int[] lightModeChoices() {
+        int[] out = new int[PRESETS.size() + 2];
+        out[0] = 0;
+        out[1] = -1;
+        for (int i = 0; i < PRESETS.size(); i++) out[i + 2] = PRESETS.get(i).id;
+        return out;
+    }
+
     private ThemePresets() {}
 }

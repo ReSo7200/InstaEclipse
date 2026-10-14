@@ -365,6 +365,9 @@
     <string name="ig_dialog_ad_block_analytics">Block Analytics</string>
     <string name="ig_dialog_ad_disable_tracking">Disable Tracking Links</string>
     <string name="ig_dialog_open_links_externally">Open Links in External Browser</string>
+    <string name="theme_light_mode">Light mode</string>
+    <string name="theme_light_same">Same theme as dark mode</string>
+    <string name="theme_light_stock">Stock Instagram (theme only in dark mode)</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">Extreme Mode (Irreversible until reinstall)</string>

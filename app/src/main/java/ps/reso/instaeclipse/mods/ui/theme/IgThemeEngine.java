@@ -27,8 +27,38 @@ public final class IgThemeEngine {
 
     private IgThemeEngine() {}
 
+    // Night state the cached palette was resolved for (-1 = none yet). Only consulted when the
+    // user picked a separate light-mode behaviour (FeatureFlags.themeLightPresetId != 0, #251).
+    private static volatile int paletteNight = -1;
+
     public static boolean isActive() {
-        return FeatureFlags.customThemeEnabled && !IgColorRemapEngine.isBypassing();
+        return themeEnabled() && !IgColorRemapEngine.isBypassing();
+    }
+
+    /**
+     * Custom theme enabled for the CURRENT day/night mode. With themeLightPresetId == -1 the theme
+     * applies only in dark mode, so light mode shows stock Instagram (dark presets made light mode
+     * illegible — #251).
+     */
+    public static boolean themeEnabled() {
+        if (!FeatureFlags.customThemeEnabled) return false;
+        return FeatureFlags.themeLightPresetId != -1 || isNightNow();
+    }
+
+    /** Dark mode as Instagram sees it: the foreground activity's configuration (IG's own in-app
+     *  dark-mode setting overrides the system one per activity), else the app's, else the system's. */
+    public static boolean isNightNow() {
+        try {
+            android.content.Context c = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+            if (c == null) c = android.app.AndroidAppHelper.currentApplication();
+            android.content.res.Configuration cfg = c != null
+                    ? c.getResources().getConfiguration()
+                    : Resources.getSystem().getConfiguration();
+            return (cfg.uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                    == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        } catch (Throwable t) {
+            return true;
+        }
     }
 
     public static boolean isInitialized() {
@@ -36,6 +66,23 @@ public final class IgThemeEngine {
     }
 
     public static IgThemePalette getActivePalette() {
+        if (FeatureFlags.themeLightPresetId > 0) {
+            // A different preset is used in light mode: re-resolve when the mode flips.
+            int night = isNightNow() ? 1 : 0;
+            if (night != paletteNight) {
+                synchronized (IgThemeEngine.class) {
+                    if (night != paletteNight) {
+                        boolean flipped = paletteNight != -1;
+                        activePalette = night == 1
+                                ? resolvePalette()
+                                : ThemePresets.getById(FeatureFlags.themeLightPresetId).palette.copy();
+                        paletteNight = night;
+                        if (flipped) IgColorRemapEngine.invalidate();
+                    }
+                }
+            }
+            return activePalette;
+        }
         if (activePalette == null) {
             synchronized (IgThemeEngine.class) {
                 if (activePalette == null) activePalette = resolvePalette();
@@ -46,6 +93,7 @@ public final class IgThemeEngine {
 
     public static void invalidate() {
         activePalette = null;
+        paletteNight = -1;
         initialized = false;
         attrToSlot = null;
         colorResToSlot = null;
@@ -83,7 +131,7 @@ public final class IgThemeEngine {
     }
 
     public static Integer colorForAttr(int attrId) {
-        if (!FeatureFlags.customThemeEnabled || attrId == 0) return null;
+        if (!themeEnabled() || attrId == 0) return null;
         SparseIntArray map = attrToSlot;
         if (map == null) return null;
         int slotIndex = map.get(attrId, -1);
@@ -92,7 +140,7 @@ public final class IgThemeEngine {
     }
 
     public static Integer colorForResource(int resId) {
-        if (!FeatureFlags.customThemeEnabled || resId == 0) return null;
+        if (!themeEnabled() || resId == 0) return null;
         SparseIntArray map = colorResToSlot;
         if (map == null) return null;
         int slotIndex = map.get(resId, -1);

@@ -1563,6 +1563,9 @@ public class DialogUtils {
                         }
                     }
                 }));
+        colorsCard.addView(createActionRow(context, R.drawable.ic_palette,
+                I18n.t(context, R.string.theme_light_mode) + ": " + lightModeLabel(context, FeatureFlags.themeLightPresetId),
+                "#FF2D55", v -> pickLightModeTheme(context)));
         layout.addView(sectionHeader(context, I18n.t(context, R.string.theme_section_colors)));
         layout.addView(colorsCard);
 
@@ -1575,6 +1578,39 @@ public class DialogUtils {
 
         showSectionDialog(context, I18n.t(context, R.string.theme_title), layout, () -> {
         });
+    }
+
+    private static String lightModeLabel(Context context, int value) {
+        if (value == 0) return I18n.t(context, R.string.theme_light_same);
+        if (value == -1) return I18n.t(context, R.string.theme_light_stock);
+        return ps.reso.instaeclipse.mods.ui.theme.ThemePresets.getDisplayName(context, value);
+    }
+
+    /** Light-mode behaviour of the custom theme (#251): same theme, stock Instagram, or a preset. */
+    private static void pickLightModeTheme(Context context) {
+        final int[] values = ps.reso.instaeclipse.mods.ui.theme.ThemePresets.lightModeChoices();
+        String[] labels = new String[values.length];
+        int sel = 0;
+        for (int i = 0; i < values.length; i++) {
+            labels[i] = lightModeLabel(context, values[i]);
+            if (values[i] == FeatureFlags.themeLightPresetId) sel = i;
+        }
+        Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
+        new AlertDialog.Builder(themed)
+                .setTitle(I18n.t(context, R.string.theme_light_mode))
+                .setSingleChoiceItems(labels, sel, (d, which) -> {
+                    FeatureFlags.themeLightPresetId = values[which];
+                    SettingsManager.saveAllFlags();
+                    d.dismiss();
+                    if (currentDialog != null) {
+                        try { currentDialog.dismiss(); } catch (Exception ignored) {}
+                        currentDialog = null;
+                    }
+                    ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.invalidate();
+                    ps.reso.instaeclipse.mods.ui.theme.IgThemeHook.refreshCurrentActivity();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     /** Grouped card: Custom Font (toggle + picker) and Custom Emoji (toggle + picker). Shared by the

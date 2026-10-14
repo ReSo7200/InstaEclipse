@@ -115,6 +115,7 @@ public class SettingsManager {
         // Custom Theme
         editor.putBoolean("customThemeEnabled", FeatureFlags.customThemeEnabled);
         editor.putInt("themePresetId", FeatureFlags.themePresetId);
+        editor.putInt("themeLightPresetId", FeatureFlags.themeLightPresetId);
         editor.putString("themePaletteJson", FeatureFlags.themePaletteJson);
 
         editor.apply();
@@ -223,6 +224,7 @@ public class SettingsManager {
         // Custom Theme
         FeatureFlags.customThemeEnabled = prefs.getBoolean("customThemeEnabled", false);
         FeatureFlags.themePresetId = prefs.getInt("themePresetId", 1);
+        FeatureFlags.themeLightPresetId = prefs.getInt("themeLightPresetId", 0);
         FeatureFlags.themePaletteJson = prefs.getString("themePaletteJson", "");
 
         FeatureManager.refreshFeatureStatus();

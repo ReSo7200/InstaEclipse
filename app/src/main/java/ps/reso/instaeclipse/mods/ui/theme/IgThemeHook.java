@@ -57,7 +57,7 @@ public class IgThemeHook {
                 int.class, TypedValue.class, boolean.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) {
-                        if (IgColorRemapEngine.isBypassing() || !FeatureFlags.customThemeEnabled) return;
+                        if (IgColorRemapEngine.isBypassing() || !IgThemeEngine.themeEnabled()) return;
                         int attrId = (Integer) param.args[0];
                         TypedValue out = (TypedValue) param.args[1];
                         if (out == null) return;
@@ -88,7 +88,7 @@ public class IgThemeHook {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.customThemeEnabled || IgColorRemapEngine.isBypassing()) return;
+                if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()) return;
                 int resId = (Integer) param.args[0];
                 if (IgThemeEngine.looksLikeDirectColor(resId)) {
                     param.setResult(IgColorRemapEngine.remap(resId));
@@ -106,7 +106,7 @@ public class IgThemeHook {
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.customThemeEnabled || IgColorRemapEngine.isBypassing()
+                if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()
                         || param.getThrowable() != null || !IgColorRemapEngine.isReady()) return;
                 int resId = (Integer) param.args[0];
                 if (!IgThemeEngine.looksLikeDirectColor(resId) && IgThemeEngine.looksLikeResourceId(resId)
@@ -132,7 +132,7 @@ public class IgThemeHook {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.customThemeEnabled || IgColorRemapEngine.isBypassing()) return;
+                if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()) return;
                 int resId = (Integer) param.args[0];
                 if (IgThemeEngine.looksLikeDirectColor(resId)) {
                     param.setResult(IgColorRemapEngine.remap(resId));
@@ -150,7 +150,7 @@ public class IgThemeHook {
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.customThemeEnabled || IgColorRemapEngine.isBypassing()
+                if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()
                         || param.getThrowable() != null || !IgColorRemapEngine.isReady()) return;
                 int resId = (Integer) param.args[0];
                 if (!IgThemeEngine.looksLikeDirectColor(resId) && IgThemeEngine.looksLikeResourceId(resId)
@@ -173,7 +173,7 @@ public class IgThemeHook {
         XposedHelpers.findAndHookMethod(TypedArray.class, "getColor", int.class, int.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (IgColorRemapEngine.isBypassing() || !FeatureFlags.customThemeEnabled) return;
+                if (IgColorRemapEngine.isBypassing() || !IgThemeEngine.themeEnabled()) return;
                 try {
                     TypedArray ta = (TypedArray) param.thisObject;
                     int index = (Integer) param.args[0];
