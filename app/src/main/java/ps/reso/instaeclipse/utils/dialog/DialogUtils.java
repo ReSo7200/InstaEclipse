@@ -1128,6 +1128,8 @@ public class DialogUtils {
         ToggleRow notesTray = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_dialog_distraction_hide_notes_tray), FeatureFlags.hideNotesTray);
         notesTray.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideNotesTray = c; SettingsManager.saveAllFlags(); });
         navCard.addView(notesTray);
+        navCard.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_nav_tab_order), "#30D158",
+                v -> showTabOrderDialog(context)));
         layout.addView(navCard);
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {
@@ -1140,6 +1142,72 @@ public class DialogUtils {
         });
 
         SettingsManager.saveAllFlags();
+    }
+
+    /** #238: reorder the bottom-nav tabs (FeatureFlags.navTabOrder). */
+    private static void showTabOrderDialog(Context context) {
+        final String[] ids = ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.ORDERABLE_TABS;
+        final java.util.Map<String, String> labels = new java.util.HashMap<>();
+        labels.put("feed_tab", I18n.t(context, R.string.ig_nav_tab_home));
+        labels.put("clips_tab", I18n.t(context, R.string.ig_nav_tab_reels));
+        labels.put("search_tab", I18n.t(context, R.string.ig_nav_tab_search));
+        labels.put("creation_tab", I18n.t(context, R.string.ig_nav_tab_create));
+        labels.put("direct_tab", I18n.t(context, R.string.ig_nav_tab_messages));
+        labels.put("news_tab", I18n.t(context, R.string.ig_nav_tab_activity));
+        labels.put("profile_tab", I18n.t(context, R.string.ig_nav_tab_profile));
+        final java.util.List<String> order = new java.util.ArrayList<>();
+        for (String n : FeatureFlags.navTabOrder.split(","))
+            if (java.util.Arrays.asList(ids).contains(n.trim()) && !order.contains(n.trim())) order.add(n.trim());
+        for (String n : ids) if (!order.contains(n)) order.add(n);
+        float d = context.getResources().getDisplayMetrics().density;
+        int pad = (int) (16 * d);
+        final LinearLayout list = new LinearLayout(context);
+        list.setOrientation(LinearLayout.VERTICAL);
+        list.setPadding(pad, pad / 2, pad, 0);
+        final Runnable[] render = new Runnable[1];
+        render[0] = () -> {
+            list.removeAllViews();
+            for (int i = 0; i < order.size(); i++) {
+                final int idx = i;
+                LinearLayout row = new LinearLayout(context);
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                TextView name = new TextView(context);
+                name.setText((i + 1) + ".  " + labels.get(order.get(i)));
+                name.setTextColor(Color.WHITE);
+                name.setTextSize(16);
+                row.addView(name, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+                for (final int dir : new int[]{-1, 1}) {
+                    TextView b = new TextView(context);
+                    b.setText(dir < 0 ? "↑" : "↓");
+                    b.setTextSize(20);
+                    b.setGravity(Gravity.CENTER);
+                    boolean on = dir < 0 ? idx > 0 : idx < order.size() - 1;
+                    b.setTextColor(on ? Color.WHITE : Color.DKGRAY);
+                    if (on) b.setOnClickListener(v -> {
+                        java.util.Collections.swap(order, idx, idx + dir);
+                        render[0].run();
+                    });
+                    row.addView(b, new LinearLayout.LayoutParams((int) (48 * d), (int) (44 * d)));
+                }
+                list.addView(row);
+            }
+        };
+        render[0].run();
+        TextView hint = new TextView(context);
+        hint.setText(I18n.t(context, R.string.ig_nav_tab_order_hint));
+        hint.setTextColor(Color.LTGRAY);
+        hint.setPadding(pad, pad / 2, pad, 0);
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.addView(list);
+        box.addView(hint);
+        new android.app.AlertDialog.Builder(context, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle(I18n.t(context, R.string.ig_nav_tab_order))
+                .setView(box)
+                .setPositiveButton(android.R.string.ok, (x, w) -> { FeatureFlags.navTabOrder = String.join(",", order); SettingsManager.saveAllFlags(); })
+                .setNeutralButton(I18n.t(context, R.string.ig_nav_tab_order_reset), (x, w) -> { FeatureFlags.navTabOrder = ""; SettingsManager.saveAllFlags(); })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private static void disableAllSwitches(ToggleRow[] switches, ToggleRow master, ToggleRow onlyInDMSwitch) {
@@ -1285,6 +1353,15 @@ public class DialogUtils {
         });
         cardView.addView(useFp);
 
+        // 6. Lockable Saved collections (#219) — 🔒 button in a collection; uses the code above.
+        ToggleRow lockColl = createSwitch(context, R.drawable.ic_shield, "#BF5AF2",
+                I18n.t(context, R.string.ig_locked_coll_setting_short), FeatureFlags.lockSavedCollections);
+        lockColl.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.lockSavedCollections = checked;
+            SettingsManager.saveAllFlags();
+        });
+        cardView.addView(lockColl);
+
         return cardView;
     }
 
@@ -1312,7 +1389,8 @@ public class DialogUtils {
                 createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_profile_follows_label), FeatureFlags.profileFollowsYouLabel),
                 createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_viewer_search), FeatureFlags.storyViewerSearch),
                 createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_comment_search), FeatureFlags.commentSearch),
-                createSwitch(context, R.drawable.ic_download, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_follow_export), FeatureFlags.followListExport)
+                createSwitch(context, R.drawable.ic_download, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_follow_export), FeatureFlags.followListExport),
+                createSwitch(context, R.drawable.ic_save, "#BF5AF2", I18n.t(context, R.string.ig_saved_on_profile), FeatureFlags.savedOnProfile)
                 // Lock controls moved to their own grouped "Lock" card below (see buildLockCard).
         };
 
@@ -1397,6 +1475,9 @@ public class DialogUtils {
                         break;
                     case 19:
                         FeatureFlags.followListExport = isChecked;
+                        break;
+                    case 20:
+                        FeatureFlags.savedOnProfile = isChecked;
                         break;
                 }
 

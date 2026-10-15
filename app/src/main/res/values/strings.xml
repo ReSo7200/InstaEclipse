@@ -295,6 +295,7 @@
     <string name="ig_dialog_ghost_chat_export">Export-Chat Button in Chats</string>
     <string name="ig_chat_export">Export chat</string>
     <string name="ig_locked_coll_setting">Lockable Saved collections (🔒 button in a collection; uses the passcode set in Instagram)</string>
+    <string name="ig_locked_coll_setting_short">Lockable Saved collections (🔒 in a collection)</string>
     <string name="ig_locked_coll_title">Locked collection</string>
     <string name="ig_locked_coll_open">Open</string>
     <string name="ig_locked_coll_lock">Lock this collection</string>

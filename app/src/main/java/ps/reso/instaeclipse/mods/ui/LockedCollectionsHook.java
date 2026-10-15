@@ -152,11 +152,10 @@ public class LockedCollectionsHook {
             for (int i = g.getChildCount() - 1; i >= 0 && options == null; i--)
                 if (g.getChildAt(i).isClickable() && g.getChildAt(i).getVisibility() == View.VISIBLE) options = g.getChildAt(i);
             if (options == null) return;
-            TextView btn = new TextView(a);
+            android.widget.ImageView btn = new android.widget.ImageView(a);
             btn.setTag(BTN_TAG);
-            btn.setText(isLocked(id) ? "🔒" : "🔓");
-            btn.setTextSize(18);
-            btn.setGravity(Gravity.CENTER);
+            btn.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+            showState(a, btn, isLocked(id));
             btn.setContentDescription(I18n.t(a, isLocked(id) ? R.string.ig_locked_coll_unlock : R.string.ig_locked_coll_lock));
             int w = options.getWidth() > 0 ? options.getWidth() : LockDirectMessagesHook.dp(a, 48);
             ViewGroup.LayoutParams lp = options.getLayoutParams();
@@ -181,7 +180,18 @@ public class LockedCollectionsHook {
         }
     }
 
-    private static void toggle(Activity a, String id, TextView btn) {
+    /** Locked: solid white lock. Unlocked: dimmed outline lock (Instagram has no unlock icon). */
+    @android.annotation.SuppressLint("DiscouragedApi")
+    private static void showState(Activity a, android.widget.ImageView btn, boolean locked) {
+        int icon = a.getResources().getIdentifier(locked ? "instagram_lock_pano_filled_24" : "instagram_lock_pano_outline_24",
+                "drawable", a.getPackageName());
+        if (icon != 0) btn.setImageResource(icon);
+        btn.setColorFilter(android.graphics.Color.WHITE);
+        btn.setAlpha(locked ? 1f : 0.45f);
+        btn.setContentDescription(I18n.t(a, locked ? R.string.ig_locked_coll_unlock : R.string.ig_locked_coll_lock));
+    }
+
+    private static void toggle(Activity a, String id, android.widget.ImageView btn) {
         if (!hasPasscode()) {
             Toast.makeText(a, I18n.t(a, R.string.ig_locked_coll_need_passcode), Toast.LENGTH_LONG).show();
             return;
@@ -192,7 +202,7 @@ public class LockedCollectionsHook {
             if (nowLocked) s.add(id);
             FeatureFlags.lockedCollections = String.join(",", s);
             SettingsManager.saveAllFlags();
-            btn.setText(nowLocked ? "🔒" : "🔓");
+            showState(a, btn, nowLocked);
             Toast.makeText(a, I18n.t(a, nowLocked ? R.string.ig_locked_coll_locked : R.string.ig_locked_coll_unlocked),
                     Toast.LENGTH_SHORT).show();
         };
