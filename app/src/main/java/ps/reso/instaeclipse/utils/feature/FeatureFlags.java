@@ -96,6 +96,7 @@ public class FeatureFlags {
     public static boolean followListExport = false; // Export CSV pill on followers/following lists (#224)
     public static boolean commentSearch = false; // search the loaded comments of a post (#230)
     public static boolean storyViewerSearch = false; // search box over your story viewers list
+    public static boolean savedOnProfile = false;        // #237: Saved button on your own profile
     public static boolean profileFollowsYouLabel = false; // "Follows you" label on profiles (#239)
     public static boolean likeUndo = false; // hold likes for a few seconds with an Undo bar (#235)
     public static boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)

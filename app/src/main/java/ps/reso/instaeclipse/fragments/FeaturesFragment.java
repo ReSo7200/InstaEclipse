@@ -988,7 +988,7 @@ public class FeaturesFragment extends Fragment {
                         "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
                         "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
                         "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
-                        "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "storyViewerSearch", "commentSearch", "followListExport"
+                        "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "savedOnProfile", "storyViewerSearch", "commentSearch", "followListExport"
                 )),
                 createSwitch(R.drawable.ic_story_ring, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
@@ -1007,6 +1007,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_timer, "#BF5AF2", getString(R.string.ig_dialog_misc_exact_timestamps), "exactTimestamps"),
                 createSwitch(R.drawable.ic_heart, "#BF5AF2", getString(R.string.ig_dialog_misc_like_undo), "likeUndo"),
                 createSwitch(R.drawable.ic_notification, "#BF5AF2", getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
+                createSwitch(R.drawable.ic_save, "#BF5AF2", getString(R.string.ig_saved_on_profile), "savedOnProfile"),
                 createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_viewer_search), "storyViewerSearch"),
                 createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_comment_search), "commentSearch"),
                 createSwitch(R.drawable.ic_download, "#BF5AF2", getString(R.string.ig_dialog_misc_follow_export), "followListExport")
