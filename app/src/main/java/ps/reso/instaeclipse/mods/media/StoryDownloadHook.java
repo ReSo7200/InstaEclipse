@@ -135,7 +135,10 @@ public class StoryDownloadHook {
     }
 
     private static List<?> highlightItems(Object reel, Object holder) {
-        Object session = readFieldByTypeName(holder, "com.instagram.common.session.UserSession");
+        return highlightItemsWith(reel, readFieldByTypeName(holder, "com.instagram.common.session.UserSession"));
+    }
+
+    private static List<?> highlightItemsWith(Object reel, Object session) {
         List<?> best = null;
         for (Method m : reel.getClass().getMethods()) {
             Class<?>[] p = m.getParameterTypes();
@@ -150,7 +153,10 @@ public class StoryDownloadHook {
     }
 
     private static void downloadHighlight(Context ctx, Object reel, Object holder) {
-        List<?> items = highlightItems(reel, holder);
+        downloadHighlightItems(ctx, highlightItems(reel, holder));
+    }
+
+    private static void downloadHighlightItems(Context ctx, List<?> items) {
         if (items == null || items.isEmpty()) {
             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
             return;
@@ -199,8 +205,203 @@ public class StoryDownloadHook {
 
         installButtonInjectorHook(bridge, classLoader);
         installClickHandlerHook(bridge, classLoader);
+        installHighlightTrayHook(bridge, classLoader);
         resolveExpiringGetter(bridge, classLoader);
         installStoryCaptureHook(bridge, classLoader);
+    }
+
+    // ── Highlight long-press menu (profile tray): "Download whole highlight" ──
+    // Helper = class of the menu builder A0G(View, ?, ReelItem, Integer), the only method using
+    // "HighlightsTrayDialogHelper" (X.0MGm on 452); it holds the Activity, UserSession and the highlight
+    // reel. The builder shows either the legacy dialog (rows via add(String, OnClickListener), then a
+    // no-arg -> List collects them) or the newer popup (List of rows passed to set(List); rows come from
+    // the helper's static (rowIface, String) -> List factory, rowIface = boolean method + void click).
+    private static final ThreadLocal<Object> trayHelper = new ThreadLocal<>();
+    private static final Set<Object> trayDialogsDone = Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    private void installHighlightTrayHook(DexKitBridge bridge, ClassLoader cl) {
+        try {
+            MethodData builder = null;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("HighlightsTrayDialogHelper").paramCount(4)))) { builder = md; break; }
+            if (builder == null) { ModuleLog.line("(IE|HighlightTray) builder not found"); return; }
+            Method build = builder.getMethodInstance(cl);
+            final Class<?> helper = build.getDeclaringClass();
+            Method addRow = null, legacyItems = null, popupSet = null, rowFactory = null;
+            for (MethodData inv : builder.getInvokes()) {
+                try {
+                    if (inv.isConstructor()) continue;
+                    Method m = inv.getMethodInstance(cl);
+                    Class<?>[] p = m.getParameterTypes();
+                    if (p.length == 2 && p[0] == String.class && p[1] == View.OnClickListener.class && m.getReturnType() == void.class) addRow = m;
+                    else if (p.length == 1 && p[0] == List.class && m.getReturnType() == void.class && m.getDeclaringClass().getName().startsWith("X.")) popupSet = m;
+                    else if (java.lang.reflect.Modifier.isStatic(m.getModifiers()) && m.getDeclaringClass() == helper && p.length == 2
+                            && p[0].isInterface() && p[1] == String.class && m.getReturnType() == List.class) rowFactory = m;
+                } catch (Throwable ignored) {}
+            }
+            if (addRow != null)
+                for (MethodData inv : builder.getInvokes()) {
+                    try {
+                        if (inv.isConstructor() || !inv.getClassName().equals(addRow.getDeclaringClass().getName())) continue;
+                        Method m = inv.getMethodInstance(cl);
+                        if (m.getParameterCount() == 0 && m.getReturnType() == List.class) legacyItems = m;
+                    } catch (Throwable ignored) {}
+                }
+            XposedBridge.hookMethod(build, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (FeatureFlags.enableStoryDownload) trayHelper.set(p.thisObject);
+                }
+                @Override protected void afterHookedMethod(MethodHookParam p) { trayHelper.remove(); }
+            });
+            if (addRow != null && legacyItems != null) {
+                final Method add = addRow;
+                XposedBridge.hookMethod(legacyItems, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        Object h = trayHelper.get();
+                        if (h == null || !trayDialogsDone.add(p.thisObject)) return;
+                        try {
+                            Context c = AndroidAppHelper.currentApplication();
+                            add.invoke(p.thisObject, I18n.t(c, R.string.ig_highlight_download_all), (View.OnClickListener) v -> trayDownload(h));
+                        } catch (Throwable t) { ModuleLog.line("(IE|HighlightTray) legacy row: " + t); }
+                    }
+                });
+            }
+            if (popupSet != null && rowFactory != null) {
+                final Method factory = rowFactory;
+                final Class<?> iface = rowFactory.getParameterTypes()[0];
+                XposedBridge.hookMethod(popupSet, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        Object h = trayHelper.get();
+                        if (h == null || !(p.args[0] instanceof List<?>)) return;
+                        try {
+                            Object click = java.lang.reflect.Proxy.newProxyInstance(cl, new Class<?>[]{iface}, (proxy, m, a) -> {
+                                if (m.getReturnType() == boolean.class) return true;
+                                if (m.getReturnType() == void.class && m.getDeclaringClass() == iface) { mainHandler.post(() -> trayDownload(h)); return null; }
+                                if (m.getName().equals("hashCode")) return System.identityHashCode(proxy);
+                                if (m.getName().equals("equals")) return proxy == a[0];
+                                if (m.getName().equals("toString")) return "IEHighlightRow";
+                                return null;
+                            });
+                            List<?> rows = (List<?>) factory.invoke(null, click, I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_highlight_download_all));
+                            @SuppressWarnings("unchecked") List<Object> list = (List<Object>) p.args[0];
+                            try { list.addAll(rows); }
+                            catch (UnsupportedOperationException e) { List<Object> copy = new ArrayList<>(list); copy.addAll(rows); p.args[0] = copy; }
+                        } catch (Throwable t) { ModuleLog.line("(IE|HighlightTray) popup row: " + t); }
+                    }
+                });
+            }
+            findReelLoader(bridge, cl);
+            ModuleLog.line("(IE|HighlightTray) ✅ " + helper.getName() + " legacy=" + (addRow != null && legacyItems != null)
+                    + " popup=" + (popupSet != null && rowFactory != null) + " loader=" + (loaderGetter != null && loaderFetch != null));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|HighlightTray) " + t);
+        }
+    }
+
+    /** Long-press row tapped: download every item of the highlight the helper was built for. */
+    private static void trayDownload(Object helper) {
+        Object reel = reelClass != null ? readFieldByTypeName(helper, reelClass.getName()) : null;
+        Object session = readFieldByTypeName(helper, "com.instagram.common.session.UserSession");
+        Context ctx = (Context) readFieldByTypeName(helper, "android.app.Activity");
+        if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (ctx == null || reel == null) { ModuleLog.line("(IE|HighlightTray) no reel/context"); return; }
+        List<?> items = highlightItemsWith(reel, session);
+        ModuleLog.line("(IE|HighlightTray) items loaded: " + (items != null ? items.size() : -1));
+        if (items != null && !items.isEmpty()) { downloadHighlightItems(ctx, items); return; }
+        loadThenDownload(ctx, reel, session); // highlight never opened: only its cover is known
+    }
+
+    // Reel loader = first ctor param of the class using "reel_store_on_story_unavailable" (X.02jU on
+    // 452), obtained from a static (UserSession) -> loader getter. register(callback, reelId, String,
+    // boolean) calls back at once when the reel is already loaded, else when fetch(reason enum, reelId,
+    // module, Map) completes; callback = success(String id, boolean) / failure(String id). The loader
+    // only keeps a WeakReference to the callback, so a strong one is held here until it fires.
+    private static Method loaderGetter, loaderRegister, loaderUnregister, loaderFetch;
+    private static final Set<Object> pendingLoads = Collections.synchronizedSet(new java.util.HashSet<>());
+
+    private static void findReelLoader(DexKitBridge bridge, ClassLoader cl) {
+        try {
+            Class<?> loader = null;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("reel_store_on_story_unavailable")))) {
+                for (java.lang.reflect.Constructor<?> c : cl.loadClass(md.getClassName()).getDeclaredConstructors())
+                    if (c.getParameterCount() > 0 && c.getParameterTypes()[0].getName().startsWith("X.")) { loader = c.getParameterTypes()[0]; break; }
+                if (loader != null) break;
+            }
+            if (loader == null) return;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType(loader.getName()).paramTypes("com.instagram.common.session.UserSession")))) {
+                Method m = md.getMethodInstance(cl);
+                if (java.lang.reflect.Modifier.isStatic(m.getModifiers())) { m.setAccessible(true); loaderGetter = m; break; }
+            }
+            for (Method m : loader.getDeclaredMethods()) {
+                Class<?>[] p = m.getParameterTypes();
+                if (p.length == 4 && p[0].isInterface() && p[1] == String.class && p[2] == String.class && p[3] == boolean.class) loaderRegister = m;
+                else if (p.length == 4 && p[0].isEnum() && p[1] == String.class && p[2] == String.class && p[3] == java.util.Map.class) loaderFetch = m;
+            }
+            if (loaderRegister != null)
+                for (Method m : loader.getDeclaredMethods()) {
+                    Class<?>[] p = m.getParameterTypes();
+                    if (p.length == 2 && p[0] == loaderRegister.getParameterTypes()[0] && p[1] == String.class) loaderUnregister = m;
+                }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|HighlightTray) loader: " + t);
+        }
+    }
+
+    private static String highlightId(Object reel) {
+        for (Class<?> k = reel.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+            for (Field f : k.getDeclaredFields()) {
+                if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                try { f.setAccessible(true); if (f.get(reel) instanceof String s && s.startsWith("highlight:")) return s; } catch (Throwable ignored) {}
+            }
+        return null;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void loadThenDownload(Context ctx, Object reel, Object session) {
+        String id = highlightId(reel);
+        if (id == null || session == null || loaderGetter == null || loaderRegister == null || loaderFetch == null) {
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            Object loader = loaderGetter.invoke(null, session);
+            Class<?> cbType = loaderRegister.getParameterTypes()[0];
+            Object[] self = new Object[1];
+            Object cb = java.lang.reflect.Proxy.newProxyInstance(cbType.getClassLoader(), new Class<?>[]{cbType}, (proxy, m, a) -> {
+                switch (m.getName()) {
+                    case "hashCode": return System.identityHashCode(proxy);
+                    case "equals": return proxy == a[0];
+                    case "toString": return "IEHighlightLoad";
+                }
+                if (a == null || a.length == 0 || !id.equals(a[0])) return null;
+                boolean success = a.length == 2;
+                mainHandler.post(() -> {
+                    if (!pendingLoads.remove(self[0])) return; // fire once
+                    try { if (loaderUnregister != null) loaderUnregister.invoke(loader, self[0], id); } catch (Throwable ignored) {}
+                    List<?> items = success ? highlightItemsWith(reel, session) : null;
+                    ModuleLog.line("(IE|HighlightTray) load " + (success ? "ok" : "failed") + ": " + (items != null ? items.size() : -1) + " items");
+                    downloadHighlightItems(ctx, items);
+                });
+                return null;
+            });
+            self[0] = cb;
+            pendingLoads.add(cb);
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_loading), Toast.LENGTH_SHORT).show();
+            loaderRegister.invoke(loader, cb, id, "profile", false);
+            if (!pendingLoads.contains(cb)) return; // was already loaded: callback ran
+            Class<? extends Enum> reason = (Class<? extends Enum>) loaderFetch.getParameterTypes()[0];
+            Object why;
+            try { why = Enum.valueOf(reason, "PROFILE_HIGHLIGHTS_TRAY"); } catch (Throwable e) { why = Enum.valueOf(reason, "ON_TAP"); }
+            loaderFetch.invoke(loader, why, id, "profile", null);
+            ModuleLog.line("(IE|HighlightTray) fetching " + id);
+            mainHandler.postDelayed(() -> { // give up after 20 s
+                if (pendingLoads.remove(cb)) Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            }, 20000);
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|HighlightTray) load: " + t);
+        }
     }
 
     // ── Story cache: capture each VIEWED story (per-page bind, fires for every story shown) ──
