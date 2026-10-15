@@ -62,8 +62,8 @@ public class PostDownloadContextMenuHook {
     private static Object   copyImageOptionValue;
     // "Media info" (#231) and "Playback speed" (#247) rows: two more internal debug-only values
     // (present 436 → 452) carry our labels the same way.
-    private static final String MEDIA_INFO_CARRIER = "DEBUG_SHOPS_AD";
-    private static final String SPEED_CARRIER = "PROMOTE_DEBUG";
+    static final String MEDIA_INFO_CARRIER = "DEBUG_SHOPS_AD";
+    static final String SPEED_CARRIER = "PROMOTE_DEBUG";
     private static Object   mediaInfoOptionValue;
     private static Object   speedOptionValue;
 
@@ -119,6 +119,11 @@ public class PostDownloadContextMenuHook {
                 } else if (speedOptionValue == null && name.equals(SPEED_CARRIER)) {
                     speedOptionValue = v;
                 }
+            }
+            ps.reso.instaeclipse.mods.misc.CaptionCopyContextMenuHook.EXTRA_REEL_LABELS.put(MEDIA_INFO_CARRIER, R.string.ig_media_info_title);
+            ps.reso.instaeclipse.mods.misc.CaptionCopyContextMenuHook.EXTRA_REEL_LABELS.put(SPEED_CARRIER, R.string.ig_playback_speed_title);
+            for (Object v : values) {
+                if (v == null) continue;
             }
             if (downloadOptionValue == null)
                 ModuleLog.line("(IE|Post) ❌ DOWNLOAD enum value not found");

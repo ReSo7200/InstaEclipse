@@ -99,6 +99,14 @@ public class CaptionCopyContextMenuHook {
     // Candidates that are gated behind Instagram's own employee/internal-build check
     // (LX/EpO;->A00 denylist, discovered while fixing the post-download allowlist) — never
     // shown to regular users natively, so safe to repurpose as our carrier.
+    /**
+     * Other module rows shown in the reel overflow menu (Media info, Playback speed): carrier
+     * option name → module string. Their titles are set by the same row-builder hook, and the
+     * reel label resolver is fed COPY_LINK for them so it returns a valid IG string id first.
+     */
+    public static final java.util.Map<String, Integer> EXTRA_REEL_LABELS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static Object copyLinkOptionForLabels;
+
     private static final String[] CARRIER_CANDIDATES = {
             "DEBUG_MEDIA", "CONTENT_DEEP_DIVE", "DEBUG_BASEL_MEDIA_INFO",
             "DEBUG_MEDIA_ON_DEVICE_CBR", "PROMOTE_DEBUG"
@@ -157,6 +165,7 @@ public class CaptionCopyContextMenuHook {
             }
             if (copyCaptionOptionValue == null)
                 ModuleLog.line("(IE|Caption) ❌ No usable carrier MediaOption$Option found");
+            for (Object v : values) if (v.toString().equals("COPY_LINK")) copyLinkOptionForLabels = v;
         } catch (Throwable t) {
             ModuleLog.line("(IE|Caption) ❌ loadMediaOptionEnum: " + t);
         }
@@ -662,6 +671,7 @@ public class CaptionCopyContextMenuHook {
         if (mediaOptionEnumClass == null || copyCaptionOptionValue == null) return;
 
         XC_MethodHook labelHook = makeBuilderLabelHook();
+        hookReelLabelResolver(bridge, classLoader);
 
         if (DexKitCache.isCacheValid()) {
             List<Method> cached = DexKitCache.loadMethods("ReelRowBuilders", classLoader);
@@ -741,6 +751,33 @@ public class CaptionCopyContextMenuHook {
         }
     }
 
+    /** Reel label resolver (int res id for an option): answer COPY_LINK's id for EXTRA_REEL_LABELS rows. */
+    private static void hookReelLabelResolver(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            Method resolver = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("ReelLabelResolver", classLoader) : null;
+            if (resolver == null) {
+                List<MethodData> r = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                        .usingEqStrings(List.of("Unsupported text row for Clips Viewer Overflow menu."))));
+                if (r.isEmpty()) return;
+                resolver = r.get(0).getMethodInstance(classLoader);
+                DexKitCache.saveMethod("ReelLabelResolver", resolver);
+            }
+            XposedBridge.hookMethod(resolver, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    if (EXTRA_REEL_LABELS.isEmpty() || copyLinkOptionForLabels == null) return;
+                    for (int i = 0; i < param.args.length; i++) {
+                        Object a = param.args[i];
+                        if (a != null && mediaOptionEnumClass.isInstance(a) && EXTRA_REEL_LABELS.containsKey(a.toString()))
+                            param.args[i] = copyLinkOptionForLabels;
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Caption) ⚠️ reel label resolver: " + t);
+        }
+    }
+
     // Builder shape: void; first param Context; second param View.OnClickListener; >=1 String
     // param (the title). Matches LX/0458.A00 (carrier's path) and .A01 on 447; harmless on any
     // other match because the hook is a no-op unless our carrier listener is present.
@@ -786,13 +823,20 @@ public class CaptionCopyContextMenuHook {
                     if (args == null) return;
 
                     boolean ours = false;
+                    Integer extraLabel = null;
                     int lastListenerIdx = -1;
                     for (int i = 0; i < args.length; i++) {
                         Object a = args[i];
                         if (a instanceof View.OnClickListener) {
                             lastListenerIdx = i;
-                            if (!ours && findCarrierOptionOnListener(a) == copyCaptionOptionValue)
-                                ours = true;
+                            if (!ours) {
+                                Object opt = findCarrierOptionOnListener(a);
+                                if (opt != null && opt == copyCaptionOptionValue) ours = true;
+                                else if (opt != null && EXTRA_REEL_LABELS.containsKey(opt.toString())) {
+                                    ours = true;
+                                    extraLabel = EXTRA_REEL_LABELS.get(opt.toString());
+                                }
+                            }
                         }
                     }
                     if (!ours || lastListenerIdx < 0) return;
@@ -806,7 +850,7 @@ public class CaptionCopyContextMenuHook {
                     Context ctx = (args[0] instanceof Context c) ? c : currentActivity;
                     if (ctx == null) return;
 
-                    args[titleIdx] = I18n.t(ctx, R.string.ig_caption_copy_menu_item);
+                    args[titleIdx] = I18n.t(ctx, extraLabel != null ? extraLabel : R.string.ig_caption_copy_menu_item);
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Caption) ❌ reel label override (builder): " + t);
                 }

@@ -171,7 +171,9 @@ public class PlaybackSpeedHook {
             labels[i] = (SPEEDS[i] == (int) SPEEDS[i] ? String.valueOf((int) SPEEDS[i]) : String.valueOf(SPEEDS[i])) + "×";
             if (SPEEDS[i] == speed) checked = i;
         }
-        new AlertDialog.Builder(new ContextThemeWrapper(ctx, android.R.style.Theme_DeviceDefault_Dialog_Alert))
+        android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        Context host = act != null && !act.isFinishing() ? act : ctx;
+        new AlertDialog.Builder(new ContextThemeWrapper(host, android.R.style.Theme_DeviceDefault_Dialog_Alert))
                 .setTitle(I18n.t(ctx, R.string.ig_playback_speed_title))
                 .setSingleChoiceItems(labels, checked, (d, which) -> {
                     speed = SPEEDS[which];

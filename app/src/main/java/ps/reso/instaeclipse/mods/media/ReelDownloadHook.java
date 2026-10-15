@@ -167,12 +167,14 @@ public class ReelDownloadHook {
     // app-wide click-handler hook already covers whatever dispatches its click.
     private static void installReduceOptionsListPatch(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            Object downloadOption = null, copyLinkOption = null;
+            Object downloadOption = null, copyLinkOption = null, infoOption = null, speedOption = null;
             Class<?> optionClass = classLoader.loadClass("com.instagram.feed.media.mediaoption.MediaOption$Option");
             for (Object v : (Object[]) optionClass.getMethod("values").invoke(null)) {
                 String n = v.toString();
                 if (n.equals("DOWNLOAD")) downloadOption = v;
                 else if (n.equals("COPY_LINK")) copyLinkOption = v;
+                else if (n.equals(PostDownloadContextMenuHook.MEDIA_INFO_CARRIER)) infoOption = v;
+                else if (n.equals(PostDownloadContextMenuHook.SPEED_CARRIER)) speedOption = v;
             }
             if (downloadOption == null && copyLinkOption == null) {
                 ModuleLog.line("(IE|Reel) ❌ DOWNLOAD/COPY_LINK enum values not found");
@@ -180,13 +182,16 @@ public class ReelDownloadHook {
             }
             final Object download = downloadOption;
             final Object copyLink = copyLinkOption;   // #117 — clicks handled by PostDownloadContextMenuHook
+            final Object info = infoOption, speedRow = speedOption; // #231 / #247 — same click handler
 
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     boolean wantDl = FeatureFlags.enableReelDownload && download != null;
                     boolean wantCl = FeatureFlags.copyMediaLink && copyLink != null;
-                    if (!wantDl && !wantCl) return;
+                    boolean wantInfo = FeatureFlags.offerMediaInfo && info != null;
+                    boolean wantSpeed = FeatureFlags.offerPlaybackSpeed && speedRow != null;
+                    if (!wantDl && !wantCl && !wantInfo && !wantSpeed) return;
                     try {
                         Object result = param.getResult();
                         if (result instanceof List<?> list) {
@@ -194,6 +199,8 @@ public class ReelDownloadHook {
                             List<Object> mutable = (List<Object>) list;
                             if (wantDl && !mutable.contains(download)) mutable.add(download);
                             if (wantCl && !mutable.contains(copyLink)) mutable.add(copyLink);
+                            if (wantInfo && !mutable.contains(info)) mutable.add(info);
+                            if (wantSpeed && !mutable.contains(speedRow)) mutable.add(speedRow);
                         }
                     } catch (Throwable t) {
                         ModuleLog.line("(IE|Reel) ❌ options-list patch failed: " + t);
@@ -205,6 +212,7 @@ public class ReelDownloadHook {
                 Method cached = DexKitCache.loadMethod("ReelOptionsListBuilder", classLoader);
                 if (cached != null) {
                     XposedBridge.hookMethod(cached, hook);
+                    FeatureStatusTracker.setHooked("ReelDownload");
                     return;
                 }
             }

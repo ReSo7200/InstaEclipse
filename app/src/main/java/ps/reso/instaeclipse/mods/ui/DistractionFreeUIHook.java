@@ -199,6 +199,8 @@ public class DistractionFreeUIHook {
                 if (!FeatureFlags.disableReels) return;
                 if (param.thisObject instanceof View self
                         && self.getParent() instanceof View p && p.getId() == tabPagerId) {
+                    if (param.method.getName().equals("onInterceptTouchEvent")
+                            && param.args[0] instanceof android.view.MotionEvent ev) trackSwipe(self, ev);
                     param.setResult(false);
                 }
             }
@@ -212,6 +214,42 @@ public class DistractionFreeUIHook {
             } catch (Throwable ignored) {}
         }
         ModuleLog.line("(IE|DistractUI) main tab pager touch gate on " + inner.getName() + ": " + n);
+    }
+
+    // Swipe between Home and Messages while Reels is off (Reels sits between them in IG's pager):
+    // the pager itself no longer scrolls, so a clear horizontal swipe taps the real tab button.
+    private static float swipeDownX, swipeDownY;
+    private static boolean swipeDone;
+
+    private static void trackSwipe(View pagerChild, android.view.MotionEvent ev) {
+        switch (ev.getActionMasked()) {
+            case android.view.MotionEvent.ACTION_DOWN:
+                swipeDownX = ev.getRawX();
+                swipeDownY = ev.getRawY();
+                swipeDone = false;
+                break;
+            case android.view.MotionEvent.ACTION_MOVE:
+            case android.view.MotionEvent.ACTION_UP:
+                if (swipeDone) return;
+                float dx = ev.getRawX() - swipeDownX, dy = ev.getRawY() - swipeDownY;
+                float min = 90 * pagerChild.getResources().getDisplayMetrics().density;
+                if (Math.abs(dx) < min || Math.abs(dx) < 2.5f * Math.abs(dy)) return;
+                swipeDone = true;
+                View root = pagerChild.getRootView();
+                View home = findTab(root, "feed_tab"), dm = findTab(root, "direct_tab");
+                if (home == null || dm == null) return;
+                // finger moving left = next page (Home → Reels → Messages); right = back.
+                if (dx < 0 && home.isSelected()) dm.post(dm::performClick);
+                else if (dx > 0 && dm.isSelected()) home.post(home::performClick);
+                break;
+            default:
+        }
+    }
+
+    @SuppressLint("DiscouragedApi")
+    private static View findTab(View root, String name) {
+        int id = root.getResources().getIdentifier(name, "id", root.getContext().getPackageName());
+        return id != 0 ? root.findViewById(id) : null;
     }
 
     /** Turns off swipe navigation between main tabs (tab buttons keep working). */

@@ -44,6 +44,7 @@ final class MediaInfo {
     private MediaInfo() {}
 
     static void show(Context ctx, Object media, Object clickHandler) {
+        ModuleLog.line("(IE|MediaInfo) requested for " + (media == null ? "null" : media.getClass().getName()));
         FeedVideoDownloadHook.executor.submit(() -> {
             String text;
             try {
@@ -55,7 +56,12 @@ final class MediaInfo {
             final String body = text;
             FeedVideoDownloadHook.mainHandler.post(() -> {
                 try {
-                    new AlertDialog.Builder(new ContextThemeWrapper(ctx, android.R.style.Theme_DeviceDefault_Dialog_Alert))
+                    // The reel menu's context belongs to a sheet that has closed by now; use the
+                    // foreground Activity for the dialog when there is one.
+                    android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+                    Context host = act != null && !act.isFinishing() ? act : ctx;
+                    ModuleLog.line("(IE|MediaInfo) showing (" + body.length() + " chars) on " + host.getClass().getSimpleName());
+                    new AlertDialog.Builder(new ContextThemeWrapper(host, android.R.style.Theme_DeviceDefault_Dialog_Alert))
                             .setTitle(I18n.t(ctx, R.string.ig_media_info_title))
                             .setMessage(body)
                             .setPositiveButton(android.R.string.ok, null)
