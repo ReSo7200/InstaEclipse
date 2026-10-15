@@ -3,12 +3,12 @@ name: Build Debug APK
 on:
   push:
     branches:
-      - main  # Trigger workflow on pushes to the main branch
+      - main
       - 0.4
   pull_request:
     branches:
-      - main  # Trigger workflow on pull requests to the main branch
-  workflow_dispatch:  # Allow manual triggering via the GitHub Actions UI
+      - main
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,11 +19,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 17 (also caches Gradle dependencies/wrapper)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -31,25 +29,20 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      # Step 3: Set up Android SDK
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          items: platform-tools,platforms;android-34,build-tools;34.0.0
+      - name: Setup Android SDK manually
+        run: |
+          echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      # Step 4: Grant execution permissions to gradlew
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      # Step 5: Run unit tests before building
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
-      # Step 6: Build the debug APK
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
-      # Step 7: Upload the debug APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
