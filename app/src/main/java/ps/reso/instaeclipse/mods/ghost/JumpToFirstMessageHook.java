@@ -35,23 +35,51 @@ public class JumpToFirstMessageHook {
 
     public void install() {
         CurrentThreadTracker.addListener((activity, threadId) -> {
-            if (FeatureFlags.jumpToFirstMessage) MAIN.postDelayed(() -> inject(activity), 600);
+            if (!FeatureFlags.jumpToFirstMessage) return;
+            final int[] tries = {0};
+            MAIN.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (inject(activity)) return;
+                    if (++tries[0] < 15) MAIN.postDelayed(this, 300);
+                    else ModuleLog.line("(IE|JumpFirst) ⚠️ gave up: header=" + (threadHeaderId != 0 && activity.findViewById(threadHeaderId) != null)
+                            + " unsentBtn=" + (activity.getWindow().getDecorView().findViewWithTag("ie_unsent_btn") != null)
+                            + " endBtns=" + (actionBarEndId != 0 && activity.findViewById(actionBarEndId) != null));
+                }
+            }, 300);
         });
         ModuleLog.line("(IE|JumpFirst) ✅ installed");
         FeatureStatusTracker.setHooked("JumpToFirstMessage");
     }
 
     @SuppressLint("DiscouragedApi")
-    private static void inject(Activity a) {
+    /** Returns true once the button is in the header (or can't be placed in this screen). */
+    static boolean inject(Activity a) {
         try {
             if (threadHeaderId == 0) {
                 threadHeaderId = a.getResources().getIdentifier("direct_thread_header", "id", a.getPackageName());
                 actionBarEndId = a.getResources().getIdentifier("action_bar_end_action_buttons", "id", a.getPackageName());
             }
             View header = threadHeaderId != 0 ? a.findViewById(threadHeaderId) : null;
-            View end = actionBarEndId != 0 ? a.findViewById(actionBarEndId) : null;
-            if (header == null || !(end instanceof ViewGroup target)) return;
-            if (target.findViewWithTag(TAG) != null) return;
+            if (header == null) return false;
+            if (a.getWindow().getDecorView().findViewWithTag(TAG) != null) return true;
+            // Next to the module's own Unsent / Hide-chat header buttons when present (the 452
+            // thread header has no action_bar_end_action_buttons), else the right-side buttons.
+            ViewGroup target = null;
+            int insertAt = 0;
+            for (String t : new String[]{"ie_unsent_btn", "ie_hidechat_btn"}) {
+                View ours = a.getWindow().getDecorView().findViewWithTag(t);
+                if (ours != null && ours.getParent() instanceof ViewGroup g) {
+                    target = g;
+                    insertAt = g.indexOfChild(ours) + 1;
+                    break;
+                }
+            }
+            if (target == null) {
+                View end = actionBarEndId != 0 ? a.findViewById(actionBarEndId) : null;
+                if (end instanceof ViewGroup g) target = g;
+            }
+            if (target == null) return false;
 
             android.widget.ImageView btn = new android.widget.ImageView(a);
             btn.setTag(TAG);
@@ -67,9 +95,12 @@ public class JumpToFirstMessageHook {
             lp.gravity = Gravity.CENTER_VERTICAL;
             btn.setLayoutParams(lp);
             btn.setOnClickListener(v -> toggle(a));
-            target.addView(btn, 0);
+            target.addView(btn, Math.min(insertAt, target.getChildCount()));
+            ModuleLog.line("(IE|JumpFirst) ✅ button injected in " + target.getClass().getSimpleName());
+            return true;
         } catch (Throwable t) {
             ModuleLog.line("(IE|JumpFirst) ⚠️ inject: " + t);
+            return true;
         }
     }
 
@@ -87,29 +118,50 @@ public class JumpToFirstMessageHook {
         }
         Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_loading), Toast.LENGTH_SHORT).show();
         final long started = System.currentTimeMillis();
-        final long[] stuckSince = {0};
+        final long[] lastChange = {System.currentTimeMillis()};
+        final int[] lastCount = {itemCount(list)};
+        final int[] lastOffset = {scrollOffset(list)};
         running = new Runnable() {
             @Override
             public void run() {
                 if (running != this) return;
                 if (!list.isAttachedToWindow() || System.currentTimeMillis() - started > 5 * 60_000) { running = null; return; }
-                if (list.canScrollVertically(-1)) {
-                    stuckSince[0] = 0;
-                    list.scrollBy(0, -list.getHeight() * 4);
-                } else {
-                    if (stuckSince[0] == 0) stuckSince[0] = System.currentTimeMillis();
-                    // nudge so IG's "near the top" pagination fires, then give it time to load
-                    list.scrollBy(0, -1);
-                    if (System.currentTimeMillis() - stuckSince[0] > 4000) {
-                        running = null;
-                        Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_done), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                list.scrollBy(0, list.canScrollVertically(-1) ? -list.getHeight() * 4 : -1);
+                int count = itemCount(list), off = scrollOffset(list);
+                if (count != lastCount[0] || off != lastOffset[0]) {
+                    lastCount[0] = count;
+                    lastOffset[0] = off;
+                    lastChange[0] = System.currentTimeMillis();
+                } else if (System.currentTimeMillis() - lastChange[0] > 3000) {
+                    // nothing moved and nothing new loaded for 3 s: this is the first message
+                    running = null;
+                    Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_done), Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 MAIN.postDelayed(this, 250);
             }
         };
         MAIN.post(running);
+    }
+
+    private static int itemCount(View list) {
+        try {
+            Object ad = list.getClass().getMethod("getAdapter").invoke(list);
+            if (ad == null) return -1;
+            for (java.lang.reflect.Method m : ad.getClass().getMethods())
+                if (m.getName().equals("getItemCount") && m.getParameterCount() == 0) return (int) m.invoke(ad);
+        } catch (Throwable ignored) {}
+        return -1;
+    }
+
+    private static int scrollOffset(View list) {
+        try {
+            java.lang.reflect.Method m = View.class.getDeclaredMethod("computeVerticalScrollOffset");
+            m.setAccessible(true);
+            return (int) m.invoke(list);
+        } catch (Throwable t) {
+            return list.getScrollY();
+        }
     }
 
     /** The tallest visible RecyclerView below the thread header = the message list. */

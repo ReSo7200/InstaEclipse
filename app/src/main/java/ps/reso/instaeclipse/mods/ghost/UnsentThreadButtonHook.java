@@ -167,7 +167,10 @@ public class UnsentThreadButtonHook {
                 insertAt = 0;
             } else return false;
 
-            if (target.findViewWithTag(TAG) != null) return true; // already injected
+            if (target.findViewWithTag(TAG) != null) { // already injected
+                if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
+                return true;
+            }
 
             android.widget.ImageView btn = new android.widget.ImageView(activity);
             btn.setTag(TAG);
@@ -206,6 +209,7 @@ public class UnsentThreadButtonHook {
             try { target.addView(btn, Math.min(insertAt, target.getChildCount())); }
             catch (Throwable t) { target.addView(btn); }
             ModuleLog.line("(IE|UnsentBtn) ✅ injected next to back in " + target.getClass().getSimpleName());
+            if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
             return true;
         } catch (Throwable t) {
             ModuleLog.line("(IE|UnsentBtn) ⚠️ inject: " + t.getMessage());

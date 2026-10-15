@@ -54,6 +54,8 @@ public class VoiceMessageDownloadHook {
     private static final String ACTION_DATA = "com.instagram.direct.messagethread.interaction.longpressaction.LongPressActionData";
     private static final String AUDIO_INFO = "com.instagram.api.schemas.AudioInfoIntf";
     private static final String MEDIA = "com.instagram.feed.media.Media";
+    // Row carrier: an action IG fully wires (click → dispatch) but never offers on voice messages.
+    private static final String CARRIER = "COPY_TEXT";
 
     private static volatile Object lastMessage;
     private static volatile long lastMessageAt;
@@ -101,6 +103,10 @@ public class VoiceMessageDownloadHook {
             Constructor<?> dataCtor = null;
             for (Constructor<?> c : data.getDeclaredConstructors()) if (c.getParameterCount() == 11) dataCtor = c;
             final Constructor<?> ctor = dataCtor;
+            if (ctor != null) {
+                for (Object v : ctor.getParameterTypes()[2].getEnumConstants())
+                    if (CARRIER.equals(((Enum<?>) v).name())) saveMediaAction = v;
+            }
             int factories = 0;
             for (Method m : vm.getDeclaredMethods()) {
                 if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != vm) continue;
@@ -109,14 +115,27 @@ public class VoiceMessageDownloadHook {
                     protected void beforeHookedMethod(MethodHookParam param) {
                         if (!FeatureFlags.enableVoiceDownload || ctor == null) return;
                         Object msg = recentMessage();
-                        if (msg == null || audioUrl(msg) == null) return;
+                        String url = msg != null ? audioUrl(msg) : null;
+                        ModuleLog.line(TAG + "menu: message=" + (msg != null) + " voice=" + (url != null));
+                        if (url == null) {
+                            if (msg != null) dumpTypes(msg);
+                            return;
+                        }
                         for (int i = 0; i < param.args.length; i++) {
                             if (!(param.args[i] instanceof List<?> list) || list.isEmpty() || !data.isInstance(list.get(0))) continue;
-                            Object row = buildRow(ctor, list.get(0), param.args[0] instanceof Context c ? c : null);
+                            // style template: a regular action row (the first item is the
+                            // non-clickable timestamp header)
+                            Object template = list.get(0);
+                            for (Object r : list) {
+                                String an = actionName(r);
+                                if ("FORWARD".equals(an) || "REPLY".equals(an) || "PIN".equals(an) || "UNPIN".equals(an)) { template = r; break; }
+                            }
+                            Object row = buildRow(ctor, template, param.args[0] instanceof Context c ? c : null);
                             if (row == null) return;
                             List<Object> copy = new ArrayList<>(list);
                             copy.add(row);
                             param.args[i] = copy;
+                            wireRowWhenShown(url);
                             return;
                         }
                     }
@@ -136,7 +155,7 @@ public class VoiceMessageDownloadHook {
                         Object action = null, msg = null;
                         Context ctx = null;
                         for (Object a : param.args) {
-                            if (a instanceof Enum<?> e && "SAVE_MEDIA".equals(e.name())) action = a;
+                            if (a instanceof Enum<?> e && CARRIER.equals(e.name())) action = a;
                             else if (a != null && messageClass != null && messageClass.isInstance(a)) msg = a;
                             else if (a instanceof Activity act) ctx = act;
                         }
@@ -145,19 +164,253 @@ public class VoiceMessageDownloadHook {
                         String url = msg != null ? audioUrl(msg) : null;
                         if (url == null) return;
                         param.setResult(null);
-                        if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-                        if (ctx == null) return;
-                        String name = "voice_message_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".m4a";
-                        FeedVideoDownloadHook.downloadAudio(ctx, url, name, "voice");
+                        startDownload(ctx, url);
                     }
                 });
                 dispatchers++;
             }
+            // Row taps of the long-press menu go through the static method of the menu controller
+            // that takes a LongPressActionData (MessageActionsController.A02 on 452).
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .paramTypes(ACTION_DATA, null, "java.lang.String")))) {
+                Method m = md.getMethodInstance(cl);
+                if (!Modifier.isStatic(m.getModifiers())) continue;
+                XposedBridge.hookMethod(m, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        if (!FeatureFlags.enableVoiceDownload) return;
+                        Object row = null;
+                        for (Object a : param.args) if (data.isInstance(a)) row = a;
+                        if (row == null || !isSaveMedia(row)) return;
+                        Object msg = recentMessage();
+                        String url = msg != null ? audioUrl(msg) : null;
+                        ModuleLog.line(TAG + "row tap: voice=" + (url != null));
+                        if (url == null) return;
+                        startDownload(null, url);
+                    }
+                });
+                dispatchers++;
+            }
+            // "Action selected" listeners: (ActionEnum, String) -> void, e.g. X.0lMj.E5t on 452.
+            if (ctor != null) {
+                String actionEnum = ctor.getParameterTypes()[2].getName();
+                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                        .paramTypes(actionEnum, "java.lang.String").returnType("void")))) {
+                    Method m;
+                    try { m = md.getMethodInstance(cl); } catch (Throwable t) { continue; }
+                    if (Modifier.isStatic(m.getModifiers()) || Modifier.isAbstract(m.getModifiers())) continue;
+                    XposedBridge.hookMethod(m, new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) {
+                            if (!FeatureFlags.enableVoiceDownload) return;
+                            if (!(param.args[0] instanceof Enum<?> e) || !CARRIER.equals(e.name())) return;
+                            Object msg = recentMessage();
+                            String url = msg != null ? audioUrl(msg) : null;
+                            ModuleLog.line(TAG + "action selected via " + param.method.getDeclaringClass().getName() + ": voice=" + (url != null));
+                            if (url == null) return;
+                            param.setResult(null);
+                            startDownload(null, url);
+                        }
+                    });
+                    dispatchers++;
+                }
+            }
+            // Compose menu rows: every method that reads the row label field and takes a Kotlin
+            // Function1 click callback (X.0Ssj.A00 on 452). Wrap the callback so a tap on our row
+            // downloads; other rows are passed through untouched.
+            int composeRows = 0;
+            try {
+                java.lang.reflect.Field labelField = null;
+                for (Field f : data.getDeclaredFields()) {
+                    if (f.getType() == String.class && !Modifier.isStatic(f.getModifiers())) {
+                        // label = constructor param 8 (index 7); pick the field set from it
+                        Class<?>[] cp = ctor.getParameterTypes();
+                        Object style = cp[1].isEnum() ? cp[1].getEnumConstants()[0] : null;
+                        Object act = cp[2].getEnumConstants()[0];
+                        ctor.setAccessible(true);
+                        Object probe = ctor.newInstance(null, style, act, null, null, null, null, "ie", null, null, null);
+                        f.setAccessible(true);
+                        if ("ie".equals(f.get(probe))) { labelField = f; break; }
+                    }
+                }
+                if (labelField != null) {
+                    final Field lf = labelField;
+                    String desc = "L" + ACTION_DATA.replace('.', '/') + ";->" + lf.getName() + ":Ljava/lang/String;";
+                    Class<?> fn1 = cl.loadClass("kotlin.jvm.functions.Function1");
+                    for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                            .addUsingField(desc)))) {
+                        if (!md.isMethod()) continue;
+                        Method m;
+                        try { m = md.getMethodInstance(cl); } catch (Throwable t) { continue; }
+                        boolean takesFn = false;
+                        for (Class<?> pt : m.getParameterTypes()) if (pt == fn1) takesFn = true;
+                        if (!takesFn) continue;
+                        XposedBridge.hookMethod(m, new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(MethodHookParam param) {
+                                if (!FeatureFlags.enableVoiceDownload) return;
+                                for (int i = 0; i < param.args.length; i++) {
+                                    Object orig = param.args[i];
+                                    if (!fn1.isInstance(orig) || java.lang.reflect.Proxy.isProxyClass(orig.getClass())) continue;
+                                    param.args[i] = java.lang.reflect.Proxy.newProxyInstance(cl, new Class<?>[]{fn1}, (proxy, method, margs) -> {
+                                        if (method.getName().equals("invoke") && margs != null && margs.length == 1
+                                                && data.isInstance(margs[0]) && isOurRow(margs[0], lf)) {
+                                            Object msg = recentMessage();
+                                            String url = msg != null ? audioUrl(msg) : null;
+                                            ModuleLog.line(TAG + "compose row tap: voice=" + (url != null));
+                                            if (url != null) {
+                                                startDownload(null, url);
+                                                dismissMenu();
+                                                return null;
+                                            }
+                                        }
+                                        if (method.getDeclaringClass() == Object.class) {
+                                            if (method.getName().equals("equals")) return proxy == margs[0];
+                                            if (method.getName().equals("hashCode")) return System.identityHashCode(proxy);
+                                            if (method.getName().equals("toString")) return "IEWrappedClick";
+                                        }
+                                        return method.invoke(orig, margs);
+                                    });
+                                }
+                            }
+                        });
+                        composeRows++;
+                    }
+                }
+            } catch (Throwable t) {
+                ModuleLog.line(TAG + "⚠️ compose rows: " + t + " / " + t.getCause());
+            }
+            ModuleLog.line(TAG + "compose row hooks=" + composeRows + " (label field " + (composeRows >= 0 ? "ok" : "") + ")");
             ModuleLog.line(TAG + "✅ lookups=" + lookups + " factories=" + factories + " dispatchers=" + dispatchers
                     + " mapper=" + (audioMapper != null) + " message=" + (messageClass != null ? messageClass.getName() : "?"));
             if (factories > 0 && dispatchers > 0) FeatureStatusTracker.setHooked("VoiceDownload");
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ " + t);
+        }
+    }
+
+    /**
+     * The menu renders our row but routes unknown actions to a dismiss-only branch, so attach our
+     * own click handler to the row once it is on screen (found by its label), then close the menu.
+     */
+    private static void wireRowWhenShown(String url) {
+        android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (act == null) return;
+        String label = I18n.t(act, R.string.ig_dl_title);
+        android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+        final int[] tries = {0};
+        h.post(new Runnable() {
+            @Override
+            public void run() {
+                android.view.View row = findRow(act.getWindow().getDecorView(), label);
+                if (row == null) {
+                    if (++tries[0] < 25) h.postDelayed(this, 80);
+                    return;
+                }
+                row.setOnClickListener(v -> {
+                    startDownload(act, url);
+                    act.dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_BACK));
+                    act.dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, android.view.KeyEvent.KEYCODE_BACK));
+                });
+                ModuleLog.line(TAG + "row wired (" + row.getClass().getSimpleName() + ")");
+            }
+        });
+    }
+
+    /** The clickable row containing a TextView whose text is exactly {@code label}. */
+    private static android.view.View findRow(android.view.View root, String label) {
+        java.util.ArrayDeque<android.view.View> st = new java.util.ArrayDeque<>();
+        st.push(root);
+        while (!st.isEmpty()) {
+            android.view.View v = st.pop();
+            if (v instanceof android.widget.TextView tv && tv.isShown() && label.contentEquals(tv.getText())) {
+                android.view.View r = tv;
+                for (int i = 0; i < 4 && r.getParent() instanceof android.view.View p; i++) {
+                    r = p;
+                    if (r.isClickable()) return r;
+                }
+                return tv.getParent() instanceof android.view.View p ? p : tv;
+            }
+            if (v instanceof android.view.ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) st.push(g.getChildAt(i));
+        }
+        return null;
+    }
+
+    private static boolean isOurRow(Object row, Field labelField) {
+        try {
+            android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+            String label = act != null ? I18n.t(act, R.string.ig_dl_title) : "Download";
+            return label.equals(labelField.get(row)) && isSaveMedia(row);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private static void dismissMenu() {
+        android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (act == null) return;
+        act.runOnUiThread(() -> {
+            act.dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_BACK));
+            act.dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, android.view.KeyEvent.KEYCODE_BACK));
+        });
+    }
+
+    private static volatile long lastDownloadAt;
+
+    private static void startDownload(Context ctx, String url) {
+        if (System.currentTimeMillis() - lastDownloadAt < 1500) return; // both tap paths fired
+        lastDownloadAt = System.currentTimeMillis();
+        if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (ctx == null) return;
+        String name = "voice_message_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".m4a";
+        FeedVideoDownloadHook.downloadAudio(ctx, url, name, "voice");
+    }
+
+    private static String actionName(Object row) {
+        try {
+            Field f = row.getClass().getDeclaredFields()[0];
+            for (Field g : row.getClass().getDeclaredFields()) {
+                if (Modifier.isStatic(g.getModifiers()) || !g.getType().isEnum()) continue;
+                g.setAccessible(true);
+                Object v = g.get(row);
+                // the action enum is the constructor's 3rd param type; its values have names like REPLY
+                if (v instanceof Enum<?> e && e.getDeclaringClass() == (saveMediaAction != null ? saveMediaAction.getClass() : e.getDeclaringClass())) {
+                    String n = e.name();
+                    if (n.equals(n.toUpperCase()) && n.length() > 2) return n;
+                }
+            }
+        } catch (Throwable ignored) {}
+        return null;
+    }
+
+    private static boolean isSaveMedia(Object row) {
+        for (Field f : row.getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(f.getModifiers()) || !f.getType().isEnum()) continue;
+            try {
+                f.setAccessible(true);
+                Object v = f.get(row);
+                if (v instanceof Enum<?> e && CARRIER.equals(e.name())) return true;
+            } catch (Throwable ignored) {}
+        }
+        return false;
+    }
+
+    /** DEBUG: types reachable from a message, to find where the voice clip lives. */
+    private static void dumpTypes(Object msg) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (Class<?> k = msg.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
+                for (Field f : k.getDeclaredFields()) {
+                    if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+                    f.setAccessible(true);
+                    Object v = f.get(msg);
+                    if (v == null || v instanceof String || v instanceof Number || v instanceof Boolean) continue;
+                    sb.append(f.getName()).append('=').append(v.getClass().getName()).append(' ');
+                }
+            }
+            ModuleLog.line(TAG + "message fields: " + sb);
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "dump: " + t);
         }
     }
 
@@ -170,7 +423,7 @@ public class VoiceMessageDownloadHook {
         try {
             Class<?>[] p = ctor.getParameterTypes();
             if (saveMediaAction == null) {
-                for (Object v : p[2].getEnumConstants()) if ("SAVE_MEDIA".equals(((Enum<?>) v).name())) saveMediaAction = v;
+                for (Object v : p[2].getEnumConstants()) if (CARRIER.equals(((Enum<?>) v).name())) saveMediaAction = v;
             }
             if (saveMediaAction == null) return null;
             Object style = null;
