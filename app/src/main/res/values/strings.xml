@@ -320,6 +320,7 @@
     <string name="ig_hide_chat_toggle">Hide / unhide chat</string>
     <string name="ig_chat_export_working">Exporting loaded messages…</string>
     <string name="ig_chat_export_done">Exported %1$d messages to %2$s</string>
+    <string name="ig_chat_export_load_all">Load the whole chat first (jumps to the first message)</string>
     <string name="ig_chat_export_none">No messages loaded for this chat yet</string>
     <string name="ig_dialog_ghost_jump_first">Jump-to-First-Message Button in Chats</string>
     <string name="ig_jump_first_message">Jump to first message</string>

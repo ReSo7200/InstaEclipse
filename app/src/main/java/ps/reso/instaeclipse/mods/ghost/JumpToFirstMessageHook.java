@@ -73,6 +73,12 @@ public class JumpToFirstMessageHook {
     }
 
     private static void toggle(Activity a) {
+        run(a, null);
+    }
+
+    /** Scrolls to the first message; {@code onDone} runs once it's reached (or the list is
+     *  missing / the 5 min cap hits), not when the user stops it. Tapping again stops. */
+    static void run(Activity a, Runnable onDone) {
         if (running != null) {
             MAIN.removeCallbacks(running);
             running = null;
@@ -82,6 +88,7 @@ public class JumpToFirstMessageHook {
         View list = findMessageList(a.getWindow().getDecorView());
         if (list == null) {
             ModuleLog.line("(IE|JumpFirst) ⚠️ message list not found");
+            if (onDone != null) onDone.run();
             return;
         }
         Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_loading), Toast.LENGTH_SHORT).show();
@@ -93,7 +100,11 @@ public class JumpToFirstMessageHook {
             @Override
             public void run() {
                 if (running != this) return;
-                if (!list.isAttachedToWindow() || System.currentTimeMillis() - started > 5 * 60_000) { running = null; return; }
+                if (!list.isAttachedToWindow() || System.currentTimeMillis() - started > 5 * 60_000) {
+                    running = null;
+                    if (onDone != null) onDone.run();
+                    return;
+                }
                 list.scrollBy(0, list.canScrollVertically(-1) ? -list.getHeight() * 4 : -1);
                 int count = itemCount(list), off = scrollOffset(list);
                 if (count != lastCount[0] || off != lastOffset[0]) {
@@ -104,6 +115,7 @@ public class JumpToFirstMessageHook {
                     // nothing moved and nothing new loaded for 3 s: this is the first message
                     running = null;
                     Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_done), Toast.LENGTH_SHORT).show();
+                    if (onDone != null) onDone.run();
                     return;
                 }
                 MAIN.postDelayed(this, 250);
