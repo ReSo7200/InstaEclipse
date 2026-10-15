@@ -116,32 +116,10 @@ public class ChatExportHook {
         }
     }
 
-    /** Adds the export button next to the module's Unsent header button. */
+    /** Adds "Export chat" to the module's thread header menu. */
     static void inject(Activity a) {
-        if (!FeatureFlags.chatExport) return;
-        try {
-            View root = a.getWindow().getDecorView();
-            if (root.findViewWithTag(BTN_TAG) != null) return;
-            View anchor = root.findViewWithTag("ie_unsent_btn");
-            if (anchor == null || !(anchor.getParent() instanceof ViewGroup parent)) return;
-            android.widget.ImageView btn = new android.widget.ImageView(a);
-            btn.setTag(BTN_TAG);
-            android.graphics.drawable.Drawable icon =
-                    ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_download, Color.WHITE);
-            if (icon != null) btn.setImageDrawable(icon);
-            float d = a.getResources().getDisplayMetrics().density;
-            int pad = (int) (9 * d);
-            btn.setPadding(pad, pad, pad, pad);
-            btn.setContentDescription(I18n.t(a, R.string.ig_chat_export));
-            int sz = (int) (40 * d);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(sz, sz);
-            lp.gravity = Gravity.CENTER_VERTICAL;
-            btn.setLayoutParams(lp);
-            btn.setOnClickListener(v -> export(a));
-            parent.addView(btn, parent.indexOfChild(anchor) + 1);
-        } catch (Throwable t) {
-            ModuleLog.line(TAG + "⚠️ inject: " + t);
-        }
+        if (!FeatureFlags.chatExport || ThreadHeaderMenu.has(a, "export")) return;
+        ThreadHeaderMenu.add(a, "export", I18n.t(a, R.string.ig_chat_export), () -> export(a));
     }
 
     private static void export(Activity a) {

@@ -148,52 +148,11 @@ public class UnsentThreadButtonHook {
             View header = threadHeaderId != 0 ? activity.findViewById(threadHeaderId) : null;
             if (header == null) return false;
 
-            // Preferred placement: right after the back button (left cluster). Fallbacks: the
-            // left-aligned container, then the right-side action buttons.
-            ViewGroup target;
-            int insertAt;
-            View back = backButtonId != 0 ? activity.findViewById(backButtonId) : null;
-            if (back != null && back.getParent() instanceof ViewGroup) {
-                target = (ViewGroup) back.getParent();
-                int bi = target.indexOfChild(back);
-                // To sit visually to the RIGHT of the back arrow: after it in LTR, before it in RTL
-                // (in RTL, a later child renders further left).
-                boolean rtl = target.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
-                insertAt = rtl ? bi : bi + 1;
-            } else if (leftContainerId != 0 && activity.findViewById(leftContainerId) instanceof ViewGroup) {
-                target = activity.findViewById(leftContainerId);
-                insertAt = 0;
-            } else if (actionBarEndId != 0 && activity.findViewById(actionBarEndId) instanceof ViewGroup) {
-                target = activity.findViewById(actionBarEndId);
-                insertAt = 0;
-            } else if (header instanceof ViewGroup) {
-                target = (ViewGroup) header;
-                insertAt = 0;
-            } else return false;
-
-            if (target.findViewWithTag(TAG) != null) { // already injected
+            if (ThreadHeaderMenu.has(activity, "unsent")) { // already injected
                 if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
                 ChatExportHook.inject(activity);
                 return true;
             }
-
-            android.widget.ImageView btn = new android.widget.ImageView(activity);
-            btn.setTag(TAG);
-            android.graphics.drawable.Drawable icon =
-                    ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(
-                            ps.reso.instaeclipse.R.drawable.ic_delete, Color.WHITE);
-            if (icon != null) btn.setImageDrawable(icon);
-            else { btn.setBackgroundColor(Color.TRANSPARENT); } // fail-safe (no crash if icon missing)
-            btn.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE);
-            int pad = dp(activity, 9);
-            btn.setPadding(pad, pad, pad, pad);
-            btn.setClickable(true);
-            btn.setFocusable(true);
-            btn.setContentDescription("Unsent messages");
-            int sz = dp(activity, 40);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(sz, sz);
-            lp.gravity = Gravity.CENTER_VERTICAL;
-            btn.setLayoutParams(lp);
 
             final View headerRoot = header;
             // Capture the thread id AT INJECTION (thread just opened, before any refresh churn),
@@ -211,14 +170,14 @@ public class UnsentThreadButtonHook {
                 if (threadId == null) threadId = resolveThreadId(headerRoot);
                 return threadId;
             };
-            btn.setOnClickListener(v -> {
+            // Lives in the shared module menu button (one header button for all thread actions).
+            if (!ThreadHeaderMenu.add(activity, "unsent",
+                    ps.reso.instaeclipse.utils.i18n.I18n.t(activity, ps.reso.instaeclipse.R.string.ig_unsent_messages), () -> {
                 String threadId = openThread.get();
                 ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
                 ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
-            });
-            try { target.addView(btn, Math.min(insertAt, target.getChildCount())); }
-            catch (Throwable t) { target.addView(btn); }
-            ModuleLog.line("(IE|UnsentBtn) ✅ injected next to back in " + target.getClass().getSimpleName());
+            })) return false;
+            ModuleLog.line("(IE|UnsentBtn) ✅ added to the thread menu");
             if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
             ChatExportHook.inject(activity);
             return true;

@@ -183,41 +183,10 @@ public class HideChatsHook {
                 return true;
             }
 
-            ViewGroup target;
-            int insertAt;
-            View back = backButtonId != 0 ? activity.findViewById(backButtonId) : null;
-            if (back != null && back.getParent() instanceof ViewGroup) {
-                target = (ViewGroup) back.getParent();
-                int bi = target.indexOfChild(back);
-                boolean rtl = target.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
-                insertAt = rtl ? bi : bi + 1;
-            } else if (header instanceof ViewGroup) {
-                target = (ViewGroup) header;
-                insertAt = 0;
-            } else return false;
-
-            if (target.findViewWithTag(TAG) != null) return true;
-
-            android.widget.ImageView btn = new android.widget.ImageView(activity);
-            btn.setTag(TAG);
-            android.graphics.drawable.Drawable icon =
-                    ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_eye_off, Color.WHITE);
-            if (icon != null) btn.setImageDrawable(icon);
-            btn.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE);
-            int pad = dp(activity, 9);
-            btn.setPadding(pad, pad, pad, pad);
-            btn.setClickable(true);
-            btn.setFocusable(true);
-            btn.setContentDescription("Hide chat");
-            int sz = dp(activity, 40);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(sz, sz);
-            lp.gravity = Gravity.CENTER_VERTICAL;
-            btn.setLayoutParams(lp);
-
-            btn.setOnClickListener(v -> toggleCurrent(activity));
-            try { target.addView(btn, Math.min(insertAt, target.getChildCount())); }
-            catch (Throwable t) { target.addView(btn); }
-            return true;
+            View oldBtn = header.getRootView().findViewWithTag(TAG); // pre-menu builds' eye button
+            if (oldBtn != null && oldBtn.getParent() instanceof ViewGroup p) p.removeView(oldBtn);
+            if (ThreadHeaderMenu.has(activity, "hide")) return true;
+            return ThreadHeaderMenu.add(activity, "hide", I18n(activity, R.string.ig_hide_chat_toggle), () -> toggleCurrent(activity));
         } catch (Throwable t) {
             ModuleLog.line("(IE|HideChats) ⚠️ inject: " + t.getMessage());
             return false;

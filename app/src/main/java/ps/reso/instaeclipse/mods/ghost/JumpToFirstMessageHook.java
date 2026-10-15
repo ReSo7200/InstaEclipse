@@ -62,41 +62,9 @@ public class JumpToFirstMessageHook {
             }
             View header = threadHeaderId != 0 ? a.findViewById(threadHeaderId) : null;
             if (header == null) return false;
-            if (a.getWindow().getDecorView().findViewWithTag(TAG) != null) return true;
-            // Next to the module's own Unsent / Hide-chat header buttons when present (the 452
-            // thread header has no action_bar_end_action_buttons), else the right-side buttons.
-            ViewGroup target = null;
-            int insertAt = 0;
-            for (String t : new String[]{"ie_unsent_btn", "ie_hidechat_btn"}) {
-                View ours = a.getWindow().getDecorView().findViewWithTag(t);
-                if (ours != null && ours.getParent() instanceof ViewGroup g) {
-                    target = g;
-                    insertAt = g.indexOfChild(ours) + 1;
-                    break;
-                }
-            }
-            if (target == null) {
-                View end = actionBarEndId != 0 ? a.findViewById(actionBarEndId) : null;
-                if (end instanceof ViewGroup g) target = g;
-            }
-            if (target == null) return false;
-
-            android.widget.ImageView btn = new android.widget.ImageView(a);
-            btn.setTag(TAG);
-            android.graphics.drawable.Drawable icon =
-                    ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_jump_first, Color.WHITE);
-            if (icon != null) btn.setImageDrawable(icon);
-            btn.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE);
-            int pad = (int) (9 * a.getResources().getDisplayMetrics().density);
-            btn.setPadding(pad, pad, pad, pad);
-            btn.setContentDescription(I18n.t(a, R.string.ig_jump_first_message));
-            int sz = (int) (40 * a.getResources().getDisplayMetrics().density);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(sz, sz);
-            lp.gravity = Gravity.CENTER_VERTICAL;
-            btn.setLayoutParams(lp);
-            btn.setOnClickListener(v -> toggle(a));
-            target.addView(btn, Math.min(insertAt, target.getChildCount()));
-            ModuleLog.line("(IE|JumpFirst) ✅ button injected in " + target.getClass().getSimpleName());
+            if (ThreadHeaderMenu.has(a, "jump")) return true;
+            ThreadHeaderMenu.add(a, "jump", I18n.t(a, R.string.ig_jump_first_message), () -> toggle(a));
+            ModuleLog.line("(IE|JumpFirst) ✅ added to the thread menu");
             return true;
         } catch (Throwable t) {
             ModuleLog.line("(IE|JumpFirst) ⚠️ inject: " + t);
