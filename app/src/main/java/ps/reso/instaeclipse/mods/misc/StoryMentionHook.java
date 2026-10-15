@@ -205,7 +205,7 @@ public class StoryMentionHook {
 
         XC_MethodHook mentionHook = new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.enableStoryMentions) return;
                     CharSequence[] original = (CharSequence[]) param.getResult();
                     if (original == null) return;
@@ -262,7 +262,7 @@ public class StoryMentionHook {
         try {
             XposedBridge.hookMethod(method, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     try {
                         if (!FeatureFlags.enableStoryMentions) return;
 

@@ -90,7 +90,7 @@ public class InstantUploadHook {
             }
             if (targets.isEmpty()) { ModuleLog.line("(IE|InstantUpload) ⚠️ A02 not found"); return; }
             XC_MethodHook swap = new XC_MethodHook() {
-                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     try {
                         if (!(p.args[1] instanceof Bitmap)) return; // suspend re-entry passes nulls
                         // Drop a stale pick so it can't hijack a much-later real capture.
@@ -130,7 +130,7 @@ public class InstantUploadHook {
             // "A15") — any one firing means the quicksnap camera VM is live, i.e. the camera is
             // on screen. Injection is idempotent + gated to the modal, so hooking several is safe.
             XC_MethodHook onActive = new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
+                @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     if (!FeatureFlags.uploadInstants) return;
                     Activity act = currentActivity();
                     if (act != null) FeedVideoDownloadHook.mainHandler.post(() -> injectChip(act));
@@ -283,7 +283,7 @@ public class InstantUploadHook {
         try {
             XposedHelpers.findAndHookMethod(Activity.class, "onActivityResult",
                     int.class, int.class, Intent.class, new XC_MethodHook() {
-                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                        @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                             try {
                                 int req = (int) p.args[0];
                                 int res = (int) p.args[1];

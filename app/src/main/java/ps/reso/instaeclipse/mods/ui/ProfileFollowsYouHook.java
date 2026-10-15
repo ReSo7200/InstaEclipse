@@ -68,7 +68,7 @@ public class ProfileFollowsYouHook {
             followedByGetter.setAccessible(true);
             XposedBridge.hookMethod(updated, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.profileFollowsYouLabel) return;
                     Object frag = param.thisObject;
                     if (frag == null) for (Object a : param.args) if (a != null && a.getClass().getName().equals(FRAGMENT)) frag = a;
@@ -81,7 +81,7 @@ public class ProfileFollowsYouHook {
             Class<?> base = cl.loadClass("androidx.fragment.app.Fragment");
             de.robv.android.xposed.XposedHelpers.findAndHookMethod(base, "onResume", new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.profileFollowsYouLabel) return;
                     Object frag = param.thisObject;
                     for (Class<?> c = frag.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {

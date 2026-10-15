@@ -41,7 +41,7 @@ public class DisableDoubleTapLikeHook {
 
     private static final XC_MethodHook HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+        protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (!FeatureFlags.disableDoubleTapLike) return;
             StackTraceElement[] stack = Thread.currentThread().getStackTrace();
             for (StackTraceElement frame : stack) {
@@ -56,7 +56,7 @@ public class DisableDoubleTapLikeHook {
 
     private static final XC_MethodHook REELS_GESTURE_HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+        protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (!FeatureFlags.disableDoubleTapLike) return;
             if (!looksLikeClipsDoubleTapGesture(param.thisObject)) return;
             block(param);

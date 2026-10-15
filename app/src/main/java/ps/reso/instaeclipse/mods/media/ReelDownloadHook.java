@@ -51,7 +51,7 @@ public class ReelDownloadHook {
                 FeatureStatusTracker.setHooked("ReelDownload");
                 XposedBridge.hookMethod(cached, new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam param) {
+                    protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!FeatureFlags.enableReelDownload) return;
                         onOptionsBuilt(param);
                     }
@@ -121,7 +121,7 @@ public class ReelDownloadHook {
 
             XposedBridge.hookMethod(target, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.enableReelDownload) return;
                     onOptionsBuilt(param);
                 }
@@ -186,7 +186,7 @@ public class ReelDownloadHook {
 
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     boolean wantDl = FeatureFlags.enableReelDownload && download != null;
                     boolean wantCl = FeatureFlags.copyMediaLink && copyLink != null;
                     boolean wantInfo = FeatureFlags.offerMediaInfo && info != null;
@@ -272,7 +272,7 @@ public class ReelDownloadHook {
                                          boolean forcedResult) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 ModuleLog.line("(IE|Reel|DEBUG) gate fired: " + cacheKey + " enabled=" + FeatureFlags.enableReelDownload);
                 if (FeatureFlags.enableReelDownload) param.setResult(forcedResult);
             }

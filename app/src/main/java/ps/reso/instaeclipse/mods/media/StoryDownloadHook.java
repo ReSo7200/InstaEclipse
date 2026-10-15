@@ -248,15 +248,15 @@ public class StoryDownloadHook {
                     } catch (Throwable ignored) {}
                 }
             XposedBridge.hookMethod(build, new XC_MethodHook() {
-                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     if (FeatureFlags.enableStoryDownload) trayHelper.set(p.thisObject);
                 }
-                @Override protected void afterHookedMethod(MethodHookParam p) { trayHelper.remove(); }
+                @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method); trayHelper.remove(); }
             });
             if (addRow != null && legacyItems != null) {
                 final Method add = addRow;
                 XposedBridge.hookMethod(legacyItems, new XC_MethodHook() {
-                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         Object h = trayHelper.get();
                         if (h == null || !trayDialogsDone.add(p.thisObject)) return;
                         try {
@@ -270,7 +270,7 @@ public class StoryDownloadHook {
                 final Method factory = rowFactory;
                 final Class<?> iface = rowFactory.getParameterTypes()[0];
                 XposedBridge.hookMethod(popupSet, new XC_MethodHook() {
-                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         Object h = trayHelper.get();
                         if (h == null || !(p.args[0] instanceof List<?>)) return;
                         try {
@@ -433,7 +433,7 @@ public class StoryDownloadHook {
      */
     private void installStoryCaptureHook(DexKitBridge bridge, ClassLoader cl) {
         XC_MethodHook capture = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!FeatureFlags.cacheStories) return;
                 Object reelItem = null;
                 for (Object a : p.args) {
@@ -538,7 +538,7 @@ public class StoryDownloadHook {
 
             XC_MethodHook injector = new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory && !FeatureFlags.offerPlaybackSpeed) return;
                     if (!(param.getResult() instanceof CharSequence[] original) || original == null) return;
 
@@ -616,7 +616,7 @@ public class StoryDownloadHook {
 
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory && !FeatureFlags.offerPlaybackSpeed) return;
 
                 // 1. Find which button was tapped

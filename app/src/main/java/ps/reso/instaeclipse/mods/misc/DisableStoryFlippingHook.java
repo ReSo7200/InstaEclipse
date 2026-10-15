@@ -19,7 +19,7 @@ public class DisableStoryFlippingHook {
 
     private static final XC_MethodHook HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+        protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (FeatureFlags.disableStoryFlipping) param.setResult(null);
         }
     };

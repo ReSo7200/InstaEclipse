@@ -28,7 +28,7 @@ public class GhostChannelMarkAsReadHook {
         try {
             XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow", new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     // Bail immediately if the feature is off — this hook fires for every
                     // view attachment in the entire app, so the fast path must be trivial.
                     if (!FeatureFlags.isGhostSeen) return;

@@ -203,7 +203,7 @@ public class DistractionFreeUIHook {
         pagerTouchHooked = true;
         de.robv.android.xposed.XC_MethodHook gate = new de.robv.android.xposed.XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.disableReels) return;
                 if (param.thisObject instanceof View self
                         && self.getParent() instanceof View p && p.getId() == tabPagerId) {
@@ -260,6 +260,8 @@ public class DistractionFreeUIHook {
         return id != 0 ? root.findViewById(id) : null;
     }
 
+    private static boolean swipeLogged;
+
     /** Turns off swipe navigation between main tabs (tab buttons keep working). */
     private static void disableTabSwipe(ViewGroup root) {
         java.util.ArrayDeque<View> stack = new java.util.ArrayDeque<>();
@@ -272,7 +274,10 @@ public class DistractionFreeUIHook {
                     java.lang.reflect.Field f = userInputField(v);
                     if (f != null && f.getBoolean(v)) {
                         f.setBoolean(v, false);
-                        ModuleLog.line("(IE|DistractUI) main tab swipe disabled (Reels off) via " + f.getName());
+                        if (!swipeLogged) { // IG turns it back on every few seconds; we keep switching it off
+                            swipeLogged = true;
+                            ModuleLog.line("(IE|DistractUI) main tab swipe disabled (Reels off) via " + f.getName());
+                        }
                     }
                 } catch (Throwable ignored) {}
                 continue;

@@ -35,7 +35,7 @@ public class TerminatedExecutorGuard {
                     Runnable.class, ThreadPoolExecutor.class,
                     new XC_MethodHook() {
                         @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {
+                        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             try {
                                 ThreadPoolExecutor ex = (ThreadPoolExecutor) param.args[1];
                                 // isShutdown() is true for SHUTDOWN/STOP/TERMINATED — in every one of

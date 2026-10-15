@@ -44,7 +44,7 @@ public class LockDirectMessagesHook {
         // inside InstagramMainActivity, whose onCreate is obfuscated/inherited (a literal hook
         // fails) — so main is covered from UIHookManager.setupHooks via watchActivity() instead.
         XC_MethodHook start = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
+            @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 watchActivity((Activity) param.thisObject);
             }
         };

@@ -79,7 +79,7 @@ public class LikeUndoHook {
         final Method sender = target;
         XposedBridge.hookMethod(sender, new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.likeUndo || REPLAYING.get() == Boolean.TRUE) return;
                 Object media = null;
                 for (Object a : param.args) {

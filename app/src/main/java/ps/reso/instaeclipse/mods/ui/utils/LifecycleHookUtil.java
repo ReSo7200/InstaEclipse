@@ -58,7 +58,7 @@ public final class LifecycleHookUtil {
             DISPATCH.put(declared, list);
             XposedBridge.hookMethod(declared, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     Object self = param.thisObject;
                     if (!(self instanceof Activity activity)) return;
                     for (Entry e : list) {

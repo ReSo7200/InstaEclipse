@@ -84,7 +84,7 @@ public class StoryViewerSearchHook {
 
             XposedBridge.hookMethod(build, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.storyViewerSearch) return;
                     Object ad = param.thisObject;
                     injectSearchBox(ad);

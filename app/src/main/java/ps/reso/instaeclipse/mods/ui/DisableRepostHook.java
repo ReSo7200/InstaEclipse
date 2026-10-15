@@ -77,7 +77,7 @@ public class DisableRepostHook {
     private int installActionHandler(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook skip = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.disableRepost) {
                     param.setResult(null); // void method → skip original entirely
                     ModuleLog.line("(IE|Repost) neutralized repost action");
@@ -109,7 +109,7 @@ public class DisableRepostHook {
     private int installFeedCommit(ClassLoader classLoader) {
         XC_MethodHook skipPostRepost = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.disableRepost) {
                     param.setResult(null); // void launcher → coroutine never built/launched
                     ModuleLog.line("(IE|Repost) neutralized FEED repost (postRepost)");

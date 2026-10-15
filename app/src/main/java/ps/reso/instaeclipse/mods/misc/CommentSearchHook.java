@@ -84,7 +84,7 @@ public class CommentSearchHook {
                 if (!takesVm) continue;
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam param) {
+                    protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!FeatureFlags.commentSearch || param.getResult() == null) return;
                         List<String[]> rows = collect(param.getResult());
                         if (!rows.isEmpty()) latest = rows;
@@ -100,7 +100,7 @@ public class CommentSearchHook {
                     Method ovc = frag.getDeclaredMethod("onViewCreated", View.class, android.os.Bundle.class);
                     XposedBridge.hookMethod(ovc, new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (FeatureFlags.commentSearch && param.args[0] instanceof View root) root.post(() -> addPill(host(root)));
                         }
                     });

@@ -50,7 +50,7 @@ public class ShareSheetCleanupHook {
             XposedHelpers.findAndHookMethod(FRAGMENT, classLoader, "onViewCreated",
                     View.class, Bundle.class, new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (param.args[0] instanceof View root) watch(root);
                         }
                     });
@@ -61,7 +61,7 @@ public class ShareSheetCleanupHook {
 
         XC_MethodHook inflate = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.hideShareCreateGroup) return;
                 try {
                     if (!(param.args[0] instanceof Integer res) || !(param.getResult() instanceof View result)) return;

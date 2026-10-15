@@ -41,7 +41,7 @@ public class HideNotesTrayHook {
                 java.lang.reflect.Method m = md.getMethodInstance(ps.reso.instaeclipse.Xposed.Module.hostClassLoader);
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam param) {
+                    protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (FeatureFlags.hideNotesTray) param.setResult(null);
                     }
                 });
@@ -69,7 +69,7 @@ public class HideNotesTrayHook {
             }
             XposedBridge.hookMethod(ctor, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.hideNotesTray) return;
                     for (Object a : param.args) {
                         if (a instanceof View v && !(a instanceof android.view.LayoutInflater)) {

@@ -38,7 +38,7 @@ public class LocationSpoofHook {
                     if (n.equals("getLastKnownLocation") || n.equals("getLastLocation")) {
                         XposedBridge.hookMethod(m, new XC_MethodHook() {
                             @Override
-                            protected void afterHookedMethod(MethodHookParam param) {
+                            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                                 if (!FeatureFlags.spoofLocation) return;
                                 String provider = (param.getResult() instanceof Location)
                                         ? ((Location) param.getResult()).getProvider() : "gps";
@@ -49,7 +49,7 @@ public class LocationSpoofHook {
                     if (n.equals("requestLocationUpdates") || n.equals("requestSingleUpdate")) {
                         XposedBridge.hookMethod(m, new XC_MethodHook() {
                             @Override
-                            protected void afterHookedMethod(MethodHookParam param) {
+                            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                                 if (!FeatureFlags.spoofLocation) return;
                                 LocationListener listener = findListener(param.args);
                                 if (listener == null) return;
@@ -67,7 +67,7 @@ public class LocationSpoofHook {
                         if (m.getName().equals("getLastLocation") && m.getParameterTypes().length == 0) {
                             XposedBridge.hookMethod(m, new XC_MethodHook() {
                                 @Override
-                                protected void afterHookedMethod(MethodHookParam param) {
+                                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                                     if (!FeatureFlags.spoofLocation) return;
                                     try {
                                         Object task = param.getResult();

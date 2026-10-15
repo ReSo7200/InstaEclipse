@@ -126,7 +126,7 @@ public class PlaybackSpeedHook {
             for (Method m : cached) { m.setAccessible(true); SETTERS.add(m); }
             XposedBridge.hookMethod(start, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     lastPlayer = new WeakReference<>(param.thisObject);
                     if (FeatureFlags.offerPlaybackSpeed && speed != 1f) {
                         Object p = param.thisObject;
@@ -148,7 +148,7 @@ public class PlaybackSpeedHook {
             if (started != null) {
                 XposedBridge.hookMethod(started, new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam param) {
+                    protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         lastPlayer = new WeakReference<>(param.thisObject);
                         if (FeatureFlags.offerPlaybackSpeed && speed != 1f) apply(param.thisObject, speed);
                     }
@@ -168,7 +168,7 @@ public class PlaybackSpeedHook {
                     WRAPPERS.add(m);
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {
+                        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             remember(param.thisObject);
                             if (APPLYING.get() == Boolean.TRUE) return;
                             if (FeatureFlags.offerPlaybackSpeed && speed != 1f && param.args[0] instanceof Float f && f == 1f)
@@ -178,7 +178,7 @@ public class PlaybackSpeedHook {
                     for (java.lang.reflect.Constructor<?> c : m.getDeclaringClass().getDeclaredConstructors()) {
                         XposedBridge.hookMethod(c, new XC_MethodHook() {
                             @Override
-                            protected void afterHookedMethod(MethodHookParam param) { remember(param.thisObject); }
+                            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method); remember(param.thisObject); }
                         });
                     }
                     storyHooks++;
@@ -213,7 +213,7 @@ public class PlaybackSpeedHook {
             }
             XposedBridge.hookMethod(gate, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.forceReelScrubber) param.setResult(true);
                 }
             });

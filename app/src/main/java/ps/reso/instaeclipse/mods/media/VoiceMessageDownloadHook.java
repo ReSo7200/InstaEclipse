@@ -85,7 +85,7 @@ public class VoiceMessageDownloadHook {
                     if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != messageClass) continue;
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (param.getResult() != null) {
                                 lastMessage = param.getResult();
                                 lastMessageAt = System.currentTimeMillis();
@@ -112,7 +112,7 @@ public class VoiceMessageDownloadHook {
                 if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != vm) continue;
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam param) {
+                    protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!FeatureFlags.enableVoiceDownload || ctor == null) return;
                         Object msg = recentMessage();
                         String url = msg != null ? audioUrl(msg) : null;
@@ -150,7 +150,7 @@ public class VoiceMessageDownloadHook {
                 Method m = md.getMethodInstance(cl);
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam param) {
+                    protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!FeatureFlags.enableVoiceDownload) return;
                         Object action = null, msg = null;
                         Context ctx = null;
@@ -177,7 +177,7 @@ public class VoiceMessageDownloadHook {
                 if (!Modifier.isStatic(m.getModifiers())) continue;
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam param) {
+                    protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!FeatureFlags.enableVoiceDownload) return;
                         Object row = null;
                         for (Object a : param.args) if (data.isInstance(a)) row = a;
@@ -201,7 +201,7 @@ public class VoiceMessageDownloadHook {
                     if (Modifier.isStatic(m.getModifiers()) || Modifier.isAbstract(m.getModifiers())) continue;
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {
+                        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (!FeatureFlags.enableVoiceDownload) return;
                             if (!(param.args[0] instanceof Enum<?> e) || !CARRIER.equals(e.name())) return;
                             Object msg = recentMessage();
@@ -247,7 +247,7 @@ public class VoiceMessageDownloadHook {
                         if (!takesFn) continue;
                         XposedBridge.hookMethod(m, new XC_MethodHook() {
                             @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
+                            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                                 if (!FeatureFlags.enableVoiceDownload) return;
                                 for (int i = 0; i < param.args.length; i++) {
                                     Object orig = param.args[i];

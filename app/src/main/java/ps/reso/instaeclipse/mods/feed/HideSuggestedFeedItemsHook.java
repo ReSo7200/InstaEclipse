@@ -28,7 +28,7 @@ public class HideSuggestedFeedItemsHook {
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook filterHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.hideSuggestionsInFeed && !FeatureFlags.hideThreadsSuggestions
                         && !FeatureFlags.hideLikedPosts) return;
 

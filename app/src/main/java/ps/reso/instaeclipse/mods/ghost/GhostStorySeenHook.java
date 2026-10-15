@@ -208,7 +208,7 @@ public class GhostStorySeenHook {
     private static XC_MethodHook legacyHook() {
         return new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.isGhostStory) param.setResult(null);
             }
         };
@@ -225,7 +225,7 @@ public class GhostStorySeenHook {
     private int hookStoreSendersScopedTo(final Class<?> storeClass) {
         XC_MethodHook gate = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.isGhostStory
                         && param.thisObject != null
                         && storeClass.isInstance(param.thisObject)) {

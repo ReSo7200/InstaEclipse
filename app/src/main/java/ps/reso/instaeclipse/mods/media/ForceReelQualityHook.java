@@ -87,7 +87,7 @@ public class ForceReelQualityHook {
 
             XposedBridge.hookMethod(videoVersionsGetter, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.forceReelQuality <= 0) return;
                     try {
                         Object result = param.getResult();

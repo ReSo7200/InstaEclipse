@@ -136,12 +136,12 @@ public class CaptionCopyContextMenuHook {
 
     private static void installActivityTracker() {
         XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 currentActivity = (Activity) p.thisObject;
             }
         });
         XposedHelpers.findAndHookMethod(Activity.class, "onDestroy", new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (currentActivity == p.thisObject) currentActivity = null;
             }
         });
@@ -429,7 +429,7 @@ public class CaptionCopyContextMenuHook {
             // idxOption. Drop that single add when Remove Meta AI is on — only if addButton is void
             // (a side-effecting row-adder), never clobbering a chaining return.
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 try {
                     Object opt = param.args[idxOption];
@@ -441,7 +441,7 @@ public class CaptionCopyContextMenuHook {
             }
 
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableCaptionCopy) return;
                 if (Boolean.TRUE.equals(sAddingCaptionRow.get())) return;
                 if (param.args[idxOption] == copyCaptionOptionValue) return;
@@ -480,7 +480,7 @@ public class CaptionCopyContextMenuHook {
     private static void installClickHandlerHook(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableCaptionCopy) return;
                 onOptionClicked(param);
             }
@@ -543,7 +543,7 @@ public class CaptionCopyContextMenuHook {
     private static void installAllowlistPatchHook(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook allowlistHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (copyCaptionOptionValue == null) return;
                 try {
                     Object result = param.getResult();
@@ -602,7 +602,7 @@ public class CaptionCopyContextMenuHook {
 
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableCaptionCopy) return;
                 try {
                     Object result = param.getResult();
@@ -764,7 +764,7 @@ public class CaptionCopyContextMenuHook {
             }
             XposedBridge.hookMethod(resolver, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (EXTRA_REEL_LABELS.isEmpty() || copyLinkOptionForLabels == null) return;
                     for (int i = 0; i < param.args.length; i++) {
                         Object a = param.args[i];
@@ -817,7 +817,7 @@ public class CaptionCopyContextMenuHook {
     private static XC_MethodHook makeBuilderLabelHook() {
         return new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 try {
                     Object[] args = param.args;
                     if (args == null) return;

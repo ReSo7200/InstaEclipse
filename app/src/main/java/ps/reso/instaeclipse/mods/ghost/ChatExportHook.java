@@ -85,7 +85,7 @@ public class ChatExportHook {
             for (Constructor<?> c : store.getDeclaredConstructors()) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam param) { STORES.put(param.thisObject, Boolean.TRUE); }
+                    protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method); STORES.put(param.thisObject, Boolean.TRUE); }
                 });
             }
             for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()

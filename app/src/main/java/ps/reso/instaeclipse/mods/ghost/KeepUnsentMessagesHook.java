@@ -126,7 +126,7 @@ public class KeepUnsentMessagesHook {
                             .paramTypes("com.instagram.model.direct.DirectThreadKey", "boolean")));
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (param.args.length > 0) {
                         String id = threadIdOf(param.args[0]);
                         Object flag = param.args.length > 1 ? param.args[1] : null;
@@ -226,7 +226,7 @@ public class KeepUnsentMessagesHook {
     private void hookRemovePrimitive(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.keepUnsentMessages) return;
                 // Record the message-id String arg(s) (GYr/GYs pass id as the String params).
                 String threadId = param.args.length > 0 ? threadIdOf(param.args[0]) : null;
@@ -294,7 +294,7 @@ public class KeepUnsentMessagesHook {
             // actual message object so we can re-inject it on later passes that no longer carry it.
             @Override
             @SuppressWarnings("unchecked")
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.keepUnsentMessages || protectedIds.isEmpty()) return;
                 Object[] args = param.args;
                 if (args == null || args.length == 0 || args[0] == null) return;
@@ -317,7 +317,7 @@ public class KeepUnsentMessagesHook {
             // from any removed/delta out-list so the removal delta won't fire.
             @Override
             @SuppressWarnings("unchecked")
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.keepUnsentMessages) return;
                 Object[] args = param.args;
                 if (args == null || args.length < 2 || args[0] == null) return;

@@ -194,7 +194,10 @@ public class FeedVideoDownloadHook {
                 + (liveTreeMediaDictClass != null) + " listCandidates="
                 + carouselCandidates.size());
 
-        installUriCaptureHook();
+        // The Uri.parse URL buffer only fed the old floating-button path (installViewHook, no longer
+        // installed). Hooking Uri.parse app-wide — one of the hottest framework methods — triggers
+        // ART's JIT SIGSEGV on IG 451+, so it is not installed any more.
+        FeatureStatusTracker.setHooked("PostDownload");
     }
 
     // ── Hook 1: Uri.parse (fallback buffer) ──────────────────────────────────
@@ -204,7 +207,7 @@ public class FeedVideoDownloadHook {
             XposedHelpers.findAndHookMethod(Uri.class, "parse", String.class,
                     new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             try {
                                 if (!FeatureFlags.enablePostDownload) return;
                                 if (param.args.length == 0 || !(param.args[0] instanceof String s)) return;
@@ -233,7 +236,7 @@ public class FeedVideoDownloadHook {
             XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow",
                     new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (!FeatureFlags.enablePostDownload) return;
                             View view = (View) param.thisObject;
                             Context ctx = view.getContext();
@@ -1105,7 +1108,7 @@ public class FeedVideoDownloadHook {
         resolveIsVideoMethod(bridge, classLoader);
         XC_MethodHook urlHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enablePostDownload) return;
                 Object result = param.getResult();
                 if (!(result instanceof String url)) return;

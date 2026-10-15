@@ -44,7 +44,7 @@ public class GhostEphemeralKeepHook {
     private void hookVanishLocalDelete(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.keepEphemeralMessages) param.setResult(null);
             }
         };
@@ -57,7 +57,7 @@ public class GhostEphemeralKeepHook {
         // Both return "anything removed"; callers only commit on true, so false = keep all.
         XC_MethodHook keep = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.keepEphemeralMessages) param.setResult(false);
             }
         };
@@ -140,7 +140,7 @@ public class GhostEphemeralKeepHook {
     private void hookServerPing(DexKitBridge bridge) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.keepEphemeralMessages) param.setResult(null);
             }
         };
@@ -183,7 +183,7 @@ public class GhostEphemeralKeepHook {
     private void hookExpiryParser(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.keepEphemeralMessages) return;
                 Object result = param.getResult();
                 if (result != null) clearExpiryTimestamp(result);

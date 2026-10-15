@@ -99,7 +99,7 @@ public class EditHistoryHook {
 
             XposedBridge.hookMethod(merge, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.keepEditHistory) return;
                     Map<Field, String> snap = new java.util.HashMap<>();
                     for (Field f : stringFields) {
@@ -109,7 +109,7 @@ public class EditHistoryHook {
                 }
 
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     Map<Field, String> snap = BEFORE.get();
                     BEFORE.remove();
                     if (snap == null) return;
@@ -130,7 +130,7 @@ public class EditHistoryHook {
 
             XposedBridge.hookMethod(getter, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.keepEditHistory) return;
                     Object r = param.getResult();
                     if (r instanceof List<?> l && !l.isEmpty()) return; // server-provided history wins

@@ -25,7 +25,7 @@ public class GhostScreenshotDetectionHook {
     public void handleScreenshotBlock(DexKitBridge bridge) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.isGhostScreenshot) param.setResult(null);
             }
         };

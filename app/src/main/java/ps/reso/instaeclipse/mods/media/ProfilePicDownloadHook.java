@@ -56,7 +56,7 @@ public class ProfilePicDownloadHook {
         // window type (Activity, Dialog, BottomSheet) without relying on layout listeners.
         XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow", new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableProfileDownload) return;
                 View v = (View) param.thisObject;
                 int vid = v.getId();

@@ -30,7 +30,7 @@ public class ExternalBrowserHook {
         try {
             int n = XposedBridge.hookAllMethods(Instrumentation.class, "execStartActivity", new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.openLinksExternally) return;
                     for (Object a : param.args) {
                         if (a instanceof Intent intent) {

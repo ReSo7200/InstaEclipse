@@ -64,7 +64,7 @@ public class ExactTimestampHook {
 
         XposedBridge.hookMethod(target, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.exactTimestamps) return;
                 try {
                     double a = (Double) param.args[4];

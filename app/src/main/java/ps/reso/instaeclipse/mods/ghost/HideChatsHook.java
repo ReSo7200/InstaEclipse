@@ -61,7 +61,7 @@ public class HideChatsHook {
     // ── 1. Inbox thread-list filter ────────────────────────────────────────────
     private void installInboxFilter(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook filter = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
+            @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.hideSpecificChats || HiddenThreads.isEmpty()) return;
                 Object r = param.getResult();
                 if (!(r instanceof java.util.List<?> list) || list.isEmpty()) return;

@@ -119,7 +119,7 @@ public class IGNetworkInterceptor {
                 String finalUriFieldName = uriFieldName;
                 XC_MethodHook dropHook = new XC_MethodHook() {
                             @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
+                            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                               try {
                                 Object requestObj = param.args[0];
                                 URI uri = (URI) XposedHelpers.getObjectField(requestObj, finalUriFieldName);

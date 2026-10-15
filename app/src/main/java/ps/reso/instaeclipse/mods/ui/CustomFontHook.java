@@ -46,8 +46,18 @@ public class CustomFontHook {
     }
 
     private void installFontHooks(ClassLoader cl) {
+        // The typeface hooks sit on very hot framework methods (Paint/TextView.setTypeface); merely
+        // installing them makes ART's JIT crash IG every ~40 s on Android 13, so they are only
+        // installed when a custom font is active (a newly picked font asks for an IG restart anyway).
+        if (FeatureFlags.customFontEnabled || FeatureFlags.customEmojiEnabled) installTypefaceHooks();
+        installPickResultHook();
+        if (FeatureFlags.customFontEnabled) FeatureStatusTracker.setHooked("CustomFont");
+        ModuleLog.line("(IE|Font) ✅ installed");
+    }
+
+    private void installTypefaceHooks() {
         XC_MethodHook replace = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!(FeatureFlags.customFontEnabled || FeatureFlags.customEmojiEnabled)) return;
                 if (Boolean.TRUE.equals(loading.get())) return; // our own load
                 // Safeguard: don't replace an icon/glyph font.
@@ -80,7 +90,7 @@ public class CustomFontHook {
         // our font on EVERY text view (this build renders icons as vector drawables, not an icon
         // font, so replacing text typefaces app-wide is safe). beforeHook swaps the arg.
         XC_MethodHook setTf1 = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!(FeatureFlags.customFontEnabled || FeatureFlags.customEmojiEnabled) || Boolean.TRUE.equals(loading.get())) return;
                 Typeface tf = getActiveTypeface();
                 if (tf != null && p.args[0] != tf) p.args[0] = tf;
@@ -92,7 +102,7 @@ public class CustomFontHook {
         // setTypeface(Typeface, int) applies a style over a base family; force our font as the base
         // and let the style (bold/italic) be derived from it.
         XC_MethodHook setTf2 = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!(FeatureFlags.customFontEnabled || FeatureFlags.customEmojiEnabled) || Boolean.TRUE.equals(loading.get())) return;
                 Typeface tf = getActiveTypeface();
                 if (tf != null && p.args[0] != tf) p.args[0] = tf;
@@ -102,26 +112,78 @@ public class CustomFontHook {
             XposedHelpers.findAndHookMethod(android.widget.TextView.class, "setTypeface", Typeface.class, int.class, setTf2);
         } catch (Throwable ignored) {}
 
-        // Deepest catch-all: DM chats and post captions are Litho/Compose text, drawn via a Paint
-        // (not a TextView), so the TextView hooks miss them. Force our font at Paint.setTypeface —
-        // this reaches every text-drawing path in the app. (Icons are vector drawables on this
-        // build, so this doesn't affect glyph rendering.)
-        XC_MethodHook paintTf = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
-                if (!(FeatureFlags.customFontEnabled || FeatureFlags.customEmojiEnabled) || Boolean.TRUE.equals(loading.get())) return;
+        // Litho/Compose text (DM chats, captions) is drawn via a Paint, not a TextView. Hooking
+        // Paint.setTypeface reached it but is far too hot (ART's JIT crashes IG within a minute), so
+        // cover the cold load-time paths instead: typefaces built from fonts/resources
+        // (Typeface.Builder / CustomFallbackBuilder) and the system defaults a null Paint typeface
+        // or a "sans-serif" family resolves to.
+        XC_MethodHook built = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
+                if (Boolean.TRUE.equals(loading.get()) || p.getResult() == null) return;
+                try { // same safeguard as above: leave icon/glyph fonts alone
+                    Object path = XposedHelpers.getObjectField(p.thisObject, "mPath");
+                    if (path != null && (path.toString().toLowerCase().contains("icon") || path.toString().toLowerCase().contains("glyph"))) return;
+                } catch (Throwable ignored) {}
                 Typeface tf = getActiveTypeface();
-                if (tf != null && p.args[0] != tf) p.args[0] = tf;
+                if (tf != null) p.setResult(Typeface.create(tf, ((Typeface) p.getResult()).getWeight(), ((Typeface) p.getResult()).isItalic()));
             }
         };
-        try {
-            XposedHelpers.findAndHookMethod(android.graphics.Paint.class, "setTypeface", Typeface.class, paintTf);
-        } catch (Throwable ignored) {}
+        for (String b : new String[]{"android.graphics.Typeface$Builder", "android.graphics.Typeface$CustomFallbackBuilder"}) {
+            try {
+                XposedHelpers.findAndHookMethod(b, null, "build", built);
+            } catch (Throwable ignored) {}
+        }
+        replaceSystemDefaults();
+    }
 
+
+    /** Points Typeface.DEFAULT/SANS_SERIF/DEFAULT_BOLD, the default native typeface and the
+     *  sans-serif entries of the system font map at the active font (keeping each one's weight/style). */
+    private static void replaceSystemDefaults() {
+        Typeface tf = getActiveTypeface();
+        if (tf == null) return;
+        int n = 0;
+        try {
+            loading.set(Boolean.TRUE);
+            for (String f : new String[]{"DEFAULT", "DEFAULT_BOLD", "SANS_SERIF"}) {
+                try {
+                    Typeface old = (Typeface) XposedHelpers.getStaticObjectField(Typeface.class, f);
+                    XposedHelpers.setStaticObjectField(Typeface.class, f, Typeface.create(tf, old.getWeight(), old.isItalic()));
+                    n++;
+                } catch (Throwable ignored) {}
+            }
+            try {
+                XposedHelpers.callStaticMethod(Typeface.class, "setDefault", Typeface.DEFAULT);
+            } catch (Throwable t) { ModuleLog.line("(IE|Font) setDefault: " + t); }
+            try {
+                @SuppressWarnings("unchecked")
+                java.util.Map<String, Typeface> orig = (java.util.Map<String, Typeface>)
+                        XposedHelpers.getStaticObjectField(Typeface.class, "sSystemFontMap");
+                // read-only on Android 13: swap in an edited copy
+                java.util.Map<String, Typeface> map = new android.util.ArrayMap<>(orig.size());
+                map.putAll(orig);
+                for (java.util.Map.Entry<String, Typeface> e : orig.entrySet()) {
+                    String k = e.getKey().toLowerCase();
+                    if (!(k.startsWith("sans-serif") || k.startsWith("roboto") || k.startsWith("google-sans"))
+                            || k.contains("mono")) continue;
+                    Typeface old = e.getValue();
+                    map.put(e.getKey(), Typeface.create(tf, old.getWeight(), old.isItalic()));
+                    n++;
+                }
+                XposedHelpers.setStaticObjectField(Typeface.class, "sSystemFontMap", map);
+            } catch (Throwable t) { ModuleLog.line("(IE|Font) system map: " + t); }
+        } finally {
+            loading.set(Boolean.FALSE);
+        }
+        ModuleLog.line("(IE|Font) system defaults replaced: " + n);
+    }
+
+    private void installPickResultHook() {
         // Receive the picked font file (launched from the module's "Pick font file" action).
         try {
             XposedHelpers.findAndHookMethod(Activity.class, "onActivityResult",
                     int.class, int.class, Intent.class, new XC_MethodHook() {
-                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                        @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                             try {
                                 int req = (int) p.args[0];
                                 if (req != FONT_PICK_REQUEST && req != EMOJI_PICK_REQUEST) return;
@@ -154,9 +216,6 @@ public class CustomFontHook {
                         }
                     });
         } catch (Throwable ignored) {}
-
-        if (FeatureFlags.customFontEnabled) FeatureStatusTracker.setHooked("CustomFont");
-        ModuleLog.line("(IE|Font) ✅ installed");
     }
 
     private static Typeface getUserFont() {
@@ -211,9 +270,14 @@ public class CustomFontHook {
                         new File(FeatureFlags.customEmojiPath)).build();
                 android.graphics.fonts.FontFamily primFam = new android.graphics.fonts.FontFamily.Builder(primary).build();
                 android.graphics.fonts.FontFamily emojiFam = new android.graphics.fonts.FontFamily.Builder(emoji).build();
-                combo = new Typeface.CustomFallbackBuilder(primFam)
-                        .addCustomFallback(emojiFam)
-                        .build();
+                loading.set(Boolean.TRUE); // our own build: skip the Builder hooks
+                try {
+                    combo = new Typeface.CustomFallbackBuilder(primFam)
+                            .addCustomFallback(emojiFam)
+                            .build();
+                } finally {
+                    loading.set(Boolean.FALSE);
+                }
             }
             comboKey = key;
         } catch (Throwable t) {
@@ -305,7 +369,7 @@ public class CustomFontHook {
             Class<?> c00aC = XposedHelpers.findClass("X.00aC", cl);       // metadata loader
             final Class<?> c00Zv = XposedHelpers.findClass("X.00Zv", cl); // callback
             XposedHelpers.findAndHookMethod(c00aC, "EXz", c00Zv, new XC_MethodHook() {
-                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     if (!FeatureFlags.customEmojiEnabled) return;
                     try {
                         XposedHelpers.callMethod(p.args[0], "A01", new Exception("ie: emoji via fallback")); // onFailed
@@ -334,7 +398,7 @@ public class CustomFontHook {
             for (org.luckypray.dexkit.result.MethodData md : found) {
                 java.lang.reflect.Method run = md.getMethodInstance(cl);
                 de.robv.android.xposed.XposedBridge.hookMethod(run, new XC_MethodHook() {
-                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         if (!FeatureFlags.customEmojiEnabled) return;
                         try {
                             if (failEmojiLoad(p.thisObject, 0)) {

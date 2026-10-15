@@ -76,7 +76,7 @@ public class FollowStatusHook {
             try {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam p) {
+                    protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         int hash = System.identityHashCode(p.thisObject);
                         String uid = sPendingCallbacks.get(hash);
                         if (uid == null) return;

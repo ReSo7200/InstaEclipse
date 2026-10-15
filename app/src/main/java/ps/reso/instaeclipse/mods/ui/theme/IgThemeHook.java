@@ -37,10 +37,19 @@ public class IgThemeHook {
 
     public void install(ClassLoader classLoader) {
         if (installed) return;
+        // These hooks sit on very hot framework methods (getColor, resolveAttribute, TypedArray);
+        // hooking them app-wide triggers ART's JIT SIGSEGV on IG 451+, so they are only installed
+        // when the custom theme is on (turning it on later applies after an Instagram restart).
+        if (!FeatureFlags.customThemeEnabled) {
+            ModuleLog.line("(InstaEclipse | Theme): off -> hooks not installed");
+            return;
+        }
         try {
-            hookResolveAttribute(classLoader);
+            // Theme.resolveAttribute and Context.getColor are NOT hooked: both are hot enough that
+            // ART's JIT crashes IG within a minute (Context.getColor ends in Resources.getColor
+            // anyway). ?attr colours are themed through IG's own attr→colour helpers instead.
+            hookAttrColorHelpers(classLoader);
             hookGetColor(classLoader);
-            hookContextGetColor();
             hookTypedArrayGetColor(classLoader);
             hookActivityLifecycle();
             hookPhoneWindowColors(classLoader);
@@ -52,42 +61,59 @@ public class IgThemeHook {
         }
     }
 
-    private void hookResolveAttribute(final ClassLoader cl) {
-        XposedHelpers.findAndHookMethod("android.content.res.Resources$Theme", cl, "resolveAttribute",
-                int.class, TypedValue.class, boolean.class, new XC_MethodHook() {
+
+    /** IG's static (Context, attr) -> int helpers that resolve a theme attribute to a colour
+     *  (X.0jhi.A02 / X.00LB.A0Z on 452: getTheme().resolveAttribute(), then TypedValue.data or
+     *  getColor(resourceId)). Helpers that return the resourceId are left alone: the colour they
+     *  lead to is themed by the Resources.getColor hook. */
+    private void hookAttrColorHelpers(final ClassLoader cl) {
+        int n = 0;
+        try {
+            org.luckypray.dexkit.DexKitBridge bridge = ps.reso.instaeclipse.Xposed.Module.dexKitBridge;
+            if (bridge == null) return;
+            for (org.luckypray.dexkit.result.MethodData md : bridge.findMethod(org.luckypray.dexkit.query.FindMethod.create()
+                    .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
+                            .modifiers(java.lang.reflect.Modifier.STATIC)
+                            .paramTypes("android.content.Context", "int").returnType("int")
+                            .addInvoke(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
+                                    .declaredClass("android.content.res.Resources$Theme").name("resolveAttribute"))))) {
+                boolean data = false, color = false;
+                for (org.luckypray.dexkit.result.UsingFieldData uf : md.getUsingFields())
+                    if ("android.util.TypedValue".equals(uf.getField().getClassName()) && "data".equals(uf.getField().getName())) data = true;
+                for (org.luckypray.dexkit.result.MethodData inv : md.getInvokes())
+                    if ("getColor".equals(inv.getName())) color = true;
+                if (!data && !color) continue;
+                final boolean viaGetColor = color && !data;
+                de.robv.android.xposed.XposedBridge.hookMethod(md.getMethodInstance(cl), new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam param) {
-                        if (IgColorRemapEngine.isBypassing() || !IgThemeEngine.themeEnabled()) return;
-                        int attrId = (Integer) param.args[0];
-                        TypedValue out = (TypedValue) param.args[1];
-                        if (out == null) return;
-                        if (!IgThemeEngine.isInitialized()) {
-                            try {
-                                Resources res = (Resources) XposedHelpers.getObjectField(param.thisObject, "mResources");
-                                if (res != null) IgThemeEngine.ensureInitialized(res, cl);
-                            } catch (Throwable ignored) {}
-                        }
+                    protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                        if (IgColorRemapEngine.isBypassing() || !IgThemeEngine.themeEnabled()
+                                || param.getThrowable() != null || !(param.args[0] instanceof Context ctx)) return;
+                        int attrId = (Integer) param.args[1];
+                        if (!IgThemeEngine.isInitialized()) IgThemeEngine.ensureInitialized(ctx);
                         Integer override = IgThemeEngine.colorForAttr(attrId);
-                        if (override != null) {
-                            IgThemeEngine.applyAttrOverride(attrId, out);
-                            param.setResult(true);
-                        } else if (IgColorRemapEngine.isReady()) {
-                            if ((out.type == TypedValue.TYPE_INT_COLOR_ARGB8 || out.type == TypedValue.TYPE_INT_COLOR_RGB8)) {
-                                int remapped = IgColorRemapEngine.remap(out.data);
-                                if (remapped != out.data) {
-                                    out.data = remapped;
-                                    param.setResult(true);
-                                }
-                            }
-                        }
+                        if (override != null) { param.setResult(override); return; }
+                        if (viaGetColor || !IgColorRemapEngine.isReady()) return; // getColor is themed itself
+                        int v = (Integer) param.getResult(), remapped = IgColorRemapEngine.remap(v);
+                        if (remapped == v) return;
+                        TypedValue tv = new TypedValue(); // only remap real colour attributes
+                        if (ctx.getTheme().resolveAttribute(attrId, tv, true) && tv.resourceId == 0
+                                && tv.type >= TypedValue.TYPE_FIRST_COLOR_INT && tv.type <= TypedValue.TYPE_LAST_COLOR_INT)
+                            param.setResult(remapped);
                     }
                 });
+                n++;
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(InstaEclipse | Theme): attr helpers: " + t);
+        }
+        ModuleLog.line("(InstaEclipse | Theme): attr colour helpers hooked: " + n);
     }
 
     private void hookGetColor(final ClassLoader cl) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()) return;
                 int resId = (Integer) param.args[0];
                 if (IgThemeEngine.looksLikeDirectColor(resId)) {
@@ -105,7 +131,7 @@ public class IgThemeHook {
             }
 
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()
                         || param.getThrowable() != null || !IgColorRemapEngine.isReady()) return;
                 int resId = (Integer) param.args[0];
@@ -128,51 +154,10 @@ public class IgThemeHook {
         } catch (Throwable ignored) {}
     }
 
-    private void hookContextGetColor() {
-        XC_MethodHook hook = new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
-                if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()) return;
-                int resId = (Integer) param.args[0];
-                if (IgThemeEngine.looksLikeDirectColor(resId)) {
-                    param.setResult(IgColorRemapEngine.remap(resId));
-                    return;
-                }
-                if (IgThemeEngine.looksLikeResourceId(resId)) {
-                    if (!IgThemeEngine.isInitialized()) {
-                        Context ctx = (Context) param.thisObject;
-                        IgThemeEngine.ensureInitialized(ctx);
-                    }
-                    Integer override = IgThemeEngine.colorForResource(resId);
-                    if (override != null) param.setResult(override);
-                }
-            }
-
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) {
-                if (!IgThemeEngine.themeEnabled() || IgColorRemapEngine.isBypassing()
-                        || param.getThrowable() != null || !IgColorRemapEngine.isReady()) return;
-                int resId = (Integer) param.args[0];
-                if (!IgThemeEngine.looksLikeDirectColor(resId) && IgThemeEngine.looksLikeResourceId(resId)
-                        && IgThemeEngine.colorForResource(resId) == null) {
-                    Object result = param.getResult();
-                    if (result instanceof Integer) {
-                        int resolved = (Integer) result;
-                        int remapped = IgColorRemapEngine.remap(resolved);
-                        if (remapped != resolved) param.setResult(remapped);
-                    }
-                }
-            }
-        };
-        try {
-            XposedHelpers.findAndHookMethod(Context.class, "getColor", int.class, hook);
-        } catch (Throwable ignored) {}
-    }
-
     private void hookTypedArrayGetColor(final ClassLoader cl) {
         XposedHelpers.findAndHookMethod(TypedArray.class, "getColor", int.class, int.class, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (IgColorRemapEngine.isBypassing() || !IgThemeEngine.themeEnabled()) return;
                 try {
                     TypedArray ta = (TypedArray) param.thisObject;
@@ -204,7 +189,7 @@ public class IgThemeHook {
     private void hookActivityLifecycle() {
         XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!IgThemeEngine.isActive()) return;
                 Activity activity = (Activity) param.thisObject;
                 IgThemeEngine.ensureInitialized(activity);
@@ -214,7 +199,7 @@ public class IgThemeHook {
         });
         XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!IgThemeEngine.isActive()) return;
                 Activity activity = (Activity) param.thisObject;
                 IgThemeEngine.ensureInitialized(activity);
@@ -227,13 +212,13 @@ public class IgThemeHook {
     private void hookPhoneWindowColors(ClassLoader cl) {
         XC_MethodHook statusHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (IgThemeEngine.isActive()) param.args[0] = IgThemeEngine.getActivePalette().statusBar;
             }
         };
         XC_MethodHook navHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (IgThemeEngine.isActive()) param.args[0] = IgThemeEngine.getActivePalette().navigation;
             }
         };

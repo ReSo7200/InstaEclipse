@@ -92,7 +92,7 @@ public class ViewOnceBadgeHook {
     private XC_MethodHook buildHook() {
         return new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.permanentViewMode) return;
                 Object[] args = param.args;
                 if (args == null) return;

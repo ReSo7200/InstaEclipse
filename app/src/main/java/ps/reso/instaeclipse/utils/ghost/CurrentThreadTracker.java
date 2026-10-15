@@ -79,13 +79,13 @@ public final class CurrentThreadTracker {
             Class<?> fragment = Class.forName("androidx.fragment.app.Fragment", false, classLoader);
             XposedHelpers.findAndHookMethod(fragment, "onResume", new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     onFragmentResumed(param.thisObject);
                 }
             });
             XposedHelpers.findAndHookMethod(fragment, "onPause", new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     synchronized (RESUMED) {
                         prune(param.thisObject);
                     }

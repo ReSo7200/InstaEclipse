@@ -280,7 +280,7 @@ public class PostDownloadContextMenuHook {
         XposedBridge.hookMethod(addButtonMethod, new XC_MethodHook() {
 
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (Boolean.TRUE.equals(sAddingDownload.get())) return;
                 Object opt = param.args[idxOption];
                 // Suppress IG's own native rows — we inject our own versions instead
@@ -298,7 +298,7 @@ public class PostDownloadContextMenuHook {
             }
 
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (Boolean.TRUE.equals(sAddingDownload.get())) return;
 
                 boolean wantDownload = FeatureFlags.enablePostDownload && downloadOptionValue != null;
@@ -361,7 +361,7 @@ public class PostDownloadContextMenuHook {
     private static void installClickHandlerHook(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enablePostDownload && !FeatureFlags.enableReelDownload
                         && !FeatureFlags.copyMediaLink && !FeatureFlags.offerCopyImage
                         && !FeatureFlags.offerMediaInfo && !FeatureFlags.offerPlaybackSpeed) return;
@@ -446,7 +446,7 @@ public class PostDownloadContextMenuHook {
     private static void installAllowlistPatchHook(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook allowlistHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 try {
                     Object result = param.getResult();
                     if (!(result instanceof List<?> original)) return;
