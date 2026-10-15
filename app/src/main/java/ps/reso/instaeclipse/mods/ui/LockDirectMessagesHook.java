@@ -321,7 +321,7 @@ public class LockDirectMessagesHook {
     }
 
     /** True when the device has biometric hardware with something enrolled. */
-    private static boolean canAuthenticate(Activity a) {
+    static boolean canAuthenticate(Activity a) {
         try {
             if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return false;
             android.hardware.biometrics.BiometricManager bm =
@@ -341,7 +341,7 @@ public class LockDirectMessagesHook {
     }
 
     /** Shows the system biometric prompt; runs onSuccess on the UI thread when auth succeeds. */
-    private static void promptBiometric(Activity a, Runnable onSuccess) {
+    static void promptBiometric(Activity a, Runnable onSuccess) {
         try {
             // Use plain literals — our module's R.string ids aren't in Instagram's resource table,
             // so a.getString(R.string...) throws Resources.NotFoundException in IG's process.
@@ -363,10 +363,10 @@ public class LockDirectMessagesHook {
         }
     }
 
-    private static int dp(Activity a, int v) { return Math.round(v * a.getResources().getDisplayMetrics().density); }
+    static int dp(Activity a, int v) { return Math.round(v * a.getResources().getDisplayMetrics().density); }
 
     /** Dismiss the soft keyboard after a successful unlock so it doesn't linger over the content. */
-    private static void hideKeyboard(Activity a, View focus) {
+    static void hideKeyboard(Activity a, View focus) {
         try {
             android.view.inputmethod.InputMethodManager imm =
                     (android.view.inputmethod.InputMethodManager) a.getSystemService(Activity.INPUT_METHOD_SERVICE);

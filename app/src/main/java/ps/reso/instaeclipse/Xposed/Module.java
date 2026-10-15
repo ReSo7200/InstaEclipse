@@ -579,6 +579,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | VOBadge): ❌ Failed to hook");
                     }
 
+                    // Locked saved collections (#219)
+                    try {
+                        if (!skip("LockedCollectionsHook")) new ps.reso.instaeclipse.mods.ui.LockedCollectionsHook().install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|LockedColl) ❌ Failed to hook");
+                    }
+
                     // Saved button on your own profile (#237)
                     try {
                         if (!skip("SavedOnProfileHook")) new ps.reso.instaeclipse.mods.ui.SavedOnProfileHook().install(dexKitBridge, hostClassLoader);

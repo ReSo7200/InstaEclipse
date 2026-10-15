@@ -112,6 +112,8 @@ public class SettingsManager {
         editor.putBoolean("likeUndo", FeatureFlags.likeUndo);
         editor.putBoolean("profileFollowsYouLabel", FeatureFlags.profileFollowsYouLabel);
         editor.putBoolean("savedOnProfile", FeatureFlags.savedOnProfile);
+        editor.putBoolean("lockSavedCollections", FeatureFlags.lockSavedCollections);
+        editor.putString("lockedCollections", FeatureFlags.lockedCollections);
         editor.putBoolean("storyViewerSearch", FeatureFlags.storyViewerSearch);
         editor.putBoolean("commentSearch", FeatureFlags.commentSearch);
         editor.putBoolean("followListExport", FeatureFlags.followListExport);
@@ -251,6 +253,8 @@ public class SettingsManager {
         FeatureFlags.likeUndo = prefs.getBoolean("likeUndo", false);
         FeatureFlags.profileFollowsYouLabel = prefs.getBoolean("profileFollowsYouLabel", false);
         FeatureFlags.savedOnProfile = prefs.getBoolean("savedOnProfile", false);
+        FeatureFlags.lockSavedCollections = prefs.getBoolean("lockSavedCollections", false);
+        FeatureFlags.lockedCollections = prefs.getString("lockedCollections", "");
         FeatureFlags.storyViewerSearch = prefs.getBoolean("storyViewerSearch", false);
         FeatureFlags.commentSearch = prefs.getBoolean("commentSearch", false);
         FeatureFlags.followListExport = prefs.getBoolean("followListExport", false);

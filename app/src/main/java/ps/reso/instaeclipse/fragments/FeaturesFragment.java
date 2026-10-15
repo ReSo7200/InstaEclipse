@@ -1026,6 +1026,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_dms), "lockDirectMessages"),
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_whole_app), "lockWholeApp"),
+                createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_locked_coll_setting), "lockSavedCollections"),
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_fingerprint), "lockUseFingerprint")
         ));
 

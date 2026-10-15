@@ -31,6 +31,8 @@ public class FeatureFlags {
     public static String lockDirectSalt = ""; // per-install random salt; "" = legacy unsalted
     public static boolean lockDirectAlways = false; // re-lock whenever leaving the inbox (not just on app close)
     public static boolean lockWholeApp = false; // lock the ENTIRE app on launch/return (same passcode as Lock DMs)
+    public static boolean lockSavedCollections = false; // #219: 🔒 button on saved collections
+    public static String lockedCollections = "";         // #219: locked saved collection ids (comma-separated)
     public static boolean lockUseFingerprint = true; // offer biometric unlock when the device has one enrolled
     // Customize navigation bar (#238): hide individual bottom-nav tabs.
     public static boolean hideTabHome = false;

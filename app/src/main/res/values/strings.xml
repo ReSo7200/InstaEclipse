@@ -294,6 +294,14 @@
     <string name="ig_dialog_ghost_keep_unsent">Keep Unsent Messages</string>
     <string name="ig_dialog_ghost_chat_export">Export-Chat Button in Chats</string>
     <string name="ig_chat_export">Export chat</string>
+    <string name="ig_locked_coll_setting">Lockable Saved collections (🔒 button in a collection; uses the passcode set in Instagram)</string>
+    <string name="ig_locked_coll_title">Locked collection</string>
+    <string name="ig_locked_coll_open">Open</string>
+    <string name="ig_locked_coll_lock">Lock this collection</string>
+    <string name="ig_locked_coll_unlock">Unlock this collection</string>
+    <string name="ig_locked_coll_locked">Collection locked: it will ask for your passcode</string>
+    <string name="ig_locked_coll_unlocked">Collection unlocked</string>
+    <string name="ig_locked_coll_need_passcode">Set a passcode first: InstaEclipse settings in Instagram, Lock</string>
     <string name="ig_saved_on_profile">Saved button on your profile (restart Instagram)</string>
     <string name="ig_saved_on_profile_button">Saved</string>
     <string name="ig_nav_tab_search">Search</string>
