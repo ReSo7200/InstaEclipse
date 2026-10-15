@@ -294,6 +294,10 @@
     <string name="ig_dialog_ghost_keep_unsent">Keep Unsent Messages</string>
     <string name="ig_dialog_ghost_chat_export">Export-Chat Button in Chats</string>
     <string name="ig_chat_export">Export chat</string>
+    <string name="ig_nav_tab_search">Search</string>
+    <string name="ig_nav_tab_order">Tab order</string>
+    <string name="ig_nav_tab_order_hint">Use the arrows to reorder the bottom bar. Hidden tabs keep their place. Takes effect when you return to Instagram.</string>
+    <string name="ig_nav_tab_order_reset">Reset</string>
     <string name="share_dl_label">Download with InstaEclipse</string>
     <string name="share_dl_no_link">No Instagram post or reel link found</string>
     <string name="share_dl_no_instagram">Instagram is not installed</string>

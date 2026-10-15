@@ -72,7 +72,8 @@ public class DistractionFreeUIHook {
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
     private static boolean anyFlag() {
-        return FeatureFlags.disableStories || FeatureFlags.disableReels || anyNavTabHidden() || FeatureFlags.hidePlusUpsells;
+        return FeatureFlags.disableStories || FeatureFlags.disableReels || anyNavTabHidden() || FeatureFlags.hidePlusUpsells
+                || !FeatureFlags.navTabOrder.isEmpty();
     }
 
     @SuppressLint("DiscouragedApi")
@@ -123,7 +124,50 @@ public class DistractionFreeUIHook {
                 if (navTabIds[i] != 0 && navTabHidden(i)) collapseAllById((ViewGroup) root, navTabIds[i]);
             if (FeatureFlags.hidePlusUpsells)
                 for (int id : plusUpsellIds) if (id != 0) collapseAllById((ViewGroup) root, id);
+            if (!FeatureFlags.navTabOrder.isEmpty()) reorderTabs(a, (ViewGroup) root);
         } catch (Throwable ignored) {}
+    }
+
+    /** Every bottom-nav tab that can be reordered, in Instagram's default order. */
+    public static final String[] ORDERABLE_TABS =
+            {"feed_tab", "clips_tab", "search_tab", "creation_tab", "direct_tab", "news_tab", "profile_tab"};
+    private static boolean orderLogged;
+
+    /**
+     * Customize navigation bar (#238): puts the tab views in the user's order
+     * (FeatureFlags.navTabOrder, comma-separated tab id names; unlisted tabs keep their relative
+     * order after the listed ones). Only the slots the tabs already occupy are reused, so other
+     * children of the bar stay where they are. Tabs are found by id, so their click handling is
+     * unaffected.
+     */
+    @SuppressLint("DiscouragedApi")
+    private static void reorderTabs(Activity a, ViewGroup root) {
+        int feedId = a.getResources().getIdentifier("feed_tab", "id", a.getPackageName());
+        View feed = feedId != 0 ? root.findViewById(feedId) : null;
+        if (feed == null || !(feed.getParent() instanceof ViewGroup bar)) return;
+        java.util.Map<String, View> tabs = new java.util.LinkedHashMap<>();
+        java.util.List<Integer> slots = new java.util.ArrayList<>();
+        for (int i = 0; i < bar.getChildCount(); i++) {
+            View c = bar.getChildAt(i);
+            if (c.getId() == View.NO_ID) continue;
+            String name;
+            try { name = a.getResources().getResourceEntryName(c.getId()); } catch (Throwable t) { continue; }
+            if (java.util.Arrays.asList(ORDERABLE_TABS).contains(name)) { tabs.put(name, c); slots.add(i); }
+        }
+        if (tabs.size() < 2) return;
+        java.util.List<View> wanted = new java.util.ArrayList<>();
+        for (String n : FeatureFlags.navTabOrder.split(","))
+            if (tabs.containsKey(n.trim()) && !wanted.contains(tabs.get(n.trim()))) wanted.add(tabs.get(n.trim()));
+        for (View v : tabs.values()) if (!wanted.contains(v)) wanted.add(v);
+        boolean same = true;
+        for (int k = 0; k < slots.size(); k++) if (bar.getChildAt(slots.get(k)) != wanted.get(k)) { same = false; break; }
+        if (same) return;
+        for (View v : wanted) bar.removeView(v);
+        for (int k = 0; k < wanted.size(); k++) bar.addView(wanted.get(k), Math.min(slots.get(k), bar.getChildCount()));
+        if (!orderLogged) {
+            orderLogged = true;
+            ModuleLog.line("(IE|DistractUI) nav tabs reordered: " + FeatureFlags.navTabOrder);
+        }
     }
 
     private static java.lang.reflect.Field userInputField;

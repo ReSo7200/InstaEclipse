@@ -886,11 +886,84 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_messages), "hideTabMessages"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_activity), "hideTabActivity"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_profile), "hideTabProfile"),
-                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray")
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray"),
+                createClickable(R.drawable.ic_tune, "#30D158", getString(R.string.ig_nav_tab_order), this::showTabOrderDialog)
         ));
 
         showMenu(getString(R.string.ig_dialog_section_distraction_free), defs);
         currentMenu = "distract";
+    }
+
+    /** #238: reorder the bottom-nav tabs (saved as the "navTabOrder" string pref). */
+    private void showTabOrderDialog() {
+        final String[] ids = ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.ORDERABLE_TABS;
+        final java.util.Map<String, String> labels = new java.util.HashMap<>();
+        labels.put("feed_tab", getString(R.string.ig_nav_tab_home));
+        labels.put("clips_tab", getString(R.string.ig_nav_tab_reels));
+        labels.put("search_tab", getString(R.string.ig_nav_tab_search));
+        labels.put("creation_tab", getString(R.string.ig_nav_tab_create));
+        labels.put("direct_tab", getString(R.string.ig_nav_tab_messages));
+        labels.put("news_tab", getString(R.string.ig_nav_tab_activity));
+        labels.put("profile_tab", getString(R.string.ig_nav_tab_profile));
+        final java.util.List<String> order = new java.util.ArrayList<>();
+        for (String n : localCache.getString("navTabOrder", "").split(","))
+            if (java.util.Arrays.asList(ids).contains(n.trim()) && !order.contains(n.trim())) order.add(n.trim());
+        for (String n : ids) if (!order.contains(n)) order.add(n);
+
+        final android.widget.LinearLayout list = new android.widget.LinearLayout(requireContext());
+        list.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = (int) (16 * getResources().getDisplayMetrics().density);
+        list.setPadding(pad, pad / 2, pad, 0);
+        final Runnable[] render = new Runnable[1];
+        render[0] = () -> {
+            list.removeAllViews();
+            for (int i = 0; i < order.size(); i++) {
+                final int idx = i;
+                android.widget.LinearLayout row = new android.widget.LinearLayout(requireContext());
+                row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                android.widget.TextView name = new android.widget.TextView(requireContext());
+                name.setText((i + 1) + ".  " + labels.get(order.get(i)));
+                name.setTextSize(16);
+                row.addView(name, new android.widget.LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+                for (final int dir : new int[]{-1, 1}) {
+                    android.widget.Button b = new android.widget.Button(requireContext(), null, android.R.attr.borderlessButtonStyle);
+                    b.setText(dir < 0 ? "↑" : "↓");
+                    b.setEnabled(dir < 0 ? idx > 0 : idx < order.size() - 1);
+                    b.setOnClickListener(v -> {
+                        java.util.Collections.swap(order, idx, idx + dir);
+                        render[0].run();
+                    });
+                    row.addView(b, new android.widget.LinearLayout.LayoutParams(
+                            (int) (48 * getResources().getDisplayMetrics().density), ViewGroup.LayoutParams.WRAP_CONTENT));
+                }
+                list.addView(row);
+            }
+        };
+        render[0].run();
+        android.widget.TextView hint = new android.widget.TextView(requireContext());
+        hint.setText(R.string.ig_nav_tab_order_hint);
+        hint.setPadding(0, pad / 2, 0, 0);
+        android.widget.LinearLayout box = new android.widget.LinearLayout(requireContext());
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        box.addView(list);
+        box.addView(hint);
+        box.setPadding(pad, 0, pad, 0);
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.ig_nav_tab_order)
+                .setView(box)
+                .setPositiveButton(android.R.string.ok, (d, w) -> saveTabOrder(String.join(",", order)))
+                .setNeutralButton(R.string.ig_nav_tab_order_reset, (d, w) -> saveTabOrder(""))
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void saveTabOrder(String value) {
+        localCache.edit().putString("navTabOrder", value).commit();
+        makeLocalCacheWorldReadable();
+        Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
+        b.putExtra("key", "navTabOrder");
+        b.putExtra("value", value);
+        requireContext().sendBroadcast(b);
     }
 
     private FeatureItem createSwitchLockedByExtreme(String title, String prefKey) {
