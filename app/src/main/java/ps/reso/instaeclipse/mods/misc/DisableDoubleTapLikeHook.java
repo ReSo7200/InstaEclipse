@@ -32,6 +32,12 @@ public class DisableDoubleTapLikeHook {
 
     // Feed like methods found via the split anchors (IG 447+), cached as a list.
     private static final String CACHE_FEED_SPLIT = "DoubleTapLikeFeedSplit";
+    // Reel like action (IG 447+): the LikeNavigator.onLikeMedia lambda that picks the source
+    // "DOUBLE_TAP_MEDIA" vs "BUTTON", runs the heart animation, updates local like state, marks
+    // "LIKE_FIRED" and sends the like (X.0C6G.invoke on 452, X.0AxE on 451, X.0Hol on 447).
+    // Reel double-taps reach it from the clips GestureDetector listener's onDoubleTap, so the
+    // stack-gated HOOK blocks only double-tap likes; the like button (no onDoubleTap frame) works.
+    private static final String CACHE_REELS_LIKE = "DoubleTapLikeReelsLike";
 
     private static final XC_MethodHook HOOK = new XC_MethodHook() {
         @Override
@@ -69,9 +75,10 @@ public class DisableDoubleTapLikeHook {
                     | hookMethods(DexKitCache.loadMethods(CACHE_FEED_SPLIT, classLoader), HOOK) > 0;
             boolean cachedLegacyReelsHooked = hookMethod(reelsCached, HOOK);
             boolean cachedGestureReelsHooked = hookMethods(reelsGestureCached, REELS_GESTURE_HOOK) > 0;
-            cachedReelsHooked = cachedLegacyReelsHooked || cachedGestureReelsHooked;
+            boolean cachedReelsLikeHooked = hookMethods(DexKitCache.loadMethods(CACHE_REELS_LIKE, classLoader), HOOK) > 0;
+            cachedReelsHooked = cachedLegacyReelsHooked || cachedGestureReelsHooked || cachedReelsLikeHooked;
 
-            if (cachedFeedHooked && cachedGestureReelsHooked) {
+            if (cachedFeedHooked && (cachedGestureReelsHooked || cachedReelsLikeHooked)) {
                 ModuleLog.line("(InstaEclipse | DoubleTapLike): Hooked (cached)");
                 FeatureStatusTracker.setHooked("DisableDoubleTapLike");
                 return;
@@ -130,6 +137,26 @@ public class DisableDoubleTapLikeHook {
             if (!splitHooked.isEmpty()) DexKitCache.saveMethods(CACHE_FEED_SPLIT, splitHooked);
             if (feedMethods.isEmpty()) {
                 ModuleLog.line("(InstaEclipse | DoubleTapLike): Feed method not found");
+            }
+        }
+
+        if (!reelsHooked) {
+            try {
+                List<Method> reelLike = new ArrayList<>();
+                for (MethodData md : bridge.findMethod(FindMethod.create()
+                        .matcher(MethodMatcher.create().usingStrings("LIKE_FIRED", "DOUBLE_TAP_MEDIA")))) {
+                    Method m = md.getMethodInstance(classLoader);
+                    if (hookMethod(m, HOOK)) {
+                        reelLike.add(m);
+                        ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels like action hooked on " + md.getClassName() + "." + md.getMethodName());
+                    }
+                }
+                if (!reelLike.isEmpty()) {
+                    DexKitCache.saveMethods(CACHE_REELS_LIKE, reelLike);
+                    reelsHooked = true;
+                }
+            } catch (Throwable e) {
+                ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels like action: " + e.getMessage());
             }
         }
 
