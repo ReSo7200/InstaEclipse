@@ -40,6 +40,7 @@ public class FeatureFlags {
     public static boolean hideTabActivity = false;
     public static boolean hideTabProfile = false;
     public static boolean hideNotesTray = false; // hide the Notes tray in the DM inbox (#241)
+    public static boolean keepEditHistory = false; // show previous text of edited DMs (#243)
     public static boolean markUnsentInThread = false; // prefix kept unsent messages with a marker in the chat (#222)
     public static boolean offerMediaInfo = false; // "Media info" row in the post menu (#231)
     public static boolean offerPlaybackSpeed = false; // "Playback speed" row for feed videos (#247)

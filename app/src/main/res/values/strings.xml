@@ -292,6 +292,7 @@
     <string name="ig_dialog_ghost_permanent_view_once">Unlock View-Once/Twice</string>
     <string name="ig_dialog_ghost_keep_disappearing">Keep Disappearing Messages</string>
     <string name="ig_dialog_ghost_keep_unsent">Keep Unsent Messages</string>
+    <string name="ig_dialog_ghost_edit_history">Keep Edit History of Messages</string>
     <string name="ig_dialog_ghost_mark_unsent">Mark Kept Unsent Messages in Chat</string>
     <string name="ig_dialog_unsent_title">Unsent Messages</string>
     <string name="ig_dialog_unsent_clear">Clear this chat\'s log</string>

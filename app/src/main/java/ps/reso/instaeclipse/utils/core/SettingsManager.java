@@ -79,6 +79,7 @@ public class SettingsManager {
         editor.putBoolean("offerPlaybackSpeed", FeatureFlags.offerPlaybackSpeed);
         editor.putBoolean("forceReelScrubber", FeatureFlags.forceReelScrubber);
         editor.putBoolean("markUnsentInThread", FeatureFlags.markUnsentInThread);
+        editor.putBoolean("keepEditHistory", FeatureFlags.keepEditHistory);
         editor.putBoolean("hideTabHome", FeatureFlags.hideTabHome);
         editor.putBoolean("hideTabReels", FeatureFlags.hideTabReels);
         editor.putBoolean("hideTabCreate", FeatureFlags.hideTabCreate);
@@ -209,6 +210,7 @@ public class SettingsManager {
         FeatureFlags.offerPlaybackSpeed = prefs.getBoolean("offerPlaybackSpeed", false);
         FeatureFlags.forceReelScrubber = prefs.getBoolean("forceReelScrubber", false);
         FeatureFlags.markUnsentInThread = prefs.getBoolean("markUnsentInThread", false);
+        FeatureFlags.keepEditHistory = prefs.getBoolean("keepEditHistory", false);
         FeatureFlags.hideTabHome = prefs.getBoolean("hideTabHome", false);
         FeatureFlags.hideTabReels = prefs.getBoolean("hideTabReels", false);
         FeatureFlags.hideTabCreate = prefs.getBoolean("hideTabCreate", false);

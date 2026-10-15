@@ -803,6 +803,13 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         layout.addView(markUnsent);
+        ToggleRow editHistory = createSwitch(context, R.drawable.ic_chat, "#5E5CE6",
+                I18n.t(context, R.string.ig_dialog_ghost_edit_history), FeatureFlags.keepEditHistory);
+        editHistory.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.keepEditHistory = checked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(editHistory);
 
         ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
