@@ -168,6 +168,8 @@ public class CommentSearchHook {
 
     private static void addPill(View root) {
         if (!(root instanceof ViewGroup g) || root.findViewWithTag("ie_comment_search") != null) return;
+        ViewGroup row = headerRow(g);
+        if (row != null && row.findViewWithTag("ie_comment_search") != null) return;
         Context ctx = root.getContext();
         float d = ctx.getResources().getDisplayMetrics().density;
         TextView pill = new TextView(ctx);
@@ -181,7 +183,32 @@ public class CommentSearchHook {
         bg.setColor(0xCC3A3A3C);
         bg.setCornerRadius(16 * d);
         pill.setBackground(bg);
-        pill.setOnClickListener(v -> showSearch(v.getContext()));
+        pill.setOnClickListener(v -> {
+            try {
+                showSearch(v.getContext());
+            } catch (Throwable t) {
+                ModuleLog.line(TAG + "⚠️ search dialog: " + t);
+            }
+        });
+        // In the sheet header the bottom sheet's touch handling swallows the click (DOWN/UP reach
+        // the pill but performClick never runs), so act on UP ourselves.
+        pill.setOnTouchListener((v, e) -> {
+            switch (e.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    if (v.getParent() != null) v.getParent().requestDisallowInterceptTouchEvent(true);
+                    v.setPressed(true);
+                    return true;
+                case android.view.MotionEvent.ACTION_UP:
+                    v.setPressed(false);
+                    if (e.getX() >= 0 && e.getY() >= 0 && e.getX() <= v.getWidth() && e.getY() <= v.getHeight()) v.performClick();
+                    return true;
+                case android.view.MotionEvent.ACTION_CANCEL:
+                    v.setPressed(false);
+                    return true;
+                default:
+                    return true;
+            }
+        });
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.START);
         lp.topMargin = (int) (34 * d);   // header row, left of the centered "Comments" title
@@ -189,6 +216,29 @@ public class CommentSearchHook {
         pill.setClickable(true);
         pill.setElevation(30 * d);
         pill.setTranslationZ(30 * d);
+        // Preferred: in the sheet's header row next to the "Comments" title (on 452 the list
+        // container starts below the header, so a fixed top margin put the pill on the first comment).
+        if (row != null) {
+            try {
+                ViewGroup.LayoutParams hl = headerParams(row, (int) (12 * d));
+                if (hl != null) {
+                    // compact in the header (the full label would cover the centred title)
+                    pill.setText("🔍");
+                    pill.setContentDescription(I18n.t(ctx, R.string.ig_comment_search));
+                    row.addView(pill, hl);
+                    if (!(row instanceof FrameLayout)) { // centred like the title: move it to the row start
+                        final int margin = (int) (12 * d);
+                        pill.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+                            boolean rtl = row.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+                            v.setTranslationX(rtl ? (row.getWidth() - margin) - r : margin - l);
+                        });
+                    }
+                    return;
+                }
+            } catch (Throwable t) {
+                ModuleLog.line(TAG + "⚠️ header pill: " + t);
+            }
+        }
         try {
             if (g instanceof FrameLayout) { g.addView(pill, lp); pill.bringToFront(); }
             else {
@@ -201,8 +251,56 @@ public class CommentSearchHook {
         }
     }
 
+    /** The layout holding the sheet's "Comments" title (id title_text_view), nearest to the sheet. */
+    @android.annotation.SuppressLint("DiscouragedApi")
+    private static ViewGroup headerRow(View sheet) {
+        int id = sheet.getResources().getIdentifier("title_text_view", "id", sheet.getContext().getPackageName());
+        if (id == 0) return null;
+        for (View v = sheet; v != null; v = v.getParent() instanceof View p ? p : null) {
+            View title = v.findViewById(id);
+            if (title != null) return title.getParent() instanceof ViewGroup g ? g : null;
+        }
+        return null;
+    }
+
+    /** Layout params that put the pill at the start of the header row, vertically centred
+     *  (FrameLayout gravity, or ConstraintLayout constraints to the parent). */
+    private static ViewGroup.LayoutParams headerParams(ViewGroup row, int startMargin) throws Exception {
+        int w = ViewGroup.LayoutParams.WRAP_CONTENT;
+        if (row instanceof FrameLayout) {
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(w, w, Gravity.START | Gravity.CENTER_VERTICAL);
+            lp.setMarginStart(startMargin);
+            return lp;
+        }
+        // ConstraintLayout (its LayoutParams class is renamed by R8): copy the title's params, which
+        // centre it in the row, then slide the pill to the row start once it is laid out.
+        View title = null;
+        for (int i = 0; i < row.getChildCount(); i++)
+            if (row.getChildAt(i) instanceof TextView t && t.getId() != View.NO_ID
+                    && "title_text_view".equals(row.getResources().getResourceEntryName(t.getId()))) title = t;
+        if (title == null) return null;
+        ViewGroup.LayoutParams src = title.getLayoutParams();
+        // Only (int,int) survives R8: build one and copy the primitive fields (the constraints);
+        // object fields (the layout's internal widget) must stay the pill's own.
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)
+                src.getClass().getConstructor(int.class, int.class).newInstance(w, w);
+        for (Class<?> k = src.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || !f.getType().isPrimitive()) continue;
+                try { f.setAccessible(true); f.set(lp, f.get(src)); } catch (Throwable ignored) {}
+            }
+        lp.width = w;
+        lp.height = w;
+        return lp;
+    }
+
     private static void showSearch(Context c) {
-        Activity act = UIHookManager.getCurrentActivity();
+        // The pill's own activity: the "current" one can be a different, hidden activity (e.g. the
+        // main activity behind UrlHandlerActivity when the post was opened from a link).
+        Activity act = null;
+        for (Context k = c; k != null; k = k instanceof android.content.ContextWrapper w ? w.getBaseContext() : null)
+            if (k instanceof Activity a) { act = a; break; }
+        if (act == null) act = UIHookManager.getCurrentActivity();
         Context ctx = act != null ? act : c;
         List<String[]> all = new ArrayList<>(latest);
         float d = ctx.getResources().getDisplayMetrics().density;
