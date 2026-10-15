@@ -82,6 +82,7 @@ public class SettingsBackupManager {
         s.put("disableRepost",           FeatureFlags.disableRepost);
         s.put("hideShareCreateGroup",    FeatureFlags.hideShareCreateGroup);
         s.put("exactTimestamps",         FeatureFlags.exactTimestamps);
+        s.put("likeUndo",                FeatureFlags.likeUndo);
         s.put("showFollowerToast",       FeatureFlags.showFollowerToast);
         s.put("showFeatureToasts",       FeatureFlags.showFeatureToasts);
         s.put("enableStoryMentions",     FeatureFlags.enableStoryMentions);
@@ -174,6 +175,7 @@ public class SettingsBackupManager {
         if (s.has("disableRepost"))          FeatureFlags.disableRepost          = s.getBoolean("disableRepost");
         if (s.has("hideShareCreateGroup"))   FeatureFlags.hideShareCreateGroup   = s.getBoolean("hideShareCreateGroup");
         if (s.has("exactTimestamps"))        FeatureFlags.exactTimestamps        = s.getBoolean("exactTimestamps");
+        if (s.has("likeUndo"))               FeatureFlags.likeUndo               = s.getBoolean("likeUndo");
         if (s.has("showFollowerToast"))      FeatureFlags.showFollowerToast      = s.getBoolean("showFollowerToast");
         if (s.has("showFeatureToasts"))      FeatureFlags.showFeatureToasts      = s.getBoolean("showFeatureToasts");
         if (s.has("enableStoryMentions"))    FeatureFlags.enableStoryMentions    = s.getBoolean("enableStoryMentions");

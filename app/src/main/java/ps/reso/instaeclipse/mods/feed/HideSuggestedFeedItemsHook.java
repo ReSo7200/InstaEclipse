@@ -164,7 +164,7 @@ public class HideSuggestedFeedItemsHook {
         }
     }
 
-    private static boolean isLiked(Object media) {
+    public static boolean isLiked(Object media) {
         Method getter = hasLikedGetter;
         if (media == null || getter == null) return false;
         try {

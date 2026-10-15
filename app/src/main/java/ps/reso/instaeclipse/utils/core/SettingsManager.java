@@ -98,6 +98,7 @@ public class SettingsManager {
         editor.putBoolean("disableRepost", FeatureFlags.disableRepost);
         editor.putBoolean("hideShareCreateGroup", FeatureFlags.hideShareCreateGroup);
         editor.putBoolean("exactTimestamps", FeatureFlags.exactTimestamps);
+        editor.putBoolean("likeUndo", FeatureFlags.likeUndo);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
         editor.putBoolean("showFeatureToasts", FeatureFlags.showFeatureToasts);
         editor.putBoolean("enableStoryMentions", FeatureFlags.enableStoryMentions);
@@ -219,6 +220,7 @@ public class SettingsManager {
         FeatureFlags.disableRepost = prefs.getBoolean("disableRepost", false);
         FeatureFlags.hideShareCreateGroup = prefs.getBoolean("hideShareCreateGroup", false);
         FeatureFlags.exactTimestamps = prefs.getBoolean("exactTimestamps", false);
+        FeatureFlags.likeUndo = prefs.getBoolean("likeUndo", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);
         FeatureFlags.showFeatureToasts = prefs.getBoolean("showFeatureToasts", false);
         FeatureFlags.enableStoryMentions = prefs.getBoolean("enableStoryMentions", false);

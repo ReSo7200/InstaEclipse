@@ -414,6 +414,9 @@
     <string name="ig_dialog_misc_disable_video_autoplay">Disable Video Autoplay</string>
     <string name="ig_dialog_misc_spoof_last_seen">Spoof Last Seen (freeze)</string>
     <string name="ig_dialog_misc_disable_repost">Disable Repost</string>
+    <string name="ig_dialog_misc_like_undo">Undo Window for Likes (4 s)</string>
+    <string name="ig_like_undo_bar">❤ Liked · UNDO</string>
+    <string name="ig_like_undo_cancelled">Like cancelled — refresh to update the heart</string>
     <string name="ig_dialog_misc_exact_timestamps">Show Exact Dates Instead of \"2h ago\"</string>
     <string name="ig_dialog_misc_hide_share_create_group">Hide \"Create group\" on Share Sheet</string>
     <string name="ig_dialog_misc_show_feature_toasts">Show Feature Toasts</string>

@@ -348,6 +348,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | ExactTime): ❌ Failed to hook");
                     }
 
+                    // Like undo window (#235) — after HideSuggestedFeedItemsHook (has_liked getter)
+                    try {
+                        if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | LikeUndo): ❌ Failed to hook");
+                    }
+
                     // Hide "Create group" on the DM share sheet (#240)
                     try {
                         if (!skip("ShareSheetCleanupHook")) new ps.reso.instaeclipse.mods.ui.ShareSheetCleanupHook().install(hostClassLoader);

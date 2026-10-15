@@ -123,6 +123,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("DisableTrackingLinks");
         }
 
+        if (FeatureFlags.likeUndo) {
+            FeatureStatusTracker.setEnabled("LikeUndo", R.string.ig_dialog_misc_like_undo);
+        } else {
+            FeatureStatusTracker.setDisabled("LikeUndo");
+        }
+
         if (FeatureFlags.exactTimestamps) {
             FeatureStatusTracker.setEnabled("ExactTimestamps", R.string.ig_dialog_misc_exact_timestamps);
         } else {
