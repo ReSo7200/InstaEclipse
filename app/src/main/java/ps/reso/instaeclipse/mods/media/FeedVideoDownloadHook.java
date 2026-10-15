@@ -56,6 +56,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -101,7 +102,9 @@ public class FeedVideoDownloadHook {
     private static MediaModelResolver.Result mediaModel;
     private static final List<Method> resolvedVideoVersionsGetters = new ArrayList<>();
     private static Method resolvedIsVideoMethod;
-    private static Method   methodImageUrl;         // MediaExtKt: static (Context, Media) -> String
+    private static Method   methodImageUrl;         // MediaExtKt: static (Context, Media) -> String, or
+                                                    // (Context, Media) -> ExtendedImageUrl on IG 452+
+    private static Method   extendedImageUrlGetUrl; // ExtendedImageUrl.getUrl(), when methodImageUrl returns it
     private static Method   carouselMediaGetter;    // Media."carousel_media" getter: () -> List<Media> (IG 447+)
     private static Method   dashManifestGetter;     // "video_dash_manifest" getter: () -> String (Media 447+, LiveTreeMediaDict <= 446)
 
@@ -145,18 +148,31 @@ public class FeedVideoDownloadHook {
         try {
             mediaClass      = classLoader.loadClass("com.instagram.feed.media.Media");
             mediaExtKtClass = classLoader.loadClass("com.instagram.feed.media.MediaExtKt");
-            // Find static (Context, Media) -> String method (name changes every version)
+            // Find static (Context, Media) -> String method (name changes every version).
+            // IG 452 dropped it; the same lookup now ends one step earlier and returns the
+            // ExtendedImageUrl (MediaExtKt.A0Y), whose URL we read via its getUrl().
+            Method extVariant = null;
             for (Method m : mediaExtKtClass.getDeclaredMethods()) {
                 Class<?>[] p = m.getParameterTypes();
-                if (p.length == 2
-                        && "android.content.Context".equals(p[0].getName())
-                        && p[1] == mediaClass
-                        && m.getReturnType() == String.class) {
+                if (p.length != 2 || !Modifier.isStatic(m.getModifiers())
+                        || !"android.content.Context".equals(p[0].getName()) || p[1] != mediaClass) continue;
+                if (m.getReturnType() == String.class) {
                     m.setAccessible(true);
                     methodImageUrl = m;
                     break;
                 }
+                if (extVariant == null
+                        && "com.instagram.model.mediasize.ExtendedImageUrl".equals(m.getReturnType().getName())) {
+                    extVariant = m;
+                }
             }
+            if (methodImageUrl == null && extVariant != null) {
+                extendedImageUrlGetUrl = extVariant.getReturnType().getMethod("getUrl");
+                extVariant.setAccessible(true);
+                methodImageUrl = extVariant;
+            }
+            ModuleLog.line("(IE|DL) image url method=" + (methodImageUrl == null ? "not found"
+                    : methodImageUrl.getName() + (extendedImageUrlGetUrl != null ? " (ExtendedImageUrl)" : "")));
         } catch (Throwable ignored) {}
 
         // Load VideoVersionIntf (stable public interface with getUrl())
@@ -493,7 +509,7 @@ public class FeedVideoDownloadHook {
                                         //    (piko shows newer Instagram carousel items are Media objects)
                                         if (methodImageUrl != null) {
                                             try {
-                                                Object r = methodImageUrl.invoke(null, saveBtn.getContext(), item);
+                                                Object r = invokeImageUrl(saveBtn.getContext(), item);
                                                 if (r instanceof String s && isCdnMediaUrl(s)) {
                                                     ModuleLog.line("(IE|Car) item[" + idx + "] mediaExtKt=" + s.substring(0, Math.min(60, s.length())));
                                                     carouselUrls.add(s);
@@ -524,7 +540,7 @@ public class FeedVideoDownloadHook {
                     // ── Step C: Single photo ───────────────────────────────────
                     if (methodImageUrl != null) {
                         try {
-                            Object img = methodImageUrl.invoke(null, saveBtn.getContext(), media);
+                            Object img = invokeImageUrl(saveBtn.getContext(), media);
                             if (img instanceof String s && isCdnMediaUrl(s))
                                 return List.of(s);
                         } catch (Throwable ignored) {}
@@ -2053,10 +2069,17 @@ public class FeedVideoDownloadHook {
      * Package-accessible: extracts the image URL from a Media object using MediaExtKt helper.
      * Returns null if not available (e.g. MediaExtKt not resolved or media is a video-only post).
      */
+    /** Calls the resolved MediaExtKt image-url method; returns the URL String (or null). */
+    private static Object invokeImageUrl(Context ctx, Object media) throws Exception {
+        Object r = methodImageUrl.invoke(null, ctx, media);
+        if (r != null && extendedImageUrlGetUrl != null) r = extendedImageUrlGetUrl.invoke(r);
+        return r;
+    }
+
     static String imageUrlFromMedia(Context ctx, Object media) {
         if (methodImageUrl == null || ctx == null || media == null) return null;
         try {
-            Object r = methodImageUrl.invoke(null, ctx, media);
+            Object r = invokeImageUrl(ctx, media);
             return (r instanceof String s && isCdnMediaUrl(s)) ? s : null;
         } catch (Throwable ignored) {
             return null;
@@ -2112,7 +2135,7 @@ public class FeedVideoDownloadHook {
                             if (itemVideo != null) { carouselUrls.add(itemVideo); continue; }
                             if (methodImageUrl != null && ctx != null) {
                                 try {
-                                    Object r = methodImageUrl.invoke(null, ctx, item);
+                                    Object r = invokeImageUrl(ctx, item);
                                     if (r instanceof String s && isCdnMediaUrl(s)) {
                                         carouselUrls.add(s); continue;
                                     }
@@ -2184,7 +2207,7 @@ public class FeedVideoDownloadHook {
                 if (img != null) { urls.add(img); continue; }
                 if (methodImageUrl != null && ctx != null) {
                     try {
-                        Object r = methodImageUrl.invoke(null, ctx, child);
+                        Object r = invokeImageUrl(ctx, child);
                         if (r instanceof String s && isCdnMediaUrl(s)) urls.add(s);
                     } catch (Throwable ignored) {}
                 }
