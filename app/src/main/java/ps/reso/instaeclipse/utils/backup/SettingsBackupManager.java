@@ -45,6 +45,7 @@ public class SettingsBackupManager {
         s.put("hideSuggestionsInFeed",      FeatureFlags.hideSuggestionsInFeed);
         s.put("hideThreadsSuggestions",     FeatureFlags.hideThreadsSuggestions);
         s.put("hideLikedPosts",             FeatureFlags.hideLikedPosts);
+        s.put("hideCommunityNotes",         FeatureFlags.hideCommunityNotes);
         s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
         s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
         s.put("markUnsentInThread",         FeatureFlags.markUnsentInThread);
@@ -141,6 +142,7 @@ public class SettingsBackupManager {
         if (s.has("hideSuggestionsInFeed"))     FeatureFlags.hideSuggestionsInFeed     = s.getBoolean("hideSuggestionsInFeed");
         if (s.has("hideThreadsSuggestions"))    FeatureFlags.hideThreadsSuggestions    = s.getBoolean("hideThreadsSuggestions");
         if (s.has("hideLikedPosts"))            FeatureFlags.hideLikedPosts            = s.getBoolean("hideLikedPosts");
+        if (s.has("hideCommunityNotes"))        FeatureFlags.hideCommunityNotes        = s.getBoolean("hideCommunityNotes");
         if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
         if (s.has("offerCopyImage"))            FeatureFlags.offerCopyImage            = s.getBoolean("offerCopyImage");
         if (s.has("markUnsentInThread"))        FeatureFlags.markUnsentInThread        = s.getBoolean("markUnsentInThread");

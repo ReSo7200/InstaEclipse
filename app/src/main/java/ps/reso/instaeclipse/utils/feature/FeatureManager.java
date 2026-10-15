@@ -109,6 +109,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("HideThreadsSuggestions");
         }
 
+        if (FeatureFlags.hideCommunityNotes) {
+            FeatureStatusTracker.setEnabled("HideCommunityNotes", R.string.ig_dialog_clean_feed_hide_community_notes);
+        } else {
+            FeatureStatusTracker.setDisabled("HideCommunityNotes");
+        }
+
         if (FeatureFlags.hideLikedPosts) {
             FeatureStatusTracker.setEnabled("HideLikedPosts", R.string.ig_dialog_clean_feed_hide_liked);
         } else {

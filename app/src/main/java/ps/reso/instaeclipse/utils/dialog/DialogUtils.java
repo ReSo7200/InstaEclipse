@@ -1171,6 +1171,13 @@ public class DialogUtils {
 
         layout.addView(hideLikedSwitch);
 
+        ToggleRow hideNotesSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_community_notes), FeatureFlags.hideCommunityNotes);
+        hideNotesSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.hideCommunityNotes = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(hideNotesSwitch);
+
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clean_feed), layout, () -> {});
     }
 
