@@ -751,6 +751,11 @@ public class FeedVideoDownloadHook {
     static String bestVideoUrlFromMedia(Object media) {
         List<String> all = new ArrayList<>();
         collectVideoUrlsFromDictionary(media, all);
+        // When IG's own video_versions getter ran on this exact media object and returned no
+        // video, it is a photo. Don't fall back to the deep graph walk: it reaches other media
+        // held by this one (related/suggested posts, sibling slides) and returned an unrelated
+        // video for photo posts on IG 452.
+        if (all.isEmpty() && isDirectVideoVersionsOwner(media)) return null;
         if (all.isEmpty()) {
             Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
             collectAllVideoUrls(media, all, visited, 0);
@@ -780,6 +785,14 @@ public class FeedVideoDownloadHook {
      * Java fields until the JNI getter is called, so the regular object-graph walk misses
      * them on current Instagram builds.
      */
+    private static boolean isDirectVideoVersionsOwner(Object media) {
+        if (media == null) return false;
+        for (Method getter : resolvedVideoVersionsGetters) {
+            if (getter.getDeclaringClass().isInstance(media)) return true;
+        }
+        return false;
+    }
+
     private static void collectVideoUrlsFromDictionary(Object media, List<String> out) {
         for (Method getter : resolvedVideoVersionsGetters) {
             Object owner = getter.getDeclaringClass().isInstance(media)
@@ -1359,33 +1372,24 @@ public class FeedVideoDownloadHook {
 
     /**
      * Optional download chooser. Offers "Audio only" (#234, when enabled and the media has an audio
-     * track) and "Copy image to clipboard" (#228, when enabled and {@code imageUrl} is a photo) next
-     * to the normal download. With neither applicable it just runs {@code downloadAction}, so the
-     * default download path is unchanged.
+     * track) next to the normal download. Otherwise it just runs {@code downloadAction}, so the
+     * default download path is unchanged. (Copy image, #228, is its own post-menu row.)
      */
     static void offerAudioOrRun(Context ctx, Object media, String imageUrl, String username, String mediaId,
                                 String type, Runnable downloadAction) {
         final String audio = FeatureFlags.offerAudioDownload ? extractAudioUrl(media) : null;
-        final String image = FeatureFlags.offerCopyImage && imageUrl != null && !isVideoUrl(imageUrl)
-                ? imageUrl : null;
-        if (audio == null && image == null) { downloadAction.run(); return; }
+        if (audio == null) { downloadAction.run(); return; }
         Context host = ctx instanceof android.app.Activity ? ctx
                 : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         if (host == null) { downloadAction.run(); return; }
         final String user = username != null ? username : type;
         java.util.List<String> labels = new ArrayList<>();
         java.util.List<Runnable> actions = new ArrayList<>();
-        labels.add(I18n.t(host, audio != null ? R.string.ig_download_choice_video : R.string.ig_download_choice_save));
+        labels.add(I18n.t(host, R.string.ig_download_choice_video));
         actions.add(downloadAction);
-        if (audio != null) {
-            labels.add(I18n.t(host, R.string.ig_download_choice_audio));
-            actions.add(() -> downloadAudio(host, audio,
-                    buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user));
-        }
-        if (image != null) {
-            labels.add(I18n.t(host, R.string.ig_download_choice_copy_image));
-            actions.add(() -> ImageClipboard.copy(host, image));
-        }
+        labels.add(I18n.t(host, R.string.ig_download_choice_audio));
+        actions.add(() -> downloadAudio(host, audio,
+                buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user));
         mainHandler.post(() -> {
             try {
                 new android.app.AlertDialog.Builder(new android.view.ContextThemeWrapper(host,

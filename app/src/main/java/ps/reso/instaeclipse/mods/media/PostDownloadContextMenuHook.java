@@ -55,6 +55,11 @@ public class PostDownloadContextMenuHook {
     private static Class<?> mediaOptionEnumClass;
     private static Object   downloadOptionValue;     // MediaOption$Option.DOWNLOAD
     private static Object   copyLinkOptionValue;     // MediaOption$Option.COPY_LINK (#117)
+    // "Copy image" row (#228). IG has no such option, so the row borrows an internal debug-only
+    // value that never appears in a normal user's menu (present 436 → 452) and gets our label;
+    // its taps are consumed below before IG's handler sees them.
+    private static final String COPY_IMAGE_CARRIER = "EXPLORE_INTERNAL_DEBUG_LOGS";
+    private static Object   copyImageOptionValue;
 
     // Obfuscated creator class found via "MediaOptionsOverflowMenuCreator" string
     private static Class<?> menuCreatorClass;
@@ -101,6 +106,8 @@ public class PostDownloadContextMenuHook {
                     downloadOptionValue = v;
                 } else if (copyLinkOptionValue == null && name.equals("COPY_LINK")) {
                     copyLinkOptionValue = v;
+                } else if (copyImageOptionValue == null && name.equals(COPY_IMAGE_CARRIER)) {
+                    copyImageOptionValue = v;
                 }
             }
             if (downloadOptionValue == null)
@@ -266,6 +273,8 @@ public class PostDownloadContextMenuHook {
                     param.setResult(null);
                 } else if (FeatureFlags.copyMediaLink && opt == copyLinkOptionValue) {
                     param.setResult(null);
+                } else if (FeatureFlags.offerCopyImage && opt == copyImageOptionValue) {
+                    param.setResult(null);
                 }
             }
 
@@ -275,11 +284,13 @@ public class PostDownloadContextMenuHook {
 
                 boolean wantDownload = FeatureFlags.enablePostDownload && downloadOptionValue != null;
                 boolean wantCopyLink = FeatureFlags.copyMediaLink && copyLinkOptionValue != null;
-                if (!wantDownload && !wantCopyLink) return;
+                boolean wantCopyImage = FeatureFlags.offerCopyImage && copyImageOptionValue != null;
+                if (!wantDownload && !wantCopyLink && !wantCopyImage) return;
 
                 // Don't react to our own target option types (suppressed in beforeHook)
                 Object opt = param.args[idxOption];
-                if (opt == downloadOptionValue || opt == copyLinkOptionValue) return;
+                if (opt == downloadOptionValue || opt == copyLinkOptionValue
+                        || (opt != null && opt == copyImageOptionValue)) return;
 
                 Object self = param.args[idxSelf];
                 boolean alreadyProcessed;
@@ -291,6 +302,7 @@ public class PostDownloadContextMenuHook {
 
                 if (wantDownload) injectRow(param, downloadOptionValue, R.string.ig_dl_title);
                 if (wantCopyLink) injectRow(param, copyLinkOptionValue, R.string.ig_copy_link_title);
+                if (wantCopyImage) injectRow(param, copyImageOptionValue, R.string.ig_download_choice_copy_image);
             }
         });
 
@@ -327,7 +339,7 @@ public class PostDownloadContextMenuHook {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 if (!FeatureFlags.enablePostDownload && !FeatureFlags.enableReelDownload
-                        && !FeatureFlags.copyMediaLink) return;
+                        && !FeatureFlags.copyMediaLink && !FeatureFlags.offerCopyImage) return;
                 onOptionClicked(param);
             }
         };
@@ -418,11 +430,14 @@ public class PostDownloadContextMenuHook {
                             && !original.contains(downloadOptionValue);
                     boolean addCopyLink = FeatureFlags.copyMediaLink && copyLinkOptionValue != null
                             && !original.contains(copyLinkOptionValue);
-                    if (!addDownload && !addCopyLink) return;
+                    boolean addCopyImage = FeatureFlags.offerCopyImage && copyImageOptionValue != null
+                            && !original.contains(copyImageOptionValue);
+                    if (!addDownload && !addCopyLink && !addCopyImage) return;
 
                     List<Object> patched = new ArrayList<>(original);
                     if (addDownload) patched.add(downloadOptionValue);
                     if (addCopyLink) patched.add(copyLinkOptionValue);
+                    if (addCopyImage) patched.add(copyImageOptionValue);
                     param.setResult(patched);
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Post) ❌ allowlist patch failed: " + t);
@@ -499,7 +514,8 @@ public class PostDownloadContextMenuHook {
             boolean isDownload = option.equals("DOWNLOAD")
                     && (FeatureFlags.enablePostDownload || FeatureFlags.enableReelDownload);
             boolean isCopyLink = option.equals("COPY_LINK") && FeatureFlags.copyMediaLink;
-            if (!isDownload && !isCopyLink) return;
+            boolean isCopyImage = option.equals(COPY_IMAGE_CARRIER) && FeatureFlags.offerCopyImage;
+            if (!isDownload && !isCopyLink && !isCopyImage) return;
 
             param.setResult(null); // consume the event
 
@@ -519,8 +535,9 @@ public class PostDownloadContextMenuHook {
                 return;
             }
 
-            if (isCopyLink) triggerCopyLink(ctx, media, thisObj);
-            else            triggerDownload(ctx, media, thisObj);
+            if (isCopyLink)       triggerCopyLink(ctx, media, thisObj);
+            else if (isCopyImage) triggerCopyImage(ctx, media, thisObj);
+            else                  triggerDownload(ctx, media, thisObj);
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ onOptionClicked: " + t);
         }
@@ -560,6 +577,27 @@ public class PostDownloadContextMenuHook {
         FeedVideoDownloadHook.offerAudioOrRun(ctx, media, shownUrl, finalUser, finalId, "post", () ->
                 FeedVideoDownloadHook.mainHandler.post(() ->
                         FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx)));
+    }
+
+    // ── Copy image (#228) ─────────────────────────────────────────────────────
+    //
+    // Copies the photo being viewed (carousel: the visible slide, resolved the same way as
+    // Download) straight to the clipboard. Video slides have no still image to copy.
+
+    private static void triggerCopyImage(Context ctx, Object media, Object clickHandler) {
+        List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
+        if (urls == null || urls.isEmpty()) {
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int viewIdx = urls.size() > 1 ? ReelDownloadHook.findCarouselIndexFromView(ctx, urls.size()) : -1;
+        int idx = viewIdx >= 0 ? viewIdx : findCarouselIndex(clickHandler, urls.size());
+        String url = urls.get(idx >= 0 && idx < urls.size() ? idx : 0);
+        if (FeedVideoDownloadHook.isVideoUrl(url)) {
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_copy_image_video), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ImageClipboard.copy(ctx, url);
     }
 
     // ── Copy Media Link (#117) ────────────────────────────────────────────────
