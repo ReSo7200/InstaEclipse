@@ -1916,6 +1916,13 @@ public class DialogUtils {
         layout.addView(createDivider(context));
         LinearLayout copyLinkCard = card(context);
         copyLinkCard.addView(copyLinkSwitch);
+        ToggleRow voiceSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
+                I18n.t(context, R.string.ig_dialog_downloader_voice), FeatureFlags.enableVoiceDownload);
+        voiceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.enableVoiceDownload = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        copyLinkCard.addView(voiceSwitch);
         ToggleRow audioSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
                 I18n.t(context, R.string.ig_dialog_downloader_offer_audio), FeatureFlags.offerAudioDownload);
         audioSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

@@ -48,6 +48,7 @@ public class SettingsBackupManager {
         s.put("hideCommunityNotes",         FeatureFlags.hideCommunityNotes);
         s.put("expandCaptions",             FeatureFlags.expandCaptions);
         s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
+        s.put("enableVoiceDownload",        FeatureFlags.enableVoiceDownload);
         s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
         s.put("offerMediaInfo",             FeatureFlags.offerMediaInfo);
         s.put("offerPlaybackSpeed",         FeatureFlags.offerPlaybackSpeed);
@@ -151,6 +152,7 @@ public class SettingsBackupManager {
         if (s.has("hideCommunityNotes"))        FeatureFlags.hideCommunityNotes        = s.getBoolean("hideCommunityNotes");
         if (s.has("expandCaptions"))            FeatureFlags.expandCaptions            = s.getBoolean("expandCaptions");
         if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
+        if (s.has("enableVoiceDownload"))       FeatureFlags.enableVoiceDownload       = s.getBoolean("enableVoiceDownload");
         if (s.has("offerCopyImage"))            FeatureFlags.offerCopyImage            = s.getBoolean("offerCopyImage");
         if (s.has("offerMediaInfo"))            FeatureFlags.offerMediaInfo            = s.getBoolean("offerMediaInfo");
         if (s.has("offerPlaybackSpeed"))        FeatureFlags.offerPlaybackSpeed        = s.getBoolean("offerPlaybackSpeed");

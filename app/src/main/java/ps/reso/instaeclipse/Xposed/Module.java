@@ -383,6 +383,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | NotesTray): ❌ Failed to hook");
                     }
 
+                    // Download DM voice messages (#223)
+                    try {
+                        if (!skip("VoiceMessageDownloadHook")) new ps.reso.instaeclipse.mods.media.VoiceMessageDownloadHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|VoiceDL) ❌ Failed to hook");
+                    }
+
                     // Like undo window (#235) — after HideSuggestedFeedItemsHook (has_liked getter)
                     try {
                         if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);
