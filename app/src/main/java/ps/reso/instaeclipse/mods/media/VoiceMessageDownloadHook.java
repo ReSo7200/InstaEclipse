@@ -336,6 +336,48 @@ public class VoiceMessageDownloadHook {
         return null;
     }
 
+    private static volatile String voiceMediaId;
+
+    /** Sender of the voice clip (its Media's owner, like post downloads), else the chat name. */
+    private static String voiceUsername(Object message) {
+        try {
+            if (message != null) {
+                Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+                ArrayDeque<Object[]> q = new ArrayDeque<>();
+                q.add(new Object[]{message, 0});
+                while (!q.isEmpty() && seen.size() < 200) {
+                    Object[] e = q.poll();
+                    Object o = e[0];
+                    int d = (int) e[1];
+                    if (o == null || !seen.add(o)) continue;
+                    if (o.getClass().getName().equals(MEDIA)) {
+                        try {
+                            Object id = o.getClass().getMethod("getId").invoke(o);
+                            if (id instanceof String sid && !sid.isEmpty()) voiceMediaId = sid.split("_")[0];
+                        } catch (Throwable ignored) {}
+                        String u = FeedVideoDownloadHook.extractUsernameFromMediaObject(o);
+                        if (u != null && !u.isEmpty()) return u;
+                        continue;
+                    }
+                    if (d >= 3) continue;
+                    String n = o.getClass().getName();
+                    if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
+                    for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+                        for (Field f : k.getDeclaredFields()) {
+                            if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
+                            try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
+                        }
+                }
+            }
+            String chat = ps.reso.instaeclipse.utils.ghost.ThreadNames.get(
+                    ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.currentThreadId());
+            if (chat != null && !chat.isEmpty()) return chat.replaceAll("[^A-Za-z0-9._-]", "_");
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ username: " + t);
+        }
+        return "voice";
+    }
+
     private static boolean isOurRow(Object row, Field labelField) {
         try {
             android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
@@ -362,8 +404,11 @@ public class VoiceMessageDownloadHook {
         lastDownloadAt = System.currentTimeMillis();
         if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         if (ctx == null) return;
-        String name = "voice_message_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".m4a";
-        FeedVideoDownloadHook.downloadAudio(ctx, url, name, "voice");
+        voiceMediaId = null;
+        String user = voiceUsername(recentMessage());
+        String id = voiceMediaId != null ? voiceMediaId : String.valueOf(System.currentTimeMillis());
+        String name = FeedVideoDownloadHook.buildFilename(user, "voice", id, true).replace(".mp4", ".m4a");
+        FeedVideoDownloadHook.downloadAudio(ctx, url, name, user);
     }
 
     private static String actionName(Object row) {
