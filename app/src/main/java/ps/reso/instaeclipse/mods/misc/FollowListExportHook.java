@@ -51,10 +51,11 @@ import ps.reso.instaeclipse.utils.users.UserUtils;
  * FollowListFragment = class whose method uses "Invalid entry type for FollowListFragment"
  * (X.0D9r on 452, X.0D96 on 451). After its onViewCreated a small "Export CSV" pill is added;
  * on tap, every com.instagram.user.model.User held by the list's adapter (the ListView inside
- * the fragment) is written as username,full_name,id. Before exporting, the list is scrolled to its
- * end repeatedly so IG's own pager loads every page; it stops when no new accounts arrive for a few
- * seconds (tap the pill again to stop early). Only users that sit in the adapter's row lists are
- * written, so the profile owner and the logged-in user (plain fields) are left out.
+ * the fragment) is written as username,full_name,id. No scrolling: on tap, IG's own list pager
+ * (X.0DRF on 452: fragment field with isLoading(), next max_id in its String field) is asked for the
+ * next page until there is no next_max_id — IG sends the API requests and parses each page into the
+ * adapter — then every user in the adapter's row lists is written (so the profile owner and the
+ * logged-in user, held in plain fields, are left out). Tap the pill again to stop early.
  */
 public class FollowListExportHook {
 
@@ -82,19 +83,43 @@ public class FollowListExportHook {
                 try { ovc = c.getDeclaredMethod("onViewCreated", View.class, android.os.Bundle.class); } catch (NoSuchMethodException ignored) {}
             }
             if (ovc == null) { ModuleLog.line(TAG + "❌ onViewCreated not found"); return; }
-            final Class<?> fragClass = frag;
+            fragClass = frag;
             XposedBridge.hookMethod(ovc, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     if (!FeatureFlags.followListExport || !fragClass.isInstance(param.thisObject)) return;
-                    if (param.args[0] instanceof View root) root.post(() -> addPill(root));
+                    if (param.args[0] instanceof View root) {
+                        live.put(param.thisObject, root);
+                        root.post(() -> addPill(root));
+                    }
                 }
             });
+            try { findPager(bridge, cl); } catch (Throwable t) { ModuleLog.line(TAG + "⚠️ pager: " + t); }
             ModuleLog.line(TAG + "✅ " + frag.getName() + " fullName=" + (fullNameGetter != null));
             FeatureStatusTracker.setHooked("FollowListExport");
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ " + t);
         }
+    }
+
+    /** Live list fragments → their root view (followers / following / mutual tabs each have one). */
+    private static final Map<Object, View> live = Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    /** The tab whose list is on screen right now. The tab pager keeps neighbouring tabs attached
+     *  (isShown() is true for them too), so take the one with the largest on-screen area. */
+    private static Object[] visibleList() {
+        Object[] best = null;
+        long bestArea = 0;
+        android.graphics.Rect rc = new android.graphics.Rect();
+        synchronized (live) {
+            for (Map.Entry<Object, View> e : live.entrySet()) {
+                View r = e.getValue();
+                if (r == null || !r.isShown() || findList(r) == null || !r.getGlobalVisibleRect(rc)) continue;
+                long area = (long) rc.width() * rc.height();
+                if (area > bestArea) { bestArea = area; best = new Object[]{e.getKey(), r}; }
+            }
+        }
+        return best;
     }
 
     private static void addPill(View root) {
@@ -116,7 +141,12 @@ public class FollowListExportHook {
         pill.setElevation(20 * d);
         pill.setOnClickListener(v -> {
             if (loading) { loading = false; return; } // second tap: stop loading, export now
-            loadAllThenExport(root, pill);
+            Object[] vis = visibleList();
+            if (vis == null) {
+                Toast.makeText(v.getContext(), I18n.t(v.getContext(), R.string.ig_follow_export_none), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            loadAllThenExport((View) vis[1], pill, vis[0]);
         });
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.END);
@@ -126,63 +156,112 @@ public class FollowListExportHook {
         pill.bringToFront();
     }
 
-    /** Scroll to the end until the loaded count stops growing (IG pages in ~50 at a time), then export. */
-    private static void loadAllThenExport(View root, TextView pill) {
+    // ---- Paging: drive IG's own pager (no scrolling) and read every parsed page response ----
+
+    private static Class<?> fragClass;
+    private static Field pagerField, nextMaxIdField;
+    private static Method pagerIsLoading, pagerLoadMore;
+
+    /** IG's own list pager: fragment field whose class has isLoading() and keeps the next max_id in a
+     *  String field; its "load more if idle" method (no-arg void, checks the lifecycle first) sends the
+     *  next /friendships/<id>/following|followers/ page request. */
+    private static void findPager(DexKitBridge bridge, ClassLoader cl) throws Throwable {
+        // pager = fragment field whose class has isLoading() and keeps the next max_id in a String field
+        for (Class<?> c = fragClass; c != null && pagerField == null; c = c.getSuperclass())
+            for (Field f : c.getDeclaredFields()) {
+                try {
+                    Method il = f.getType().getDeclaredMethod("isLoading");
+                    if (il.getReturnType() != boolean.class) continue;
+                    for (Field sf : f.getType().getDeclaredFields())
+                        if (sf.getType() == String.class && !Modifier.isStatic(sf.getModifiers())) { sf.setAccessible(true); nextMaxIdField = sf; }
+                    if (nextMaxIdField == null) continue;
+                    f.setAccessible(true);
+                    pagerField = f;
+                    pagerIsLoading = il;
+                    break;
+                } catch (NoSuchMethodException ignored) {}
+            }
+        if (pagerField != null) {
+            // "load more if idle": the no-arg void method that checks the lifecycle first
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .declaredClass(pagerField.getType().getName()).paramCount(0).returnType("void")
+                    .addInvoke(MethodMatcher.create().name("getLifecycle"))))) {
+                pagerLoadMore = md.getMethodInstance(cl);
+                break;
+            }
+        }
+        ModuleLog.line(TAG + "pager=" + (pagerField != null ? pagerField.getType().getName() : null)
+                + " loadMore=" + (pagerLoadMore != null ? pagerLoadMore.getName() : null));
+    }
+
+    /** Ask IG's pager for the next page until next_max_id is gone, then export. Tap again to stop. */
+    private static void loadAllThenExport(View root, TextView pill, Object frag) {
+        Object pager = null;
+        try { if (pagerField != null) pager = pagerField.get(frag); } catch (Throwable ignored) {}
+        if (pager == null || pagerLoadMore == null) { export(root, frag); return; }
         loading = true;
+        final Object pg = pager;
         Handler h = new Handler(Looper.getMainLooper());
         String label = pill.getText().toString();
         new Runnable() {
-            int last = -1, still = 0;
+            int idle = 0;
+            boolean first = true;
             @Override public void run() {
-                AbsListView list = findList(root);
-                int n = list != null && list.getAdapter() != null ? list.getAdapter().getCount() : 0;
-                if (n == last) still++; else { still = 0; last = n; }
-                if (!loading || still >= 7 || list == null || !root.isAttachedToWindow()) {
+                boolean more = false;
+                try {
+                    // isLoading() is the footer-spinner flag (true while more pages exist), so don't gate
+                    // on it: the load-more method itself skips when a request is in flight or failed.
+                    more = nextMaxIdField.get(pg) != null;
+                    if (more) pagerLoadMore.invoke(pg);
+                    if (first) { first = false; ModuleLog.line(TAG + "pager start: more=" + more); }
+                } catch (Throwable t) {
+                    ModuleLog.line(TAG + "⚠️ pager: " + t);
+                    loading = false;
+                }
+                idle = more ? 0 : idle + 1;
+                AbsListView lv = findList(root);
+                pill.setText("⏳ " + (lv != null && lv.getAdapter() != null ? lv.getAdapter().getCount() : 0));
+                if (!loading || idle >= 2 || !root.isAttachedToWindow()) {
                     loading = false;
                     pill.setText(label);
-                    if (list != null) list.setSelection(0);
-                    export(root);
+                    export(root, frag);
                     return;
                 }
-                pill.setText("⏳ " + n);
-                list.setSelection(Math.max(0, n - 1));
-                list.smoothScrollBy(list.getHeight(), 250); // a real scroll so IG's pager fires
-                h.postDelayed(this, 900);
+                h.postDelayed(this, 500);
             }
         }.run();
     }
 
-    private static void export(View root) {
+    private static void writeCsv(android.content.Context ctx, Map<String, String[]> users, String file) {
+        try {
+            StringBuilder csv = new StringBuilder("username,full_name,id\n");
+            for (String[] u : users.values()) csv.append(q(u[0])).append(',').append(q(u[1])).append(',').append(q(u[2])).append('\n');
+            try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openExport(ctx, file, "text/csv")) {
+                out.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}); // UTF-8 BOM for Excel
+                out.write(csv.toString().getBytes(StandardCharsets.UTF_8));
+            }
+            ModuleLog.line(TAG + "exported " + users.size() + " users to " + file);
+            new Handler(Looper.getMainLooper()).post(() ->
+                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_follow_export_done, users.size(), file), Toast.LENGTH_LONG).show());
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "❌ export: " + t);
+        }
+    }
+
+    /** Every user of the pages IG has received, as held by the list's adapter. */
+    private static void export(View root, Object frag) {
         AbsListView list = findList(root);
         Adapter ad = list != null ? list.getAdapter() : null;
         if (ad instanceof HeaderViewListAdapter h) ad = h.getWrappedAdapter();
-        if (ad == null) {
-            Toast.makeText(root.getContext(), I18n.t(root.getContext(), R.string.ig_follow_export_none), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Map<String, String[]> users = collect(ad);
+        Map<String, String[]> users = ad != null ? collect(ad, true) : new LinkedHashMap<>();
         if (users.isEmpty()) {
             Toast.makeText(root.getContext(), I18n.t(root.getContext(), R.string.ig_follow_export_none), Toast.LENGTH_SHORT).show();
             return;
         }
         Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         android.content.Context ctx = act != null ? act : root.getContext();
-        new Thread(() -> {
-            try {
-                StringBuilder csv = new StringBuilder("username,full_name,id\n");
-                for (String[] u : users.values()) csv.append(q(u[0])).append(',').append(q(u[1])).append(',').append(q(u[2])).append('\n');
-                String file = "follow_list_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".csv";
-                try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openExport(ctx, file, "text/csv")) {
-                    out.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}); // UTF-8 BOM for Excel
-                    out.write(csv.toString().getBytes(StandardCharsets.UTF_8));
-                }
-                ModuleLog.line(TAG + "exported " + users.size() + " users to " + file);
-                new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_follow_export_done, users.size(), file), Toast.LENGTH_LONG).show());
-            } catch (Throwable t) {
-                ModuleLog.line(TAG + "❌ export: " + t);
-            }
-        }).start();
+        String file = "follow_list_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".csv";
+        new Thread(() -> writeCsv(ctx, users, file)).start();
     }
 
     private static String q(String s) {
@@ -202,7 +281,7 @@ public class FollowListExportHook {
     }
 
     /** id → {username, full name, id} for every User reachable from the adapter, in order. */
-    private static Map<String, String[]> collect(Object adapter) {
+    private static Map<String, String[]> collect(Object adapter, boolean rowsOnly) {
         Map<String, String[]> out = new LinkedHashMap<>();
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         ArrayDeque<Object[]> q = new ArrayDeque<>();
@@ -216,7 +295,7 @@ public class FollowListExportHook {
             if (o instanceof List<?> l) { for (Object it : l) q.add(new Object[]{it, d + 1, true}); continue; }
             if (o instanceof Map<?, ?> m) { for (Object it : m.values()) q.add(new Object[]{it, d + 1, true}); continue; }
             if (o.getClass().getName().equals(USER)) {
-                if (!row) continue; // the profile owner / logged-in user held in plain fields, not a list row
+                if (rowsOnly && !row) continue; // the profile owner / logged-in user held in plain fields, not a list row
                 String u = UserUtils.callUsernameGetter(o);
                 String id = userId(o);
                 String full = null;
