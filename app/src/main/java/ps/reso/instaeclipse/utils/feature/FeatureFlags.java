@@ -92,6 +92,7 @@ public class FeatureFlags {
     public static boolean showFollowerToast = false;
     public static boolean showFeatureToasts = false;
     public static boolean disableRepost = false;
+    public static boolean commentSearch = false; // search the loaded comments of a post (#230)
     public static boolean storyViewerSearch = false; // search box over your story viewers list
     public static boolean profileFollowsYouLabel = false; // "Follows you" label on profiles (#239)
     public static boolean likeUndo = false; // hold likes for a few seconds with an Undo bar (#235)

@@ -411,6 +411,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|ViewerSearch) ❌ Failed to hook");
                     }
 
+                    // Search inside the comments sheet (#230)
+                    try {
+                        if (!skip("CommentSearchHook")) new ps.reso.instaeclipse.mods.misc.CommentSearchHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|CommentSearch) ❌ Failed to hook");
+                    }
+
                     // Like undo window (#235) — after HideSuggestedFeedItemsHook (has_liked getter)
                     try {
                         if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);

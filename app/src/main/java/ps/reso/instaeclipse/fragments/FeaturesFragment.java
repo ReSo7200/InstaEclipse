@@ -914,7 +914,7 @@ public class FeaturesFragment extends Fragment {
                         "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
                         "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
                         "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
-                        "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "storyViewerSearch"
+                        "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "storyViewerSearch", "commentSearch"
                 )),
                 createSwitch(R.drawable.ic_story_ring, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
@@ -933,7 +933,8 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_timer, "#BF5AF2", getString(R.string.ig_dialog_misc_exact_timestamps), "exactTimestamps"),
                 createSwitch(R.drawable.ic_heart, "#BF5AF2", getString(R.string.ig_dialog_misc_like_undo), "likeUndo"),
                 createSwitch(R.drawable.ic_notification, "#BF5AF2", getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
-                createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_viewer_search), "storyViewerSearch")
+                createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_viewer_search), "storyViewerSearch"),
+                createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_comment_search), "commentSearch")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_misc), defs);
