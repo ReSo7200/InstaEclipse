@@ -33,7 +33,9 @@ jobs:
 
       # Step 3: Set up Android SDK
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
+        with:
+          items: platform-tools,platforms;android-34,build-tools;34.0.0
 
       # Step 4: Grant execution permissions to gradlew
       - name: Grant execute permission to gradlew
