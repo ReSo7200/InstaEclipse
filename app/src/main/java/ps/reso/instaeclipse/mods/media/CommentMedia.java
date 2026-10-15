@@ -101,8 +101,29 @@ public final class CommentMedia {
         return null;
     }
 
-    /** Opens the regular download chooser for the comment's media. */
+    /** GIF comments are saved as .gif (the photo path would name the animated file .jpg); anything else
+     *  opens the regular download chooser. */
     public static void download(Context ctx, List<String> urls, String commentId) {
-        FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, "comment", commentId != null ? commentId : "0", 0);
+        String id = commentId != null ? commentId : "0";
+        if (urls.size() == 1 && isGif(urls.get(0))) {
+            String url = urls.get(0);
+            String jpg = FeedVideoDownloadHook.buildFilename("comment", "gif", id, false);
+            String fn = jpg.endsWith(".jpg") ? jpg.substring(0, jpg.length() - 4) + ".gif" : jpg;
+            android.widget.Toast.makeText(ctx, ps.reso.instaeclipse.utils.i18n.I18n.t(ctx, ps.reso.instaeclipse.R.string.ig_comment_gif_downloading),
+                    android.widget.Toast.LENGTH_SHORT).show();
+            new Thread(() -> {
+                try { FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, false, "comment"); }
+                catch (Throwable t) { ModuleLog.line("(IE|CommentMedia) gif: " + t); }
+            }).start();
+            return;
+        }
+        FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, "comment", id, 0);
+    }
+
+    private static boolean isGif(String url) {
+        String u = url.toLowerCase(java.util.Locale.ROOT);
+        int q = u.indexOf('?');
+        String path = q >= 0 ? u.substring(0, q) : u;
+        return u.contains("giphy.com") || path.endsWith(".gif");
     }
 }

@@ -600,6 +600,14 @@ public class CommentCopyHook {
                         ps.reso.instaeclipse.mods.media.CommentMedia.download(ctx, media, commentId);
                     });
                     sheet.addView(btnDl);
+                    // GIF / photo comments: copy the media link (Android can't put an animated GIF on the clipboard)
+                    Button btnLink = makeButton(ctx,
+                            I18n.t(ctx, R.string.ig_comment_copy_media_link), secondBg, secondText, dp);
+                    btnLink.setOnClickListener(v -> {
+                        dialog.dismiss();
+                        copyToClipboard(ctx, media.get(0));
+                    });
+                    sheet.addView(btnLink);
                 }
                 if (text.isEmpty()) {
                     commentTv.setVisibility(View.GONE);

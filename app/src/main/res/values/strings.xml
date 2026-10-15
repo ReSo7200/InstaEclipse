@@ -467,6 +467,8 @@ Stay on this screen until it finishes.</string>
 
     <!-- Comment Copy dialog (runs in IG process) -->
     <string name="ig_comment_copy_title">Copy Comment</string>
+    <string name="ig_comment_gif_downloading">Downloading GIF…</string>
+    <string name="ig_comment_copy_media_link">Copy GIF / image link</string>
     <string name="ig_comment_copy_full">Copy Full Comment</string>
     <string name="ig_comment_select_part">Select Part to Copy</string>
     <string name="ig_comment_select_title">Select to Copy</string>
