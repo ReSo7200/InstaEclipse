@@ -131,14 +131,18 @@ public class GhostEphemeralKeepHook {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
                 if (!FeatureFlags.keepEphemeralMessages) return;
-                clearExpiryTimestamp(param.thisObject);
                 Object result = param.getResult();
-                if (result != null && result != param.thisObject) clearExpiryTimestamp(result);
+                if (result != null) clearExpiryTimestamp(result);
             }
         };
 
+        // Key renamed from "Ephemeral_expiry": that list included the static per-FIELD parser
+        // (X.00zF.A01 on 452, called once for every JSON field of every DM message — ~5k calls
+        // per 40 s of feed scrolling). Hooking such a hot method made ART's JIT compile its
+        // hook backup, which crashes Instagram (SIGSEGV in DexCache::SetResolvedType) on
+        // Vector/Android 13. It also never had an object to clean (static, void).
         if (DexKitCache.isCacheValid()) {
-            List<Method> cached = DexKitCache.loadMethods("Ephemeral_expiry", classLoader);
+            List<Method> cached = DexKitCache.loadMethods("Ephemeral_expiry_v2", classLoader);
             if (cached != null && !cached.isEmpty()) {
                 for (Method m : cached) XposedBridge.hookMethod(m, hook);
                 return;
@@ -150,20 +154,38 @@ public class GhostEphemeralKeepHook {
                     .matcher(MethodMatcher.create()
                             .usingStrings("message_expiration_timestamp_ms")));
 
-            List<Method> hooked = new java.util.ArrayList<>();
+            // Hook only whole-object parse entry points (one call per parsed model, returning
+            // it): the parser classes' parseFromJsonParser/unsafeParseFromJson, plus any anchor
+            // method that returns an object. Never the static void per-field helpers.
+            java.util.Set<Method> targets = new java.util.LinkedHashSet<>();
+            java.util.Set<Class<?>> owners = new java.util.LinkedHashSet<>();
             for (MethodData md : methods) {
                 try {
                     Method m = md.getMethodInstance(classLoader);
+                    owners.add(m.getDeclaringClass());
+                    if (m.getReturnType() != void.class && !m.getReturnType().isPrimitive()) targets.add(m);
+                } catch (Throwable ignored) {}
+            }
+            for (Class<?> c : owners) {
+                for (Method m : c.getDeclaredMethods()) {
+                    String n = m.getName();
+                    if ((n.equals("parseFromJsonParser") || n.equals("unsafeParseFromJson"))
+                            && m.getReturnType() != void.class) targets.add(m);
+                }
+            }
+            List<Method> hooked = new java.util.ArrayList<>();
+            for (Method m : targets) {
+                try {
                     XposedBridge.hookMethod(m, hook);
                     hooked.add(m);
                     ModuleLog.line("(IE|Ephemeral) ✅ expiry-parser hook → "
-                            + md.getClassName() + "." + md.getName());
+                            + m.getDeclaringClass().getName() + "." + m.getName());
                 } catch (Throwable ignored) {}
             }
             if (hooked.isEmpty()) {
                 ModuleLog.line("(IE|Ephemeral) ❌ no expiry-parser methods hooked");
             } else {
-                DexKitCache.saveMethods("Ephemeral_expiry", hooked);
+                DexKitCache.saveMethods("Ephemeral_expiry_v2", hooked);
             }
         } catch (Throwable t) {
             ModuleLog.line("(IE|Ephemeral) ❌ hookExpiryParser: " + t.getMessage());
