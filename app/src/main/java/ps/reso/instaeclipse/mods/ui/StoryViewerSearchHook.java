@@ -57,12 +57,12 @@ public class StoryViewerSearchHook {
             Class<?> adapter = null;
             for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("search_result_rendered")))) {
-                adapter = md.getMethodInstance(cl).getDeclaringClass();
+                adapter = cl.loadClass(md.getClassName());
                 break;
             }
             for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("XDTViewerFeedbackDict")))) {
-                recordClass = md.getMethodInstance(cl).getDeclaringClass();
+                recordClass = cl.loadClass(md.getClassName());
                 break;
             }
             if (adapter == null) { ModuleLog.line(TAG + "❌ viewer adapter not found"); return; }
