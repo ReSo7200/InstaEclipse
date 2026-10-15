@@ -51,14 +51,17 @@ import ps.reso.instaeclipse.utils.users.UserUtils;
  * FollowListFragment = class whose method uses "Invalid entry type for FollowListFragment"
  * (X.0D9r on 452, X.0D96 on 451). After its onViewCreated a small "Export CSV" pill is added;
  * on tap, every com.instagram.user.model.User held by the list's adapter (the ListView inside
- * the fragment) is written as username,full_name,id. Only loaded rows are exported — scroll to
- * the end of the list first for a complete file.
+ * the fragment) is written as username,full_name,id. Before exporting, the list is scrolled to its
+ * end repeatedly so IG's own pager loads every page; it stops when no new accounts arrive for a few
+ * seconds (tap the pill again to stop early). Only users that sit in the adapter's row lists are
+ * written, so the profile owner and the logged-in user (plain fields) are left out.
  */
 public class FollowListExportHook {
 
     private static final String TAG = "(IE|FollowExport) ";
     private static final String USER = "com.instagram.user.model.User";
     private static Method fullNameGetter;
+    private static volatile boolean loading;
 
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
@@ -111,13 +114,42 @@ public class FollowListExportHook {
         bg.setCornerRadius(18 * d);
         pill.setBackground(bg);
         pill.setElevation(20 * d);
-        pill.setOnClickListener(v -> export(root));
+        pill.setOnClickListener(v -> {
+            if (loading) { loading = false; return; } // second tap: stop loading, export now
+            loadAllThenExport(root, pill);
+        });
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.END);
         lp.bottomMargin = (int) (24 * d);
         lp.rightMargin = (int) (16 * d);
         g.addView(pill, lp);
         pill.bringToFront();
+    }
+
+    /** Scroll to the end until the loaded count stops growing (IG pages in ~50 at a time), then export. */
+    private static void loadAllThenExport(View root, TextView pill) {
+        loading = true;
+        Handler h = new Handler(Looper.getMainLooper());
+        String label = pill.getText().toString();
+        new Runnable() {
+            int last = -1, still = 0;
+            @Override public void run() {
+                AbsListView list = findList(root);
+                int n = list != null && list.getAdapter() != null ? list.getAdapter().getCount() : 0;
+                if (n == last) still++; else { still = 0; last = n; }
+                if (!loading || still >= 7 || list == null || !root.isAttachedToWindow()) {
+                    loading = false;
+                    pill.setText(label);
+                    if (list != null) list.setSelection(0);
+                    export(root);
+                    return;
+                }
+                pill.setText("⏳ " + n);
+                list.setSelection(Math.max(0, n - 1));
+                list.smoothScrollBy(list.getHeight(), 250); // a real scroll so IG's pager fires
+                h.postDelayed(this, 900);
+            }
+        }.run();
     }
 
     private static void export(View root) {
@@ -174,15 +206,17 @@ public class FollowListExportHook {
         Map<String, String[]> out = new LinkedHashMap<>();
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         ArrayDeque<Object[]> q = new ArrayDeque<>();
-        q.add(new Object[]{adapter, 0});
+        q.add(new Object[]{adapter, 0, false}); // {object, depth, reached through a List/Map (= a row)}
         while (!q.isEmpty() && seen.size() < 20000) {
             Object[] e = q.poll();
             Object o = e[0];
             int d = (int) e[1];
+            boolean row = (boolean) e[2];
             if (o == null || !seen.add(o)) continue;
-            if (o instanceof List<?> l) { for (Object it : l) q.add(new Object[]{it, d + 1}); continue; }
-            if (o instanceof Map<?, ?> m) { for (Object it : m.values()) q.add(new Object[]{it, d + 1}); continue; }
+            if (o instanceof List<?> l) { for (Object it : l) q.add(new Object[]{it, d + 1, true}); continue; }
+            if (o instanceof Map<?, ?> m) { for (Object it : m.values()) q.add(new Object[]{it, d + 1, true}); continue; }
             if (o.getClass().getName().equals(USER)) {
+                if (!row) continue; // the profile owner / logged-in user held in plain fields, not a list row
                 String u = UserUtils.callUsernameGetter(o);
                 String id = userId(o);
                 String full = null;
@@ -197,7 +231,7 @@ public class FollowListExportHook {
                 for (Field f : k.getDeclaredFields()) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class
                             || android.content.Context.class.isAssignableFrom(f.getType()) || View.class.isAssignableFrom(f.getType())) continue;
-                    try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
+                    try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1, row}); } catch (Throwable ignored) {}
                 }
         }
         return out;
