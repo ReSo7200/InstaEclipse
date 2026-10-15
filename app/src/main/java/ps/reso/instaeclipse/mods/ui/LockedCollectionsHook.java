@@ -40,6 +40,10 @@ public class LockedCollectionsHook {
     private static final String BTN_TAG = "ie_lock_collection_btn";
     private static final String ARG_PREFIX = "SaveFragment.ARGUMENT_SAVED_";
     private static boolean prompting;
+    /** the collection screen on display (its root view) and its id, for re-adding the button */
+    private static java.lang.ref.WeakReference<View> active;
+    private static String activeId;
+    private static final Set<View> watchedBars = java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
     /** screen root -> its fragment, hidden while the passcode prompt is up */
     private static final java.util.Map<View, Object> hidden = new java.util.WeakHashMap<>();
     /** fragments unlocked by a prompt (stay unlocked until they are gone, e.g. back from a post) */
@@ -61,6 +65,8 @@ public class LockedCollectionsHook {
                     if (a == null) return;
                     // ask once per opening: coming back from a post inside it doesn't ask again
                     if (isLocked(id) && !isUnlocked(param.thisObject)) gate(a, param.thisObject, root);
+                    active = new java.lang.ref.WeakReference<>(root);
+                    activeId = id;
                     root.postDelayed(() -> addButton(a, id), 400);
                 }
             });
@@ -144,6 +150,14 @@ public class LockedCollectionsHook {
             int barId = a.getResources().getIdentifier("action_bar", "id", a.getPackageName());
             View bar = barId != 0 ? a.findViewById(barId) : null;
             if (!(bar instanceof ViewGroup g)) return;
+            // IG rebuilds the shared action bar (e.g. when the ⋮ sheet opens), dropping our button:
+            // put it back while that collection screen is still the one shown
+            if (watchedBars.add(g))
+                g.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                    View r = active != null ? active.get() : null;
+                    if (!FeatureFlags.lockSavedCollections || r == null || !r.isShown() || activeId == null) return;
+                    if (g.findViewWithTag(BTN_TAG) == null) g.post(() -> addButton(a, activeId));
+                });
             View old = g.findViewWithTag(BTN_TAG);
             if (old != null && old.getParent() instanceof ViewGroup p) p.removeView(old);
             // the Options button's parent: the deepest group holding the bar's right-most clickable
