@@ -34,6 +34,10 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  */
 public class UnsentThreadButtonHook {
 
+    /** Resolves the thread whose header carries the module buttons (set when they are injected). */
+    static volatile java.util.function.Supplier<String> openThread = CurrentThreadTracker::currentThreadId;
+
+
     private static final String TAG = "ie_unsent_btn";
     private static final java.util.Set<View> pendingDecors =
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
@@ -196,14 +200,19 @@ public class UnsentThreadButtonHook {
             // bound to THIS button — a stable per-thread fallback if the live read fails.
             final String[] bound = { CurrentThreadTracker.currentThreadId() != null
                     ? CurrentThreadTracker.currentThreadId() : KeepUnsentMessagesHook.currentThreadId };
-            btn.setOnClickListener(v -> {
-                // PRIMARY: read the actually-open thread from the foreground fragment (immune to
-                // background igThreadIgid churn). Fallbacks: id bound at open, then tracked, then tags.
+            // PRIMARY: read the actually-open thread from the foreground fragment (immune to
+            // background igThreadIgid churn). Fallbacks: id bound at open, then tracked, then tags.
+            // Shared with the other header buttons (chat export) so they act on the same thread.
+            openThread = () -> {
                 String threadId = CurrentThreadTracker.currentThreadId();
                 if (threadId == null) threadId = resolveFromActivity(activity);
                 if (threadId == null) threadId = bound[0];
                 if (threadId == null) threadId = KeepUnsentMessagesHook.currentThreadId;
                 if (threadId == null) threadId = resolveThreadId(headerRoot);
+                return threadId;
+            };
+            btn.setOnClickListener(v -> {
+                String threadId = openThread.get();
                 ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
                 ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
             });

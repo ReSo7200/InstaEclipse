@@ -145,8 +145,11 @@ public class ChatExportHook {
     }
 
     private static void export(Activity a) {
-        String threadId = CurrentThreadTracker.currentThreadId();
+        String tracked = CurrentThreadTracker.currentThreadId();
+        if (tracked == null) try { tracked = UnsentThreadButtonHook.openThread.get(); } catch (Throwable ignored) {}
+        final String threadId = tracked;
         Object store = findStore(threadId);
+        ModuleLog.line(TAG + "export thread=" + threadId + " store=" + (store != null));
         if (store == null || messagesMethod == null) {
             Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_none), Toast.LENGTH_SHORT).show();
             return;
@@ -212,17 +215,14 @@ public class ChatExportHook {
         }
     }
 
-    /** The live store for this thread (its graph holds the thread id), else the newest one. */
+    /** The live store for exactly this thread (its graph holds the thread id). Never guesses: stores of
+     *  other chats (inbox prefetch) stay alive too, so without a confirmed match nothing is exported. */
     private static Object findStore(String threadId) {
+        if (threadId == null) return null;
         Object[] all;
         synchronized (STORES) { all = STORES.keySet().toArray(); }
-        Object fallback = null;
-        for (Object s : all) {
-            if (s == null) continue;
-            fallback = s;
-            if (threadId != null && graphHasString(s, threadId)) return s;
-        }
-        return threadId == null ? fallback : null;
+        for (Object s : all) if (s != null && graphHasString(s, threadId)) return s;
+        return null;
     }
 
     private static boolean graphHasString(Object root, String needle) {
