@@ -447,7 +447,10 @@
     <string name="ig_dialog_misc_follow_export">Export Followers/Following to CSV</string>
     <string name="ig_follow_export">Export CSV</string>
     <string name="ig_follow_export_done">Exported %1$d accounts to %2$s</string>
-    <string name="ig_follow_export_none">No accounts loaded yet — scroll the list first</string>
+    <string name="ig_follow_export_none">No accounts loaded yet</string>
+    <string name="ig_follow_export_loading">Loading accounts… %1$d so far.
+Stay on this screen until it finishes.</string>
+    <string name="ig_follow_export_stop">Stop &amp; save</string>
     <string name="ig_dialog_misc_like_undo">Undo Window for Likes (4 s)</string>
     <string name="ig_like_undo_bar">❤ Liked · UNDO</string>
     <string name="ig_like_undo_cancelled">Like cancelled — refresh to update the heart</string>

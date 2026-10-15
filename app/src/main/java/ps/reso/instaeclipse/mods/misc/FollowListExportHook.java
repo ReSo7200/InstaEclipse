@@ -55,7 +55,8 @@ import ps.reso.instaeclipse.utils.users.UserUtils;
  * (X.0DRF on 452: fragment field with isLoading(), next max_id in its String field) is asked for the
  * next page until there is no next_max_id — IG sends the API requests and parses each page into the
  * adapter — then every user in the adapter's row lists is written (so the profile owner and the
- * logged-in user, held in plain fields, are left out). Tap the pill again to stop early.
+ * logged-in user, held in plain fields, are left out). A progress dialog keeps the user on the list
+ * (IG's pager only runs while it is open); "Stop & save" ends early.
  */
 public class FollowListExportHook {
 
@@ -194,7 +195,9 @@ public class FollowListExportHook {
                 + " loadMore=" + (pagerLoadMore != null ? pagerLoadMore.getName() : null));
     }
 
-    /** Ask IG's pager for the next page until next_max_id is gone, then export. Tap again to stop. */
+    /** Ask IG's pager for the next page until next_max_id is gone, then export. The pager only works
+     *  while the list screen is resumed, so a non-cancelable progress dialog keeps the user here; its
+     *  button (or a second tap on the pill) stops early and saves what has loaded. */
     private static void loadAllThenExport(View root, TextView pill, Object frag) {
         Object pager = null;
         try { if (pagerField != null) pager = pagerField.get(frag); } catch (Throwable ignored) {}
@@ -202,7 +205,7 @@ public class FollowListExportHook {
         loading = true;
         final Object pg = pager;
         Handler h = new Handler(Looper.getMainLooper());
-        String label = pill.getText().toString();
+        android.app.AlertDialog dlg = progressDialog(root.getContext());
         new Runnable() {
             int idle = 0;
             boolean first = true;
@@ -220,10 +223,11 @@ public class FollowListExportHook {
                 }
                 idle = more ? 0 : idle + 1;
                 AbsListView lv = findList(root);
-                pill.setText("⏳ " + (lv != null && lv.getAdapter() != null ? lv.getAdapter().getCount() : 0));
+                int n = lv != null && lv.getAdapter() != null ? lv.getAdapter().getCount() : 0;
+                if (dlg != null) dlg.setMessage(I18n.t(root.getContext(), R.string.ig_follow_export_loading, n));
                 if (!loading || idle >= 2 || !root.isAttachedToWindow()) {
                     loading = false;
-                    pill.setText(label);
+                    try { if (dlg != null) dlg.dismiss(); } catch (Throwable ignored) {}
                     export(root, frag);
                     return;
                 }
@@ -245,6 +249,31 @@ public class FollowListExportHook {
                     Toast.makeText(ctx, I18n.t(ctx, R.string.ig_follow_export_done, users.size(), file), Toast.LENGTH_LONG).show());
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ export: " + t);
+        }
+    }
+
+    private static android.app.AlertDialog progressDialog(android.content.Context c) {
+        try {
+            // the Activity that hosts the list (UIHookManager's current one can be a different, hidden one)
+            android.content.Context ctx = c;
+            while (!(ctx instanceof Activity) && ctx instanceof android.content.ContextWrapper w && w.getBaseContext() != null) ctx = w.getBaseContext();
+            if (!(ctx instanceof Activity)) {
+                Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+                ctx = act != null ? act : c;
+            }
+            android.app.AlertDialog d = new android.app.AlertDialog.Builder(ctx, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                    .setTitle(I18n.t(ctx, R.string.ig_follow_export))
+                    .setMessage(I18n.t(ctx, R.string.ig_follow_export_loading, 0))
+                    .setCancelable(false) // leaving the list would stop IG's pager
+                    .setPositiveButton(I18n.t(ctx, R.string.ig_follow_export_stop), (x, w) -> loading = false)
+                    .create();
+            d.setCanceledOnTouchOutside(false);
+            d.show();
+            ModuleLog.line(TAG + "progress dialog on " + ctx.getClass().getName());
+            return d;
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ dialog: " + t);
+            return null;
         }
     }
 
