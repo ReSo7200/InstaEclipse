@@ -221,6 +221,10 @@
     <string name="ig_dialog_ad_block_analytics">Blokir Analitik</string>
     <string name="ig_dialog_clean_feed_hide_suggested">Sembunyikan saran di feed</string>
     <string name="ig_dialog_ad_disable_tracking">Nonaktifkan Tautan Pelacakan</string>
+    <string name="ig_dialog_open_links_externally">Buka Tautan di Browser Eksternal</string>
+    <string name="theme_light_mode">Mode terang</string>
+    <string name="theme_light_same">Tema sama seperti mode gelap</string>
+    <string name="theme_light_stock">Instagram bawaan (tema hanya di mode gelap)</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">Mode Ekstrem (Tidak dapat dipulihkan hingga reinstall)</string>
@@ -237,6 +241,8 @@
     <string name="ig_dialog_misc_disable_story_autoswipe">Nonaktifkan Auto-Geser Story</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Nonaktifkan Putar Otomatis Video</string>
     <string name="ig_dialog_misc_disable_repost">Nonaktifkan Repost</string>
+    <string name="ig_dialog_misc_exact_timestamps">Tampilkan Tanggal Pasti, Bukan \"2 jam lalu\"</string>
+    <string name="ig_dialog_misc_hide_share_create_group">Sembunyikan \"Buat grup\" di Menu Bagikan</string>
     <string name="ig_dialog_misc_show_feature_toasts">Tampilkan Toast Fitur</string>
     <string name="ig_dialog_misc_show_follower_toast">Tampilkan Toast Pengikut</string>
     <string name="ig_dialog_misc_view_story_mentions">Lihat Sebutan Story</string>
@@ -336,6 +342,9 @@
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">Unduh</string>
+    <string name="ig_story_mark_seen">Tandai sudah dilihat</string>
+    <string name="ig_story_marked_seen">Ditandai sudah dilihat</string>
+    <string name="ig_story_mark_seen_none">Belum ada yang bisa dikirim untuk story ini — biarkan diputar dulu</string>
     <string name="ig_dl_carousel_subtitle">Carousel • %1$d item</string>
     <string name="ig_dl_carousel_current">Unduh saat ini (%1$d dari %2$d)</string>
     <string name="ig_dl_carousel_all">Unduh semua %1$d item</string>
@@ -433,6 +442,7 @@
     <string name="loc_picker_search_failed">Lokasi tidak ditemukan</string>
     <string name="loc_picker_search_error">Pencarian gagal: %1$s</string>
     <string name="ig_dialog_ghost_keep_unsent">Simpan Pesan yang Tidak Terkirim</string>
+    <string name="ig_dialog_ghost_mark_unsent">Tandai Pesan Tidak Terkirim yang Disimpan di Obrolan</string>
     <string name="ig_dialog_unsent_title">Pesan Tidak Terkirim</string>
     <string name="ig_dialog_unsent_clear">Bersihkan log obrolan ini</string>
     <string name="ig_dialog_unsent_export">Ekspor sebagai JSON</string>
@@ -455,6 +465,23 @@
     <string name="ig_dialog_misc_lock_section">Kunci</string>
     <string name="ig_dialog_misc_lock_fingerprint">Gunakan sidik jari untuk membuka kunci</string>
     <string name="ig_hide_chats_title">Sembunyikan Obrolan Tertentu</string>
+    <string name="ig_translate_text">Terjemahkan</string>
+    <string name="ig_dialog_downloader_offer_audio">Tawarkan Unduhan Audio Saja untuk Video</string>
+    <string name="ig_download_choice_title">Unduh</string>
+    <string name="ig_download_choice_video">Video</string>
+    <string name="ig_download_choice_audio">Audio saja (.m4a)</string>
+    <string name="ig_download_choice_save">Simpan ke perangkat</string>
+    <string name="ig_download_choice_copy_image">Salin gambar</string>
+    <string name="ig_dialog_downloader_offer_copy_image">Tambahkan Salin Gambar ke Menu Postingan</string>
+    <string name="ig_toast_copy_image_video">Slide ini adalah video — tidak ada yang bisa disalin</string>
+    <string name="ig_toast_copying_image">Menyalin gambar…</string>
+    <string name="ig_toast_image_copied">Gambar disalin ke clipboard</string>
+    <string name="ig_toast_downloading_audio">Mengunduh audio…</string>
+    <string name="ig_toast_audio_saved">Audio disimpan</string>
+    <string name="ig_read_receipts_title">Kirim tanda dibaca ke…</string>
+    <string name="ig_read_receipts_hint">Obrolan yang diaktifkan di sini tetap dapat melihat saat Anda membaca pesan mereka, meskipun Sembunyikan Tanda Baca DM aktif.</string>
+    <string name="ig_read_receipts_empty">Belum ada obrolan. Buka obrolan sekali dan obrolan itu akan muncul di sini.</string>
+    <string name="ig_hide_chats_stealth">Mode senyap: tanpa ikon mata (tekan lama nama obrolan untuk menyembunyikan)</string>
     <string name="ig_dialog_misc_hide_chats">Sembunyikan Obrolan Tertentu</string>
     <string name="ig_hide_chats_manage">Kelola obrolan tersembunyi</string>
     <string name="ig_hide_chats_empty">Belum ada obrolan tersembunyi. Buka obrolan dan ketuk tombol mata-dicoret untuk menyembunyikannya.</string>
@@ -486,6 +513,14 @@
     <string name="ig_dialog_unsent_empty">Belum ada pesan tidak terkirim yang tertangkap</string>
     <string name="ig_dialog_unsent_unknown_chat">Obrolan tidak dikenal</string>
     <string name="ig_dialog_clean_feed_hide_threads">Sembunyikan Saran Threads</string>
+    <string name="ig_dialog_clean_feed_hide_liked">Sembunyikan Postingan yang Sudah Anda Sukai</string>
+    <string name="ig_nav_tabs_title">Sembunyikan tab navigasi</string>
+    <string name="ig_nav_tab_home">Sembunyikan tab Beranda</string>
+    <string name="ig_nav_tab_reels">Sembunyikan tab Reels</string>
+    <string name="ig_nav_tab_create">Sembunyikan tab Buat</string>
+    <string name="ig_nav_tab_messages">Sembunyikan tab Pesan</string>
+    <string name="ig_nav_tab_activity">Sembunyikan tab Aktivitas</string>
+    <string name="ig_nav_tab_profile">Sembunyikan tab Profil</string>
     <string name="ig_dialog_misc_spoof_last_seen">Palsukan Terakhir Dilihat (bekukan)</string>
     <string name="ig_dialog_misc_copy_caption">Salin Keterangan</string>
     <string name="ig_dialog_misc_photo_zoom">Zoom Foto (Tekan Lama)</string>

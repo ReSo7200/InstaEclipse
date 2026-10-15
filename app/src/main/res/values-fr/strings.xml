@@ -221,6 +221,10 @@
     <string name="ig_dialog_ad_block_analytics">Bloquer les analytics</string>
     <string name="ig_dialog_clean_feed_hide_suggested">Masquer les suggestions dans le fil</string>
     <string name="ig_dialog_ad_disable_tracking">Désactiver liens de suivi</string>
+    <string name="ig_dialog_open_links_externally">Ouvrir les liens dans un navigateur externe</string>
+    <string name="theme_light_mode">Mode clair</string>
+    <string name="theme_light_same">Même thème qu\'en mode sombre</string>
+    <string name="theme_light_stock">Instagram d\'origine (thème uniquement en mode sombre)</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">Mode Extrême (Irréversible jusqu\'à réinstallation)</string>
@@ -237,6 +241,8 @@
     <string name="ig_dialog_misc_disable_story_autoswipe">Désactiver défilement auto des Stories</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Désactiver lecture auto des vidéos</string>
     <string name="ig_dialog_misc_disable_repost">Désactiver Repartage</string>
+    <string name="ig_dialog_misc_exact_timestamps">Afficher les dates exactes au lieu de « il y a 2 h »</string>
+    <string name="ig_dialog_misc_hide_share_create_group">Masquer « Créer un groupe » dans le menu de partage</string>
     <string name="ig_dialog_misc_show_feature_toasts">Afficher Notifications des fonctions</string>
     <string name="ig_dialog_misc_show_follower_toast">Afficher Notification d\'abonné</string>
     <string name="ig_dialog_misc_view_story_mentions">Voir Mentions de Story</string>
@@ -336,6 +342,9 @@
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">Télécharger</string>
+    <string name="ig_story_mark_seen">Marquer comme vu</string>
+    <string name="ig_story_marked_seen">Marqué comme vu</string>
+    <string name="ig_story_mark_seen_none">Rien à envoyer pour cette story pour l\'instant — laissez-la d\'abord se lire</string>
     <string name="ig_dl_carousel_subtitle">Carrousel • %1$d éléments</string>
     <string name="ig_dl_carousel_current">Télécharger actuel (%1$d sur %2$d)</string>
     <string name="ig_dl_carousel_all">Télécharger tous les %1$d éléments</string>
@@ -435,6 +444,7 @@
     <string name="loc_picker_search_failed">Lieu introuvable</string>
     <string name="loc_picker_search_error">Échec de la recherche : %1$s</string>
     <string name="ig_dialog_ghost_keep_unsent">Conserver les messages non envoyés</string>
+    <string name="ig_dialog_ghost_mark_unsent">Marquer les messages non envoyés conservés dans la conversation</string>
     <string name="ig_dialog_unsent_title">Messages non envoyés</string>
     <string name="ig_dialog_unsent_clear">Effacer le journal de cette conversation</string>
     <string name="ig_dialog_unsent_export">Exporter en JSON</string>
@@ -457,6 +467,23 @@
     <string name="ig_dialog_misc_lock_section">Verrou</string>
     <string name="ig_dialog_misc_lock_fingerprint">Utiliser l\'empreinte digitale pour déverrouiller</string>
     <string name="ig_hide_chats_title">Masquer des conversations</string>
+    <string name="ig_translate_text">Traduire</string>
+    <string name="ig_dialog_downloader_offer_audio">Proposer le téléchargement audio seul pour les vidéos</string>
+    <string name="ig_download_choice_title">Télécharger</string>
+    <string name="ig_download_choice_video">Vidéo</string>
+    <string name="ig_download_choice_audio">Audio seul (.m4a)</string>
+    <string name="ig_download_choice_save">Enregistrer sur l\'appareil</string>
+    <string name="ig_download_choice_copy_image">Copier l\'image</string>
+    <string name="ig_dialog_downloader_offer_copy_image">Ajouter Copier l\'image au menu de la publication</string>
+    <string name="ig_toast_copy_image_video">Cette diapositive est une vidéo — rien à copier</string>
+    <string name="ig_toast_copying_image">Copie de l\'image…</string>
+    <string name="ig_toast_image_copied">Image copiée dans le presse-papiers</string>
+    <string name="ig_toast_downloading_audio">Téléchargement de l\'audio…</string>
+    <string name="ig_toast_audio_saved">Audio enregistré</string>
+    <string name="ig_read_receipts_title">Envoyer les confirmations de lecture à…</string>
+    <string name="ig_read_receipts_hint">Les conversations activées ici voient toujours quand vous lisez leurs messages, même si Masquer Lu DM est activé.</string>
+    <string name="ig_read_receipts_empty">Aucune conversation pour l\'instant. Ouvrez une conversation une fois et elle apparaîtra ici.</string>
+    <string name="ig_hide_chats_stealth">Discret : pas d\'icône œil (appui long sur le nom de la conversation pour la masquer)</string>
     <string name="ig_dialog_misc_hide_chats">Masquer des conversations</string>
     <string name="ig_hide_chats_manage">Gérer les conversations masquées</string>
     <string name="ig_hide_chats_empty">Aucune conversation masquée. Ouvrez une conversation et touchez le bouton œil barré pour la masquer.</string>
@@ -488,6 +515,14 @@
     <string name="ig_dialog_unsent_empty">Aucun message non envoyé capturé pour l\'instant</string>
     <string name="ig_dialog_unsent_unknown_chat">Conversation inconnue</string>
     <string name="ig_dialog_clean_feed_hide_threads">Masquer les suggestions Threads</string>
+    <string name="ig_dialog_clean_feed_hide_liked">Masquer les publications déjà aimées</string>
+    <string name="ig_nav_tabs_title">Masquer les onglets de navigation</string>
+    <string name="ig_nav_tab_home">Masquer l\'onglet Accueil</string>
+    <string name="ig_nav_tab_reels">Masquer l\'onglet Reels</string>
+    <string name="ig_nav_tab_create">Masquer l\'onglet Créer</string>
+    <string name="ig_nav_tab_messages">Masquer l\'onglet Messages</string>
+    <string name="ig_nav_tab_activity">Masquer l\'onglet Activité</string>
+    <string name="ig_nav_tab_profile">Masquer l\'onglet Profil</string>
     <string name="ig_dialog_misc_spoof_last_seen">Simuler la dernière connexion (figer)</string>
     <string name="ig_dialog_misc_copy_caption">Copier la légende</string>
     <string name="ig_dialog_misc_photo_zoom">Zoom photo (appui long)</string>
