@@ -566,6 +566,9 @@
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">Download</string>
+    <string name="ig_highlight_download_all">Download whole highlight</string>
+    <string name="ig_highlight_downloading">Downloading %1$d highlight items…</string>
+    <string name="ig_highlight_done">Highlight saved: %1$d of %2$d items</string>
     <string name="ig_story_mark_seen">Mark as seen</string>
     <string name="ig_story_marked_seen">Marked as seen</string>
     <string name="ig_story_mark_seen_none">Nothing to send for this story yet — let it play first</string>

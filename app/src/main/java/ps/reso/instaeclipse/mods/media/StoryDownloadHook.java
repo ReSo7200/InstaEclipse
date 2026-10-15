@@ -78,7 +78,135 @@ public class StoryDownloadHook {
 
     // ── Entry point ──────────────────────────────────────────────────────────
 
+    // ── Highlight "Download all" (#250) ─────────────────────────────────────
+    // Reel model = class using "Reel with pending media should have an owner." (X.04aX on 452,
+    // X.04ey on 451). A highlight's reel has a String id starting with "highlight:"; its
+    // (UserSession) -> List methods return the ReelItems (the whole highlight is fetched by
+    // feed/reels_media/ when it opens).
+    private static Class<?> reelClass;
+
+    private static Object findHighlightReel(Object root) {
+        if (reelClass == null || root == null) return null;
+        Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        java.util.ArrayDeque<Object[]> q = new java.util.ArrayDeque<>();
+        q.add(new Object[]{root, 0});
+        while (!q.isEmpty() && seen.size() < 300) {
+            Object[] e = q.poll();
+            Object o = e[0];
+            int d = (int) e[1];
+            if (o == null || !seen.add(o)) continue;
+            if (reelClass.isInstance(o)) {
+                if (isHighlight(o)) return o;
+                StringBuilder sb = new StringBuilder();
+                for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+                    for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                        if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                        try { f.setAccessible(true); Object v = f.get(o); if (v != null) sb.append(f.getName()).append('=').append(String.valueOf(v).length() > 40 ? String.valueOf(v).substring(0, 40) : v).append(' '); } catch (Throwable ignored) {}
+                    }
+                ModuleLog.line("(IE|Highlight) reel at depth " + d + " strings: " + sb);
+                continue;
+            }
+            if (d >= 4) continue;
+            String n = o.getClass().getName();
+            if (!n.startsWith("X.") && !n.startsWith("com.instagram.") && !n.startsWith("instagram.")) continue;
+            for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+                for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
+                    try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
+                }
+        }
+        return null;
+    }
+
+    private static Object highlightFromParam(XC_MethodHook.MethodHookParam param) {
+        Object holder = findReelItemHolder(param);
+        Object r = findHighlightReel(holder);
+        if (r == null) r = findHighlightReel(param.thisObject);
+        if (r == null && param.args != null) for (Object a : param.args) { r = findHighlightReel(a); if (r != null) break; }
+        if (r == null && holder != null) {
+            StringBuilder sb = new StringBuilder();
+            for (java.lang.reflect.Field f : holder.getClass().getDeclaredFields()) {
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                try { f.setAccessible(true); Object v = f.get(holder); sb.append(f.getName()).append(':').append(f.getType().getSimpleName()).append('=').append(v == null ? "null" : v.getClass().getName()).append(' '); } catch (Throwable ignored) {}
+            }
+            ModuleLog.line("(IE|Highlight) holder fields: " + sb);
+        }
+        ModuleLog.line("(IE|Highlight) menu: holder=" + (holder != null ? holder.getClass().getName() : "null")
+                + " this=" + (param.thisObject != null ? param.thisObject.getClass().getName() : "static") + " highlight=" + (r != null));
+        return r;
+    }
+
+    private static boolean isHighlight(Object reel) {
+        for (Class<?> k = reel.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                try {
+                    f.setAccessible(true);
+                    Object v = f.get(reel);
+                    if (v instanceof String str && str.startsWith("highlight:")) return true;
+                } catch (Throwable ignored) {}
+            }
+        return false;
+    }
+
+    private static List<?> highlightItems(Object reel, Object holder) {
+        Object session = readFieldByTypeName(holder, "com.instagram.common.session.UserSession");
+        List<?> best = null;
+        for (Method m : reel.getClass().getMethods()) {
+            Class<?>[] p = m.getParameterTypes();
+            if (p.length != 1 || !List.class.isAssignableFrom(m.getReturnType())
+                    || !p[0].getName().equals("com.instagram.common.session.UserSession")) continue;
+            try {
+                Object r = m.invoke(reel, session);
+                if (r instanceof List<?> l && (best == null || l.size() > best.size())) best = l;
+            } catch (Throwable ignored) {}
+        }
+        return best;
+    }
+
+    private static void downloadHighlight(Context ctx, Object reel, Object holder) {
+        List<?> items = highlightItems(reel, holder);
+        if (items == null || items.isEmpty()) {
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final List<Object> copy = new ArrayList<>(items);
+        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_downloading, copy.size()), Toast.LENGTH_LONG).show();
+        ModuleLog.line("(IE|Highlight) downloading " + copy.size() + " items");
+        new Thread(() -> {
+            int ok = 0;
+            for (Object item : copy) {
+                try {
+                    StoryMediaOptions m = extractStoryMediaOptions(ctx, item, true);
+                    if (m == null) continue;
+                    boolean video = m.videoUrl != null;
+                    String url = video ? m.videoUrl : m.imageUrl;
+                    String user = extractUsernameFromReelItemHolder(item);
+                    String id = extractMediaIdFromReelItemHolder(item);
+                    String fn = FeedVideoDownloadHook.buildFilename(user, "highlight", id, video);
+                    FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, video, user);
+                    ok++;
+                    Thread.sleep(400);
+                } catch (Throwable t) {
+                    ModuleLog.line("(IE|Highlight) item: " + t);
+                }
+            }
+            final int done = ok;
+            mainHandler.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_done, done, copy.size()), Toast.LENGTH_LONG).show());
+        }).start();
+    }
+
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("Reel with pending media should have an owner.")))) {
+                reelClass = classLoader.loadClass(md.getClassName());
+                break;
+            }
+            ModuleLog.line("(IE|Highlight) reel class " + (reelClass != null ? reelClass.getName() : "not found"));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Highlight) " + t);
+        }
         try {
             videoVersionIntfClass = classLoader.loadClass("com.instagram.model.mediasize.VideoVersionIntf");
             videoVersionGetUrl    = videoVersionIntfClass.getMethod("getUrl");
@@ -234,6 +362,9 @@ public class StoryDownloadHook {
                     // Selective "Mark as seen" (#226): only meaningful while Hide Story Views is on.
                     if (FeatureFlags.isGhostStory)
                         add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen));
+                    // Highlight "Download all" (#250)
+                    if (FeatureFlags.enableStoryDownload && highlightFromParam(param) != null)
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_highlight_download_all));
                     // Story playback speed (Instagram Plus–style, our own implementation)
                     if (FeatureFlags.offerPlaybackSpeed)
                         add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_playback_speed_title));
@@ -309,6 +440,16 @@ public class StoryDownloadHook {
                 }
                 if (tapped == null) return;
 
+                String allLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_highlight_download_all);
+                if (FeatureFlags.enableStoryDownload && allLabel.contentEquals(tapped)) {
+                    param.setResult(null);
+                    Object holder = findReelItemHolder(param);
+                    Object reel = highlightFromParam(param);
+                    Context ctx = findContextAcrossParam(param, holder != null ? holder : param.thisObject);
+                    if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+                    if (ctx != null && reel != null) downloadHighlight(ctx, reel, holder);
+                    return;
+                }
                 String speedLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_playback_speed_title);
                 if (FeatureFlags.offerPlaybackSpeed && speedLabel.contentEquals(tapped)) {
                     param.setResult(null);
@@ -441,9 +582,14 @@ public class StoryDownloadHook {
      * finding the MP4: keeping both URLs is what lets the user choose the JPG instead.
      */
     private static StoryMediaOptions extractStoryMediaOptions(Context ctx, Object holder) {
+        return extractStoryMediaOptions(ctx, holder, false);
+    }
+
+    /** {@code direct}: holder IS the ReelItem (don't look for a nested ReelItem field). */
+    private static StoryMediaOptions extractStoryMediaOptions(Context ctx, Object holder, boolean direct) {
         if (holder == null) return null;
         try {
-            Object reelItem = readFieldByTypeName(holder, "com.instagram.model.reels.ReelItem");
+            Object reelItem = direct ? holder : readFieldByTypeName(holder, "com.instagram.model.reels.ReelItem");
             ModuleLog.line("(IE|Story) reelItem=" +
                     (reelItem != null ? reelItem.getClass().getName() : "null"));
 
