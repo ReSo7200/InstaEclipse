@@ -40,6 +40,7 @@ public class FeatureFlags {
     public static boolean hideTabActivity = false;
     public static boolean hideTabProfile = false;
     public static boolean hideNotesTray = false; // hide the Notes tray in the DM inbox (#241)
+    public static boolean chatExport = false; // header button: export the open chat to HTML (#225)
     public static boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
     public static boolean keepEditHistory = false; // show previous text of edited DMs (#243)
     public static boolean markUnsentInThread = false; // prefix kept unsent messages with a marker in the chat (#222)
@@ -92,6 +93,7 @@ public class FeatureFlags {
     public static boolean showFollowerToast = false;
     public static boolean showFeatureToasts = false;
     public static boolean disableRepost = false;
+    public static boolean followListExport = false; // Export CSV pill on followers/following lists (#224)
     public static boolean commentSearch = false; // search the loaded comments of a post (#230)
     public static boolean storyViewerSearch = false; // search box over your story viewers list
     public static boolean profileFollowsYouLabel = false; // "Follows you" label on profiles (#239)

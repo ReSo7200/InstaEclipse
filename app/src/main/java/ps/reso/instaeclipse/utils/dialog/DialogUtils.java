@@ -817,6 +817,13 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         layout.addView(jumpFirst);
+        ToggleRow chatExp = createSwitch(context, R.drawable.ic_download, "#5E5CE6",
+                I18n.t(context, R.string.ig_dialog_ghost_chat_export), FeatureFlags.chatExport);
+        chatExp.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.chatExport = checked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(chatExp);
 
         ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 
@@ -1304,7 +1311,8 @@ public class DialogUtils {
                 createSwitch(context, R.drawable.ic_heart, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_like_undo), FeatureFlags.likeUndo),
                 createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_profile_follows_label), FeatureFlags.profileFollowsYouLabel),
                 createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_viewer_search), FeatureFlags.storyViewerSearch),
-                createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_comment_search), FeatureFlags.commentSearch)
+                createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_comment_search), FeatureFlags.commentSearch),
+                createSwitch(context, R.drawable.ic_download, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_follow_export), FeatureFlags.followListExport)
                 // Lock controls moved to their own grouped "Lock" card below (see buildLockCard).
         };
 
@@ -1386,6 +1394,9 @@ public class DialogUtils {
                         break;
                     case 18:
                         FeatureFlags.commentSearch = isChecked;
+                        break;
+                    case 19:
+                        FeatureFlags.followListExport = isChecked;
                         break;
                 }
 

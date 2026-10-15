@@ -57,6 +57,7 @@ public class SettingsBackupManager {
         s.put("markUnsentInThread",         FeatureFlags.markUnsentInThread);
         s.put("keepEditHistory",            FeatureFlags.keepEditHistory);
         s.put("jumpToFirstMessage",         FeatureFlags.jumpToFirstMessage);
+        s.put("chatExport",                 FeatureFlags.chatExport);
         s.put("hideTabHome", FeatureFlags.hideTabHome);
         s.put("hideTabReels", FeatureFlags.hideTabReels);
         s.put("hideTabCreate", FeatureFlags.hideTabCreate);
@@ -96,6 +97,7 @@ public class SettingsBackupManager {
         s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
         s.put("storyViewerSearch",       FeatureFlags.storyViewerSearch);
         s.put("commentSearch",           FeatureFlags.commentSearch);
+        s.put("followListExport",        FeatureFlags.followListExport);
         s.put("showFollowerToast",       FeatureFlags.showFollowerToast);
         s.put("showFeatureToasts",       FeatureFlags.showFeatureToasts);
         s.put("enableStoryMentions",     FeatureFlags.enableStoryMentions);
@@ -166,6 +168,7 @@ public class SettingsBackupManager {
         if (s.has("markUnsentInThread"))        FeatureFlags.markUnsentInThread        = s.getBoolean("markUnsentInThread");
         if (s.has("keepEditHistory"))           FeatureFlags.keepEditHistory           = s.getBoolean("keepEditHistory");
         if (s.has("jumpToFirstMessage"))        FeatureFlags.jumpToFirstMessage        = s.getBoolean("jumpToFirstMessage");
+        if (s.has("chatExport"))                FeatureFlags.chatExport                = s.getBoolean("chatExport");
         if (s.has("hideTabHome")) FeatureFlags.hideTabHome = s.getBoolean("hideTabHome");
         if (s.has("hideTabReels")) FeatureFlags.hideTabReels = s.getBoolean("hideTabReels");
         if (s.has("hideTabCreate")) FeatureFlags.hideTabCreate = s.getBoolean("hideTabCreate");
@@ -202,6 +205,7 @@ public class SettingsBackupManager {
         if (s.has("profileFollowsYouLabel")) FeatureFlags.profileFollowsYouLabel = s.getBoolean("profileFollowsYouLabel");
         if (s.has("storyViewerSearch"))      FeatureFlags.storyViewerSearch      = s.getBoolean("storyViewerSearch");
         if (s.has("commentSearch"))          FeatureFlags.commentSearch          = s.getBoolean("commentSearch");
+        if (s.has("followListExport"))       FeatureFlags.followListExport       = s.getBoolean("followListExport");
         if (s.has("showFollowerToast"))      FeatureFlags.showFollowerToast      = s.getBoolean("showFollowerToast");
         if (s.has("showFeatureToasts"))      FeatureFlags.showFeatureToasts      = s.getBoolean("showFeatureToasts");
         if (s.has("enableStoryMentions"))    FeatureFlags.enableStoryMentions    = s.getBoolean("enableStoryMentions");

@@ -292,6 +292,11 @@
     <string name="ig_dialog_ghost_permanent_view_once">Unlock View-Once/Twice</string>
     <string name="ig_dialog_ghost_keep_disappearing">Keep Disappearing Messages</string>
     <string name="ig_dialog_ghost_keep_unsent">Keep Unsent Messages</string>
+    <string name="ig_dialog_ghost_chat_export">Export-Chat Button in Chats</string>
+    <string name="ig_chat_export">Export chat</string>
+    <string name="ig_chat_export_working">Exporting loaded messages…</string>
+    <string name="ig_chat_export_done">Exported %1$d messages to %2$s</string>
+    <string name="ig_chat_export_none">No messages loaded for this chat yet</string>
     <string name="ig_dialog_ghost_jump_first">Jump-to-First-Message Button in Chats</string>
     <string name="ig_jump_first_message">Jump to first message</string>
     <string name="ig_jump_first_loading">Loading older messages… tap again to stop</string>
@@ -439,6 +444,10 @@
     <string name="ig_dialog_misc_comment_search">Search Comments</string>
     <string name="ig_comment_search">Search comments</string>
     <string name="ig_comment_search_hint">Search %1$d loaded comments</string>
+    <string name="ig_dialog_misc_follow_export">Export Followers/Following to CSV</string>
+    <string name="ig_follow_export">Export CSV</string>
+    <string name="ig_follow_export_done">Exported %1$d accounts to %2$s</string>
+    <string name="ig_follow_export_none">No accounts loaded yet — scroll the list first</string>
     <string name="ig_dialog_misc_like_undo">Undo Window for Likes (4 s)</string>
     <string name="ig_like_undo_bar">❤ Liked · UNDO</string>
     <string name="ig_like_undo_cancelled">Like cancelled — refresh to update the heart</string>

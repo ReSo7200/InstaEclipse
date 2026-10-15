@@ -1839,6 +1839,16 @@ public class FeedVideoDownloadHook {
         return openOutputStream(ctx, filename, isVideo ? "video/mp4" : "image/jpeg", username);
     }
 
+    /** Output stream for an exported chat (HTML) in the downloads location, "chats" subfolder. */
+    /** Output stream for an exported file (CSV etc.) in the downloads location, "exports" subfolder. */
+    public static OutputStream openExport(Context ctx, String filename, String mime) throws Exception {
+        return openOutputStream(ctx, filename, mime, "exports");
+    }
+
+    public static OutputStream openChatExport(Context ctx, String filename) throws Exception {
+        return openOutputStream(ctx, filename, "text/html", "chats");
+    }
+
     static OutputStream openOutputStream(Context ctx, String filename, String mimeType, String username)
             throws Exception {
 

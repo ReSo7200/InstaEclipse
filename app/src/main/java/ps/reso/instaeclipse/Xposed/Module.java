@@ -418,6 +418,20 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|CommentSearch) ❌ Failed to hook");
                     }
 
+                    // Export a DM chat to HTML (#225)
+                    try {
+                        if (!skip("ChatExportHook")) new ps.reso.instaeclipse.mods.ghost.ChatExportHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|ChatExport) ❌ Failed to hook");
+                    }
+
+                    // Export followers / following to CSV (#224)
+                    try {
+                        if (!skip("FollowListExportHook")) new ps.reso.instaeclipse.mods.misc.FollowListExportHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|FollowExport) ❌ Failed to hook");
+                    }
+
                     // Like undo window (#235) — after HideSuggestedFeedItemsHook (has_liked getter)
                     try {
                         if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);

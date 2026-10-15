@@ -772,7 +772,8 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_keep_unsent), "keepUnsentMessages"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_mark_unsent), "markUnsentInThread"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_edit_history), "keepEditHistory"),
-                createSwitch(R.drawable.ic_jump_first, "#5E5CE6", getString(R.string.ig_dialog_ghost_jump_first), "jumpToFirstMessage")
+                createSwitch(R.drawable.ic_jump_first, "#5E5CE6", getString(R.string.ig_dialog_ghost_jump_first), "jumpToFirstMessage"),
+                createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_ghost_mode), defs);
@@ -914,7 +915,7 @@ public class FeaturesFragment extends Fragment {
                         "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
                         "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
                         "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
-                        "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "storyViewerSearch", "commentSearch"
+                        "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "storyViewerSearch", "commentSearch", "followListExport"
                 )),
                 createSwitch(R.drawable.ic_story_ring, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
@@ -934,7 +935,8 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_heart, "#BF5AF2", getString(R.string.ig_dialog_misc_like_undo), "likeUndo"),
                 createSwitch(R.drawable.ic_notification, "#BF5AF2", getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
                 createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_viewer_search), "storyViewerSearch"),
-                createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_comment_search), "commentSearch")
+                createSwitch(R.drawable.ic_search, "#BF5AF2", getString(R.string.ig_dialog_misc_comment_search), "commentSearch"),
+                createSwitch(R.drawable.ic_download, "#BF5AF2", getString(R.string.ig_dialog_misc_follow_export), "followListExport")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_misc), defs);
