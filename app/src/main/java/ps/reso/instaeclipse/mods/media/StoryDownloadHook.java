@@ -90,23 +90,18 @@ public class StoryDownloadHook {
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         java.util.ArrayDeque<Object[]> q = new java.util.ArrayDeque<>();
         q.add(new Object[]{root, 0});
-        while (!q.isEmpty() && seen.size() < 300) {
+        while (!q.isEmpty() && seen.size() < 2000) {
             Object[] e = q.poll();
             Object o = e[0];
             int d = (int) e[1];
             if (o == null || !seen.add(o)) continue;
             if (reelClass.isInstance(o)) {
                 if (isHighlight(o)) return o;
-                StringBuilder sb = new StringBuilder();
-                for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                    for (java.lang.reflect.Field f : k.getDeclaredFields()) {
-                        if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
-                        try { f.setAccessible(true); Object v = f.get(o); if (v != null) sb.append(f.getName()).append('=').append(String.valueOf(v).length() > 40 ? String.valueOf(v).substring(0, 40) : v).append(' '); } catch (Throwable ignored) {}
-                    }
-                ModuleLog.line("(IE|Highlight) reel at depth " + d + " strings: " + sb);
                 continue;
             }
             if (d >= 4) continue;
+            if (o instanceof android.app.Activity || o instanceof android.view.View || o instanceof android.content.Context
+                    || o instanceof android.content.res.Resources || o.getClass().getName().startsWith("androidx.")) continue;
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.") && !n.startsWith("instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
@@ -123,16 +118,6 @@ public class StoryDownloadHook {
         Object r = findHighlightReel(holder);
         if (r == null) r = findHighlightReel(param.thisObject);
         if (r == null && param.args != null) for (Object a : param.args) { r = findHighlightReel(a); if (r != null) break; }
-        if (r == null && holder != null) {
-            StringBuilder sb = new StringBuilder();
-            for (java.lang.reflect.Field f : holder.getClass().getDeclaredFields()) {
-                if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
-                try { f.setAccessible(true); Object v = f.get(holder); sb.append(f.getName()).append(':').append(f.getType().getSimpleName()).append('=').append(v == null ? "null" : v.getClass().getName()).append(' '); } catch (Throwable ignored) {}
-            }
-            ModuleLog.line("(IE|Highlight) holder fields: " + sb);
-        }
-        ModuleLog.line("(IE|Highlight) menu: holder=" + (holder != null ? holder.getClass().getName() : "null")
-                + " this=" + (param.thisObject != null ? param.thisObject.getClass().getName() : "static") + " highlight=" + (r != null));
         return r;
     }
 
