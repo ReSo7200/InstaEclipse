@@ -91,15 +91,16 @@ public class CommentCopyHook {
     private static java.lang.reflect.Method resolverMethod; // static (Object,String,String) -> EGL
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        ps.reso.instaeclipse.mods.media.CommentMedia.trackCommentSheet(bridge, classLoader);
         // Track current Activity for showing dialogs
         try {
             XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
+                @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     currentActivity = (Activity) p.thisObject;
                 }
             });
             XposedHelpers.findAndHookMethod(Activity.class, "onDestroy", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
+                @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     if (currentActivity == p.thisObject) currentActivity = null;
                 }
             });
@@ -281,7 +282,7 @@ public class CommentCopyHook {
 
     private static final XC_MethodHook LONG_PRESS_HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) {
+        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (!FeatureFlags.enableCopyComment) return;
             try {
                 String text = extractCommentTextLegacy(param.thisObject);
@@ -446,7 +447,7 @@ public class CommentCopyHook {
 
     private static final XC_MethodHook SHOW_MENU_HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) {
+        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (!FeatureFlags.enableCopyComment) return;
             try {
                 Activity ctx = currentActivity;
@@ -468,7 +469,9 @@ public class CommentCopyHook {
                 java.util.List<String> media = ps.reso.instaeclipse.mods.media.CommentMedia.urls(ctx, comment);
                 if ((text == null || text.trim().isEmpty()) && media.isEmpty()) return;
 
-                showCopyPopup(ctx, text == null ? "" : text.trim(), media, commentId);
+                String[] names = media.isEmpty() ? new String[2] // {commenter, post author} for the file name
+                        : ps.reso.instaeclipse.mods.media.CommentMedia.names(comment, mediaId, heldValue, repo, param.thisObject);
+                showCopyPopup(ctx, text == null ? "" : text.trim(), media, commentId, names);
             } catch (Throwable t) {
                 ModuleLog.line("(InstaEclipse | CopyComment): ❌ hook body – " + t);
             }
@@ -528,11 +531,12 @@ public class CommentCopyHook {
     // ── Copy popup ────────────────────────────────────────────────────────────
 
     private static void showCopyPopup(final Context ctx, final String text) {
-        showCopyPopup(ctx, text, java.util.Collections.emptyList(), null);
+        showCopyPopup(ctx, text, java.util.Collections.emptyList(), null, new String[2]);
     }
 
     private static void showCopyPopup(final Context ctx, final String text,
-                                      final java.util.List<String> media, final String commentId) {
+                                      final java.util.List<String> media, final String commentId,
+                                      final String[] names) {
         MAIN.post(() -> {
             try {
                 float dp = ctx.getResources().getDisplayMetrics().density;
@@ -597,7 +601,7 @@ public class CommentCopyHook {
                             I18n.t(ctx, R.string.ig_dl_title), accentBg, Color.WHITE, dp);
                     btnDl.setOnClickListener(v -> {
                         dialog.dismiss();
-                        ps.reso.instaeclipse.mods.media.CommentMedia.download(ctx, media, commentId);
+                        ps.reso.instaeclipse.mods.media.CommentMedia.download(ctx, media, commentId, names[0], names[1]);
                     });
                     sheet.addView(btnDl);
                     // GIF / photo comments: copy the media link (Android can't put an animated GIF on the clipboard)
