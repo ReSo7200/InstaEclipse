@@ -464,9 +464,11 @@ public class CommentCopyHook {
                 if (comment == null) return;
 
                 String text = findLongestTextField(comment);
-                if (text == null || text.trim().isEmpty()) return;
+                // #242: image / GIF comments get a Download button (GIF-only comments have no text)
+                java.util.List<String> media = ps.reso.instaeclipse.mods.media.CommentMedia.urls(ctx, comment);
+                if ((text == null || text.trim().isEmpty()) && media.isEmpty()) return;
 
-                showCopyPopup(ctx, text.trim());
+                showCopyPopup(ctx, text == null ? "" : text.trim(), media, commentId);
             } catch (Throwable t) {
                 ModuleLog.line("(InstaEclipse | CopyComment): ❌ hook body – " + t);
             }
@@ -526,6 +528,11 @@ public class CommentCopyHook {
     // ── Copy popup ────────────────────────────────────────────────────────────
 
     private static void showCopyPopup(final Context ctx, final String text) {
+        showCopyPopup(ctx, text, java.util.Collections.emptyList(), null);
+    }
+
+    private static void showCopyPopup(final Context ctx, final String text,
+                                      final java.util.List<String> media, final String commentId) {
         MAIN.post(() -> {
             try {
                 float dp = ctx.getResources().getDisplayMetrics().density;
@@ -585,6 +592,21 @@ public class CommentCopyHook {
                 Dialog dialog = new Dialog(ctx);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+                if (!media.isEmpty()) {
+                    Button btnDl = makeButton(ctx,
+                            I18n.t(ctx, R.string.ig_dl_title), accentBg, Color.WHITE, dp);
+                    btnDl.setOnClickListener(v -> {
+                        dialog.dismiss();
+                        ps.reso.instaeclipse.mods.media.CommentMedia.download(ctx, media, commentId);
+                    });
+                    sheet.addView(btnDl);
+                }
+                if (text.isEmpty()) {
+                    commentTv.setVisibility(View.GONE);
+                    finishDialog(dialog, sheet, dp);
+                    return;
+                }
+
                 Button btnCopy = makeButton(ctx,
                         I18n.t(ctx, R.string.ig_comment_copy_full), accentBg, Color.WHITE, dp);
                 btnCopy.setOnClickListener(v -> {
@@ -610,25 +632,29 @@ public class CommentCopyHook {
                 });
                 sheet.addView(btnTranslate);
 
-                dialog.setContentView(sheet);
-                Window w = dialog.getWindow();
-                if (w != null) {
-                    w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    w.setGravity(Gravity.BOTTOM);
-                    w.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                            WindowManager.LayoutParams.WRAP_CONTENT);
-                    WindowManager.LayoutParams wlp = w.getAttributes();
-                    int margin = (int)(12 * dp);
-                    wlp.x = margin;
-                    wlp.y = margin;
-                    w.setAttributes(wlp);
-                }
-                dialog.show();
+                finishDialog(dialog, sheet, dp);
 
             } catch (Throwable t) {
                 ModuleLog.line("(InstaEclipse | CopyComment): ❌ Popup – " + t.getMessage());
             }
         });
+    }
+
+    private static void finishDialog(Dialog dialog, View sheet, float dp) {
+        dialog.setContentView(sheet);
+        Window w = dialog.getWindow();
+        if (w != null) {
+            w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            w.setGravity(Gravity.BOTTOM);
+            w.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT);
+            WindowManager.LayoutParams wlp = w.getAttributes();
+            int margin = (int)(12 * dp);
+            wlp.x = margin;
+            wlp.y = margin;
+            w.setAttributes(wlp);
+        }
+        dialog.show();
     }
 
     // ── Select dialog ─────────────────────────────────────────────────────────

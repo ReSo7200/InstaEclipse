@@ -2122,7 +2122,7 @@ public class FeedVideoDownloadHook {
      * Returns a single-entry list for plain photo/video posts, multi-entry for carousels.
      * Steps: (A) video, (B) carousel via MutableMediaDictIntf, (C) single photo, (D) CDN scan.
      */
-    static List<String> extractAllUrlsFromMedia(Context ctx, Object media) {
+    public static List<String> extractAllUrlsFromMedia(Context ctx, Object media) {
         if (media == null) return new ArrayList<>();
 
         // Step 0 (IG 447+): carousel-first. Must run BEFORE the single-video short-circuit —
