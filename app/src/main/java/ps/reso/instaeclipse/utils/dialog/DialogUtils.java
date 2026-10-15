@@ -810,6 +810,13 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         layout.addView(editHistory);
+        ToggleRow jumpFirst = createSwitch(context, R.drawable.ic_jump_first, "#5E5CE6",
+                I18n.t(context, R.string.ig_dialog_ghost_jump_first), FeatureFlags.jumpToFirstMessage);
+        jumpFirst.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.jumpToFirstMessage = checked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(jumpFirst);
 
         ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
 

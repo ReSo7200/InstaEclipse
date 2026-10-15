@@ -397,6 +397,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|EditHistory) ❌ Failed to hook");
                     }
 
+                    // Jump to the first message of a DM (#244)
+                    try {
+                        if (!skip("JumpToFirstMessageHook")) new ps.reso.instaeclipse.mods.ghost.JumpToFirstMessageHook().install();
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|JumpFirst) ❌ Failed to hook");
+                    }
+
                     // Like undo window (#235) — after HideSuggestedFeedItemsHook (has_liked getter)
                     try {
                         if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);

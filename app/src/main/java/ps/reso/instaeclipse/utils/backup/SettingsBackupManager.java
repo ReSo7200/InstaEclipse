@@ -55,6 +55,7 @@ public class SettingsBackupManager {
         s.put("forceReelScrubber",          FeatureFlags.forceReelScrubber);
         s.put("markUnsentInThread",         FeatureFlags.markUnsentInThread);
         s.put("keepEditHistory",            FeatureFlags.keepEditHistory);
+        s.put("jumpToFirstMessage",         FeatureFlags.jumpToFirstMessage);
         s.put("hideTabHome", FeatureFlags.hideTabHome);
         s.put("hideTabReels", FeatureFlags.hideTabReels);
         s.put("hideTabCreate", FeatureFlags.hideTabCreate);
@@ -160,6 +161,7 @@ public class SettingsBackupManager {
         if (s.has("forceReelScrubber"))         FeatureFlags.forceReelScrubber         = s.getBoolean("forceReelScrubber");
         if (s.has("markUnsentInThread"))        FeatureFlags.markUnsentInThread        = s.getBoolean("markUnsentInThread");
         if (s.has("keepEditHistory"))           FeatureFlags.keepEditHistory           = s.getBoolean("keepEditHistory");
+        if (s.has("jumpToFirstMessage"))        FeatureFlags.jumpToFirstMessage        = s.getBoolean("jumpToFirstMessage");
         if (s.has("hideTabHome")) FeatureFlags.hideTabHome = s.getBoolean("hideTabHome");
         if (s.has("hideTabReels")) FeatureFlags.hideTabReels = s.getBoolean("hideTabReels");
         if (s.has("hideTabCreate")) FeatureFlags.hideTabCreate = s.getBoolean("hideTabCreate");
