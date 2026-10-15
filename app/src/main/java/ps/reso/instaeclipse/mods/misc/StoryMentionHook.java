@@ -177,42 +177,33 @@ public class StoryMentionHook {
     // Xposed stacks hooks, so both run independently on the same method.
 
     private void installButtonHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = null;
+        List<Method> builders = null;
 
+        // Key renamed from "MentionButton": it cached a single builder; IG builds the menu with
+        // a different CharSequence[] method per story owner (own vs others'), so hook them all.
         if (DexKitCache.isCacheValid()) {
-            method = DexKitCache.loadMethod("MentionButton", classLoader);
+            builders = DexKitCache.loadMethods("MentionButtons", classLoader);
         }
 
-        if (method == null) {
+        if (builders == null || builders.isEmpty()) {
             try {
                 List<MethodData> methods = bridge.findMethod(FindMethod.create()
                         .matcher(MethodMatcher.create()
-                                .usingStrings("[INTERNAL] Pause Playback")
-                                .paramCount(1)));
-
-                for (MethodData md : methods) {
-                    try {
-                        Method m = md.getMethodInstance(classLoader);
-                        if (m.getReturnType().isArray() &&
-                                CharSequence.class.isAssignableFrom(m.getReturnType().getComponentType())) {
-                            method = m;
-                            break;
-                        }
-                    } catch (Throwable ignored) {}
-                }
+                                .usingStrings("[INTERNAL] Pause Playback")));
+                builders = new java.util.ArrayList<>(
+                        ps.reso.instaeclipse.mods.media.StoryDownloadHook.storyOptionBuilders(methods, classLoader));
             } catch (Throwable t) {
                 ModuleLog.line("(IE|Mention) ❌ button hook DexKit: " + t);
             }
         }
 
-        if (method == null) {
+        if (builders == null || builders.isEmpty()) {
             ModuleLog.line("(IE|Mention) ❌ button builder not found");
             return;
         }
-        DexKitCache.saveMethod("MentionButton", method);
+        DexKitCache.saveMethods("MentionButtons", builders);
 
-        try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
+        XC_MethodHook mentionHook = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
                     if (!FeatureFlags.enableStoryMentions) return;
@@ -227,11 +218,13 @@ public class StoryMentionHook {
                     extended[original.length] = mentionLabel;
                     param.setResult(extended);
                 }
-            });
-            ModuleLog.line("(IE|Mention) ✅ button hook installed");
-        } catch (Throwable t) {
-            ModuleLog.line("(IE|Mention) ❌ button hook: " + t);
+            };
+        int hooked = 0;
+        for (Method m : builders) {
+            try { XposedBridge.hookMethod(m, mentionHook); hooked++; }
+            catch (Throwable t) { ModuleLog.line("(IE|Mention) ❌ button hook: " + t); }
         }
+        ModuleLog.line("(IE|Mention) ✅ button hook installed on " + hooked + " builder(s)");
     }
 
     // ── Hook 2: handle "View Mentions" tap ───────────────────────────────────

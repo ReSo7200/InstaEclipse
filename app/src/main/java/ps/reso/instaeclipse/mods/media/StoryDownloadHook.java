@@ -176,6 +176,34 @@ public class StoryDownloadHook {
     // Found via "[INTERNAL] Pause Playback" string + CharSequence[] return type, 1 param.
     // afterHookedMethod: appends our "Download" entry to the returned CharSequence[] array.
 
+    /**
+     * Every CharSequence[] option builder of the story-options helper class (X.0mt9 on 452).
+     * IG 452 moved the "[INTERNAL] …" rows into a private List helper (A0c), so the builder used
+     * for other people's stories (A0t) no longer contains the anchor string itself; taking all
+     * CharSequence[] methods of the anchor's declaring class(es) catches it again.
+     */
+    public static java.util.Set<Method> storyOptionBuilders(List<MethodData> anchorMethods, ClassLoader classLoader) {
+        java.util.Set<Method> out = new java.util.LinkedHashSet<>();
+        java.util.Set<Class<?>> owners = new java.util.LinkedHashSet<>();
+        for (MethodData md : anchorMethods) {
+            try {
+                Method m = md.getMethodInstance(classLoader);
+                owners.add(m.getDeclaringClass());
+                if (isCharSequenceArray(m.getReturnType())) out.add(m);
+            } catch (Throwable ignored) {}
+        }
+        for (Class<?> c : owners) {
+            for (Method m : c.getDeclaredMethods()) {
+                if (isCharSequenceArray(m.getReturnType())) out.add(m);
+            }
+        }
+        return out;
+    }
+
+    private static boolean isCharSequenceArray(Class<?> rt) {
+        return rt.isArray() && CharSequence.class.isAssignableFrom(rt.getComponentType());
+    }
+
     private void installButtonInjectorHook(DexKitBridge bridge, ClassLoader classLoader) {
         // Hook EVERY CharSequence[]-returning candidate behind the "[INTERNAL] Pause Playback"
         // anchor — NOT just the first 1-arg one. Instagram builds the option list with a DIFFERENT
@@ -222,14 +250,10 @@ public class StoryDownloadHook {
             };
 
             int hooked = 0;
-            for (MethodData md : methods) {
+            for (Method m : storyOptionBuilders(methods, classLoader)) {
                 try {
-                    Method m = md.getMethodInstance(classLoader);
-                    Class<?> rt = m.getReturnType();
-                    if (rt.isArray() && CharSequence.class.isAssignableFrom(rt.getComponentType())) {
-                        XposedBridge.hookMethod(m, injector);
-                        hooked++;
-                    }
+                    XposedBridge.hookMethod(m, injector);
+                    hooked++;
                 } catch (Throwable ignored) {}
             }
             ModuleLog.line("(IE|Story) button injector hooked " + hooked + " builder(s)");
