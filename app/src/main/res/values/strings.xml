@@ -294,6 +294,12 @@
     <string name="ig_dialog_ghost_keep_unsent">Keep Unsent Messages</string>
     <string name="ig_dialog_ghost_chat_export">Export-Chat Button in Chats</string>
     <string name="ig_chat_export">Export chat</string>
+    <string name="share_dl_label">Download with InstaEclipse</string>
+    <string name="share_dl_no_link">No Instagram post or reel link found</string>
+    <string name="share_dl_no_instagram">Instagram is not installed</string>
+    <string name="ig_share_dl_loading">InstaEclipse: loading the post to download…</string>
+    <string name="ig_share_dl_saving">InstaEclipse: saving %1$d file(s)…</string>
+    <string name="ig_share_dl_not_found">InstaEclipse: could not load that post</string>
     <string name="ig_thread_menu">InstaEclipse chat actions</string>
     <string name="ig_unsent_messages">Unsent messages</string>
     <string name="ig_hide_chat_toggle">Hide / unhide chat</string>

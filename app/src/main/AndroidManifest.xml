@@ -45,6 +45,22 @@
             android:exported="true"
             android:theme="@style/Theme.InstaEclipse" />
 
+        <!-- "Download with InstaEclipse" share target for Instagram post/reel links (#236). -->
+        <activity
+            android:name=".share.ShareDownloadActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/share_dl_label"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
         <!-- Companion-app service: receives downloaded file (via ParcelFileDescriptor) from the
              Xposed module (running in Instagram's process) and writes it to the SAF folder
              whose permission belongs to the companion app. -->

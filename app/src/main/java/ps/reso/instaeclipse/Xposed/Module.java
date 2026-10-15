@@ -164,7 +164,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
             XposedHelpers.findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     // Install CommentCopyButtonHook BEFORE Instagram's Application.attach() runs
                     // so we catch any ViewBinding pre-inflation that happens during attach()
                     Context context = (Context) param.args[0];
@@ -184,7 +184,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 }
 
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
 
                     // Setup context, preferences
                     Context context = (Context) param.args[0];
@@ -577,6 +577,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         if (!skip("ViewOnceBadgeHook")) new ViewOnceBadgeHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | VOBadge): ❌ Failed to hook");
+                    }
+
+                    // Download a post/reel link shared to InstaEclipse from another app (#236)
+                    try {
+                        if (!skip("ShareLinkDownloadHook")) new ps.reso.instaeclipse.mods.media.ShareLinkDownloadHook().install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|ShareDL) ❌ Failed to hook");
                     }
 
                     // Story Download
