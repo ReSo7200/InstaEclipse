@@ -104,6 +104,12 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
 
         // Hook into Instagram and its clones
+        // Debug kill switch: `adb shell setprop debug.instaeclipse.off 1` loads the module but
+        // installs no hooks (isolates crashes to the framework vs. this module).
+        if (SUPPORTED_PACKAGES.contains(lpparam.packageName) && "1".equals(debugProp("debug.instaeclipse.off"))) {
+            android.util.Log.i("InstaEclipse", "debug.instaeclipse.off=1 -> no hooks installed");
+            return;
+        }
         if (SUPPORTED_PACKAGES.contains(lpparam.packageName)) {
             try {
                 if (dexKitBridge == null) {
@@ -125,6 +131,29 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             } catch (Exception e) {
                 ModuleLog.line("(InstaEclipse): Failed to initialize DexKitBridge for " + lpparam.packageName + ": " + e.getMessage());
             }
+        }
+    }
+
+    private static java.util.Set<String> skipped;
+
+    /** Debug bisect switch: `setprop debug.instaeclipse.skip A,B` skips those hook installs. */
+    static boolean skip(String name) {
+        if (skipped == null) {
+            skipped = new java.util.HashSet<>();
+            for (String prop : new String[]{"skip", "skip2", "skip3", "skip4", "skip5", "skip6"}) // props max 91 chars each
+                for (String k : debugProp("debug.instaeclipse." + prop).split(",")) if (!k.trim().isEmpty()) skipped.add(k.trim());
+            if (!skipped.isEmpty()) ModuleLog.line("(InstaEclipse) debug skip: " + skipped);
+        }
+        return skipped.contains(name);
+    }
+
+    /** Reads a system property (debug switches); empty string when unavailable. */
+    static String debugProp(String key) {
+        try {
+            Object v = Class.forName("android.os.SystemProperties").getMethod("get", String.class).invoke(null, key);
+            return v instanceof String ? (String) v : "";
+        } catch (Throwable t) {
+            return "";
         }
     }
 
@@ -194,7 +223,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
                     }
                     UIHookManager instagramUI = new UIHookManager();
-                    instagramUI.mainActivity(hostClassLoader);
+                    if (!skip("instagramUI")) instagramUI.mainActivity(hostClassLoader);
 
                     IGNetworkInterceptor interceptor = new IGNetworkInterceptor();
 
@@ -202,287 +231,287 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
                     // Developer Options
                     try {
-                        new DevOptionsUnlockHook().handleDevOptions(dexKitBridge);
+                        if (!skip("DevOptionsUnlockHook")) new DevOptionsUnlockHook().handleDevOptions(dexKitBridge);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | DevOptions): ❌ Failed to hook");
                     }
 
                     // Ghost Mode
                     try {
-                        new GhostDMSeenHook().handleSeenBlock(dexKitBridge); // DM Seen
-                        new GhostDMMarkAsReadHook(moduleSourceDir).install(lpparam.classLoader); // Mark as Read Button
-                        new GhostChannelMarkAsReadHook().install(lpparam.classLoader); // Channel Mark as Read Button
+                        if (!skip("GhostDMSeenHook")) new GhostDMSeenHook().handleSeenBlock(dexKitBridge); // DM Seen
+                        if (!skip("GhostDMMarkAsReadHook")) new GhostDMMarkAsReadHook(moduleSourceDir).install(lpparam.classLoader); // Mark as Read Button
+                        if (!skip("GhostChannelMarkAsReadHook")) new GhostChannelMarkAsReadHook().install(lpparam.classLoader); // Channel Mark as Read Button
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | GhostSeen): ❌ Failed to hook");
                     }
 
                     try {
-                        new GhostTypingIndicatorHook().handleTypingBlock(dexKitBridge); // DM Typing
+                        if (!skip("GhostTypingIndicatorHook")) new GhostTypingIndicatorHook().handleTypingBlock(dexKitBridge); // DM Typing
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | GhostTyping): ❌ Failed to hook");
                     }
 
                     try {
-                        new GhostScreenshotDetectionHook().handleScreenshotBlock(dexKitBridge); // Screenshot
+                        if (!skip("GhostScreenshotDetectionHook")) new GhostScreenshotDetectionHook().handleScreenshotBlock(dexKitBridge); // Screenshot
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | GhostScreenshot): ❌ Failed to hook");
                     }
 
                     try {
-                        new ScreenshotPermissionHook().install(lpparam.classLoader); // Allow Screenshots
+                        if (!skip("ScreenshotPermissionHook")) new ScreenshotPermissionHook().install(lpparam.classLoader); // Allow Screenshots
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ScreenshotPermission): ❌ Failed to hook");
                     }
 
                     try {
-                        new GhostViewOnceHook().handleViewOnceBlock(dexKitBridge); // View Once
+                        if (!skip("GhostViewOnceHook")) new GhostViewOnceHook().handleViewOnceBlock(dexKitBridge); // View Once
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | GhostViewOnce): ❌ Failed to hook");
                     }
 
                     try {
-                        new GhostStorySeenHook().handleStorySeenBlock(dexKitBridge); // Story Seen
+                        if (!skip("GhostStorySeenHook")) new GhostStorySeenHook().handleStorySeenBlock(dexKitBridge); // Story Seen
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | GhostStorySeen): ❌ Failed to hook");
                     }
 
                     try {
-                        new KeepUnsentMessagesHook().install(dexKitBridge, lpparam.classLoader); // Keep Unsent
+                        if (!skip("KeepUnsentMessagesHook")) new KeepUnsentMessagesHook().install(dexKitBridge, lpparam.classLoader); // Keep Unsent
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | KeepUnsent): ❌ Failed to hook");
                     }
 
                     try {
-                        new ps.reso.instaeclipse.mods.ghost.UnsentThreadButtonHook().install(lpparam.classLoader); // per-thread unsent button
+                        if (!skip("UnsentThreadButtonHook")) new ps.reso.instaeclipse.mods.ghost.UnsentThreadButtonHook().install(lpparam.classLoader); // per-thread unsent button
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | UnsentBtn): ❌ Failed to hook");
                     }
 
                     try {
-                        new ps.reso.instaeclipse.mods.ghost.HideChatsHook().install(dexKitBridge, lpparam.classLoader); // Hide Specific Chats
+                        if (!skip("HideChatsHook")) new ps.reso.instaeclipse.mods.ghost.HideChatsHook().install(dexKitBridge, lpparam.classLoader); // Hide Specific Chats
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | HideChats): ❌ Failed to hook");
                     }
 
                     try {
-                        new ps.reso.instaeclipse.mods.ui.CustomFontHook().install(lpparam.classLoader); // Custom UI font
+                        if (!skip("CustomFontHook")) new ps.reso.instaeclipse.mods.ui.CustomFontHook().install(lpparam.classLoader); // Custom UI font
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | CustomFont): ❌ Failed to hook");
                     }
 
                     try {
                         ps.reso.instaeclipse.mods.ui.RemoveMetaAIHook metaAi = new ps.reso.instaeclipse.mods.ui.RemoveMetaAIHook();
-                        metaAi.install(lpparam.classLoader);              // composer/search XML layouts
-                        metaAi.installReels(dexKitBridge, lpparam.classLoader); // reels Litho unit (#179)
+                        if (!skip("metaAi")) metaAi.install(lpparam.classLoader);              // composer/search XML layouts
+                        if (!skip("metaAi")) metaAi.installReels(dexKitBridge, lpparam.classLoader); // reels Litho unit (#179)
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | RemoveMetaAI): ❌ Failed to hook");
                     }
 
                     // Disable Repost (feed + reels) — UI/action level; network drop is ineffective
                     try {
-                        new ps.reso.instaeclipse.mods.ui.DisableRepostHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("DisableRepostHook")) new ps.reso.instaeclipse.mods.ui.DisableRepostHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | DisableRepost): ❌ Failed to hook");
                     }
 
                     try {
-                        new ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook().install(lpparam.classLoader); // Lock DMs (#182)
+                        if (!skip("LockDirectMessagesHook")) new ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook().install(lpparam.classLoader); // Lock DMs (#182)
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | LockDMs): ❌ Failed to hook");
                     }
 
                     // Hide in-feed widget units (suggested users panels, surveys, carousels, etc.)
                     try {
-                        new HideSuggestedFeedItemsHook().install(dexKitBridge, hostClassLoader);
+                        if (!skip("HideSuggestedFeedItemsHook")) new HideSuggestedFeedItemsHook().install(dexKitBridge, hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | HideSuggested): ❌ Failed to hook");
                     }
 
                     // Ads Blocker
                     try {
-                        new AdBlocker().disableSponsoredContent(dexKitBridge, hostClassLoader);
+                        if (!skip("AdBlocker")) new AdBlocker().disableSponsoredContent(dexKitBridge, hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | AdBlocker): ❌ Failed to hook");
                     }
 
                     // tracking link disable
                     try {
-                        new TrackingLinkDisable().disableTrackingLinks(hostClassLoader);
+                        if (!skip("TrackingLinkDisable")) new TrackingLinkDisable().disableTrackingLinks(hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | TrackingLinkDisable): ❌ Failed to hook");
                     }
 
                     // Exact timestamps instead of "3h ago" (#232)
                     try {
-                        new ps.reso.instaeclipse.mods.misc.ExactTimestampHook().install(dexKitBridge);
+                        if (!skip("ExactTimestampHook")) new ps.reso.instaeclipse.mods.misc.ExactTimestampHook().install(dexKitBridge);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ExactTime): ❌ Failed to hook");
                     }
 
                     // Hide "Create group" on the DM share sheet (#240)
                     try {
-                        new ps.reso.instaeclipse.mods.ui.ShareSheetCleanupHook().install(hostClassLoader);
+                        if (!skip("ShareSheetCleanupHook")) new ps.reso.instaeclipse.mods.ui.ShareSheetCleanupHook().install(hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ShareSheet): ❌ Failed to hook");
                     }
 
                     // Open links in the external browser (#229)
                     try {
-                        new ps.reso.instaeclipse.mods.misc.ExternalBrowserHook().install();
+                        if (!skip("ExternalBrowserHook")) new ps.reso.instaeclipse.mods.misc.ExternalBrowserHook().install();
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ExternalBrowser): ❌ Failed to hook");
                     }
 
                     // Miscellaneous
                     try {
-                        new DisableStoryFlippingHook().handleStoryFlippingDisable(dexKitBridge); // Story Flipping
+                        if (!skip("DisableStoryFlippingHook")) new DisableStoryFlippingHook().handleStoryFlippingDisable(dexKitBridge); // Story Flipping
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | StoryFlipping): ❌ Failed to hook");
                     }
 
                     // Story Mentions
                     try {
-                        new StoryMentionHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("StoryMentionHook")) new StoryMentionHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | StoryMentions): ❌ Failed to hook");
                     }
 
                     // Comment Copy
                     try {
-                        new CommentCopyHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("CommentCopyHook")) new CommentCopyHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | CopyComment): ❌ Failed to hook");
                     }
 
                     // Caption Copy
                     try {
-                        new CaptionCopyContextMenuHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("CaptionCopyContextMenuHook")) new CaptionCopyContextMenuHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | Caption): ❌ Failed to hook");
                     }
 
                     // Disable Double Tap to Like
                     try {
-                        new DisableDoubleTapLikeHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("DisableDoubleTapLikeHook")) new DisableDoubleTapLikeHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | DoubleTapLike): ❌ Failed to hook");
                     }
 
                     // Photo Zoom (long-press)
                     try {
-                        new FeedPhotoZoomHook().install(lpparam.classLoader);
+                        if (!skip("FeedPhotoZoomHook")) new FeedPhotoZoomHook().install(lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | PhotoZoom): ❌ Failed to hook");
                     }
 
                     // Location Spoof
                     try {
-                        new LocationSpoofHook().install(lpparam.classLoader);
+                        if (!skip("LocationSpoofHook")) new LocationSpoofHook().install(lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | SpoofLocation): ❌ Failed to hook");
                     }
 
                     // Custom Theme
                     try {
-                        new IgThemeHook().install(hostClassLoader);
+                        if (!skip("IgThemeHook")) new IgThemeHook().install(hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | Theme): ❌ Failed to hook");
                     }
 
                     // Force Reel Quality
                     try {
-                        new ForceReelQualityHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("ForceReelQualityHook")) new ForceReelQualityHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ Failed to hook");
                     }
 
                     try {
-                        new DisableVideoAutoPlayHook().handleAutoPlayDisable(dexKitBridge); // Video Autoplay
+                        if (!skip("DisableVideoAutoPlayHook")) new DisableVideoAutoPlayHook().handleAutoPlayDisable(dexKitBridge); // Video Autoplay
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | AutoPlayDisable): ❌ Failed to hook");
                     }
 
                     // Build Expired Popup
                     try {
-                        new BuildExpiredPopupHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("BuildExpiredPopupHook")) new BuildExpiredPopupHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | BuildExpired): ❌ Failed to hook");
                     }
 
                     // Media Download (feed)
                     try {
-                        new FeedVideoDownloadHook().install(lpparam.classLoader);
-                        FeedVideoDownloadHook.installVideoUrlCaptureHook(dexKitBridge, lpparam.classLoader);
+                        if (!skip("FeedVideoDownloadHook")) new FeedVideoDownloadHook().install(lpparam.classLoader);
+                        if (!skip("FeedVideoDownloadHook")) FeedVideoDownloadHook.installVideoUrlCaptureHook(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | MediaDownload): ❌ Failed to hook");
                     }
 
                     // Post Download — three-dots menu (replaces floating button + long-press)
                     try {
-                        new PostDownloadContextMenuHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("PostDownloadContextMenuHook")) new PostDownloadContextMenuHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | PostDownload): ❌ Failed to hook");
                     }
 
                     // Save Instants (#184) — long-press a received Instant (quicksnap) to save it
                     try {
-                        new ps.reso.instaeclipse.mods.media.InstantSaveHook().install(lpparam.classLoader);
+                        if (!skip("InstantSaveHook")) new ps.reso.instaeclipse.mods.media.InstantSaveHook().install(lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | InstantSave): ❌ Failed to hook");
                     }
 
                     // Upload Instants from gallery (#199) — swap gallery bitmap into quicksnap send
                     try {
-                        new ps.reso.instaeclipse.mods.media.InstantUploadHook().install(lpparam.classLoader);
+                        if (!skip("InstantUploadHook")) new ps.reso.instaeclipse.mods.media.InstantUploadHook().install(lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | InstantUpload): ❌ Failed to hook");
                     }
 
                     // Keep Ephemeral Messages
                     try {
-                        new GhostEphemeralKeepHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("GhostEphemeralKeepHook")) new GhostEphemeralKeepHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | EphemeralHook): ❌ Failed to hook");
                     }
 
                     // Permanent View Mode (view-once / view-twice → permanent)
                     try {
-                        new GhostPermanentViewHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("GhostPermanentViewHook")) new GhostPermanentViewHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ViewOnceMedia): ❌ Failed to hook");
                     }
 
                     // Restore IG's native view-once/twice corner icon when Permanent View is on
                     try {
-                        new ViewOnceBadgeHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("ViewOnceBadgeHook")) new ViewOnceBadgeHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | VOBadge): ❌ Failed to hook");
                     }
 
                     // Story Download
                     try {
-                        new StoryDownloadHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("StoryDownloadHook")) new StoryDownloadHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | StoryDownload): ❌ Failed to hook");
                     }
 
                     // Reel Download
                     try {
-                        new ReelDownloadHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("ReelDownloadHook")) new ReelDownloadHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ReelDownload): ❌ Failed to hook");
                     }
 
                     // Profile Picture Download
                     try {
-                        ProfilePicDownloadHook.install();
+                        if (!skip("ProfilePicDownloadHook")) ProfilePicDownloadHook.install();
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ProfileDownload): ❌ Failed to hook");
                     }
 
                     // Network Interceptor
                     try {
-                        interceptor.handleInterceptor(lpparam);
+                        if (!skip("interceptor")) interceptor.handleInterceptor(lpparam);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | Interceptor): ❌ Failed to hook");
                     }
@@ -491,7 +520,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // realtime teardown race on IG 446+/447.0.0.39+) instead of letting AbortPolicy
                     // throw and hard-crash the app.
                     try {
-                        new ps.reso.instaeclipse.mods.core.TerminatedExecutorGuard().install(lpparam.classLoader);
+                        if (!skip("TerminatedExecutorGuard")) new ps.reso.instaeclipse.mods.core.TerminatedExecutorGuard().install(lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ExecGuard): ❌ Failed to hook");
                     }
