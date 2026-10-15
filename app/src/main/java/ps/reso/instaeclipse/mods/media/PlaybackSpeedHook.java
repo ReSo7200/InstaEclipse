@@ -51,6 +51,35 @@ public class PlaybackSpeedHook {
     private static volatile float speed = 1f;
     private static volatile WeakReference<Object> lastPlayer;
     private static final List<Method> SETTERS = new ArrayList<>();
+    private static final List<Method> WRAPPERS = new ArrayList<>();
+    private static final ThreadLocal<Boolean> APPLYING = new ThreadLocal<>();
+    private static final java.util.Map<Object, Boolean> PLAYERS =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    private static void remember(Object o) {
+        if (o != null) PLAYERS.put(o, Boolean.TRUE);
+    }
+
+    /** Applies the speed to every live story/reel player; true if any accepted it. */
+    private static boolean applyToPlayers(float s) {
+        boolean ok = false;
+        Object[] live;
+        synchronized (PLAYERS) { live = PLAYERS.keySet().toArray(); }
+        for (Object p : live) {
+            for (Method m : WRAPPERS) {
+                if (!m.getDeclaringClass().isInstance(p)) continue;
+                try {
+                    APPLYING.set(Boolean.TRUE);
+                    m.invoke(p, s);
+                    ok = true;
+                } catch (Throwable ignored) {
+                } finally {
+                    APPLYING.remove();
+                }
+            }
+        }
+        return ok;
+    }
 
     public void install(DexKitBridge bridge, ClassLoader cl) {
         installFeed(bridge, cl);
@@ -125,6 +154,37 @@ public class PlaybackSpeedHook {
                     }
                 });
             }
+            // Story / reel players set speed through their own (float) method that calls the Groot
+            // setter (X.0S4W / X.0Cfw .HFy on 452). Remember their instances and, when a custom
+            // speed is chosen, apply it there too (and override IG's own 1x calls).
+            int storyHooks = 0;
+            for (Method setter : SETTERS) {
+                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                        .paramTypes("float").returnType("void").addInvoke(MethodMatcher.create(setter))))) {
+                    Method m;
+                    try { m = md.getMethodInstance(cl); } catch (Throwable t) { continue; }
+                    if (Modifier.isStatic(m.getModifiers()) || SETTERS.contains(m)) continue;
+                    m.setAccessible(true);
+                    WRAPPERS.add(m);
+                    XposedBridge.hookMethod(m, new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) {
+                            remember(param.thisObject);
+                            if (APPLYING.get() == Boolean.TRUE) return;
+                            if (FeatureFlags.offerPlaybackSpeed && speed != 1f && param.args[0] instanceof Float f && f == 1f)
+                                param.args[0] = speed;
+                        }
+                    });
+                    for (java.lang.reflect.Constructor<?> c : m.getDeclaringClass().getDeclaredConstructors()) {
+                        XposedBridge.hookMethod(c, new XC_MethodHook() {
+                            @Override
+                            protected void afterHookedMethod(MethodHookParam param) { remember(param.thisObject); }
+                        });
+                    }
+                    storyHooks++;
+                }
+            }
+            ModuleLog.line(TAG + "story/reel speed methods: " + storyHooks);
             ModuleLog.line(TAG + "✅ feed player " + start.getDeclaringClass().getName() + "." + start.getName()
                     + ", started-cb " + (started != null ? started.getDeclaringClass().getName() + "." + started.getName() : "none")
                     + ", setters " + SETTERS.size());
@@ -179,7 +239,9 @@ public class PlaybackSpeedHook {
                     speed = SPEEDS[which];
                     WeakReference<Object> ref = lastPlayer;
                     Object p = ref != null ? ref.get() : null;
-                    boolean ok = p != null && apply(p, speed);
+                    boolean ok = applyToPlayers(speed);
+                    ok |= p != null && apply(p, speed);
+                    ModuleLog.line(TAG + "chosen " + speed + "x, applied now=" + ok);
                     if (!ok) Toast.makeText(ctx, I18n.t(ctx, R.string.ig_playback_speed_next), Toast.LENGTH_SHORT).show();
                     d.dismiss();
                 })

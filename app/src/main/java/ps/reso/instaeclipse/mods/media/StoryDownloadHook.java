@@ -225,7 +225,7 @@ public class StoryDownloadHook {
             XC_MethodHook injector = new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
-                    if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory) return;
+                    if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory && !FeatureFlags.offerPlaybackSpeed) return;
                     if (!(param.getResult() instanceof CharSequence[] original) || original == null) return;
 
                     java.util.List<CharSequence> add = new java.util.ArrayList<>();
@@ -234,6 +234,9 @@ public class StoryDownloadHook {
                     // Selective "Mark as seen" (#226): only meaningful while Hide Story Views is on.
                     if (FeatureFlags.isGhostStory)
                         add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen));
+                    // Story playback speed (Instagram Plus–style, our own implementation)
+                    if (FeatureFlags.offerPlaybackSpeed)
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_playback_speed_title));
 
                     // Guard: don't inject twice
                     for (CharSequence cs : original) {
@@ -297,7 +300,7 @@ public class StoryDownloadHook {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory) return;
+                if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory && !FeatureFlags.offerPlaybackSpeed) return;
 
                 // 1. Find which button was tapped
                 CharSequence tapped = null;
@@ -305,6 +308,16 @@ public class StoryDownloadHook {
                     if (arg instanceof CharSequence cs) { tapped = cs; break; }
                 }
                 if (tapped == null) return;
+
+                String speedLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_playback_speed_title);
+                if (FeatureFlags.offerPlaybackSpeed && speedLabel.contentEquals(tapped)) {
+                    param.setResult(null);
+                    Object holder = findReelItemHolder(param);
+                    Context ctx = findContextAcrossParam(param, holder != null ? holder : param.thisObject);
+                    if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+                    if (ctx != null) PlaybackSpeedHook.showChooser(ctx);
+                    return;
+                }
 
                 // Selective "Mark as seen" (#226)
                 String seenLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen);
