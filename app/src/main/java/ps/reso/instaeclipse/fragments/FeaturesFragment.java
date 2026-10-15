@@ -881,7 +881,8 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_create), "hideTabCreate"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_messages), "hideTabMessages"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_activity), "hideTabActivity"),
-                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_profile), "hideTabProfile")
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_profile), "hideTabProfile"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_distraction_free), defs);

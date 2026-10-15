@@ -376,6 +376,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | PlaybackSpeed): ❌ Failed to hook");
                     }
 
+                    // Hide the DM Notes tray (#241)
+                    try {
+                        if (!skip("HideNotesTrayHook")) new ps.reso.instaeclipse.mods.ui.HideNotesTrayHook().install(dexKitBridge);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | NotesTray): ❌ Failed to hook");
+                    }
+
                     // Like undo window (#235) — after HideSuggestedFeedItemsHook (has_liked getter)
                     try {
                         if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);

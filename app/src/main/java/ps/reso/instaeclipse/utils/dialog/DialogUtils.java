@@ -1104,6 +1104,9 @@ public class DialogUtils {
         ToggleRow navTab5 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_profile), FeatureFlags.hideTabProfile);
         navTab5.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabProfile = c; SettingsManager.saveAllFlags(); });
         navCard.addView(navTab5);
+        ToggleRow notesTray = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_dialog_distraction_hide_notes_tray), FeatureFlags.hideNotesTray);
+        notesTray.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideNotesTray = c; SettingsManager.saveAllFlags(); });
+        navCard.addView(notesTray);
         layout.addView(navCard);
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {

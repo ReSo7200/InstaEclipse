@@ -84,6 +84,7 @@ public class SettingsManager {
         editor.putBoolean("hideTabMessages", FeatureFlags.hideTabMessages);
         editor.putBoolean("hideTabActivity", FeatureFlags.hideTabActivity);
         editor.putBoolean("hideTabProfile", FeatureFlags.hideTabProfile);
+        editor.putBoolean("hideNotesTray", FeatureFlags.hideNotesTray);
 
         // Ads
         editor.putBoolean("isAdBlockEnabled", FeatureFlags.isAdBlockEnabled);
@@ -212,6 +213,7 @@ public class SettingsManager {
         FeatureFlags.hideTabMessages = prefs.getBoolean("hideTabMessages", false);
         FeatureFlags.hideTabActivity = prefs.getBoolean("hideTabActivity", false);
         FeatureFlags.hideTabProfile = prefs.getBoolean("hideTabProfile", false);
+        FeatureFlags.hideNotesTray = prefs.getBoolean("hideNotesTray", false);
 
         // Ads
         FeatureFlags.isAdBlockEnabled = prefs.getBoolean("isAdBlockEnabled", false);

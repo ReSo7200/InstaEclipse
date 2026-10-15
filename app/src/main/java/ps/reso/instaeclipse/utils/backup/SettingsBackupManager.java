@@ -59,6 +59,7 @@ public class SettingsBackupManager {
         s.put("hideTabMessages", FeatureFlags.hideTabMessages);
         s.put("hideTabActivity", FeatureFlags.hideTabActivity);
         s.put("hideTabProfile", FeatureFlags.hideTabProfile);
+        s.put("hideNotesTray", FeatureFlags.hideNotesTray);
 
         // Ads
         s.put("isAdBlockEnabled",        FeatureFlags.isAdBlockEnabled);
@@ -161,6 +162,7 @@ public class SettingsBackupManager {
         if (s.has("hideTabMessages")) FeatureFlags.hideTabMessages = s.getBoolean("hideTabMessages");
         if (s.has("hideTabActivity")) FeatureFlags.hideTabActivity = s.getBoolean("hideTabActivity");
         if (s.has("hideTabProfile")) FeatureFlags.hideTabProfile = s.getBoolean("hideTabProfile");
+        if (s.has("hideNotesTray")) FeatureFlags.hideNotesTray = s.getBoolean("hideNotesTray");
 
         if (s.has("isAdBlockEnabled"))       FeatureFlags.isAdBlockEnabled       = s.getBoolean("isAdBlockEnabled");
         if (s.has("isAnalyticsBlocked"))     FeatureFlags.isAnalyticsBlocked     = s.getBoolean("isAnalyticsBlocked");
