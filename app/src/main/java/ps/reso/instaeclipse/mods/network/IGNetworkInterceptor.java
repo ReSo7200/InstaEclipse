@@ -250,7 +250,7 @@ public class IGNetworkInterceptor {
                                     }
 
                                     // Follow status
-                                    if (FeatureFlags.showFollowerToast) {
+                                    if (FeatureFlags.showFollowerToast || FeatureFlags.profileFollowsYouLabel) {
                                         FeatureStatusTracker.setHooked("FollowerToast");
                                         FollowStatusHook.handleRequest(uri, param.args);
                                     }
