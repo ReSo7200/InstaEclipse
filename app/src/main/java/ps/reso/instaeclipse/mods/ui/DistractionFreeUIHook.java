@@ -38,6 +38,10 @@ public class DistractionFreeUIHook {
     private static final String[] NAV_TAB_NAMES =
             {"feed_tab", "clips_tab", "creation_tab", "direct_tab", "news_tab", "profile_tab"};
     private static final int[] navTabIds = new int[NAV_TAB_NAMES.length];
+    // Instagram Plus ("aura") upsell button, badges and lock icons (same ids 451/452).
+    private static final String[] PLUS_UPSELL_NAMES =
+            {"aura_upsell_button", "aura_list_badge", "aura_list_badge_stub", "aura_badge_lock_icon", "aura_badge_chevron"};
+    private static final int[] plusUpsellIds = new int[PLUS_UPSELL_NAMES.length];
 
     private static boolean navTabHidden(int index) {
         switch (index) {
@@ -68,7 +72,7 @@ public class DistractionFreeUIHook {
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
     private static boolean anyFlag() {
-        return FeatureFlags.disableStories || FeatureFlags.disableReels || anyNavTabHidden();
+        return FeatureFlags.disableStories || FeatureFlags.disableReels || anyNavTabHidden() || FeatureFlags.hidePlusUpsells;
     }
 
     @SuppressLint("DiscouragedApi")
@@ -82,6 +86,8 @@ public class DistractionFreeUIHook {
             tabPagerId = res.getIdentifier("swipeable_tab_view_pager", "id", pkg);
             for (int i = 0; i < NAV_TAB_NAMES.length; i++)
                 navTabIds[i] = res.getIdentifier(NAV_TAB_NAMES[i], "id", pkg);
+            for (int i = 0; i < PLUS_UPSELL_NAMES.length; i++)
+                plusUpsellIds[i] = res.getIdentifier(PLUS_UPSELL_NAMES[i], "id", pkg);
             idsResolved = true;
             ModuleLog.line("(IE|DistractUI) resolved: tray=" + trayId + " clipsTab=" + clipsTabId);
         } catch (Throwable ignored) {}
@@ -115,6 +121,8 @@ public class DistractionFreeUIHook {
             if (FeatureFlags.disableReels && tabPagerId != 0) disableTabSwipe((ViewGroup) root);
             for (int i = 0; i < NAV_TAB_NAMES.length; i++)
                 if (navTabIds[i] != 0 && navTabHidden(i)) collapseAllById((ViewGroup) root, navTabIds[i]);
+            if (FeatureFlags.hidePlusUpsells)
+                for (int id : plusUpsellIds) if (id != 0) collapseAllById((ViewGroup) root, id);
         } catch (Throwable ignored) {}
     }
 

@@ -1195,6 +1195,13 @@ public class DialogUtils {
         });
         layout.addView(hideNotesSwitch);
 
+        ToggleRow hidePlusSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_plus), FeatureFlags.hidePlusUpsells);
+        hidePlusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.hidePlusUpsells = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(hidePlusSwitch);
+
         ToggleRow expandSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_expand_captions), FeatureFlags.expandCaptions);
         expandSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             FeatureFlags.expandCaptions = isChecked;

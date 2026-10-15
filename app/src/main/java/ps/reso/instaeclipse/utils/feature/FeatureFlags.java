@@ -50,6 +50,7 @@ public class FeatureFlags {
     public static boolean enableVoiceDownload = false; // Download row for DM voice messages (#223)
     public static boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)
     public static boolean expandCaptions = false; // feed captions without "… more" (#246)
+    public static boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
     public static boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)
     public static boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)

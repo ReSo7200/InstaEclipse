@@ -421,6 +421,7 @@
     <string name="ig_dialog_misc_spoof_last_seen">Spoof Last Seen (freeze)</string>
     <string name="ig_dialog_misc_disable_repost">Disable Repost</string>
     <string name="ig_dialog_clean_feed_expand_captions">Always Show Full Captions (restart IG)</string>
+    <string name="ig_dialog_clean_feed_hide_plus">Hide Instagram Plus Upsells</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Hide Community Notes</string>
     <string name="ig_dialog_misc_profile_follows_label">Show \"Follows You\" on Profiles</string>
     <string name="ig_profile_follows_you">Follows you</string>

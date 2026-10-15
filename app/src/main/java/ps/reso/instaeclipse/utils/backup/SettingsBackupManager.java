@@ -46,6 +46,7 @@ public class SettingsBackupManager {
         s.put("hideThreadsSuggestions",     FeatureFlags.hideThreadsSuggestions);
         s.put("hideLikedPosts",             FeatureFlags.hideLikedPosts);
         s.put("hideCommunityNotes",         FeatureFlags.hideCommunityNotes);
+        s.put("hidePlusUpsells",            FeatureFlags.hidePlusUpsells);
         s.put("expandCaptions",             FeatureFlags.expandCaptions);
         s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
         s.put("enableVoiceDownload",        FeatureFlags.enableVoiceDownload);
@@ -152,6 +153,7 @@ public class SettingsBackupManager {
         if (s.has("hideThreadsSuggestions"))    FeatureFlags.hideThreadsSuggestions    = s.getBoolean("hideThreadsSuggestions");
         if (s.has("hideLikedPosts"))            FeatureFlags.hideLikedPosts            = s.getBoolean("hideLikedPosts");
         if (s.has("hideCommunityNotes"))        FeatureFlags.hideCommunityNotes        = s.getBoolean("hideCommunityNotes");
+        if (s.has("hidePlusUpsells"))           FeatureFlags.hidePlusUpsells           = s.getBoolean("hidePlusUpsells");
         if (s.has("expandCaptions"))            FeatureFlags.expandCaptions            = s.getBoolean("expandCaptions");
         if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
         if (s.has("enableVoiceDownload"))       FeatureFlags.enableVoiceDownload       = s.getBoolean("enableVoiceDownload");
