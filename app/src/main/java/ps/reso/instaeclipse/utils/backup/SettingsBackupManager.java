@@ -49,6 +49,9 @@ public class SettingsBackupManager {
         s.put("expandCaptions",             FeatureFlags.expandCaptions);
         s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
         s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
+        s.put("offerMediaInfo",             FeatureFlags.offerMediaInfo);
+        s.put("offerPlaybackSpeed",         FeatureFlags.offerPlaybackSpeed);
+        s.put("forceReelScrubber",          FeatureFlags.forceReelScrubber);
         s.put("markUnsentInThread",         FeatureFlags.markUnsentInThread);
         s.put("hideTabHome", FeatureFlags.hideTabHome);
         s.put("hideTabReels", FeatureFlags.hideTabReels);
@@ -148,6 +151,9 @@ public class SettingsBackupManager {
         if (s.has("expandCaptions"))            FeatureFlags.expandCaptions            = s.getBoolean("expandCaptions");
         if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
         if (s.has("offerCopyImage"))            FeatureFlags.offerCopyImage            = s.getBoolean("offerCopyImage");
+        if (s.has("offerMediaInfo"))            FeatureFlags.offerMediaInfo            = s.getBoolean("offerMediaInfo");
+        if (s.has("offerPlaybackSpeed"))        FeatureFlags.offerPlaybackSpeed        = s.getBoolean("offerPlaybackSpeed");
+        if (s.has("forceReelScrubber"))         FeatureFlags.forceReelScrubber         = s.getBoolean("forceReelScrubber");
         if (s.has("markUnsentInThread"))        FeatureFlags.markUnsentInThread        = s.getBoolean("markUnsentInThread");
         if (s.has("hideTabHome")) FeatureFlags.hideTabHome = s.getBoolean("hideTabHome");
         if (s.has("hideTabReels")) FeatureFlags.hideTabReels = s.getBoolean("hideTabReels");

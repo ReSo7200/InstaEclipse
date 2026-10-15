@@ -1347,6 +1347,33 @@ public class FeedVideoDownloadHook {
     }
 
     /** Audio track URL of a video/reel (from its DASH manifest), or null (photos, no manifest). */
+    /** Child Media of a carousel (carousel_media getter), or null when not a carousel / unavailable. */
+    static List<?> carouselChildren(Object media) {
+        if (media == null || carouselMediaGetter == null) return null;
+        try {
+            Object owner = carouselMediaGetter.getDeclaringClass().isInstance(media) ? media
+                    : MediaModelResolver.findObjectOfType(media, carouselMediaGetter.getDeclaringClass(), 5);
+            Object r = owner != null ? carouselMediaGetter.invoke(owner) : null;
+            return r instanceof List<?> l ? l : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** The media's DASH manifest XML (video_dash_manifest), or null. */
+    static String dashManifest(Object media) {
+        Method getter = dashManifestGetter;
+        if (media == null || getter == null) return null;
+        try {
+            Object target = getter.getDeclaringClass().isInstance(media) ? media
+                    : MediaModelResolver.findObjectOfType(media, getter.getDeclaringClass(), 5);
+            Object r = target != null ? getter.invoke(target) : null;
+            return r instanceof String s ? s : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     static String extractAudioUrl(Object media) {
         Method getter = dashManifestGetter;
         if (media == null || getter == null) return null;

@@ -1927,6 +1927,27 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         copyLinkCard.addView(copyImageSwitch);
+        ToggleRow infoSwitch = createSwitch(context, R.drawable.ic_search, "#FF9F0A",
+                I18n.t(context, R.string.ig_dialog_downloader_offer_media_info), FeatureFlags.offerMediaInfo);
+        infoSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.offerMediaInfo = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        copyLinkCard.addView(infoSwitch);
+        ToggleRow speedSwitch = createSwitch(context, R.drawable.ic_movie, "#FF9F0A",
+                I18n.t(context, R.string.ig_dialog_downloader_offer_speed), FeatureFlags.offerPlaybackSpeed);
+        speedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.offerPlaybackSpeed = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        copyLinkCard.addView(speedSwitch);
+        ToggleRow scrubSwitch = createSwitch(context, R.drawable.ic_movie, "#FF9F0A",
+                I18n.t(context, R.string.ig_dialog_downloader_reel_scrubber), FeatureFlags.forceReelScrubber);
+        scrubSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.forceReelScrubber = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        copyLinkCard.addView(scrubSwitch);
         copyLinkCard.addView(saveInstantsSwitch);
         copyLinkCard.addView(uploadInstantsSwitch);
 

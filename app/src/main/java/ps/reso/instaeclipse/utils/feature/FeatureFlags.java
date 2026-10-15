@@ -40,6 +40,9 @@ public class FeatureFlags {
     public static boolean hideTabActivity = false;
     public static boolean hideTabProfile = false;
     public static boolean markUnsentInThread = false; // prefix kept unsent messages with a marker in the chat (#222)
+    public static boolean offerMediaInfo = false; // "Media info" row in the post menu (#231)
+    public static boolean offerPlaybackSpeed = false; // "Playback speed" row for feed videos (#247)
+    public static boolean forceReelScrubber = false; // always show IG's reel seek bar (#247)
     public static boolean offerCopyImage = false; // offer "Copy image to clipboard" when downloading a photo (#228)
     public static boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)
     public static boolean expandCaptions = false; // feed captions without "… more" (#246)

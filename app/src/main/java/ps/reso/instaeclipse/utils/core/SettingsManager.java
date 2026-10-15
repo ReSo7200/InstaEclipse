@@ -74,6 +74,9 @@ public class SettingsManager {
         editor.putBoolean("expandCaptions", FeatureFlags.expandCaptions);
         editor.putBoolean("offerAudioDownload", FeatureFlags.offerAudioDownload);
         editor.putBoolean("offerCopyImage", FeatureFlags.offerCopyImage);
+        editor.putBoolean("offerMediaInfo", FeatureFlags.offerMediaInfo);
+        editor.putBoolean("offerPlaybackSpeed", FeatureFlags.offerPlaybackSpeed);
+        editor.putBoolean("forceReelScrubber", FeatureFlags.forceReelScrubber);
         editor.putBoolean("markUnsentInThread", FeatureFlags.markUnsentInThread);
         editor.putBoolean("hideTabHome", FeatureFlags.hideTabHome);
         editor.putBoolean("hideTabReels", FeatureFlags.hideTabReels);
@@ -199,6 +202,9 @@ public class SettingsManager {
         FeatureFlags.expandCaptions = prefs.getBoolean("expandCaptions", false);
         FeatureFlags.offerAudioDownload = prefs.getBoolean("offerAudioDownload", false);
         FeatureFlags.offerCopyImage = prefs.getBoolean("offerCopyImage", false);
+        FeatureFlags.offerMediaInfo = prefs.getBoolean("offerMediaInfo", false);
+        FeatureFlags.offerPlaybackSpeed = prefs.getBoolean("offerPlaybackSpeed", false);
+        FeatureFlags.forceReelScrubber = prefs.getBoolean("forceReelScrubber", false);
         FeatureFlags.markUnsentInThread = prefs.getBoolean("markUnsentInThread", false);
         FeatureFlags.hideTabHome = prefs.getBoolean("hideTabHome", false);
         FeatureFlags.hideTabReels = prefs.getBoolean("hideTabReels", false);

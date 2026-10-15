@@ -60,6 +60,12 @@ public class PostDownloadContextMenuHook {
     // its taps are consumed below before IG's handler sees them.
     private static final String COPY_IMAGE_CARRIER = "EXPLORE_INTERNAL_DEBUG_LOGS";
     private static Object   copyImageOptionValue;
+    // "Media info" (#231) and "Playback speed" (#247) rows: two more internal debug-only values
+    // (present 436 → 452) carry our labels the same way.
+    private static final String MEDIA_INFO_CARRIER = "DEBUG_SHOPS_AD";
+    private static final String SPEED_CARRIER = "PROMOTE_DEBUG";
+    private static Object   mediaInfoOptionValue;
+    private static Object   speedOptionValue;
 
     // Obfuscated creator class found via "MediaOptionsOverflowMenuCreator" string
     private static Class<?> menuCreatorClass;
@@ -108,6 +114,10 @@ public class PostDownloadContextMenuHook {
                     copyLinkOptionValue = v;
                 } else if (copyImageOptionValue == null && name.equals(COPY_IMAGE_CARRIER)) {
                     copyImageOptionValue = v;
+                } else if (mediaInfoOptionValue == null && name.equals(MEDIA_INFO_CARRIER)) {
+                    mediaInfoOptionValue = v;
+                } else if (speedOptionValue == null && name.equals(SPEED_CARRIER)) {
+                    speedOptionValue = v;
                 }
             }
             if (downloadOptionValue == null)
@@ -275,6 +285,10 @@ public class PostDownloadContextMenuHook {
                     param.setResult(null);
                 } else if (FeatureFlags.offerCopyImage && opt == copyImageOptionValue) {
                     param.setResult(null);
+                } else if (FeatureFlags.offerMediaInfo && opt == mediaInfoOptionValue) {
+                    param.setResult(null);
+                } else if (FeatureFlags.offerPlaybackSpeed && opt == speedOptionValue) {
+                    param.setResult(null);
                 }
             }
 
@@ -285,12 +299,15 @@ public class PostDownloadContextMenuHook {
                 boolean wantDownload = FeatureFlags.enablePostDownload && downloadOptionValue != null;
                 boolean wantCopyLink = FeatureFlags.copyMediaLink && copyLinkOptionValue != null;
                 boolean wantCopyImage = FeatureFlags.offerCopyImage && copyImageOptionValue != null;
-                if (!wantDownload && !wantCopyLink && !wantCopyImage) return;
+                boolean wantInfo = FeatureFlags.offerMediaInfo && mediaInfoOptionValue != null;
+                boolean wantSpeed = FeatureFlags.offerPlaybackSpeed && speedOptionValue != null;
+                if (!wantDownload && !wantCopyLink && !wantCopyImage && !wantInfo && !wantSpeed) return;
 
                 // Don't react to our own target option types (suppressed in beforeHook)
                 Object opt = param.args[idxOption];
                 if (opt == downloadOptionValue || opt == copyLinkOptionValue
-                        || (opt != null && opt == copyImageOptionValue)) return;
+                        || (opt != null && (opt == copyImageOptionValue || opt == mediaInfoOptionValue
+                                || opt == speedOptionValue))) return;
 
                 Object self = param.args[idxSelf];
                 boolean alreadyProcessed;
@@ -303,6 +320,8 @@ public class PostDownloadContextMenuHook {
                 if (wantDownload) injectRow(param, downloadOptionValue, R.string.ig_dl_title);
                 if (wantCopyLink) injectRow(param, copyLinkOptionValue, R.string.ig_copy_link_title);
                 if (wantCopyImage) injectRow(param, copyImageOptionValue, R.string.ig_download_choice_copy_image);
+                if (wantInfo) injectRow(param, mediaInfoOptionValue, R.string.ig_media_info_title);
+                if (wantSpeed) injectRow(param, speedOptionValue, R.string.ig_playback_speed_title);
             }
         });
 
@@ -339,7 +358,8 @@ public class PostDownloadContextMenuHook {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 if (!FeatureFlags.enablePostDownload && !FeatureFlags.enableReelDownload
-                        && !FeatureFlags.copyMediaLink && !FeatureFlags.offerCopyImage) return;
+                        && !FeatureFlags.copyMediaLink && !FeatureFlags.offerCopyImage
+                        && !FeatureFlags.offerMediaInfo && !FeatureFlags.offerPlaybackSpeed) return;
                 onOptionClicked(param);
             }
         };
@@ -432,12 +452,18 @@ public class PostDownloadContextMenuHook {
                             && !original.contains(copyLinkOptionValue);
                     boolean addCopyImage = FeatureFlags.offerCopyImage && copyImageOptionValue != null
                             && !original.contains(copyImageOptionValue);
-                    if (!addDownload && !addCopyLink && !addCopyImage) return;
+                    boolean addInfo = FeatureFlags.offerMediaInfo && mediaInfoOptionValue != null
+                            && !original.contains(mediaInfoOptionValue);
+                    boolean addSpeed = FeatureFlags.offerPlaybackSpeed && speedOptionValue != null
+                            && !original.contains(speedOptionValue);
+                    if (!addDownload && !addCopyLink && !addCopyImage && !addInfo && !addSpeed) return;
 
                     List<Object> patched = new ArrayList<>(original);
                     if (addDownload) patched.add(downloadOptionValue);
                     if (addCopyLink) patched.add(copyLinkOptionValue);
                     if (addCopyImage) patched.add(copyImageOptionValue);
+                    if (addInfo) patched.add(mediaInfoOptionValue);
+                    if (addSpeed) patched.add(speedOptionValue);
                     param.setResult(patched);
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Post) ❌ allowlist patch failed: " + t);
@@ -515,7 +541,9 @@ public class PostDownloadContextMenuHook {
                     && (FeatureFlags.enablePostDownload || FeatureFlags.enableReelDownload);
             boolean isCopyLink = option.equals("COPY_LINK") && FeatureFlags.copyMediaLink;
             boolean isCopyImage = option.equals(COPY_IMAGE_CARRIER) && FeatureFlags.offerCopyImage;
-            if (!isDownload && !isCopyLink && !isCopyImage) return;
+            boolean isInfo = option.equals(MEDIA_INFO_CARRIER) && FeatureFlags.offerMediaInfo;
+            boolean isSpeed = option.equals(SPEED_CARRIER) && FeatureFlags.offerPlaybackSpeed;
+            if (!isDownload && !isCopyLink && !isCopyImage && !isInfo && !isSpeed) return;
 
             param.setResult(null); // consume the event
 
@@ -527,6 +555,7 @@ public class PostDownloadContextMenuHook {
                 return;
             }
 
+            if (isSpeed) { PlaybackSpeedHook.showChooser(ctx); return; }
             Object media = findMediaViaMenuCreator(thisObj);
             if (media == null) media = findMedia(thisObj);
             if (media == null) {
@@ -535,6 +564,7 @@ public class PostDownloadContextMenuHook {
                 return;
             }
 
+            if (isInfo) { MediaInfo.show(ctx, media, thisObj); return; }
             if (isCopyLink)       triggerCopyLink(ctx, media, thisObj);
             else if (isCopyImage) triggerCopyImage(ctx, media, thisObj);
             else                  triggerDownload(ctx, media, thisObj);
