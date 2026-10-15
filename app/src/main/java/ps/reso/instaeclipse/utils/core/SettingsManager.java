@@ -71,6 +71,7 @@ public class SettingsManager {
         editor.putBoolean("hideThreadsSuggestions", FeatureFlags.hideThreadsSuggestions);
         editor.putBoolean("hideLikedPosts", FeatureFlags.hideLikedPosts);
         editor.putBoolean("hideCommunityNotes", FeatureFlags.hideCommunityNotes);
+        editor.putBoolean("expandCaptions", FeatureFlags.expandCaptions);
         editor.putBoolean("offerAudioDownload", FeatureFlags.offerAudioDownload);
         editor.putBoolean("offerCopyImage", FeatureFlags.offerCopyImage);
         editor.putBoolean("markUnsentInThread", FeatureFlags.markUnsentInThread);
@@ -194,6 +195,7 @@ public class SettingsManager {
         FeatureFlags.hideThreadsSuggestions = prefs.getBoolean("hideThreadsSuggestions", false);
         FeatureFlags.hideLikedPosts = prefs.getBoolean("hideLikedPosts", false);
         FeatureFlags.hideCommunityNotes = prefs.getBoolean("hideCommunityNotes", false);
+        FeatureFlags.expandCaptions = prefs.getBoolean("expandCaptions", false);
         FeatureFlags.offerAudioDownload = prefs.getBoolean("offerAudioDownload", false);
         FeatureFlags.offerCopyImage = prefs.getBoolean("offerCopyImage", false);
         FeatureFlags.markUnsentInThread = prefs.getBoolean("markUnsentInThread", false);

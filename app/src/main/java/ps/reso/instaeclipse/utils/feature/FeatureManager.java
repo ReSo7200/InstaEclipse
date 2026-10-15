@@ -109,6 +109,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("HideThreadsSuggestions");
         }
 
+        if (FeatureFlags.expandCaptions) {
+            FeatureStatusTracker.setEnabled("ExpandCaptions", R.string.ig_dialog_clean_feed_expand_captions);
+        } else {
+            FeatureStatusTracker.setDisabled("ExpandCaptions");
+        }
+
         if (FeatureFlags.hideCommunityNotes) {
             FeatureStatusTracker.setEnabled("HideCommunityNotes", R.string.ig_dialog_clean_feed_hide_community_notes);
         } else {

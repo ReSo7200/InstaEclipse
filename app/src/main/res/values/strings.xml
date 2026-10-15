@@ -414,6 +414,7 @@
     <string name="ig_dialog_misc_disable_video_autoplay">Disable Video Autoplay</string>
     <string name="ig_dialog_misc_spoof_last_seen">Spoof Last Seen (freeze)</string>
     <string name="ig_dialog_misc_disable_repost">Disable Repost</string>
+    <string name="ig_dialog_clean_feed_expand_captions">Always Show Full Captions (restart IG)</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Hide Community Notes</string>
     <string name="ig_dialog_misc_like_undo">Undo Window for Likes (4 s)</string>
     <string name="ig_like_undo_bar">❤ Liked · UNDO</string>

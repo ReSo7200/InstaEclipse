@@ -1178,6 +1178,13 @@ public class DialogUtils {
         });
         layout.addView(hideNotesSwitch);
 
+        ToggleRow expandSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_expand_captions), FeatureFlags.expandCaptions);
+        expandSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.expandCaptions = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(expandSwitch);
+
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clean_feed), layout, () -> {});
     }
 

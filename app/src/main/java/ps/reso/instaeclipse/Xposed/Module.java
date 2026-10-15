@@ -348,6 +348,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | ExactTime): ❌ Failed to hook");
                     }
 
+                    // Auto-expand feed captions (#246)
+                    try {
+                        if (!skip("ExpandCaptionsHook")) new ps.reso.instaeclipse.mods.feed.ExpandCaptionsHook().install(dexKitBridge);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | ExpandCaptions): ❌ Failed to hook");
+                    }
+
                     // Hide community notes (#259)
                     try {
                         if (!skip("HideCommunityNotesHook")) new ps.reso.instaeclipse.mods.feed.HideCommunityNotesHook().install(dexKitBridge, hostClassLoader);
