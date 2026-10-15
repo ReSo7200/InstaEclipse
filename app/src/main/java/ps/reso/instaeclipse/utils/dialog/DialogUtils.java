@@ -1302,7 +1302,8 @@ public class DialogUtils {
                 createSwitch(context, R.drawable.ic_block, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_hide_share_create_group), FeatureFlags.hideShareCreateGroup),
                 createSwitch(context, R.drawable.ic_timer, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_exact_timestamps), FeatureFlags.exactTimestamps),
                 createSwitch(context, R.drawable.ic_heart, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_like_undo), FeatureFlags.likeUndo),
-                createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_profile_follows_label), FeatureFlags.profileFollowsYouLabel)
+                createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_profile_follows_label), FeatureFlags.profileFollowsYouLabel),
+                createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_viewer_search), FeatureFlags.storyViewerSearch)
                 // Lock controls moved to their own grouped "Lock" card below (see buildLockCard).
         };
 
@@ -1378,6 +1379,9 @@ public class DialogUtils {
                         break;
                     case 16:
                         FeatureFlags.profileFollowsYouLabel = isChecked;
+                        break;
+                    case 17:
+                        FeatureFlags.storyViewerSearch = isChecked;
                         break;
                 }
 

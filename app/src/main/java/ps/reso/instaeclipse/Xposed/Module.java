@@ -404,6 +404,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|JumpFirst) ❌ Failed to hook");
                     }
 
+                    // Search your story viewers (Plus-style)
+                    try {
+                        if (!skip("StoryViewerSearchHook")) new ps.reso.instaeclipse.mods.ui.StoryViewerSearchHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|ViewerSearch) ❌ Failed to hook");
+                    }
+
                     // Like undo window (#235) — after HideSuggestedFeedItemsHook (has_liked getter)
                     try {
                         if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);

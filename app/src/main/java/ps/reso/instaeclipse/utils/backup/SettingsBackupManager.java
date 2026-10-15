@@ -94,6 +94,7 @@ public class SettingsBackupManager {
         s.put("exactTimestamps",         FeatureFlags.exactTimestamps);
         s.put("likeUndo",                FeatureFlags.likeUndo);
         s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
+        s.put("storyViewerSearch",       FeatureFlags.storyViewerSearch);
         s.put("showFollowerToast",       FeatureFlags.showFollowerToast);
         s.put("showFeatureToasts",       FeatureFlags.showFeatureToasts);
         s.put("enableStoryMentions",     FeatureFlags.enableStoryMentions);
@@ -198,6 +199,7 @@ public class SettingsBackupManager {
         if (s.has("exactTimestamps"))        FeatureFlags.exactTimestamps        = s.getBoolean("exactTimestamps");
         if (s.has("likeUndo"))               FeatureFlags.likeUndo               = s.getBoolean("likeUndo");
         if (s.has("profileFollowsYouLabel")) FeatureFlags.profileFollowsYouLabel = s.getBoolean("profileFollowsYouLabel");
+        if (s.has("storyViewerSearch"))      FeatureFlags.storyViewerSearch      = s.getBoolean("storyViewerSearch");
         if (s.has("showFollowerToast"))      FeatureFlags.showFollowerToast      = s.getBoolean("showFollowerToast");
         if (s.has("showFeatureToasts"))      FeatureFlags.showFeatureToasts      = s.getBoolean("showFeatureToasts");
         if (s.has("enableStoryMentions"))    FeatureFlags.enableStoryMentions    = s.getBoolean("enableStoryMentions");

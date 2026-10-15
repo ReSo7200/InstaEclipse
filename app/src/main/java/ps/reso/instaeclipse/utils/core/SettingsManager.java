@@ -110,6 +110,7 @@ public class SettingsManager {
         editor.putBoolean("exactTimestamps", FeatureFlags.exactTimestamps);
         editor.putBoolean("likeUndo", FeatureFlags.likeUndo);
         editor.putBoolean("profileFollowsYouLabel", FeatureFlags.profileFollowsYouLabel);
+        editor.putBoolean("storyViewerSearch", FeatureFlags.storyViewerSearch);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
         editor.putBoolean("showFeatureToasts", FeatureFlags.showFeatureToasts);
         editor.putBoolean("enableStoryMentions", FeatureFlags.enableStoryMentions);
@@ -243,6 +244,7 @@ public class SettingsManager {
         FeatureFlags.exactTimestamps = prefs.getBoolean("exactTimestamps", false);
         FeatureFlags.likeUndo = prefs.getBoolean("likeUndo", false);
         FeatureFlags.profileFollowsYouLabel = prefs.getBoolean("profileFollowsYouLabel", false);
+        FeatureFlags.storyViewerSearch = prefs.getBoolean("storyViewerSearch", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);
         FeatureFlags.showFeatureToasts = prefs.getBoolean("showFeatureToasts", false);
         FeatureFlags.enableStoryMentions = prefs.getBoolean("enableStoryMentions", false);

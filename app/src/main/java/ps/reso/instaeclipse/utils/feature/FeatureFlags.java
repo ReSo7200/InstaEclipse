@@ -92,6 +92,7 @@ public class FeatureFlags {
     public static boolean showFollowerToast = false;
     public static boolean showFeatureToasts = false;
     public static boolean disableRepost = false;
+    public static boolean storyViewerSearch = false; // search box over your story viewers list
     public static boolean profileFollowsYouLabel = false; // "Follows you" label on profiles (#239)
     public static boolean likeUndo = false; // hold likes for a few seconds with an Undo bar (#235)
     public static boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)

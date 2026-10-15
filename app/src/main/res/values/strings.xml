@@ -434,6 +434,8 @@
     <string name="ig_playback_speed_next">Speed set — applies to the next video that starts</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Hide Notes in Messages</string>
     <string name="ig_dialog_downloader_voice">Download Voice Messages (long-press)</string>
+    <string name="ig_dialog_misc_viewer_search">Search Your Story Viewers</string>
+    <string name="ig_viewer_search_hint">Search viewers</string>
     <string name="ig_dialog_misc_like_undo">Undo Window for Likes (4 s)</string>
     <string name="ig_like_undo_bar">❤ Liked · UNDO</string>
     <string name="ig_like_undo_cancelled">Like cancelled — refresh to update the heart</string>
