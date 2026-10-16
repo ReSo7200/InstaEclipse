@@ -43,13 +43,8 @@ public class GhostDMMarkAsReadHook {
 
                     View view = (View) param.thisObject;
 
-                    if (sCachedContainerId == 0) {
-                        @SuppressLint("DiscouragedApi")
-                        int id = view.getContext().getResources().getIdentifier(
-                                "row_thread_composer_buttons_container", "id",
-                                view.getContext().getPackageName());
-                        sCachedContainerId = id;
-                    }
+                    // Cached, including "not found" (a miss used to be looked up on every attach).
+                    sCachedContainerId = ps.reso.instaeclipse.utils.ui.ResIds.id(view.getContext(), "row_thread_composer_buttons_container");
 
                     if (sCachedContainerId == 0 || view.getId() != sCachedContainerId) return;
                     if (!(view.getParent() instanceof ViewGroup parent)) return;

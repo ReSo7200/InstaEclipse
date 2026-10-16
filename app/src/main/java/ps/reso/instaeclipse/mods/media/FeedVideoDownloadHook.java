@@ -245,15 +245,10 @@ public class FeedVideoDownloadHook {
                             View view = (View) param.thisObject;
                             Context ctx = view.getContext();
 
-                            @SuppressLint("DiscouragedApi")
-                            int feedLikeId = ctx.getResources().getIdentifier(
-                                    "row_feed_button_like", "id", ctx.getPackageName());
-                            @SuppressLint("DiscouragedApi")
-                            int reelLikeId = ctx.getResources().getIdentifier(
-                                    "like_button", "id", ctx.getPackageName());
-                            @SuppressLint("DiscouragedApi")
-                            int clipsUfiId = ctx.getResources().getIdentifier(
-                                    "clips_ufi_component", "id", ctx.getPackageName());
+                            // Cached ids: this runs for every view attached anywhere in the app.
+                            int feedLikeId = ps.reso.instaeclipse.utils.ui.ResIds.id(ctx, "row_feed_button_like");
+                            int reelLikeId = ps.reso.instaeclipse.utils.ui.ResIds.id(ctx, "like_button");
+                            int clipsUfiId = ps.reso.instaeclipse.utils.ui.ResIds.id(ctx, "clips_ufi_component");
 
                             int viewId = view.getId();
                             boolean isFeedLike = feedLikeId != 0 && viewId == feedLikeId;

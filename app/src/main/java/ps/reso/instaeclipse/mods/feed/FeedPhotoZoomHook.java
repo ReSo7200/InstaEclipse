@@ -114,10 +114,7 @@ public class FeedPhotoZoomHook {
      * ancestor's own subtree (siblings like the like/save buttons, not just further ancestors).
      */
     private static boolean isInsideFeedRow(View view) {
-        if (sFeedLikeButtonId == 0) {
-            sFeedLikeButtonId = view.getContext().getResources()
-                    .getIdentifier("row_feed_button_like", "id", view.getContext().getPackageName());
-        }
+        sFeedLikeButtonId = ps.reso.instaeclipse.utils.ui.ResIds.id(view.getContext(), "row_feed_button_like");
         if (sFeedLikeButtonId == 0) return false; // can't verify — be conservative and skip
 
         ViewParent parent = view.getParent();

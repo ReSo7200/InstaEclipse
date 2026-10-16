@@ -36,22 +36,13 @@ public class GhostChannelMarkAsReadHook {
                     View view = (View) param.thisObject;
                     Context context = view.getContext();
 
-                    if (sCachedSeenStateId == 0) {
-                        @SuppressLint("DiscouragedApi")
-                        int id = context.getResources().getIdentifier(
-                                "seen_state_text", "id", context.getPackageName());
-                        sCachedSeenStateId = id;
-                    }
+                    // Cached, including "not found" (a miss used to be looked up on every attach).
+                    sCachedSeenStateId = ps.reso.instaeclipse.utils.ui.ResIds.id(context, "seen_state_text");
 
                     if (sCachedSeenStateId == 0 || view.getId() != sCachedSeenStateId) return;
                     if (!(view instanceof TextView seenTextView)) return;
 
-                    if (sCachedHeaderButtonsId == 0) {
-                        @SuppressLint("DiscouragedApi")
-                        int id = context.getResources().getIdentifier(
-                                "header_right_buttons", "id", context.getPackageName());
-                        sCachedHeaderButtonsId = id;
-                    }
+                    sCachedHeaderButtonsId = ps.reso.instaeclipse.utils.ui.ResIds.id(context, "header_right_buttons");
 
                     if (sCachedHeaderButtonsId != 0) {
                         View container = view.getRootView().findViewById(sCachedHeaderButtonsId);
