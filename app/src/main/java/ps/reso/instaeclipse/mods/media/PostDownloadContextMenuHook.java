@@ -617,6 +617,14 @@ public class PostDownloadContextMenuHook {
             if (kids != null && carouselIdx >= 0 && carouselIdx < kids.size() && kids.get(carouselIdx) != null)
                 audioMedia = kids.get(carouselIdx);
         } catch (Throwable ignored) {}
+        // Carousel: one sheet with every choice (current / all / audio of this slide). A separate
+        // "Video or audio" step first would hide which item gets downloaded.
+        if (urls.size() > 1) {
+            final Object slide = audioMedia;
+            FeedVideoDownloadHook.mainHandler.post(() ->
+                    FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx, slide));
+            return;
+        }
         FeedVideoDownloadHook.offerAudioOrRun(ctx, audioMedia, shownUrl, finalUser, finalId, "post", () ->
                 FeedVideoDownloadHook.mainHandler.post(() ->
                         FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx)));

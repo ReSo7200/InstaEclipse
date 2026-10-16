@@ -1456,20 +1456,30 @@ public class FeedVideoDownloadHook {
      * track) next to the normal download. Otherwise it just runs {@code downloadAction}, so the
      * default download path is unchanged. (Copy image, #228, is its own post-menu row.)
      */
-    static void offerAudioOrRun(Context ctx, Object media, String imageUrl, String username, String mediaId,
-                                String type, Runnable downloadAction) {
-        // Prefer the DASH audio track; a video served only as a progressive MP4 has none, so fall
-        // back to the video itself and pull its audio out after download.
-        String dashAudio = FeatureFlags.offerAudioDownload ? extractAudioUrl(media) : null;
-        String videoForAudio = FeatureFlags.offerAudioDownload && dashAudio == null
-                ? bestVideoUrlFromMedia(media) : null;
-        final String audio = dashAudio != null ? dashAudio : videoForAudio;
-        final boolean extractFromVideo = dashAudio == null && videoForAudio != null;
-        // A silent video has nothing to extract: only offer audio when Instagram says it has sound.
+    /**
+     * Where the audio of {@code media} can be saved from, or null when audio-only should not be
+     * offered (option off, not a video, or Instagram marks it silent). Prefers the DASH audio track;
+     * a video served only as a progressive MP4 has none, so its audio is pulled out after download.
+     * Returns {url, extractFromVideo}.
+     */
+    static Object[] audioSource(Object media) {
+        if (!FeatureFlags.offerAudioDownload || media == null) return null;
+        String dashAudio = extractAudioUrl(media);
+        String videoForAudio = dashAudio == null ? bestVideoUrlFromMedia(media) : null;
         Boolean sound = hasAudio(media);
         ModuleLog.line("(IE|DL|Audio) has_audio=" + sound + " dash=" + (dashAudio != null)
                 + " video=" + (videoForAudio != null));
-        if (audio == null || Boolean.FALSE.equals(sound)) { downloadAction.run(); return; }
+        String url = dashAudio != null ? dashAudio : videoForAudio;
+        if (url == null || Boolean.FALSE.equals(sound)) return null;
+        return new Object[]{url, dashAudio == null};
+    }
+
+    static void offerAudioOrRun(Context ctx, Object media, String imageUrl, String username, String mediaId,
+                                String type, Runnable downloadAction) {
+        Object[] src = audioSource(media);
+        if (src == null) { downloadAction.run(); return; }
+        final String audio = (String) src[0];
+        final boolean extractFromVideo = (Boolean) src[1];
         Context host = ctx instanceof android.app.Activity ? ctx
                 : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         if (host == null) { downloadAction.run(); return; }
@@ -2392,6 +2402,16 @@ public class FeedVideoDownloadHook {
     @SuppressLint("DefaultLocale")
     static void showPostDownloadDialog(Context ctx, List<String> urls,
                                        String username, String mediaId, int currentIndex) {
+        showPostDownloadDialog(ctx, urls, username, mediaId, currentIndex, null);
+    }
+
+    /**
+     * @param slideMedia the carousel slide being viewed; when it is a video with sound the carousel
+     *                   sheet also offers "Audio only" for it, so every choice is on one screen.
+     */
+    static void showPostDownloadDialog(Context ctx, List<String> urls,
+                                       String username, String mediaId, int currentIndex,
+                                       Object slideMedia) {
         if (urls.isEmpty()) {
             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_post_url_not_found), Toast.LENGTH_SHORT).show();
             return;
@@ -2421,7 +2441,8 @@ public class FeedVideoDownloadHook {
         // Carousel: modern bottom sheet with two pill buttons
         int n = urls.size();
         int safeIdx = (currentIndex >= 0 && currentIndex < n) ? currentIndex : 0;
-        showCarouselBottomSheet(ctx, urls, username, mediaId, n, safeIdx);
+        showCarouselBottomSheet(ctx, urls, username, mediaId, n, safeIdx,
+                slideMedia != null ? audioSource(slideMedia) : null);
     }
 
     // ── Modern bottom sheet for carousel download ─────────────────────────────
@@ -2459,7 +2480,7 @@ public class FeedVideoDownloadHook {
 
     private static void showCarouselBottomSheet(Context ctx, List<String> urls,
                                                  String username, String mediaId,
-                                                 int n, int safeIdx) {
+                                                 int n, int safeIdx, Object[] audioSrc) {
         try {
             float dp   = ctx.getResources().getDisplayMetrics().density;
             boolean dk = isDarkTheme(ctx);
@@ -2572,6 +2593,22 @@ public class FeedVideoDownloadHook {
                 });
             });
             sheet.addView(btnAll);
+
+            // Button: audio of the slide being viewed (only when it is a video with sound)
+            if (audioSrc != null) {
+                String user = username != null ? username : "post";
+                Button btnAudio = makePillButton(ctx,
+                        I18n.t(ctx, R.string.ig_download_choice_audio) + "  ·  " + (safeIdx + 1) + "/" + n,
+                        secondBg, secondText, dp);
+                btnAudio.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    downloadAudio(ctx, (String) audioSrc[0],
+                            withSlide(buildFilename(user, "post_audio", mediaId, true)
+                                    .replaceAll("\\.mp4$", ".m4a"), safeIdx + 1, n),
+                            user, (Boolean) audioSrc[1]);
+                });
+                sheet.addView(btnAudio);
+            }
 
             dialog.setContentView(sheet);
             Window w = dialog.getWindow();
