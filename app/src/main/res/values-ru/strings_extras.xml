@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">Стартовая вкладка</string>
     <string name="ig_media_open_with">Открыть с помощью…</string>
     <string name="ig_lock_try_again_in">Слишком много попыток. Повторите через %1$d с</string>
+    <string name="loc_picker_locating">Поиск места…</string>
+    <string name="loc_picker_unnamed">Место без названия</string>
+    <string name="ig_dialog_location_current_title">Текущее местоположение</string>
+    <string name="ig_dialog_location_recent">Недавние места</string>
+    <string name="ig_dialog_location_applied">Местоположение применено</string>
 </resources>

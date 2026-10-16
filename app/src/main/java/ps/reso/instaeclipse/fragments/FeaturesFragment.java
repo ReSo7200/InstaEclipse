@@ -1487,21 +1487,34 @@ public class FeaturesFragment extends Fragment {
         double lat = 0.0, lng = 0.0;
         try { lat = Double.parseDouble(localCache.getString("spoofLat", "0")); } catch (Throwable ignored) {}
         try { lng = Double.parseDouble(localCache.getString("spoofLng", "0")); } catch (Throwable ignored) {}
-        String coordLabel = (lat == 0.0 && lng == 0.0)
+        String label = localCache.getString("spoofLabel", "");
+        String place = !ps.reso.instaeclipse.mods.location.LocationPresets.valid(lat, lng)
                 ? getString(R.string.ig_dialog_location_unset)
-                : getString(R.string.ig_dialog_location_current, lat, lng);
+                : !label.isEmpty() ? label : ps.reso.instaeclipse.mods.location.LocationPresets.coords(lat, lng);
 
-        defs.add(getString(R.string.feat_options));
-        defs.add(Arrays.asList(createClickable(R.drawable.ic_pin, "#FFD60A",
-                getString(R.string.ig_dialog_location_pick) + " — " + coordLabel, () -> {
-                    double curLat = 0.0, curLng = 0.0;
-                    try { curLat = Double.parseDouble(localCache.getString("spoofLat", "0")); } catch (Throwable ignored) {}
-                    try { curLng = Double.parseDouble(localCache.getString("spoofLng", "0")); } catch (Throwable ignored) {}
-                    Intent i = new Intent(requireContext(), LocationPickerActivity.class);
-                    i.putExtra(LocationPickerActivity.EXTRA_LAT, curLat);
-                    i.putExtra(LocationPickerActivity.EXTRA_LNG, curLng);
-                    locationPickerLauncher.launch(i);
-                })));
+        final double curLat = lat, curLng = lng;
+        defs.add(getString(R.string.ig_dialog_location_current_title));
+        defs.add(Arrays.asList(createNav(R.drawable.ic_search, "#FFD60A", place, () -> {
+            Intent i = new Intent(requireContext(), LocationPickerActivity.class);
+            i.putExtra(LocationPickerActivity.EXTRA_LAT, curLat);
+            i.putExtra(LocationPickerActivity.EXTRA_LNG, curLng);
+            locationPickerLauncher.launch(i);
+        })));
+
+        List<ps.reso.instaeclipse.mods.location.LocationPresets.Preset> recent =
+                ps.reso.instaeclipse.mods.location.LocationPresets.parse(localCache.getString("spoofRecent", ""));
+        if (!recent.isEmpty()) {
+            List<FeatureItem> rows = new ArrayList<>();
+            for (ps.reso.instaeclipse.mods.location.LocationPresets.Preset p : recent) {
+                rows.add(createNav(R.drawable.ic_timer, "#FFD60A", p.title(), () -> {
+                    ps.reso.instaeclipse.mods.location.LocationPresets.applyFromCompanion(requireContext(), p);
+                    Toast.makeText(requireContext(), R.string.ig_dialog_location_applied, Toast.LENGTH_SHORT).show();
+                    loadLocationMenu();
+                }));
+            }
+            defs.add(getString(R.string.ig_dialog_location_recent));
+            defs.add(rows);
+        }
 
         return defs;
     }

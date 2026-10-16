@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">علامة التبويب عند البدء</string>
     <string name="ig_media_open_with">فتح باستخدام…</string>
     <string name="ig_lock_try_again_in">محاولات كثيرة. حاول مجددًا بعد %1$d ث</string>
+    <string name="loc_picker_locating">جارٍ البحث عن المكان…</string>
+    <string name="loc_picker_unnamed">مكان بلا اسم</string>
+    <string name="ig_dialog_location_current_title">الموقع الحالي</string>
+    <string name="ig_dialog_location_recent">الأماكن الأخيرة</string>
+    <string name="ig_dialog_location_applied">تم تطبيق الموقع</string>
 </resources>

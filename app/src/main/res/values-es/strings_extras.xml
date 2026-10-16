@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">Pestaña de inicio</string>
     <string name="ig_media_open_with">Abrir con…</string>
     <string name="ig_lock_try_again_in">Demasiados intentos. Vuelve a intentarlo en %1$d s</string>
+    <string name="loc_picker_locating">Buscando lugar…</string>
+    <string name="loc_picker_unnamed">Lugar sin nombre</string>
+    <string name="ig_dialog_location_current_title">Ubicación actual</string>
+    <string name="ig_dialog_location_recent">Lugares recientes</string>
+    <string name="ig_dialog_location_applied">Ubicación aplicada</string>
 </resources>

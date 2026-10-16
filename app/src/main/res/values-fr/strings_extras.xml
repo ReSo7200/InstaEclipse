@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">Onglet de démarrage</string>
     <string name="ig_media_open_with">Ouvrir avec…</string>
     <string name="ig_lock_try_again_in">Trop d\'essais. Réessayez dans %1$d s</string>
+    <string name="loc_picker_locating">Recherche du lieu…</string>
+    <string name="loc_picker_unnamed">Lieu sans nom</string>
+    <string name="ig_dialog_location_current_title">Position actuelle</string>
+    <string name="ig_dialog_location_recent">Lieux récents</string>
+    <string name="ig_dialog_location_applied">Position appliquée</string>
 </resources>

@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">Tab khi khởi động</string>
     <string name="ig_media_open_with">Mở bằng…</string>
     <string name="ig_lock_try_again_in">Thử quá nhiều lần. Thử lại sau %1$d giây</string>
+    <string name="loc_picker_locating">Đang tìm địa điểm…</string>
+    <string name="loc_picker_unnamed">Địa điểm chưa có tên</string>
+    <string name="ig_dialog_location_current_title">Vị trí hiện tại</string>
+    <string name="ig_dialog_location_recent">Gần đây</string>
+    <string name="ig_dialog_location_applied">Đã áp dụng vị trí</string>
 </resources>

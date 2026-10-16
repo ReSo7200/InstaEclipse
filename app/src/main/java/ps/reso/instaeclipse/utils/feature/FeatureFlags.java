@@ -130,6 +130,8 @@ public class FeatureFlags {
     public static volatile boolean spoofLocation = false;
     public static volatile double spoofLat = 0.0;
     public static volatile double spoofLng = 0.0;
+    public static volatile String spoofLabel = "";   // place name for spoofLat/spoofLng
+    public static volatile String spoofRecent = "";  // JSON history, see LocationPresets
 
     // Video Quality (0 = auto/off, else desired height in px, or Integer.MAX_VALUE for max available)
     public static volatile int forceReelQuality = 0;

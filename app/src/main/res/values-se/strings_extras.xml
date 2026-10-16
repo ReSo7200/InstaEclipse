@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">Startflik</string>
     <string name="ig_media_open_with">Öppna med…</string>
     <string name="ig_lock_try_again_in">För många försök. Försök igen om %1$d s</string>
+    <string name="loc_picker_locating">Söker plats…</string>
+    <string name="loc_picker_unnamed">Namnlös plats</string>
+    <string name="ig_dialog_location_current_title">Aktuell plats</string>
+    <string name="ig_dialog_location_recent">Senaste platser</string>
+    <string name="ig_dialog_location_applied">Platsen har tillämpats</string>
 </resources>

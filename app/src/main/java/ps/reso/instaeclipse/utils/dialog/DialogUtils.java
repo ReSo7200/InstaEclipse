@@ -1981,26 +1981,58 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
 
-        String coordLabel = (FeatureFlags.spoofLat == 0.0 && FeatureFlags.spoofLng == 0.0)
-                ? I18n.t(context, R.string.ig_dialog_location_unset)
-                : I18n.t(context, R.string.ig_dialog_location_current, FeatureFlags.spoofLat, FeatureFlags.spoofLng);
+        LinearLayout toggleCard = card(context);
+        toggleCard.addView(spoofSwitch);
+        layout.addView(toggleCard);
 
-        layout.addView(createDivider(context));
-        layout.addView(spoofSwitch);
-        layout.addView(createDivider(context));
-        layout.addView(createActionRow(context, R.drawable.ic_pin,
-                I18n.t(context, R.string.ig_dialog_location_pick) + " — " + coordLabel, "#FFD60A", v -> {
-                    Bundle extras = new Bundle();
-                    extras.putDouble(LocationPickerActivity.EXTRA_LAT, FeatureFlags.spoofLat);
-                    extras.putDouble(LocationPickerActivity.EXTRA_LNG, FeatureFlags.spoofLng);
-                    if (ModuleActivityLauncher.launch(context,
-                            "ps.reso.instaeclipse.mods.location.LocationPickerActivity", extras)) {
-                        if (currentDialog != null) {
-                            try { currentDialog.dismiss(); } catch (Exception ignored) {}
-                            currentDialog = null;
-                        }
+        boolean set = ps.reso.instaeclipse.mods.location.LocationPresets.valid(FeatureFlags.spoofLat, FeatureFlags.spoofLng);
+        String place = !set ? I18n.t(context, R.string.ig_dialog_location_unset)
+                : !FeatureFlags.spoofLabel.isEmpty() ? FeatureFlags.spoofLabel
+                : ps.reso.instaeclipse.mods.location.LocationPresets.coords(FeatureFlags.spoofLat, FeatureFlags.spoofLng);
+
+        LinearLayout current = card(context);
+        current.addView(createInfoSection(context, I18n.t(context, R.string.ig_dialog_location_current_title), place));
+        current.addView(createActionRow(context, R.drawable.ic_search, I18n.t(context, R.string.ig_dialog_location_pick), "#FFD60A", v -> {
+            Bundle extras = new Bundle();
+            extras.putDouble(LocationPickerActivity.EXTRA_LAT, FeatureFlags.spoofLat);
+            extras.putDouble(LocationPickerActivity.EXTRA_LNG, FeatureFlags.spoofLng);
+            if (ModuleActivityLauncher.launch(context,
+                    "ps.reso.instaeclipse.mods.location.LocationPickerActivity", extras)) {
+                if (currentDialog != null) {
+                    try { currentDialog.dismiss(); } catch (Exception ignored) {}
+                    currentDialog = null;
+                }
+            }
+        }));
+        layout.addView(current);
+
+        java.util.List<ps.reso.instaeclipse.mods.location.LocationPresets.Preset> recent =
+                ps.reso.instaeclipse.mods.location.LocationPresets.parse(FeatureFlags.spoofRecent);
+        if (!recent.isEmpty()) {
+            layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_dialog_location_recent)));
+            LinearLayout recentCard = card(context);
+            for (ps.reso.instaeclipse.mods.location.LocationPresets.Preset p : recent) {
+                boolean active = set && ps.reso.instaeclipse.mods.location.LocationPresets.distanceMeters(
+                        p.lat, p.lng, FeatureFlags.spoofLat, FeatureFlags.spoofLng) < 5;
+                RadioRow row = new RadioRow(context, p.title(), active);
+                row.setOnClickListener(v -> {
+                    FeatureFlags.spoofLat = p.lat;
+                    FeatureFlags.spoofLng = p.lng;
+                    FeatureFlags.spoofLabel = p.label;
+                    FeatureFlags.spoofRecent = ps.reso.instaeclipse.mods.location.LocationPresets.serialize(
+                            ps.reso.instaeclipse.mods.location.LocationPresets.remember(recent, p));
+                    SettingsManager.saveAllFlags();
+                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_location_applied), Toast.LENGTH_SHORT).show();
+                    if (currentDialog != null) {
+                        try { currentDialog.dismiss(); } catch (Exception ignored) {}
+                        currentDialog = null;
                     }
-                }));
+                    showLocationOptions(context);
+                });
+                recentCard.addView(row);
+            }
+            layout.addView(recentCard);
+        }
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_location), layout, () -> {
         });

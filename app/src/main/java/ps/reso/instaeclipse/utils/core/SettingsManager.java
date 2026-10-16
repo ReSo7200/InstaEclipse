@@ -108,6 +108,8 @@ public class SettingsManager {
         editor.putBoolean("spoofLocation", FeatureFlags.spoofLocation);
         editor.putString("spoofLat", String.valueOf(FeatureFlags.spoofLat));
         editor.putString("spoofLng", String.valueOf(FeatureFlags.spoofLng));
+        editor.putString("spoofLabel", FeatureFlags.spoofLabel);
+        editor.putString("spoofRecent", FeatureFlags.spoofRecent);
         editor.putInt("forceReelQuality", FeatureFlags.forceReelQuality);
         editor.putBoolean("disableRepost", FeatureFlags.disableRepost);
         editor.putBoolean("hideShareCreateGroup", FeatureFlags.hideShareCreateGroup);
@@ -255,6 +257,8 @@ public class SettingsManager {
         FeatureFlags.spoofLocation = prefs.getBoolean("spoofLocation", false);
         FeatureFlags.spoofLat = readDoublePref(prefs, "spoofLat", 0.0);
         FeatureFlags.spoofLng = readDoublePref(prefs, "spoofLng", 0.0);
+        FeatureFlags.spoofLabel = prefs.getString("spoofLabel", "");
+        FeatureFlags.spoofRecent = prefs.getString("spoofRecent", "");
         FeatureFlags.forceReelQuality = prefs.getInt("forceReelQuality", 0);
         FeatureFlags.disableRepost = prefs.getBoolean("disableRepost", false);
         FeatureFlags.hideShareCreateGroup = prefs.getBoolean("hideShareCreateGroup", false);

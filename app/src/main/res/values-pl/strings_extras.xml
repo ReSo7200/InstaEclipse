@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">Karta startowa</string>
     <string name="ig_media_open_with">Otwórz za pomocą…</string>
     <string name="ig_lock_try_again_in">Zbyt wiele prób. Spróbuj ponownie za %1$d s</string>
+    <string name="loc_picker_locating">Szukanie miejsca…</string>
+    <string name="loc_picker_unnamed">Miejsce bez nazwy</string>
+    <string name="ig_dialog_location_current_title">Bieżąca lokalizacja</string>
+    <string name="ig_dialog_location_recent">Ostatnie miejsca</string>
+    <string name="ig_dialog_location_applied">Lokalizacja ustawiona</string>
 </resources>

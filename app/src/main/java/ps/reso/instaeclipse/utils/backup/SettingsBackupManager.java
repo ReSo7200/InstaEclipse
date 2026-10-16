@@ -121,6 +121,8 @@ public class SettingsBackupManager {
         for (String flag : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags())
             s.put(flag, ps.reso.instaeclipse.utils.feature.ExtrasFeatures.get(flag));
         s.put("customShareDomain", FeatureFlags.customShareDomain);
+        s.put("spoofLabel", FeatureFlags.spoofLabel);
+        s.put("spoofRecent", FeatureFlags.spoofRecent);
         s.put("startupTab", FeatureFlags.startupTab);
         root.put("settings", s);
         return root.toString(2);
@@ -137,6 +139,8 @@ public class SettingsBackupManager {
         JSONObject s = root.has("settings") ? root.getJSONObject("settings") : root;
         if (s.has("startupTab") && java.util.Arrays.asList(ps.reso.instaeclipse.mods.ui.StartupTabHook.TABS)
                 .contains(s.getString("startupTab"))) FeatureFlags.startupTab = s.getString("startupTab");
+        if (s.has("spoofLabel")) FeatureFlags.spoofLabel = s.getString("spoofLabel");
+        if (s.has("spoofRecent")) FeatureFlags.spoofRecent = s.getString("spoofRecent");
         if (s.has("customShareDomain")) FeatureFlags.customShareDomain = ShareDomain.normalize(s.getString("customShareDomain"));
         for (String flag : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags())
             if (s.has(flag)) ps.reso.instaeclipse.utils.feature.ExtrasFeatures.set(flag, s.getBoolean(flag));

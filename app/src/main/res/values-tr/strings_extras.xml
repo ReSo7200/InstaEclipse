@@ -19,4 +19,9 @@
     <string name="ig_dialog_extras_startup_tab">Başlangıç Sekmesi</string>
     <string name="ig_media_open_with">Birlikte aç…</string>
     <string name="ig_lock_try_again_in">Çok fazla deneme. %1$d sn sonra tekrar deneyin</string>
+    <string name="loc_picker_locating">Yer aranıyor…</string>
+    <string name="loc_picker_unnamed">Adsız konum</string>
+    <string name="ig_dialog_location_current_title">Geçerli konum</string>
+    <string name="ig_dialog_location_recent">Son konumlar</string>
+    <string name="ig_dialog_location_applied">Konum uygulandı</string>
 </resources>
