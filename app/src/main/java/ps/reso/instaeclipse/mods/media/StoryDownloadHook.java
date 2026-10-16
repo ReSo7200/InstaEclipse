@@ -1444,6 +1444,7 @@ public class StoryDownloadHook {
 
     private static void downloadToStream(String url, java.io.OutputStream out) throws Exception {
         java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();
         try (java.io.InputStream in = conn.getInputStream()) {

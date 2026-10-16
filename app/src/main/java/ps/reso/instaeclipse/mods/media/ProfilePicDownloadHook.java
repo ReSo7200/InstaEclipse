@@ -219,6 +219,7 @@ public class ProfilePicDownloadHook {
 
     private static void downloadToStream(String url, OutputStream out) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent",
                 "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();

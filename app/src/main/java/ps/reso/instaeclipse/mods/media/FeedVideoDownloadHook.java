@@ -138,7 +138,8 @@ public class FeedVideoDownloadHook {
     private static final Deque<UrlEntry> urlBuffer      = new ArrayDeque<>();
     private static final Deque<UrlEntry> videoUrlBuffer = new ArrayDeque<>(); // DexKit-captured video URLs
     private static final WeakHashMap<View, List<String>> buttonUrls = new WeakHashMap<>();
-    static final ExecutorService executor    = Executors.newCachedThreadPool();
+    // Bounded: at most 4 downloads/lookups at once, extra work queues instead of spawning a thread each.
+    static final ExecutorService executor    = MediaHttp.newDownloadExecutor(4);
     static final Handler         mainHandler = new Handler(Looper.getMainLooper());
 
     // Username + media ID resolved at download trigger time
@@ -3174,6 +3175,7 @@ public class FeedVideoDownloadHook {
 
     static String downloadToFileAndGetType(String url, File dest) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();
         String contentType = conn.getContentType();
@@ -3186,6 +3188,7 @@ public class FeedVideoDownloadHook {
 
     static void downloadToStream(String url, OutputStream out) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();
         try (InputStream in = conn.getInputStream()) {
