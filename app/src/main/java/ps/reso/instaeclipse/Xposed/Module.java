@@ -546,6 +546,12 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | DoubleTapLike): ❌ Failed to hook");
                     }
+                    // ...and in comments and DMs
+                    try {
+                        if (!skip("DoubleTapExtrasHook")) new ps.reso.instaeclipse.mods.misc.DoubleTapExtrasHook().install(dexKitBridge, lpparam.classLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | DoubleTapLike): ❌ comments/DMs: " + t);
+                    }
 
                     // Photo Zoom (long-press)
                     try {
