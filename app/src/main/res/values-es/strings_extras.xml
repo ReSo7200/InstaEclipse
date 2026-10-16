@@ -17,4 +17,5 @@
     <string name="ig_dialog_extras_share_domain_hint">Reemplaza instagram.com en los enlaces que copias o compartes, p. ej. para vistas previas. Déjalo vacío para desactivarlo.</string>
     <string name="ig_dialog_extras_share_domain_invalid">Dominio no válido</string>
     <string name="ig_dialog_extras_startup_tab">Pestaña de inicio</string>
+    <string name="ig_media_open_with">Abrir con…</string>
 </resources>

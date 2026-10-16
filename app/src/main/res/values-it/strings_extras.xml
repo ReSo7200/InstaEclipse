@@ -17,4 +17,5 @@
     <string name="ig_dialog_extras_share_domain_hint">Sostituisce instagram.com nei link copiati o condivisi, ad es. per le anteprime. Lascia vuoto per disattivare.</string>
     <string name="ig_dialog_extras_share_domain_invalid">Dominio non valido</string>
     <string name="ig_dialog_extras_startup_tab">Scheda iniziale</string>
+    <string name="ig_media_open_with">Apri con…</string>
 </resources>

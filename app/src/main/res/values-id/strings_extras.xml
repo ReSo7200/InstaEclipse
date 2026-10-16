@@ -17,4 +17,5 @@
     <string name="ig_dialog_extras_share_domain_hint">Mengganti instagram.com pada tautan yang kamu salin atau bagikan. Kosongkan untuk mematikan.</string>
     <string name="ig_dialog_extras_share_domain_invalid">Domain tidak valid</string>
     <string name="ig_dialog_extras_startup_tab">Tab Awal</string>
+    <string name="ig_media_open_with">Buka dengan…</string>
 </resources>

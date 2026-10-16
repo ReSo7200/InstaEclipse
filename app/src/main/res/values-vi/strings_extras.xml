@@ -17,4 +17,5 @@
     <string name="ig_dialog_extras_share_domain_hint">Thay instagram.com trong các liên kết bạn sao chép hoặc chia sẻ, ví dụ để có bản xem trước nhúng. Để trống để tắt.</string>
     <string name="ig_dialog_extras_share_domain_invalid">Tên miền không hợp lệ</string>
     <string name="ig_dialog_extras_startup_tab">Tab khi khởi động</string>
+    <string name="ig_media_open_with">Mở bằng…</string>
 </resources>

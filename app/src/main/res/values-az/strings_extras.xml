@@ -17,4 +17,5 @@
     <string name="ig_dialog_extras_share_domain_hint">Kopyaladığın və ya paylaşdığın linklərdə instagram.com-u dəyişir. Söndürmək üçün boş burax.</string>
     <string name="ig_dialog_extras_share_domain_invalid">Yanlış domen</string>
     <string name="ig_dialog_extras_startup_tab">Başlanğıc bölməsi</string>
+    <string name="ig_media_open_with">Bununla aç…</string>
 </resources>

@@ -50,8 +50,9 @@ final class MediaInfo {
         ModuleLog.line("(IE|MediaInfo) requested for " + (media == null ? "null" : media.getClass().getName()));
         FeedVideoDownloadHook.executor.submit(() -> {
             String text;
+            String[] mediaUrl = new String[1];
             try {
-                text = build(ctx, media, clickHandler);
+                text = build(ctx, media, clickHandler, mediaUrl);
             } catch (Throwable t) {
                 text = String.valueOf(t);
                 ModuleLog.line("(IE|MediaInfo) ❌ " + t);
@@ -98,6 +99,7 @@ final class MediaInfo {
                         android.content.ClipboardManager cm = (android.content.ClipboardManager) host.getSystemService(Context.CLIPBOARD_SERVICE);
                         cm.setPrimaryClip(android.content.ClipData.newPlainText("media info", body));
                     });
+                    if (mediaUrl[0] != null) dlg.secondary(I18n.t(ctx, R.string.ig_media_open_with), () -> openWith(host, mediaUrl[0]));
                     dlg.primary(I18n.t(ctx, R.string.ig_dialog_ok), null);
                     dlg.show();
                 } catch (Throwable t) {
@@ -107,7 +109,23 @@ final class MediaInfo {
         });
     }
 
-    private static String build(Context ctx, Object media, Object clickHandler) {
+    /** Hands the media's direct CDN link to any app that can open it (player, browser, editor). */
+    private static void openWith(Context host, String url) {
+        try {
+            android.content.Intent view = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url));
+            String path = android.net.Uri.parse(url).getPath();
+            String type = path == null ? null : path.toLowerCase(Locale.ROOT).endsWith(".mp4") ? "video/*"
+                    : path.toLowerCase(Locale.ROOT).matches(".*\\.(jpe?g|png|webp|heic|gif)$") ? "image/*" : null;
+            if (type != null) view.setDataAndType(android.net.Uri.parse(url), type);
+            android.content.Intent chooser = android.content.Intent.createChooser(view, I18n.t(host, R.string.ig_media_open_with));
+            if (!(host instanceof android.app.Activity)) chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            host.startActivity(chooser);
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|MediaInfo) open with: " + t);
+        }
+    }
+
+    private static String build(Context ctx, Object media, Object clickHandler, String[] urlOut) {
         Object target = media;
         String slide = "";
         List<?> children = FeedVideoDownloadHook.carouselChildren(media);
@@ -142,6 +160,7 @@ final class MediaInfo {
 
         List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, target);
         if (urls != null && !urls.isEmpty()) {
+            urlOut[0] = urls.get(0);
             long size = headSize(urls.get(0));
             if (size > 0) sb.append(String.format(Locale.US, "\nFile size: %.2f MB", size / 1048576.0));
         }
