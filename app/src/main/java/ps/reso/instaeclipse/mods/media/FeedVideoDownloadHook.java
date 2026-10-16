@@ -1475,9 +1475,10 @@ public class FeedVideoDownloadHook {
     /**
      * Audio to save for {@code media} (a single post or the carousel slide being viewed): its own
      * sound track, or else the song attached to the post ({@code post}; for a carousel the music
-     * belongs to the album, not the slide). Returns {url, extract, trimStartMs, trimDurationMs}
-     * where extract means "run through the extractor" (video → audio track, or song → clip), and
-     * a duration of -1 keeps everything.
+     * belongs to the album, not the slide). Returns {url, extract, trimStartMs, trimDurationMs,
+     * postWide} where extract means "run through the extractor" (video → audio track, or song →
+     * clip), a duration of -1 keeps everything, and postWide marks the post's song (the same audio
+     * for every item) as opposed to one slide's own sound.
      */
     static Object[] audioSource(Object media, Object post) {
         if (!FeatureFlags.offerAudioDownload || media == null) return null;
@@ -1487,13 +1488,13 @@ public class FeedVideoDownloadHook {
         ModuleLog.line("(IE|DL|Audio) has_audio=" + sound + " dash=" + (dashAudio != null)
                 + " video=" + (videoForAudio != null));
         String url = dashAudio != null ? dashAudio : videoForAudio;
-        if (url != null && !Boolean.FALSE.equals(sound)) return new Object[]{url, dashAudio == null, 0L, -1L};
+        if (url != null && !Boolean.FALSE.equals(sound)) return new Object[]{url, dashAudio == null, 0L, -1L, false};
         Object[] music = musicSource(post);
         if (music == null && post != media) music = musicSource(media);
         return music;
     }
 
-    /** The song attached to a post (Instagram music) as {url, true, startMs, MUSIC_CLIP_MS}, or null. */
+    /** The song attached to a post (Instagram music) as {url, true, startMs, MUSIC_CLIP_MS, true}, or null. */
     static Object[] musicSource(Object media) {
         if (media == null) return null;
         for (Method getter : new Method[]{musicMetadataGetter, clipsMetadataGetter}) {
@@ -1514,7 +1515,7 @@ public class FeedVideoDownloadHook {
                 }
                 ModuleLog.line("(IE|DL|Music) song=\"" + tm.get("title") + "\" by " + tm.get("display_artist")
                         + " start=" + start + "ms");
-                return new Object[]{url, true, start, MUSIC_CLIP_MS};
+                return new Object[]{url, true, start, MUSIC_CLIP_MS, true};
             } catch (Throwable t) {
                 ModuleLog.line("(IE|DL|Music) lookup: " + t);
             }
@@ -2729,14 +2730,19 @@ public class FeedVideoDownloadHook {
             // Button: audio of the slide being viewed (only when it is a video with sound)
             if (audioSrc != null) {
                 String user = username != null ? username : "post";
-                Button btnAudio = makePillButton(ctx,
-                        I18n.t(ctx, R.string.ig_download_choice_audio) + "  ·  " + (safeIdx + 1) + "/" + n,
-                        secondBg, secondText, dp);
+                boolean postWide = (Boolean) audioSrc[4];
+                // The post's song plays over every item, so it is offered once for the post; a
+                // slide's own sound is tied to that slide and keeps its slide number.
+                String audioLabel = I18n.t(ctx, R.string.ig_download_choice_audio)
+                        + (postWide ? "" : "  ·  " + (safeIdx + 1) + "/" + n);
+                String audioName = buildFilename(user, postWide ? "post_music" : "post_audio", mediaId, true)
+                        .replaceAll("\\.mp4$", ".m4a");
+                if (!postWide) audioName = withSlide(audioName, safeIdx + 1, n);
+                final String fAudioName = audioName;
+                Button btnAudio = makePillButton(ctx, audioLabel, secondBg, secondText, dp);
                 btnAudio.setOnClickListener(v -> {
                     dialog.dismiss();
-                    downloadAudio(ctx, (String) audioSrc[0],
-                            withSlide(buildFilename(user, "post_audio", mediaId, true)
-                                    .replaceAll("\\.mp4$", ".m4a"), safeIdx + 1, n),
+                    downloadAudio(ctx, (String) audioSrc[0], fAudioName,
                             user, (Boolean) audioSrc[1], (Long) audioSrc[2], (Long) audioSrc[3]);
                 });
                 sheet.addView(btnAudio);
