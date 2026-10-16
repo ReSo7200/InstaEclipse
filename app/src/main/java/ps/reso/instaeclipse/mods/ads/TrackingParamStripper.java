@@ -14,7 +14,8 @@ public final class TrackingParamStripper {
         String k = key.toLowerCase(java.util.Locale.ROOT);
         return k.equals("igshid") || k.equals("igsh") || k.equals("ig_rid") || k.equals("ig_mid")
                 || k.equals("stkn") || k.startsWith("utm_") || k.equals("story_media_id")
-                || k.equals("saved_by") || k.equals("saved-by");
+                || k.equals("saved_by") || k.equals("saved-by")
+                || k.equals("psln"); // per-share id on "Copy link" (IG 452)
     }
 
     /**

@@ -15,6 +15,12 @@ public class TrackingParamStripperTest {
     }
 
     @Test
+    public void dropsShareLinkId() {
+        assertEquals("https://www.instagram.com/p/DdWEH9hFDtG/",
+                TrackingParamStripper.strip("https://www.instagram.com/p/DdWEH9hFDtG/?psln=cHNzeXhlMDJsYm5k"));
+    }
+
+    @Test
     public void removesWholeQueryWhenOnlyTrackingParams() {
         assertEquals("https://www.instagram.com/reel/XYZ/",
                 TrackingParamStripper.strip("https://www.instagram.com/reel/XYZ/?igsh=abc&utm_source=ig_web_copy_link"));
