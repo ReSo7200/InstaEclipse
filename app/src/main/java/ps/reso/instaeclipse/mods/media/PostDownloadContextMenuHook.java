@@ -669,22 +669,14 @@ public class PostDownloadContextMenuHook {
     }
 
     /**
-     * Finds the current carousel slide index from the click handler object.
-     * Tries a known field name first (fast path), then scans all int fields for the
-     * first value in [0, urlCount) — only the index field will be in that range.
+     * Finds the current carousel slide index from the click handler object by scanning its int
+     * fields (no obfuscated field name) for the first value in (0, urlCount) — only the index
+     * field will be in that range. Slide 0 is the default when nothing matches.
      */
     static int findCarouselIndex(Object obj, int urlCount) {
         if (obj == null || urlCount <= 1) return 0;
 
-        // Fast path: try the currently known field name
-        try {
-            Field f = obj.getClass().getDeclaredField("A00");
-            f.setAccessible(true);
-            int v = f.getInt(obj);
-            if (v >= 0 && v < urlCount) return v;
-        } catch (Throwable ignored) {}
-
-        // Fallback: scan all int fields for a value that fits as a carousel index
+        // Scan all int fields for a value that fits as a carousel index
         for (Field f : obj.getClass().getDeclaredFields()) {
             if (f.getType() != int.class) continue;
             f.setAccessible(true);

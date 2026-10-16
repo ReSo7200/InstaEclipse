@@ -345,10 +345,8 @@ public class CustomFontHook {
     // ── Custom emoji (EmojiCompat) ─────────────────────────────────────────────
     //
     // IG uses androidx.emoji2 (obfuscated). The emoji font is loaded lazily ~500ms after start by
-    // the metadata loader X/00aC.EXz(callback). We replace that: build a MetadataRepo (X/00ae) from
-    // the user's EmojiCompat-format font and hand it to the callback, bypassing the Google-Play font
-    // download. The font MUST contain the EmojiCompat 'meta' table (a NotoColorEmojiCompat-style
-    // build) — a plain emoji .ttf has no metadata and is rejected at pick time.
+    // emoji2's FontRequestMetadataLoader, whose background worker hands the result (or failure) to
+    // a MetadataRepoLoaderCallback. All of it is located by emoji2's own strings, not by X.* name.
 
     /**
      * Font-fallback method: rather than feeding EmojiCompat a special metadata font (which requires
@@ -357,32 +355,14 @@ public class CustomFontHook {
      * is added as a fallback family on the active typeface (see getCombo). This works with any plain
      * color-emoji .ttf (CBDT/CBLC + cmap), e.g. a raw Apple emoji font.
      *
-     * Disable = force the metadata loader (X/00aC.EXz) to report failure (callback.A01), leaving
-     * EmojiCompat in the FAILED state where process() is a no-op.
+     * Disable = make the metadata loader worker report failure to its callback (onFailed, see
+     * failEmojiLoad), leaving EmojiCompat in the FAILED state where process() is a no-op.
      */
     private void installEmojiHook(final ClassLoader cl) {
-        // Version-proof path first: the androidx.emoji2 FontRequestMetadataLoader worker run() is
-        // anchored by emoji2's own library strings (X.00aO.run on IG 451). The hardcoded X.00aC#EXz
-        // below matched a single build only (it is an ANR reporter on 447.0.0.1 and absent on 451).
-        if (installEmojiWorkerHook(cl)) return;
-        try {
-            Class<?> c00aC = XposedHelpers.findClass("X.00aC", cl);       // metadata loader
-            final Class<?> c00Zv = XposedHelpers.findClass("X.00Zv", cl); // callback
-            XposedHelpers.findAndHookMethod(c00aC, "EXz", c00Zv, new XC_MethodHook() {
-                @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
-                    if (!FeatureFlags.customEmojiEnabled) return;
-                    try {
-                        XposedHelpers.callMethod(p.args[0], "A01", new Exception("ie: emoji via fallback")); // onFailed
-                        ModuleLog.line("(IE|Emoji) EmojiCompat disabled — emoji via font fallback");
-                    } catch (Throwable ignored) {}
-                    p.setResult(null);
-                }
-            });
-            if (FeatureFlags.customEmojiEnabled) FeatureStatusTracker.setHooked("CustomEmoji");
-            ModuleLog.line("(IE|Emoji) ✅ hook installed");
-        } catch (Throwable t) {
-            ModuleLog.line("(IE|Emoji) ⚠️ install: " + t.getMessage());
-        }
+        // Version-proof: the androidx.emoji2 FontRequestMetadataLoader worker run() is anchored by
+        // emoji2's own library strings (X.00aO.run on IG 451). The old hardcoded X.00aC#EXz path
+        // matched a single build only (an ANR reporter on 447.0.0.1, absent on 451), so it is gone.
+        if (!installEmojiWorkerHook(cl)) ModuleLog.line("(IE|Emoji) ⚠️ emoji2 loader worker not found");
     }
 
     private boolean installEmojiWorkerHook(final ClassLoader cl) {

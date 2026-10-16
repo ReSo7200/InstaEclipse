@@ -1,5 +1,7 @@
 package ps.reso.instaeclipse.mods.extras;
 
+import android.view.View;
+
 import org.luckypray.dexkit.DexKitBridge;
 import org.luckypray.dexkit.result.MethodData;
 
@@ -12,6 +14,7 @@ import de.robv.android.xposed.XposedHelpers;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.ui.ViewPager2Input;
 
 /**
  * Reels viewer controls, keyed on IG's own "android_purge_…" markers:
@@ -20,7 +23,8 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  *   {@code ClipsViewerExperimentUtil.isOptInAutoscrollEnabled} is forced true, which unlocks IG's
  *   native "Auto scroll" option in the Reels ⋯ menu.</li>
  *   <li>Lock scrolling: {@code ClipsViewPagerImpl.getViewAtIndex} runs on every page bind; it
- *   toggles the pager's ViewPager2 user input, and pull-to-refresh is disabled with it.</li>
+ *   toggles the pager's ViewPager2 user input (see {@link ViewPager2Input}), and pull-to-refresh
+ *   is disabled with it.</li>
  * </ul>
  */
 public class ReelsControlsHook {
@@ -61,18 +65,18 @@ public class ReelsControlsHook {
         });
         Field pager = bind == null ? null : viewPagerField(bind.getDeclaringClass());
         if (pager != null) {
-            Method setInput;
-            try {
-                setInput = pager.getType().getMethod("setUserInputEnabled", boolean.class);
-            } catch (NoSuchMethodException e) {
-                ModuleLog.line(TAG + "❌ ViewPager2.setUserInputEnabled missing");
-                return;
-            }
+            // setUserInputEnabled() when the build kept it, else IG's renamed mUserInputEnabled
+            // field (resolved via DexKit, shared with DistractionFreeUIHook's main tab pager).
             XposedBridge.hookMethod(bind, new XC_MethodHook() {
+                private boolean failLogged;
+
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Object vp = pager.get(param.thisObject);
-                    if (vp != null) setInput.invoke(vp, !FeatureFlags.reelsLockScroll);
+                    if (!(pager.get(param.thisObject) instanceof View vp)) return;
+                    if (!ViewPager2Input.setEnabled(vp, !FeatureFlags.reelsLockScroll) && !failLogged) {
+                        failLogged = true;
+                        ModuleLog.line(TAG + "❌ ViewPager2 user-input flag not resolved");
+                    }
                 }
             });
             FeatureStatusTracker.setHooked("reelsLockScroll");

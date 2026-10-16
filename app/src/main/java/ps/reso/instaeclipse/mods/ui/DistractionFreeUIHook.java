@@ -170,64 +170,6 @@ public class DistractionFreeUIHook {
         }
     }
 
-    private static java.lang.reflect.Field userInputField;
-    private static boolean userInputFieldTried;
-    private static final String CACHE_PAGER_INPUT = "ViewPager2_userInputEnabled";
-
-    /**
-     * ViewPager2's {@code mUserInputEnabled}. IG's R8 build keeps the class name but drops
-     * setUserInputEnabled() and renames the field (A09 on 452). Its inner RecyclerView reads it in
-     * onInterceptTouchEvent, so DexKit gives the exact boolean field that method reads.
-     */
-    private static java.lang.reflect.Field userInputField(View pager) {
-        if (userInputFieldTried) return userInputField;
-        userInputFieldTried = true;
-        try {
-            Class<?> vp = pager.getClass();
-            while (vp != null && !vp.getName().equals("androidx.viewpager2.widget.ViewPager2")) vp = vp.getSuperclass();
-            if (vp == null) return null;
-            try {
-                java.lang.reflect.Field f = vp.getDeclaredField("mUserInputEnabled"); // unminified builds
-                f.setAccessible(true);
-                return userInputField = f;
-            } catch (NoSuchFieldException ignored) {}
-            String cached = ps.reso.instaeclipse.utils.core.DexKitCache.isCacheValid()
-                    ? ps.reso.instaeclipse.utils.core.DexKitCache.loadString(CACHE_PAGER_INPUT) : null;
-            if (cached != null) {
-                java.lang.reflect.Field f = vp.getDeclaredField(cached);
-                f.setAccessible(true);
-                return userInputField = f;
-            }
-            Class<?> inner = null;
-            if (pager instanceof ViewGroup g) {
-                for (int i = 0; i < g.getChildCount() && inner == null; i++) {
-                    Class<?> c = g.getChildAt(i).getClass();
-                    for (java.lang.reflect.Field f : c.getDeclaredFields()) if (f.getType() == vp) { inner = c; break; }
-                }
-            }
-            org.luckypray.dexkit.DexKitBridge bridge = ps.reso.instaeclipse.Xposed.Module.dexKitBridge;
-            if (inner == null || bridge == null) return null;
-            for (org.luckypray.dexkit.result.MethodData md : bridge.findMethod(org.luckypray.dexkit.query.FindMethod.create()
-                    .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                            .declaredClass(inner.getName()).name("onInterceptTouchEvent")))) {
-                for (org.luckypray.dexkit.result.UsingFieldData uf : md.getUsingFields()) {
-                    org.luckypray.dexkit.result.FieldData fd = uf.getField();
-                    if (fd.getDeclaredClassName().equals(vp.getName()) && fd.getTypeName().equals("boolean")) {
-                        java.lang.reflect.Field f = vp.getDeclaredField(fd.getFieldName());
-                        f.setAccessible(true);
-                        ps.reso.instaeclipse.utils.core.DexKitCache.saveString(CACHE_PAGER_INPUT, f.getName());
-                        ModuleLog.line("(IE|DistractUI) ViewPager2 user-input field = " + f.getName());
-                        return userInputField = f;
-                    }
-                }
-            }
-            ModuleLog.line("(IE|DistractUI) ViewPager2 user-input field not found");
-        } catch (Throwable t) {
-            ModuleLog.line("(IE|DistractUI) ViewPager2 user-input field: " + t);
-        }
-        return null;
-    }
-
     private static boolean pagerTouchHooked;
 
     /**
@@ -315,7 +257,7 @@ public class DistractionFreeUIHook {
             if (v.getId() == tabPagerId) {
                 hookPagerTouch(v);
                 try {
-                    java.lang.reflect.Field f = userInputField(v);
+                    java.lang.reflect.Field f = ps.reso.instaeclipse.utils.ui.ViewPager2Input.field(v);
                     if (f != null && f.getBoolean(v)) {
                         f.setBoolean(v, false);
                         if (!swipeLogged) { // IG turns it back on every few seconds; we keep switching it off
