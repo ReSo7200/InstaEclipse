@@ -68,7 +68,9 @@ public final class Logging {
     private static final Uri MIRROR_URI = Uri.parse("content://ps.reso.instaeclipse.logmirror/log");
     private static Context mirrorContext;
     private static ParcelFileDescriptor mirrorPfd;
-    private static FileOutputStream mirrorOut;
+    // Mirror and log-file state is only touched on the IO thread; LOCK guards LINES alone, so
+    // logging from the main thread never waits for disk I/O.
+    private static volatile FileOutputStream mirrorOut;
     private static long mirrorBytes;
 
     private static final Runnable REWRITE_RUNNABLE = Logging::rewriteFileRunnable;
@@ -137,13 +139,11 @@ public final class Logging {
             } catch (Throwable t) {
                 Log.w("InstaEclipse", "[Logging] log mirror unavailable: " + t);
             }
-            synchronized (LOCK) {
-                closeMirrorLocked();
-                if (fresh != null) {
-                    mirrorPfd = fresh;
-                    mirrorOut = new FileOutputStream(fresh.getFileDescriptor());
-                    rewriteMirrorLocked();
-                }
+            closeMirror();
+            if (fresh != null) {
+                mirrorPfd = fresh;
+                mirrorOut = new FileOutputStream(fresh.getFileDescriptor());
+                rewriteMirror(snapshotLines());
             }
             if (after != null) {
                 try { after.run(); } catch (Throwable ignored) {}
@@ -153,12 +153,17 @@ public final class Logging {
 
     /** True while Instagram's buffer is being mirrored into the companion's storage. */
     public static boolean isMirrorActive() {
+        return mirrorOut != null;
+    }
+
+    /** Copy of the buffered lines, taken under LOCK so the IO thread can write without it. */
+    private static java.util.List<String> snapshotLines() {
         synchronized (LOCK) {
-            return mirrorOut != null;
+            return new ArrayList<>(LINES);
         }
     }
 
-    private static void closeMirrorLocked() {
+    private static void closeMirror() {
         if (mirrorPfd != null) {
             try { mirrorPfd.close(); } catch (Throwable ignored) {}
         }
@@ -167,29 +172,29 @@ public final class Logging {
         mirrorBytes = 0;
     }
 
-    private static void writeMirrorLocked(byte[] data) {
+    private static void writeMirror(byte[] data) {
         if (mirrorOut == null) return;
         try {
             mirrorOut.write(data);
             mirrorBytes += data.length;
         } catch (Throwable t) {
             // EBADF/EPIPE etc.: drop it; the companion's next request re-attaches.
-            closeMirrorLocked();
+            closeMirror();
         }
     }
 
-    private static void rewriteMirrorLocked() {
+    private static void rewriteMirror(java.util.List<String> lines) {
         if (mirrorPfd == null) return;
         try {
             Os.ftruncate(mirrorPfd.getFileDescriptor(), 0);
         } catch (Throwable t) {
-            closeMirrorLocked();
+            closeMirror();
             return;
         }
         mirrorBytes = 0;
-        StringBuilder sb = new StringBuilder(LINES.size() * 96);
-        for (String s : LINES) sb.append(s).append('\n');
-        if (sb.length() > 0) writeMirrorLocked(sb.toString().getBytes(StandardCharsets.UTF_8));
+        StringBuilder sb = new StringBuilder(lines.size() * 96);
+        for (String s : lines) sb.append(s).append('\n');
+        if (sb.length() > 0) writeMirror(sb.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     private static void ensureIoThread() {
@@ -249,31 +254,31 @@ public final class Logging {
     }
 
     private static void rewriteFileRunnable() {
+        java.util.List<String> lines;
         synchronized (LOCK) {
             dirtyFile = false;
-            rewriteFileLocked();
+            lines = new ArrayList<>(LINES);
         }
+        rewriteFile(lines);
     }
 
     private static void postIoWrite(boolean rewriteFirst, String entry) {
         if (ioHandler == null) return;
         ioHandler.post(() -> {
-            synchronized (LOCK) {
-                if (rewriteFirst) rewriteFileLocked();
-                else appendLineToFileLocked(entry);
-            }
+            if (rewriteFirst) rewriteFile(snapshotLines());
+            else appendLineToFile(entry);
         });
     }
 
-    private static void appendLineToFileLocked(String entry) {
+    private static void appendLineToFile(String entry) {
         if (mirrorOut != null) {
-            if (mirrorBytes > MAX_FILE_BYTES) rewriteMirrorLocked();
-            else writeMirrorLocked((entry + "\n").getBytes(StandardCharsets.UTF_8));
+            if (mirrorBytes > MAX_FILE_BYTES) rewriteMirror(snapshotLines());
+            else writeMirror((entry + "\n").getBytes(StandardCharsets.UTF_8));
         }
         if (logFile == null) return;
         try {
             if (logFile.exists() && logFile.length() > MAX_FILE_BYTES) {
-                rewriteLocalFileLocked();
+                rewriteLocalFile(snapshotLines());
                 return;
             }
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true))) {
@@ -283,15 +288,15 @@ public final class Logging {
         } catch (Throwable ignored) {}
     }
 
-    private static void rewriteFileLocked() {
-        rewriteMirrorLocked();
-        rewriteLocalFileLocked();
+    private static void rewriteFile(java.util.List<String> lines) {
+        rewriteMirror(lines);
+        rewriteLocalFile(lines);
     }
 
-    private static void rewriteLocalFileLocked() {
+    private static void rewriteLocalFile(java.util.List<String> lines) {
         if (logFile == null) return;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, false))) {
-            for (String s : LINES) {
+            for (String s : lines) {
                 bw.write(s);
                 bw.newLine();
             }
@@ -309,11 +314,9 @@ public final class Logging {
         if (ioHandler != null) {
             ioHandler.removeCallbacks(REWRITE_RUNNABLE);
             ioHandler.post(() -> {
-                synchronized (LOCK) {
-                    rewriteMirrorLocked(); // LINES is empty -> truncates the mirror
-                    if (logFile != null && logFile.exists()) {
-                        try { logFile.delete(); } catch (Throwable ignored) {}
-                    }
+                rewriteMirror(new ArrayList<>()); // empty -> truncates the mirror
+                if (logFile != null && logFile.exists()) {
+                    try { logFile.delete(); } catch (Throwable ignored) {}
                 }
             });
         }
