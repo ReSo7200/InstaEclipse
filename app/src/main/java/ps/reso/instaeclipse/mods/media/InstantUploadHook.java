@@ -1,5 +1,6 @@
 package ps.reso.instaeclipse.mods.media;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -159,24 +160,47 @@ public class InstantUploadHook {
      * (the modal window/decor is reused across surfaces, so a left-over chip would show app-wide).
      */
     private void registerLifecycle(ClassLoader cl) {
+        registerLifecycle(0);
+    }
+
+    /** Hooks may install before the Application exists; retry for up to ~30 s until it does. */
+    private static void registerLifecycle(int attempt) {
         if (lifecycleRegistered) return;
         try {
             android.app.Application app = (android.app.Application)
                     android.app.AndroidAppHelper.currentApplication();
-            if (app == null) return;
+            if (app == null) {
+                if (attempt < 30) FeedVideoDownloadHook.mainHandler.postDelayed(() -> registerLifecycle(attempt + 1), 1000);
+                else ModuleLog.line("(IE|InstantUpload) ⚠️ no Application; chip lifecycle not registered");
+                return;
+            }
             app.registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
-                @Override public void onActivityPaused(Activity a) { if (a == chipHost && !pickerOpen) removeChip(); }
+                @Override public void onActivityPaused(Activity a) {
+                    if (a == watchHost && !pickerOpen) stopWatch();
+                    if (a == chipHost && !pickerOpen) removeChip();
+                }
                 @Override public void onActivityStopped(Activity a) { if (a == chipHost && !pickerOpen) removeChip(); }
-                @Override public void onActivityDestroyed(Activity a) { if (a == chipHost) { pickerOpen = false; removeChip(); } }
+                @Override public void onActivityDestroyed(Activity a) {
+                    if (a == watchHost) stopWatch();
+                    if (a == chipHost) { pickerOpen = false; removeChip(); }
+                }
                 // If focus moves to any other screen, the chip must not follow — kill it. It is
                 // re-injected only when the quicksnap camera signals open again (A15).
-                @Override public void onActivityResumed(Activity a) { if (chip != null && a != chipHost) removeChip(); }
+                @Override public void onActivityResumed(Activity a) {
+                    if (chip != null && a != chipHost) removeChip();
+                    // The quicksnap screens live in a modal; watch it so the chip appears whenever
+                    // the camera page is on screen, however the user got there.
+                    if (FeatureFlags.uploadInstants && a.getClass().getName().contains("ModalActivity")) startWatch(a);
+                }
                 @Override public void onActivityCreated(Activity a, android.os.Bundle b) {}
                 @Override public void onActivityStarted(Activity a) {}
                 @Override public void onActivitySaveInstanceState(Activity a, android.os.Bundle b) {}
             });
             lifecycleRegistered = true;
-        } catch (Throwable ignored) {}
+            ModuleLog.line("(IE|InstantUpload) ✅ lifecycle registered");
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|InstantUpload) ❌ lifecycle: " + t);
+        }
     }
 
     /**
@@ -269,9 +293,72 @@ public class InstantUploadHook {
             ((ViewGroup) decor).addView(c);
             chip = c;
             chipHost = act;
+            watchCamera();
             ModuleLog.line("(IE|InstantUpload) ✅ gallery chip injected");
         } catch (Throwable t) {
             ModuleLog.line("(IE|InstantUpload) ❌ chip: " + t);
+        }
+    }
+
+    // The camera and "Your instants" are pages of one horizontal pager in the same modal, so the
+    // chip follows the camera preview (app:id/camera_view): shown only while that page is on screen.
+    private static final long WATCH_MS = 300;
+    private static int cameraViewId;
+    private static Activity watchHost;          // the resumed modal being watched (main thread only)
+    private static final Runnable WATCH = new Runnable() {
+        @Override public void run() {
+            Activity host = watchHost;
+            if (host == null || !FeatureFlags.uploadInstants) return;
+            boolean hasCam = hasCameraView(host);
+            boolean on = hasCam && cameraOnScreen(host);
+            if (on && (chip == null || chipHost != host)) injectChip(host);
+            if (chip != null && chipHost == host) {
+                int vis = on || pickerOpen ? View.VISIBLE : View.GONE;
+                if (chip.getVisibility() != vis) chip.setVisibility(vis);
+                if (preview != null && preview.getVisibility() != vis) preview.setVisibility(vis);
+            }
+            // Modals without a camera (comments, profiles…) are checked rarely.
+            FeedVideoDownloadHook.mainHandler.postDelayed(this, hasCam ? WATCH_MS : 1000);
+        }
+    };
+
+    private static void startWatch(Activity act) {
+        watchHost = act;
+        FeedVideoDownloadHook.mainHandler.removeCallbacks(WATCH);
+        FeedVideoDownloadHook.mainHandler.post(WATCH);
+    }
+
+    private static void stopWatch() {
+        watchHost = null;
+        FeedVideoDownloadHook.mainHandler.removeCallbacks(WATCH);
+    }
+
+    private static void watchCamera() {
+        if (chipHost != null && watchHost != chipHost) startWatch(chipHost);
+    }
+
+    @SuppressLint("DiscouragedApi")
+    private static boolean cameraOnScreen(Activity act) {
+        try {
+            if (cameraViewId == 0) cameraViewId = act.getResources().getIdentifier("camera_view", "id", act.getPackageName());
+            View cam = cameraViewId == 0 ? null : act.getWindow().getDecorView().findViewById(cameraViewId);
+            if (cam == null) return true; // no preview to follow on this build: keep the chip
+            if (!cam.isShown() || cam.getWidth() == 0) return false;
+            int[] at = new int[2];
+            cam.getLocationOnScreen(at);
+            return Math.abs(at[0]) < cam.getWidth() / 2;
+        } catch (Throwable t) {
+            return true;
+        }
+    }
+
+    @SuppressLint("DiscouragedApi")
+    private static boolean hasCameraView(Activity act) {
+        try {
+            if (cameraViewId == 0) cameraViewId = act.getResources().getIdentifier("camera_view", "id", act.getPackageName());
+            return cameraViewId != 0 && act.getWindow().getDecorView().findViewById(cameraViewId) != null;
+        } catch (Throwable t) {
+            return false;
         }
     }
 
