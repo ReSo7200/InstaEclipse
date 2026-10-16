@@ -40,6 +40,11 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
+      - name: Setup Android Keystore Directories
+        run: |
+          mkdir -p ~/.android ~/.config/.android
+          sudo chmod -R 777 ~/.android ~/.config/.android
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
