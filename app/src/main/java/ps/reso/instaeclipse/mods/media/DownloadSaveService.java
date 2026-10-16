@@ -99,6 +99,8 @@ public class DownloadSaveService extends Service {
         String filename  = intent.getStringExtra("filename");
         String mimeType  = intent.getStringExtra("mimeType");
         String username  = intent.getStringExtra("username");
+        // Audio-only from a plain MP4 (no separate DASH audio track): pull the audio out locally.
+        boolean extractAudio = intent.getBooleanExtra("extractAudio", false);
 
         if (url == null || filename == null) { stopSelf(startId); return START_NOT_STICKY; }
 
@@ -116,10 +118,13 @@ public class DownloadSaveService extends Service {
         final String fUrl   = url, fAudio = audioUrl, fFile = filename;
         final String fMime  = mimeType, fUser = username, fSave = saveUri;
         final boolean fUF   = usernameFolder;
+        final boolean fExtract = extractAudio;
 
         new Thread(() -> {
             try {
-                SavedMedia saved = fAudio != null
+                SavedMedia saved = fExtract
+                        ? downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF)
+                        : fAudio != null
                         ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
                         : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
                 postDoneNotification(sid, "Saved: " + saved.filename, saved.mimeType, saved.uri);
@@ -212,6 +217,51 @@ public class DownloadSaveService extends Service {
             ta.delete();
             //noinspection ResultOfMethodCallIgnored
             out.delete();
+        }
+    }
+
+    /** Downloads a video and saves only its audio track as .m4a (AAC copied as-is, no re-encode). */
+    private SavedMedia downloadExtractAudioAndSave(String videoUrl, String filename, String saveUri,
+                                                   String username, boolean usernameFolder)
+            throws Exception {
+        File cacheDir = getCacheDir();
+        long ts = System.currentTimeMillis();
+        File tv  = new File(cacheDir, "ie_xv_" + ts + ".mp4");
+        File out = new File(cacheDir, "ie_xa_" + ts + ".m4a");
+        try {
+            pushProgress("Downloading audio…", 0, 100, false);
+            downloadToFile(videoUrl, tv, (done, total) -> {
+                if (total > 0) maybeUpdateProgress("Downloading audio…", (int) (done * 85 / total), 100);
+            });
+            pushProgress("Extracting audio…", 90, 100, true);
+            extractAudioTrack(tv.getAbsolutePath(), out.getAbsolutePath());
+            String name = filename.replaceAll("\\.(mp4|m4a)$", "") + ".m4a";
+            Uri uri = writeViaSaf(out, name, "audio/mp4", saveUri, username, usernameFolder);
+            return new SavedMedia(uri, name, "audio/mp4");
+        } finally {
+            //noinspection ResultOfMethodCallIgnored
+            tv.delete();
+            //noinspection ResultOfMethodCallIgnored
+            out.delete();
+        }
+    }
+
+    /** Copies the audio track of {@code videoPath} into an audio-only MP4 (.m4a) at {@code outPath}. */
+    static void extractAudioTrack(String videoPath, String outPath) throws Exception {
+        MediaExtractor ex = new MediaExtractor();
+        MediaMuxer mux = null;
+        try {
+            ex.setDataSource(videoPath);
+            int ai = selectTrack(ex, "audio/");
+            if (ai < 0) throw new Exception("This video has no audio track");
+            mux = new MediaMuxer(outPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+            int ao = mux.addTrack(ex.getTrackFormat(ai));
+            mux.start();
+            copyTrack(ex, mux, ao, ByteBuffer.allocate(1024 * 1024), new MediaCodec.BufferInfo());
+            mux.stop();
+        } finally {
+            ex.release();
+            if (mux != null) mux.release();
         }
     }
 

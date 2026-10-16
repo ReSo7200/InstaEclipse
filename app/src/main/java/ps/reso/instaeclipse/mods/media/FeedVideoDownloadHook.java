@@ -105,6 +105,7 @@ public class FeedVideoDownloadHook {
                                                     // (Context, Media) -> ExtendedImageUrl on IG 452+
     private static Method   extendedImageUrlGetUrl; // ExtendedImageUrl.getUrl(), when methodImageUrl returns it
     private static Method   carouselMediaGetter;    // Media."carousel_media" getter: () -> List<Media> (IG 447+)
+    private static Method   hasAudioGetter;         // "has_audio" getter: () -> Boolean (Media)
     private static Method   dashManifestGetter;     // "video_dash_manifest" getter: () -> String (Media 447+, LiveTreeMediaDict <= 446)
 
     // VideoVersionIntf – stable public interface with getUrl()
@@ -1104,6 +1105,7 @@ public class FeedVideoDownloadHook {
         resolveVideoVersionsGetters(bridge, classLoader);
         resolveCarouselGetter(bridge, classLoader);
         resolveDashManifestGetter(bridge, classLoader);
+        resolveHasAudioGetter(bridge, classLoader);
         resolveIsVideoMethod(bridge, classLoader);
         XC_MethodHook urlHook = new XC_MethodHook() {
             @Override
@@ -1317,6 +1319,43 @@ public class FeedVideoDownloadHook {
     }
 
     /** Audio-only download (#234): the DASH manifest accessor, anchored like has_liked / carousel. */
+    /** Audio-only (#234): Instagram's own "has_audio" flag, so silent videos aren't offered audio. */
+    private static void resolveHasAudioGetter(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                Method cached = DexKitCache.loadMethod("MediaDownload_HasAudio", classLoader);
+                if (cached != null) { cached.setAccessible(true); hasAudioGetter = cached; return; }
+            }
+            List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .declaredClass("com.instagram.feed.media.Media")
+                    .paramCount(0)
+                    .returnType("java.lang.Boolean")
+                    .usingEqStrings(List.of("has_audio"))));
+            if (found.size() == 1) {
+                Method m = found.get(0).getMethodInstance(classLoader);
+                m.setAccessible(true);
+                hasAudioGetter = m;
+                DexKitCache.saveMethod("MediaDownload_HasAudio", m);
+            }
+            ModuleLog.line("(IE|DL|DexKit) has_audio getter="
+                    + (hasAudioGetter == null ? "not found" : hasAudioGetter.getName()));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|DexKit) has_audio getter failed: " + t);
+        }
+    }
+
+    /** Instagram's has_audio for this media: TRUE / FALSE, or null when unknown. */
+    static Boolean hasAudio(Object media) {
+        Method getter = hasAudioGetter;
+        if (media == null || getter == null || !getter.getDeclaringClass().isInstance(media)) return null;
+        try {
+            Object v = getter.invoke(media);
+            return v instanceof Boolean ? (Boolean) v : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     private static void resolveDashManifestGetter(DexKitBridge bridge, ClassLoader classLoader) {
         try {
             if (DexKitCache.isCacheValid()) {
@@ -1419,8 +1458,18 @@ public class FeedVideoDownloadHook {
      */
     static void offerAudioOrRun(Context ctx, Object media, String imageUrl, String username, String mediaId,
                                 String type, Runnable downloadAction) {
-        final String audio = FeatureFlags.offerAudioDownload ? extractAudioUrl(media) : null;
-        if (audio == null) { downloadAction.run(); return; }
+        // Prefer the DASH audio track; a video served only as a progressive MP4 has none, so fall
+        // back to the video itself and pull its audio out after download.
+        String dashAudio = FeatureFlags.offerAudioDownload ? extractAudioUrl(media) : null;
+        String videoForAudio = FeatureFlags.offerAudioDownload && dashAudio == null
+                ? bestVideoUrlFromMedia(media) : null;
+        final String audio = dashAudio != null ? dashAudio : videoForAudio;
+        final boolean extractFromVideo = dashAudio == null && videoForAudio != null;
+        // A silent video has nothing to extract: only offer audio when Instagram says it has sound.
+        Boolean sound = hasAudio(media);
+        ModuleLog.line("(IE|DL|Audio) has_audio=" + sound + " dash=" + (dashAudio != null)
+                + " video=" + (videoForAudio != null));
+        if (audio == null || Boolean.FALSE.equals(sound)) { downloadAction.run(); return; }
         Context host = ctx instanceof android.app.Activity ? ctx
                 : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         if (host == null) { downloadAction.run(); return; }
@@ -1431,7 +1480,8 @@ public class FeedVideoDownloadHook {
         actions.add(downloadAction);
         labels.add(I18n.t(host, R.string.ig_download_choice_audio));
         actions.add(() -> downloadAudio(host, audio,
-                buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user));
+                buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user,
+                extractFromVideo));
         mainHandler.post(() -> {
             try {
                 new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
@@ -1447,6 +1497,12 @@ public class FeedVideoDownloadHook {
 
     /** Saves an audio-only (.m4a) stream; same destinations as other downloads. */
     static void downloadAudio(Context ctx, String url, String filename, String username) {
+        downloadAudio(ctx, url, filename, username, false);
+    }
+
+    /** @param extractFromVideo {@code url} is a video; save only its audio track (.m4a). */
+    static void downloadAudio(Context ctx, String url, String filename, String username,
+                              boolean extractFromVideo) {
         Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
             try {
@@ -1460,12 +1516,19 @@ public class FeedVideoDownloadHook {
                     intent.putExtra("filename", filename);
                     intent.putExtra("mimeType", "audio/mp4");
                     intent.putExtra("username", username);
+                    intent.putExtra("extractAudio", extractFromVideo);
                     ctx.startForegroundService(intent);
                     return;
                 }
                 File temp = File.createTempFile("ie_dl_", ".m4a", ctx.getCacheDir());
+                File video = extractFromVideo ? File.createTempFile("ie_dv_", ".mp4", ctx.getCacheDir()) : null;
                 try {
-                    downloadToFileAndGetType(url, temp);
+                    if (video != null) {
+                        downloadToFileAndGetType(url, video);
+                        DownloadSaveService.extractAudioTrack(video.getAbsolutePath(), temp.getAbsolutePath());
+                    } else {
+                        downloadToFileAndGetType(url, temp);
+                    }
                     try (FileInputStream in = new FileInputStream(temp);
                          OutputStream out = openOutputStream(ctx, filename, "audio/mp4", username)) {
                         byte[] buf = new byte[32768]; int n;
@@ -1474,6 +1537,8 @@ public class FeedVideoDownloadHook {
                 } finally {
                     //noinspection ResultOfMethodCallIgnored
                     temp.delete();
+                    //noinspection ResultOfMethodCallIgnored
+                    if (video != null) video.delete();
                 }
                 mainHandler.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_audio_saved), Toast.LENGTH_SHORT).show());
             } catch (Throwable e) {
@@ -1829,6 +1894,18 @@ public class FeedVideoDownloadHook {
     }
 
     // ── Filename + directory helpers (package-accessible for StoryDownloadHook) ──
+
+    /**
+     * Carousel item name: inserts the slide number before the extension ("…_03of10.mp4") so every
+     * item of an album gets its own, ordered file instead of N copies of the same name.
+     */
+    static String withSlide(String filename, int slide, int total) {
+        if (total <= 1 || slide < 1) return filename;
+        int width = String.valueOf(total).length();
+        String tag = String.format(Locale.US, "_%0" + width + "dof%d", slide, total);
+        int dot = filename.lastIndexOf('.');
+        return dot > 0 ? filename.substring(0, dot) + tag + filename.substring(dot) : filename + tag;
+    }
 
     static String buildFilename(String username, String type, String mediaId, boolean isVideo) {
         String u  = (username != null && !username.isEmpty()) ? username : "unknown";
@@ -2446,7 +2523,7 @@ public class FeedVideoDownloadHook {
                 dialog.dismiss();
                 String url = urls.get(safeIdx);
                 boolean isVid = isVideoUrl(url);
-                String fn = buildFilename(username, "post", mediaId, isVid);
+                String fn = withSlide(buildFilename(username, "post", mediaId, isVid), safeIdx + 1, n);
                 Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
                     try {
@@ -2471,9 +2548,10 @@ public class FeedVideoDownloadHook {
                 Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_all_n_items, n), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
                     int failed = 0;
-                    for (String url : urls) {
+                    for (int i = 0; i < urls.size(); i++) {
+                        String url = urls.get(i);
                         boolean isVid = isVideoUrl(url);
-                        String fn = buildFilename(username, "post", mediaId, isVid);
+                        String fn = withSlide(buildFilename(username, "post", mediaId, isVid), i + 1, n);
                         try {
                             downloadAndSave(ctx, url, fn, isVid, username);
                         } catch (Throwable e) {
@@ -2810,9 +2888,10 @@ public class FeedVideoDownloadHook {
                 }, -1, w -> {
                     if (w == 0) {
                         String url = urls.get(current);
-                        startDirectDownload(ctx, url, isVideoUrl(url));
+                        startDirectDownload(ctx, url, isVideoUrl(url), current + 1, n);
                     } else {
-                        for (String u : urls) startDirectDownload(ctx, u, isVideoUrl(u));
+                        for (int i = 0; i < urls.size(); i++)
+                            startDirectDownload(ctx, urls.get(i), isVideoUrl(urls.get(i)), i + 1, n);
                         Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_n_items, n), Toast.LENGTH_SHORT).show();
                     }
                 }).show();
@@ -2848,7 +2927,12 @@ public class FeedVideoDownloadHook {
     }
 
     private void startDirectDownload(Context ctx, String url, boolean isVideo) {
-        String fn = buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, isVideo);
+        startDirectDownload(ctx, url, isVideo, 0, 0);
+    }
+
+    private void startDirectDownload(Context ctx, String url, boolean isVideo, int slide, int total) {
+        String fn = withSlide(buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, isVideo),
+                slide, total);
         ModuleLog.line("(IE|DL) startDirectDownload file=" + fn);
         Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
