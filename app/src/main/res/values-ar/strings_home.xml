@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">إجراءات سريعة</string>
+    <string name="home_section_shortcuts">اختصارات سريعة</string>
+    <string name="home_status_installed">مثبّت</string>
+    <string name="home_status_not_installed">غير مثبّت</string>
+    <string name="home_status_module_active">الوحدة مفعّلة</string>
+    <string name="home_status_version">الإصدار %1$s</string>
+    <string name="home_status_no_version">ثبّت Instagram لاستخدام InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="zero">%d ميزة مفعّلة</item>
+        <item quantity="one">%d ميزة مفعّلة</item>
+        <item quantity="two">%d ميزتان مفعّلتان</item>
+        <item quantity="few">%d ميزات مفعّلة</item>
+        <item quantity="many">%d ميزة مفعّلة</item>
+        <item quantity="other">%d ميزة مفعّلة</item>
+    </plurals>
+    <string name="home_action_launch">تشغيل</string>
+    <string name="home_action_restart">إعادة تشغيل</string>
+    <string name="home_action_download">تنزيل APK</string>
+    <string name="home_restart_done">تمت إعادة تشغيل Instagram</string>
+    <string name="home_shortcuts_edit">تعديل الاختصارات</string>
+    <string name="home_shortcuts_dialog_title">اختر الاختصارات</string>
+    <string name="home_shortcuts_empty">لا توجد اختصارات بعد. اضغط على أيقونة القلم لإضافة ما يصل إلى 8 من المفاتيح التي تستخدمها أكثر.</string>
+    <string name="home_shortcuts_hint">تُرسَل التغييرات إلى Instagram فورًا.</string>
+    <string name="home_shortcuts_limit">يمكنك إضافة %1$d اختصارات كحد أقصى</string>
+    <string name="home_shortcuts_locked_extreme">مقفل بواسطة الوضع المتطرف</string>
+</resources>

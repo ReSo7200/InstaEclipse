@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Γρήγορες ενέργειες</string>
+    <string name="home_section_shortcuts">Γρήγορες συντομεύσεις</string>
+    <string name="home_status_installed">Εγκατεστημένο</string>
+    <string name="home_status_not_installed">Μη εγκατεστημένο</string>
+    <string name="home_status_module_active">Module ενεργό</string>
+    <string name="home_status_version">Έκδοση %1$s</string>
+    <string name="home_status_no_version">Εγκαταστήστε το Instagram για να χρησιμοποιήσετε το InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d ενεργή λειτουργία</item>
+        <item quantity="other">%d ενεργές λειτουργίες</item>
+    </plurals>
+    <string name="home_action_launch">Άνοιγμα</string>
+    <string name="home_action_restart">Επανεκκίνηση</string>
+    <string name="home_action_download">Λήψη APK</string>
+    <string name="home_restart_done">Έγινε επανεκκίνηση του Instagram</string>
+    <string name="home_shortcuts_edit">Επεξεργασία συντομεύσεων</string>
+    <string name="home_shortcuts_dialog_title">Καρφίτσωμα συντομεύσεων</string>
+    <string name="home_shortcuts_empty">Δεν υπάρχουν καρφιτσωμένες συντομεύσεις. Πατήστε το μολύβι για να καρφιτσώσετε έως 8 διακόπτες που χρησιμοποιείτε συχνότερα.</string>
+    <string name="home_shortcuts_hint">Οι αλλαγές αποστέλλονται αμέσως στο Instagram.</string>
+    <string name="home_shortcuts_limit">Μπορείτε να καρφιτσώσετε έως %1$d συντομεύσεις</string>
+    <string name="home_shortcuts_locked_extreme">Κλειδωμένο από την Ακραία Λειτουργία</string>
+</resources>

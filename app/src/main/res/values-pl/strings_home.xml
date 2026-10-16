@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Szybkie akcje</string>
+    <string name="home_section_shortcuts">Szybkie skróty</string>
+    <string name="home_status_installed">Zainstalowany</string>
+    <string name="home_status_not_installed">Nie zainstalowano</string>
+    <string name="home_status_module_active">Moduł aktywny</string>
+    <string name="home_status_version">Wersja %1$s</string>
+    <string name="home_status_no_version">Zainstaluj Instagrama, aby korzystać z InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d funkcja włączona</item>
+        <item quantity="few">%d funkcje włączone</item>
+        <item quantity="many">%d funkcji włączonych</item>
+        <item quantity="other">%d funkcji włączonych</item>
+    </plurals>
+    <string name="home_action_launch">Otwórz</string>
+    <string name="home_action_restart">Restart</string>
+    <string name="home_action_download">Pobierz APK</string>
+    <string name="home_restart_done">Instagram uruchomiony ponownie</string>
+    <string name="home_shortcuts_edit">Edytuj skróty</string>
+    <string name="home_shortcuts_dialog_title">Przypnij skróty</string>
+    <string name="home_shortcuts_empty">Brak przypiętych skrótów. Stuknij ołówek, aby przypiąć do 8 najczęściej używanych przełączników.</string>
+    <string name="home_shortcuts_hint">Zmiany są od razu wysyłane do Instagrama.</string>
+    <string name="home_shortcuts_limit">Możesz przypiąć maksymalnie %1$d skrótów</string>
+    <string name="home_shortcuts_locked_extreme">Zablokowane przez tryb ekstremalny</string>
+</resources>

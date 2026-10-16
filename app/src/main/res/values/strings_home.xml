@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Quick actions</string>
+    <string name="home_section_shortcuts">Quick shortcuts</string>
+
+    <string name="home_status_installed">Installed</string>
+    <string name="home_status_not_installed">Not installed</string>
+    <string name="home_status_module_active">Module active</string>
+    <string name="home_status_version">Version %1$s</string>
+    <string name="home_status_no_version">Install Instagram to use InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d feature enabled</item>
+        <item quantity="other">%d features enabled</item>
+    </plurals>
+
+    <string name="home_action_launch">Launch</string>
+    <string name="home_action_restart">Restart</string>
+    <string name="home_action_download">Get APK</string>
+    <string name="home_restart_done">Instagram restarted</string>
+
+    <string name="home_shortcuts_edit">Edit shortcuts</string>
+    <string name="home_shortcuts_dialog_title">Pin shortcuts</string>
+    <string name="home_shortcuts_empty">No shortcuts pinned. Tap the pencil to pin up to 8 toggles you use most.</string>
+    <string name="home_shortcuts_hint">Changes are sent to Instagram instantly.</string>
+    <string name="home_shortcuts_limit">You can pin up to %1$d shortcuts</string>
+    <string name="home_shortcuts_locked_extreme">Locked by Extreme Mode</string>
+</resources>

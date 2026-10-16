@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Acciones rápidas</string>
+    <string name="home_section_shortcuts">Accesos rápidos</string>
+    <string name="home_status_installed">Instalado</string>
+    <string name="home_status_not_installed">No instalado</string>
+    <string name="home_status_module_active">Módulo activo</string>
+    <string name="home_status_version">Versión %1$s</string>
+    <string name="home_status_no_version">Instala Instagram para usar InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d función activada</item>
+        <item quantity="many">%d funciones activadas</item>
+        <item quantity="other">%d funciones activadas</item>
+    </plurals>
+    <string name="home_action_launch">Abrir</string>
+    <string name="home_action_restart">Reiniciar</string>
+    <string name="home_action_download">Obtener APK</string>
+    <string name="home_restart_done">Instagram reiniciado</string>
+    <string name="home_shortcuts_edit">Editar accesos</string>
+    <string name="home_shortcuts_dialog_title">Fijar accesos rápidos</string>
+    <string name="home_shortcuts_empty">No hay accesos fijados. Toca el lápiz para fijar hasta 8 de los interruptores que más usas.</string>
+    <string name="home_shortcuts_hint">Los cambios se envían a Instagram al instante.</string>
+    <string name="home_shortcuts_limit">Puedes fijar hasta %1$d accesos rápidos</string>
+    <string name="home_shortcuts_locked_extreme">Bloqueado por el Modo extremo</string>
+</resources>

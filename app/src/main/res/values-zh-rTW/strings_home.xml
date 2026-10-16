@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">快速操作</string>
+    <string name="home_section_shortcuts">快速開關</string>
+    <string name="home_status_installed">已安裝</string>
+    <string name="home_status_not_installed">未安裝</string>
+    <string name="home_status_module_active">模組已啟用</string>
+    <string name="home_status_version">版本 %1$s</string>
+    <string name="home_status_no_version">請先安裝 Instagram 才能使用 InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">已啟用 %d 項功能</item>
+        <item quantity="other">已啟用 %d 項功能</item>
+    </plurals>
+    <string name="home_action_launch">開啟</string>
+    <string name="home_action_restart">重新啟動</string>
+    <string name="home_action_download">取得 APK</string>
+    <string name="home_restart_done">Instagram 已重新啟動</string>
+    <string name="home_shortcuts_edit">編輯快速開關</string>
+    <string name="home_shortcuts_dialog_title">釘選快速開關</string>
+    <string name="home_shortcuts_empty">尚未釘選任何快速開關。輕觸鉛筆圖示，最多可釘選 8 個最常用的開關。</string>
+    <string name="home_shortcuts_hint">變更會立即同步到 Instagram。</string>
+    <string name="home_shortcuts_limit">最多只能釘選 %1$d 個快速開關</string>
+    <string name="home_shortcuts_locked_extreme">已被極端模式鎖定</string>
+</resources>

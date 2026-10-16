@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Быстрые действия</string>
+    <string name="home_section_shortcuts">Быстрые ярлыки</string>
+    <string name="home_status_installed">Установлен</string>
+    <string name="home_status_not_installed">Не установлен</string>
+    <string name="home_status_module_active">Модуль активен</string>
+    <string name="home_status_version">Версия %1$s</string>
+    <string name="home_status_no_version">Установите Instagram, чтобы пользоваться InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">Включена %d функция</item>
+        <item quantity="few">Включено %d функции</item>
+        <item quantity="many">Включено %d функций</item>
+        <item quantity="other">Включено %d функции</item>
+    </plurals>
+    <string name="home_action_launch">Запуск</string>
+    <string name="home_action_restart">Перезапуск</string>
+    <string name="home_action_download">Скачать APK</string>
+    <string name="home_restart_done">Instagram перезапущен</string>
+    <string name="home_shortcuts_edit">Изменить ярлыки</string>
+    <string name="home_shortcuts_dialog_title">Закрепить ярлыки</string>
+    <string name="home_shortcuts_empty">Нет закреплённых ярлыков. Нажмите на карандаш, чтобы закрепить до 8 самых нужных переключателей.</string>
+    <string name="home_shortcuts_hint">Изменения сразу применяются в Instagram.</string>
+    <string name="home_shortcuts_limit">Можно закрепить не более %1$d ярлыков</string>
+    <string name="home_shortcuts_locked_extreme">Заблокировано экстремальным режимом</string>
+</resources>
