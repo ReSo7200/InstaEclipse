@@ -1,7 +1,6 @@
 package ps.reso.instaeclipse.mods.media;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -2790,12 +2789,12 @@ public class FeedVideoDownloadHook {
         if (idx >= urls.size()) idx = 0;
         final int current = idx;
         int n = urls.size();
-        new AlertDialog.Builder(ctx)
-                .setTitle(I18n.t(ctx, R.string.ig_dl_title))
-                .setItems(new CharSequence[]{
+        new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                .title(I18n.t(ctx, R.string.ig_dl_title))
+                .choices(new CharSequence[]{
                         I18n.t(ctx, R.string.ig_dl_carousel_current, current + 1, n),
                         I18n.t(ctx, R.string.ig_dl_carousel_all, n)
-                }, (d, w) -> {
+                }, -1, w -> {
                     if (w == 0) {
                         String url = urls.get(current);
                         startDirectDownload(ctx, url, isVideoUrl(url));

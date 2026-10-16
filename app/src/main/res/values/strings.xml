@@ -326,6 +326,16 @@
     <string name="ig_chat_export_media_progress">Downloading media %1$d/%2$d…</string>
     <string name="ig_chat_export_done_media">Exported %1$d messages and %2$d media files to %3$s</string>
     <string name="ig_export_media_saved">Export saved — %1$d media file(s) in %2$s</string>
+    <!-- Short labels for the "features loaded" toast grid (kept concise so the dense grid fits) -->
+    <string name="ig_feat_edit_history">Edit history</string>
+    <string name="ig_feat_lock_collections">Lock collections</string>
+    <string name="ig_feat_comment_search">Comment search</string>
+    <string name="ig_feat_viewer_search">Story viewers</string>
+    <string name="ig_feat_follow_export">Follow export</string>
+    <string name="ig_feat_saved_on_profile">Saved on profile</string>
+    <string name="ig_feat_hide_notes">Hide Notes tray</string>
+    <string name="ig_feat_voice_download">Voice download</string>
+    <string name="ig_feat_photo_zoom">Photo zoom</string>
     <string name="ig_chat_export_none">No messages loaded for this chat yet</string>
     <string name="ig_dialog_ghost_jump_first">Jump-to-First-Message Button in Chats</string>
     <string name="ig_jump_first_message">Jump to first message</string>
