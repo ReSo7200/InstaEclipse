@@ -72,6 +72,7 @@ public class CaptionCopyContextMenuHook {
 
     private static Class<?> mediaOptionEnumClass;
     private static Object   copyCaptionOptionValue; // repurposed employee-only-gated option
+    private static Object   translateCaptionOptionValue; // second carrier: "Translate caption" row
 
     private static Class<?> menuCreatorClass;
     private static Method   addButtonMethod;
@@ -110,6 +111,11 @@ public class CaptionCopyContextMenuHook {
     private static final String[] CARRIER_CANDIDATES = {
             "DEBUG_MEDIA", "CONTENT_DEEP_DIVE", "DEBUG_BASEL_MEDIA_INFO",
             "DEBUG_MEDIA_ON_DEVICE_CBR", "PROMOTE_DEBUG"
+    };
+    // Carrier for the separate "Translate caption" row. Not CONTENT_DEEP_DIVE (Remove Meta AI
+    // filters it out) and not the downloader's carriers (copy image / media info / speed).
+    private static final String[] TRANSLATE_CARRIER_CANDIDATES = {
+            "DEBUG_BASEL_MEDIA_INFO", "DEBUG_MEDIA_ON_DEVICE_CBR"
     };
 
     // ── Entry point ──────────────────────────────────────────────────────────
@@ -165,6 +171,17 @@ public class CaptionCopyContextMenuHook {
             }
             if (copyCaptionOptionValue == null)
                 ModuleLog.line("(IE|Caption) ❌ No usable carrier MediaOption$Option found");
+            for (String candidate : TRANSLATE_CARRIER_CANDIDATES) {
+                for (Object v : values) {
+                    if (v != copyCaptionOptionValue && v.toString().equals(candidate)) {
+                        translateCaptionOptionValue = v;
+                        break;
+                    }
+                }
+                if (translateCaptionOptionValue != null) break;
+            }
+            if (translateCaptionOptionValue != null)
+                EXTRA_REEL_LABELS.put(translateCaptionOptionValue.toString(), R.string.ig_caption_translate_menu_item);
             for (Object v : values) if (v.toString().equals("COPY_LINK")) copyLinkOptionForLabels = v;
         } catch (Throwable t) {
             ModuleLog.line("(IE|Caption) ❌ loadMediaOptionEnum: " + t);
@@ -445,6 +462,7 @@ public class CaptionCopyContextMenuHook {
                 if (!FeatureFlags.enableCaptionCopy) return;
                 if (Boolean.TRUE.equals(sAddingCaptionRow.get())) return;
                 if (param.args[idxOption] == copyCaptionOptionValue) return;
+                if (translateCaptionOptionValue != null && param.args[idxOption] == translateCaptionOptionValue) return;
 
                 Object self = param.args[idxSelf];
                 boolean alreadyProcessed;
@@ -463,6 +481,12 @@ public class CaptionCopyContextMenuHook {
                 sAddingCaptionRow.set(true);
                 try {
                     addButtonMethod.invoke(null, callArgs);
+                    if (translateCaptionOptionValue != null) {
+                        Object[] translateArgs = callArgs.clone();
+                        translateArgs[idxOption] = translateCaptionOptionValue;
+                        translateArgs[idxText] = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_caption_translate_menu_item);
+                        addButtonMethod.invoke(null, translateArgs);
+                    }
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Caption) ❌ addButton invoke failed: " + t);
                 } finally {
@@ -548,9 +572,12 @@ public class CaptionCopyContextMenuHook {
                 try {
                     Object result = param.getResult();
                     if (!(result instanceof List<?> original)) return;
-                    if (original.contains(copyCaptionOptionValue)) return;
+                    boolean needCopy = !original.contains(copyCaptionOptionValue);
+                    boolean needTranslate = translateCaptionOptionValue != null && !original.contains(translateCaptionOptionValue);
+                    if (!needCopy && !needTranslate) return;
                     List<Object> patched = new ArrayList<>(original);
-                    patched.add(copyCaptionOptionValue);
+                    if (needCopy) patched.add(copyCaptionOptionValue);
+                    if (needTranslate) patched.add(translateCaptionOptionValue);
                     param.setResult(patched);
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Caption) ❌ allowlist patch failed: " + t);
@@ -606,10 +633,12 @@ public class CaptionCopyContextMenuHook {
                 if (!FeatureFlags.enableCaptionCopy) return;
                 try {
                     Object result = param.getResult();
-                    if (result instanceof List<?> list && !list.contains(copyCaptionOptionValue)) {
+                    if (result instanceof List<?> list) {
                         @SuppressWarnings("unchecked")
                         List<Object> mutable = (List<Object>) list;
-                        mutable.add(copyCaptionOptionValue);
+                        if (!mutable.contains(copyCaptionOptionValue)) mutable.add(copyCaptionOptionValue);
+                        if (translateCaptionOptionValue != null && !mutable.contains(translateCaptionOptionValue))
+                            mutable.add(translateCaptionOptionValue);
                     }
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Caption) ❌ reel options-list patch failed: " + t);
@@ -870,7 +899,9 @@ public class CaptionCopyContextMenuHook {
                     clicked = a; break;
                 }
             }
-            if (clicked == null || copyCaptionOptionValue == null || clicked != copyCaptionOptionValue) return;
+            if (clicked == null || copyCaptionOptionValue == null) return;
+            boolean translate = translateCaptionOptionValue != null && clicked == translateCaptionOptionValue;
+            if (clicked != copyCaptionOptionValue && !translate) return;
 
             param.setResult(null); // consume the event
 
@@ -895,7 +926,8 @@ public class CaptionCopyContextMenuHook {
                 return;
             }
 
-            showCopyPopup(ctx, caption.trim());
+            if (translate) ps.reso.instaeclipse.utils.core.TextTranslator.translate(ctx, caption.trim());
+            else showCopyPopup(ctx, caption.trim());
         } catch (Throwable t) {
             ModuleLog.line("(IE|Caption) ❌ onOptionClicked: " + t);
         }
@@ -1097,14 +1129,6 @@ public class CaptionCopyContextMenuHook {
                 });
                 sheet.addView(btnSelect);
 
-                // Translate (#233): hand the text to the user's translation app.
-                Button btnTranslate = makeButton(ctx,
-                        I18n.t(ctx, R.string.ig_translate_text), secondBg, secondText, dp);
-                btnTranslate.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    ps.reso.instaeclipse.utils.core.TextTranslator.translate(ctx, text);
-                });
-                sheet.addView(btnTranslate);
 
                 dialog.setContentView(sheet);
                 Window w = dialog.getWindow();

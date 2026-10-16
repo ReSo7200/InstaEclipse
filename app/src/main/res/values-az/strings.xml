@@ -533,6 +533,7 @@
     <string name="ig_dialog_misc_copy_caption">Başlığı Kopyala</string>
     <string name="ig_dialog_misc_photo_zoom">Foto Yaxınlaşdırma (Uzun Basma)</string>
     <string name="ig_caption_copy_menu_item">Başlığı Kopyala</string>
+    <string name="ig_caption_translate_menu_item">Başlığı Tərcümə et</string>
     <string name="ig_caption_copy_title">Başlığı Kopyala</string>
     <string name="ig_caption_copy_full">Tam Başlığı Kopyala</string>
     <string name="ig_caption_copy_none">Bu paylaşımda başlıq yoxdur</string>

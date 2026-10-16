@@ -531,6 +531,7 @@
     <string name="ig_dialog_misc_copy_caption">複製說明文字</string>
     <string name="ig_dialog_misc_photo_zoom">相片縮放（長按）</string>
     <string name="ig_caption_copy_menu_item">複製說明文字</string>
+    <string name="ig_caption_translate_menu_item">翻譯說明文字</string>
     <string name="ig_caption_copy_title">複製說明文字</string>
     <string name="ig_caption_copy_full">複製完整說明文字</string>
     <string name="ig_caption_copy_none">此貼文沒有說明文字</string>

@@ -563,6 +563,7 @@
     <string name="ig_dialog_misc_copy_caption">复制标题</string>
     <string name="ig_dialog_misc_photo_zoom">图片缩放（长按）</string>
     <string name="ig_caption_copy_menu_item">复制标题</string>
+    <string name="ig_caption_translate_menu_item">翻译标题</string>
     <string name="ig_caption_copy_title">复制标题</string>
     <string name="ig_caption_copy_full">复制完整标题</string>
     <string name="ig_caption_copy_none">此帖子没有标题</string>

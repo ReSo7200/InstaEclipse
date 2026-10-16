@@ -562,6 +562,7 @@
     <string name="ig_dialog_misc_copy_caption">העתק כיתוב</string>
     <string name="ig_dialog_misc_photo_zoom">זום בתמונה (לחיצה ארוכה)</string>
     <string name="ig_caption_copy_menu_item">העתק כיתוב</string>
+    <string name="ig_caption_translate_menu_item">תרגם כיתוב</string>
     <string name="ig_caption_copy_title">העתק כיתוב</string>
     <string name="ig_caption_copy_full">העתק כיתוב מלא</string>
     <string name="ig_caption_copy_none">אין כיתוב בפוסט הזה</string>

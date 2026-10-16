@@ -539,6 +539,7 @@
     <string name="ig_dialog_misc_copy_caption">Bildunterschrift kopieren</string>
     <string name="ig_dialog_misc_photo_zoom">Foto-Zoom (langes Drücken)</string>
     <string name="ig_caption_copy_menu_item">Bildunterschrift kopieren</string>
+    <string name="ig_caption_translate_menu_item">Bildunterschrift übersetzen</string>
     <string name="ig_caption_copy_title">Bildunterschrift kopieren</string>
     <string name="ig_caption_copy_full">Vollständige Bildunterschrift kopieren</string>
     <string name="ig_caption_copy_none">Kein Text bei diesem Beitrag</string>

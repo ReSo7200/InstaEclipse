@@ -562,6 +562,7 @@
     <string name="ig_dialog_misc_copy_caption">Salin Keterangan</string>
     <string name="ig_dialog_misc_photo_zoom">Zoom Foto (Tekan Lama)</string>
     <string name="ig_caption_copy_menu_item">Salin Keterangan</string>
+    <string name="ig_caption_translate_menu_item">Terjemahkan Keterangan</string>
     <string name="ig_caption_copy_title">Salin Keterangan</string>
     <string name="ig_caption_copy_full">Salin Keterangan Lengkap</string>
     <string name="ig_caption_copy_none">Tidak ada keterangan pada postingan ini</string>

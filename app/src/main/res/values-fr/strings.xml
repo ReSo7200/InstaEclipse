@@ -564,6 +564,7 @@
     <string name="ig_dialog_misc_copy_caption">Copier la légende</string>
     <string name="ig_dialog_misc_photo_zoom">Zoom photo (appui long)</string>
     <string name="ig_caption_copy_menu_item">Copier la légende</string>
+    <string name="ig_caption_translate_menu_item">Traduire la légende</string>
     <string name="ig_caption_copy_title">Copier la légende</string>
     <string name="ig_caption_copy_full">Copier toute la légende</string>
     <string name="ig_caption_copy_none">Aucune légende sur cette publication</string>

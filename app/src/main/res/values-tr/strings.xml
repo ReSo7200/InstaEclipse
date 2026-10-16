@@ -531,6 +531,7 @@
     <string name="ig_dialog_misc_copy_caption">Açıklamayı Kopyala</string>
     <string name="ig_dialog_misc_photo_zoom">Fotoğraf Yakınlaştırma (Uzun Basma)</string>
     <string name="ig_caption_copy_menu_item">Açıklamayı Kopyala</string>
+    <string name="ig_caption_translate_menu_item">Açıklamayı Çevir</string>
     <string name="ig_caption_copy_title">Açıklamayı Kopyala</string>
     <string name="ig_caption_copy_full">Açıklamanın Tamamını Kopyala</string>
     <string name="ig_caption_copy_none">Bu gönderide açıklama yok</string>

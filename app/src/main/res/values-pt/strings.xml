@@ -530,6 +530,7 @@
     <string name="ig_dialog_misc_copy_caption">Copiar Legenda</string>
     <string name="ig_dialog_misc_photo_zoom">Zoom de Foto (Toque Prolongado)</string>
     <string name="ig_caption_copy_menu_item">Copiar Legenda</string>
+    <string name="ig_caption_translate_menu_item">Traduzir Legenda</string>
     <string name="ig_caption_copy_title">Copiar Legenda</string>
     <string name="ig_caption_copy_full">Copiar Legenda Completa</string>
     <string name="ig_caption_copy_none">Esta publicação não tem legenda</string>
