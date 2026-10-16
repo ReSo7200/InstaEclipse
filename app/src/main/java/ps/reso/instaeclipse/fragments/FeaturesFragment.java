@@ -1103,7 +1103,7 @@ public class FeaturesFragment extends Fragment {
                 createClickable(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_customize), () ->
                         themeCustomizerLauncher.launch(new Intent(requireContext(), ThemeCustomizerActivity.class))),
                 createClickable(R.drawable.ic_palette, "#FF375F",
-                        getString(R.string.theme_light_mode) + ": " + lightModeLabel(localCache.getInt("themeLightPresetId", 0)),
+                        getString(R.string.theme_light_mode) + ": " + lightModeLabel(localCache.getInt("themeLightPresetId", -1)),
                         this::pickLightModeTheme)
         ));
 
@@ -1129,7 +1129,7 @@ public class FeaturesFragment extends Fragment {
     /** Light-mode behaviour of the custom theme (#251). */
     private void pickLightModeTheme() {
         final int[] values = ps.reso.instaeclipse.mods.ui.theme.ThemePresets.lightModeChoices();
-        int current = localCache.getInt("themeLightPresetId", 0);
+        int current = localCache.getInt("themeLightPresetId", -1);
         String[] labels = new String[values.length];
         int sel = 0;
         for (int i = 0; i < values.length; i++) {

@@ -290,7 +290,18 @@ public class SettingsManager {
         // Custom Theme
         FeatureFlags.customThemeEnabled = prefs.getBoolean("customThemeEnabled", false);
         FeatureFlags.themePresetId = prefs.getInt("themePresetId", 1);
-        FeatureFlags.themeLightPresetId = prefs.getInt("themeLightPresetId", 0);
+        // #251: "theme in dark mode only" is the default so a custom theme never breaks light mode
+        // (a dark palette's surfaces/text are illegible on IG's light chrome). The old default was 0
+        // ("same theme as dark mode"), which rendered light mode unreadable; migrate it to -1 once
+        // so existing users are fixed, without overriding anyone who later re-selects it on purpose.
+        FeatureFlags.themeLightPresetId = prefs.getInt("themeLightPresetId", -1);
+        if (!prefs.getBoolean("themeLightMigratedV1", false)) {
+            if (FeatureFlags.themeLightPresetId == 0) FeatureFlags.themeLightPresetId = -1;
+            prefs.edit()
+                    .putInt("themeLightPresetId", FeatureFlags.themeLightPresetId)
+                    .putBoolean("themeLightMigratedV1", true)
+                    .apply();
+        }
         FeatureFlags.themePaletteJson = prefs.getString("themePaletteJson", "");
 
         FeatureManager.refreshFeatureStatus();
