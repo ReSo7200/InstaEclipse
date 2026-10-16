@@ -34,8 +34,6 @@
     <string name="special_thanks">特別感謝</string>
 
     <!-- Don't translate! -->
-    <string name="instagram_logo" translatable="false">Instagram Logo</string>
-    <string name="instagram_info" translatable="false">instagram_info</string>
 
     <!-- help -->
     <string name="help_amp_troubleshooting">幫助和故障排除</string>
@@ -43,10 +41,8 @@
     <string name="go_to_github">前往 GitHub</string>
     <string name="find_support">查詢支援</string>
     <string name="go_to_telegram">前往 Telegram</string>
-    <string name="instaeclipse_telegram_group" translatable="false">InstaEclipse Telegram Group</string>
 
     <!-- Don't translate! -->
-    <string name="instaeclipse_github" translatable="false">InstaEclipse GitHub</string>
     <string name="github">GitHub</string>
     <string name="telegram">Telegram</string>
 
@@ -73,7 +69,6 @@
     <string name="enable_disable_all">啟用/禁用所有</string>
 
     <!-- Don't translate! -->
-    <string name="hint" translatable="false">Hint</string>
 
     <!-- ghost -->
     <string name="ghost_mode_options">幽靈模式選項</string>
@@ -96,9 +91,6 @@
     <string name="dev_options_4">4. 最後，從模組中禁用開發者選項以防止應用崩潰。</string>
 
     <!-- Don't translate! -->
-    <string name="is_employee" translatable="false">• is employee</string>
-    <string name="is_employee_or_test_user" translatable="false">• is employee or test user</string>
-    <string name="employee_options" translatable="false">• employee options</string>
 
     <!-- distraction free -->
     <string name="distraction_free_options">無干擾模式選項</string>
@@ -555,4 +547,77 @@
     <string name="ig_story_download_video_music">下載含音樂的影片</string>
     <string name="ig_story_cache_clear_confirm">刪除所有已快取的限時動態？此操作無法復原。</string>
     <string name="ig_story_cache_cleared">已清除快取的限時動態</string>
+    <string name="ig_dialog_ghost_chat_export">聊天中的「匯出聊天」按鈕</string>
+    <string name="ig_chat_export">匯出聊天</string>
+    <string name="ig_locked_coll_setting">可鎖定的收藏夾（收藏夾內的 🔒 按鈕；使用在 Instagram 中設定的密碼）</string>
+    <string name="ig_locked_coll_setting_short">可鎖定的收藏夾（收藏夾內的 🔒）</string>
+    <string name="ig_locked_coll_title">已鎖定的收藏夾</string>
+    <string name="ig_locked_coll_open">開啟</string>
+    <string name="ig_locked_coll_hint">密碼</string>
+    <string name="ig_locked_coll_lock">鎖定此收藏夾</string>
+    <string name="ig_locked_coll_unlock">解鎖此收藏夾</string>
+    <string name="ig_locked_coll_locked">收藏夾已鎖定：將會要求輸入密碼</string>
+    <string name="ig_locked_coll_unlocked">收藏夾已解鎖</string>
+    <string name="ig_locked_coll_need_passcode">請先設定密碼：在 Instagram 中開啟 InstaEclipse 設定 → 鎖定</string>
+    <string name="ig_saved_on_profile">在個人檔案顯示「收藏」按鈕（需重新啟動 Instagram）</string>
+    <string name="ig_saved_on_profile_button">收藏</string>
+    <string name="ig_nav_tab_search">搜尋</string>
+    <string name="ig_nav_tab_order">標籤順序</string>
+    <string name="ig_nav_tab_order_hint">使用箭頭重新排列底部列。隱藏的標籤會保留原位。返回 Instagram 後生效。</string>
+    <string name="ig_nav_tab_order_reset">重設</string>
+    <string name="share_dl_label">使用 InstaEclipse 下載</string>
+    <string name="share_dl_no_link">找不到 Instagram 貼文或 Reels 連結</string>
+    <string name="share_dl_no_instagram">尚未安裝 Instagram</string>
+    <string name="ig_share_dl_loading">InstaEclipse：正在載入要下載的貼文…</string>
+    <string name="ig_share_dl_saving">InstaEclipse：正在儲存 %1$d 個檔案…</string>
+    <string name="ig_share_dl_not_found">InstaEclipse：無法載入該貼文</string>
+    <string name="ig_thread_menu">InstaEclipse 聊天操作</string>
+    <string name="ig_unsent_messages">已收回訊息</string>
+    <string name="ig_hide_chat_toggle">隱藏 / 取消隱藏聊天</string>
+    <string name="ig_chat_export_working">正在匯出已載入的訊息…</string>
+    <string name="ig_chat_export_done">已將 %1$d 則訊息匯出至 %2$s</string>
+    <string name="ig_chat_export_load_all">先載入整個聊天（跳到第一則訊息）</string>
+    <string name="ig_chat_export_media">將媒體下載至匯出資料夾</string>
+    <string name="ig_chat_export_media_progress">正在下載媒體 %1$d/%2$d…</string>
+    <string name="ig_chat_export_done_media">已將 %1$d 則訊息與 %2$d 個媒體檔案匯出至 %3$s</string>
+    <string name="ig_export_media_saved">匯出已儲存 — %1$d 個媒體檔案已存入 %2$s</string>
+    <string name="ig_feat_edit_history">編輯紀錄</string>
+    <string name="ig_feat_lock_collections">鎖定收藏夾</string>
+    <string name="ig_feat_comment_search">留言搜尋</string>
+    <string name="ig_feat_viewer_search">限時動態觀看者</string>
+    <string name="ig_feat_follow_export">追蹤匯出</string>
+    <string name="ig_feat_saved_on_profile">個人檔案上的收藏</string>
+    <string name="ig_feat_hide_notes">隱藏便利貼列</string>
+    <string name="ig_feat_voice_download">語音下載</string>
+    <string name="ig_feat_photo_zoom">相片縮放</string>
+    <string name="ig_chat_export_none">此聊天尚未載入任何訊息</string>
+    <string name="ig_media_info_copy">複製</string>
+    <string name="ig_dialog_misc_comment_search">搜尋留言</string>
+    <string name="ig_comment_search">搜尋留言</string>
+    <string name="ig_comment_search_hint">在 %1$d 則已載入留言中搜尋</string>
+    <string name="ig_comment_search_load_all">全部載入</string>
+    <string name="ig_comment_search_stop">停止</string>
+    <string name="ig_comment_search_field_hint">依名稱或關鍵字搜尋</string>
+    <string name="ig_comment_search_count">已載入 %1$d 則留言</string>
+    <string name="ig_comment_search_matches">%1$d 則留言中有 %2$d 則符合</string>
+    <string name="ig_comment_search_empty">沒有符合的留言</string>
+    <string name="ig_comment_search_tip">點一下留言即可複製</string>
+    <string name="ig_comment_search_view_replies">查看 %1$d 則回覆</string>
+    <string name="ig_comment_search_hide_replies">隱藏回覆</string>
+    <string name="ig_comment_export">匯出</string>
+    <string name="ig_comment_export_working">正在匯出已載入的留言…</string>
+    <string name="ig_comment_export_post_media">同時儲存貼文的相片/影片</string>
+    <string name="ig_comment_export_done">已將 %1$d 則留言匯出至 %2$s</string>
+    <string name="ig_dialog_misc_follow_export">將粉絲/追蹤中名單匯出為 CSV</string>
+    <string name="ig_follow_export">匯出 CSV</string>
+    <string name="ig_follow_export_done">已將 %1$d 個帳號匯出至 %2$s</string>
+    <string name="ig_follow_export_none">尚未載入任何帳號</string>
+    <string name="ig_follow_export_loading">正在載入帳號… 已載入 %1$d 個。\n請停留在此畫面直到完成。</string>
+    <string name="ig_follow_export_stop">停止並儲存</string>
+    <string name="ig_comment_gif_downloading">正在下載留言媒體…</string>
+    <string name="ig_comment_copy_media_link">複製 GIF / 圖片連結</string>
+    <string name="ig_highlight_download_all">下載整個精選</string>
+    <string name="ig_highlight_loading">正在載入精選…</string>
+    <string name="ig_highlight_downloading">正在下載 %1$d 個精選項目…</string>
+    <string name="ig_highlight_done">精選已儲存：%1$d / %2$d 個項目</string>
 </resources>
