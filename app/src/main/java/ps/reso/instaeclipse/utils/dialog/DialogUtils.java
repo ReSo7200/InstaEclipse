@@ -66,6 +66,7 @@ public class DialogUtils {
     private static final String A_APPEARANCE = "#FF375F"; // vivid pink/red
     private static final String A_PRIVACY    = "#5E5CE6"; // indigo
     private static final String A_MEDIA      = "#FF9F0A"; // amber
+    private static final String A_SOCIAL     = "#BF5AF2"; // purple
     private static final String A_TOOLS      = "#8E8E93"; // neutral gray
 
     /** Card corner radius (px) — the rounded "grouped list" idiom. */
@@ -158,36 +159,45 @@ public class DialogUtils {
         mainLayout.setOrientation(LinearLayout.VERTICAL);
         mainLayout.setPadding(24, 0, 24, 0);
 
-        // ---- APPEARANCE ---- look & feel: theme, fonts/emoji (inside theme), quality, feed cleanup
+        // ---- APPEARANCE ---- look & feel: theme, feed, navigation bar, reels & stories
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_appearance)));
         LinearLayout appearance = createGroupCard(context);
         appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
-        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.ig_dialog_menu_quality), A_APPEARANCE, () -> showQualityOptions(context)));
-        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.ig_dialog_menu_clean_feed), A_APPEARANCE, () -> showCleanFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "followingOnlyFeed", "hidePlusUpsells", "expandCaptions")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_feed), A_APPEARANCE, () -> showFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "hidePlusUpsells", "followingOnlyFeed", "hideStoriesTray", "disableDiscoverPeople", "expandCaptions", "exactTimestamps", "highResolutionImages", "enablePhotoZoom", "disableVideoAutoPlay")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), onCount(context, "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile", "disableSwipeToCamera")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels_stories), A_APPEARANCE, () -> showReelsStoriesOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "disableStoryFlipping", "enableStoryMentions", "storyViewerSearch", "disableRepost")));
         mainLayout.addView(appearance);
 
-        // ---- PRIVACY ---- ghost, lock, hidden chats, ad/analytics blocking, distraction-free
+        // ---- PRIVACY ---- ghost, messages, hidden chats, lock, ads/tracking, location, distraction-free
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_privacy)));
         LinearLayout privacy = createGroupCard(context);
-        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostScreenshot", "isGhostViewOnce", "isGhostStory", "isGhostLive", "allowScreenshots", "keepEphemeralMessages", "permanentViewMode", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "chatExport")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "isGhostScreenshot", "allowScreenshots", "isGhostViewOnce", "permanentViewMode", "spoofLastSeen", "airplaneMode")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_chat, I18n.t(context, R.string.menu_messages), A_PRIVACY, () -> showMessagesOptions(context), onCount(context, "keepEphemeralMessages", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "chatExport", "hideNotesTray", "hideShareCreateGroup")));
         privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context), onCount(context, "hideSpecificChats", "hideChatButtonStealth")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.ig_dialog_menu_ad_analytics), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments", "hideNotesTray")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.menu_ads_tracking), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally", "removeMetaAI", "hideOnboardingPrompts")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_PRIVACY, () -> showLocationOptions(context), onCount(context, "spoofLocation")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments")));
         mainLayout.addView(privacy);
 
-        // ---- MEDIA ---- downloading, location spoofing
+        // ---- MEDIA ---- downloading, post-menu extras and uploads
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_media)));
         LinearLayout media = createGroupCard(context);
-        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "copyMediaLink", "offerAudioDownload", "enableVoiceDownload", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed", "forceReelScrubber", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories")));
-        media.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_MEDIA, () -> showLocationOptions(context), onCount(context, "spoofLocation")));
+        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "offerAudioDownload", "cacheStories")));
+        media.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.menu_post_menu), A_MEDIA, () -> showPostMenuOptions(context), onCount(context, "copyMediaLink", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed", "maxUploadQuality", "saveInstants", "uploadInstants")));
         mainLayout.addView(media);
 
-        // ---- TOOLS ---- misc toggles, developer, backup, restart, cache, about
+        // ---- SOCIAL ---- likes, comments, profiles
+        mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_social)));
+        LinearLayout social = createGroupCard(context);
+        social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "enableCopyComment", "commentSearch", "enableCaptionCopy")));
+        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileFollowsYouLabel", "showFollowerToast", "followListExport", "savedOnProfile")));
+        mainLayout.addView(social);
+
+        // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_tools)));
         LinearLayout tools = createGroupCard(context);
-        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.ig_dialog_menu_misc), A_TOOLS, () -> showMiscOptions(context), onCount(context, "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast", "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment", "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI", "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "savedOnProfile", "storyViewerSearch", "commentSearch", "followListExport")));
-        tools.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.ig_dialog_menu_extras), A_TOOLS, () -> showExtrasOptions(context), onCount(context, ExtrasFeatures.flags())));
+        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.menu_app), A_TOOLS, () -> showAppOptions(context), onCount(context, "unlimitedAccounts", "fixNotificationRegistration", "showFeatureToasts")));
         tools.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_menu_dev_options), A_TOOLS, () -> showDevOptions(context), onCount(context, "isDevEnabled", "removeBuildExpiredPopup")));
         tools.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.ig_dialog_menu_backup_restore), A_TOOLS, () -> showBackupRestoreOptions(context)));
         tools.addView(createMenuRow(context, R.drawable.ic_restart, I18n.t(context, R.string.ig_dialog_menu_restart), A_TOOLS, () -> showRestartSection(context)));
@@ -250,6 +260,83 @@ public class DialogUtils {
             } catch (Throwable ignored) {}
         }
         return on > 0 ? I18n.t(context, R.string.feat_count_on, on) : I18n.t(context, R.string.feat_count_off);
+    }
+
+    // ==== FLAG-BOUND ROWS ====
+    // Rows bound to a FeatureFlags boolean by field name (read/written by reflection, like onCount),
+    // so a menu is just a list of rows and no index→flag switch has to be kept in step with it.
+
+    private static boolean flagValue(String flag) {
+        try {
+            return FeatureFlags.class.getField(flag).getBoolean(null);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private static void setFlagValue(String flag, boolean value) {
+        try {
+            FeatureFlags.class.getField(flag).setBoolean(null, value);
+        } catch (Throwable ignored) {}
+    }
+
+    /** Switch for FeatureFlags.{flag}: toggling sets the flag, saves, then runs {@code after} (may be null). */
+    private static ToggleRow flagSwitch(Context context, int iconRes, String accentHex, int labelRes, String flag, Runnable after) {
+        ToggleRow row = createSwitch(context, iconRes, accentHex, I18n.t(context, labelRes), flagValue(flag));
+        row.setOnCheckedChangeListener((b, checked) -> {
+            setFlagValue(flag, checked);
+            SettingsManager.saveAllFlags();
+            if (after != null) after.run();
+        });
+        return row;
+    }
+
+    private static ToggleRow flagSwitch(Context context, int iconRes, String accentHex, int labelRes, String flag) {
+        return flagSwitch(context, iconRes, accentHex, labelRes, flag, null);
+    }
+
+    /** Switch for an Extras feature, with the label and icon from its ExtrasFeatures entry. */
+    private static ToggleRow extraSwitch(Context context, String accentHex, String flag, Runnable after) {
+        ExtrasFeatures.Entry e = ExtrasFeatures.entry(flag);
+        return flagSwitch(context, e.icon, accentHex, e.label, flag, after);
+    }
+
+    private static ToggleRow extraSwitch(Context context, String accentHex, String flag) {
+        return extraSwitch(context, accentHex, flag, null);
+    }
+
+    /**
+     * Adds the "Enable/Disable all" master switch plus a card holding {@code rows} to layout. The
+     * master flips every row (each row's own listener sets its flag); any row change re-syncs it.
+     * Returns the card so a menu can append extra rows to it.
+     */
+    private static LinearLayout addMasterGroup(Context context, LinearLayout layout, ToggleRow... rows) {
+        ToggleRow master = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(rows));
+        CompoundButton.OnCheckedChangeListener flipAll = (b, checked) -> {
+            for (ToggleRow r : rows) r.setChecked(checked);
+        };
+        master.setOnCheckedChangeListener(flipAll);
+        for (ToggleRow r : rows) {
+            r.addOnCheckedChangeListener((b, checked) -> {
+                master.setOnCheckedChangeListener(null);
+                master.setChecked(areAllEnabled(rows));
+                master.setOnCheckedChangeListener(flipAll);
+            });
+        }
+
+        layout.addView(createDivider(context));
+        layout.addView(createEnableAllSwitch(context, master));
+        layout.addView(createDivider(context));
+        LinearLayout group = cardOf(context, rows);
+        layout.addView(group);
+        return group;
+    }
+
+    /** A grouped card holding the given rows. */
+    private static LinearLayout cardOf(Context context, View... rows) {
+        LinearLayout group = card(context);
+        for (View r : rows) group.addView(r);
+        return group;
     }
 
     /** InstaEclipse's own version, read from the module APK (works inside Instagram's process). */
@@ -910,187 +997,71 @@ public class DialogUtils {
     private static void showGhostOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        ToggleRow[] switches = new ToggleRow[]{
-                createSwitch(context, R.drawable.ic_eye_off, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_hide_dm_seen),         FeatureFlags.isGhostSeen),
-                createSwitch(context, R.drawable.ic_chat, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_hide_typing),          FeatureFlags.isGhostTyping),
-                createSwitch(context, R.drawable.ic_story_ring, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_hide_story_views),     FeatureFlags.isGhostStory),
-                createSwitch(context, R.drawable.ic_live, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_hide_live_presence),   FeatureFlags.isGhostLive),
-                createSwitch(context, R.drawable.ic_camera, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_allow_screenshots_dms),FeatureFlags.allowScreenshots),
-                createSwitch(context, R.drawable.ic_camera, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_bypass_screenshot),    FeatureFlags.isGhostScreenshot),
-                createSwitch(context, R.drawable.ic_eye_off, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_hide_view_once),       FeatureFlags.isGhostViewOnce),
-                createSwitch(context, R.drawable.ic_eye, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_permanent_view_once),  FeatureFlags.permanentViewMode),
-                createSwitch(context, R.drawable.ic_timer, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_keep_disappearing),    FeatureFlags.keepEphemeralMessages),
-                createSwitch(context, R.drawable.ic_chat, "#5E5CE6", I18n.t(context, R.string.ig_dialog_ghost_keep_unsent),         FeatureFlags.keepUnsentMessages)};
-
-        layout.addView(createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ig_dialog_unsent_title), "#5E5CE6", v -> showUnsentMessages(context)));
         layout.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_customize_quick_toggle), "#5E5CE6", v -> showGhostQuickToggleOptions(context)));
         layout.addView(createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_read_receipts_title), "#5E5CE6", v -> showReadReceiptWhitelist(context)));
-        ToggleRow editHistory = createSwitch(context, R.drawable.ic_chat, "#5E5CE6",
-                I18n.t(context, R.string.ig_dialog_ghost_edit_history), FeatureFlags.keepEditHistory);
-        editHistory.setOnCheckedChangeListener((b, checked) -> {
-            FeatureFlags.keepEditHistory = checked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(editHistory);
-        ToggleRow jumpFirst = createSwitch(context, R.drawable.ic_jump_first, "#5E5CE6",
-                I18n.t(context, R.string.ig_dialog_ghost_jump_first), FeatureFlags.jumpToFirstMessage);
-        jumpFirst.setOnCheckedChangeListener((b, checked) -> {
-            FeatureFlags.jumpToFirstMessage = checked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(jumpFirst);
-        ToggleRow chatExp = createSwitch(context, R.drawable.ic_download, "#5E5CE6",
-                I18n.t(context, R.string.ig_dialog_ghost_chat_export), FeatureFlags.chatExport);
-        chatExp.setOnCheckedChangeListener((b, checked) -> {
-            FeatureFlags.chatExport = checked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(chatExp);
 
-        ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
-
-        enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            for (ToggleRow s :switches) {
-                s.setChecked(isChecked);
+        // Each ghost toggle applies at once and refreshes the ghost emoji next to the inbox.
+        Runnable refreshGhostEmoji = () -> {
+            Activity activity = UIHookManager.getCurrentActivity();
+            if (activity != null) {
+                GhostEmojiManager.addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
             }
-        });
+        };
+        addMasterGroup(context, layout,
+                flagSwitch(context, R.drawable.ic_eye_off, "#5E5CE6", R.string.ig_dialog_ghost_hide_dm_seen, "isGhostSeen", refreshGhostEmoji),
+                flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_ghost_hide_typing, "isGhostTyping", refreshGhostEmoji),
+                flagSwitch(context, R.drawable.ic_story_ring, "#5E5CE6", R.string.ig_dialog_ghost_hide_story_views, "isGhostStory", refreshGhostEmoji),
+                flagSwitch(context, R.drawable.ic_live, "#5E5CE6", R.string.ig_dialog_ghost_hide_live_presence, "isGhostLive", refreshGhostEmoji),
+                flagSwitch(context, R.drawable.ic_camera, "#5E5CE6", R.string.ig_dialog_ghost_bypass_screenshot, "isGhostScreenshot", refreshGhostEmoji),
+                flagSwitch(context, R.drawable.ic_camera, "#5E5CE6", R.string.ig_dialog_ghost_allow_screenshots_dms, "allowScreenshots", refreshGhostEmoji),
+                flagSwitch(context, R.drawable.ic_eye_off, "#5E5CE6", R.string.ig_dialog_ghost_hide_view_once, "isGhostViewOnce", refreshGhostEmoji),
+                flagSwitch(context, R.drawable.ic_eye, "#5E5CE6", R.string.ig_dialog_ghost_permanent_view_once, "permanentViewMode", refreshGhostEmoji));
 
-        for (int i = 0; i < switches.length; i++) {
-            final int index = i;
-            switches[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                enableAllSwitch.setOnCheckedChangeListener(null);
-                enableAllSwitch.setChecked(areAllEnabled(switches));
-                enableAllSwitch.setOnCheckedChangeListener((buttonView2, isChecked2) -> {
-                    for (ToggleRow s2 :switches) {
-                        s2.setChecked(isChecked2);
-                    }
-                });
-
-                // Set FeatureFlag immediately
-                switch (index) {
-                    case 0:
-                        FeatureFlags.isGhostSeen = isChecked;
-                        break;
-                    case 1:
-                        FeatureFlags.isGhostTyping = isChecked;
-                        break;
-                    case 2:
-                        FeatureFlags.isGhostStory = isChecked;
-                        break;
-                    case 3:
-                        FeatureFlags.isGhostLive = isChecked;
-                        break;
-                    case 4:
-                        FeatureFlags.allowScreenshots = isChecked;
-                        break;
-                    case 5:
-                        FeatureFlags.isGhostScreenshot = isChecked;
-                        break;
-                    case 6:
-                        FeatureFlags.isGhostViewOnce = isChecked;
-                        break;
-                    case 7:
-                        FeatureFlags.permanentViewMode = isChecked;
-                        break;
-                    case 8:
-                        FeatureFlags.keepEphemeralMessages = isChecked;
-                        break;
-                    case 9:
-                        FeatureFlags.keepUnsentMessages = isChecked;
-                        break;
-                }
-
-                // Save immediately
-                SettingsManager.saveAllFlags();
-
-                // Update ghost emoji immediately
-                Activity activity = UIHookManager.getCurrentActivity();
-                if (activity != null) {
-                    GhostEmojiManager.addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
-                }
-            });
-        }
-
+        // Outside the master switch: last-seen spoofing and airplane mode.
         layout.addView(createDivider(context));
-        layout.addView(createEnableAllSwitch(context, enableAllSwitch));
-        layout.addView(createDivider(context));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_timer, "#5E5CE6", R.string.ig_dialog_misc_spoof_last_seen, "spoofLastSeen"),
+                // Airplane mode takes effect at once: stop / restart the live MQTT connection.
+                extraSwitch(context, "#5E5CE6", "airplaneMode", ps.reso.instaeclipse.mods.extras.AirplaneModeHook::apply)));
 
-        LinearLayout groupCard = card(context);
-        for (ToggleRow s :switches) {
-            groupCard.addView(s);
-        }
-        layout.addView(groupCard);
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_ghost_mode), layout, () -> {});
+    }
 
-        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_ghost_mode), layout, () -> {
-            // No need to set FeatureFlags here anymore because handled instantly
-        });
+    /** DM extras: keep disappearing/unsent messages, edit history, chat tools, inbox cleanup. */
+    private static void showMessagesOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_timer, "#5E5CE6", R.string.ig_dialog_ghost_keep_disappearing, "keepEphemeralMessages"),
+                flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_ghost_keep_unsent, "keepUnsentMessages"),
+                createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ig_dialog_unsent_title), "#5E5CE6", v -> showUnsentMessages(context)),
+                flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_ghost_edit_history, "keepEditHistory"),
+                flagSwitch(context, R.drawable.ic_jump_first, "#5E5CE6", R.string.ig_dialog_ghost_jump_first, "jumpToFirstMessage"),
+                flagSwitch(context, R.drawable.ic_download, "#5E5CE6", R.string.ig_dialog_ghost_chat_export, "chatExport"),
+                flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_distraction_hide_notes_tray, "hideNotesTray"),
+                flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_misc_hide_share_create_group, "hideShareCreateGroup")));
+        showSectionDialog(context, I18n.t(context, R.string.menu_messages), layout, () -> {});
     }
 
 
     private static void showAdOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        // Create switches
-        ToggleRow adBlock = createSwitch(context, R.drawable.ic_shield, "#FF453A", I18n.t(context, R.string.ig_dialog_ad_block_ads), FeatureFlags.isAdBlockEnabled);
-
-        ToggleRow analytics = createSwitch(context, R.drawable.ic_shield, "#FF453A", I18n.t(context, R.string.ig_dialog_ad_block_analytics), FeatureFlags.isAnalyticsBlocked);
-
-        ToggleRow trackingLinks = createSwitch(context, R.drawable.ic_link, "#FF453A", I18n.t(context, R.string.ig_dialog_ad_disable_tracking), FeatureFlags.disableTrackingLinks);
-
-        ToggleRow externalLinks = createSwitch(context, R.drawable.ic_link, "#FF453A", I18n.t(context, R.string.ig_dialog_open_links_externally), FeatureFlags.openLinksExternally);
-
-        ToggleRow[] switches = new ToggleRow[]{adBlock, analytics, trackingLinks, externalLinks};
-
-        // Create Enable/Disable All switch
-        ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
-
-        // Master listener
-        enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            for (ToggleRow s :switches) {
-                s.setChecked(isChecked);
-            }
-        });
-
-        // Individual switch listeners
-        for (int i = 0; i < switches.length; i++) {
-            final int index = i;
-            switches[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                enableAllSwitch.setOnCheckedChangeListener(null);
-                enableAllSwitch.setChecked(areAllEnabled(switches));
-                enableAllSwitch.setOnCheckedChangeListener((buttonView2, isChecked2) -> {
-                    for (ToggleRow s2 :switches) {
-                        s2.setChecked(isChecked2);
-                    }
-                });
-
-                // Update FeatureFlag immediately
-                if (index == 0) FeatureFlags.isAdBlockEnabled = isChecked;
-                if (index == 1) FeatureFlags.isAnalyticsBlocked = isChecked;
-                if (index == 2) FeatureFlags.disableTrackingLinks = isChecked;
-                if (index == 3) FeatureFlags.openLinksExternally = isChecked;
-
-                // Save immediately
-                SettingsManager.saveAllFlags();
-            });
-        }
-
-
-        // Add views
-        layout.addView(createDivider(context));
-        layout.addView(createEnableAllSwitch(context, enableAllSwitch));
-        layout.addView(createDivider(context));
-
-        LinearLayout groupCard = card(context);
-        for (ToggleRow s :switches) {
-            groupCard.addView(s);
-        }
-        groupCard.addView(createActionRow(context, R.drawable.ic_link, shareDomainLabel(context), "#FF453A",
+        LinearLayout adCard = addMasterGroup(context, layout,
+                flagSwitch(context, R.drawable.ic_shield, "#FF453A", R.string.ig_dialog_ad_block_ads, "isAdBlockEnabled"),
+                flagSwitch(context, R.drawable.ic_shield, "#FF453A", R.string.ig_dialog_ad_block_analytics, "isAnalyticsBlocked"),
+                flagSwitch(context, R.drawable.ic_link, "#FF453A", R.string.ig_dialog_ad_disable_tracking, "disableTrackingLinks"),
+                flagSwitch(context, R.drawable.ic_link, "#FF453A", R.string.ig_dialog_open_links_externally, "openLinksExternally"));
+        // The master group's card ends with the custom share-domain row, as before.
+        adCard.addView(createActionRow(context, R.drawable.ic_link, shareDomainLabel(context), "#FF453A",
                 v -> showShareDomainDialog(context, (TextView) findFirstText(v))));
-        layout.addView(groupCard);
 
-        // Show the dialog
-        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_ad_analytics), layout, () -> {
-        });
+        // Outside the master switch.
+        layout.addView(createDivider(context));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_sparkle, "#FF453A", R.string.ig_dialog_misc_remove_meta_ai, "removeMetaAI"),
+                extraSwitch(context, "#FF453A", "hideOnboardingPrompts")));
+
+        showSectionDialog(context, I18n.t(context, R.string.menu_ads_tracking), layout, () -> {});
     }
 
 
@@ -1228,36 +1199,6 @@ public class DialogUtils {
         }
         layout.addView(groupCard);
 
-        // Customize navigation bar (#238) — independent of the toggles above / extreme mode.
-        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_nav_tabs_title)));
-        LinearLayout navCard = card(context);
-        ToggleRow navTab0 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_home), FeatureFlags.hideTabHome);
-        navTab0.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabHome = c; SettingsManager.saveAllFlags(); });
-        navCard.addView(navTab0);
-        ToggleRow navTab1 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_reels), FeatureFlags.hideTabReels);
-        navTab1.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabReels = c; SettingsManager.saveAllFlags(); });
-        navCard.addView(navTab1);
-        ToggleRow navTab2 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_create), FeatureFlags.hideTabCreate);
-        navTab2.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabCreate = c; SettingsManager.saveAllFlags(); });
-        navCard.addView(navTab2);
-        ToggleRow navTab3 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_messages), FeatureFlags.hideTabMessages);
-        navTab3.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabMessages = c; SettingsManager.saveAllFlags(); });
-        navCard.addView(navTab3);
-        ToggleRow navTab4 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_activity), FeatureFlags.hideTabActivity);
-        navTab4.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabActivity = c; SettingsManager.saveAllFlags(); });
-        navCard.addView(navTab4);
-        ToggleRow navTab5 = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_nav_tab_profile), FeatureFlags.hideTabProfile);
-        navTab5.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideTabProfile = c; SettingsManager.saveAllFlags(); });
-        navCard.addView(navTab5);
-        ToggleRow notesTray = createSwitch(context, R.drawable.ic_block, "#30D158", I18n.t(context, R.string.ig_dialog_distraction_hide_notes_tray), FeatureFlags.hideNotesTray);
-        notesTray.setOnCheckedChangeListener((b, c) -> { FeatureFlags.hideNotesTray = c; SettingsManager.saveAllFlags(); });
-        navCard.addView(notesTray);
-        navCard.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_nav_tab_order), "#30D158",
-                v -> showTabOrderDialog(context)));
-        navCard.addView(createActionRow(context, R.drawable.ic_tune, startupTabLabel(context), "#30D158",
-                v -> showStartupTabDialog(context, (TextView) findFirstText(v))));
-        layout.addView(navCard);
-
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {
             FeatureFlags.disableStories = disableStoriesSwitch.isChecked();
             FeatureFlags.disableFeed = disableFeedSwitch.isChecked();
@@ -1268,6 +1209,32 @@ public class DialogUtils {
         });
 
         SettingsManager.saveAllFlags();
+    }
+
+    /** Bottom navigation bar (#238): hide tabs, reorder them, pick the startup tab, gestures. */
+    private static void showNavigationOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.menu_nav_tabs)));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_nav_tab_home, "hideTabHome"),
+                flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_nav_tab_reels, "hideTabReels"),
+                flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_nav_tab_create, "hideTabCreate"),
+                flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_nav_tab_messages, "hideTabMessages"),
+                flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_nav_tab_activity, "hideTabActivity"),
+                flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_nav_tab_profile, "hideTabProfile")));
+
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.menu_nav_order)));
+        layout.addView(cardOf(context,
+                createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_nav_tab_order), "#30D158",
+                        v -> showTabOrderDialog(context)),
+                createActionRow(context, R.drawable.ic_tune, startupTabLabel(context), "#30D158",
+                        v -> showStartupTabDialog(context, (TextView) findFirstText(v)))));
+
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.menu_nav_gestures)));
+        layout.addView(cardOf(context, extraSwitch(context, "#30D158", "disableSwipeToCamera")));
+
+        showSectionDialog(context, I18n.t(context, R.string.menu_navigation), layout, () -> {});
     }
 
     static String[] startupTabNames(Context context) {
@@ -1389,82 +1356,78 @@ public class DialogUtils {
     }
 
 
-    private static void showExtrasOptions(Context context) {
+    /** Feed: what shows up in it (clean-feed filters) and how posts render. */
+    private static void showFeedOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
-        LinearLayout group = card(context);
-        for (ExtrasFeatures.Entry e : ExtrasFeatures.ALL) {
-            ToggleRow row = createSwitch(context, e.icon, "#BF5AF2", I18n.t(context, e.label), ExtrasFeatures.get(e.flag));
-            row.setOnCheckedChangeListener((b, checked) -> {
-                ExtrasFeatures.set(e.flag, checked);
-                SettingsManager.saveAllFlags();
-                // Airplane mode takes effect at once: stop / restart the live MQTT connection.
-                if ("airplaneMode".equals(e.flag)) ps.reso.instaeclipse.mods.extras.AirplaneModeHook.apply();
-            });
-            group.addView(row);
-        }
-        layout.addView(group);
-        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_menu_extras), layout, () -> {});
+
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_dialog_menu_clean_feed)));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_suggested, "hideSuggestionsInFeed"),
+                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_threads, "hideThreadsSuggestions"),
+                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_liked, "hideLikedPosts"),
+                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_community_notes, "hideCommunityNotes"),
+                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_plus, "hidePlusUpsells"),
+                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_following_only, "followingOnlyFeed"),
+                extraSwitch(context, "#64D2FF", "hideStoriesTray"),
+                flagSwitch(context, R.drawable.ic_block, "#64D2FF", R.string.ig_dialog_misc_disable_discover_people, "disableDiscoverPeople")));
+
+        // feat_options reads "Options:" (written for the companion app), so drop the colon for a header.
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.feat_options).replaceAll("[:：]\\s*$", "")));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_expand_captions, "expandCaptions"),
+                flagSwitch(context, R.drawable.ic_timer, "#64D2FF", R.string.ig_dialog_misc_exact_timestamps, "exactTimestamps"),
+                extraSwitch(context, "#64D2FF", "highResolutionImages"),
+                flagSwitch(context, R.drawable.ic_search, "#64D2FF", R.string.ig_dialog_misc_photo_zoom, "enablePhotoZoom"),
+                flagSwitch(context, R.drawable.ic_movie, "#64D2FF", R.string.ig_dialog_misc_disable_video_autoplay, "disableVideoAutoPlay")));
+
+        showSectionDialog(context, I18n.t(context, R.string.menu_feed), layout, () -> {});
     }
 
-    private static void showCleanFeedOptions(Context context) {
+    /** Reels & Stories: forced reel quality, reel scrolling/scrubber, story behaviour. */
+    private static void showReelsStoriesOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        ToggleRow hideSuggestedSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_suggested), FeatureFlags.hideSuggestionsInFeed);
+        // Force Reels Quality — inline single choice (FeatureFlags.forceReelQuality, 0 = auto).
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_dialog_quality_force_reels)));
+        String[] labels = {
+                I18n.t(context, R.string.ig_dialog_quality_auto),
+                I18n.t(context, R.string.ig_dialog_quality_360),
+                I18n.t(context, R.string.ig_dialog_quality_480),
+                I18n.t(context, R.string.ig_dialog_quality_720),
+                I18n.t(context, R.string.ig_dialog_quality_1080),
+                I18n.t(context, R.string.ig_dialog_quality_max)
+        };
+        int[] values = {0, 360, 480, 720, 1080, Integer.MAX_VALUE};
+        int current = FeatureFlags.forceReelQuality;
+        LinearLayout qualityCard = card(context);
+        RadioRow[] rows = new RadioRow[labels.length];
+        for (int i = 0; i < labels.length; i++) {
+            int idx = i;
+            rows[i] = new RadioRow(context, labels[i], values[i] == current);
+            rows[i].setOnClickListener(v -> {
+                FeatureFlags.forceReelQuality = values[idx];
+                SettingsManager.saveAllFlags();
+                for (RadioRow r : rows) r.setChecked(false);
+                rows[idx].setChecked(true);
+            });
+            qualityCard.addView(rows[i]);
+        }
+        layout.addView(qualityCard);
 
-        hideSuggestedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.hideSuggestionsInFeed = isChecked;
-            SettingsManager.saveAllFlags();
-        });
+        layout.addView(createDivider(context));
+        layout.addView(cardOf(context,
+                extraSwitch(context, "#FF375F", "reelsAutoScroll"),
+                extraSwitch(context, "#FF375F", "reelsLockScroll"),
+                flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_downloader_reel_scrubber, "forceReelScrubber")));
 
-        layout.addView(hideSuggestedSwitch);
+        layout.addView(createDivider(context));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_story_ring, "#FF375F", R.string.ig_dialog_misc_disable_story_autoswipe, "disableStoryFlipping"),
+                flagSwitch(context, R.drawable.ic_at, "#FF375F", R.string.ig_dialog_misc_view_story_mentions, "enableStoryMentions"),
+                flagSwitch(context, R.drawable.ic_search, "#FF375F", R.string.ig_dialog_misc_viewer_search, "storyViewerSearch"),
+                flagSwitch(context, R.drawable.ic_block, "#FF375F", R.string.ig_dialog_misc_disable_repost, "disableRepost")));
 
-        ToggleRow hideThreadsSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_threads), FeatureFlags.hideThreadsSuggestions);
-
-        hideThreadsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.hideThreadsSuggestions = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-
-        layout.addView(hideThreadsSwitch);
-
-        ToggleRow hideLikedSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_liked), FeatureFlags.hideLikedPosts);
-
-        hideLikedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.hideLikedPosts = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-
-        layout.addView(hideLikedSwitch);
-
-        ToggleRow hideNotesSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_community_notes), FeatureFlags.hideCommunityNotes);
-        hideNotesSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.hideCommunityNotes = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(hideNotesSwitch);
-
-        ToggleRow followingOnlyFeedSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_following_only), FeatureFlags.followingOnlyFeed);
-        followingOnlyFeedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.followingOnlyFeed = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(followingOnlyFeedSwitch);
-
-        ToggleRow hidePlusSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_plus), FeatureFlags.hidePlusUpsells);
-        hidePlusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.hidePlusUpsells = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(hidePlusSwitch);
-
-        ToggleRow expandSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_expand_captions), FeatureFlags.expandCaptions);
-        expandSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.expandCaptions = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(expandSwitch);
-
-        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_clean_feed), layout, () -> {});
+        showSectionDialog(context, I18n.t(context, R.string.menu_reels_stories), layout, () -> {});
     }
 
 
@@ -1545,143 +1508,37 @@ public class DialogUtils {
         return cardView;
     }
 
-    private static void showMiscOptions(Context context) {
+    /** Likes & Comments: like gestures, copy/search in comments and captions. */
+    private static void showLikesCommentsOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_dialog_misc_disable_double_tap_like, "disableDoubleTapLike"),
+                flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_dialog_misc_like_undo, "likeUndo"),
+                flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_comment, "enableCopyComment"),
+                flagSwitch(context, R.drawable.ic_search, A_SOCIAL, R.string.ig_dialog_misc_comment_search, "commentSearch"),
+                flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_caption, "enableCaptionCopy")));
+        showSectionDialog(context, I18n.t(context, R.string.menu_likes_comments), layout, () -> {});
+    }
 
-        // Create all child switches
-        ToggleRow[] switches = new ToggleRow[]{
-                createSwitch(context, R.drawable.ic_story_ring, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_story_autoswipe), FeatureFlags.disableStoryFlipping),
-                createSwitch(context, R.drawable.ic_movie, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_video_autoplay),  FeatureFlags.disableVideoAutoPlay),
-                createSwitch(context, R.drawable.ic_block, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_repost),          FeatureFlags.disableRepost),
-                createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_show_feature_toasts),     FeatureFlags.showFeatureToasts),
-                createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_show_follower_toast),     FeatureFlags.showFollowerToast),
-                createSwitch(context, R.drawable.ic_at, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_view_story_mentions),     FeatureFlags.enableStoryMentions),
-                createSwitch(context, R.drawable.ic_block, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_discover_people), FeatureFlags.disableDiscoverPeople),
-                createSwitch(context, R.drawable.ic_content_copy, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_copy_comment),            FeatureFlags.enableCopyComment),
-                createSwitch(context, R.drawable.ic_heart, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_double_tap_like), FeatureFlags.disableDoubleTapLike),
-                createSwitch(context, R.drawable.ic_content_copy, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_copy_caption),            FeatureFlags.enableCaptionCopy),
-                createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_photo_zoom),               FeatureFlags.enablePhotoZoom),
-                createSwitch(context, R.drawable.ic_timer, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_spoof_last_seen),          FeatureFlags.spoofLastSeen),
-                createSwitch(context, R.drawable.ic_sparkle, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_remove_meta_ai),        FeatureFlags.removeMetaAI),
-                createSwitch(context, R.drawable.ic_block, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_hide_share_create_group), FeatureFlags.hideShareCreateGroup),
-                createSwitch(context, R.drawable.ic_timer, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_exact_timestamps), FeatureFlags.exactTimestamps),
-                createSwitch(context, R.drawable.ic_heart, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_like_undo), FeatureFlags.likeUndo),
-                createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_profile_follows_label), FeatureFlags.profileFollowsYouLabel),
-                createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_viewer_search), FeatureFlags.storyViewerSearch),
-                createSwitch(context, R.drawable.ic_search, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_comment_search), FeatureFlags.commentSearch),
-                createSwitch(context, R.drawable.ic_download, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_follow_export), FeatureFlags.followListExport),
-                createSwitch(context, R.drawable.ic_save, "#BF5AF2", I18n.t(context, R.string.ig_saved_on_profile), FeatureFlags.savedOnProfile)
-                // Lock controls moved to their own grouped "Lock" card below (see buildLockCard).
-        };
+    /** Profiles: follows-you label, follower toast, follow-list export, Saved on profile. */
+    private static void showProfilesOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_misc_profile_follows_label, "profileFollowsYouLabel"),
+                flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_misc_show_follower_toast, "showFollowerToast"),
+                flagSwitch(context, R.drawable.ic_download, A_SOCIAL, R.string.ig_dialog_misc_follow_export, "followListExport"),
+                flagSwitch(context, R.drawable.ic_save, A_SOCIAL, R.string.ig_saved_on_profile, "savedOnProfile")));
+        showSectionDialog(context, I18n.t(context, R.string.menu_profiles), layout, () -> {});
+    }
 
-        // Create Enable/Disable All switch
-        ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
-
-        enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            for (ToggleRow s :switches) {
-                s.setChecked(isChecked);
-            }
-        });
-
-        for (int i = 0; i < switches.length; i++) {
-            final int index = i;
-            switches[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                enableAllSwitch.setOnCheckedChangeListener(null);
-                enableAllSwitch.setChecked(areAllEnabled(switches));
-                enableAllSwitch.setOnCheckedChangeListener((buttonView2, isChecked2) -> {
-                    for (ToggleRow s2 :switches) {
-                        s2.setChecked(isChecked2);
-                    }
-                });
-
-                // Update FeatureFlags
-                switch (index) {
-                    case 0:
-                        FeatureFlags.disableStoryFlipping = isChecked;
-                        break;
-                    case 1:
-                        FeatureFlags.disableVideoAutoPlay = isChecked;
-                        break;
-                    case 2:
-                        FeatureFlags.disableRepost = isChecked;
-                        break;
-                    case 3:
-                        FeatureFlags.showFeatureToasts = isChecked;
-                        break;
-                    case 4:
-                        FeatureFlags.showFollowerToast = isChecked;
-                        break;
-                    case 5:
-                        FeatureFlags.enableStoryMentions = isChecked;
-                        break;
-                    case 6:
-                        FeatureFlags.disableDiscoverPeople = isChecked;
-                        break;
-                    case 7:
-                        FeatureFlags.enableCopyComment = isChecked;
-                        break;
-                    case 8:
-                        FeatureFlags.disableDoubleTapLike = isChecked;
-                        break;
-                    case 9:
-                        FeatureFlags.enableCaptionCopy = isChecked;
-                        break;
-                    case 10:
-                        FeatureFlags.enablePhotoZoom = isChecked;
-                        break;
-                    case 11:
-                        FeatureFlags.spoofLastSeen = isChecked;
-                        break;
-                    case 12:
-                        FeatureFlags.removeMetaAI = isChecked;
-                        break;
-                    case 13:
-                        FeatureFlags.hideShareCreateGroup = isChecked;
-                        break;
-                    case 14:
-                        FeatureFlags.exactTimestamps = isChecked;
-                        break;
-                    case 15:
-                        FeatureFlags.likeUndo = isChecked;
-                        break;
-                    case 16:
-                        FeatureFlags.profileFollowsYouLabel = isChecked;
-                        break;
-                    case 17:
-                        FeatureFlags.storyViewerSearch = isChecked;
-                        break;
-                    case 18:
-                        FeatureFlags.commentSearch = isChecked;
-                        break;
-                    case 19:
-                        FeatureFlags.followListExport = isChecked;
-                        break;
-                    case 20:
-                        FeatureFlags.savedOnProfile = isChecked;
-                        break;
-                }
-
-                SettingsManager.saveAllFlags();
-            });
-        }
-
-        // Add views to layout
-        layout.addView(createDivider(context));
-        layout.addView(createEnableAllSwitch(context, enableAllSwitch));
-        layout.addView(createDivider(context));
-
-        LinearLayout groupCard = card(context);
-        for (ToggleRow s :switches) {
-            groupCard.addView(s);
-        }
-        layout.addView(groupCard);
-
-        // Lock, Hide Chats (Privacy group) and Custom Font/Emoji (Custom Theme) are now their own
-        // top-level menu sections — no longer buried inside Misc.
-
-        // Show dialog
-        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_misc), layout, () -> {
-        });
+    /** App & Account: account limit, notification fix, InstaEclipse's own toasts. */
+    private static void showAppOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+        layout.addView(cardOf(context,
+                extraSwitch(context, "#0A84FF", "unlimitedAccounts"),
+                extraSwitch(context, "#0A84FF", "fixNotificationRegistration"),
+                flagSwitch(context, R.drawable.ic_notification, "#0A84FF", R.string.ig_dialog_misc_show_feature_toasts, "showFeatureToasts")));
+        showSectionDialog(context, I18n.t(context, R.string.menu_app), layout, () -> {});
     }
 
     /** Top-level "Lock" section (Privacy group) — the grouped passcode-lock card. */
@@ -2144,15 +2001,6 @@ public class DialogUtils {
         return fontCard;
     }
 
-    private static String qualityLabel(Context context, int h) {
-        if (h == 360) return I18n.t(context, R.string.ig_dialog_quality_360);
-        if (h == 480) return I18n.t(context, R.string.ig_dialog_quality_480);
-        if (h == 720) return I18n.t(context, R.string.ig_dialog_quality_720);
-        if (h == 1080) return I18n.t(context, R.string.ig_dialog_quality_1080);
-        if (h == Integer.MAX_VALUE) return I18n.t(context, R.string.ig_dialog_quality_max);
-        return I18n.t(context, R.string.ig_dialog_quality_auto);
-    }
-
     private static class RadioRow extends LinearLayout {
         private final TextView checkmark;
 
@@ -2193,183 +2041,44 @@ public class DialogUtils {
         }
     }
 
-    private static void showQualityOptions(Context context) {
-        LinearLayout layout = createSwitchLayout(context);
-
-        String[] labels = {
-                I18n.t(context, R.string.ig_dialog_quality_auto),
-                I18n.t(context, R.string.ig_dialog_quality_360),
-                I18n.t(context, R.string.ig_dialog_quality_480),
-                I18n.t(context, R.string.ig_dialog_quality_720),
-                I18n.t(context, R.string.ig_dialog_quality_1080),
-                I18n.t(context, R.string.ig_dialog_quality_max)
-        };
-        int[] values = {0, 360, 480, 720, 1080, Integer.MAX_VALUE};
-        int current = FeatureFlags.forceReelQuality;
-
-        RadioRow[] rows = new RadioRow[labels.length];
-        for (int i = 0; i < labels.length; i++) {
-            rows[i] = new RadioRow(context, labels[i], values[i] == current);
-        }
-        for (int i = 0; i < rows.length; i++) {
-            int idx = i;
-            rows[i].setOnClickListener(v -> {
-                FeatureFlags.forceReelQuality = values[idx];
-                SettingsManager.saveAllFlags();
-                for (RadioRow r : rows) r.setChecked(false);
-                rows[idx].setChecked(true);
-            });
-            layout.addView(rows[i]);
-            if (i < rows.length - 1) layout.addView(createDivider(context));
-        }
-
-        showSectionDialog(context,
-                I18n.t(context, R.string.ig_dialog_quality_force_reels) + " — " + qualityLabel(context, current),
-                layout, () -> {
-        });
-    }
-
     private static void showDownloaderOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
         layout.addView(createActionRow(context, R.drawable.ic_folder, I18n.t(context, R.string.ig_dialog_downloader_settings), "#FF9F0A", v -> showDownloaderSettings(context)));
 
-        ToggleRow postSwitch    = createSwitch(context, R.drawable.ic_download, "#FF9F0A", I18n.t(context, R.string.ig_dialog_downloader_posts),    FeatureFlags.enablePostDownload);
-        ToggleRow storySwitch   = createSwitch(context, R.drawable.ic_download, "#FF9F0A", I18n.t(context, R.string.ig_dialog_downloader_stories),  FeatureFlags.enableStoryDownload);
-        ToggleRow reelSwitch    = createSwitch(context, R.drawable.ic_download, "#FF9F0A", I18n.t(context, R.string.ig_dialog_downloader_reels),    FeatureFlags.enableReelDownload);
-        ToggleRow profileSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A", I18n.t(context, R.string.ig_dialog_downloader_profiles), FeatureFlags.enableProfileDownload);
-
-        ToggleRow[] switches = new ToggleRow[]{postSwitch, storySwitch, reelSwitch, profileSwitch};
-
-        ToggleRow enableAllSwitch = createSwitch(context, I18n.t(context, R.string.ig_dialog_enable_disable_all), areAllEnabled(switches));
-
-        enableAllSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            for (ToggleRow s :switches) {
-                s.setChecked(isChecked);
-            }
-        });
-
-        for (int i = 0; i < switches.length; i++) {
-            final int index = i;
-            switches[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                enableAllSwitch.setOnCheckedChangeListener(null);
-                enableAllSwitch.setChecked(areAllEnabled(switches));
-                enableAllSwitch.setOnCheckedChangeListener((buttonView2, isChecked2) -> {
-                    for (ToggleRow s2 :switches) {
-                        s2.setChecked(isChecked2);
-                    }
-                });
-
-                if (index == 0) FeatureFlags.enablePostDownload    = isChecked;
-                if (index == 1) FeatureFlags.enableStoryDownload   = isChecked;
-                if (index == 2) FeatureFlags.enableReelDownload    = isChecked;
-                if (index == 3) FeatureFlags.enableProfileDownload = isChecked;
-
-                SettingsManager.saveAllFlags();
-            });
-        }
+        addMasterGroup(context, layout,
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_posts, "enablePostDownload"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_stories, "enableStoryDownload"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_reels, "enableReelDownload"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_profiles, "enableProfileDownload"));
 
         layout.addView(createDivider(context));
-        layout.addView(createEnableAllSwitch(context, enableAllSwitch));
-        layout.addView(createDivider(context));
-
-        LinearLayout groupCard = card(context);
-        for (ToggleRow s :switches) {
-            groupCard.addView(s);
-        }
-        layout.addView(groupCard);
-
-        // Copy Media Link (#117) — standalone; injects a "Copy Media Link" row into the
-        // post ⋮ menu that copies the current slide's direct CDN url to the clipboard.
-        ToggleRow copyLinkSwitch = createSwitch(context, R.drawable.ic_link, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_downloader_copy_link), FeatureFlags.copyMediaLink);
-        copyLinkSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.copyMediaLink = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        // Save Instants (#184) — long-press a received Instant to save its media.
-        ToggleRow saveInstantsSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_misc_save_instants), FeatureFlags.saveInstants);
-        saveInstantsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.saveInstants = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-
-        ToggleRow uploadInstantsSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_misc_upload_instants), FeatureFlags.uploadInstants);
-        uploadInstantsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.uploadInstants = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-
-        layout.addView(createDivider(context));
-        LinearLayout copyLinkCard = card(context);
-        copyLinkCard.addView(copyLinkSwitch);
-        ToggleRow voiceSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_downloader_voice), FeatureFlags.enableVoiceDownload);
-        voiceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.enableVoiceDownload = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(voiceSwitch);
-        ToggleRow audioSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_downloader_offer_audio), FeatureFlags.offerAudioDownload);
-        audioSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.offerAudioDownload = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(audioSwitch);
-        ToggleRow maxQualitySwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_max_upload_quality), FeatureFlags.maxUploadQuality);
-        maxQualitySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.maxUploadQuality = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(maxQualitySwitch);
-        ToggleRow copyImageSwitch = createSwitch(context, R.drawable.ic_content_copy, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_downloader_offer_copy_image), FeatureFlags.offerCopyImage);
-        copyImageSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.offerCopyImage = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(copyImageSwitch);
-        ToggleRow infoSwitch = createSwitch(context, R.drawable.ic_search, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_downloader_offer_media_info), FeatureFlags.offerMediaInfo);
-        infoSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.offerMediaInfo = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(infoSwitch);
-        ToggleRow speedSwitch = createSwitch(context, R.drawable.ic_movie, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_downloader_offer_speed), FeatureFlags.offerPlaybackSpeed);
-        speedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.offerPlaybackSpeed = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(speedSwitch);
-        ToggleRow scrubSwitch = createSwitch(context, R.drawable.ic_movie, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_downloader_reel_scrubber), FeatureFlags.forceReelScrubber);
-        scrubSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.forceReelScrubber = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(scrubSwitch);
-        copyLinkCard.addView(saveInstantsSwitch);
-        copyLinkCard.addView(uploadInstantsSwitch);
-
-        // Cache Stories (24h) — keep viewed stories locally so they survive expiry/deletion.
-        ToggleRow cacheStoriesSwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
-                I18n.t(context, R.string.ig_dialog_misc_cache_stories), FeatureFlags.cacheStories);
-        cacheStoriesSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.cacheStories = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        copyLinkCard.addView(cacheStoriesSwitch);
-        copyLinkCard.addView(createActionRow(context, R.drawable.ic_eye,
-                I18n.t(context, R.string.ig_story_cache_view), "#FF9F0A", v -> showCachedStories(context)));
-        layout.addView(copyLinkCard);
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_voice, "enableVoiceDownload"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_offer_audio, "offerAudioDownload"),
+                // Cache Stories (24h) — keep viewed stories locally so they survive expiry/deletion.
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_cache_stories, "cacheStories"),
+                createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_story_cache_view), "#FF9F0A", v -> showCachedStories(context))));
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_downloader), layout, () -> {});
+    }
+
+    /** Post ⋮ menu extras (copy link/image, media info, playback speed) and upload/Instants tweaks. */
+    private static void showPostMenuOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+        layout.addView(cardOf(context,
+                // Copy Media Link (#117) — copies the current slide's direct CDN url to the clipboard.
+                flagSwitch(context, R.drawable.ic_link, "#FF9F0A", R.string.ig_dialog_downloader_copy_link, "copyMediaLink"),
+                flagSwitch(context, R.drawable.ic_content_copy, "#FF9F0A", R.string.ig_dialog_downloader_offer_copy_image, "offerCopyImage"),
+                flagSwitch(context, R.drawable.ic_search, "#FF9F0A", R.string.ig_dialog_downloader_offer_media_info, "offerMediaInfo"),
+                flagSwitch(context, R.drawable.ic_movie, "#FF9F0A", R.string.ig_dialog_downloader_offer_speed, "offerPlaybackSpeed")));
+        layout.addView(createDivider(context));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_max_upload_quality, "maxUploadQuality"),
+                // Save Instants (#184) — long-press a received Instant to save its media.
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_save_instants, "saveInstants"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_upload_instants, "uploadInstants")));
+        showSectionDialog(context, I18n.t(context, R.string.menu_post_menu), layout, () -> {});
     }
 
     /** Viewer for the 24h story cache — a list per author; tap to view; plus a clear action. */
@@ -2839,6 +2548,10 @@ public class DialogUtils {
     private static class ToggleRow extends LinearLayout {
         private final Switch toggle;
         private final TextView labelView;
+        // The row's own listener (replaceable / clearable) plus extra observers that always run
+        // after it, e.g. a master switch keeping itself in sync (see addMasterGroup).
+        private CompoundButton.OnCheckedChangeListener primary;
+        private final java.util.List<CompoundButton.OnCheckedChangeListener> observers = new java.util.ArrayList<>();
 
         ToggleRow(Context context, String label, boolean checked) {
             this(context, 0, null, label, checked);
@@ -2879,6 +2592,10 @@ public class DialogUtils {
                     new int[]{Color.parseColor("#777777"), Color.parseColor("#1C4C78"), Color.parseColor("#CFD8DC")}));
             toggle.setClickable(false);
             toggle.setFocusable(false);
+            toggle.setOnCheckedChangeListener((b, c) -> {
+                if (primary != null) primary.onCheckedChanged(b, c);
+                for (CompoundButton.OnCheckedChangeListener o : observers) o.onCheckedChanged(b, c);
+            });
 
             addView(labelView);
             addView(toggle);
@@ -2896,7 +2613,11 @@ public class DialogUtils {
         }
 
         void setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener l) {
-            toggle.setOnCheckedChangeListener(l);
+            primary = l;
+        }
+
+        void addOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener l) {
+            observers.add(l);
         }
 
         void makeBold() {

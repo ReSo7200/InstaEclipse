@@ -44,6 +44,12 @@ public final class ExtrasFeatures {
         return out;
     }
 
+    /** The entry for {@code flag}, or null if it isn't an Extras feature. */
+    public static Entry entry(String flag) {
+        for (Entry e : ALL) if (e.flag.equals(flag)) return e;
+        return null;
+    }
+
     public static boolean get(String flag) {
         try {
             return field(flag).getBoolean(null);
