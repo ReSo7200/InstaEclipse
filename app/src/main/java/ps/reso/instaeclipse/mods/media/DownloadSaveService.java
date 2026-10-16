@@ -87,6 +87,13 @@ public class DownloadSaveService extends Service {
 
         if (intent == null) { stopSelf(startId); return START_NOT_STICKY; }
 
+        // Chat export (ChatExportHook): write a generated HTML + download its media into a
+        // nested subfolder, so the whole export lands in the user's SAF folder and is visible.
+        if (intent.getStringExtra("chatExportSubdir") != null) {
+            handleChatExport(intent, startId);
+            return START_NOT_STICKY;
+        }
+
         String url       = intent.getStringExtra("url");
         String audioUrl  = intent.getStringExtra("audioUrl"); // null → single-stream
         String filename  = intent.getStringExtra("filename");
@@ -230,6 +237,140 @@ public class DownloadSaveService extends Service {
 
         try (FileInputStream in  = new FileInputStream(src);
              OutputStream    os  = getContentResolver().openOutputStream(file.getUri())) {
+            if (os == null) throw new Exception("SAF openOutputStream returned null");
+            byte[] buf = new byte[32768]; int n;
+            while ((n = in.read(buf)) != -1) os.write(buf, 0, n);
+        }
+        return file.getUri();
+    }
+
+    // ── Chat export (HTML + media batch into a nested subfolder) ───────────────
+
+    private void handleChatExport(Intent intent, int startId) {
+        final String subdir       = intent.getStringExtra("chatExportSubdir");
+        final String htmlFilename = intent.getStringExtra("htmlFilename");
+        final String htmlB64      = intent.getStringExtra("htmlB64");
+        final String[] urls  = intent.getStringArrayExtra("mediaUrls");
+        final String[] names = intent.getStringArrayExtra("mediaNames");
+        final String[] mimes = intent.getStringArrayExtra("mediaMimes");
+        final int messageCount = intent.getIntExtra("messageCount", 0);
+
+        SharedPreferences cache = getSharedPreferences(CACHE_PREFS, Context.MODE_PRIVATE);
+        String saveUri = cache.getString("downloaderCustomUri", "");
+        if (saveUri.isEmpty()) saveUri = intent.getStringExtra("saveUri");
+        final String fSave = saveUri;
+        if (fSave == null || fSave.isEmpty()) {
+            showToast(getString(R.string.ig_toast_no_download_folder));
+            stopSelf(startId);
+            return;
+        }
+
+        new Thread(() -> {
+            int saved = 0;
+            int total = urls != null ? urls.length : 0;
+            try {
+                DocumentFile dir = resolveNestedDir(fSave, subdir);
+                pushProgress("Saving chat export…", 0, 100, true);
+                // The HTML references media by bare filename (src="0001_photo.jpg"). That only
+                // resolves when the page is opened with file:// access — but file managers open it
+                // through a content:// URI, where sibling files can't be reached. So as each media is
+                // downloaded (and saved to the folder), inline it into the HTML as a base64 data URI,
+                // making the page self-contained and render everywhere. Oversized media (large videos)
+                // are left as a file reference to keep the HTML openable.
+                StringBuilder html = (htmlB64 != null)
+                        ? new StringBuilder(new String(android.util.Base64.decode(htmlB64, android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8))
+                        : null;
+                long inlined = 0;
+                final long INLINE_EACH_MAX  = 16L * 1024 * 1024; // skip inlining a single file over 16 MB
+                final long INLINE_TOTAL_MAX = 48L * 1024 * 1024; // keep the whole HTML openable
+                for (int i = 0; i < total; i++) {
+                    maybeUpdateProgress("Saving media " + (i + 1) + "/" + total,
+                            (int) ((i + 1) * 100L / Math.max(1, total)), 100);
+                    File tmp = File.createTempFile("ie_cm_", ".bin", getCacheDir());
+                    try {
+                        downloadToFile(urls[i], tmp, null);
+                        long len = tmp.length();
+                        if (len > 0) {
+                            writeFileToDir(dir, tmp, names[i], mimes[i]);
+                            saved++;
+                            if (html != null && len <= INLINE_EACH_MAX && inlined + len <= INLINE_TOTAL_MAX) {
+                                String token = "src=\"" + names[i] + "\"";
+                                int idx = html.indexOf(token);
+                                if (idx >= 0) {
+                                    String dataUri = "src=\"data:" + mimes[i] + ";base64,"
+                                            + android.util.Base64.encodeToString(readAll(tmp), android.util.Base64.NO_WRAP) + "\"";
+                                    html.replace(idx, idx + token.length(), dataUri);
+                                    inlined += len;
+                                }
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                    } finally { //noinspection ResultOfMethodCallIgnored
+                        tmp.delete(); }
+                }
+                if (html != null && htmlFilename != null) {
+                    pushProgress("Saving chat export…", 99, 100, true);
+                    File htmp = File.createTempFile("ie_html_", ".html", getCacheDir());
+                    try {
+                        try (FileOutputStream fo = new FileOutputStream(htmp)) {
+                            fo.write(html.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        }
+                        writeFileToDir(dir, htmp, htmlFilename, "text/html");
+                    } finally { //noinspection ResultOfMethodCallIgnored
+                        htmp.delete(); }
+                }
+                final int fSaved = saved;
+                ModuleLog.line("(IE|Export|Service) saved html + " + fSaved + "/" + total + " media to " + subdir);
+                postDoneNotification(startId, getString(R.string.ig_export_media_saved, fSaved, subdir), "text/html", null);
+                showToast(getString(R.string.ig_export_media_saved, fSaved, subdir));
+            } catch (Throwable e) {
+                ModuleLog.line("(IE|ChatExport|Service) failed: " + e);
+                postDoneNotification(startId, "Chat export failed: " + e.getMessage(), null, null);
+                showToast(getString(R.string.ig_toast_download_failed, String.valueOf(e.getMessage())));
+            } finally {
+                stopSelf(startId);
+            }
+        }, "ie-chatexport-" + startId).start();
+    }
+
+    /** Reads a (small) file fully into memory — used to base64-inline media into the export HTML. */
+    private static byte[] readAll(File f) throws Exception {
+        try (FileInputStream in = new FileInputStream(f)) {
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream((int) Math.max(1024, f.length()));
+            byte[] buf = new byte[32768]; int n;
+            while ((n = in.read(buf)) != -1) bos.write(buf, 0, n);
+            return bos.toByteArray();
+        }
+    }
+
+    /** Resolves (creating each segment) a nested subfolder like "chats/chat_x" under the SAF tree. */
+    private DocumentFile resolveNestedDir(String saveUri, String subPath) throws Exception {
+        DocumentFile dir = DocumentFile.fromTreeUri(this, Uri.parse(saveUri));
+        if (dir == null || !dir.canWrite()) {
+            throw new Exception("SAF folder not writable — was the permission revoked?");
+        }
+        if (subPath != null) {
+            for (String seg : subPath.split("/")) {
+                if (seg.isEmpty()) continue;
+                DocumentFile sub = dir.findFile(seg);
+                if (sub == null || !sub.isDirectory()) sub = dir.createDirectory(seg);
+                if (sub == null) throw new Exception("Cannot create folder: " + seg);
+                dir = sub;
+            }
+        }
+        return dir;
+    }
+
+    /** Writes src into an already-resolved SAF directory, replacing any existing file of that name. */
+    private Uri writeFileToDir(DocumentFile dir, File src, String filename, String mimeType)
+            throws Exception {
+        DocumentFile existing = dir.findFile(filename);
+        if (existing != null) //noinspection ResultOfMethodCallIgnored
+            existing.delete();
+        DocumentFile file = dir.createFile(mimeType != null ? mimeType : "application/octet-stream", filename);
+        if (file == null) throw new Exception("SAF createFile returned null: " + filename);
+        try (FileInputStream in = new FileInputStream(src);
+             OutputStream os = getContentResolver().openOutputStream(file.getUri())) {
             if (os == null) throw new Exception("SAF openOutputStream returned null");
             byte[] buf = new byte[32768]; int n;
             while ((n = in.read(buf)) != -1) os.write(buf, 0, n);

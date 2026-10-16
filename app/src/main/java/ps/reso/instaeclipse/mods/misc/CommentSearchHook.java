@@ -845,19 +845,21 @@ public class CommentSearchHook {
                 h.append("<div class=stats><span class=chip>").append(tops.size()).append(" comments</span><span class=chip>")
                  .append(replies).append(" replies</span><span class=chip>Exported ").append(esc(now)).append("</span></div></div></div>");
                 h.append("<div class=search><input id=q placeholder=\"Search names or words…\" autocomplete=off></div><div id=list>");
+                List<String[]> media = new ArrayList<>();   // {url, local name, mime}
+                int[] ctr = {0};
                 for (String[] t : tops) {
                     h.append("<div class=thread>");
-                    commentHtml(h, t, fmt);
+                    commentHtml(h, t, fmt, media, ctr);
                     List<String[]> ch = kids.get(t[2]);
                     if (ch != null && !ch.isEmpty()) {
                         h.append("<details><summary>").append(ch.size()).append(ch.size() == 1 ? " reply" : " replies")
                          .append("</summary><div class=replies>");
-                        for (String[] r : ch) commentHtml(h, r, fmt);
+                        for (String[] r : ch) commentHtml(h, r, fmt, media, ctr);
                         h.append("</div></details>");
                     }
                     h.append("</div>");
                 }
-                h.append("</div><div class=foot>Only comments loaded in the app are included · images/GIFs are linked from Instagram and stop showing when their links expire</div>")
+                h.append("</div><div class=foot>Only comments loaded in the app are included</div>")
                  .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlFooter()).append("</div>")
                  .append("<script>const q=document.getElementById('q');const th=[...document.querySelectorAll('.thread')];")
                  .append("th.forEach(t=>t.querySelectorAll('.u,.t').forEach(e=>e.dataset.o=e.innerHTML));")
@@ -872,13 +874,53 @@ public class CommentSearchHook {
                  .append("</body></html>");
 
                 String safe = (author.isEmpty() ? "post" : author).replaceAll("[^A-Za-z0-9._-]", "_");
-                String file = "comments_" + safe + (code.isEmpty() ? "" : "_" + code) + "_"
-                        + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new java.util.Date()) + ".html";
-                try (java.io.OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openCommentsExport(ctx, file)) {
-                    out.write(h.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                String stamp = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new java.util.Date());
+                String folder = "comments_" + safe + (code.isEmpty() ? "" : "_" + code) + "_" + stamp;
+                String file = folder + ".html";
+                final int cCount = comments.size();
+
+                // Preferred path: hand the HTML + comment media to the companion service, which saves
+                // everything into <SAF folder>/comments/<folder>/ and inlines the media as base64 data
+                // URIs — so GIF/image comments are kept on device and never expire.
+                String saf = FeatureFlags.downloaderCustomUri;
+                boolean delegated = false;
+                if (saf != null && !saf.isEmpty()) {
+                    try {
+                        android.content.Intent it = new android.content.Intent();
+                        it.setClassName("ps.reso.instaeclipse",
+                                "ps.reso.instaeclipse.mods.media.DownloadSaveService");
+                        it.putExtra("chatExportSubdir", "comments/" + folder);
+                        it.putExtra("htmlFilename", file);
+                        it.putExtra("htmlB64", android.util.Base64.encodeToString(
+                                h.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8), android.util.Base64.NO_WRAP));
+                        it.putExtra("saveUri", saf);
+                        if (!media.isEmpty()) {
+                            String[] us = new String[media.size()], ns = new String[media.size()], ms = new String[media.size()];
+                            for (int i = 0; i < media.size(); i++) { us[i] = media.get(i)[0]; ns[i] = media.get(i)[1]; ms[i] = media.get(i)[2]; }
+                            it.putExtra("mediaUrls", us);
+                            it.putExtra("mediaNames", ns);
+                            it.putExtra("mediaMimes", ms);
+                        }
+                        ctx.startForegroundService(it);
+                        delegated = true;
+                        ModuleLog.line(TAG + "delegated comment export (" + cCount + " comments, "
+                                + media.size() + " media) to companion service: " + folder);
+                    } catch (Throwable t) {
+                        ModuleLog.line(TAG + "comment export delegate failed, writing locally: " + t);
+                    }
                 }
-                ModuleLog.line(TAG + "exported " + comments.size() + " comments to " + file);
-                MAIN.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_done, comments.size(), file), Toast.LENGTH_LONG).show());
+
+                if (!delegated) {
+                    // No SAF folder set: fall back to the old single-file export with the media still
+                    // pointing at the Instagram CDN links (which work only until they expire).
+                    String html = h.toString();
+                    for (String[] m : media) html = html.replace("src=\"" + m[1] + "\"", "src=\"" + esc(m[0]) + "\"");
+                    try (java.io.OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openCommentsExport(ctx, file)) {
+                        out.write(html.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    }
+                    ModuleLog.line(TAG + "exported " + cCount + " comments to " + file);
+                    MAIN.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_done, cCount, file), Toast.LENGTH_LONG).show());
+                }
             } catch (Throwable t) {
                 ModuleLog.line(TAG + "❌ export: " + t);
                 MAIN.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
@@ -886,7 +928,8 @@ public class CommentSearchHook {
         }).start();
     }
 
-    private static void commentHtml(StringBuilder h, String[] r, java.text.SimpleDateFormat fmt) {
+    private static void commentHtml(StringBuilder h, String[] r, java.text.SimpleDateFormat fmt,
+                                    List<String[]> media, int[] ctr) {
         String initial = r[0].isEmpty() ? "?" : r[0].substring(0, 1).toUpperCase(Locale.ROOT);
         h.append("<div class=c><div class=av style=\"background:#")
          .append(String.format(Locale.US, "%06X", avatarColor(r[0]) & 0xFFFFFF)).append("\">").append(esc(initial))
@@ -897,11 +940,37 @@ public class CommentSearchHook {
         h.append("</span><div class=t>").append(esc(r[1])).append("</div>");
         if (r.length > 9 && !r[8].isEmpty()) {
             String label = "gif".equals(r[9]) ? "GIF" : "Image";
+            // Reference the media by a local name; the companion service downloads it into the export
+            // folder and inlines it as a base64 data URI, so it no longer expires with the CDN link.
+            String kind = r[9].isEmpty() ? "image" : r[9];
+            String ext = mediaExt(r[8], kind);
+            String name = String.format(Locale.US, "c%04d_%s%s", ++ctr[0], kind, ext);
+            media.add(new String[]{r[8], name, mediaMime(ext)});
             h.append("<img class=media loading=lazy referrerpolicy=no-referrer alt=\"").append(label).append("\" src=\"")
-             .append(esc(r[8])).append("\" onerror=\"this.outerHTML='<span class=tag>🖼 ").append(label)
-             .append(" (link expired)</span>'\">");
+             .append(name).append("\" onerror=\"this.outerHTML='<span class=tag>🖼 ").append(label)
+             .append(" (unavailable)</span>'\">");
         }
         h.append("</div></div>");
+    }
+
+    /** File extension for a comment-media URL (".gif"/".webp"/".mp4"/".jpg"). */
+    private static String mediaExt(String url, String kind) {
+        try {
+            String p = url.split("\\?")[0];
+            int dot = p.lastIndexOf('.'), slash = p.lastIndexOf('/');
+            if (dot > slash && dot >= 0 && p.length() - dot <= 5) return p.substring(dot).toLowerCase(Locale.ROOT);
+        } catch (Throwable ignored) {}
+        return "gif".equals(kind) ? ".gif" : ".jpg";
+    }
+
+    private static String mediaMime(String ext) {
+        switch (ext) {
+            case ".gif":  return "image/gif";
+            case ".webp": return "image/webp";
+            case ".png":  return "image/png";
+            case ".mp4":  return "video/mp4";
+            default:       return "image/jpeg";
+        }
     }
 
     private static GradientDrawable round(int color, float radius) {

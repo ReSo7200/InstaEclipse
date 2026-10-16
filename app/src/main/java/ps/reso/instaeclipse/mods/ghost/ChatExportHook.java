@@ -163,16 +163,7 @@ public class ChatExportHook {
             return;
         }
         final boolean withMedia = downloadMedia;
-        final ps.reso.instaeclipse.utils.dialog.IeDialog[] progress = {null};
-        if (withMedia) {
-            progress[0] = new ps.reso.instaeclipse.utils.dialog.IeDialog(a)
-                    .title(I18n.t(a, R.string.ig_chat_export))
-                    .message(I18n.t(a, R.string.ig_chat_export_working))
-                    .cancelable(false);
-            progress[0].show();
-        } else {
-            Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_working), Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_working), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             try {
                 List<?> msgs = (List<?>) messagesMethod.invoke(store, true);
@@ -196,49 +187,21 @@ public class ChatExportHook {
                 String folder = "chat_" + safe + "_" + stamp;   // the export's own folder
                 String file = folder + ".html";
 
-                // media pass: download each message's media into <folder>/media/, keyed by row index
-                Map<Integer, String[]> media = new HashMap<>();   // row index -> {relative path, kind}
-                int mediaCount = 0;
+                // media manifest (no in-process download — Instagram's process can't write to the
+                // user's SAF folder, so the companion service fetches + saves these): row index ->
+                // {name, kind}, plus parallel url/name/mime lists handed to the service.
+                Map<Integer, String[]> media = new HashMap<>();
+                List<String> mUrls = new ArrayList<>(), mNames = new ArrayList<>(), mMimes = new ArrayList<>();
                 if (withMedia) {
-                    List<Object[]> todo = new ArrayList<>();        // {rowIndex, url, kind, ext}
                     for (int i = 0; i < rows.size(); i++) {
                         JSONObject j = (JSONObject) rows.get(i)[1];
                         String[] mm = mediaForMessage(j, j.optString("item_type", ""));
-                        if (mm != null && mm[0].startsWith("https://")) todo.add(new Object[]{i, mm[0], mm[1], mm[2]});
-                    }
-                    int total = todo.size(), done = 0;
-                    for (Object[] t : todo) {
-                        done++;
-                        progressMessage(a, progress, I18n.t(a, R.string.ig_chat_export_media_progress, done, total));
-                        int rowI = (int) t[0];
-                        String url = (String) t[1], kind = (String) t[2], ext = (String) t[3];
-                        // Extension is taken from the final mime so MediaStore never rewrites the
-                        // name (e.g. audio/mp4 → .m4a), which would break the HTML's media link.
-                        String mime = mimeFor(kind, ext);
-                        String name = String.format(Locale.US, "%04d_%s%s", rowI + 1, kind, extForMime(mime));
-                        // Fetch to a temp file first; only create the file in the export folder once
-                        // the download succeeds, so a failed one never leaves a 0-byte file behind.
-                        File tmp = null;
-                        try {
-                            tmp = File.createTempFile("ie_chat_media", null, a.getCacheDir());
-                            boolean ok;
-                            try (OutputStream fout = new FileOutputStream(tmp)) { ok = httpGet(url, fout); }
-                            if (ok && tmp.length() > 0) {
-                                try (InputStream in = new FileInputStream(tmp);
-                                     OutputStream mout = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook
-                                             .openChatExportFile(a, folder + "/media", name, mime)) {
-                                    byte[] buf = new byte[32768];
-                                    int rd;
-                                    while ((rd = in.read(buf)) != -1) mout.write(buf, 0, rd);
-                                }
-                                media.put(rowI, new String[]{"media/" + name, kind});
-                                mediaCount++;
-                            }
-                        } catch (Throwable ignored) {
-                        } finally {
-                            //noinspection ResultOfMethodCallIgnored
-                            if (tmp != null) tmp.delete();
-                        }
+                        if (mm == null || !mm[0].startsWith("https://")) continue;
+                        // Extension from the final mime so the saved name matches the HTML link.
+                        String mime = mimeFor(mm[1], mm[2]);
+                        String name = String.format(Locale.US, "%04d_%s%s", i + 1, mm[1], extForMime(mime));
+                        media.put(i, new String[]{name, mm[1]});
+                        mUrls.add(mm[0]); mNames.add(name); mMimes.add(mime);
                     }
                 }
 
@@ -293,31 +256,83 @@ public class ChatExportHook {
                 for (Map.Entry<String, Integer> e : perUser.entrySet())
                     html.append(Html.escapeHtml(e.getKey())).append(": ").append(e.getValue()).append("<br>");
                 html.append("Exported ").append(fmt.format(new Date())).append("</p>").append(body).append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlFooter());
-                try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openChatExportFile(a, folder, file, "text/html")) {
-                    out.write(html.toString().getBytes(StandardCharsets.UTF_8));
+
+                final int count = n;
+                // Preferred path: hand the HTML + media list to the companion app's DownloadSaveService,
+                // which owns the user's SAF folder (Instagram's own process can't write there, so a
+                // local write would land in Download/ and be hidden from file managers). The service
+                // writes everything into <SAF folder>/chats/<folder>/ and shows its own notification.
+                String saf = FeatureFlags.downloaderCustomUri;
+                boolean delegated = false;
+                if (saf != null && !saf.isEmpty()) {
+                    try {
+                        android.content.Intent it = new android.content.Intent();
+                        it.setClassName("ps.reso.instaeclipse",
+                                "ps.reso.instaeclipse.mods.media.DownloadSaveService");
+                        it.putExtra("chatExportSubdir", "chats/" + folder);
+                        it.putExtra("htmlFilename", file);
+                        it.putExtra("htmlB64", android.util.Base64.encodeToString(
+                                html.toString().getBytes(StandardCharsets.UTF_8), android.util.Base64.NO_WRAP));
+                        it.putExtra("saveUri", saf);
+                        it.putExtra("messageCount", count);
+                        if (!mUrls.isEmpty()) {
+                            it.putExtra("mediaUrls", mUrls.toArray(new String[0]));
+                            it.putExtra("mediaNames", mNames.toArray(new String[0]));
+                            it.putExtra("mediaMimes", mMimes.toArray(new String[0]));
+                        }
+                        a.startForegroundService(it);
+                        delegated = true;
+                        ModuleLog.line(TAG + "delegated export (" + count + " msgs, " + mUrls.size()
+                                + " media) to companion service: " + folder);
+                    } catch (Throwable t) {
+                        ModuleLog.line(TAG + "delegate failed, writing locally: " + t);
+                    }
                 }
-                final int count = n, mcount = mediaCount;
-                ModuleLog.line(TAG + "exported " + count + " messages, " + mcount + " media to " + folder);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    if (progress[0] != null) progress[0].dismiss();
-                    if (mcount > 0)
-                        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done_media, count, mcount, folder), Toast.LENGTH_LONG).show();
-                    else
-                        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done, count, file), Toast.LENGTH_LONG).show();
-                });
+
+                if (!delegated) {
+                    // No SAF folder set: write in-process via MediaStore (lands in Download/… and is
+                    // only reachable via the gallery or a PC, but at least the data is saved).
+                    int saved = 0;
+                    for (int i = 0; i < mUrls.size(); i++) {
+                        File tmp = null;
+                        try {
+                            tmp = File.createTempFile("ie_chat_media", null, a.getCacheDir());
+                            boolean ok;
+                            try (OutputStream fout = new FileOutputStream(tmp)) { ok = httpGet(mUrls.get(i), fout); }
+                            if (ok && tmp.length() > 0) {
+                                try (InputStream in = new FileInputStream(tmp);
+                                     OutputStream mout = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook
+                                             .openChatExportFile(a, folder, mNames.get(i), mMimes.get(i))) {
+                                    byte[] buf = new byte[32768];
+                                    int rd;
+                                    while ((rd = in.read(buf)) != -1) mout.write(buf, 0, rd);
+                                }
+                                saved++;
+                            }
+                        } catch (Throwable ignored) {
+                        } finally {
+                            //noinspection ResultOfMethodCallIgnored
+                            if (tmp != null) tmp.delete();
+                        }
+                    }
+                    try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openChatExportFile(a, folder, file, "text/html")) {
+                        out.write(html.toString().getBytes(StandardCharsets.UTF_8));
+                    }
+                    final int fsaved = saved;
+                    ModuleLog.line(TAG + "exported locally " + count + " messages, " + fsaved + " media to " + folder);
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        if (fsaved > 0)
+                            Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done_media, count, fsaved, folder), Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done, count, file), Toast.LENGTH_LONG).show();
+                    });
+                }
             } catch (Throwable t) {
                 ModuleLog.line(TAG + "❌ export: " + t);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    if (progress[0] != null) progress[0].dismiss();
-                    Toast.makeText(a, I18n.t(a, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show();
-                });
+                new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(a, I18n.t(a, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
             }
         }).start();
-    }
-
-    /** Updates the progress dialog's message on the UI thread (no-op if there is no dialog). */
-    private static void progressMessage(Activity a, ps.reso.instaeclipse.utils.dialog.IeDialog[] progress, CharSequence msg) {
-        new Handler(Looper.getMainLooper()).post(() -> { if (progress[0] != null) progress[0].message(msg); });
     }
 
     /** Downloads a URL straight into {@code out}. Returns false (leaving {@code out} to the caller) on any error. */
@@ -465,12 +480,13 @@ public class ChatExportHook {
         }
     }
 
-    /** Inline element referencing a downloaded media file by its relative path. */
+    /** Inline element referencing a media file by name (the companion service rewrites the src to a
+     *  base64 data URI so the page is self-contained; onerror hides any media that failed to save). */
     private static String mediaHtml(String rel, String kind) {
         switch (kind) {
-            case "video": return "<video class=media controls preload=none src=\"" + rel + "\"></video>";
-            case "voice": return "<audio class=media controls preload=none src=\"" + rel + "\"></audio>";
-            default:      return "<img class=media loading=lazy src=\"" + rel + "\">"; // photo, gif, preview
+            case "video": return "<video class=media controls preload=none src=\"" + rel + "\" onerror=\"this.remove()\"></video>";
+            case "voice": return "<audio class=media controls preload=none src=\"" + rel + "\" onerror=\"this.remove()\"></audio>";
+            default:      return "<img class=media loading=lazy src=\"" + rel + "\" onerror=\"this.remove()\">"; // photo, gif, preview
         }
     }
 
