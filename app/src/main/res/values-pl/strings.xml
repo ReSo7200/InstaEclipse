@@ -516,7 +516,6 @@
     <string name="ig_jump_first_done">Osiągnięto pierwszą wiadomość</string>
     <string name="ig_jump_first_stopped">Zatrzymano</string>
     <string name="ig_dialog_ghost_edit_history">Zachowuj historię edycji wiadomości</string>
-    <string name="ig_dialog_ghost_mark_unsent">Oznaczaj zachowane niewysłane wiadomości w czacie</string>
     <string name="ig_dialog_unsent_title">Niewysłane wiadomości</string>
     <string name="ig_dialog_unsent_clear">Wyczyść dziennik tego czatu</string>
     <string name="ig_dialog_unsent_export">Eksportuj jako JSON</string>

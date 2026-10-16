@@ -444,7 +444,6 @@
     <string name="ig_jump_first_done">Se llegó al primer mensaje</string>
     <string name="ig_jump_first_stopped">Detenido</string>
     <string name="ig_dialog_ghost_edit_history">Conservar el historial de edición de los mensajes</string>
-    <string name="ig_dialog_ghost_mark_unsent">Marcar en el chat los mensajes no enviados conservados</string>
     <string name="ig_dialog_unsent_title">Mensajes no enviados</string>
     <string name="ig_dialog_unsent_clear">Borrar el registro de este chat</string>
     <string name="ig_dialog_unsent_export">Exportar como JSON</string>

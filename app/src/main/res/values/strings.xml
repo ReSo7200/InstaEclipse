@@ -344,7 +344,6 @@
     <string name="ig_jump_first_done">Reached the first message</string>
     <string name="ig_jump_first_stopped">Stopped</string>
     <string name="ig_dialog_ghost_edit_history">Keep Edit History of Messages</string>
-    <string name="ig_dialog_ghost_mark_unsent">Mark Kept Unsent Messages in Chat</string>
     <string name="ig_dialog_unsent_title">Unsent Messages</string>
     <string name="ig_dialog_unsent_clear">Clear this chat\'s log</string>
     <string name="ig_dialog_unsent_export">Export as JSON</string>

@@ -471,7 +471,6 @@
     <string name="ig_jump_first_done">הגעת להודעה הראשונה</string>
     <string name="ig_jump_first_stopped">נעצר</string>
     <string name="ig_dialog_ghost_edit_history">שמור היסטוריית עריכה של הודעות</string>
-    <string name="ig_dialog_ghost_mark_unsent">סמן בצ\'אט הודעות שבוטלו ונשמרו</string>
     <string name="ig_dialog_unsent_title">הודעות שבוטלו</string>
     <string name="ig_dialog_unsent_clear">נקה את יומן הצ\'אט הזה</string>
     <string name="ig_dialog_unsent_export">ייצא כ-JSON</string>

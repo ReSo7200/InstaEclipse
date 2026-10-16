@@ -169,7 +169,7 @@ public class DialogUtils {
         // ---- PRIVACY ---- ghost, lock, hidden chats, ad/analytics blocking, distraction-free
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_privacy)));
         LinearLayout privacy = createGroupCard(context);
-        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostScreenshot", "isGhostViewOnce", "isGhostStory", "isGhostLive", "allowScreenshots", "keepEphemeralMessages", "permanentViewMode", "keepUnsentMessages", "markUnsentInThread", "keepEditHistory", "jumpToFirstMessage", "chatExport")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostScreenshot", "isGhostViewOnce", "isGhostStory", "isGhostLive", "allowScreenshots", "keepEphemeralMessages", "permanentViewMode", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "chatExport")));
         privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
         privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context), onCount(context, "hideSpecificChats", "hideChatButtonStealth")));
         privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.ig_dialog_menu_ad_analytics), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally")));
@@ -925,13 +925,6 @@ public class DialogUtils {
         layout.addView(createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ig_dialog_unsent_title), "#5E5CE6", v -> showUnsentMessages(context)));
         layout.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_customize_quick_toggle), "#5E5CE6", v -> showGhostQuickToggleOptions(context)));
         layout.addView(createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_read_receipts_title), "#5E5CE6", v -> showReadReceiptWhitelist(context)));
-        ToggleRow markUnsent = createSwitch(context, R.drawable.ic_chat, "#5E5CE6",
-                I18n.t(context, R.string.ig_dialog_ghost_mark_unsent), FeatureFlags.markUnsentInThread);
-        markUnsent.setOnCheckedChangeListener((b, checked) -> {
-            FeatureFlags.markUnsentInThread = checked;
-            SettingsManager.saveAllFlags();
-        });
-        layout.addView(markUnsent);
         ToggleRow editHistory = createSwitch(context, R.drawable.ic_chat, "#5E5CE6",
                 I18n.t(context, R.string.ig_dialog_ghost_edit_history), FeatureFlags.keepEditHistory);
         editHistory.setOnCheckedChangeListener((b, checked) -> {

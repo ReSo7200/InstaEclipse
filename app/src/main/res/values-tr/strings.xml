@@ -563,7 +563,6 @@
     <string name="ig_jump_first_done">İlk mesaja ulaşıldı</string>
     <string name="ig_jump_first_stopped">Durduruldu</string>
     <string name="ig_dialog_ghost_edit_history">Mesajların Düzenleme Geçmişini Sakla</string>
-    <string name="ig_dialog_ghost_mark_unsent">Saklanan Gönderilmemiş Mesajları Sohbette İşaretle</string>
     <string name="ig_translate_text">Çevir</string>
     <string name="ig_dialog_downloader_offer_audio">Videolar İçin Yalnızca Ses İndirmeyi Sun</string>
     <string name="ig_download_choice_title">İndir</string>

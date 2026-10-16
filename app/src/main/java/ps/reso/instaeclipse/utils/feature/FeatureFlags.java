@@ -46,7 +46,6 @@ public class FeatureFlags {
     public static volatile boolean chatExport = false; // header button: export the open chat to HTML (#225)
     public static volatile boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
     public static volatile boolean keepEditHistory = false; // show previous text of edited DMs (#243)
-    public static volatile boolean markUnsentInThread = false; // prefix kept unsent messages with a marker in the chat (#222)
     public static volatile boolean offerMediaInfo = false; // "Media info" row in the post menu (#231)
     public static volatile boolean offerPlaybackSpeed = false; // "Playback speed" row for feed videos (#247)
     public static volatile boolean forceReelScrubber = false; // always show IG's reel seek bar (#247)

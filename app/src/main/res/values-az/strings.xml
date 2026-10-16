@@ -442,7 +442,6 @@
     <string name="ig_jump_first_done">İlk mesaja çatıldı</string>
     <string name="ig_jump_first_stopped">Dayandırıldı</string>
     <string name="ig_dialog_ghost_edit_history">Mesajların Redaktə Tarixçəsini Saxla</string>
-    <string name="ig_dialog_ghost_mark_unsent">Saxlanılan Geri Götürülən Mesajları Söhbətdə İşarələ</string>
     <string name="ig_dialog_unsent_title">Geri Götürülən Mesajlar</string>
     <string name="ig_dialog_unsent_clear">Bu söhbətin qeydini təmizlə</string>
     <string name="ig_dialog_unsent_export">JSON kimi ixrac et</string>

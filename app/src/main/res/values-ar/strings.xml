@@ -438,7 +438,6 @@
     <string name="ig_jump_first_done">تم الوصول إلى أول رسالة</string>
     <string name="ig_jump_first_stopped">تم الإيقاف</string>
     <string name="ig_dialog_ghost_edit_history">الاحتفاظ بسجل تعديل الرسائل</string>
-    <string name="ig_dialog_ghost_mark_unsent">تمييز الرسائل الملغاة المحفوظة في المحادثة</string>
     <string name="ig_dialog_unsent_title">الرسائل الملغاة</string>
     <string name="ig_dialog_unsent_clear">مسح سجل هذه المحادثة</string>
     <string name="ig_dialog_unsent_export">تصدير كملف JSON</string>

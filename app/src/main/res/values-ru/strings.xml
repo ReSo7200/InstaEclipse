@@ -440,7 +440,6 @@
     <string name="ig_jump_first_done">Достигнуто первое сообщение</string>
     <string name="ig_jump_first_stopped">Остановлено</string>
     <string name="ig_dialog_ghost_edit_history">Сохранять историю правок сообщений</string>
-    <string name="ig_dialog_ghost_mark_unsent">Отмечать сохранённые неотправленные сообщения в чате</string>
     <string name="ig_dialog_unsent_title">Неотправленные сообщения</string>
     <string name="ig_dialog_unsent_clear">Очистить журнал этого чата</string>
     <string name="ig_dialog_unsent_export">Экспорт в JSON</string>

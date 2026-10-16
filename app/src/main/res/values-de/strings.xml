@@ -448,7 +448,6 @@
     <string name="ig_jump_first_done">Erste Nachricht erreicht</string>
     <string name="ig_jump_first_stopped">Gestoppt</string>
     <string name="ig_dialog_ghost_edit_history">Bearbeitungsverlauf von Nachrichten behalten</string>
-    <string name="ig_dialog_ghost_mark_unsent">Behaltene nicht gesendete Nachrichten im Chat markieren</string>
     <string name="ig_dialog_unsent_title">Nicht gesendete Nachrichten</string>
     <string name="ig_dialog_unsent_clear">Protokoll dieses Chats leeren</string>
     <string name="ig_dialog_unsent_export">Als JSON exportieren</string>

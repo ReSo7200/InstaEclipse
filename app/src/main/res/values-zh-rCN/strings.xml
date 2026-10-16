@@ -472,7 +472,6 @@
     <string name="ig_jump_first_done">已到达第一条消息</string>
     <string name="ig_jump_first_stopped">已停止</string>
     <string name="ig_dialog_ghost_edit_history">保留消息的编辑历史</string>
-    <string name="ig_dialog_ghost_mark_unsent">在聊天中标记保留的已撤回消息</string>
     <string name="ig_dialog_unsent_title">已撤回消息</string>
     <string name="ig_dialog_unsent_clear">清除此对话的记录</string>
     <string name="ig_dialog_unsent_export">导出为 JSON</string>

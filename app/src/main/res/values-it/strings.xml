@@ -229,7 +229,6 @@
     <string name="ig_jump_first_done">Primo messaggio raggiunto</string>
     <string name="ig_jump_first_stopped">Interrotto</string>
     <string name="ig_dialog_ghost_edit_history">Conserva la cronologia delle modifiche dei messaggi</string>
-    <string name="ig_dialog_ghost_mark_unsent">Segna nella chat i messaggi eliminati conservati</string>
     <string name="ig_dialog_unsent_title">Messaggi eliminati</string>
     <string name="ig_dialog_unsent_clear">Cancella il registro di questa chat</string>
     <string name="ig_dialog_unsent_export">Esporta come JSON</string>

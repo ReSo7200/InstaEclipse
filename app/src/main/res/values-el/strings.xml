@@ -472,7 +472,6 @@
     <string name="ig_jump_first_done">Φτάσατε στο πρώτο μήνυμα</string>
     <string name="ig_jump_first_stopped">Διακόπηκε</string>
     <string name="ig_dialog_ghost_edit_history">Διατήρηση Ιστορικού Επεξεργασίας Μηνυμάτων</string>
-    <string name="ig_dialog_ghost_mark_unsent">Επισήμανση Διατηρημένων Μη Απεσταλμένων Μηνυμάτων στη Συνομιλία</string>
     <string name="ig_dialog_unsent_title">Μη Απεσταλμένα Μηνύματα</string>
     <string name="ig_dialog_unsent_clear">Εκκαθάριση του αρχείου αυτής της συνομιλίας</string>
     <string name="ig_dialog_unsent_export">Εξαγωγή ως JSON</string>

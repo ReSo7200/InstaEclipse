@@ -440,7 +440,6 @@
     <string name="ig_jump_first_done">已到達第一則訊息</string>
     <string name="ig_jump_first_stopped">已停止</string>
     <string name="ig_dialog_ghost_edit_history">保留訊息的編輯紀錄</string>
-    <string name="ig_dialog_ghost_mark_unsent">在聊天中標記保留的已收回訊息</string>
     <string name="ig_dialog_unsent_title">已收回訊息</string>
     <string name="ig_dialog_unsent_clear">清除此對話的記錄</string>
     <string name="ig_dialog_unsent_export">匯出為 JSON</string>

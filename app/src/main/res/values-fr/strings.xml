@@ -473,7 +473,6 @@
     <string name="ig_jump_first_done">Premier message atteint</string>
     <string name="ig_jump_first_stopped">Arrêté</string>
     <string name="ig_dialog_ghost_edit_history">Conserver l\'historique des modifications des messages</string>
-    <string name="ig_dialog_ghost_mark_unsent">Marquer les messages non envoyés conservés dans la conversation</string>
     <string name="ig_dialog_unsent_title">Messages non envoyés</string>
     <string name="ig_dialog_unsent_clear">Effacer le journal de cette conversation</string>
     <string name="ig_dialog_unsent_export">Exporter en JSON</string>

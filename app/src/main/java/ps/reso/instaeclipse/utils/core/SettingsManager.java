@@ -84,7 +84,6 @@ public class SettingsManager {
         editor.putBoolean("offerPlaybackSpeed", FeatureFlags.offerPlaybackSpeed);
         editor.putBoolean("maxUploadQuality", FeatureFlags.maxUploadQuality);
         editor.putBoolean("forceReelScrubber", FeatureFlags.forceReelScrubber);
-        editor.putBoolean("markUnsentInThread", FeatureFlags.markUnsentInThread);
         editor.putBoolean("keepEditHistory", FeatureFlags.keepEditHistory);
         editor.putBoolean("jumpToFirstMessage", FeatureFlags.jumpToFirstMessage);
         editor.putBoolean("chatExport", FeatureFlags.chatExport);
@@ -248,7 +247,6 @@ public class SettingsManager {
         FeatureFlags.offerPlaybackSpeed = prefs.getBoolean("offerPlaybackSpeed", false);
         FeatureFlags.maxUploadQuality = prefs.getBoolean("maxUploadQuality", false);
         FeatureFlags.forceReelScrubber = prefs.getBoolean("forceReelScrubber", false);
-        FeatureFlags.markUnsentInThread = prefs.getBoolean("markUnsentInThread", false);
         FeatureFlags.keepEditHistory = prefs.getBoolean("keepEditHistory", false);
         FeatureFlags.jumpToFirstMessage = prefs.getBoolean("jumpToFirstMessage", false);
         FeatureFlags.chatExport = prefs.getBoolean("chatExport", false);

@@ -471,7 +471,6 @@
     <string name="ig_jump_first_done">Sudah sampai di pesan pertama</string>
     <string name="ig_jump_first_stopped">Dihentikan</string>
     <string name="ig_dialog_ghost_edit_history">Simpan Riwayat Edit Pesan</string>
-    <string name="ig_dialog_ghost_mark_unsent">Tandai Pesan Tidak Terkirim yang Disimpan di Obrolan</string>
     <string name="ig_dialog_unsent_title">Pesan Tidak Terkirim</string>
     <string name="ig_dialog_unsent_clear">Bersihkan log obrolan ini</string>
     <string name="ig_dialog_unsent_export">Ekspor sebagai JSON</string>

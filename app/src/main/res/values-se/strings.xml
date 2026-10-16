@@ -439,7 +439,6 @@
     <string name="ig_jump_first_done">Nådde första meddelandet</string>
     <string name="ig_jump_first_stopped">Stoppad</string>
     <string name="ig_dialog_ghost_edit_history">Behåll redigeringshistorik för meddelanden</string>
-    <string name="ig_dialog_ghost_mark_unsent">Markera behållna ej skickade meddelanden i chatten</string>
     <string name="ig_dialog_unsent_title">Ej skickade meddelanden</string>
     <string name="ig_dialog_unsent_clear">Rensa loggen för denna chatt</string>
     <string name="ig_dialog_unsent_export">Exportera som JSON</string>
