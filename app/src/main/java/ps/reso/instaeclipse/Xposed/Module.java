@@ -111,6 +111,11 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             return;
         }
         if (SUPPORTED_PACKAGES.contains(lpparam.packageName)) {
+            // Only the main app process: Instagram's helper processes (":fbns" push, browser,
+            // video …) never show our features, so hooking them only costs startup time and memory.
+            if (lpparam.processName != null && !lpparam.processName.equals(lpparam.packageName)) {
+                return;
+            }
             try {
                 if (dexKitBridge == null) {
                     // Load the .so file from your module (if not already loaded)
@@ -133,6 +138,9 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             }
         }
     }
+
+    /** DexKitCache key set once every feature hook has been installed for this IG version. */
+    private static final String CACHE_COMPLETE_KEY = "InstallComplete";
 
     private static java.util.Set<String> skipped;
 
@@ -225,6 +233,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     } catch (Throwable e) {
                         ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
                     }
+                    final Runnable installFeatureHooks = () -> {
                     UIHookManager instagramUI = new UIHookManager();
                     if (!skip("instagramUI")) instagramUI.mainActivity(hostClassLoader);
 
@@ -716,6 +725,30 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | ExecGuard): ❌ Failed to hook");
                     }
 
+                    // Every lookup is cached now: later launches install inline.
+                    DexKitCache.saveString(CACHE_COMPLETE_KEY, "1");
+                    };
+
+                    if (DexKitCache.isCacheValid() && "1".equals(DexKitCache.loadString(CACHE_COMPLETE_KEY))) {
+                        // Warm cache: installing is quick (reflection only), so hooks are in place
+                        // before Instagram's own startup code runs.
+                        installFeatureHooks.run();
+                    } else {
+                        // First launch for this Instagram version (or an interrupted one): DexKit has
+                        // to scan the APK, which takes many seconds. Inside Application.attach that
+                        // risks Android killing the app for not finishing startup, before the cache
+                        // is even written. Resolve in the background instead; features turn on a few
+                        // seconds after launch, and from the next launch on everything is cached.
+                        ModuleLog.line("(InstaEclipse): first launch for this Instagram version — installing hooks in background");
+                        Thread t = new Thread(() -> {
+                            long start = android.os.SystemClock.elapsedRealtime();
+                            installFeatureHooks.run();
+                            ModuleLog.line("(InstaEclipse): background hook installation took "
+                                    + (android.os.SystemClock.elapsedRealtime() - start) + " ms");
+                        }, "InstaEclipse-Init");
+                        t.setPriority(Thread.NORM_PRIORITY - 1);
+                        t.start();
+                    }
                 }
 
             });
