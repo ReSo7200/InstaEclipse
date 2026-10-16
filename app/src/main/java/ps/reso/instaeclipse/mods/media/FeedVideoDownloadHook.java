@@ -1422,10 +1422,9 @@ public class FeedVideoDownloadHook {
                 buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user));
         mainHandler.post(() -> {
             try {
-                new android.app.AlertDialog.Builder(new android.view.ContextThemeWrapper(host,
-                        android.R.style.Theme_DeviceDefault_Dialog_Alert))
-                        .setTitle(I18n.t(host, R.string.ig_download_choice_title))
-                        .setItems(labels.toArray(new String[0]), (d, which) -> actions.get(which).run())
+                new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
+                        .title(I18n.t(host, R.string.ig_download_choice_title))
+                        .choices(labels.toArray(new String[0]), -1, which -> actions.get(which).run())
                         .show();
             } catch (Throwable t) {
                 ModuleLog.line("(IE|DL) chooser failed: " + t);

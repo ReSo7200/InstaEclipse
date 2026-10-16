@@ -233,9 +233,9 @@ public class PlaybackSpeedHook {
         }
         android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         Context host = act != null && !act.isFinishing() ? act : ctx;
-        new AlertDialog.Builder(new ContextThemeWrapper(host, android.R.style.Theme_DeviceDefault_Dialog_Alert))
-                .setTitle(I18n.t(ctx, R.string.ig_playback_speed_title))
-                .setSingleChoiceItems(labels, checked, (d, which) -> {
+        new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
+                .title(I18n.t(ctx, R.string.ig_playback_speed_title))
+                .choices(labels, checked, which -> {
                     speed = SPEEDS[which];
                     WeakReference<Object> ref = lastPlayer;
                     Object p = ref != null ? ref.get() : null;
@@ -243,7 +243,6 @@ public class PlaybackSpeedHook {
                     ok |= p != null && apply(p, speed);
                     ModuleLog.line(TAG + "chosen " + speed + "x, applied now=" + ok);
                     if (!ok) Toast.makeText(ctx, I18n.t(ctx, R.string.ig_playback_speed_next), Toast.LENGTH_SHORT).show();
-                    d.dismiss();
                 })
                 .show();
     }

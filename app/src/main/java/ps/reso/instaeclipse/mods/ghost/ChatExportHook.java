@@ -130,23 +130,16 @@ public class ChatExportHook {
 
     /** Export dialog: optionally scroll to the first message first so the whole chat is loaded. */
     private static void ask(Activity a) {
-        android.widget.CheckBox box = new android.widget.CheckBox(a);
-        box.setText(I18n.t(a, R.string.ig_chat_export_load_all));
-        box.setChecked(loadAll);
-        int pad = (int) (20 * a.getResources().getDisplayMetrics().density);
-        android.widget.FrameLayout wrap = new android.widget.FrameLayout(a);
-        wrap.setPadding(pad, pad / 2, pad, 0);
-        wrap.addView(box);
-        new android.app.AlertDialog.Builder(a)
-                .setTitle(I18n.t(a, R.string.ig_chat_export))
-                .setView(wrap)
-                .setNegativeButton(I18n.t(a, R.string.ig_dialog_cancel), null)
-                .setPositiveButton(I18n.t(a, R.string.ig_chat_export), (d, w) -> {
-                    loadAll = box.isChecked();
-                    if (loadAll) JumpToFirstMessageHook.run(a, () -> export(a));
-                    else export(a);
-                })
-                .show();
+        ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(a)
+                .title(I18n.t(a, R.string.ig_chat_export));
+        android.widget.CheckBox box = dlg.checkBox(I18n.t(a, R.string.ig_chat_export_load_all), loadAll);
+        dlg.secondary(I18n.t(a, R.string.ig_dialog_cancel), null);
+        dlg.primary(I18n.t(a, R.string.ig_chat_export), () -> {
+            loadAll = box.isChecked();
+            if (loadAll) JumpToFirstMessageHook.run(a, () -> export(a));
+            else export(a);
+        });
+        dlg.show();
     }
 
     private static void export(Activity a) {

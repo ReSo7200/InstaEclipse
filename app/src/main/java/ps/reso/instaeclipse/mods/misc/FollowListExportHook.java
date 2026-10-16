@@ -205,7 +205,7 @@ public class FollowListExportHook {
         loading = true;
         final Object pg = pager;
         Handler h = new Handler(Looper.getMainLooper());
-        android.app.AlertDialog dlg = progressDialog(root.getContext());
+        ps.reso.instaeclipse.utils.dialog.IeDialog dlg = progressDialog(root.getContext());
         new Runnable() {
             int idle = 0;
             boolean first = true;
@@ -224,7 +224,7 @@ public class FollowListExportHook {
                 idle = more ? 0 : idle + 1;
                 AbsListView lv = findList(root);
                 int n = lv != null && lv.getAdapter() != null ? lv.getAdapter().getCount() : 0;
-                if (dlg != null) dlg.setMessage(I18n.t(root.getContext(), R.string.ig_follow_export_loading, n));
+                if (dlg != null) dlg.message(I18n.t(root.getContext(), R.string.ig_follow_export_loading, n));
                 if (!loading || idle >= 2 || !root.isAttachedToWindow()) {
                     loading = false;
                     try { if (dlg != null) dlg.dismiss(); } catch (Throwable ignored) {}
@@ -253,7 +253,7 @@ public class FollowListExportHook {
         }
     }
 
-    private static android.app.AlertDialog progressDialog(android.content.Context c) {
+    private static ps.reso.instaeclipse.utils.dialog.IeDialog progressDialog(android.content.Context c) {
         try {
             // the Activity that hosts the list (UIHookManager's current one can be a different, hidden one)
             android.content.Context ctx = c;
@@ -262,13 +262,16 @@ public class FollowListExportHook {
                 Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
                 ctx = act != null ? act : c;
             }
-            android.app.AlertDialog d = new android.app.AlertDialog.Builder(ctx, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                    .setTitle(I18n.t(ctx, R.string.ig_follow_export))
-                    .setMessage(I18n.t(ctx, R.string.ig_follow_export_loading, 0))
-                    .setCancelable(false) // leaving the list would stop IG's pager
-                    .setPositiveButton(I18n.t(ctx, R.string.ig_follow_export_stop), (x, w) -> loading = false)
-                    .create();
-            d.setCanceledOnTouchOutside(false);
+            ps.reso.instaeclipse.utils.dialog.IeDialog d = new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                    .title(I18n.t(ctx, R.string.ig_follow_export))
+                    .message(I18n.t(ctx, R.string.ig_follow_export_loading, 0))
+                    .cancelable(false); // leaving the list would stop IG's pager
+            android.widget.ProgressBar bar = new android.widget.ProgressBar(d.ctx, null, android.R.attr.progressBarStyleHorizontal);
+            bar.setIndeterminate(true);
+            bar.setIndeterminateTintList(android.content.res.ColorStateList.valueOf(d.accent));
+            d.view(bar);
+            d.primary(I18n.t(ctx, R.string.ig_follow_export_stop), () -> loading = false);
+            d.onClose(() -> loading = false);
             d.show();
             ModuleLog.line(TAG + "progress dialog on " + ctx.getClass().getName());
             return d;

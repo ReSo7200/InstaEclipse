@@ -248,29 +248,32 @@ public class LockedCollectionsHook {
 
     /** Passcode dialog (+ fingerprint when enabled); onOk after success, onCancel otherwise. */
     private static void ask(Activity a, Runnable onOk, Runnable onCancel) {
-        final EditText code = new EditText(a);
+        final ps.reso.instaeclipse.utils.dialog.IeDialog d = new ps.reso.instaeclipse.utils.dialog.IeDialog(a)
+                .title("🔒 " + I18n.t(a, R.string.ig_locked_coll_title))
+                .cancelable(false);
+        final EditText code = d.input(I18n.t(a, R.string.ig_locked_coll_hint));
         code.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        code.setHint("Passcode");
         code.setGravity(Gravity.CENTER);
+        code.setTextSize(22);
+        code.setLetterSpacing(0.4f);
         final boolean[] done = {false};
-        final AlertDialog d = new AlertDialog.Builder(a, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle("🔒 " + I18n.t(a, R.string.ig_locked_coll_title))
-                .setView(code)
-                .setCancelable(false)
-                .setPositiveButton(I18n.t(a, R.string.ig_locked_coll_open), null)
-                .setNegativeButton(android.R.string.cancel, (x, w) -> { if (onCancel != null) onCancel.run(); })
-                .create();
         Runnable success = () -> {
             if (done[0]) return;
             done[0] = true;
             LockDirectMessagesHook.hideKeyboard(a, code);
-            try { d.dismiss(); } catch (Throwable ignored) {}
+            d.dismiss();
             if (onOk != null) onOk.run();
         };
-        d.setOnShowListener(x -> d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+        Runnable cancel = () -> {
+            LockDirectMessagesHook.hideKeyboard(a, code);
+            if (onCancel != null) onCancel.run();
+        };
+        d.secondary(I18n.t(a, R.string.ig_dialog_cancel), cancel);
+        d.onClose(cancel); // ✕ = Cancel (never leaves the locked content showing)
+        d.primaryKeepOpen(I18n.t(a, R.string.ig_locked_coll_open), () -> {
             if (LockDirectMessagesHook.hashPass(code.getText().toString()).equals(FeatureFlags.lockDirectPasscode)) success.run();
             else { code.setText(""); code.setError("✗"); }
-        }));
+        });
         d.show();
         if (FeatureFlags.lockUseFingerprint && LockDirectMessagesHook.canAuthenticate(a))
             LockDirectMessagesHook.promptBiometric(a, success);

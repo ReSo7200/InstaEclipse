@@ -3,6 +3,9 @@ package ps.reso.instaeclipse.mods.media;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.ContextThemeWrapper;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.luckypray.dexkit.DexKitBridge;
 import org.luckypray.dexkit.query.FindMethod;
@@ -61,11 +64,42 @@ final class MediaInfo {
                     android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
                     Context host = act != null && !act.isFinishing() ? act : ctx;
                     ModuleLog.line("(IE|MediaInfo) showing (" + body.length() + " chars) on " + host.getClass().getSimpleName());
-                    new AlertDialog.Builder(new ContextThemeWrapper(host, android.R.style.Theme_DeviceDefault_Dialog_Alert))
-                            .setTitle(I18n.t(ctx, R.string.ig_media_info_title))
-                            .setMessage(body)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show();
+                    ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
+                            .title(I18n.t(ctx, R.string.ig_media_info_title));
+                    // one rounded "label · value" card per line
+                    LinearLayout rows = new LinearLayout(dlg.ctx);
+                    rows.setOrientation(LinearLayout.VERTICAL);
+                    rows.setBackground(dlg.round(dlg.field, 14));
+                    rows.setPadding(dlg.dp(14), dlg.dp(6), dlg.dp(14), dlg.dp(6));
+                    for (String ln : body.split("\n")) {
+                        if (ln.trim().isEmpty()) continue;
+                        int c = ln.indexOf(':');
+                        LinearLayout r = new LinearLayout(dlg.ctx);
+                        r.setPadding(0, dlg.dp(7), 0, dlg.dp(7));
+                        TextView k = new TextView(dlg.ctx);
+                        k.setText(c > 0 ? ln.substring(0, c).trim() : ln.trim());
+                        k.setTextColor(dlg.sub);
+                        k.setTextSize(14);
+                        r.addView(k, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+                        if (c > 0) {
+                            TextView v = new TextView(dlg.ctx);
+                            v.setText(ln.substring(c + 1).trim());
+                            v.setTextColor(dlg.text);
+                            v.setTextSize(14);
+                            v.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+                            v.setGravity(android.view.Gravity.END);
+                            v.setTextIsSelectable(true);
+                            r.addView(v, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.3f));
+                        }
+                        rows.addView(r);
+                    }
+                    dlg.view(rows);
+                    dlg.secondary(I18n.t(ctx, R.string.ig_media_info_copy), () -> {
+                        android.content.ClipboardManager cm = (android.content.ClipboardManager) host.getSystemService(Context.CLIPBOARD_SERVICE);
+                        cm.setPrimaryClip(android.content.ClipData.newPlainText("media info", body));
+                    });
+                    dlg.primary(I18n.t(ctx, R.string.ig_dialog_ok), null);
+                    dlg.show();
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|MediaInfo) dialog: " + t);
                 }
