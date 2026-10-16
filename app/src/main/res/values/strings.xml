@@ -470,7 +470,14 @@
     <string name="ig_comment_search">Search comments</string>
     <string name="ig_comment_search_hint">Search %1$d loaded comments</string>
     <string name="ig_comment_search_load_all">Load all</string>
-    <string name="ig_comment_search_loading">Loading… %1$d (tap to stop)</string>
+    <string name="ig_comment_search_stop">Stop</string>
+    <string name="ig_comment_search_field_hint">Search by name or words</string>
+    <string name="ig_comment_search_count">%1$d comments loaded</string>
+    <string name="ig_comment_search_matches">%2$d of %1$d comments match</string>
+    <string name="ig_comment_search_empty">No matching comments</string>
+    <string name="ig_comment_search_tip">Tap a comment to copy it</string>
+    <string name="ig_comment_search_view_replies">View %1$d replies</string>
+    <string name="ig_comment_search_hide_replies">Hide replies</string>
     <string name="ig_dialog_misc_follow_export">Export Followers/Following to CSV</string>
     <string name="ig_follow_export">Export CSV</string>
     <string name="ig_follow_export_done">Exported %1$d accounts to %2$s</string>
