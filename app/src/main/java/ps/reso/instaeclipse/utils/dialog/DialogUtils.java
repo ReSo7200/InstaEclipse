@@ -177,13 +177,13 @@ public class DialogUtils {
         privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
         privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.menu_ads_tracking), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally", "removeMetaAI", "hideOnboardingPrompts")));
         privacy.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_PRIVACY, () -> showLocationOptions(context), onCount(context, "spoofLocation")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "isExtremeMode", "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments")));
         mainLayout.addView(privacy);
 
         // ---- MEDIA ---- downloading, post-menu extras and uploads
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_media)));
         LinearLayout media = createGroupCard(context);
-        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "offerAudioDownload", "cacheStories")));
+        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "offerAudioDownload", "cacheStories", "downloaderUsernameFolder", "downloaderAddTimestamp")));
         media.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.menu_post_menu), A_MEDIA, () -> showPostMenuOptions(context), onCount(context, "copyMediaLink", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed", "maxUploadQuality", "saveInstants", "uploadInstants")));
         mainLayout.addView(media);
 
@@ -2044,8 +2044,6 @@ public class DialogUtils {
     private static void showDownloaderOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        layout.addView(createActionRow(context, R.drawable.ic_folder, I18n.t(context, R.string.ig_dialog_downloader_settings), "#FF9F0A", v -> showDownloaderSettings(context)));
-
         addMasterGroup(context, layout,
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_posts, "enablePostDownload"),
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_stories, "enableStoryDownload"),
@@ -2059,6 +2057,20 @@ public class DialogUtils {
                 // Cache Stories (24h) — keep viewed stories locally so they survive expiry/deletion.
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_cache_stories, "cacheStories"),
                 createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_story_cache_view), "#FF9F0A", v -> showCachedStories(context))));
+
+        // Where and how files are saved.
+        String folderRaw = FeatureFlags.downloaderCustomPath.isEmpty()
+                ? android.os.Environment.getExternalStorageDirectory().getAbsolutePath()
+                        + "/Download/InstaEclipse"
+                : FeatureFlags.downloaderCustomPath;
+        // Strip everything up to and including the primary storage root ("…/0/")
+        // so "/storage/emulated/0/Download/InstaEclipse" → "Download/InstaEclipse"
+        String folderDisplay = folderRaw.replaceFirst("^.*/0/", "");
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_dialog_section_downloader_settings)));
+        layout.addView(cardOf(context,
+                createInfoSection(context, I18n.t(context, R.string.ig_dialog_downloader_folder), folderDisplay),
+                flagSwitch(context, R.drawable.ic_folder, "#FF9F0A", R.string.ig_dialog_downloader_username_subfolder, "downloaderUsernameFolder"),
+                flagSwitch(context, R.drawable.ic_timer, "#FF9F0A", R.string.ig_dialog_downloader_add_timestamp, "downloaderAddTimestamp")));
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_downloader), layout, () -> {});
     }
@@ -2241,38 +2253,6 @@ public class DialogUtils {
                 context, e.path,
                 (e.author == null || e.author.isEmpty()) ? "story" : e.author, e.id, e.video,
                 I18n.t(context, R.string.ig_story_cache_saved), I18n.t(context, R.string.ig_story_cache_save_fail));
-    }
-
-    private static void showDownloaderSettings(Context context) {
-        LinearLayout layout = createSwitchLayout(context);
-
-        String folderRaw = FeatureFlags.downloaderCustomPath.isEmpty()
-                ? android.os.Environment.getExternalStorageDirectory().getAbsolutePath()
-                        + "/Download/InstaEclipse"
-                : FeatureFlags.downloaderCustomPath;
-        // Strip everything up to and including the primary storage root ("…/0/")
-        // so "/storage/emulated/0/Download/InstaEclipse" → "Download/InstaEclipse"
-        String folderDisplay = folderRaw.replaceFirst("^.*/0/", "");
-        layout.addView(createInfoSection(context,
-                I18n.t(context, R.string.ig_dialog_downloader_folder), folderDisplay));
-
-        ToggleRow usernameFolderSwitch = createSwitch(context, R.drawable.ic_folder, "#FF9F0A", I18n.t(context, R.string.ig_dialog_downloader_username_subfolder), FeatureFlags.downloaderUsernameFolder);
-        ToggleRow timestampSwitch = createSwitch(context, R.drawable.ic_timer, "#FF9F0A", I18n.t(context, R.string.ig_dialog_downloader_add_timestamp), FeatureFlags.downloaderAddTimestamp);
-
-        usernameFolderSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.downloaderUsernameFolder = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-        timestampSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FeatureFlags.downloaderAddTimestamp = isChecked;
-            SettingsManager.saveAllFlags();
-        });
-
-        layout.addView(createDivider(context));
-        layout.addView(usernameFolderSwitch);
-        layout.addView(timestampSwitch);
-
-        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_downloader_settings), layout, () -> {});
     }
 
     private static Activity unwrapActivity(Context context) {

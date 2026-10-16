@@ -432,7 +432,7 @@
     <string name="loc_picker_use">Usar esta Localização</string>
     <string name="loc_picker_search_failed">Localização não encontrada</string>
     <string name="loc_picker_search_error">A pesquisa falhou: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Manter Mensagens Não Enviadas</string>
+    <string name="ig_dialog_ghost_keep_unsent">Registrar Mensagens Anuladas</string>
     <string name="ig_dialog_ghost_jump_first">Botão Ir para a Primeira Mensagem nas Conversas</string>
     <string name="ig_jump_first_message">Ir para a primeira mensagem</string>
     <string name="ig_jump_first_loading">A carregar mensagens antigas… toque novamente para parar</string>

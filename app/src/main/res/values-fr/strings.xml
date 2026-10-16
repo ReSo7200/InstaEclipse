@@ -466,7 +466,7 @@
     <string name="loc_picker_use">Utiliser ce lieu</string>
     <string name="loc_picker_search_failed">Lieu introuvable</string>
     <string name="loc_picker_search_error">Échec de la recherche : %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Conserver les messages non envoyés</string>
+    <string name="ig_dialog_ghost_keep_unsent">Journaliser les messages retirés</string>
     <string name="ig_dialog_ghost_jump_first">Bouton « Aller au premier message » dans les conversations</string>
     <string name="ig_jump_first_message">Aller au premier message</string>
     <string name="ig_jump_first_loading">Chargement des anciens messages… touchez à nouveau pour arrêter</string>

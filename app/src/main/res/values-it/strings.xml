@@ -222,7 +222,7 @@
     <string name="ig_dialog_ghost_hide_view_once">Nascondi apertura dei «Visualizza una volta»</string>
     <string name="ig_dialog_ghost_permanent_view_once">Sblocca Visualizza una/due volte</string>
     <string name="ig_dialog_ghost_keep_disappearing">Conserva i messaggi effimeri</string>
-    <string name="ig_dialog_ghost_keep_unsent">Conserva i messaggi eliminati</string>
+    <string name="ig_dialog_ghost_keep_unsent">Registra i messaggi annullati</string>
     <string name="ig_dialog_ghost_jump_first">Pulsante Vai al primo messaggio nelle chat</string>
     <string name="ig_jump_first_message">Vai al primo messaggio</string>
     <string name="ig_jump_first_loading">Caricamento dei messaggi meno recenti… tocca di nuovo per fermare</string>

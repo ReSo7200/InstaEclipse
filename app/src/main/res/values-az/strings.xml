@@ -435,7 +435,7 @@
     <string name="loc_picker_use">Bu Məkanı İstifadə Et</string>
     <string name="loc_picker_search_failed">Məkan tapılmadı</string>
     <string name="loc_picker_search_error">Axtarış alınmadı: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Geri Götürülən Mesajları Saxla</string>
+    <string name="ig_dialog_ghost_keep_unsent">Geri Götürülən Mesajları Qeyd Et</string>
     <string name="ig_dialog_ghost_jump_first">Söhbətlərdə İlk Mesaja Keçid Düyməsi</string>
     <string name="ig_jump_first_message">İlk mesaja keç</string>
     <string name="ig_jump_first_loading">Köhnə mesajlar yüklənir… dayandırmaq üçün yenidən toxunun</string>

@@ -437,7 +437,7 @@
     <string name="loc_picker_use">Usar esta ubicación</string>
     <string name="loc_picker_search_failed">Ubicación no encontrada</string>
     <string name="loc_picker_search_error">Error en la búsqueda: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Conservar mensajes no enviados</string>
+    <string name="ig_dialog_ghost_keep_unsent">Registrar mensajes anulados</string>
     <string name="ig_dialog_ghost_jump_first">Botón para ir al primer mensaje en los chats</string>
     <string name="ig_jump_first_message">Ir al primer mensaje</string>
     <string name="ig_jump_first_loading">Cargando mensajes anteriores… toca de nuevo para detener</string>

@@ -433,7 +433,7 @@
     <string name="loc_picker_use">使用此位置</string>
     <string name="loc_picker_search_failed">找不到位置</string>
     <string name="loc_picker_search_error">搜尋失敗：%1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">保留已收回訊息</string>
+    <string name="ig_dialog_ghost_keep_unsent">記錄已收回訊息</string>
     <string name="ig_dialog_ghost_jump_first">聊天中的「跳到第一則訊息」按鈕</string>
     <string name="ig_jump_first_message">跳到第一則訊息</string>
     <string name="ig_jump_first_loading">正在載入較舊的訊息… 再點一下即可停止</string>

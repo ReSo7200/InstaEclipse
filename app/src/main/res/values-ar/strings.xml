@@ -431,7 +431,7 @@
     <string name="loc_picker_use">استخدم هذا الموقع</string>
     <string name="loc_picker_search_failed">لم يتم العثور على الموقع</string>
     <string name="loc_picker_search_error">فشل البحث: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">الاحتفاظ بالرسائل الملغاة</string>
+    <string name="ig_dialog_ghost_keep_unsent">تسجيل الرسائل الملغاة</string>
     <string name="ig_dialog_ghost_jump_first">زر الانتقال إلى أول رسالة في المحادثات</string>
     <string name="ig_jump_first_message">الانتقال إلى أول رسالة</string>
     <string name="ig_jump_first_loading">جارٍ تحميل الرسائل الأقدم… اضغط مرة أخرى للإيقاف</string>

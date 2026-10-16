@@ -464,7 +464,7 @@
     <string name="loc_picker_use">Gunakan Lokasi Ini</string>
     <string name="loc_picker_search_failed">Lokasi tidak ditemukan</string>
     <string name="loc_picker_search_error">Pencarian gagal: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Simpan Pesan yang Tidak Terkirim</string>
+    <string name="ig_dialog_ghost_keep_unsent">Catat Pesan yang Ditarik</string>
     <string name="ig_dialog_ghost_jump_first">Tombol Lompat ke Pesan Pertama di Obrolan</string>
     <string name="ig_jump_first_message">Lompat ke pesan pertama</string>
     <string name="ig_jump_first_loading">Memuat pesan lama… ketuk lagi untuk berhenti</string>

@@ -433,7 +433,7 @@
     <string name="loc_picker_use">Использовать это место</string>
     <string name="loc_picker_search_failed">Место не найдено</string>
     <string name="loc_picker_search_error">Ошибка поиска: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Сохранять неотправленные сообщения</string>
+    <string name="ig_dialog_ghost_keep_unsent">Записывать отменённые сообщения</string>
     <string name="ig_dialog_ghost_jump_first">Кнопка перехода к первому сообщению в чатах</string>
     <string name="ig_jump_first_message">К первому сообщению</string>
     <string name="ig_jump_first_loading">Загрузка старых сообщений… нажмите ещё раз, чтобы остановить</string>

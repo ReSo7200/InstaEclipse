@@ -441,7 +441,7 @@
     <string name="loc_picker_use">Diesen Standort verwenden</string>
     <string name="loc_picker_search_failed">Standort nicht gefunden</string>
     <string name="loc_picker_search_error">Suche fehlgeschlagen: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Nicht gesendete Nachrichten behalten</string>
+    <string name="ig_dialog_ghost_keep_unsent">Zurückgezogene Nachrichten protokollieren</string>
     <string name="ig_dialog_ghost_jump_first">Schaltfläche „Zur ersten Nachricht“ in Chats</string>
     <string name="ig_jump_first_message">Zur ersten Nachricht springen</string>
     <string name="ig_jump_first_loading">Ältere Nachrichten werden geladen… zum Stoppen erneut tippen</string>

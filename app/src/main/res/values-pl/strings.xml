@@ -509,7 +509,7 @@
     <string name="ig_dialog_subtitle">Dotknij sekcji, aby ją skonfigurować</string>
     <string name="theme_section_colors">Kolory</string>
     <string name="theme_section_fonts">Czcionki i emoji</string>
-    <string name="ig_dialog_ghost_keep_unsent">Zachowuj niewysłane wiadomości</string>
+    <string name="ig_dialog_ghost_keep_unsent">Zapisuj cofnięte wiadomości</string>
     <string name="ig_dialog_ghost_jump_first">Przycisk przejścia do pierwszej wiadomości w czatach</string>
     <string name="ig_jump_first_message">Przejdź do pierwszej wiadomości</string>
     <string name="ig_jump_first_loading">Wczytywanie starszych wiadomości… dotknij ponownie, aby zatrzymać</string>

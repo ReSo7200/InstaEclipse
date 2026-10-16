@@ -465,7 +465,7 @@
     <string name="loc_picker_use">Χρήση αυτής της Τοποθεσίας</string>
     <string name="loc_picker_search_failed">Η τοποθεσία δεν βρέθηκε</string>
     <string name="loc_picker_search_error">Η αναζήτηση απέτυχε: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Διατήρηση Μη Απεσταλμένων Μηνυμάτων</string>
+    <string name="ig_dialog_ghost_keep_unsent">Καταγραφή Μηνυμάτων που Ακυρώθηκαν</string>
     <string name="ig_dialog_ghost_jump_first">Κουμπί Μετάβασης στο Πρώτο Μήνυμα στις Συνομιλίες</string>
     <string name="ig_jump_first_message">Μετάβαση στο πρώτο μήνυμα</string>
     <string name="ig_jump_first_loading">Φόρτωση παλαιότερων μηνυμάτων… πατήστε ξανά για διακοπή</string>

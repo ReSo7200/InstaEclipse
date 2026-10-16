@@ -432,7 +432,7 @@
     <string name="loc_picker_use">Använd denna plats</string>
     <string name="loc_picker_search_failed">Platsen hittades inte</string>
     <string name="loc_picker_search_error">Sökningen misslyckades: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Behåll ej skickade meddelanden</string>
+    <string name="ig_dialog_ghost_keep_unsent">Logga ångrade meddelanden</string>
     <string name="ig_dialog_ghost_jump_first">Knapp för att hoppa till första meddelandet i chattar</string>
     <string name="ig_jump_first_message">Hoppa till första meddelandet</string>
     <string name="ig_jump_first_loading">Läser in äldre meddelanden… tryck igen för att stoppa</string>

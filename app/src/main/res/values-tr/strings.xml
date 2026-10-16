@@ -280,7 +280,7 @@
     <string name="ig_dialog_ghost_hide_view_once">Bir Kez Görüntüle Açılmasını Gizle</string>
     <string name="ig_dialog_ghost_permanent_view_once">Bir Kez/İki Kez Görüntüleme Kısıtlamasını Kaldır</string>
     <string name="ig_dialog_ghost_keep_disappearing">Kaybolan Mesajları Sakla</string>
-    <string name="ig_dialog_ghost_keep_unsent">Gönderilmeyen Mesajları Sakla</string>
+    <string name="ig_dialog_ghost_keep_unsent">Geri Alınan Mesajları Kaydet</string>
     <string name="ig_dialog_unsent_title">Gönderilmeyen Mesajlar</string>
     <string name="ig_dialog_unsent_clear">Bu sohbetin günlüğünü temizle</string>
     <string name="ig_dialog_unsent_export">JSON Olarak Dışa Aktar</string>

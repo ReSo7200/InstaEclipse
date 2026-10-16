@@ -464,7 +464,7 @@
     <string name="loc_picker_use">השתמש במיקום זה</string>
     <string name="loc_picker_search_failed">המיקום לא נמצא</string>
     <string name="loc_picker_search_error">החיפוש נכשל: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">שמור הודעות שבוטלו</string>
+    <string name="ig_dialog_ghost_keep_unsent">תיעוד הודעות שבוטלו</string>
     <string name="ig_dialog_ghost_jump_first">כפתור מעבר להודעה הראשונה בצ\'אטים</string>
     <string name="ig_jump_first_message">עבור להודעה הראשונה</string>
     <string name="ig_jump_first_loading">טוען הודעות ישנות יותר… הקש שוב כדי לעצור</string>

@@ -465,7 +465,7 @@
     <string name="loc_picker_use">使用此位置</string>
     <string name="loc_picker_search_failed">未找到位置</string>
     <string name="loc_picker_search_error">搜索失败：%1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">保留已撤回消息</string>
+    <string name="ig_dialog_ghost_keep_unsent">记录已撤回消息</string>
     <string name="ig_dialog_ghost_jump_first">聊天中的“跳到第一条消息”按钮</string>
     <string name="ig_jump_first_message">跳到第一条消息</string>
     <string name="ig_jump_first_loading">正在加载更早的消息… 再次点按以停止</string>
