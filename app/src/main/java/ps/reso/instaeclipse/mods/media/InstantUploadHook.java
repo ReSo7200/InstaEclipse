@@ -55,6 +55,10 @@ public class InstantUploadHook {
     private static ImageView preview;          // full-screen preview of the picked image
     private static Activity chipHost;          // the Activity we injected them on
     private static boolean lifecycleRegistered = false;
+    // True while OUR gallery picker is on top of the camera. The camera screen pauses/stops while
+    // the picker is open; the chip must survive that, otherwise backing out of the picker without
+    // choosing anything leaves the camera with no Gallery chip until it is reopened.
+    private static volatile boolean pickerOpen = false;
 
     public void install(ClassLoader cl) {
         hookSwap(cl);
@@ -161,9 +165,9 @@ public class InstantUploadHook {
                     android.app.AndroidAppHelper.currentApplication();
             if (app == null) return;
             app.registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
-                @Override public void onActivityPaused(Activity a) { if (a == chipHost) removeChip(); }
-                @Override public void onActivityStopped(Activity a) { if (a == chipHost) removeChip(); }
-                @Override public void onActivityDestroyed(Activity a) { if (a == chipHost) removeChip(); }
+                @Override public void onActivityPaused(Activity a) { if (a == chipHost && !pickerOpen) removeChip(); }
+                @Override public void onActivityStopped(Activity a) { if (a == chipHost && !pickerOpen) removeChip(); }
+                @Override public void onActivityDestroyed(Activity a) { if (a == chipHost) { pickerOpen = false; removeChip(); } }
                 // If focus moves to any other screen, the chip must not follow — kill it. It is
                 // re-injected only when the quicksnap camera signals open again (A15).
                 @Override public void onActivityResumed(Activity a) { if (chip != null && a != chipHost) removeChip(); }
@@ -183,7 +187,12 @@ public class InstantUploadHook {
     private static void markChipReady(Activity act, Bitmap bmp) {
         try {
             View decor = act.getWindow().getDecorView();
-            if (decor instanceof ViewGroup && preview == null) {
+            if (preview != null) {
+                try { if (preview.getParent() instanceof ViewGroup) ((ViewGroup) preview.getParent()).removeView(preview); }
+                catch (Throwable ignored) {}
+                preview = null;
+            }
+            if (decor instanceof ViewGroup) {
                 ImageView iv = new ImageView(act);
                 iv.setImageBitmap(bmp);
                 iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -268,14 +277,41 @@ public class InstantUploadHook {
 
     private static void launchPicker(Activity act) {
         try {
+            pickerOpen = true;
             Intent i = new Intent(Intent.ACTION_GET_CONTENT);
             i.setType("image/*");
             i.addCategory(Intent.CATEGORY_OPENABLE);
             act.startActivityForResult(Intent.createChooser(i,
                     I18n.t(act, R.string.ig_instant_upload_chip)), PICK_REQUEST);
         } catch (Throwable t) {
+            pickerOpen = false;
             Toast.makeText(act, I18n.t(act, R.string.ig_instant_upload_fail), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Picker closed without a usable image (cancelled, nothing chosen, or undecodable): drop any
+     * half-armed pick so the next shutter press is a normal capture, and put the Gallery chip back
+     * in its default state on the camera screen.
+     */
+    private static void restoreChipAfterCancel(Activity act) {
+        pendingBitmap = null;
+        try {
+            if (preview != null && preview.getParent() instanceof ViewGroup)
+                ((ViewGroup) preview.getParent()).removeView(preview);
+        } catch (Throwable ignored) {}
+        preview = null;
+        if (chip == null || chipHost != act || chip.getParent() == null) {
+            removeChip();
+            injectChip(act);
+            return;
+        }
+        chip.setText(I18n.t(act, R.string.ig_instant_upload_chip));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.parseColor("#CC0A84FF"));
+        bg.setCornerRadius(dp(act, 22));
+        chip.setBackground(bg);
+        chip.bringToFront();
     }
 
     // ── 3. Receive the pick (hook base Activity.onActivityResult) ──────────────
@@ -288,12 +324,17 @@ public class InstantUploadHook {
                                 int req = (int) p.args[0];
                                 int res = (int) p.args[1];
                                 if (req != PICK_REQUEST) return;
-                                if (res != Activity.RESULT_OK || p.args[2] == null) return;
-                                Uri uri = ((Intent) p.args[2]).getData();
-                                if (uri == null) return;
+                                pickerOpen = false;
                                 Activity act = (Activity) p.thisObject;
+                                Uri uri = res == Activity.RESULT_OK && p.args[2] != null
+                                        ? ((Intent) p.args[2]).getData() : null;
+                                if (uri == null) {          // backed out / picked nothing
+                                    restoreChipAfterCancel(act);
+                                    return;
+                                }
                                 Bitmap bmp = decode(act, uri);
                                 if (bmp == null) {
+                                    restoreChipAfterCancel(act);
                                     Toast.makeText(act, I18n.t(act, R.string.ig_instant_upload_fail),
                                             Toast.LENGTH_SHORT).show();
                                     return;
