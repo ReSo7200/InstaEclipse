@@ -1856,13 +1856,36 @@ public class FeedVideoDownloadHook {
         return openOutputStream(ctx, filename, "text/html", "chats");
     }
 
+    /**
+     * A file inside a chat export's own folder: {@code <download>/chats/<sub>/<filename>}
+     * ({@code sub} may itself be nested, e.g. {@code <folder>/media}). The chat's HTML and its
+     * media/ folder must stay side by side, so the subfolder is always applied here regardless of
+     * the "username folder" downloader setting.
+     */
+    public static OutputStream openChatExportFile(Context ctx, String sub, String filename, String mime)
+            throws Exception {
+        String user = "chats" + (sub == null || sub.isEmpty() ? "" : "/" + sub);
+        return openOutputStream(ctx, filename, mime, user, true);
+    }
+
     static OutputStream openOutputStream(Context ctx, String filename, String mimeType, String username)
             throws Exception {
+        return openOutputStream(ctx, filename, mimeType, username, FeatureFlags.downloaderUsernameFolder);
+    }
+
+    /**
+     * As {@link #openOutputStream(Context, String, String, String)}, but {@code nestFolder} forces
+     * (or suppresses) the {@code username} subfolder regardless of the downloader setting. Chat
+     * exports pass {@code true} so an export's HTML and its media/ folder always stay together.
+     * {@code username} may contain '/'; every segment is created.
+     */
+    static OutputStream openOutputStream(Context ctx, String filename, String mimeType, String username,
+                                         boolean nestFolder) throws Exception {
 
         // 1. Raw path — preferred when set; bypasses SAF authority entirely
         if (!FeatureFlags.downloaderCustomPath.isEmpty()) {
             try {
-                return openRawPathOutputStream(filename, username);
+                return openRawPathOutputStream(filename, username, nestFolder);
             } catch (Exception e) {
                 ModuleLog.line("(InstaEclipse|DL) Raw path failed, trying SAF: " + e.getMessage());
             }
@@ -1872,7 +1895,7 @@ public class FeedVideoDownloadHook {
         //    (so Instagram holds the persistable URI permission, not the companion app)
         if (!FeatureFlags.downloaderCustomUri.isEmpty()) {
             try {
-                return openSafOutputStream(ctx, filename, mimeType, username);
+                return openSafOutputStream(ctx, filename, mimeType, username, nestFolder);
             } catch (Exception e) {
                 ModuleLog.line("(InstaEclipse|DL) SAF failed, falling back to MediaStore: " + e.getMessage());
             }
@@ -1880,12 +1903,12 @@ public class FeedVideoDownloadHook {
 
         // 3. MediaStore (API 29+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return openMediaStoreOutputStream(ctx, filename, mimeType, username);
+            return openMediaStoreOutputStream(ctx, filename, mimeType, username, nestFolder);
         }
 
         // 4. Legacy API < 29: direct file write
         File dir = new File(Environment.getExternalStorageDirectory(), "InstaEclipse");
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+        if (nestFolder && username != null && !username.isEmpty()) {
             dir = new File(dir, username);
         }
         //noinspection ResultOfMethodCallIgnored
@@ -1893,14 +1916,14 @@ public class FeedVideoDownloadHook {
         return new FileOutputStream(new File(dir, filename));
     }
 
-    private static OutputStream openRawPathOutputStream(String filename, String username) throws Exception {
+    private static OutputStream openRawPathOutputStream(String filename, String username, boolean nestFolder) throws Exception {
         String rawPath = FeatureFlags.downloaderCustomPath;
         // Reject if path conversion failed and we got a content URI string as fallback
         if (rawPath.startsWith("content://")) {
             throw new Exception("Not a raw file path: " + rawPath);
         }
         File dir = new File(rawPath);
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+        if (nestFolder && username != null && !username.isEmpty()) {
             dir = new File(dir, username);
         }
         if (!dir.exists() && !dir.mkdirs()) {
@@ -1909,13 +1932,18 @@ public class FeedVideoDownloadHook {
         return new FileOutputStream(new File(dir, filename));
     }
 
-    private static OutputStream openSafOutputStream(Context ctx, String filename, String mimeType, String username)
+    private static OutputStream openSafOutputStream(Context ctx, String filename, String mimeType, String username, boolean nestFolder)
             throws Exception {
         Uri treeUri = Uri.parse(FeatureFlags.downloaderCustomUri);
         String rootDocId = DocumentsContract.getTreeDocumentId(treeUri);
         Uri dirUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, rootDocId);
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
-            dirUri = findOrCreateSafDir(ctx, treeUri, rootDocId, username);
+        if (nestFolder && username != null && !username.isEmpty()) {
+            String parentDocId = rootDocId;
+            for (String seg : username.split("/")) {
+                if (seg.isEmpty()) continue;
+                dirUri = findOrCreateSafDir(ctx, treeUri, parentDocId, seg);
+                parentDocId = DocumentsContract.getDocumentId(dirUri);
+            }
         }
         Uri fileUri = DocumentsContract.createDocument(ctx.getContentResolver(), dirUri, mimeType, filename);
         if (fileUri == null) throw new Exception("SAF createDocument returned null");
@@ -1946,9 +1974,9 @@ public class FeedVideoDownloadHook {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("NewApi")
-    private static OutputStream openMediaStoreOutputStream(Context ctx, String filename, String mimeType, String username)
+    private static OutputStream openMediaStoreOutputStream(Context ctx, String filename, String mimeType, String username, boolean nestFolder)
             throws Exception {
-        String relPath = buildMediaStoreRelPath(username);
+        String relPath = buildMediaStoreRelPath(username, nestFolder);
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
         values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
@@ -1973,7 +2001,7 @@ public class FeedVideoDownloadHook {
      * - Otherwise the path is nested under Download/ (e.g. /sdcard/Test55 → Download/Test55).
      * - Falls back to Download/InstaEclipse when no custom path is set.
      */
-    private static String buildMediaStoreRelPath(String username) {
+    private static String buildMediaStoreRelPath(String username, boolean nestFolder) {
         String customPath = FeatureFlags.downloaderCustomPath;
         String base = "Download/InstaEclipse"; // default
 
@@ -1986,7 +2014,7 @@ public class FeedVideoDownloadHook {
             }
         }
 
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+        if (nestFolder && username != null && !username.isEmpty()) {
             base += "/" + username;
         }
         return base;

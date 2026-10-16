@@ -322,6 +322,9 @@
     <string name="ig_chat_export_working">Exporting loaded messages…</string>
     <string name="ig_chat_export_done">Exported %1$d messages to %2$s</string>
     <string name="ig_chat_export_load_all">Load the whole chat first (jumps to the first message)</string>
+    <string name="ig_chat_export_media">Download media into the export folder</string>
+    <string name="ig_chat_export_media_progress">Downloading media %1$d/%2$d…</string>
+    <string name="ig_chat_export_done_media">Exported %1$d messages and %2$d media files to %3$s</string>
     <string name="ig_chat_export_none">No messages loaded for this chat yet</string>
     <string name="ig_dialog_ghost_jump_first">Jump-to-First-Message Button in Chats</string>
     <string name="ig_jump_first_message">Jump to first message</string>

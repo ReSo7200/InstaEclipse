@@ -18,8 +18,14 @@ import org.luckypray.dexkit.query.FindMethod;
 import org.luckypray.dexkit.query.matchers.MethodMatcher;
 import org.luckypray.dexkit.result.MethodData;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -127,15 +133,19 @@ public class ChatExportHook {
     }
 
     private static boolean loadAll = true;
+    private static boolean downloadMedia = true;
 
-    /** Export dialog: optionally scroll to the first message first so the whole chat is loaded. */
+    /** Export dialog: optionally scroll to the first message first so the whole chat is loaded, and
+     *  optionally download photos/videos/voice/GIFs/shared previews into the export's own folder. */
     private static void ask(Activity a) {
         ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(a)
                 .title(I18n.t(a, R.string.ig_chat_export));
         android.widget.CheckBox box = dlg.checkBox(I18n.t(a, R.string.ig_chat_export_load_all), loadAll);
+        android.widget.CheckBox mediaBox = dlg.checkBox(I18n.t(a, R.string.ig_chat_export_media), downloadMedia);
         dlg.secondary(I18n.t(a, R.string.ig_dialog_cancel), null);
         dlg.primary(I18n.t(a, R.string.ig_chat_export), () -> {
             loadAll = box.isChecked();
+            downloadMedia = mediaBox.isChecked();
             if (loadAll) JumpToFirstMessageHook.run(a, () -> export(a));
             else export(a);
         });
@@ -152,7 +162,17 @@ public class ChatExportHook {
             Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_none), Toast.LENGTH_SHORT).show();
             return;
         }
-        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_working), Toast.LENGTH_SHORT).show();
+        final boolean withMedia = downloadMedia;
+        final ps.reso.instaeclipse.utils.dialog.IeDialog[] progress = {null};
+        if (withMedia) {
+            progress[0] = new ps.reso.instaeclipse.utils.dialog.IeDialog(a)
+                    .title(I18n.t(a, R.string.ig_chat_export))
+                    .message(I18n.t(a, R.string.ig_chat_export_working))
+                    .cancelable(false);
+            progress[0].show();
+        } else {
+            Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_working), Toast.LENGTH_SHORT).show();
+        }
         new Thread(() -> {
             try {
                 List<?> msgs = (List<?>) messagesMethod.invoke(store, true);
@@ -170,10 +190,63 @@ public class ChatExportHook {
                     String id = j.optString("item_id", "");
                     if (!id.isEmpty()) byId.put(id, j);
                 }
+
+                String stamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+                String safe = title.replaceAll("[^A-Za-z0-9._-]", "_");
+                String folder = "chat_" + safe + "_" + stamp;   // the export's own folder
+                String file = folder + ".html";
+
+                // media pass: download each message's media into <folder>/media/, keyed by row index
+                Map<Integer, String[]> media = new HashMap<>();   // row index -> {relative path, kind}
+                int mediaCount = 0;
+                if (withMedia) {
+                    List<Object[]> todo = new ArrayList<>();        // {rowIndex, url, kind, ext}
+                    for (int i = 0; i < rows.size(); i++) {
+                        JSONObject j = (JSONObject) rows.get(i)[1];
+                        String[] mm = mediaForMessage(j, j.optString("item_type", ""));
+                        if (mm != null && mm[0].startsWith("https://")) todo.add(new Object[]{i, mm[0], mm[1], mm[2]});
+                    }
+                    int total = todo.size(), done = 0;
+                    for (Object[] t : todo) {
+                        done++;
+                        progressMessage(a, progress, I18n.t(a, R.string.ig_chat_export_media_progress, done, total));
+                        int rowI = (int) t[0];
+                        String url = (String) t[1], kind = (String) t[2], ext = (String) t[3];
+                        // Extension is taken from the final mime so MediaStore never rewrites the
+                        // name (e.g. audio/mp4 → .m4a), which would break the HTML's media link.
+                        String mime = mimeFor(kind, ext);
+                        String name = String.format(Locale.US, "%04d_%s%s", rowI + 1, kind, extForMime(mime));
+                        // Fetch to a temp file first; only create the file in the export folder once
+                        // the download succeeds, so a failed one never leaves a 0-byte file behind.
+                        File tmp = null;
+                        try {
+                            tmp = File.createTempFile("ie_chat_media", null, a.getCacheDir());
+                            boolean ok;
+                            try (OutputStream fout = new FileOutputStream(tmp)) { ok = httpGet(url, fout); }
+                            if (ok && tmp.length() > 0) {
+                                try (InputStream in = new FileInputStream(tmp);
+                                     OutputStream mout = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook
+                                             .openChatExportFile(a, folder + "/media", name, mime)) {
+                                    byte[] buf = new byte[32768];
+                                    int rd;
+                                    while ((rd = in.read(buf)) != -1) mout.write(buf, 0, rd);
+                                }
+                                media.put(rowI, new String[]{"media/" + name, kind});
+                                mediaCount++;
+                            }
+                        } catch (Throwable ignored) {
+                        } finally {
+                            //noinspection ResultOfMethodCallIgnored
+                            if (tmp != null) tmp.delete();
+                        }
+                    }
+                }
+
                 StringBuilder body = new StringBuilder();
                 long first = 0, last = 0;
                 Map<String, Integer> perUser = new LinkedHashMap<>();
-                for (Object[] r : rows) {
+                for (int i = 0; i < rows.size(); i++) {
+                    Object[] r = rows.get(i);
                     JSONObject j = (JSONObject) r[1];
                     String uid = j.optString("user_id", "");
                     String who = names.getOrDefault(uid, uid);
@@ -192,7 +265,12 @@ public class ChatExportHook {
                         body.append("<div class=q>↪ ").append(Html.escapeHtml(names.getOrDefault(ru, ru))).append(": ")
                                 .append(Html.escapeHtml(clip(describe(replied), 120))).append("</div>");
                     } else body.append("<br>");
-                    body.append(Html.escapeHtml(describe(j)).replace("\n", "<br>"));
+                    String[] mrel = media.get(i);
+                    if (mrel != null) body.append(mediaHtml(mrel[0], mrel[1]));
+                    // caption: for direct media keep only the user's own text (the "[photo]" placeholder
+                    // is replaced by the media itself); for previews / no media keep the full description.
+                    String caption = (mrel != null && !"preview".equals(mrel[1])) ? j.optString("text", "") : describe(j);
+                    if (!caption.isEmpty()) body.append(Html.escapeHtml(caption).replace("\n", "<br>"));
                     body.append(editHistory(j, fmt));
                     String react = reactions(j, names);
                     if (!react.isEmpty()) body.append("<div class=r>").append(Html.escapeHtml(react)).append("</div>");
@@ -206,7 +284,8 @@ public class ChatExportHook {
                                 + ".m{margin:6px 0;padding:8px 12px;border-radius:12px;background:#262626;overflow-wrap:anywhere}"
                                 + ".u{color:#9ad;font-weight:bold}.t{color:#888;font-size:12px}"
                                 + ".q{border-left:3px solid #555;padding-left:8px;margin:4px 0;color:#aaa;font-size:13px}"
-                                + ".r{margin-top:4px;font-size:13px;color:#ccc}.h{color:#aaa;font-size:13px}.e{color:#999;font-size:12px;margin-top:2px}</style>")
+                                + ".r{margin-top:4px;font-size:13px;color:#ccc}.h{color:#aaa;font-size:13px}.e{color:#999;font-size:12px;margin-top:2px}"
+                                + ".media{display:block;max-width:260px;max-height:360px;border-radius:10px;margin:6px 0}audio.media{width:240px;height:40px}</style>")
                         .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlBanner("Chat export")).append("<h2>")
                         .append(Html.escapeHtml(title)).append("</h2><p class=h>").append(n).append(" messages");
                 if (first > 0) html.append(" · ").append(fmt.format(new Date(first))).append(" – ").append(fmt.format(new Date(last)));
@@ -214,21 +293,185 @@ public class ChatExportHook {
                 for (Map.Entry<String, Integer> e : perUser.entrySet())
                     html.append(Html.escapeHtml(e.getKey())).append(": ").append(e.getValue()).append("<br>");
                 html.append("Exported ").append(fmt.format(new Date())).append("</p>").append(body).append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlFooter());
-                String safe = title.replaceAll("[^A-Za-z0-9._-]", "_");
-                String file = "chat_" + safe + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".html";
-                try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openChatExport(a, file)) {
+                try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openChatExportFile(a, folder, file, "text/html")) {
                     out.write(html.toString().getBytes(StandardCharsets.UTF_8));
                 }
-                final int count = n;
-                ModuleLog.line(TAG + "exported " + count + " messages to " + file);
-                new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done, count, file), Toast.LENGTH_LONG).show());
+                final int count = n, mcount = mediaCount;
+                ModuleLog.line(TAG + "exported " + count + " messages, " + mcount + " media to " + folder);
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (progress[0] != null) progress[0].dismiss();
+                    if (mcount > 0)
+                        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done_media, count, mcount, folder), Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done, count, file), Toast.LENGTH_LONG).show();
+                });
             } catch (Throwable t) {
                 ModuleLog.line(TAG + "❌ export: " + t);
-                new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(a, I18n.t(a, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (progress[0] != null) progress[0].dismiss();
+                    Toast.makeText(a, I18n.t(a, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show();
+                });
             }
         }).start();
+    }
+
+    /** Updates the progress dialog's message on the UI thread (no-op if there is no dialog). */
+    private static void progressMessage(Activity a, ps.reso.instaeclipse.utils.dialog.IeDialog[] progress, CharSequence msg) {
+        new Handler(Looper.getMainLooper()).post(() -> { if (progress[0] != null) progress[0].message(msg); });
+    }
+
+    /** Downloads a URL straight into {@code out}. Returns false (leaving {@code out} to the caller) on any error. */
+    private static boolean httpGet(String url, OutputStream out) {
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
+            conn.setConnectTimeout(20000);
+            conn.setReadTimeout(30000);
+            conn.connect();
+            if (conn.getResponseCode() / 100 != 2) return false;
+            try (InputStream in = conn.getInputStream()) {
+                byte[] buf = new byte[32768];
+                int r;
+                while ((r = in.read(buf)) != -1) out.write(buf, 0, r);
+            }
+            return true;
+        } catch (Throwable t) {
+            return false;
+        } finally {
+            if (conn != null) try { conn.disconnect(); } catch (Throwable ignored) {}
+        }
+    }
+
+    /** {url, kind, ext} of the best downloadable media in a message, or null. kind ∈
+     *  photo / video / voice / gif / preview (shared-content thumbnail). */
+    static String[] mediaForMessage(JSONObject j, String type) {
+        Object payload = j.opt(type);
+        if (!(payload instanceof JSONObject) && !"text".equals(type)) {
+            Object m = j.opt("media");
+            if (m != null) payload = m;
+        }
+        if (payload == null) payload = j;
+        switch (type) {
+            case "media": case "raven_media": case "visual_media": {
+                boolean video = "2".equals(first(payload, "media_type")) || nodeFor(payload, "video_versions", 0) != null;
+                if (video) {
+                    String u = deepUrl(nodeFor(payload, "video_versions", 0), 0);
+                    if (!u.isEmpty()) return new String[]{u, "video", ".mp4"};
+                }
+                String u = deepUrl(nodeFor(payload, "image_versions2", 0), 0);
+                if (u.isEmpty()) u = deepUrl(payload, 0);
+                if (!u.isEmpty()) return new String[]{u, "photo", ".jpg"};
+                return null;
+            }
+            case "voice_media": {
+                String u = first(payload, "audio_src");
+                if (u.isEmpty()) u = deepUrl(nodeFor(payload, "audio", 0), 0);
+                if (u.isEmpty()) u = deepUrl(payload, 0);
+                if (!u.isEmpty()) return new String[]{u, "voice", extFromUrl(u, ".mp4")};
+                return null;
+            }
+            case "animated_media": {
+                String u = deepUrl(payload, 0);
+                if (u.isEmpty()) return null;
+                return new String[]{u, u.contains(".mp4") ? "video" : "gif", extFromUrl(u, ".gif")};
+            }
+            case "media_share": case "clip": case "felix_share":
+            case "xma_media_share": case "xma_clip": case "xma_felix_share":
+            case "story_share": case "xma_story_share":
+            case "reel_share": case "xma_reel_share":
+            case "xma_reel_mention": case "xma_story_mention":
+            case "profile": case "xma_profile":
+            case "link": case "xma_link": case "generic_xma": case "xma": {
+                String u = deepUrl(nodeFor(payload, "image_versions2", 0), 0);
+                if (u.isEmpty()) u = deepUrl(payload, 0);
+                if (!u.isEmpty()) return new String[]{u, "preview", extFromUrl(u, ".jpg")};
+                return null;
+            }
+            default:
+                return null;
+        }
+    }
+
+    /** First https URL in a JSON subtree (url / uri / audio_src etc. preferred). */
+    private static String deepUrl(Object o, int d) {
+        if (o == null || d > 6) return "";
+        if (o instanceof JSONObject jo) {
+            for (String k : new String[]{"url", "uri", "image_url", "audio_src", "playable_url", "src"}) {
+                String v = jo.optString(k, "");
+                if (v.startsWith("https://")) return v;
+            }
+            for (Iterator<String> it = jo.keys(); it.hasNext(); ) {
+                String r = deepUrl(jo.opt(it.next()), d + 1);
+                if (!r.isEmpty()) return r;
+            }
+        } else if (o instanceof JSONArray ja) {
+            for (int i = 0; i < ja.length() && i < 15; i++) {
+                String r = deepUrl(ja.opt(i), d + 1);
+                if (!r.isEmpty()) return r;
+            }
+        }
+        return "";
+    }
+
+    /** First object/array stored under {@code key} anywhere in a JSON subtree. */
+    private static Object nodeFor(Object o, String key, int d) {
+        if (o == null || d > 6) return null;
+        if (o instanceof JSONObject jo) {
+            Object direct = jo.opt(key);
+            if (direct instanceof JSONObject || direct instanceof JSONArray) return direct;
+            for (Iterator<String> it = jo.keys(); it.hasNext(); ) {
+                Object r = nodeFor(jo.opt(it.next()), key, d + 1);
+                if (r != null) return r;
+            }
+        } else if (o instanceof JSONArray ja) {
+            for (int i = 0; i < ja.length() && i < 15; i++) {
+                Object r = nodeFor(ja.opt(i), key, d + 1);
+                if (r != null) return r;
+            }
+        }
+        return null;
+    }
+
+    /** File extension from a URL's path (".jpg"), or {@code fallback}. */
+    private static String extFromUrl(String url, String fallback) {
+        try {
+            String p = url.split("\\?")[0];
+            int dot = p.lastIndexOf('.'), slash = p.lastIndexOf('/');
+            if (dot > slash && dot >= 0 && p.length() - dot <= 5) return p.substring(dot).toLowerCase(Locale.ROOT);
+        } catch (Throwable ignored) {}
+        return fallback;
+    }
+
+    private static String mimeFor(String kind, String ext) {
+        switch (kind) {
+            case "video": return "video/mp4";
+            case "voice": return ".webm".equals(ext) ? "audio/webm" : "audio/mp4";
+            case "gif":   return ".webp".equals(ext) ? "image/webp" : "image/gif";
+            default:      return ".png".equals(ext) ? "image/png" : ".webp".equals(ext) ? "image/webp" : "image/jpeg";
+        }
+    }
+
+    /** The canonical extension for a mime, so the saved file name matches what MediaStore expects. */
+    private static String extForMime(String mime) {
+        switch (mime) {
+            case "video/mp4":  return ".mp4";
+            case "audio/mp4":  return ".m4a";
+            case "audio/webm": return ".webm";
+            case "image/gif":  return ".gif";
+            case "image/webp": return ".webp";
+            case "image/png":  return ".png";
+            default:           return ".jpg";
+        }
+    }
+
+    /** Inline element referencing a downloaded media file by its relative path. */
+    private static String mediaHtml(String rel, String kind) {
+        switch (kind) {
+            case "video": return "<video class=media controls preload=none src=\"" + rel + "\"></video>";
+            case "voice": return "<audio class=media controls preload=none src=\"" + rel + "\"></audio>";
+            default:      return "<img class=media loading=lazy src=\"" + rel + "\">"; // photo, gif, preview
+        }
     }
 
     private static long timestampMs(JSONObject j) {
