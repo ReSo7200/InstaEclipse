@@ -58,9 +58,8 @@ public class ThreadNames {
             if (f == null) return;
             JSONObject o = new JSONObject();
             for (Map.Entry<String, String> e : cache.entrySet()) o.put(e.getKey(), e.getValue());
-            try (FileOutputStream out = new FileOutputStream(f)) {
-                out.write(o.toString().getBytes(StandardCharsets.UTF_8));
-            }
+            // temp file + rename: a crash mid-write keeps the previous version intact
+            ps.reso.instaeclipse.utils.core.AtomicFiles.write(f, o.toString());
         } catch (Throwable t) {
             ModuleLog.line("(IE|ThreadNames) persist failed: " + t.getMessage());
         }
