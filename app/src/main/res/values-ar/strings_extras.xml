@@ -16,4 +16,5 @@
     <string name="ig_dialog_extras_share_domain_off">متوقف</string>
     <string name="ig_dialog_extras_share_domain_hint">يستبدل instagram.com في الروابط التي تنسخها أو تشاركها. اتركه فارغًا لإيقافه.</string>
     <string name="ig_dialog_extras_share_domain_invalid">نطاق غير صالح</string>
+    <string name="ig_dialog_extras_startup_tab">علامة التبويب عند البدء</string>
 </resources>

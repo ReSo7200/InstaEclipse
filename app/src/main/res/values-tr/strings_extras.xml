@@ -16,4 +16,5 @@
     <string name="ig_dialog_extras_share_domain_off">Kapalı</string>
     <string name="ig_dialog_extras_share_domain_hint">Kopyaladığın veya paylaştığın linklerde instagram.com\'u değiştirir (ör. gömülü önizleme için). Kapatmak için boş bırak.</string>
     <string name="ig_dialog_extras_share_domain_invalid">Geçersiz domain</string>
+    <string name="ig_dialog_extras_startup_tab">Başlangıç Sekmesi</string>
 </resources>

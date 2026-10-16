@@ -1261,6 +1261,8 @@ public class DialogUtils {
         navCard.addView(notesTray);
         navCard.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_nav_tab_order), "#30D158",
                 v -> showTabOrderDialog(context)));
+        navCard.addView(createActionRow(context, R.drawable.ic_tune, startupTabLabel(context), "#30D158",
+                v -> showStartupTabDialog(context, (TextView) findFirstText(v))));
         layout.addView(navCard);
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {
@@ -1273,6 +1275,36 @@ public class DialogUtils {
         });
 
         SettingsManager.saveAllFlags();
+    }
+
+    static String[] startupTabNames(Context context) {
+        return new String[]{
+                I18n.t(context, R.string.ig_dialog_extras_share_domain_off),
+                I18n.t(context, R.string.ig_nav_name_home),
+                I18n.t(context, R.string.ig_nav_name_reels),
+                I18n.t(context, R.string.ig_nav_name_messages),
+                I18n.t(context, R.string.ig_nav_name_search),
+                I18n.t(context, R.string.ig_nav_name_profile),
+                I18n.t(context, R.string.ig_nav_name_activity)};
+    }
+
+    private static String startupTabLabel(Context context) {
+        int i = java.util.Arrays.asList(ps.reso.instaeclipse.mods.ui.StartupTabHook.TABS).indexOf(FeatureFlags.startupTab);
+        return I18n.t(context, R.string.ig_dialog_extras_startup_tab) + "  ·  " + startupTabNames(context)[Math.max(i, 0)];
+    }
+
+    /** Which tab Instagram opens on (FeatureFlags.startupTab). */
+    private static void showStartupTabDialog(Context context, TextView label) {
+        String[] tabs = ps.reso.instaeclipse.mods.ui.StartupTabHook.TABS;
+        int current = Math.max(java.util.Arrays.asList(tabs).indexOf(FeatureFlags.startupTab), 0);
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.ig_dialog_extras_startup_tab))
+                .choices(startupTabNames(context), current, which -> {
+                    FeatureFlags.startupTab = tabs[which];
+                    SettingsManager.saveAllFlags();
+                    if (label != null) label.setText(startupTabLabel(context));
+                })
+                .show();
     }
 
     /** #238: reorder the bottom-nav tabs (FeatureFlags.navTabOrder). */

@@ -142,6 +142,7 @@ public class SettingsManager {
         editor.putBoolean("customFontEnabled", FeatureFlags.customFontEnabled);
         editor.putString("customFontPath", FeatureFlags.customFontPath);
         editor.putString("navTabOrder", FeatureFlags.navTabOrder);
+        editor.putString("startupTab", FeatureFlags.startupTab);
         editor.putString("customShareDomain", FeatureFlags.customShareDomain);
         editor.putBoolean("customEmojiEnabled", FeatureFlags.customEmojiEnabled);
         editor.putString("customEmojiPath", FeatureFlags.customEmojiPath);
@@ -288,6 +289,7 @@ public class SettingsManager {
         FeatureFlags.customFontEnabled        = prefs.getBoolean("customFontEnabled", false);
         FeatureFlags.customFontPath           = prefs.getString("customFontPath", "");
         FeatureFlags.navTabOrder              = prefs.getString("navTabOrder", "");
+        FeatureFlags.startupTab               = prefs.getString("startupTab", "");
         FeatureFlags.customShareDomain        = prefs.getString("customShareDomain", "");
         FeatureFlags.customEmojiEnabled       = prefs.getBoolean("customEmojiEnabled", false);
         FeatureFlags.customEmojiPath          = prefs.getString("customEmojiPath", "");

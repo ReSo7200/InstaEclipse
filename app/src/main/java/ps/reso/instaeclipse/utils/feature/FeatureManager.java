@@ -302,6 +302,12 @@ public class FeatureManager {
         reg(FeatureFlags.enableCopyComment,    "CopyComment",          R.string.ig_dialog_misc_copy_comment);
         reg(FeatureFlags.enablePhotoZoom,      "PhotoZoom",            R.string.ig_feat_photo_zoom);
 
+        if (!FeatureFlags.startupTab.isEmpty()) {
+            FeatureStatusTracker.setEnabled("StartupTab", R.string.ig_dialog_extras_startup_tab);
+        } else {
+            FeatureStatusTracker.setDisabled("StartupTab");
+        }
+
         for (ExtrasFeatures.Entry e : ExtrasFeatures.ALL) {
             if (ExtrasFeatures.get(e.flag)) FeatureStatusTracker.setEnabled(e.flag, e.label);
             else FeatureStatusTracker.setDisabled(e.flag);

@@ -1215,7 +1215,8 @@ public class FeaturesFragment extends Fragment {
 
         defs.add(getString(R.string.ig_nav_tab_order));
         defs.add(Arrays.asList(
-                createClickable(R.drawable.ic_tune, "#30D158", getString(R.string.ig_nav_tab_order), this::showTabOrderDialog)
+                createClickable(R.drawable.ic_tune, "#30D158", getString(R.string.ig_nav_tab_order), this::showTabOrderDialog),
+                createClickable(R.drawable.ic_tune, "#30D158", startupTabLabel(), this::showStartupTabDialog)
         ));
 
         return defs;
@@ -1319,6 +1320,42 @@ public class FeaturesFragment extends Fragment {
                     b.putExtra("value", domain);
                     requireContext().sendBroadcast(b);
                     loadAdsMenu();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private String[] startupTabNames() {
+        return new String[]{
+                getString(R.string.ig_dialog_extras_share_domain_off),
+                getString(R.string.ig_nav_name_home),
+                getString(R.string.ig_nav_name_reels),
+                getString(R.string.ig_nav_name_messages),
+                getString(R.string.ig_nav_name_search),
+                getString(R.string.ig_nav_name_profile),
+                getString(R.string.ig_nav_name_activity)};
+    }
+
+    private String startupTabLabel() {
+        int i = Arrays.asList(ps.reso.instaeclipse.mods.ui.StartupTabHook.TABS).indexOf(localCache.getString("startupTab", ""));
+        return getString(R.string.ig_dialog_extras_startup_tab) + "  ·  " + startupTabNames()[Math.max(i, 0)];
+    }
+
+    /** Which tab Instagram opens on (saved as the "startupTab" string pref). */
+    private void showStartupTabDialog() {
+        String[] tabs = ps.reso.instaeclipse.mods.ui.StartupTabHook.TABS;
+        int current = Math.max(Arrays.asList(tabs).indexOf(localCache.getString("startupTab", "")), 0);
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.ig_dialog_extras_startup_tab)
+                .setSingleChoiceItems(startupTabNames(), current, (d, which) -> {
+                    localCache.edit().putString("startupTab", tabs[which]).commit();
+                    makeLocalCacheWorldReadable();
+                    Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
+                    b.putExtra("key", "startupTab");
+                    b.putExtra("value", tabs[which]);
+                    requireContext().sendBroadcast(b);
+                    d.dismiss();
+                    loadNavigationMenu();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
