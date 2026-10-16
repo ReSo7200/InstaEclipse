@@ -1,6 +1,5 @@
 package ps.reso.instaeclipse.mods.media;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.ContextThemeWrapper;
 import android.widget.Toast;

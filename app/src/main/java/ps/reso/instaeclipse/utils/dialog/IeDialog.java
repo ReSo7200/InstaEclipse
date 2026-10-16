@@ -166,6 +166,39 @@ public class IeDialog {
         return this;
     }
 
+    /** A rounded card quoting {@code t} (e.g. the comment being copied), cut at {@code maxLines}. */
+    public TextView quote(CharSequence t, int maxLines) {
+        TextView q = new TextView(ctx);
+        q.setText(t);
+        q.setTextColor(text);
+        q.setTextSize(14);
+        q.setMaxLines(maxLines);
+        q.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        q.setPadding(dp(14), dp(12), dp(14), dp(12));
+        q.setBackground(round(field, 14));
+        view(q);
+        return q;
+    }
+
+    /** A read-only, selectable text box (all text pre-selected) for "copy part of it" dialogs. */
+    public EditText selectableText(CharSequence t, int maxLines) {
+        EditText et = new EditText(ctx);
+        et.setText(t);
+        et.setTextColor(text);
+        et.setTextIsSelectable(true);
+        et.setFocusableInTouchMode(true);
+        et.setInputType(android.text.InputType.TYPE_NULL);
+        et.setKeyListener(null);
+        et.setHorizontallyScrolling(false);
+        et.setMaxLines(maxLines);
+        et.setTextSize(14);
+        et.setPadding(dp(14), dp(12), dp(14), dp(12));
+        et.setBackground(round(field, 14));
+        et.setSelection(0, et.getText().length());
+        view(et);
+        return et;
+    }
+
     /** A rounded input in the dialog's style. */
     public EditText input(CharSequence hint) {
         EditText et = new EditText(ctx);

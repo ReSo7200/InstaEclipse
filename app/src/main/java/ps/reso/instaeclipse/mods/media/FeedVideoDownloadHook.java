@@ -1,17 +1,12 @@
 package ps.reso.instaeclipse.mods.media;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
@@ -23,18 +18,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -73,7 +63,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -2574,103 +2563,18 @@ public class FeedVideoDownloadHook {
                 slideMedia != null ? audioSource(slideMedia, postMedia) : null);
     }
 
-    // ── Modern bottom sheet for carousel download ─────────────────────────────
-
-    private static boolean isDarkTheme(Context ctx) {
-        return (ctx.getResources().getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-    }
-
-    private static GradientDrawable roundRect(int color, float radiusDp, Context ctx) {
-        float r = radiusDp * ctx.getResources().getDisplayMetrics().density;
-        GradientDrawable d = new GradientDrawable();
-        d.setColor(color);
-        d.setCornerRadius(r);
-        return d;
-    }
-
-    private static Button makePillButton(Context ctx, String label,
-                                         int bgColor, int textColor, float dp) {
-        Button btn = new Button(ctx);
-        btn.setText(label);
-        btn.setTextColor(textColor);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        btn.setTypeface(null, Typeface.BOLD);
-        btn.setBackground(roundRect(bgColor, 14, ctx));
-        btn.setAllCaps(false);
-        btn.setPadding((int)(20 * dp), (int)(14 * dp), (int)(20 * dp), (int)(14 * dp));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = (int)(10 * dp);
-        btn.setLayoutParams(lp);
-        return btn;
-    }
+    // ── Carousel download chooser ─────────────────────────────────────────────
 
     private static void showCarouselBottomSheet(Context ctx, List<String> urls,
                                                  String username, String mediaId,
                                                  int n, int safeIdx, Object[] audioSrc) {
         try {
-            float dp   = ctx.getResources().getDisplayMetrics().density;
-            boolean dk = isDarkTheme(ctx);
+            java.util.List<CharSequence> labels = new ArrayList<>();
+            java.util.List<Runnable> actions = new ArrayList<>();
 
-            int sheetBg    = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-            int textPrim   = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int textSec    = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
-            int accentBg   = Color.parseColor("#0A84FF");
-            int secondBg   = dk ? Color.parseColor("#3A3A3C") : Color.parseColor("#E5E5EA");
-            int secondText = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int handleClr  = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
-            LinearLayout sheet = new LinearLayout(ctx);
-            sheet.setOrientation(LinearLayout.VERTICAL);
-            sheet.setBackground(roundRect(sheetBg, 20, ctx));
-            int hPad = (int)(20 * dp);
-            sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
-
-            // Drag handle
-            View handle = new View(ctx);
-            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
-                    (int)(40 * dp), (int)(4 * dp));
-            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-            handleLp.bottomMargin = (int)(16 * dp);
-            handle.setLayoutParams(handleLp);
-            handle.setBackground(roundRect(handleClr, 2, ctx));
-            sheet.addView(handle);
-
-            // Title
-            TextView title = new TextView(ctx);
-            title.setText(I18n.t(ctx, R.string.ig_dl_title));
-            title.setTextColor(textPrim);
-            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            title.setTypeface(null, Typeface.BOLD);
-            LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            titleLp.bottomMargin = (int)(4 * dp);
-            title.setLayoutParams(titleLp);
-            sheet.addView(title);
-
-            // Subtitle
-            TextView subtitle = new TextView(ctx);
-            subtitle.setText(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n));
-            subtitle.setTextColor(textSec);
-            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            subLp.bottomMargin = (int)(14 * dp);
-            subtitle.setLayoutParams(subLp);
-            sheet.addView(subtitle);
-
-            Dialog dialog = new Dialog(ctx);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-            // Button: Download current
-            String currentLabel = I18n.t(ctx, R.string.ig_dl_carousel_current, safeIdx + 1, n);
-            Button btnCurrent = makePillButton(ctx, currentLabel, accentBg, Color.WHITE, dp);
-            btnCurrent.setOnClickListener(v -> {
-                dialog.dismiss();
+            // Download current
+            labels.add(I18n.t(ctx, R.string.ig_dl_carousel_current, safeIdx + 1, n));
+            actions.add(() -> {
                 String url = urls.get(safeIdx);
                 boolean isVid = isVideoUrl(url);
                 String fn = withSlide(buildFilename(username, "post", mediaId, isVid), safeIdx + 1, n);
@@ -2688,13 +2592,10 @@ public class FeedVideoDownloadHook {
                     }
                 });
             });
-            sheet.addView(btnCurrent);
 
-            // Button: Download all
-            Button btnAll = makePillButton(ctx, I18n.t(ctx, R.string.ig_dl_carousel_all, n),
-                    secondBg, secondText, dp);
-            btnAll.setOnClickListener(v -> {
-                dialog.dismiss();
+            // Download all
+            labels.add(I18n.t(ctx, R.string.ig_dl_carousel_all, n));
+            actions.add(() -> {
                 Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_all_n_items, n), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
                     int failed = 0;
@@ -2721,9 +2622,8 @@ public class FeedVideoDownloadHook {
                     });
                 });
             });
-            sheet.addView(btnAll);
 
-            // Button: audio of the slide being viewed (only when it is a video with sound)
+            // Audio of the slide being viewed (only when it is a video with sound)
             if (audioSrc != null) {
                 String user = username != null ? username : "post";
                 boolean postWide = (Boolean) audioSrc[4];
@@ -2735,29 +2635,16 @@ public class FeedVideoDownloadHook {
                         .replaceAll("\\.mp4$", ".m4a");
                 if (!postWide) audioName = withSlide(audioName, safeIdx + 1, n);
                 final String fAudioName = audioName;
-                Button btnAudio = makePillButton(ctx, audioLabel, secondBg, secondText, dp);
-                btnAudio.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    downloadAudio(ctx, (String) audioSrc[0], fAudioName,
-                            user, (Boolean) audioSrc[1], (Long) audioSrc[2], (Long) audioSrc[3]);
-                });
-                sheet.addView(btnAudio);
+                labels.add(audioLabel);
+                actions.add(() -> downloadAudio(ctx, (String) audioSrc[0], fAudioName,
+                        user, (Boolean) audioSrc[1], (Long) audioSrc[2], (Long) audioSrc[3]));
             }
 
-            dialog.setContentView(sheet);
-            Window w = dialog.getWindow();
-            if (w != null) {
-                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                w.setGravity(Gravity.BOTTOM);
-                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT);
-                WindowManager.LayoutParams wlp = w.getAttributes();
-                int margin = (int)(12 * dp);
-                wlp.x = margin;
-                wlp.y = margin;
-                w.setAttributes(wlp);
-            }
-            dialog.show();
+            new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                    .title(I18n.t(ctx, R.string.ig_dl_title))
+                    .message(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n))
+                    .choices(labels.toArray(new CharSequence[0]), -1, which -> actions.get(which).run())
+                    .show();
 
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ showCarouselBottomSheet: " + t);
@@ -2799,83 +2686,15 @@ public class FeedVideoDownloadHook {
         if (urls.size() == 1) { copyLinkToClipboard(ctx, urls.get(0)); return; }
 
         try {
-            float dp   = ctx.getResources().getDisplayMetrics().density;
-            boolean dk = isDarkTheme(ctx);
-
-            int sheetBg    = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-            int textPrim   = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int textSec    = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
-            int accentBg   = Color.parseColor("#0A84FF");
-            int secondBg   = dk ? Color.parseColor("#3A3A3C") : Color.parseColor("#E5E5EA");
-            int secondText = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int handleClr  = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
             final int n = urls.size();
-
-            LinearLayout sheet = new LinearLayout(ctx);
-            sheet.setOrientation(LinearLayout.VERTICAL);
-            sheet.setBackground(roundRect(sheetBg, 20, ctx));
-            int hPad = (int)(20 * dp);
-            sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
-
-            View handle = new View(ctx);
-            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams((int)(40 * dp), (int)(4 * dp));
-            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-            handleLp.bottomMargin = (int)(16 * dp);
-            handle.setLayoutParams(handleLp);
-            handle.setBackground(roundRect(handleClr, 2, ctx));
-            sheet.addView(handle);
-
-            TextView title = new TextView(ctx);
-            title.setText(I18n.t(ctx, R.string.ig_copy_link_title));
-            title.setTextColor(textPrim);
-            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            title.setTypeface(null, Typeface.BOLD);
-            sheet.addView(title);
-
-            TextView subtitle = new TextView(ctx);
-            subtitle.setText(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n));
-            subtitle.setTextColor(textSec);
-            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            subLp.bottomMargin = (int)(10 * dp);
-            subtitle.setLayoutParams(subLp);
-            sheet.addView(subtitle);
-
-            Dialog dialog = new Dialog(ctx);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-            // One pill per slide (scrollable, capped height for long carousels)
-            LinearLayout pillList = new LinearLayout(ctx);
-            pillList.setOrientation(LinearLayout.VERTICAL);
-            for (int i = 0; i < n; i++) {
-                final int idx = i;
-                Button b = makePillButton(ctx,
-                        I18n.t(ctx, R.string.ig_copy_link_slide, i + 1, n), secondBg, secondText, dp);
-                b.setOnClickListener(v -> { dialog.dismiss(); copyLinkToClipboard(ctx, urls.get(idx)); });
-                pillList.addView(b);
-            }
-            ScrollView scroller = new ScrollView(ctx);
-            scroller.addView(pillList);
-            LinearLayout.LayoutParams svLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            svLp.weight = 1f;
-            scroller.setLayoutParams(svLp);
-            // Cap so many slides don't push the "copy all" pill off-screen
-            scroller.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                int cap = (int)(300 * dp);
-                if (scroller.getHeight() > cap && scroller.getLayoutParams().height != cap) {
-                    scroller.getLayoutParams().height = cap;
-                    scroller.requestLayout();
-                }
-            });
-            sheet.addView(scroller);
-
-            Button btnAll = makePillButton(ctx, I18n.t(ctx, R.string.ig_copy_link_all, n),
-                    accentBg, Color.WHITE, dp);
-            btnAll.setOnClickListener(v -> {
-                dialog.dismiss();
+            CharSequence[] slides = new CharSequence[n];
+            for (int i = 0; i < n; i++) slides[i] = I18n.t(ctx, R.string.ig_copy_link_slide, i + 1, n);
+            ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                    .title(I18n.t(ctx, R.string.ig_copy_link_title))
+                    .message(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n))
+                    // One row per slide (the dialog body scrolls for long carousels)
+                    .choices(slides, -1, idx -> copyLinkToClipboard(ctx, urls.get(idx)));
+            dlg.primary(I18n.t(ctx, R.string.ig_copy_link_all, n), () -> {
                 StringBuilder sb = new StringBuilder();
                 for (String u : urls) sb.append(u).append('\n');
                 final String allText = sb.toString().trim();
@@ -2891,21 +2710,7 @@ public class FeedVideoDownloadHook {
                     }
                 }, 350);
             });
-            sheet.addView(btnAll);
-
-            dialog.setContentView(sheet);
-            Window w = dialog.getWindow();
-            if (w != null) {
-                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                w.setGravity(Gravity.BOTTOM);
-                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                WindowManager.LayoutParams wlp = w.getAttributes();
-                int margin = (int)(12 * dp);
-                wlp.x = margin;
-                wlp.y = margin;
-                w.setAttributes(wlp);
-            }
-            dialog.show();
+            dlg.show();
 
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ showCopyLinkSheet: " + t);

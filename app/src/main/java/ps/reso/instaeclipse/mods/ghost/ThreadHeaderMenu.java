@@ -7,13 +7,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.utils.dialog.IeDialog;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -100,17 +100,18 @@ final class ThreadHeaderMenu {
     private static void show(View btn) {
         Map<String, Entry> m = entries.get(btn);
         if (m == null || m.isEmpty()) return;
-        PopupMenu pm = new PopupMenu(btn.getContext(), btn);
         java.util.List<Entry> list = new java.util.ArrayList<>();
         for (String k : ORDER) if (m.containsKey(k)) list.add(m.get(k));
         for (Map.Entry<String, Entry> e : m.entrySet())
             if (!java.util.Arrays.asList(ORDER).contains(e.getKey())) list.add(e.getValue());
-        for (int i = 0; i < list.size(); i++) pm.getMenu().add(0, i, i, list.get(i).label());
-        pm.setOnMenuItemClickListener(item -> {
-            try { list.get(item.getItemId()).action().run(); }
-            catch (Throwable t) { ModuleLog.line("(IE|ThreadMenu) ⚠️ action: " + t); }
-            return true;
-        });
-        pm.show();
+        CharSequence[] labels = new CharSequence[list.size()];
+        for (int i = 0; i < list.size(); i++) labels[i] = list.get(i).label();
+        new IeDialog(btn.getContext())
+                .title(I18n.t(btn.getContext(), R.string.ig_thread_menu))
+                .choices(labels, -1, which -> {
+                    try { list.get(which).action().run(); }
+                    catch (Throwable t) { ModuleLog.line("(IE|ThreadMenu) ⚠️ action: " + t); }
+                })
+                .show();
     }
 }

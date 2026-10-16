@@ -1,25 +1,14 @@
 package ps.reso.instaeclipse.mods.misc;
 
 import android.app.AndroidAppHelper;
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +28,7 @@ import java.util.Set;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.utils.dialog.IeDialog;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -47,8 +37,6 @@ import ps.reso.instaeclipse.utils.users.UserUtils;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 public class StoryMentionHook {
-
-
 
     // Story @mentions live behind a two-step pipeline, not a single Media-level getter:
     //   Media -> LiveTreeMediaDict (found by type) -> "reel_mentions" field (raw tree entries)
@@ -385,169 +373,55 @@ public class StoryMentionHook {
         return null;
     }
 
-    // ── Bottom sheet dialog ───────────────────────────────────────────────────
+    // ── Mentions dialog ───────────────────────────────────────────────────────
 
     private static void showMentionsDialog(Context ctx, List<String> usernames) {
         mainHandler.post(() -> {
             try {
-                float dp   = ctx.getResources().getDisplayMetrics().density;
-                boolean dk = (ctx.getResources().getConfiguration().uiMode
-                        & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+                IeDialog dlg = new IeDialog(ctx)
+                        .title(I18n.t(ctx, R.string.ig_mention_dialog_title))
+                        .message(usernames.isEmpty()
+                                ? I18n.t(ctx, R.string.ig_mention_no_mentions)
+                                : I18n.t(ctx, R.string.ig_mention_subtitle, usernames.size()));
 
-                int sheetBg    = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-                int cardBg     = dk ? Color.parseColor("#2C2C2E") : Color.parseColor("#FFFFFF");
-                int textPrim   = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-                int textSec    = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
-                int accentBg   = Color.parseColor("#0A84FF");
-                int handleClr  = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
-                LinearLayout sheet = new LinearLayout(ctx);
-                sheet.setOrientation(LinearLayout.VERTICAL);
-                sheet.setBackground(roundRect(sheetBg, 20, ctx, dp));
-                int hPad = (int)(20 * dp);
-                sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
-
-                // Drag handle
-                View handle = new View(ctx);
-                LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
-                        (int)(40 * dp), (int)(4 * dp));
-                handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-                handleLp.bottomMargin = (int)(16 * dp);
-                handle.setLayoutParams(handleLp);
-                handle.setBackground(roundRect(handleClr, 2, ctx, dp));
-                sheet.addView(handle);
-
-                // Title
-                TextView title = new TextView(ctx);
-                title.setText(I18n.t(ctx, R.string.ig_mention_dialog_title));
-                title.setTextColor(textPrim);
-                title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                title.setTypeface(null, Typeface.BOLD);
-                LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                titleLp.bottomMargin = (int)(4 * dp);
-                title.setLayoutParams(titleLp);
-                sheet.addView(title);
-
-                // Subtitle
-                TextView subtitle = new TextView(ctx);
-                subtitle.setText(usernames.isEmpty()
-                        ? I18n.t(ctx, R.string.ig_mention_no_mentions)
-                        : I18n.t(ctx, R.string.ig_mention_subtitle, usernames.size()));
-                subtitle.setTextColor(textSec);
-                subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-                LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                subLp.bottomMargin = (int)(14 * dp);
-                subtitle.setLayoutParams(subLp);
-                sheet.addView(subtitle);
-
-                Dialog dialog = new Dialog(ctx);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-                if (!usernames.isEmpty()) {
-                    // Scrollable username list
-                    ScrollView scroll = new ScrollView(ctx);
-                    scroll.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
-
-                    LinearLayout list = new LinearLayout(ctx);
-                    list.setOrientation(LinearLayout.VERTICAL);
-
-                    for (String username : usernames) {
-                        TextView row = new TextView(ctx);
-                        row.setText("@" + username);
-                        row.setTextColor(textPrim);
-                        row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                        row.setTypeface(null, Typeface.BOLD);
-                        int rowPad = (int)(14 * dp);
-                        row.setPadding(rowPad, rowPad, rowPad, rowPad);
-                        row.setBackground(roundRect(cardBg, 12, ctx, dp));
-                        LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT);
-                        rowLp.bottomMargin = (int)(8 * dp);
-                        row.setLayoutParams(rowLp);
-                        row.setOnClickListener(v -> {
-                            ClipboardManager cm = (ClipboardManager)
-                                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-                            if (cm != null) {
-                                cm.setPrimaryClip(ClipData.newPlainText("username", username));
-                                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_mention_copied, username), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        list.addView(row);
-                    }
-                    scroll.addView(list);
-                    sheet.addView(scroll);
-
-                    // Copy all button (only shown when more than one mention)
-                    if (usernames.size() > 1) {
-                        Button btnAll = makePillButton(ctx, I18n.t(ctx, R.string.ig_mention_copy_all), accentBg, Color.WHITE, dp);
-                        btnAll.setOnClickListener(v -> {
-                            dialog.dismiss();
-                            StringBuilder sb = new StringBuilder();
-                            for (String u : usernames) sb.append("@").append(u).append("\n");
-                            ClipboardManager cm = (ClipboardManager)
-                                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-                            if (cm != null) {
-                                cm.setPrimaryClip(ClipData.newPlainText("mentions", sb.toString().trim()));
-                                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_mentions_copied), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        sheet.addView(btnAll);
-                    }
+                // One row per mention; tapping copies that username and keeps the list open.
+                for (String username : usernames) {
+                    TextView row = new TextView(ctx);
+                    row.setText("@" + username);
+                    row.setTextColor(dlg.text);
+                    row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                    row.setTypeface(null, Typeface.BOLD);
+                    row.setPadding(dlg.dp(16), dlg.dp(13), dlg.dp(14), dlg.dp(13));
+                    row.setBackground(dlg.round(dlg.field, 14));
+                    row.setOnClickListener(v -> {
+                        ClipboardManager cm = (ClipboardManager)
+                                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+                        if (cm != null) {
+                            cm.setPrimaryClip(ClipData.newPlainText("username", username));
+                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_mention_copied, username), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    dlg.view(row);
                 }
 
-                dialog.setContentView(sheet);
-                Window w = dialog.getWindow();
-                if (w != null) {
-                    w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    w.setGravity(Gravity.BOTTOM);
-                    w.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                            WindowManager.LayoutParams.WRAP_CONTENT);
-                    WindowManager.LayoutParams wlp = w.getAttributes();
-                    int margin = (int)(12 * dp);
-                    wlp.x = margin;
-                    wlp.y = margin;
-                    w.setAttributes(wlp);
+                // Copy all button (only shown when more than one mention)
+                if (usernames.size() > 1) {
+                    dlg.primary(I18n.t(ctx, R.string.ig_mention_copy_all), () -> {
+                        StringBuilder sb = new StringBuilder();
+                        for (String u : usernames) sb.append("@").append(u).append("\n");
+                        ClipboardManager cm = (ClipboardManager)
+                                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+                        if (cm != null) {
+                            cm.setPrimaryClip(ClipData.newPlainText("mentions", sb.toString().trim()));
+                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_mentions_copied), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
-                dialog.show();
-
+                dlg.show();
             } catch (Throwable t) {
                 ModuleLog.line("(IE|Mention) ❌ showMentionsDialog: " + t);
             }
         });
-    }
-
-    // ── UI helpers ────────────────────────────────────────────────────────────
-
-    private static GradientDrawable roundRect(int color, float radiusDp, Context ctx, float dp) {
-        GradientDrawable d = new GradientDrawable();
-        d.setColor(color);
-        d.setCornerRadius(radiusDp * dp);
-        return d;
-    }
-
-    private static Button makePillButton(Context ctx, String label,
-                                          int bgColor, int textColor, float dp) {
-        Button btn = new Button(ctx);
-        btn.setText(label);
-        btn.setTextColor(textColor);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        btn.setTypeface(null, Typeface.BOLD);
-        btn.setBackground(roundRect(bgColor, 14, ctx, dp));
-        btn.setAllCaps(false);
-        btn.setPadding((int)(20 * dp), (int)(14 * dp), (int)(20 * dp), (int)(14 * dp));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = (int)(10 * dp);
-        btn.setLayoutParams(lp);
-        return btn;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

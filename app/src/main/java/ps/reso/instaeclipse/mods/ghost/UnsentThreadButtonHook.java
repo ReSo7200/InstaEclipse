@@ -2,7 +2,6 @@ package ps.reso.instaeclipse.mods.ghost;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;

@@ -146,8 +146,9 @@ public class DialogUtils {
 
     public static void showSimpleDialog(Context context, String title, String message) {
         try {
-            new AlertDialog.Builder(context).setTitle(title).setMessage(message)
-                    .setPositiveButton(I18n.t(context, R.string.ig_dialog_ok), null).show();
+            IeDialog dlg = new IeDialog(context).title(title).message(message);
+            dlg.primary(I18n.t(context, R.string.ig_dialog_ok), null);
+            dlg.show();
         } catch (Exception e) {
             // handle UI crash fallback
         }
@@ -777,13 +778,13 @@ public class DialogUtils {
         }));
 
         layout.addView(createActionRow(context, R.drawable.ic_restart, I18n.t(context, R.string.ig_dialog_dev_restore_default_config), "#FF9F0A", v -> {
-            new AlertDialog.Builder(context)
-                    .setTitle(I18n.t(context, R.string.ig_dialog_dev_restore_default_config))
-                    .setMessage(I18n.t(context, R.string.ig_dialog_dev_restore_default_config_confirm))
-                    .setPositiveButton(I18n.t(context, R.string.ig_dialog_yes), (dialog, which) ->
-                            ConfigManager.restoreDefaultConfig(context, Module.moduleSourceDir))
-                    .setNegativeButton(I18n.t(context, R.string.ig_dialog_cancel), null)
-                    .show();
+            IeDialog dlg = new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_dialog_dev_restore_default_config))
+                    .message(I18n.t(context, R.string.ig_dialog_dev_restore_default_config_confirm));
+            dlg.secondary(I18n.t(context, R.string.ig_dialog_cancel), null);
+            dlg.primary(I18n.t(context, R.string.ig_dialog_yes), () ->
+                    ConfigManager.restoreDefaultConfig(context, Module.moduleSourceDir));
+            dlg.show();
         }));
 
         layout.addView(createDivider(context));
@@ -823,17 +824,16 @@ public class DialogUtils {
             }));
             layout.addView(createActionRow(context, R.drawable.ic_delete, I18n.t(context, R.string.ig_dialog_unsent_clear), "#FF453A", v -> {
                 try {
-                    Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-                    new AlertDialog.Builder(themed)
-                            .setTitle(I18n.t(context, R.string.ig_dialog_unsent_clear))
-                            .setMessage(I18n.t(context, R.string.ig_dialog_unsent_clear_confirm))
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .setPositiveButton(I18n.t(context, R.string.ig_dialog_unsent_clear_yes), (d, w) -> {
-                                ps.reso.instaeclipse.utils.ghost.UnsentLog.clearThread(threadId);
-                                Toast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
-                                showThreadUnsent(context, threadId);
-                            })
-                            .show();
+                    IeDialog dlg = new IeDialog(context)
+                            .title(I18n.t(context, R.string.ig_dialog_unsent_clear))
+                            .message(I18n.t(context, R.string.ig_dialog_unsent_clear_confirm));
+                    dlg.secondary(context.getString(android.R.string.cancel), null);
+                    dlg.primary(I18n.t(context, R.string.ig_dialog_unsent_clear_yes), () -> {
+                        ps.reso.instaeclipse.utils.ghost.UnsentLog.clearThread(threadId);
+                        Toast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
+                        showThreadUnsent(context, threadId);
+                    });
+                    dlg.show();
                 } catch (Throwable ignored) {}
             }));
             layout.addView(createDivider(context));
@@ -977,17 +977,16 @@ public class DialogUtils {
 
         layout.addView(createActionRow(context, R.drawable.ic_delete, I18n.t(context, R.string.ig_dialog_unsent_clear), "#FF453A", v -> {
             try {
-                Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-                new AlertDialog.Builder(themed)
-                        .setTitle(I18n.t(context, R.string.ig_dialog_unsent_clear))
-                        .setMessage(I18n.t(context, R.string.ig_dialog_unsent_clear_confirm))
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .setPositiveButton(I18n.t(context, R.string.ig_dialog_unsent_clear_yes), (d, w) -> {
-                            ps.reso.instaeclipse.utils.ghost.UnsentLog.clear();
-                            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
-                            showUnsentMessages(context); // refresh
-                        })
-                        .show();
+                IeDialog dlg = new IeDialog(context)
+                        .title(I18n.t(context, R.string.ig_dialog_unsent_clear))
+                        .message(I18n.t(context, R.string.ig_dialog_unsent_clear_confirm));
+                dlg.secondary(context.getString(android.R.string.cancel), null);
+                dlg.primary(I18n.t(context, R.string.ig_dialog_unsent_clear_yes), () -> {
+                    ps.reso.instaeclipse.utils.ghost.UnsentLog.clear();
+                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
+                    showUnsentMessages(context); // refresh
+                });
+                dlg.show();
             } catch (Throwable ignored) {}
         }));
 
@@ -1105,10 +1104,13 @@ public class DialogUtils {
 
         extremeModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(I18n.t(context, R.string.ig_dialog_distraction_extreme_title));
-                builder.setMessage(I18n.t(context, R.string.ig_dialog_distraction_extreme_message));
-                builder.setPositiveButton(I18n.t(context, R.string.ig_dialog_yes), (dialog, which) -> {
+                IeDialog builder = new IeDialog(context)
+                        .title(I18n.t(context, R.string.ig_dialog_distraction_extreme_title))
+                        .message(I18n.t(context, R.string.ig_dialog_distraction_extreme_message));
+                Runnable cancelExtreme = () -> extremeModeSwitch.setChecked(false);
+                builder.secondary(I18n.t(context, R.string.ig_dialog_cancel), cancelExtreme);
+                builder.onClose(cancelExtreme); // ✕ = Cancel
+                builder.primary(I18n.t(context, R.string.ig_dialog_yes), () -> {
                     FeatureFlags.isExtremeMode = true;
                     FeatureFlags.isDistractionFree = true;
 
@@ -1125,7 +1127,6 @@ public class DialogUtils {
                     disableAllSwitches(switches, enableAllSwitch, onlyInDMSwitch);
                     extremeModeSwitch.setEnabled(false);
                 });
-                builder.setNegativeButton(I18n.t(context, R.string.ig_dialog_cancel), (dialog, which) -> extremeModeSwitch.setChecked(false));
                 builder.show();
             }
         });
@@ -1282,11 +1283,9 @@ public class DialogUtils {
         for (String n : FeatureFlags.navTabOrder.split(","))
             if (java.util.Arrays.asList(ids).contains(n.trim()) && !order.contains(n.trim())) order.add(n.trim());
         for (String n : ids) if (!order.contains(n)) order.add(n);
-        float d = context.getResources().getDisplayMetrics().density;
-        int pad = (int) (16 * d);
+        final IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_nav_tab_order));
         final LinearLayout list = new LinearLayout(context);
         list.setOrientation(LinearLayout.VERTICAL);
-        list.setPadding(pad, pad / 2, pad, 0);
         final Runnable[] render = new Runnable[1];
         render[0] = () -> {
             list.removeAllViews();
@@ -1294,10 +1293,12 @@ public class DialogUtils {
                 final int idx = i;
                 LinearLayout row = new LinearLayout(context);
                 row.setGravity(Gravity.CENTER_VERTICAL);
+                row.setPadding(dlg.dp(16), dlg.dp(2), dlg.dp(6), dlg.dp(2));
+                row.setBackground(dlg.round(dlg.field, 14));
                 TextView name = new TextView(context);
                 name.setText((i + 1) + ".  " + labels.get(order.get(i)));
-                name.setTextColor(Color.WHITE);
-                name.setTextSize(16);
+                name.setTextColor(dlg.text);
+                name.setTextSize(15);
                 row.addView(name, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
                 for (final int dir : new int[]{-1, 1}) {
                     TextView b = new TextView(context);
@@ -1305,32 +1306,29 @@ public class DialogUtils {
                     b.setTextSize(20);
                     b.setGravity(Gravity.CENTER);
                     boolean on = dir < 0 ? idx > 0 : idx < order.size() - 1;
-                    b.setTextColor(on ? Color.WHITE : Color.DKGRAY);
+                    b.setTextColor(on ? dlg.accent : (dlg.sub & 0x00FFFFFF) | 0x55000000);
                     if (on) b.setOnClickListener(v -> {
                         java.util.Collections.swap(order, idx, idx + dir);
                         render[0].run();
                     });
-                    row.addView(b, new LinearLayout.LayoutParams((int) (48 * d), (int) (44 * d)));
+                    row.addView(b, new LinearLayout.LayoutParams(dlg.dp(44), dlg.dp(44)));
                 }
-                list.addView(row);
+                LinearLayout.LayoutParams rlp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                if (i > 0) rlp.topMargin = dlg.dp(8);
+                list.addView(row, rlp);
             }
         };
         render[0].run();
+        dlg.view(list);
         TextView hint = new TextView(context);
         hint.setText(I18n.t(context, R.string.ig_nav_tab_order_hint));
-        hint.setTextColor(Color.LTGRAY);
-        hint.setPadding(pad, pad / 2, pad, 0);
-        LinearLayout box = new LinearLayout(context);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.addView(list);
-        box.addView(hint);
-        new android.app.AlertDialog.Builder(context, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle(I18n.t(context, R.string.ig_nav_tab_order))
-                .setView(box)
-                .setPositiveButton(android.R.string.ok, (x, w) -> { FeatureFlags.navTabOrder = String.join(",", order); SettingsManager.saveAllFlags(); })
-                .setNeutralButton(I18n.t(context, R.string.ig_nav_tab_order_reset), (x, w) -> { FeatureFlags.navTabOrder = ""; SettingsManager.saveAllFlags(); })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+        hint.setTextColor(dlg.sub);
+        hint.setTextSize(13);
+        dlg.view(hint);
+        dlg.secondary(I18n.t(context, R.string.ig_nav_tab_order_reset), () -> { FeatureFlags.navTabOrder = ""; SettingsManager.saveAllFlags(); });
+        dlg.secondary(context.getString(android.R.string.cancel), null);
+        dlg.primary(context.getString(android.R.string.ok), () -> { FeatureFlags.navTabOrder = String.join(",", order); SettingsManager.saveAllFlags(); });
+        dlg.show();
     }
 
     private static void disableAllSwitches(ToggleRow[] switches, ToggleRow master, ToggleRow onlyInDMSwitch) {
@@ -1647,42 +1645,21 @@ public class DialogUtils {
 
     private static boolean suppressLockToggle = false;
 
-    /** A styled numeric passcode field for the lock dialogs (rounded, centered, large). */
-    private static android.widget.EditText makePinField(Context ctx, String hint) {
-        android.widget.EditText e = new android.widget.EditText(ctx);
+    /** A numeric passcode field for the lock dialogs: the dialog's rounded input, centered and large. */
+    private static android.widget.EditText pinInput(IeDialog dlg, String hint) {
+        android.widget.EditText e = dlg.input(hint);
         e.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        e.setHint(hint);
         e.setGravity(Gravity.CENTER);
         e.setTextSize(20);
         e.setLetterSpacing(0.2f);
-        e.setTextColor(Color.WHITE);
-        e.setHintTextColor(C_TEXT2);
-        // Size the box to a handful of digits instead of stretching — no wide empty margins.
-        e.setEms(6);
-        e.setMaxLines(1);
-        e.setMinWidth(0);
-        e.setMinHeight(0);
-        e.setMinimumWidth(0);
-        e.setMinimumHeight(0);
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(C_CARD);
-        bg.setCornerRadius(dpF(ctx, 12));
-        e.setBackground(bg);
-        e.setPadding(dpI(ctx, 12), dpI(ctx, 10), dpI(ctx, 12), dpI(ctx, 10));
         return e;
     }
 
-    /** Wrapper that centers the compact passcode box (sized to its content, not the dialog width). */
-    private static View wrapPin(Context ctx, View field) {
-        LinearLayout w = new LinearLayout(ctx);
-        w.setGravity(Gravity.CENTER_HORIZONTAL);
-        w.setPadding(dpI(ctx, 20), dpI(ctx, 10), dpI(ctx, 20), dpI(ctx, 6));
-        w.addView(field, new LinearLayout.LayoutParams(-2, -2)); // wrap_content — box hugs the digits
-        return w;
+    private static void toastWrongPass(Context context) {
+        Toast.makeText(context, ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.lockoutSecondsLeft() > 0
+                ? ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.failureText(context)
+                : I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
     }
-
-    private static float dpF(Context c, int v) { return v * c.getResources().getDisplayMetrics().density; }
-    private static int dpI(Context c, int v) { return Math.round(dpF(c, v)); }
 
     /** Turning the Lock-DMs toggle OFF requires the current passcode. */
     private static void promptDisableLock(Context context, ToggleRow lockSwitch) {
@@ -1690,30 +1667,26 @@ public class DialogUtils {
     }
 
     /** Turning a lock toggle OFF requires the current passcode; on success disable + save, otherwise
-     *  the toggle stays on. wholeApp=true disables the whole-app lock, else the DM lock. */
+     *  the toggle stays on. wholeApp=true disables the whole-app lock, else the DM lock.
+     *  Cancel / ✕ leave the toggle on. */
     private static void promptDisableLock(Context context, ToggleRow lockSwitch, boolean wholeApp) {
         try {
-            Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-            final android.widget.EditText cur = makePinField(themed, I18n.t(context, R.string.ig_dialog_misc_lock_dms_current));
-            new AlertDialog.Builder(themed)
-                    .setTitle(I18n.t(context, R.string.ig_dialog_misc_lock_dms_disable))
-                    .setView(wrapPin(themed, cur))
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, (d, w) -> {
-                        if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.checkPass(cur.getText().toString())) {
-                            if (wholeApp) FeatureFlags.lockWholeApp = false;
-                            else          FeatureFlags.lockDirectMessages = false;
-                            suppressLockToggle = true;
-                            lockSwitch.setChecked(false);
-                            suppressLockToggle = false;
-                            SettingsManager.saveAllFlags();
-                        } else {
-                            Toast.makeText(context, ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.lockoutSecondsLeft() > 0
-                                    ? ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.failureText(context)
-                                    : I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .show();
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_dialog_misc_lock_dms_disable));
+            final android.widget.EditText cur = pinInput(dlg, I18n.t(context, R.string.ig_dialog_misc_lock_dms_current));
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(context.getString(android.R.string.ok), () -> {
+                if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.checkPass(cur.getText().toString())) {
+                    if (wholeApp) FeatureFlags.lockWholeApp = false;
+                    else          FeatureFlags.lockDirectMessages = false;
+                    suppressLockToggle = true;
+                    lockSwitch.setChecked(false);
+                    suppressLockToggle = false;
+                    SettingsManager.saveAllFlags();
+                } else {
+                    toastWrongPass(context);
+                }
+            });
+            dlg.show();
         } catch (Throwable ignored) {}
     }
 
@@ -1722,22 +1695,17 @@ public class DialogUtils {
         String existing = FeatureFlags.lockDirectPasscode;
         if (existing == null || existing.isEmpty()) { promptSetNewDmPasscode(context); return; }
         try {
-            Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-            final android.widget.EditText cur = makePinField(themed, I18n.t(context, R.string.ig_dialog_misc_lock_dms_current));
-            new AlertDialog.Builder(themed)
-                    .setTitle(I18n.t(context, R.string.ig_dialog_misc_lock_dms_current))
-                    .setView(wrapPin(themed, cur))
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, (d, w) -> {
-                        if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.checkPass(cur.getText().toString())) {
-                            promptSetNewDmPasscode(context);
-                        } else {
-                            Toast.makeText(context, ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.lockoutSecondsLeft() > 0
-                                    ? ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.failureText(context)
-                                    : I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .show();
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_dialog_misc_lock_dms_current));
+            final android.widget.EditText cur = pinInput(dlg, I18n.t(context, R.string.ig_dialog_misc_lock_dms_current));
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(context.getString(android.R.string.ok), () -> {
+                if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.checkPass(cur.getText().toString())) {
+                    promptSetNewDmPasscode(context);
+                } else {
+                    toastWrongPass(context);
+                }
+            });
+            dlg.show();
         } catch (Throwable ignored) {}
     }
 
@@ -1764,60 +1732,49 @@ public class DialogUtils {
     /** Custom share domain: replaces instagram.com in links Instagram copies or shares. */
     private static void showShareDomainDialog(Context context, TextView label) {
         try {
-            Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-            final android.widget.EditText input = new android.widget.EditText(themed);
-            input.setSingleLine(true);
+            IeDialog dlg = new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_dialog_extras_share_domain))
+                    .message(I18n.t(context, R.string.ig_dialog_extras_share_domain_hint));
+            final android.widget.EditText input = dlg.input("ddinstagram.com");
             input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_URI);
-            input.setHint("ddinstagram.com");
             input.setText(FeatureFlags.customShareDomain);
-            LinearLayout box = new LinearLayout(themed);
-            int pad = dp(context, 20);
-            box.setPadding(pad, dp(context, 8), pad, 0);
-            box.addView(input, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            new AlertDialog.Builder(themed)
-                    .setTitle(I18n.t(context, R.string.ig_dialog_extras_share_domain))
-                    .setMessage(I18n.t(context, R.string.ig_dialog_extras_share_domain_hint))
-                    .setView(box)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, (d, w) -> {
-                        String raw = input.getText().toString();
-                        String domain = ps.reso.instaeclipse.mods.ads.ShareDomain.normalize(raw);
-                        if (domain == null) {
-                            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_extras_share_domain_invalid), Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        FeatureFlags.customShareDomain = domain;
-                        SettingsManager.saveAllFlags();
-                        if (label != null) label.setText(shareDomainLabel(context));
-                    })
-                    .show();
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(context.getString(android.R.string.ok), () -> {
+                String raw = input.getText().toString();
+                String domain = ps.reso.instaeclipse.mods.ads.ShareDomain.normalize(raw);
+                if (domain == null) {
+                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_extras_share_domain_invalid), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                FeatureFlags.customShareDomain = domain;
+                SettingsManager.saveAllFlags();
+                if (label != null) label.setText(shareDomainLabel(context));
+            });
+            dlg.show();
         } catch (Throwable ignored) {}
     }
 
     /** Prompt for a new passcode (empty clears it). */
     private static void promptSetNewDmPasscode(Context context) {
         try {
-            Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-            final android.widget.EditText input = makePinField(themed, I18n.t(context, R.string.ig_dialog_misc_lock_dms_hint));
-            new AlertDialog.Builder(themed)
-                    .setTitle(I18n.t(context, R.string.ig_dialog_misc_lock_dms_set))
-                    .setView(wrapPin(themed, input))
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, (d, w) -> {
-                        String pass = input.getText().toString();
-                        if (pass.isEmpty()) {
-                            FeatureFlags.lockDirectPasscode = "";
-                            FeatureFlags.lockDirectSalt = "";
-                            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_cleared), Toast.LENGTH_SHORT).show();
-                        } else {
-                            ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.newSalt(); // fresh salt per set
-                            FeatureFlags.lockDirectPasscode =
-                                    ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.hashPass(pass);
-                            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_saved), Toast.LENGTH_SHORT).show();
-                        }
-                        SettingsManager.saveAllFlags();
-                    })
-                    .show();
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_dialog_misc_lock_dms_set));
+            final android.widget.EditText input = pinInput(dlg, I18n.t(context, R.string.ig_dialog_misc_lock_dms_hint));
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(context.getString(android.R.string.ok), () -> {
+                String pass = input.getText().toString();
+                if (pass.isEmpty()) {
+                    FeatureFlags.lockDirectPasscode = "";
+                    FeatureFlags.lockDirectSalt = "";
+                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_cleared), Toast.LENGTH_SHORT).show();
+                } else {
+                    ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.newSalt(); // fresh salt per set
+                    FeatureFlags.lockDirectPasscode =
+                            ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.hashPass(pass);
+                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_saved), Toast.LENGTH_SHORT).show();
+                }
+                SettingsManager.saveAllFlags();
+            });
+            dlg.show();
         } catch (Throwable ignored) {}
     }
 
@@ -1946,13 +1903,11 @@ public class DialogUtils {
             labels[i] = lightModeLabel(context, values[i]);
             if (values[i] == FeatureFlags.themeLightPresetId) sel = i;
         }
-        Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-        new AlertDialog.Builder(themed)
-                .setTitle(I18n.t(context, R.string.theme_light_mode))
-                .setSingleChoiceItems(labels, sel, (d, which) -> {
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.theme_light_mode))
+                .choices(labels, sel, which -> {
                     FeatureFlags.themeLightPresetId = values[which];
                     SettingsManager.saveAllFlags();
-                    d.dismiss();
                     if (currentDialog != null) {
                         try { currentDialog.dismiss(); } catch (Exception ignored) {}
                         currentDialog = null;
@@ -1960,7 +1915,6 @@ public class DialogUtils {
                     ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.invalidate();
                     ps.reso.instaeclipse.mods.ui.theme.IgThemeHook.refreshCurrentActivity();
                 })
-                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
@@ -2123,17 +2077,16 @@ public class DialogUtils {
                 "#FF453A", v -> {
                     // Confirm before permanently deleting every cached story, then refresh the view.
                     try {
-                        Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
-                        new AlertDialog.Builder(themed)
-                                .setTitle(I18n.t(context, R.string.ig_story_cache_clear))
-                                .setMessage(I18n.t(context, R.string.ig_story_cache_clear_confirm))
-                                .setNegativeButton(android.R.string.cancel, null)
-                                .setPositiveButton(I18n.t(context, R.string.ig_story_cache_clear), (d, w) -> {
-                                    ps.reso.instaeclipse.utils.media.StoryCache.clearAll();
-                                    Toast.makeText(context, I18n.t(context, R.string.ig_story_cache_cleared), Toast.LENGTH_SHORT).show();
-                                    showCachedStories(context); // refresh so the deleted rows disappear
-                                })
-                                .show();
+                        IeDialog dlg = new IeDialog(context)
+                                .title(I18n.t(context, R.string.ig_story_cache_clear))
+                                .message(I18n.t(context, R.string.ig_story_cache_clear_confirm));
+                        dlg.secondary(context.getString(android.R.string.cancel), null);
+                        dlg.primary(I18n.t(context, R.string.ig_story_cache_clear), () -> {
+                            ps.reso.instaeclipse.utils.media.StoryCache.clearAll();
+                            Toast.makeText(context, I18n.t(context, R.string.ig_story_cache_cleared), Toast.LENGTH_SHORT).show();
+                            showCachedStories(context); // refresh so the deleted rows disappear
+                        });
+                        dlg.show();
                     } catch (Throwable ignored) {}
                 }));
         showSectionDialog(context, I18n.t(context, R.string.ig_story_cache_view), layout, () -> {});

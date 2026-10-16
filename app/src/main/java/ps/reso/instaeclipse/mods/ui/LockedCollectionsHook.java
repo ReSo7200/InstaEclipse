@@ -1,7 +1,6 @@
 package ps.reso.instaeclipse.mods.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.InputType;
