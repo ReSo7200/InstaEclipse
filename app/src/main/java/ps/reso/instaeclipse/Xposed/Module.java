@@ -365,6 +365,20 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | CommunityNotes): ❌ Failed to hook");
                     }
 
+                    // Extras: tapping a reel mutes instead of pausing
+                    try {
+                        if (!skip("ReelsControlsHook")) new ps.reso.instaeclipse.mods.extras.ReelsControlsHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | Reels): ❌ Failed to hook: " + t);
+                    }
+
+                    // Extras: lift the 5-account limit
+                    try {
+                        if (!skip("AccountLimitHook")) new ps.reso.instaeclipse.mods.extras.AccountLimitHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | UnlimitedAccounts): ❌ Failed to hook: " + t);
+                    }
+
                     // Extras: no swipe to camera from the feed
                     try {
                         if (!skip("SwipeToCameraHook")) new ps.reso.instaeclipse.mods.extras.SwipeToCameraHook().install(hostClassLoader);

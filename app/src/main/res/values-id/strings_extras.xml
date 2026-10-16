@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Feed Hanya yang Diikuti</string>
     <string name="ig_dialog_menu_extras">Ekstra</string>
     <string name="ig_dialog_extras_no_swipe_camera">Nonaktifkan Geser ke Kamera</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Opsi Gulir Otomatis Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Kunci Gulir Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Akun Tanpa Batas</string>
 </resources>

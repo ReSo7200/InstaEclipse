@@ -26,6 +26,9 @@ public final class ExtrasFeatures {
 
     public static final Entry[] ALL = {
             new Entry("disableSwipeToCamera", R.string.ig_dialog_extras_no_swipe_camera, R.drawable.ic_camera),
+            new Entry("reelsAutoScroll", R.string.ig_dialog_extras_reels_auto_scroll, R.drawable.ic_movie),
+            new Entry("reelsLockScroll", R.string.ig_dialog_extras_reels_lock_scroll, R.drawable.ic_movie),
+            new Entry("unlimitedAccounts", R.string.ig_dialog_extras_unlimited_accounts, R.drawable.ic_settings_gear),
     };
 
     private ExtrasFeatures() {}

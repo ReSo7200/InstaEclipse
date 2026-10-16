@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Ροή μόνο από όσους ακολουθείτε</string>
     <string name="ig_dialog_menu_extras">Επιπλέον</string>
     <string name="ig_dialog_extras_no_swipe_camera">Απενεργοποίηση σύρσιμου προς κάμερα</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Επιλογή αυτόματης κύλισης Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Κλείδωμα κύλισης Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Απεριόριστοι λογαριασμοί</string>
 </resources>

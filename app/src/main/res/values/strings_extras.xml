@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Following-only Feed</string>
     <string name="ig_dialog_menu_extras">Extras</string>
     <string name="ig_dialog_extras_no_swipe_camera">Disable Swipe to Camera</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels Auto-Scroll Option</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Lock Reels Scrolling</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Unlimited Accounts</string>
 </resources>

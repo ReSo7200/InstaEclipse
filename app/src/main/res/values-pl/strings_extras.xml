@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Tylko obserwowani w feedzie</string>
     <string name="ig_dialog_menu_extras">Dodatki</string>
     <string name="ig_dialog_extras_no_swipe_camera">Wyłącz przesuwanie do aparatu</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Opcja autoprzewijania Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Zablokuj przewijanie Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Nieograniczona liczba kont</string>
 </resources>

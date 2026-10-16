@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">仅显示关注的动态</string>
     <string name="ig_dialog_menu_extras">额外功能</string>
     <string name="ig_dialog_extras_no_swipe_camera">禁用滑动进入相机</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels 自动滚动选项</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">锁定 Reels 滑动</string>
+    <string name="ig_dialog_extras_unlimited_accounts">无限账户</string>
 </resources>

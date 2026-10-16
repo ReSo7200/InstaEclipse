@@ -57,6 +57,9 @@ public class FeatureFlags {
     public static boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
     public static boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)
     // Extras (see ExtrasFeatures)
+    public static boolean unlimitedAccounts = false; // lift the 5-account limit
+    public static boolean reelsLockScroll = false; // lock swiping between reels
+    public static boolean reelsAutoScroll = false; // unlock Instagram's own Reels auto-scroll option
     public static boolean disableSwipeToCamera = false; // sideways swipe on the feed no longer opens the camera
     public static boolean followingOnlyFeed = false; // home feed shows only accounts you follow
     public static boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)

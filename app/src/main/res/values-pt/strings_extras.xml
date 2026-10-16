@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Feed só de quem você segue</string>
     <string name="ig_dialog_menu_extras">Extras</string>
     <string name="ig_dialog_extras_no_swipe_camera">Desativar deslizar para a câmera</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Opção de rolagem automática dos Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Bloquear rolagem dos Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Contas ilimitadas</string>
 </resources>

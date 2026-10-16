@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Fil des abonnements uniquement</string>
     <string name="ig_dialog_menu_extras">Extras</string>
     <string name="ig_dialog_extras_no_swipe_camera">Désactiver le balayage vers la caméra</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Option de défilement auto des Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Bloquer le défilement des Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Comptes illimités</string>
 </resources>

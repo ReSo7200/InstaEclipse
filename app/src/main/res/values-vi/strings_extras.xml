@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Bảng tin chỉ từ người bạn theo dõi</string>
     <string name="ig_dialog_menu_extras">Bổ sung</string>
     <string name="ig_dialog_extras_no_swipe_camera">Tắt vuốt để mở camera</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Tùy chọn tự cuộn Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Khóa cuộn Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Không giới hạn tài khoản</string>
 </resources>

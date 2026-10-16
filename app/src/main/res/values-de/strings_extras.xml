@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Nur abonnierte Konten im Feed</string>
     <string name="ig_dialog_menu_extras">Extras</string>
     <string name="ig_dialog_extras_no_swipe_camera">Wischen zur Kamera aus</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels-Autoscroll-Option</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Reels-Scrollen sperren</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Unbegrenzte Konten</string>
 </resources>

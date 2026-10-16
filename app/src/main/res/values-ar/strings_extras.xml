@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">خلاصة المتابَعين فقط</string>
     <string name="ig_dialog_menu_extras">إضافات</string>
     <string name="ig_dialog_extras_no_swipe_camera">تعطيل السحب إلى الكاميرا</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">خيار التمرير التلقائي في Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">قفل تمرير Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">حسابات غير محدودة</string>
 </resources>

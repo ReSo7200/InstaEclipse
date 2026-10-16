@@ -4,4 +4,7 @@
     <string name="ig_dialog_clean_feed_following_only">Yalnız İzlənilənlər Axını</string>
     <string name="ig_dialog_menu_extras">Əlavələr</string>
     <string name="ig_dialog_extras_no_swipe_camera">Kameraya sürüşdürməni söndür</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels avtomatik sürüşdürmə seçimi</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Reels sürüşdürməsini kilidlə</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Limitsiz hesab</string>
 </resources>
