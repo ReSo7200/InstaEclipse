@@ -39,6 +39,7 @@ import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.core.ModuleActivityLauncher;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
+import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.ghost.GhostModeUtils;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
@@ -98,8 +99,9 @@ public class DialogUtils {
         subtitle.setTextColor(C_TEXT2);
         subtitle.setTextSize(13);
         subtitle.setGravity(Gravity.CENTER);
-        subtitle.setPadding(40, 0, 40, 18);
+        subtitle.setPadding(40, 0, 40, 12);
         outer.addView(subtitle);
+        outer.addView(buildStatusChips(context));
         outer.addView(createDivider(context));
 
         // Scrollable middle: the feature category list + footer credit
@@ -158,33 +160,33 @@ public class DialogUtils {
         // ---- APPEARANCE ---- look & feel: theme, fonts/emoji (inside theme), quality, feed cleanup
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_appearance)));
         LinearLayout appearance = createGroupCard(context);
-        appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context)));
+        appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
         appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.ig_dialog_menu_quality), A_APPEARANCE, () -> showQualityOptions(context)));
-        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.ig_dialog_menu_clean_feed), A_APPEARANCE, () -> showCleanFeedOptions(context)));
+        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.ig_dialog_menu_clean_feed), A_APPEARANCE, () -> showCleanFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "hidePlusUpsells", "expandCaptions")));
         mainLayout.addView(appearance);
 
         // ---- PRIVACY ---- ghost, lock, hidden chats, ad/analytics blocking, distraction-free
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_privacy)));
         LinearLayout privacy = createGroupCard(context);
-        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context)));
-        privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context)));
-        privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context)));
-        privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.ig_dialog_menu_ad_analytics), A_PRIVACY, () -> showAdOptions(context)));
-        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context)));
+        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostScreenshot", "isGhostViewOnce", "isGhostStory", "isGhostLive", "allowScreenshots", "keepEphemeralMessages", "permanentViewMode", "keepUnsentMessages", "markUnsentInThread", "keepEditHistory", "jumpToFirstMessage", "chatExport")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context), onCount(context, "hideSpecificChats", "hideChatButtonStealth")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.ig_dialog_menu_ad_analytics), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments", "hideNotesTray")));
         mainLayout.addView(privacy);
 
         // ---- MEDIA ---- downloading, location spoofing
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_media)));
         LinearLayout media = createGroupCard(context);
-        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context)));
-        media.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_MEDIA, () -> showLocationOptions(context)));
+        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "copyMediaLink", "offerAudioDownload", "enableVoiceDownload", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed", "forceReelScrubber", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories")));
+        media.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_MEDIA, () -> showLocationOptions(context), onCount(context, "spoofLocation")));
         mainLayout.addView(media);
 
         // ---- TOOLS ---- misc toggles, developer, backup, restart, cache, about
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_tools)));
         LinearLayout tools = createGroupCard(context);
-        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.ig_dialog_menu_misc), A_TOOLS, () -> showMiscOptions(context)));
-        tools.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_menu_dev_options), A_TOOLS, () -> showDevOptions(context)));
+        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.ig_dialog_menu_misc), A_TOOLS, () -> showMiscOptions(context), onCount(context, "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast", "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment", "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI", "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "savedOnProfile", "storyViewerSearch", "commentSearch", "followListExport")));
+        tools.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_menu_dev_options), A_TOOLS, () -> showDevOptions(context), onCount(context, "isDevEnabled", "removeBuildExpiredPopup")));
         tools.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.ig_dialog_menu_backup_restore), A_TOOLS, () -> showBackupRestoreOptions(context)));
         tools.addView(createMenuRow(context, R.drawable.ic_restart, I18n.t(context, R.string.ig_dialog_menu_restart), A_TOOLS, () -> showRestartSection(context)));
         tools.addView(createMenuRow(context, R.drawable.ic_delete, I18n.t(context, R.string.ig_dialog_clear_cache), A_TOOLS, () -> showClearCacheSection(context)));
@@ -194,7 +196,7 @@ public class DialogUtils {
 
         // Footer Credit
         TextView footer = new TextView(context);
-        footer.setText("@reso7200");
+        footer.setText("@reso7200  ·  " + moduleVersion(context));
         footer.setTextColor(C_TEXT2);
         footer.setTextSize(13);
         footer.setPadding(16, 26, 16, 8);
@@ -233,6 +235,116 @@ public class DialogUtils {
      *  most locales, trailing in Arabic), so this strips from whichever end it's on rather than
      *  assuming a fixed position. */
     private static View createMenuRow(Context context, int iconRes, String labelWithEmoji, String accentHex, Runnable onClick) {
+        return createMenuRow(context, iconRes, labelWithEmoji, accentHex, onClick, null);
+    }
+
+    /** "N on" / "Off" for a category, read live from FeatureFlags (counted every time the menu opens). */
+    private static String onCount(Context context, String... flagNames) {
+        int on = 0;
+        for (String name : flagNames) {
+            try {
+                java.lang.reflect.Field f = FeatureFlags.class.getField(name);
+                if (f.getType() == boolean.class && f.getBoolean(null)) on++;
+            } catch (Throwable ignored) {}
+        }
+        return on > 0 ? I18n.t(context, R.string.feat_count_on, on) : I18n.t(context, R.string.feat_count_off);
+    }
+
+    /** InstaEclipse's own version, read from the module APK (works inside Instagram's process). */
+    private static String moduleVersion(Context context) {
+        try {
+            String apk = ps.reso.instaeclipse.Xposed.Module.moduleSourceDir;
+            if (apk != null) {
+                android.content.pm.PackageInfo pi = context.getPackageManager().getPackageArchiveInfo(apk, 0);
+                if (pi != null && pi.versionName != null) return "v" + pi.versionName;
+            }
+        } catch (Throwable ignored) {}
+        return I18n.t(context, R.string.version);
+    }
+
+    private static String hostVersion(Context context) {
+        try {
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Throwable t) {
+            return "?";
+        }
+    }
+
+    /**
+     * Version + health line under the menu title: InstaEclipse version, Instagram version, and how
+     * many enabled features actually hooked on this Instagram build. Tapping the health chip lists
+     * the ones that did not, which is what to check after Instagram updates itself.
+     */
+    private static View buildStatusChips(Context context) {
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+        box.setPadding(dp(context, 12), 0, dp(context, 12), dp(context, 14));
+
+        LinearLayout versions = new LinearLayout(context);
+        versions.setOrientation(LinearLayout.HORIZONTAL);
+        versions.setGravity(Gravity.CENTER);
+        versions.addView(statusChip(context, "InstaEclipse " + moduleVersion(context), C_TEXT2, null));
+        versions.addView(statusChip(context, I18n.t(context, R.string.menu_chip_instagram, hostVersion(context)), C_TEXT2, null));
+        box.addView(versions);
+
+        java.util.Map<String, Boolean> status = FeatureStatusTracker.getStatus();
+        int total = status.size(), active = 0;
+        java.util.List<String> inactive = new java.util.ArrayList<>();
+        synchronized (status) {
+            for (java.util.Map.Entry<String, Boolean> e : status.entrySet()) {
+                if (Boolean.TRUE.equals(e.getValue())) active++;
+                else inactive.add(FeatureStatusTracker.getLabel(context, e.getKey()));
+            }
+        }
+        if (total > 0) {
+            int color = active == total ? 0xFF30D158 : 0xFFFF9F0A;
+            View health = statusChip(context, "●  " + I18n.t(context, R.string.menu_chip_active, active, total), color, v -> {
+                StringBuilder msg = new StringBuilder();
+                if (inactive.isEmpty()) {
+                    msg.append(I18n.t(context, R.string.menu_inactive_all_good));
+                } else {
+                    msg.append(I18n.t(context, R.string.menu_inactive_hint)).append("\n");
+                    java.util.Collections.sort(inactive);
+                    for (String label : inactive) msg.append("\n•  ").append(label);
+                }
+                showSimpleDialog(context, I18n.t(context, R.string.menu_inactive_title), msg.toString());
+            });
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.topMargin = dp(context, 6);
+            health.setLayoutParams(lp);
+            box.addView(health);
+        }
+        return box;
+    }
+
+    private static TextView statusChip(Context context, String text, int textColor, View.OnClickListener onClick) {
+        TextView chip = new TextView(context);
+        chip.setText(text);
+        chip.setTextColor(textColor);
+        chip.setTextSize(12);
+        chip.setSingleLine(true);
+        chip.setPadding(dp(context, 12), dp(context, 5), dp(context, 12), dp(context, 5));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(C_CARD);
+        bg.setCornerRadius(dp(context, 14));
+        bg.setStroke(1, C_HAIRLINE);
+        chip.setBackground(bg);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.leftMargin = dp(context, 3);
+        lp.rightMargin = dp(context, 3);
+        chip.setLayoutParams(lp);
+        if (onClick != null) {
+            chip.setClickable(true);
+            chip.setOnClickListener(onClick);
+        }
+        return chip;
+    }
+
+    private static View createMenuRow(Context context, int iconRes, String labelWithEmoji, String accentHex,
+                                      Runnable onClick, String subtitleText) {
         String label = stripEdgeEmoji(labelWithEmoji);
 
         LinearLayout row = new LinearLayout(context);
@@ -247,7 +359,20 @@ public class DialogUtils {
         labelView.setText(label);
         labelView.setTextSize(16);
         labelView.setTextColor(C_TEXT);
-        labelView.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        View labelBlock = labelView;
+        if (subtitleText != null) {
+            LinearLayout texts = new LinearLayout(context);
+            texts.setOrientation(LinearLayout.VERTICAL);
+            texts.addView(labelView);
+            TextView sub = new TextView(context);
+            sub.setText(subtitleText);
+            sub.setTextSize(12);
+            boolean off = subtitleText.equals(I18n.t(context, R.string.feat_count_off));
+            sub.setTextColor(off ? C_TEXT2 : Color.parseColor(accentHex));
+            texts.addView(sub);
+            labelBlock = texts;
+        }
+        labelBlock.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
         android.widget.ImageView chevron = new android.widget.ImageView(context);
         Drawable chev = loadModuleIcon(R.drawable.ic_chevron_right, C_TEXT2);
@@ -257,7 +382,7 @@ public class DialogUtils {
         chevron.setLayoutParams(chevLp);
 
         row.addView(buildIconChip(context, iconRes, accentHex));
-        row.addView(labelView);
+        row.addView(labelBlock);
         row.addView(chevron);
         row.setOnClickListener(v -> onClick.run());
         return row;
