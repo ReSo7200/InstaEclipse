@@ -609,7 +609,15 @@ public class PostDownloadContextMenuHook {
         // Audio-only option (#234) — only asks when enabled and the media has an audio track.
         // Copy-image (#228) acts on the slide being viewed.
         String shownUrl = urls.isEmpty() ? null : urls.get(carouselIdx >= 0 && carouselIdx < urls.size() ? carouselIdx : 0);
-        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, shownUrl, finalUser, finalId, "post", () ->
+        // For a carousel, offer audio for the slide being viewed (its own video item), not the
+        // album container — the container has no video_dash_manifest of its own.
+        Object audioMedia = media;
+        try {
+            java.util.List<?> kids = FeedVideoDownloadHook.carouselChildren(media);
+            if (kids != null && carouselIdx >= 0 && carouselIdx < kids.size() && kids.get(carouselIdx) != null)
+                audioMedia = kids.get(carouselIdx);
+        } catch (Throwable ignored) {}
+        FeedVideoDownloadHook.offerAudioOrRun(ctx, audioMedia, shownUrl, finalUser, finalId, "post", () ->
                 FeedVideoDownloadHook.mainHandler.post(() ->
                         FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx)));
     }

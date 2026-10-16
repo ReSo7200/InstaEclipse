@@ -1393,7 +1393,20 @@ public class FeedVideoDownloadHook {
                 if (target == null) return null;
             }
             Object manifest = getter.invoke(target);
-            return manifest instanceof String s ? DashAudio.audioUrl(s) : null;
+            String audio = manifest instanceof String s ? DashAudio.audioUrl(s) : null;
+            if (audio != null) return audio;
+            // Carousel container: the manifest lives on the child video item(s), not the album.
+            // Fall back to the first child that has an audio track (per-slide resolution is done
+            // at the call site, which passes the specific child; this is the safety net).
+            List<?> children = carouselChildren(media);
+            if (children != null) {
+                for (Object child : children) {
+                    if (child == null || child == media) continue;
+                    String a = extractAudioUrl(child);
+                    if (a != null) return a;
+                }
+            }
+            return null;
         } catch (Throwable t) {
             return null;
         }
