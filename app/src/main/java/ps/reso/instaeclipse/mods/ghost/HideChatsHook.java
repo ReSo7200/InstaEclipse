@@ -48,12 +48,17 @@ public class HideChatsHook {
     private static final String HEADER_ANCHOR = "PrebindThreadHeader";
     private static final String THREAD_OPEN_ANCHOR = "igThreadIgid";
 
+    private static final String GENERAL_LABEL_REGEX = "^(?i)(general|generale|général|allgemein|geral|genel|общие|عام)(\\s.*|\\u00a0.*|•.*|\\d+.*)?$";
+    private static final String OTHER_FOLDER_LABEL_REGEX = "^(?i)(primary|principale|principal|haupt|primario|requests|richieste|anfragen|demandes|solicitudes|channels|canali|kanäle|canaux|canales|unread|non letti)(\\s.*|\\u00a0.*|•.*|\\d+.*)?$";
+
     private static int threadHeaderId, backButtonId, tagKeyId;
     public static volatile String currentOpenThreadId = null;
 
     private static volatile boolean isGeneralTabSelected = false;
     private static final WeakHashMap<View, Boolean> backButtonTouchAttached = new WeakHashMap<>();
     private static final WeakHashMap<View, int[]> originalPillsBarLayout = new WeakHashMap<>();
+    private static final WeakHashMap<Activity, Boolean> registeredActivities = new WeakHashMap<>();
+    private static final WeakHashMap<View, Boolean> hookedPills = new WeakHashMap<>();
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         installInboxFilter(bridge, classLoader);
@@ -78,19 +83,14 @@ public class HideChatsHook {
                                         if (Modifier.isStatic(f.getModifiers())) continue;
                                         f.setAccessible(true);
                                         Object fv = f.get(el);
-                                        if (fv instanceof Enum<?> e && e.name().toUpperCase().contains("GENERAL")) {
-                                            isGeneralCall = true; break;
-                                        }
-                                        if (fv instanceof String s && s.equalsIgnoreCase("general")) {
+                                        if (isGeneralEnum(fv)) {
                                             isGeneralCall = true; break;
                                         }
                                     }
                                 } catch (Throwable ignored) {}
                                 if (isGeneralCall) break;
                             }
-                        } else if (arg instanceof Enum<?> e && e.name().toUpperCase().contains("GENERAL")) {
-                            isGeneralCall = true;
-                        } else if (arg instanceof String s && s.equalsIgnoreCase("general")) {
+                        } else if (isGeneralEnum(arg)) {
                             isGeneralCall = true;
                         }
                         if (isGeneralCall) break;
@@ -133,6 +133,25 @@ public class HideChatsHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|HideChats) ⚠️ inbox filter: " + t.getMessage());
         }
+    }
+
+    private static boolean isGeneralEnum(Object obj) {
+        if (obj instanceof Enum<?>) {
+            Enum<?> e = (Enum<?>) obj;
+            if (e.name().toUpperCase().contains("GENERAL") || e.toString().toLowerCase().contains("general")) return true;
+            try {
+                for (Field f : e.getClass().getDeclaredFields()) {
+                    if (f.getType() == String.class) {
+                        f.setAccessible(true);
+                        String s = (String) f.get(e);
+                        if (s != null && (s.equalsIgnoreCase("general") || s.equals("1"))) return true;
+                    }
+                }
+            } catch (Throwable ignored) {}
+        } else if (obj instanceof String s && s.equalsIgnoreCase("general")) {
+            return true;
+        }
+        return false;
     }
 
     // ── 1b. Active Thread Tracker (PrebindThreadHeader + igThreadIgid) ─────────
@@ -222,7 +241,7 @@ public class HideChatsHook {
                             if (sub.getType() == String.class) {
                                 sub.setAccessible(true);
                                 String s = (String) sub.get(val);
-                                if (s != null && s.matches("\\\\d{15,}")) return s;
+                                if (s != null && s.matches("\\d{15,}")) return s;
                             }
                         }
                     }
@@ -281,20 +300,26 @@ public class HideChatsHook {
     private void registerListener(final Activity activity) {
         try {
             ensureIds(activity);
-            applyFoldersBarVisibility(activity);
-            trackGeneralFolderPill(activity);
 
-            if (tryInject(activity)) return;
-            final View decor = activity.getWindow().getDecorView();
+            View decor = activity.getWindow().getDecorView();
+            View foldersBar = findFoldersBar(decor);
+
+            scanAndHookInboxPills(activity, foldersBar);
+            applyFoldersBarVisibility(activity, foldersBar);
+            tryInject(activity);
+            applyEmptyGeneralUiFallback(activity, foldersBar);
+
+            if (registeredActivities.containsKey(activity)) return;
+            registeredActivities.put(activity, true);
+
             decor.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    applyFoldersBarVisibility(activity);
-                    trackGeneralFolderPill(activity);
-                    if (tryInject(activity)) {
-                        try { decor.getViewTreeObserver().removeOnGlobalLayoutListener(this); }
-                        catch (Throwable ignored) {}
-                    }
+                    View fb = findFoldersBar(decor);
+                    scanAndHookInboxPills(activity, fb);
+                    applyFoldersBarVisibility(activity, fb);
+                    tryInject(activity);
+                    applyEmptyGeneralUiFallback(activity, fb);
                 }
             });
         } catch (Throwable ignored) {}
@@ -430,61 +455,49 @@ public class HideChatsHook {
         }
     }
 
-    // ── Apply visibility of direct folders bar ──────────────────────────────────
-    private static void applyFoldersBarVisibility(Activity activity) {
-        try {
-            View decor = activity.getWindow().getDecorView();
-            View bar = findFoldersBar(decor);
-            if (bar == null) return;
-
-            if (!originalPillsBarLayout.containsKey(bar)) {
-                ViewGroup.LayoutParams lp = bar.getLayoutParams();
-                int tm = 0, bm = 0;
-                if (lp instanceof ViewGroup.MarginLayoutParams) {
-                    tm = ((ViewGroup.MarginLayoutParams) lp).topMargin;
-                    bm = ((ViewGroup.MarginLayoutParams) lp).bottomMargin;
-                }
-                originalPillsBarLayout.put(bar, new int[]{
-                    lp.height, bar.getPaddingTop(), bar.getPaddingBottom(), tm, bm
-                });
-            }
-
-            if (FeatureFlags.hideDirectFoldersBar) {
-                bar.setVisibility(View.GONE);
-                ViewGroup.LayoutParams lp = bar.getLayoutParams();
-                lp.height = 0;
-                bar.setPadding(bar.getPaddingLeft(), 0, bar.getPaddingRight(), 0);
-                if (lp instanceof ViewGroup.MarginLayoutParams) {
-                    ((ViewGroup.MarginLayoutParams) lp).topMargin = 0;
-                    ((ViewGroup.MarginLayoutParams) lp).bottomMargin = 0;
-                }
-                bar.setLayoutParams(lp);
-            } else {
-                int[] orig = originalPillsBarLayout.get(bar);
-                if (orig != null) {
-                    ViewGroup.LayoutParams lp = bar.getLayoutParams();
-                    lp.height = orig[0];
-                    bar.setPadding(bar.getPaddingLeft(), orig[1], bar.getPaddingRight(), orig[2]);
-                    if (lp instanceof ViewGroup.MarginLayoutParams) {
-                        ((ViewGroup.MarginLayoutParams) lp).topMargin = orig[3];
-                        ((ViewGroup.MarginLayoutParams) lp).bottomMargin = orig[4];
-                    }
-                    bar.setLayoutParams(lp);
-                    bar.setVisibility(View.VISIBLE);
-                    bar.requestLayout();
-                }
-            }
-        } catch (Throwable ignored) {}
-    }
-
+    // ── Structural Finder for Folders Bar ──────────────────────────────────────
     private static View findFoldersBar(View v) {
         if (v == null) return null;
+
+        List<android.widget.TextView> textViews = new ArrayList<>();
+        collectFolderTextViews(v, textViews);
+
+        for (android.widget.TextView tv : textViews) {
+            String text = tv.getText().toString();
+            if (text.matches(GENERAL_LABEL_REGEX)) {
+                View bar = tv;
+                int levels = 0;
+                while (bar != null && bar.getParent() instanceof ViewGroup && levels < 4) {
+                    bar = (View) bar.getParent();
+                    if (bar instanceof ViewGroup) {
+                        ViewGroup vg = (ViewGroup) bar;
+                        if (vg.getHeight() < dp(v.getContext(), 90) || vg.getHeight() == 0) {
+                            if (vg.getClass().getName().contains("RecyclerView") ||
+                                vg.getClass().getName().contains("HorizontalScrollView") ||
+                                (vg instanceof LinearLayout && ((LinearLayout) vg).getOrientation() == LinearLayout.HORIZONTAL)) {
+
+                                int childPillsCount = 0;
+                                for (int i = 0; i < vg.getChildCount(); i++) {
+                                    if (hasFolderText(vg.getChildAt(i))) {
+                                        childPillsCount++;
+                                    }
+                                }
+                                if (childPillsCount >= 2) {
+                                    return vg;
+                                }
+                            }
+                        }
+                    }
+                    levels++;
+                }
+            }
+        }
+
+        // Fallback to resource ID
         if (v instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) v;
             String resName = "";
-            try {
-                resName = v.getResources().getResourceEntryName(v.getId());
-            } catch (Throwable ignored) {}
+            try { resName = v.getResources().getResourceEntryName(v.getId()); } catch (Throwable ignored) {}
 
             if (resName != null && (resName.contains("direct_inbox_folder") ||
                 resName.contains("direct_inbox_filter_pill") ||
@@ -495,30 +508,6 @@ public class HideChatsHook {
                 return v;
             }
 
-            if (vg.getClass().getName().contains("RecyclerView") ||
-                vg.getClass().getName().contains("HorizontalScrollView") ||
-                (vg instanceof LinearLayout && ((LinearLayout) vg).getOrientation() == LinearLayout.HORIZONTAL)) {
-
-                int childCount = vg.getChildCount();
-                if (childCount >= 2) {
-                    int h = vg.getHeight();
-                    if (h > 0 && h >= dp(v.getContext(), 20) && h <= dp(v.getContext(), 75)) {
-                        int pillChildren = 0;
-                        for (int i = 0; i < childCount; i++) {
-                            View child = vg.getChildAt(i);
-                            String cResName = "";
-                            try { cResName = child.getResources().getResourceEntryName(child.getId()); } catch (Throwable ignored) {}
-                            if (cResName != null && cResName.contains("pill")) {
-                                pillChildren++;
-                            } else if (hasPillText(child)) {
-                                pillChildren++;
-                            }
-                        }
-                        if (pillChildren >= 2) return v;
-                    }
-                }
-            }
-
             for (int i = 0; i < vg.getChildCount(); i++) {
                 View found = findFoldersBar(vg.getChildAt(i));
                 if (found != null) return found;
@@ -527,39 +516,128 @@ public class HideChatsHook {
         return null;
     }
 
-    private static boolean hasPillText(View v) {
+    private static void collectFolderTextViews(View v, List<android.widget.TextView> list) {
+        if (v == null) return;
+
+        // Exclude bottom nav and header
+        String resName = "";
+        try { resName = v.getResources().getResourceEntryName(v.getId()); } catch (Throwable ignored) {}
+        if (resName != null && (resName.contains("direct_thread_header") || resName.contains("tab_bar") || resName.contains("bottom_navigation"))) return;
+
         if (v instanceof android.widget.TextView) {
-            String text = ((android.widget.TextView) v).getText().toString().toLowerCase();
-            return text.matches("^(primary|principale|general|generale|requests|richieste|channels|canali)$");
+            String text = ((android.widget.TextView) v).getText().toString();
+            if (text.matches(GENERAL_LABEL_REGEX) || text.matches(OTHER_FOLDER_LABEL_REGEX)) {
+                list.add((android.widget.TextView) v);
+            }
         } else if (v instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) v;
             for (int i = 0; i < vg.getChildCount(); i++) {
-                if (hasPillText(vg.getChildAt(i))) return true;
+                collectFolderTextViews(vg.getChildAt(i), list);
+            }
+        }
+    }
+
+    private static boolean hasFolderText(View v) {
+        if (v instanceof android.widget.TextView) {
+            String text = ((android.widget.TextView) v).getText().toString();
+            return text.matches(GENERAL_LABEL_REGEX) || text.matches(OTHER_FOLDER_LABEL_REGEX);
+        } else if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                if (hasFolderText(vg.getChildAt(i))) return true;
             }
         }
         return false;
     }
 
+    // ── Apply visibility of direct folders bar ──────────────────────────────────
+    private static void applyFoldersBarVisibility(Activity activity, View bar) {
+        try {
+            if (bar == null) return;
+
+            ViewGroup.LayoutParams lp = bar.getLayoutParams();
+            if (bar.getVisibility() == View.VISIBLE && lp.height != 0) {
+                int tm = 0, bm = 0;
+                if (lp instanceof ViewGroup.MarginLayoutParams) {
+                    tm = ((ViewGroup.MarginLayoutParams) lp).topMargin;
+                    bm = ((ViewGroup.MarginLayoutParams) lp).bottomMargin;
+                }
+                originalPillsBarLayout.put(bar, new int[]{
+                    lp.height, bar.getPaddingTop(), bar.getPaddingBottom(), tm, bm, bar.getMinimumHeight()
+                });
+            }
+
+            if (FeatureFlags.hideDirectFoldersBar) {
+                bar.setVisibility(View.GONE);
+                bar.setMinimumHeight(0);
+                lp.height = 0;
+                bar.setPadding(bar.getPaddingLeft(), 0, bar.getPaddingRight(), 0);
+                if (lp instanceof ViewGroup.MarginLayoutParams) {
+                    ((ViewGroup.MarginLayoutParams) lp).topMargin = 0;
+                    ((ViewGroup.MarginLayoutParams) lp).bottomMargin = 0;
+                }
+                if (bar instanceof ViewGroup) {
+                    ViewGroup vg = (ViewGroup) bar;
+                    for (int i = 0; i < vg.getChildCount(); i++) vg.getChildAt(i).setVisibility(View.GONE);
+                }
+                bar.setLayoutParams(lp);
+                bar.requestLayout();
+            } else {
+                int[] orig = originalPillsBarLayout.get(bar);
+                if (orig != null) {
+                    lp.height = orig[0];
+                    bar.setMinimumHeight(orig[5]);
+                    bar.setPadding(bar.getPaddingLeft(), orig[1], bar.getPaddingRight(), orig[2]);
+                    if (lp instanceof ViewGroup.MarginLayoutParams) {
+                        ((ViewGroup.MarginLayoutParams) lp).topMargin = orig[3];
+                        ((ViewGroup.MarginLayoutParams) lp).bottomMargin = orig[4];
+                    }
+                    if (bar instanceof ViewGroup) {
+                        ViewGroup vg = (ViewGroup) bar;
+                        for (int i = 0; i < vg.getChildCount(); i++) vg.getChildAt(i).setVisibility(View.VISIBLE);
+                    }
+                    bar.setLayoutParams(lp);
+                    bar.setVisibility(View.VISIBLE);
+                    bar.requestLayout();
+                }
+            }
+        } catch (Throwable ignored) {}
+    }
+
     // ── Track General Folder Pill ──────────────────────────────────────────────
-    private static void trackGeneralFolderPill(Activity activity) {
-        if (!FeatureFlags.emptyGeneralFolder) return;
+    private static void scanAndHookInboxPills(Activity activity, View bar) {
+        if (!FeatureFlags.emptyGeneralFolder || bar == null || !(bar instanceof ViewGroup)) return;
 
         try {
-            View decor = activity.getWindow().getDecorView();
-            View bar = findFoldersBar(decor);
-            if (bar == null || !(bar instanceof ViewGroup)) return;
-
             boolean wasGeneral = isGeneralTabSelected;
             boolean foundGeneralSelected = false;
 
             ViewGroup vg = (ViewGroup) bar;
             for (int i = 0; i < vg.getChildCount(); i++) {
                 View pill = vg.getChildAt(i);
-                if (isGeneralPill(pill)) {
+
+                boolean isGen = isGeneralPill(pill);
+
+                if (isGen) {
                     if (pill.isSelected() || pill.isActivated() || isAnyChildCheckedOrSelected(pill)) {
                         foundGeneralSelected = true;
-                        break;
                     }
+                }
+
+                if (!hookedPills.containsKey(pill)) {
+                    hookedPills.put(pill, true);
+                    pill.setOnTouchListener((v, event) -> {
+                        if (event.getAction() == MotionEvent.ACTION_UP) {
+                            boolean wasGen = isGeneralTabSelected;
+                            isGeneralTabSelected = isGen;
+                            if (wasGen != isGen) {
+                                Handler h = new Handler(Looper.getMainLooper());
+                                h.postDelayed(() -> refreshActiveInbox(activity), 50);
+                                h.postDelayed(() -> refreshActiveInbox(activity), 200);
+                            }
+                        }
+                        return false; // let normal click run
+                    });
                 }
             }
 
@@ -573,11 +651,11 @@ public class HideChatsHook {
     private static boolean isGeneralPill(View v) {
         if (v instanceof android.widget.TextView) {
             String text = ((android.widget.TextView) v).getText().toString();
-            return text.matches("(?i)^(general|generale|général|allgemein|geral|genel|общие|عام)(\s.*)?$");
+            return text.matches(GENERAL_LABEL_REGEX);
         }
         if (v.getContentDescription() != null) {
             String desc = v.getContentDescription().toString();
-            if (desc.matches("(?i)^(general|generale|général|allgemein|geral|genel|общие|عام)(\s.*)?$")) return true;
+            if (desc.matches(GENERAL_LABEL_REGEX)) return true;
         }
         if (v instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) v;
@@ -600,6 +678,42 @@ public class HideChatsHook {
         return false;
     }
 
+    // ── Apply UI Fallback for Empty General ────────────────────────────────────
+    private static void applyEmptyGeneralUiFallback(Activity activity, View foldersBar) {
+        if (foldersBar == null) return;
+        try {
+            View parent = (View) foldersBar.getParent();
+            while (parent != null && !parent.getClass().getName().contains("RecyclerView")) {
+                parent = (View) parent.getParent();
+            }
+            if (parent != null) {
+                // Look for the threads recyclerview which is usually below the bar
+                View decor = activity.getWindow().getDecorView();
+                List<View> recyclerViews = new ArrayList<>();
+                findRecyclerViews(decor, recyclerViews);
+
+                for (View rv : recyclerViews) {
+                    if (rv != parent && rv.getHeight() > dp(activity, 200)) { // Main threads list
+                        if (FeatureFlags.emptyGeneralFolder && isGeneralTabSelected) {
+                            rv.setVisibility(View.INVISIBLE);
+                        } else {
+                            if (rv.getVisibility() == View.INVISIBLE) rv.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    private static void findRecyclerViews(View v, List<View> list) {
+        if (v == null) return;
+        if (v.getClass().getName().contains("RecyclerView")) list.add(v);
+        if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0; i < vg.getChildCount(); i++) findRecyclerViews(vg.getChildAt(i), list);
+        }
+    }
+
     // ── Live Inbox Refresh ─────────────────────────────────────────────────────
     public static void refreshActiveInbox(Activity activity) {
         if (activity == null || activity.isFinishing()) return;
@@ -610,7 +724,11 @@ public class HideChatsHook {
                 HideChatsHook inst = new HideChatsHook();
                 inst.ensureIds(activity);
                 inst.tryInject(activity);
-                applyFoldersBarVisibility(activity);
+
+                View decor = activity.getWindow().getDecorView();
+                View fb = findFoldersBar(decor);
+                applyFoldersBarVisibility(activity, fb);
+                applyEmptyGeneralUiFallback(activity, fb);
 
                 // Force IG to re-query the thread store by cycling visible fragments
                 Method getSfm = activity.getClass().getMethod("getSupportFragmentManager");
@@ -622,7 +740,6 @@ public class HideChatsHook {
                 }
 
                 // Also poke RecyclerView adapters to redraw immediately
-                View decor = activity.getWindow().getDecorView();
                 notifyRecyclerViews(decor);
             } catch (Throwable t) {
                 ModuleLog.line("(IE|HideChats) refresh error: " + t.getMessage());

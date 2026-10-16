@@ -1,0 +1,11 @@
+1. Update `HideChatsHook.java` Logic (Filter & Refresh)
+   - Fix `installInboxFilter`: Modify to do defensive copying. Apply the `emptyGeneralFolder` filtering based on checking method arguments for the "GENERAL" intent (case insensitive match on Enum or string in `C09ZC` AND inspecting the Enum's `String` fields via reflection for "general" or "1"). Also filter out hidden chats if `hideChatsMode != 0` via a new list copying mechanism. Do not mutate `param.getResult()` via `it.remove()`.
+   - Update `registerListener` to maintain the `OnGlobalLayoutListener` persistently per Activity via a `WeakHashMap<Activity, Boolean> registeredActivities`. It should never be removed.
+   - Replace `findFoldersBar` with a structural view-tree detector that uses regex (`GENERAL_LABEL_REGEX` and `OTHER_FOLDER_LABEL_REGEX`) to find the horizontal row container.
+   - Implement `isGeneralTabSelected` tracking via multiple methods: Parent/self selection state (`isSelected`, `isActivated`), and `OnTouchListener` on child pills (intercepting `ACTION_UP` to set state and post `refreshActiveInbox`).
+   - Implement UI-level fallback in `applyEmptyGeneralUiFallback` to hide the main inbox threads `RecyclerView` when `isGeneralTabSelected` and `emptyGeneralFolder` are true.
+   - Fix `applyFoldersBarVisibility` to properly save original layouts and completely collapse/hide the bar (including setting `minimumHeight=0`, `padding`, `margin`, and children to `GONE`).
+   - Implement `refreshActiveInbox(Activity activity)` method to force refresh via FragmentManager reflective onPause/onResume and RecyclerView `notifyDataSetChanged`.
+2. Pre-commit Steps
+   - Run `./gradlew testDebugUnitTest assembleDebug`. Verify it compiles perfectly.
+3. Submit
