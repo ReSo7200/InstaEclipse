@@ -18,4 +18,5 @@
     <string name="ig_dialog_extras_share_domain_invalid">網域無效</string>
     <string name="ig_dialog_extras_startup_tab">啟動分頁</string>
     <string name="ig_media_open_with">開啟方式…</string>
+    <string name="ig_lock_try_again_in">嘗試次數過多，請在 %1$d 秒後重試</string>
 </resources>

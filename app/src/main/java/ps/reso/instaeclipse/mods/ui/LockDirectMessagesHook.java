@@ -1,5 +1,8 @@
 package ps.reso.instaeclipse.mods.ui;
 
+import ps.reso.instaeclipse.utils.i18n.I18n;
+import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.utils.core.PasscodeHasher;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
@@ -276,13 +279,13 @@ public class LockDirectMessagesHook {
         unlock.setLayoutParams(btnLp);
 
         final Runnable attempt = () -> {
-            if (hashPass(code.getText().toString()).equals(FeatureFlags.lockDirectPasscode)) {
+            if (checkPass(code.getText().toString())) {
                 if (wholeApp) appUnlockedThisSession = true; else unlockedThisSession = true;
                 hideKeyboard(a, code);
                 content.removeView(overlay);
             } else {
                 code.setText("");
-                error.setText("Wrong passcode");
+                error.setText(failureText(a));
                 error.setVisibility(View.VISIBLE);
             }
         };
@@ -385,11 +388,50 @@ public class LockDirectMessagesHook {
         } catch (Throwable t) { return s; }
     }
 
-    /** Salted hash of a passcode: sha256(salt + passcode). Legacy passcodes have salt="" so
-     *  sha256(""+pass) == sha256(pass) and keep verifying without a forced reset. */
+    /** Hash for a NEW passcode: PBKDF2 with the per-install salt (see {@link PasscodeHasher}). */
     public static String hashPass(String passcode) {
         String salt = FeatureFlags.lockDirectSalt == null ? "" : FeatureFlags.lockDirectSalt;
-        return sha256(salt + passcode);
+        return PasscodeHasher.hash(passcode, salt);
+    }
+
+    private static final int MAX_FAILURES = 5;
+    private static final long LOCKOUT_MS = 30_000;
+    private static int failures;
+    private static long lockedUntil;
+
+    /** Seconds left in the lockout after too many wrong passcodes, or 0. */
+    public static int lockoutSecondsLeft() {
+        long left = lockedUntil - android.os.SystemClock.elapsedRealtime();
+        return left > 0 ? (int) ((left + 999) / 1000) : 0;
+    }
+
+    /**
+     * Checks a passcode against the stored hash (PBKDF2, or the older salted SHA-256, which is
+     * re-hashed with PBKDF2 on the first successful unlock). Five wrong tries lock entry for 30 s;
+     * during the lockout every attempt fails without being checked.
+     */
+    public static synchronized boolean checkPass(String passcode) {
+        if (lockoutSecondsLeft() > 0) return false;
+        String salt = FeatureFlags.lockDirectSalt == null ? "" : FeatureFlags.lockDirectSalt;
+        if (PasscodeHasher.verify(passcode, salt, FeatureFlags.lockDirectPasscode)) {
+            failures = 0;
+            if (PasscodeHasher.needsUpgrade(FeatureFlags.lockDirectPasscode)) {
+                FeatureFlags.lockDirectPasscode = PasscodeHasher.hash(passcode, salt);
+                ps.reso.instaeclipse.utils.core.SettingsManager.saveAllFlags();
+            }
+            return true;
+        }
+        if (++failures >= MAX_FAILURES) {
+            failures = 0;
+            lockedUntil = android.os.SystemClock.elapsedRealtime() + LOCKOUT_MS;
+        }
+        return false;
+    }
+
+    /** Message for a failed attempt: the lockout countdown when one is running. */
+    public static String failureText(android.content.Context ctx) {
+        int s = lockoutSecondsLeft();
+        return s > 0 ? I18n.t(ctx, R.string.ig_lock_try_again_in, s) : "Wrong passcode";
     }
 
     /** Generate + store a fresh random salt (call right before hashing a NEW passcode). */

@@ -18,4 +18,5 @@
     <string name="ig_dialog_extras_share_domain_invalid">Ogiltig domän</string>
     <string name="ig_dialog_extras_startup_tab">Startflik</string>
     <string name="ig_media_open_with">Öppna med…</string>
+    <string name="ig_lock_try_again_in">För många försök. Försök igen om %1$d s</string>
 </resources>

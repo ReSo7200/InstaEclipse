@@ -1850,8 +1850,7 @@ public class DialogUtils {
                     .setView(wrapPin(themed, cur))
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, (d, w) -> {
-                        if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.hashPass(cur.getText().toString())
-                                .equals(FeatureFlags.lockDirectPasscode)) {
+                        if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.checkPass(cur.getText().toString())) {
                             if (wholeApp) FeatureFlags.lockWholeApp = false;
                             else          FeatureFlags.lockDirectMessages = false;
                             suppressLockToggle = true;
@@ -1859,7 +1858,9 @@ public class DialogUtils {
                             suppressLockToggle = false;
                             SettingsManager.saveAllFlags();
                         } else {
-                            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.lockoutSecondsLeft() > 0
+                                    ? ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.failureText(context)
+                                    : I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
                         }
                     })
                     .show();
@@ -1878,10 +1879,12 @@ public class DialogUtils {
                     .setView(wrapPin(themed, cur))
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, (d, w) -> {
-                        if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.hashPass(cur.getText().toString()).equals(existing)) {
+                        if (ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.checkPass(cur.getText().toString())) {
                             promptSetNewDmPasscode(context);
                         } else {
-                            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.lockoutSecondsLeft() > 0
+                                    ? ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.failureText(context)
+                                    : I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
                         }
                     })
                     .show();

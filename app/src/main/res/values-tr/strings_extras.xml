@@ -18,4 +18,5 @@
     <string name="ig_dialog_extras_share_domain_invalid">Geçersiz domain</string>
     <string name="ig_dialog_extras_startup_tab">Başlangıç Sekmesi</string>
     <string name="ig_media_open_with">Birlikte aç…</string>
+    <string name="ig_lock_try_again_in">Çok fazla deneme. %1$d sn sonra tekrar deneyin</string>
 </resources>

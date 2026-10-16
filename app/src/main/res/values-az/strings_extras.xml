@@ -18,4 +18,5 @@
     <string name="ig_dialog_extras_share_domain_invalid">Yanlış domen</string>
     <string name="ig_dialog_extras_startup_tab">Başlanğıc bölməsi</string>
     <string name="ig_media_open_with">Bununla aç…</string>
+    <string name="ig_lock_try_again_in">Çox cəhd. %1$d san sonra yenidən cəhd edin</string>
 </resources>

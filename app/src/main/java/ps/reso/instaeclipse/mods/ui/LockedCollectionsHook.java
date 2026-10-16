@@ -271,8 +271,9 @@ public class LockedCollectionsHook {
         d.secondary(I18n.t(a, R.string.ig_dialog_cancel), cancel);
         d.onClose(cancel); // ✕ = Cancel (never leaves the locked content showing)
         d.primaryKeepOpen(I18n.t(a, R.string.ig_locked_coll_open), () -> {
-            if (LockDirectMessagesHook.hashPass(code.getText().toString()).equals(FeatureFlags.lockDirectPasscode)) success.run();
-            else { code.setText(""); code.setError("✗"); }
+            if (LockDirectMessagesHook.checkPass(code.getText().toString())) success.run();
+            else { code.setText(""); code.setError(LockDirectMessagesHook.lockoutSecondsLeft() > 0
+                    ? LockDirectMessagesHook.failureText(a) : "✗"); }
         });
         d.show();
         if (FeatureFlags.lockUseFingerprint && LockDirectMessagesHook.canAuthenticate(a))

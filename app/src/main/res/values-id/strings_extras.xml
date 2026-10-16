@@ -18,4 +18,5 @@
     <string name="ig_dialog_extras_share_domain_invalid">Domain tidak valid</string>
     <string name="ig_dialog_extras_startup_tab">Tab Awal</string>
     <string name="ig_media_open_with">Buka dengan…</string>
+    <string name="ig_lock_try_again_in">Terlalu banyak percobaan. Coba lagi dalam %1$d dtk</string>
 </resources>

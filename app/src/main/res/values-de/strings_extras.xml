@@ -18,4 +18,5 @@
     <string name="ig_dialog_extras_share_domain_invalid">Ungültige Domain</string>
     <string name="ig_dialog_extras_startup_tab">Starttab</string>
     <string name="ig_media_open_with">Öffnen mit…</string>
+    <string name="ig_lock_try_again_in">Zu viele Versuche. Erneut in %1$d s</string>
 </resources>
