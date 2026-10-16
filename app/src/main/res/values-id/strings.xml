@@ -541,6 +541,14 @@
     <string name="ig_dialog_unsent_unknown_chat">Obrolan tidak dikenal</string>
     <string name="ig_dialog_clean_feed_hide_threads">Sembunyikan Saran Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Sembunyikan Postingan yang Sudah Anda Sukai</string>
+    <string name="ig_nav_settings_title">Pengaturan navigasi</string>
+    <string name="ig_nav_name_home">Beranda</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Buat</string>
+    <string name="ig_nav_name_messages">Pesan</string>
+    <string name="ig_nav_name_activity">Aktivitas</string>
+    <string name="ig_nav_name_profile">Profil</string>
+    <string name="ig_nav_name_search">Cari</string>
     <string name="ig_nav_tabs_title">Sembunyikan tab navigasi</string>
     <string name="ig_nav_tab_home">Sembunyikan tab Beranda</string>
     <string name="ig_nav_tab_reels">Sembunyikan tab Reels</string>

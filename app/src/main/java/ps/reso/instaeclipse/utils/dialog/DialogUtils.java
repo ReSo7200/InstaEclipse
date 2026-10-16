@@ -1148,13 +1148,13 @@ public class DialogUtils {
     private static void showTabOrderDialog(Context context) {
         final String[] ids = ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.ORDERABLE_TABS;
         final java.util.Map<String, String> labels = new java.util.HashMap<>();
-        labels.put("feed_tab", I18n.t(context, R.string.ig_nav_tab_home));
-        labels.put("clips_tab", I18n.t(context, R.string.ig_nav_tab_reels));
-        labels.put("search_tab", I18n.t(context, R.string.ig_nav_tab_search));
-        labels.put("creation_tab", I18n.t(context, R.string.ig_nav_tab_create));
-        labels.put("direct_tab", I18n.t(context, R.string.ig_nav_tab_messages));
-        labels.put("news_tab", I18n.t(context, R.string.ig_nav_tab_activity));
-        labels.put("profile_tab", I18n.t(context, R.string.ig_nav_tab_profile));
+        labels.put("feed_tab", I18n.t(context, R.string.ig_nav_name_home));
+        labels.put("clips_tab", I18n.t(context, R.string.ig_nav_name_reels));
+        labels.put("search_tab", I18n.t(context, R.string.ig_nav_name_search));
+        labels.put("creation_tab", I18n.t(context, R.string.ig_nav_name_create));
+        labels.put("direct_tab", I18n.t(context, R.string.ig_nav_name_messages));
+        labels.put("news_tab", I18n.t(context, R.string.ig_nav_name_activity));
+        labels.put("profile_tab", I18n.t(context, R.string.ig_nav_name_profile));
         final java.util.List<String> order = new java.util.ArrayList<>();
         for (String n : FeatureFlags.navTabOrder.split(","))
             if (java.util.Arrays.asList(ids).contains(n.trim()) && !order.contains(n.trim())) order.add(n.trim());

@@ -322,6 +322,14 @@
     <string name="ig_dialog_clean_feed_hide_suggested">Ukryj sugestie w Dla Ciebie</string>
     <string name="ig_dialog_clean_feed_hide_threads">Ukryj sugestie Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Ukryj posty, które już polubiłeś</string>
+    <string name="ig_nav_settings_title">Ustawienia nawigacji</string>
+    <string name="ig_nav_name_home">Główna</string>
+    <string name="ig_nav_name_reels">Rolki</string>
+    <string name="ig_nav_name_create">Utwórz</string>
+    <string name="ig_nav_name_messages">Wiadomości</string>
+    <string name="ig_nav_name_activity">Aktywność</string>
+    <string name="ig_nav_name_profile">Profil</string>
+    <string name="ig_nav_name_search">Szukaj</string>
     <string name="ig_nav_tabs_title">Ukryj karty nawigacji</string>
     <string name="ig_nav_tab_home">Ukryj kartę Główna</string>
     <string name="ig_nav_tab_reels">Ukryj kartę Rolki</string>

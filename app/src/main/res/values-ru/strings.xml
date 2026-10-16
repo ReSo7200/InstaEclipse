@@ -510,6 +510,14 @@
     <string name="ig_dialog_unsent_unknown_chat">Неизвестный чат</string>
     <string name="ig_dialog_clean_feed_hide_threads">Скрыть рекомендации Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Скрывать публикации, которые вам уже понравились</string>
+    <string name="ig_nav_settings_title">Настройки навигации</string>
+    <string name="ig_nav_name_home">Главная</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Создать</string>
+    <string name="ig_nav_name_messages">Сообщения</string>
+    <string name="ig_nav_name_activity">Активность</string>
+    <string name="ig_nav_name_profile">Профиль</string>
+    <string name="ig_nav_name_search">Поиск</string>
     <string name="ig_nav_tabs_title">Скрыть вкладки навигации</string>
     <string name="ig_nav_tab_home">Скрыть вкладку «Главная»</string>
     <string name="ig_nav_tab_reels">Скрыть вкладку Reels</string>

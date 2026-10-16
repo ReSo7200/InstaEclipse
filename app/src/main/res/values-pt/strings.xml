@@ -509,6 +509,14 @@
     <string name="ig_dialog_unsent_unknown_chat">Conversa desconhecida</string>
     <string name="ig_dialog_clean_feed_hide_threads">Ocultar Sugestões do Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Ocultar Publicações de que Já Gostou</string>
+    <string name="ig_nav_settings_title">Definições de navegação</string>
+    <string name="ig_nav_name_home">Página inicial</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Criar</string>
+    <string name="ig_nav_name_messages">Mensagens</string>
+    <string name="ig_nav_name_activity">Atividade</string>
+    <string name="ig_nav_name_profile">Perfil</string>
+    <string name="ig_nav_name_search">Pesquisar</string>
     <string name="ig_nav_tabs_title">Ocultar separadores de navegação</string>
     <string name="ig_nav_tab_home">Ocultar separador Página inicial</string>
     <string name="ig_nav_tab_reels">Ocultar separador Reels</string>

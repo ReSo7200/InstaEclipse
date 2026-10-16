@@ -512,6 +512,14 @@
     <string name="ig_dialog_unsent_unknown_chat">Naməlum söhbət</string>
     <string name="ig_dialog_clean_feed_hide_threads">Threads Təkliflərini Gizlət</string>
     <string name="ig_dialog_clean_feed_hide_liked">Artıq Bəyəndiyiniz Paylaşımları Gizlət</string>
+    <string name="ig_nav_settings_title">Naviqasiya ayarları</string>
+    <string name="ig_nav_name_home">Əsas səhifə</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Yarat</string>
+    <string name="ig_nav_name_messages">Mesajlar</string>
+    <string name="ig_nav_name_activity">Fəaliyyət</string>
+    <string name="ig_nav_name_profile">Profil</string>
+    <string name="ig_nav_name_search">Axtarış</string>
     <string name="ig_nav_tabs_title">Naviqasiya tablarını gizlət</string>
     <string name="ig_nav_tab_home">Əsas səhifə tabını gizlət</string>
     <string name="ig_nav_tab_reels">Reels tabını gizlət</string>

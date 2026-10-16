@@ -704,7 +704,8 @@ public class FeaturesFragment extends Fragment {
                 createNav(R.drawable.ic_shield, A_PRIVACY, getString(R.string.ig_dialog_misc_lock_section), this::loadLockMenu),
                 createNav(R.drawable.ic_eye_off, A_PRIVACY, getString(R.string.ig_hide_chats_title), this::loadHideChatsMenu),
                 createNav(R.drawable.ic_block, A_PRIVACY, getString(R.string.ig_dialog_menu_ad_analytics), this::loadAdsMenu),
-                createNav(R.drawable.ic_notification, A_PRIVACY, getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu)
+                createNav(R.drawable.ic_notification, A_PRIVACY, getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu),
+                createNav(R.drawable.ic_tune, A_PRIVACY, getString(R.string.ig_nav_settings_title), this::loadNavigationMenu)
         ));
 
         defs.add(getString(R.string.feat_group_media));
@@ -874,10 +875,18 @@ public class FeaturesFragment extends Fragment {
                 disableReels,
                 disableReelsExceptDM,
                 createSwitchLockedByExtreme(R.drawable.ic_search, "#30D158", getString(R.string.ig_dialog_distraction_disable_explore), "disableExplore"),
-                createSwitchLockedByExtreme(R.drawable.ic_chat, "#30D158", getString(R.string.ig_dialog_distraction_disable_comments), "disableComments")
+                createSwitchLockedByExtreme(R.drawable.ic_chat, "#30D158", getString(R.string.ig_dialog_distraction_disable_comments), "disableComments"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray")
         ));
 
-        // Customize navigation bar (#238)
+        showMenu(getString(R.string.ig_dialog_section_distraction_free), defs);
+        currentMenu = "distract";
+    }
+
+    /** Navigation bar editor (#238): hide and reorder the bottom-nav tabs, in their own menu. */
+    private void loadNavigationMenu() {
+        List<Object> defs = new ArrayList<>();
+
         defs.add(getString(R.string.ig_nav_tabs_title));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_home), "hideTabHome"),
@@ -885,26 +894,29 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_create), "hideTabCreate"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_messages), "hideTabMessages"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_activity), "hideTabActivity"),
-                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_profile), "hideTabProfile"),
-                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_nav_tab_profile), "hideTabProfile")
+        ));
+
+        defs.add(getString(R.string.ig_nav_tab_order));
+        defs.add(Arrays.asList(
                 createClickable(R.drawable.ic_tune, "#30D158", getString(R.string.ig_nav_tab_order), this::showTabOrderDialog)
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_distraction_free), defs);
-        currentMenu = "distract";
+        showMenu(getString(R.string.ig_nav_settings_title), defs);
+        currentMenu = "navigation";
     }
 
     /** #238: reorder the bottom-nav tabs (saved as the "navTabOrder" string pref). */
     private void showTabOrderDialog() {
         final String[] ids = ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.ORDERABLE_TABS;
         final java.util.Map<String, String> labels = new java.util.HashMap<>();
-        labels.put("feed_tab", getString(R.string.ig_nav_tab_home));
-        labels.put("clips_tab", getString(R.string.ig_nav_tab_reels));
-        labels.put("search_tab", getString(R.string.ig_nav_tab_search));
-        labels.put("creation_tab", getString(R.string.ig_nav_tab_create));
-        labels.put("direct_tab", getString(R.string.ig_nav_tab_messages));
-        labels.put("news_tab", getString(R.string.ig_nav_tab_activity));
-        labels.put("profile_tab", getString(R.string.ig_nav_tab_profile));
+        labels.put("feed_tab", getString(R.string.ig_nav_name_home));
+        labels.put("clips_tab", getString(R.string.ig_nav_name_reels));
+        labels.put("search_tab", getString(R.string.ig_nav_name_search));
+        labels.put("creation_tab", getString(R.string.ig_nav_name_create));
+        labels.put("direct_tab", getString(R.string.ig_nav_name_messages));
+        labels.put("news_tab", getString(R.string.ig_nav_name_activity));
+        labels.put("profile_tab", getString(R.string.ig_nav_name_profile));
         final java.util.List<String> order = new java.util.ArrayList<>();
         for (String n : localCache.getString("navTabOrder", "").split(","))
             if (java.util.Arrays.asList(ids).contains(n.trim()) && !order.contains(n.trim())) order.add(n.trim());

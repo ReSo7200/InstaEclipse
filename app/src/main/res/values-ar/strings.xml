@@ -508,6 +508,14 @@
     <string name="ig_dialog_unsent_unknown_chat">محادثة غير معروفة</string>
     <string name="ig_dialog_clean_feed_hide_threads">إخفاء اقتراحات Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">إخفاء المنشورات التي أعجبتك مسبقاً</string>
+    <string name="ig_nav_settings_title">إعدادات التنقل</string>
+    <string name="ig_nav_name_home">الرئيسية</string>
+    <string name="ig_nav_name_reels">ريلز</string>
+    <string name="ig_nav_name_create">إنشاء</string>
+    <string name="ig_nav_name_messages">الرسائل</string>
+    <string name="ig_nav_name_activity">النشاط</string>
+    <string name="ig_nav_name_profile">الملف الشخصي</string>
+    <string name="ig_nav_name_search">البحث</string>
     <string name="ig_nav_tabs_title">إخفاء علامات تبويب التنقل</string>
     <string name="ig_nav_tab_home">إخفاء تبويب الرئيسية</string>
     <string name="ig_nav_tab_reels">إخفاء تبويب الريلز</string>

@@ -328,6 +328,14 @@
     <string name="ig_dialog_clean_feed_hide_suggested">Nascondi suggerimenti nel Feed</string>
     <string name="ig_dialog_clean_feed_hide_threads">Nascondi suggerimenti di Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Nascondi i post a cui hai già messo Mi piace</string>
+    <string name="ig_nav_settings_title">Impostazioni di navigazione</string>
+    <string name="ig_nav_name_home">Home</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Crea</string>
+    <string name="ig_nav_name_messages">Messaggi</string>
+    <string name="ig_nav_name_activity">Attività</string>
+    <string name="ig_nav_name_profile">Profilo</string>
+    <string name="ig_nav_name_search">Cerca</string>
     <string name="ig_nav_tabs_title">Nascondi schede di navigazione</string>
     <string name="ig_nav_tab_home">Nascondi scheda Home</string>
     <string name="ig_nav_tab_reels">Nascondi scheda Reels</string>

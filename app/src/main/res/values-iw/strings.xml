@@ -541,6 +541,14 @@
     <string name="ig_dialog_unsent_unknown_chat">צ\'אט לא ידוע</string>
     <string name="ig_dialog_clean_feed_hide_threads">הסתר הצעות Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">הסתר פוסטים שכבר אהבת</string>
+    <string name="ig_nav_settings_title">הגדרות ניווט</string>
+    <string name="ig_nav_name_home">בית</string>
+    <string name="ig_nav_name_reels">ריילז</string>
+    <string name="ig_nav_name_create">יצירה</string>
+    <string name="ig_nav_name_messages">הודעות</string>
+    <string name="ig_nav_name_activity">פעילות</string>
+    <string name="ig_nav_name_profile">פרופיל</string>
+    <string name="ig_nav_name_search">חיפוש</string>
     <string name="ig_nav_tabs_title">הסתר לשוניות ניווט</string>
     <string name="ig_nav_tab_home">הסתר לשונית בית</string>
     <string name="ig_nav_tab_reels">הסתר לשונית ריילז</string>

@@ -542,6 +542,14 @@
     <string name="ig_dialog_unsent_unknown_chat">Άγνωστη συνομιλία</string>
     <string name="ig_dialog_clean_feed_hide_threads">Απόκρυψη Προτάσεων Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Απόκρυψη Δημοσιεύσεων που Σας Αρέσουν Ήδη</string>
+    <string name="ig_nav_settings_title">Ρυθμίσεις πλοήγησης</string>
+    <string name="ig_nav_name_home">Αρχική</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Δημιουργία</string>
+    <string name="ig_nav_name_messages">Μηνύματα</string>
+    <string name="ig_nav_name_activity">Δραστηριότητα</string>
+    <string name="ig_nav_name_profile">Προφίλ</string>
+    <string name="ig_nav_name_search">Αναζήτηση</string>
     <string name="ig_nav_tabs_title">Απόκρυψη καρτελών πλοήγησης</string>
     <string name="ig_nav_tab_home">Απόκρυψη καρτέλας Αρχική</string>
     <string name="ig_nav_tab_reels">Απόκρυψη καρτέλας Reels</string>

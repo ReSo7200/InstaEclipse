@@ -509,6 +509,14 @@
     <string name="ig_dialog_unsent_unknown_chat">Okänd chatt</string>
     <string name="ig_dialog_clean_feed_hide_threads">Dölj Threads-förslag</string>
     <string name="ig_dialog_clean_feed_hide_liked">Dölj inlägg du redan har gillat</string>
+    <string name="ig_nav_settings_title">Navigeringsinställningar</string>
+    <string name="ig_nav_name_home">Hem</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Skapa</string>
+    <string name="ig_nav_name_messages">Meddelanden</string>
+    <string name="ig_nav_name_activity">Aktivitet</string>
+    <string name="ig_nav_name_profile">Profil</string>
+    <string name="ig_nav_name_search">Sök</string>
     <string name="ig_nav_tabs_title">Dölj navigeringsflikar</string>
     <string name="ig_nav_tab_home">Dölj fliken Hem</string>
     <string name="ig_nav_tab_reels">Dölj fliken Reels</string>

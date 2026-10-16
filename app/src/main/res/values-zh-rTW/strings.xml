@@ -510,6 +510,14 @@
     <string name="ig_dialog_unsent_unknown_chat">未知對話</string>
     <string name="ig_dialog_clean_feed_hide_threads">隱藏 Threads 推薦</string>
     <string name="ig_dialog_clean_feed_hide_liked">隱藏已按讚的貼文</string>
+    <string name="ig_nav_settings_title">導覽設定</string>
+    <string name="ig_nav_name_home">首頁</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">建立</string>
+    <string name="ig_nav_name_messages">訊息</string>
+    <string name="ig_nav_name_activity">活動</string>
+    <string name="ig_nav_name_profile">個人檔案</string>
+    <string name="ig_nav_name_search">搜尋</string>
     <string name="ig_nav_tabs_title">隱藏導覽分頁</string>
     <string name="ig_nav_tab_home">隱藏首頁分頁</string>
     <string name="ig_nav_tab_reels">隱藏 Reels 分頁</string>

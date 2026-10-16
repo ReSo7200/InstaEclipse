@@ -542,6 +542,14 @@
     <string name="ig_dialog_unsent_unknown_chat">未知对话</string>
     <string name="ig_dialog_clean_feed_hide_threads">隐藏 Threads 推荐</string>
     <string name="ig_dialog_clean_feed_hide_liked">隐藏已赞过的帖子</string>
+    <string name="ig_nav_settings_title">导航设置</string>
+    <string name="ig_nav_name_home">首页</string>
+    <string name="ig_nav_name_reels">连续短片</string>
+    <string name="ig_nav_name_create">创建</string>
+    <string name="ig_nav_name_messages">消息</string>
+    <string name="ig_nav_name_activity">活动</string>
+    <string name="ig_nav_name_profile">个人主页</string>
+    <string name="ig_nav_name_search">搜索</string>
     <string name="ig_nav_tabs_title">隐藏导航标签</string>
     <string name="ig_nav_tab_home">隐藏首页标签</string>
     <string name="ig_nav_tab_reels">隐藏连续短片标签</string>
