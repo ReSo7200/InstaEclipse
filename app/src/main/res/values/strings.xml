@@ -544,6 +544,8 @@ Stay on this screen until it finishes.</string>
     <!-- Caption Copy menu + dialog (runs in IG process) -->
     <string name="ig_caption_copy_menu_item">Copy Caption</string>
     <string name="ig_caption_translate_menu_item">Translate Caption</string>
+    <string name="ig_caption_translate_full">Full caption</string>
+    <string name="ig_caption_translate_no_hashtags">Without hashtags</string>
     <string name="ig_caption_copy_title">Copy Caption</string>
     <string name="ig_caption_copy_full">Copy Full Caption</string>
     <string name="ig_caption_copy_none">No caption on this post</string>

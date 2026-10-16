@@ -564,6 +564,8 @@
     <string name="ig_dialog_misc_photo_zoom">Ζουμ Φωτογραφίας (Παρατεταμένο Πάτημα)</string>
     <string name="ig_caption_copy_menu_item">Αντιγραφή Λεζάντας</string>
     <string name="ig_caption_translate_menu_item">Μετάφραση Λεζάντας</string>
+    <string name="ig_caption_translate_full">Ολόκληρη η λεζάντα</string>
+    <string name="ig_caption_translate_no_hashtags">Χωρίς hashtags</string>
     <string name="ig_caption_copy_title">Αντιγραφή Λεζάντας</string>
     <string name="ig_caption_copy_full">Αντιγραφή Πλήρους Λεζάντας</string>
     <string name="ig_caption_copy_none">Δεν υπάρχει λεζάντα σε αυτή τη δημοσίευση</string>

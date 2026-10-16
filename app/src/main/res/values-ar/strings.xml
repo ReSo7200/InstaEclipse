@@ -530,6 +530,8 @@
     <string name="ig_dialog_misc_photo_zoom">تكبير الصورة (بالضغط المطوّل)</string>
     <string name="ig_caption_copy_menu_item">نسخ الوصف</string>
     <string name="ig_caption_translate_menu_item">ترجمة الوصف</string>
+    <string name="ig_caption_translate_full">الوصف كاملًا</string>
+    <string name="ig_caption_translate_no_hashtags">بدون الهاشتاغات</string>
     <string name="ig_caption_copy_title">نسخ الوصف</string>
     <string name="ig_caption_copy_full">نسخ الوصف كاملاً</string>
     <string name="ig_caption_copy_none">لا يوجد وصف لهذا المنشور</string>

@@ -926,11 +926,55 @@ public class CaptionCopyContextMenuHook {
                 return;
             }
 
-            if (translate) ps.reso.instaeclipse.utils.core.TextTranslator.translate(ctx, caption.trim());
+            if (translate) translateCaption(ctx, caption.trim());
             else showCopyPopup(ctx, caption.trim());
         } catch (Throwable t) {
             ModuleLog.line("(IE|Caption) ❌ onOptionClicked: " + t);
         }
+    }
+
+    // Hashtag: "#" followed by letters/digits/underscores in any script.
+    private static final java.util.regex.Pattern HASHTAG =
+            java.util.regex.Pattern.compile("#[\\p{L}\\p{N}_]+");
+
+    /**
+     * Translate a caption. With hashtags, asks whether to translate it whole or without them
+     * (tags are mostly untranslatable noise); without hashtags it opens the translator directly.
+     */
+    private static void translateCaption(Context ctx, String caption) {
+        String withoutTags = stripHashtags(caption);
+        if (withoutTags.equals(caption) || withoutTags.isEmpty()) {
+            ps.reso.instaeclipse.utils.core.TextTranslator.translate(ctx, caption);
+            return;
+        }
+        Context host = currentActivity != null ? currentActivity : ctx;
+        String[] labels = {
+                I18n.t(host, R.string.ig_caption_translate_full),
+                I18n.t(host, R.string.ig_caption_translate_no_hashtags)
+        };
+        MAIN.post(() -> {
+            try {
+                new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
+                        .title(I18n.t(host, R.string.ig_caption_translate_menu_item))
+                        .choices(labels, -1, which -> ps.reso.instaeclipse.utils.core.TextTranslator
+                                .translate(ctx, which == 1 ? withoutTags : caption))
+                        .show();
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|Caption) translate chooser: " + t);
+                ps.reso.instaeclipse.utils.core.TextTranslator.translate(ctx, caption);
+            }
+        });
+    }
+
+    /** Caption with every hashtag removed and the leftover spacing tidied (blank lines collapsed). */
+    static String stripHashtags(String caption) {
+        String out = HASHTAG.matcher(caption).replaceAll("");
+        out = out.replaceAll("[ \\t]+", " ")       // runs of spaces left by removed tags
+                .replaceAll("(?m)^ +| +$", "")       // spaces at line starts/ends
+                .replaceAll(" +([,.!?;:،])", "$1") // space a removed tag left before punctuation
+                .replaceAll("\\n{3,}", "\n\n")       // at most one blank line
+                .trim();
+        return out;
     }
 
     // ── Media resolution (mirrors PostDownloadContextMenuHook's fix for stale profile data) ─

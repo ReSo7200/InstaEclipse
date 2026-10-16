@@ -532,6 +532,8 @@
     <string name="ig_dialog_misc_photo_zoom">Увеличение фото (долгое нажатие)</string>
     <string name="ig_caption_copy_menu_item">Копировать подпись</string>
     <string name="ig_caption_translate_menu_item">Перевести подпись</string>
+    <string name="ig_caption_translate_full">Подпись целиком</string>
+    <string name="ig_caption_translate_no_hashtags">Без хештегов</string>
     <string name="ig_caption_copy_title">Копировать подпись</string>
     <string name="ig_caption_copy_full">Копировать всю подпись</string>
     <string name="ig_caption_copy_none">У этого поста нет подписи</string>

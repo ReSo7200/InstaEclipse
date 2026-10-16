@@ -386,6 +386,8 @@
     <!-- Caption Copy menu + dialog (runs in IG process) -->
     <string name="ig_caption_copy_menu_item">Skopiuj podpis</string>
     <string name="ig_caption_translate_menu_item">Przetłumacz podpis</string>
+    <string name="ig_caption_translate_full">Cały podpis</string>
+    <string name="ig_caption_translate_no_hashtags">Bez hashtagów</string>
     <string name="ig_caption_copy_title">Skopiuj podpis</string>
     <string name="ig_caption_copy_full">Skopiuj cały podpis</string>
     <string name="ig_caption_copy_none">Brak podpisu w tym poście</string>
