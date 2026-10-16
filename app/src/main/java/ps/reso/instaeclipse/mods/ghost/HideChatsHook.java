@@ -86,7 +86,6 @@ public class HideChatsHook {
 
     // ── 1b. Active Thread Tracker (PrebindThreadHeader + igThreadIgid) ─────────
     private void installThreadTracker(DexKitBridge bridge, ClassLoader classLoader) {
-        // Hook 1: igThreadIgid -> A0v(DirectThreadKey, boolean)
         try {
             List<MethodData> openMethods = bridge.findMethod(FindMethod.create()
                     .matcher(MethodMatcher.create()
@@ -103,7 +102,6 @@ public class HideChatsHook {
                             ModuleLog.line("(IE|HideChats) tracked open thread (igThreadIgid)=" + id);
                         }
                     }
-                    // Also check thisObject (C2655013p) in case param.args[0] had null A00
                     if (currentOpenThreadId == null && param.thisObject != null) {
                         String id = extractThreadIdDeep(param.thisObject, 3);
                         if (id != null) currentOpenThreadId = id;
@@ -116,7 +114,6 @@ public class HideChatsHook {
             }
         } catch (Throwable ignored) {}
 
-        // Hook 2: PrebindThreadHeader -> C1524605z6.A01(...)
         try {
             List<MethodData> headerMethods = bridge.findMethod(FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings(HEADER_ANCHOR)));
@@ -158,7 +155,6 @@ public class HideChatsHook {
             }
             Class<?> c = row.getClass();
             while (c != null && c != Object.class) {
-                // 1. Check direct fields of type DirectThreadKey
                 for (Field f : c.getDeclaredFields()) {
                     if (!f.getType().getName().contains("DirectThreadKey")) continue;
                     f.setAccessible(true);
@@ -166,7 +162,6 @@ public class HideChatsHook {
                     String id = firstStringField(key);
                     if (id != null) return id;
                 }
-                // 2. If field was null (lazy init), invoke 0-arg getter returning DirectThreadKey (e.g. CTG())
                 for (Method m : c.getDeclaredMethods()) {
                     if (m.getParameterCount() == 0 && m.getReturnType().getName().contains("DirectThreadKey")) {
                         m.setAccessible(true);
@@ -181,7 +176,6 @@ public class HideChatsHook {
         return null;
     }
 
-    /** Extracts threadId from any wrapper object (C285301Bf, C2655013p, C00WH, DirectThreadKey, etc.) */
     private static String extractThreadIdDeep(Object root, int maxDepth) {
         Object found = scan(root, 0, Collections.newSetFromMap(new IdentityHashMap<>()), maxDepth);
         if (found == null) return null;
@@ -328,7 +322,6 @@ public class HideChatsHook {
 
     // ── Multi-layer Thread ID resolution ───────────────────────────────────────
     private String resolveThreadId(Activity activity, View headerRoot, String boundAtInject) {
-        // 1. Live tracked thread from PrebindThreadHeader / igThreadIgid
         if (currentOpenThreadId != null && !currentOpenThreadId.isEmpty()) return currentOpenThreadId;
         if (KeepUnsentMessagesHook.currentThreadId != null && !KeepUnsentMessagesHook.currentThreadId.isEmpty()) {
             return KeepUnsentMessagesHook.currentThreadId;
@@ -336,7 +329,6 @@ public class HideChatsHook {
         if (boundAtInject != null && !boundAtInject.isEmpty()) return boundAtInject;
 
         try {
-            // 2. Intent extras
             Bundle ex = activity.getIntent() != null ? activity.getIntent().getExtras() : null;
             if (ex != null) {
                 Object dtk = scan(ex, 0, Collections.newSetFromMap(new IdentityHashMap<>()), 5);
@@ -346,7 +338,6 @@ public class HideChatsHook {
                 }
             }
 
-            // 3. View tags on header & ancestors
             View v = headerRoot;
             int up = 0;
             while (v != null && up++ < 8) {
@@ -365,7 +356,6 @@ public class HideChatsHook {
                 v = (v.getParent() instanceof View) ? (View) v.getParent() : null;
             }
 
-            // 4. Active AndroidX Fragments hosted in the Activity
             try {
                 Method getSfm = activity.getClass().getMethod("getSupportFragmentManager");
                 Object fm = getSfm.invoke(activity);
@@ -382,7 +372,6 @@ public class HideChatsHook {
                 }
             } catch (Throwable ignored) {}
 
-            // 5. Activity object graph fallback
             Object dtk = scan(activity, 0, Collections.newSetFromMap(new IdentityHashMap<>()), 6);
             if (dtk != null) {
                 return (dtk instanceof String s) ? s : firstStringField(dtk);
@@ -391,10 +380,6 @@ public class HideChatsHook {
         return null;
     }
 
-    /**
-     * Scans object graph for DirectThreadKey, ThreadIdParcelable, UnifiedThreadKeyParcelable,
-     * or an inbox row (C00WH) that exposes a 0-arg DirectThreadKey getter (CTG()).
-     */
     private static Object scan(Object obj, int depth, Set<Object> seen, int maxDepth) {
         if (obj == null || depth > maxDepth || !seen.add(obj)) return null;
         String cn = obj.getClass().getName();
@@ -402,7 +387,6 @@ public class HideChatsHook {
             return obj;
         }
 
-        // Check if this object has a 0-arg method returning DirectThreadKey (like C00WH.CTG())
         if (cn.startsWith("X.")) {
             String rowId = threadIdOfRow(obj);
             if (rowId != null) return rowId;
