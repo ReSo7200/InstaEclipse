@@ -365,6 +365,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | CommunityNotes): ❌ Failed to hook");
                     }
 
+                    // home feed shows only accounts you follow
+                    try {
+                        if (!skip("FollowingOnlyFeedHook")) new ps.reso.instaeclipse.mods.feed.FollowingOnlyFeedHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | FollowingOnlyFeed): ❌ Failed to hook");
+                    }
+
                     // "Follows you" label on profiles (#239)
                     try {
                         if (!skip("ProfileFollowsYouHook")) new ps.reso.instaeclipse.mods.ui.ProfileFollowsYouHook().install(dexKitBridge, hostClassLoader);

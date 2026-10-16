@@ -1121,6 +1121,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_hide_threads), "hideThreadsSuggestions"),
                 createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_hide_liked), "hideLikedPosts"),
                 createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_hide_community_notes), "hideCommunityNotes"),
+                createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_following_only), "followingOnlyFeed"),
                 createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_hide_plus), "hidePlusUpsells"),
                 createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_expand_captions), "expandCaptions")
         ));

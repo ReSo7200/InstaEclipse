@@ -162,7 +162,7 @@ public class DialogUtils {
         LinearLayout appearance = createGroupCard(context);
         appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
         appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.ig_dialog_menu_quality), A_APPEARANCE, () -> showQualityOptions(context)));
-        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.ig_dialog_menu_clean_feed), A_APPEARANCE, () -> showCleanFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "hidePlusUpsells", "expandCaptions")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.ig_dialog_menu_clean_feed), A_APPEARANCE, () -> showCleanFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "followingOnlyFeed", "hidePlusUpsells", "expandCaptions")));
         mainLayout.addView(appearance);
 
         // ---- PRIVACY ---- ghost, lock, hidden chats, ad/analytics blocking, distraction-free
@@ -1396,6 +1396,13 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         layout.addView(hideNotesSwitch);
+
+        ToggleRow followingOnlyFeedSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_following_only), FeatureFlags.followingOnlyFeed);
+        followingOnlyFeedSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.followingOnlyFeed = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(followingOnlyFeedSwitch);
 
         ToggleRow hidePlusSwitch = createSwitch(context, R.drawable.ic_sparkle, "#64D2FF", I18n.t(context, R.string.ig_dialog_clean_feed_hide_plus), FeatureFlags.hidePlusUpsells);
         hidePlusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

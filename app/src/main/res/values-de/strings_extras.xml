@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ig_caption_copy_no_hashtags">Ohne Hashtags kopieren</string>
+    <string name="ig_dialog_clean_feed_following_only">Nur abonnierte Konten im Feed</string>
 </resources>
