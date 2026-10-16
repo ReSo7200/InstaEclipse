@@ -49,7 +49,7 @@ public class IgThemeHook {
             hookGetColor(classLoader);
             hookContextGetColor();
             hookTypedArrayGetColor(classLoader);
-            IgThemeColorSourceHooks.install();
+            IgThemeColorSourceHooks.install(classLoader);
             hookActivityLifecycle();
             hookPhoneWindowColors(classLoader);
             installed = true;

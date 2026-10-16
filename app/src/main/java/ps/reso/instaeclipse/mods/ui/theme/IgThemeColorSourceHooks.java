@@ -39,8 +39,9 @@ final class IgThemeColorSourceHooks {
 
     private IgThemeColorSourceHooks() {}
 
-    static void install() {
+    static void install(ClassLoader cl) {
         int n = 0;
+        n += hookComposeDrawing(cl);
         n += hookCslResult(TypedArray.class, "getColorStateList", int.class);
         n += hookCslResult(Resources.class, "getColorStateList", int.class, Resources.Theme.class);
         n += hookCslResult(Resources.class, "getColorStateList", int.class);
@@ -156,6 +157,54 @@ final class IgThemeColorSourceHooks {
             return 1;
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse | Theme): ⚠️ ColorDrawable(state): " + t);
+            return 0;
+        }
+    }
+
+    // Compose screens (e.g. the DM inbox) draw straight onto an android.graphics.Paint and never
+    // touch resources, so their colors are themed at Paint.setColor — but only while a Compose view
+    // is recording its drawing (UI thread), leaving ordinary views and the module's own UI alone.
+    private static int composeDrawDepth;
+
+    private static int hookComposeDrawing(ClassLoader cl) {
+        try {
+            XposedHelpers.findAndHookMethod("androidx.compose.ui.platform.AndroidComposeView", cl,
+                    "dispatchDraw", android.graphics.Canvas.class, new XC_MethodHook() {
+                        @Override protected void beforeHookedMethod(MethodHookParam p) {
+                            JitGuard.tick(p.method);
+                            composeDrawDepth++;
+                        }
+
+                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                            if (composeDrawDepth > 0) composeDrawDepth--;
+                        }
+                    });
+            XposedHelpers.findAndHookMethod(android.graphics.Paint.class, "setColor", int.class, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) {
+                    if (composeDrawDepth == 0) return;
+                    JitGuard.tick(p.method);
+                    if (!active()) return;
+                    int c = (Integer) p.args[0];
+                    int r = IgColorRemapEngine.remap(c);
+                    if (r != c) p.args[0] = r;
+                }
+            });
+            if (Build.VERSION.SDK_INT >= 29) {
+                XposedHelpers.findAndHookMethod(android.graphics.Paint.class, "setColor", long.class, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) {
+                        if (composeDrawDepth == 0) return;
+                        JitGuard.tick(p.method);
+                        long c = (Long) p.args[0];
+                        if (!active() || !android.graphics.Color.isSrgb(c)) return;
+                        int argb = android.graphics.Color.toArgb(c);
+                        int r = IgColorRemapEngine.remap(argb);
+                        if (r != argb) p.args[0] = android.graphics.Color.pack(r);
+                    }
+                });
+            }
+            return 1;
+        } catch (Throwable t) {
+            ModuleLog.line("(InstaEclipse | Theme): ⚠️ compose drawing: " + t);
             return 0;
         }
     }
