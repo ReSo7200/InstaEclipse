@@ -213,13 +213,14 @@ public class ChatExportHook {
                                 + ".m{margin:6px 0;padding:8px 12px;border-radius:12px;background:#262626;overflow-wrap:anywhere}"
                                 + ".u{color:#9ad;font-weight:bold}.t{color:#888;font-size:12px}"
                                 + ".q{border-left:3px solid #555;padding-left:8px;margin:4px 0;color:#aaa;font-size:13px}"
-                                + ".r{margin-top:4px;font-size:13px;color:#ccc}.h{color:#aaa;font-size:13px}.e{color:#999;font-size:12px;margin-top:2px}</style><h2>")
+                                + ".r{margin-top:4px;font-size:13px;color:#ccc}.h{color:#aaa;font-size:13px}.e{color:#999;font-size:12px;margin-top:2px}</style>")
+                        .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlBanner("Chat export")).append("<h2>")
                         .append(Html.escapeHtml(title)).append("</h2><p class=h>").append(n).append(" messages");
                 if (first > 0) html.append(" · ").append(fmt.format(new Date(first))).append(" – ").append(fmt.format(new Date(last)));
                 html.append("<br>");
                 for (Map.Entry<String, Integer> e : perUser.entrySet())
                     html.append(Html.escapeHtml(e.getKey())).append(": ").append(e.getValue()).append("<br>");
-                html.append("Exported ").append(fmt.format(new Date())).append("</p>").append(body);
+                html.append("Exported ").append(fmt.format(new Date())).append("</p>").append(body).append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlFooter());
                 String safe = title.replaceAll("[^A-Za-z0-9._-]", "_");
                 String file = "chat_" + safe + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".html";
                 try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openChatExport(a, file)) {

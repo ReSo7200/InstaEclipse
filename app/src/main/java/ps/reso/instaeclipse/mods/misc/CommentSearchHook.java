@@ -64,7 +64,8 @@ public class CommentSearchHook {
 
     private static final String TAG = "(IE|CommentSearch) ";
     private static final String USER = "com.instagram.user.model.User";
-    /** {username, text, comment id, parent comment id ("" = top level), likes, reply count, created (s)} */
+    /** {username, text, comment id, parent comment id ("" = top level), likes, reply count, created (s), media id};
+     *  the post caption row has no ids (its user = the post author) */
     private static volatile List<String[]> latest = new ArrayList<>();
     // IG's own comment JSON serializer (static void (generator, Comment) using "parent_comment_id")
     // and the JSON factory's (Writer) -> generator method: field names stay readable across versions
@@ -183,12 +184,17 @@ public class CommentSearchHook {
                         }
                     } catch (Throwable ignored) {}
                 }
-            if (user != null && text != null && !text.isEmpty() && !text.matches("[0-9_:.-]+")) {
+            if (user == null) continue;
+            // a real Comment model counts even without text (GIF / image comments)
+            if (commentSerializer != null && commentSerializer.getParameterTypes()[1].isInstance(o)) {
+                String u = UserUtils.callUsernameGetter(user);
+                String[] row = u != null ? commentRow(o, u) : null;
+                if (row != null) { out.put(row[2], row); continue; } // by comment id (newer state wins)
+            }
+            if (text != null && !text.isEmpty() && !text.matches("[0-9_:.-]+")) {
                 String u = UserUtils.callUsernameGetter(user);
                 if (u == null || text.equals(u)) continue;
-                String[] row = commentRow(o, u);
-                if (row != null) out.put(row[2], row); // by comment id (newer state wins)
-                else out.putIfAbsent(u + "\u0000" + text, new String[]{u, text, "", "", "", "", ""});
+                out.putIfAbsent(u + "\u0000" + text, new String[]{u, text, "", "", "", "", "", "", "", ""});
             }
         }
         // the row view-models wrap the Comment model: keep the model's row (it has ids), drop the wrapper's
@@ -219,13 +225,56 @@ public class CommentSearchHook {
             String parent = j.optString("parent_comment_id", "");
             if (parent.equals("null") || parent.equals("0")) parent = "";
             String[] row = {user, j.optString("text", ""), id, parent,
-                    j.optString("comment_like_count", ""), j.optString("child_comment_count", ""), j.optString("created_at", "")};
+                    j.optString("comment_like_count", ""), j.optString("child_comment_count", ""), j.optString("created_at", ""),
+                    j.optString("media_id", ""), "", ""};
+            String[] media = commentMedia(j);
+            row[8] = media[0];
+            row[9] = media[1];
+            if (row[1].isEmpty() && !media[0].isEmpty()) row[1] = "gif".equals(media[1]) ? "🖼 GIF" : "🖼 Image";
             ROW_CACHE.put(c, row);
             return row;
         } catch (Throwable t) {
             if (!rowLogged) { rowLogged = true; ModuleLog.line(TAG + "⚠️ comment json: " + (t.getCause() != null ? t.getCause() : t)); }
             return null;
         }
+    }
+
+    /** {url, "gif" | "image"} of a GIF / image comment ("" when it has none). */
+    private static String[] commentMedia(org.json.JSONObject j) {
+        org.json.JSONObject gif = j.optJSONObject("giphy_media_info");
+        if (gif != null) {
+            String u = firstUrl(gif, 0);
+            if (!u.isEmpty()) return new String[]{u, "gif"};
+        }
+        for (String k : new String[]{"media_info", "media_comment_info", "media"}) {
+            Object o = j.opt(k);
+            if (o instanceof org.json.JSONObject || o instanceof org.json.JSONArray) {
+                String u = firstUrl(o, 0);
+                if (!u.isEmpty()) return new String[]{u, u.contains(".gif") || u.contains("giphy") ? "gif" : "image"};
+            }
+        }
+        return new String[]{"", ""};
+    }
+
+    /** First image-looking https URL in a JSON tree (keys named url / uri first). */
+    private static String firstUrl(Object o, int depth) {
+        if (o == null || depth > 6) return "";
+        if (o instanceof org.json.JSONObject jo) {
+            for (String k : new String[]{"url", "uri", "image_url"}) {
+                String v = jo.optString(k, "");
+                if (v.startsWith("https://")) return v;
+            }
+            for (java.util.Iterator<String> it = jo.keys(); it.hasNext(); ) {
+                String r = firstUrl(jo.opt(it.next()), depth + 1);
+                if (!r.isEmpty()) return r;
+            }
+        } else if (o instanceof org.json.JSONArray ja) {
+            for (int i = 0; i < ja.length() && i < 10; i++) {
+                String r = firstUrl(ja.opt(i), depth + 1);
+                if (!r.isEmpty()) return r;
+            }
+        }
+        return "";
     }
 
     private static boolean rowLogged;
@@ -464,6 +513,23 @@ public class CommentSearchHook {
         loadBtn.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         loadBtn.setPadding((int) (14 * d), (int) (7 * d), (int) (14 * d), (int) (7 * d));
         loadBtn.setBackground(round(cAccent, 16 * d));
+        TextView exportBtn = new TextView(ctx);
+        exportBtn.setText(I18n.t(ctx, R.string.ig_comment_export));
+        exportBtn.setTextColor(cAccent);
+        exportBtn.setTextSize(13);
+        exportBtn.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        exportBtn.setPadding((int) (14 * d), (int) (6 * d), (int) (14 * d), (int) (6 * d));
+        GradientDrawable outline = round(Color.TRANSPARENT, 16 * d);
+        outline.setStroke(Math.max(1, (int) (1.5f * d)), cAccent);
+        exportBtn.setBackground(outline);
+        exportBtn.setOnClickListener(v -> {
+            if (all.isEmpty()) return;
+            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_working), Toast.LENGTH_SHORT).show();
+            exportComments(ctx, new ArrayList<>(all));
+        });
+        LinearLayout.LayoutParams elp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        elp.setMarginEnd((int) (8 * d));
+        status.addView(exportBtn, elp);
         status.addView(loadBtn);
         LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         slp.topMargin = (int) (10 * d);
@@ -693,6 +759,151 @@ public class CommentSearchHook {
         return b.toString();
     }
 
+    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+    /** Post shortcode from its media pk (base64url of the number; the reverse of a link's code). */
+    static String shortcode(String mediaId) {
+        try {
+            String pk = mediaId.contains("_") ? mediaId.substring(0, mediaId.indexOf('_')) : mediaId;
+            java.math.BigInteger n = new java.math.BigInteger(pk);
+            if (n.signum() <= 0) return "";
+            StringBuilder b = new StringBuilder();
+            java.math.BigInteger sixtyFour = java.math.BigInteger.valueOf(64);
+            while (n.signum() > 0) {
+                java.math.BigInteger[] qr = n.divideAndRemainder(sixtyFour);
+                b.append(ALPHABET.charAt(qr[1].intValue()));
+                n = qr[0];
+            }
+            return b.reverse().toString();
+        } catch (Throwable t) {
+            return "";
+        }
+    }
+
+    private static String esc(String s) {
+        return android.text.Html.escapeHtml(s == null ? "" : s).replace("\n", "<br>");
+    }
+
+    /** Saves the loaded comments as a self-contained HTML page (tree of replies, search box). */
+    private static void exportComments(Context ctx, List<String[]> rows) {
+        new Thread(() -> {
+            try {
+                String author = "", caption = "", mediaId = "";
+                List<String[]> comments = new ArrayList<>();
+                for (String[] r : rows) {
+                    if (r[2].isEmpty() && author.isEmpty()) { author = r[0]; caption = r[1]; continue; }
+                    if (r[2].isEmpty()) continue;
+                    comments.add(r);
+                    if (mediaId.isEmpty() && r.length > 7) mediaId = r[7];
+                }
+                String code = shortcode(mediaId);
+                String link = code.isEmpty() ? "" : "https://www.instagram.com/p/" + code + "/";
+                Map<String, List<String[]>> kids = new java.util.HashMap<>();
+                Set<String> ids = new java.util.HashSet<>();
+                for (String[] r : comments) ids.add(r[2]);
+                List<String[]> tops = new ArrayList<>();
+                for (String[] r : comments) {
+                    if (!r[3].isEmpty() && ids.contains(r[3])) kids.computeIfAbsent(r[3], k -> new ArrayList<>()).add(r);
+                    else tops.add(r);
+                }
+                for (List<String[]> l : kids.values()) l.sort((x, y) -> Long.compare(num(x[6]), num(y[6])));
+                int replies = comments.size() - tops.size();
+                java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault());
+                String now = fmt.format(new java.util.Date());
+
+                StringBuilder h = new StringBuilder(64 * 1024);
+                h.append("<!doctype html><html><head><meta charset=utf-8>")
+                 .append("<meta name=viewport content=\"width=device-width,initial-scale=1\">")
+                 .append("<title>Comments").append(author.isEmpty() ? "" : " · @" + esc(author)).append("</title><style>")
+                 .append(":root{--bg:#fafafa;--card:#fff;--text:#111;--sub:#737373;--line:#ececec;--accent:#0095f6;--mark:#cfe8fd}")
+                 .append("@media(prefers-color-scheme:dark){:root{--bg:#0b0b0c;--card:#18181a;--text:#f2f2f2;--sub:#9a9aa0;--line:#2a2a2d;--accent:#3aa8ff;--mark:#0b4a7a}}")
+                 .append("*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}")
+                 .append(".wrap{max-width:720px;margin:0 auto;padding:16px}")
+                 .append(".hero{background:linear-gradient(135deg,#feda75,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5);border-radius:20px;padding:2px;margin-bottom:14px}")
+                 .append(".heroin{background:var(--card);border-radius:18px;padding:18px}")
+                 .append(".hero h1{margin:0 0 4px;font-size:20px}.hero a{color:var(--accent);text-decoration:none;word-break:break-all}")
+                 .append(".cap{margin-top:10px;color:var(--text);white-space:normal;max-height:9em;overflow:auto}")
+                 .append(".stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--sub)}")
+                 .append(".search{position:sticky;top:0;z-index:2;padding:8px 0;background:var(--bg)}")
+                 .append(".search input{width:100%;padding:12px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:15px;outline:none}")
+                 .append(".c{display:flex;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:10px}")
+                 .append(".av{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}")
+                 .append(".body{min-width:0;flex:1}.u{font-weight:700}.m{color:var(--sub);font-size:12px;margin-left:6px}.t{margin-top:2px;overflow-wrap:anywhere}")
+                 .append(".replies{margin:6px 0 0 50px;border-left:2px solid var(--line);padding-left:10px}")
+                 .append(".replies .c{margin-top:6px;padding:10px 12px;border-radius:14px}.replies .av{width:28px;height:28px;font-size:12px}")
+                 .append("details>summary{cursor:pointer;color:var(--sub);font-size:13px;font-weight:600;margin:6px 0 0 50px;list-style:none}")
+                 .append("details>summary::before{content:'— ';}mark{background:var(--mark);color:inherit;border-radius:3px}")
+                 .append(".foot{color:var(--sub);font-size:12px;text-align:center;margin:20px 0 8px}.hide{display:none!important}")
+                 .append(".media{display:block;margin-top:8px;max-width:min(260px,100%);max-height:320px;border-radius:12px;border:1px solid var(--line)}")
+                 .append(".tag{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--sub);font-size:12px}")
+                 .append("</style></head><body><div class=wrap>");
+                h.append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlBanner("Comments export"));
+                h.append("<div class=hero><div class=heroin><h1>💬 Comments")
+                 .append(author.isEmpty() ? "" : " on @" + esc(author) + "'s post").append("</h1>");
+                if (!link.isEmpty()) h.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+                if (!caption.isEmpty()) h.append("<div class=cap>").append(esc(caption)).append("</div>");
+                h.append("<div class=stats><span class=chip>").append(tops.size()).append(" comments</span><span class=chip>")
+                 .append(replies).append(" replies</span><span class=chip>Exported ").append(esc(now)).append("</span></div></div></div>");
+                h.append("<div class=search><input id=q placeholder=\"Search names or words…\" autocomplete=off></div><div id=list>");
+                for (String[] t : tops) {
+                    h.append("<div class=thread>");
+                    commentHtml(h, t, fmt);
+                    List<String[]> ch = kids.get(t[2]);
+                    if (ch != null && !ch.isEmpty()) {
+                        h.append("<details><summary>").append(ch.size()).append(ch.size() == 1 ? " reply" : " replies")
+                         .append("</summary><div class=replies>");
+                        for (String[] r : ch) commentHtml(h, r, fmt);
+                        h.append("</div></details>");
+                    }
+                    h.append("</div>");
+                }
+                h.append("</div><div class=foot>Only comments loaded in the app are included · images/GIFs are linked from Instagram and stop showing when their links expire</div>")
+                 .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlFooter()).append("</div>")
+                 .append("<script>const q=document.getElementById('q');const th=[...document.querySelectorAll('.thread')];")
+                 .append("th.forEach(t=>t.querySelectorAll('.u,.t').forEach(e=>e.dataset.o=e.innerHTML));")
+                 .append("function mk(e,s){const o=e.dataset.o;if(!s){e.innerHTML=o;return false;}const i=e.textContent.toLowerCase().indexOf(s);")
+                 .append("if(i<0){e.innerHTML=o;return false;}const re=new RegExp('('+s.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+')','gi');")
+                 .append("e.innerHTML=o.replace(/(^|>)([^<]+)/g,(m,a,b)=>a+b.replace(re,'<mark>$1</mark>'));return true;}")
+                 .append("q.addEventListener('input',()=>{const s=q.value.trim().toLowerCase();th.forEach(t=>{")
+                 .append("const cs=[...t.querySelectorAll('.c')];let any=false;cs.forEach((c,i)=>{let h=false;")
+                 .append("c.querySelectorAll('.u,.t').forEach(e=>{if(mk(e,s))h=true;});c.dataset.h=h?1:0;if(h)any=true;")
+                 .append("if(i>0)c.classList.toggle('hide',!!s&&!h);});t.classList.toggle('hide',!!s&&!any);")
+                 .append("const d=t.querySelector('details');if(d)d.open=!!s&&cs.slice(1).some(c=>c.dataset.h==1);});});</script>")
+                 .append("</body></html>");
+
+                String safe = (author.isEmpty() ? "post" : author).replaceAll("[^A-Za-z0-9._-]", "_");
+                String file = "comments_" + safe + (code.isEmpty() ? "" : "_" + code) + "_"
+                        + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new java.util.Date()) + ".html";
+                try (java.io.OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openCommentsExport(ctx, file)) {
+                    out.write(h.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+                ModuleLog.line(TAG + "exported " + comments.size() + " comments to " + file);
+                MAIN.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_done, comments.size(), file), Toast.LENGTH_LONG).show());
+            } catch (Throwable t) {
+                ModuleLog.line(TAG + "❌ export: " + t);
+                MAIN.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+    private static void commentHtml(StringBuilder h, String[] r, java.text.SimpleDateFormat fmt) {
+        String initial = r[0].isEmpty() ? "?" : r[0].substring(0, 1).toUpperCase(Locale.ROOT);
+        h.append("<div class=c><div class=av style=\"background:#")
+         .append(String.format(Locale.US, "%06X", avatarColor(r[0]) & 0xFFFFFF)).append("\">").append(esc(initial))
+         .append("</div><div class=body><span class=u>").append(esc(r[0])).append("</span><span class=m>");
+        long likes = num(r[4]), created = num(r[6]);
+        if (likes > 0) h.append(String.format(Locale.getDefault(), "%,d ♥", likes));
+        if (created > 0) h.append(likes > 0 ? " · " : "").append(esc(fmt.format(new java.util.Date(created * 1000))));
+        h.append("</span><div class=t>").append(esc(r[1])).append("</div>");
+        if (r.length > 9 && !r[8].isEmpty()) {
+            String label = "gif".equals(r[9]) ? "GIF" : "Image";
+            h.append("<img class=media loading=lazy referrerpolicy=no-referrer alt=\"").append(label).append("\" src=\"")
+             .append(esc(r[8])).append("\" onerror=\"this.outerHTML='<span class=tag>🖼 ").append(label)
+             .append(" (link expired)</span>'\">");
+        }
+        h.append("</div></div>");
+    }
+
     private static GradientDrawable round(int color, float radius) {
         GradientDrawable g = new GradientDrawable();
         g.setColor(color);
@@ -746,7 +957,10 @@ public class CommentSearchHook {
                     done.run();
                     return;
                 }
-                scrollDown(list);
+                // open every visible "View N replies" link first; scroll on once none are left
+                int opened = expandReplies(list);
+                if (opened > 0) lastChange[0] = System.currentTimeMillis();
+                else scrollDown(list);
                 int count = latest.size();
                 progress.accept(count);
                 if (count != lastCount[0] || list.canScrollVertically(1)) {
@@ -789,6 +1003,72 @@ public class CommentSearchHook {
     private static boolean isRecyclerView(Class<?> c) {
         for (; c != null; c = c.getSuperclass()) if (c.getName().equals("androidx.recyclerview.widget.RecyclerView")) return true;
         return false;
+    }
+
+    private static final java.util.regex.Pattern VIEW_REPLIES =
+            java.util.regex.Pattern.compile("(?i)^\\s*view\\s+(all\\s+)?\\d[\\d,.]*\\s+(more\\s+)?repl(y|ies)\\s*$");
+    private static Method childIdMethod;
+    private static boolean a11yLogged;
+
+    /** Clicks the "View N (more) replies" links currently on screen through the list's accessibility
+     *  tree (Compose draws them, so there are no Views to click). Returns how many were clicked. */
+    private static int expandReplies(View list) {
+        try {
+            android.view.accessibility.AccessibilityNodeProvider p = list.getAccessibilityNodeProvider();
+            if (p == null) { logA11y("no node provider"); return 0; }
+            if (childIdMethod == null) {
+                childIdMethod = android.view.accessibility.AccessibilityNodeInfo.class.getDeclaredMethod("getChildId", int.class);
+                childIdMethod.setAccessible(true);
+            }
+            int clicked = 0, nodes = 0;
+            java.util.ArrayDeque<Integer> q = new java.util.ArrayDeque<>();
+            q.add(View.NO_ID);
+            Set<Integer> seen = new java.util.HashSet<>();
+            while (!q.isEmpty() && nodes < 3000) {
+                int id = q.poll();
+                if (!seen.add(id)) continue;
+                android.view.accessibility.AccessibilityNodeInfo n = p.createAccessibilityNodeInfo(id);
+                if (n == null) continue;
+                nodes++;
+                CharSequence t = n.getText() != null ? n.getText() : n.getContentDescription();
+                if (id != View.NO_ID && t != null && VIEW_REPLIES.matcher(t).matches()) {
+                    // the link text isn't clickable itself (a click on it is accepted but does nothing):
+                    // click the nearest clickable node above it
+                    int target = id;
+                    android.view.accessibility.AccessibilityNodeInfo cur = n;
+                    for (int up = 0; up < 5 && cur != null && !cur.isClickable(); up++) {
+                        long parent = (long) parentIdMethod().invoke(cur);
+                        target = (int) (parent >> 32);
+                        cur = p.createAccessibilityNodeInfo(target);
+                    }
+                    boolean ok = cur != null && cur.isClickable()
+                            && p.performAction(target, android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK, null);
+                    logA11y("click '" + t + "' via " + (target == id ? "itself" : "parent " + target) + " -> " + ok);
+                    if (ok) clicked++;
+                }
+                for (int i = 0; i < n.getChildCount(); i++) q.add((int) (((long) childIdMethod.invoke(n, i)) >> 32));
+            }
+            if (!a11yLogged) { a11yLogged = true; logA11y("nodes=" + nodes + " clicked=" + clicked); }
+            if (clicked > 0) ModuleLog.line(TAG + "load all: opened " + clicked + " reply thread(s)");
+            return clicked;
+        } catch (Throwable t) {
+            logA11y(String.valueOf(t.getCause() != null ? t.getCause() : t));
+            return 0;
+        }
+    }
+
+    private static Method parentIdMethod;
+
+    private static Method parentIdMethod() throws NoSuchMethodException {
+        if (parentIdMethod == null) {
+            parentIdMethod = android.view.accessibility.AccessibilityNodeInfo.class.getDeclaredMethod("getParentNodeId");
+            parentIdMethod.setAccessible(true);
+        }
+        return parentIdMethod;
+    }
+
+    private static void logA11y(String msg) {
+        ModuleLog.line(TAG + "replies: " + msg);
     }
 
     /** RecyclerView scrolls directly; other lists (Compose) get a synthetic upward drag. */

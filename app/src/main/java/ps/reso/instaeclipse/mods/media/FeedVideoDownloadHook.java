@@ -1848,6 +1848,11 @@ public class FeedVideoDownloadHook {
         return openOutputStream(ctx, filename, mime, "exports");
     }
 
+    /** Comment exports: <download folder>/comments/<file>. */
+    public static OutputStream openCommentsExport(Context ctx, String filename) throws Exception {
+        return openOutputStream(ctx, filename, "text/html", "comments");
+    }
+
     public static OutputStream openChatExport(Context ctx, String filename) throws Exception {
         return openOutputStream(ctx, filename, "text/html", "chats");
     }

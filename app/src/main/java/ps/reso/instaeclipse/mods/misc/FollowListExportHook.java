@@ -240,6 +240,7 @@ public class FollowListExportHook {
         try {
             StringBuilder csv = new StringBuilder("username,full_name,id\n");
             for (String[] u : users.values()) csv.append(q(u[0])).append(',').append(q(u[1])).append(',').append(q(u[2])).append('\n');
+            csv.append(ps.reso.instaeclipse.utils.core.ExportBrand.csvFooter());
             try (OutputStream out = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.openExport(ctx, file, "text/csv")) {
                 out.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}); // UTF-8 BOM for Excel
                 out.write(csv.toString().getBytes(StandardCharsets.UTF_8));
