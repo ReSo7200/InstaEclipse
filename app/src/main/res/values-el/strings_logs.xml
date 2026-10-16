@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">Όλα</string>
+    <string name="logs_filter_hooked">Επιτυχή ✅</string>
+    <string name="logs_filter_errors">Σφάλματα ❌</string>
+    <string name="logs_filter_warnings">Προειδοποιήσεις ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">Ανανέωση</string>
+    <string name="logs_copy">Αντιγραφή</string>
+    <string name="logs_share">Κοινοποίηση</string>
+    <string name="logs_clear">Εκκαθάριση</string>
+    <string name="logs_share_title">Κοινοποίηση καταγραφών InstaEclipse</string>
+    <string name="logs_share_subject">Καταγραφές InstaEclipse</string>
+    <string name="logs_loading">Φόρτωση καταγραφών…</string>
+    <string name="logs_count_format">%1$d από %2$d εγγραφές</string>
+    <string name="logs_status_live">Το Instagram εκτελείται · ζωντανά</string>
+    <string name="logs_status_saved">Αποθηκευμένη καταγραφή · Το Instagram δεν εκτελείται</string>
+    <string name="logs_status_none">Δεν έχει εγκατασταθεί υποστηριζόμενη εφαρμογή Instagram</string>
+    <string name="logs_empty_title">Δεν υπάρχουν καταγραφές ακόμα</string>
+    <string name="logs_empty_body">Ανοίξτε μία φορά το Instagram με το InstaEclipse ενεργό στο LSPosed, μετά επιστρέψτε εδώ και πατήστε Ανανέωση. Η καταγραφή του Instagram αποθηκεύεται εδώ αυτόματα, ακόμα και αφού κλείσει το Instagram.</string>
+    <string name="logs_empty_filter_title">Τίποτα δεν ταιριάζει με αυτό το φίλτρο</string>
+    <string name="logs_empty_filter_body">Επιστρέψτε στο «Όλα» για να δείτε όλες τις εγγραφές.</string>
+    <string name="logs_nothing_to_copy">Δεν υπάρχουν καταγραφές για αντιγραφή</string>
+    <string name="logs_copied">Οι καταγραφές αντιγράφηκαν</string>
+    <string name="logs_entry_copied">Η εγγραφή αντιγράφηκε</string>
+    <string name="logs_cleared">Οι καταγραφές διαγράφηκαν</string>
+    <string name="logs_source_companion">[εφαρμογή]</string>
+</resources>

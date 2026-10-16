@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">Hamısı</string>
+    <string name="logs_filter_hooked">Uğurlu ✅</string>
+    <string name="logs_filter_errors">Xətalar ❌</string>
+    <string name="logs_filter_warnings">Xəbərdarlıqlar ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">Yenilə</string>
+    <string name="logs_copy">Kopyala</string>
+    <string name="logs_share">Paylaş</string>
+    <string name="logs_clear">Təmizlə</string>
+    <string name="logs_share_title">InstaEclipse loglarını paylaş</string>
+    <string name="logs_share_subject">InstaEclipse logları</string>
+    <string name="logs_loading">Loglar yüklənir…</string>
+    <string name="logs_count_format">%1$d / %2$d qeyd</string>
+    <string name="logs_status_live">Instagram işləyir · canlı</string>
+    <string name="logs_status_saved">Saxlanmış log · Instagram işləmir</string>
+    <string name="logs_status_none">Dəstəklənən Instagram tətbiqi quraşdırılmayıb</string>
+    <string name="logs_empty_title">Hələ log yoxdur</string>
+    <string name="logs_empty_body">InstaEclipse LSPosed-də aktiv olduğu halda Instagram-ı bir dəfə açın, sonra bura qayıdıb Yenilə düyməsinə toxunun. Instagram-ın logu, hətta Instagram bağlandıqdan sonra da, avtomatik olaraq burada saxlanılır.</string>
+    <string name="logs_empty_filter_title">Bu filtrə uyğun heç nə yoxdur</string>
+    <string name="logs_empty_filter_body">Bütün qeydləri görmək üçün Hamısı seçiminə qayıdın.</string>
+    <string name="logs_nothing_to_copy">Kopyalanacaq log yoxdur</string>
+    <string name="logs_copied">Loglar kopyalandı</string>
+    <string name="logs_entry_copied">Qeyd kopyalandı</string>
+    <string name="logs_cleared">Loglar təmizləndi</string>
+    <string name="logs_source_companion">[tətbiq]</string>
+</resources>

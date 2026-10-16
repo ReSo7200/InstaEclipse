@@ -69,6 +69,14 @@
             android:exported="true"
             android:foregroundServiceType="dataSync" />
 
+        <!-- Logs tab: hands Instagram's hooked process an append-only FD on a file in the
+             companion's storage so module logs survive Instagram being backgrounded/killed.
+             Only supported Instagram packages may open it (checked in openFile). -->
+        <provider
+            android:name=".utils.log.LogMirrorProvider"
+            android:authorities="ps.reso.instaeclipse.logmirror"
+            android:exported="true" />
+
         <!-- Xposed Meta-data -->
         <meta-data
             android:name="xposedmodule"

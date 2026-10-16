@@ -194,6 +194,9 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // In-app log viewer: every ModuleLog.line(...) call across the hook codebase
                     // appends to this buffer, which the companion app can read via IPC.
                     Logging.init(context, "instaeclipse_module.log");
+                    // Mirror the buffer into a file owned by the companion app (LogMirrorProvider)
+                    // so its Logs tab works even when Instagram is backgrounded or killed.
+                    Logging.enableMirror(context);
 
                     // Pull downloader path from companion app's cache so it's available even
                     // when Instagram was started without ever receiving the sync broadcast.
@@ -704,19 +707,25 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     IgThemeHook.refreshCurrentActivity();
 
                 } else if (CommonUtils.ACTION_REQUEST_LOGS.equals(action)) {
-                    try {
-                        Intent reply = new Intent(CommonUtils.ACTION_LOGS_REPLY);
-                        reply.setPackage(CommonUtils.MY_PACKAGE_NAME);
-                        reply.putExtra(CommonUtils.EXTRA_LOG_TEXT, Logging.getSnapshotForIpc());
-                        reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
-                        ctx.sendBroadcast(reply);
-                    } catch (Throwable t) {
-                        Intent reply = new Intent(CommonUtils.ACTION_LOGS_REPLY);
-                        reply.setPackage(CommonUtils.MY_PACKAGE_NAME);
-                        reply.putExtra(CommonUtils.EXTRA_LOG_ERROR, String.valueOf(t.getMessage()));
-                        reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
-                        ctx.sendBroadcast(reply);
-                    }
+                    // Re-attach/rewrite the companion-side mirror file first (covers the companion
+                    // having cleared its data), then reply; the companion re-reads the file on
+                    // reply and only uses the inline text as a fallback.
+                    Logging.refreshMirror(ctx, () -> {
+                        try {
+                            Intent reply = new Intent(CommonUtils.ACTION_LOGS_REPLY);
+                            reply.setPackage(CommonUtils.MY_PACKAGE_NAME);
+                            // Mirror active -> companion reads the file; skip the big (binder-limited) extra.
+                            reply.putExtra(CommonUtils.EXTRA_LOG_TEXT, Logging.isMirrorActive() ? "" : Logging.getSnapshotForIpc());
+                            reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
+                            ctx.sendBroadcast(reply);
+                        } catch (Throwable t) {
+                            Intent reply = new Intent(CommonUtils.ACTION_LOGS_REPLY);
+                            reply.setPackage(CommonUtils.MY_PACKAGE_NAME);
+                            reply.putExtra(CommonUtils.EXTRA_LOG_ERROR, String.valueOf(t.getMessage()));
+                            reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
+                            ctx.sendBroadcast(reply);
+                        }
+                    });
 
                 } else if (CommonUtils.ACTION_CLEAR_LOGS.equals(action)) {
                     Logging.clear();

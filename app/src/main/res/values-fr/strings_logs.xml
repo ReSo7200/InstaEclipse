@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">Tous</string>
+    <string name="logs_filter_hooked">Réussis ✅</string>
+    <string name="logs_filter_errors">Erreurs ❌</string>
+    <string name="logs_filter_warnings">Avertissements ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">Actualiser</string>
+    <string name="logs_copy">Copier</string>
+    <string name="logs_share">Partager</string>
+    <string name="logs_clear">Effacer</string>
+    <string name="logs_share_title">Partager les journaux InstaEclipse</string>
+    <string name="logs_share_subject">Journaux InstaEclipse</string>
+    <string name="logs_loading">Chargement des journaux…</string>
+    <string name="logs_count_format">%1$d sur %2$d entrées</string>
+    <string name="logs_status_live">Instagram en cours d\'exécution · en direct</string>
+    <string name="logs_status_saved">Journal enregistré · Instagram n\'est pas lancé</string>
+    <string name="logs_status_none">Aucune application Instagram compatible installée</string>
+    <string name="logs_empty_title">Aucun journal pour l\'instant</string>
+    <string name="logs_empty_body">Ouvrez Instagram une fois avec InstaEclipse activé dans LSPosed, puis revenez ici et appuyez sur Actualiser. Le journal d\'Instagram est enregistré ici automatiquement, même après la fermeture d\'Instagram.</string>
+    <string name="logs_empty_filter_title">Aucun résultat pour ce filtre</string>
+    <string name="logs_empty_filter_body">Revenez à Tous pour voir toutes les entrées.</string>
+    <string name="logs_nothing_to_copy">Aucun journal à copier</string>
+    <string name="logs_copied">Journaux copiés</string>
+    <string name="logs_entry_copied">Entrée copiée</string>
+    <string name="logs_cleared">Journaux effacés</string>
+    <string name="logs_source_companion">[app]</string>
+</resources>

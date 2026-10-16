@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">הכל</string>
+    <string name="logs_filter_hooked">הצליחו ✅</string>
+    <string name="logs_filter_errors">שגיאות ❌</string>
+    <string name="logs_filter_warnings">אזהרות ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">רענן</string>
+    <string name="logs_copy">העתק</string>
+    <string name="logs_share">שתף</string>
+    <string name="logs_clear">נקה</string>
+    <string name="logs_share_title">שתף יומני InstaEclipse</string>
+    <string name="logs_share_subject">יומני InstaEclipse</string>
+    <string name="logs_loading">טוען יומנים…</string>
+    <string name="logs_count_format">%1$d מתוך %2$d רשומות</string>
+    <string name="logs_status_live">Instagram פועל · בזמן אמת</string>
+    <string name="logs_status_saved">יומן שמור · Instagram לא פועל</string>
+    <string name="logs_status_none">לא מותקנת אפליקציית Instagram נתמכת</string>
+    <string name="logs_empty_title">אין עדיין יומנים</string>
+    <string name="logs_empty_body">פתח את Instagram פעם אחת כש-InstaEclipse מופעל ב-LSPosed, ואז חזור לכאן והקש על רענן. היומן של Instagram נשמר כאן אוטומטית, גם אחרי ש-Instagram נסגר.</string>
+    <string name="logs_empty_filter_title">אין תוצאות למסנן הזה</string>
+    <string name="logs_empty_filter_body">חזור אל הכל כדי לראות את כל הרשומות.</string>
+    <string name="logs_nothing_to_copy">אין יומנים להעתקה</string>
+    <string name="logs_copied">היומנים הועתקו</string>
+    <string name="logs_entry_copied">הרשומה הועתקה</string>
+    <string name="logs_cleared">היומנים נוקו</string>
+    <string name="logs_source_companion">[אפליקציה]</string>
+</resources>

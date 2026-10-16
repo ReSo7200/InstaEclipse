@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">الكل</string>
+    <string name="logs_filter_hooked">ناجحة ✅</string>
+    <string name="logs_filter_errors">أخطاء ❌</string>
+    <string name="logs_filter_warnings">تحذيرات ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">تحديث</string>
+    <string name="logs_copy">نسخ</string>
+    <string name="logs_share">مشاركة</string>
+    <string name="logs_clear">مسح</string>
+    <string name="logs_share_title">مشاركة سجلات InstaEclipse</string>
+    <string name="logs_share_subject">سجلات InstaEclipse</string>
+    <string name="logs_loading">جارٍ تحميل السجلات…</string>
+    <string name="logs_count_format">%1$d من أصل %2$d إدخال</string>
+    <string name="logs_status_live">Instagram يعمل · مباشر</string>
+    <string name="logs_status_saved">سجل محفوظ · Instagram لا يعمل</string>
+    <string name="logs_status_none">لا يوجد تطبيق Instagram مدعوم مثبّت</string>
+    <string name="logs_empty_title">لا توجد سجلات بعد</string>
+    <string name="logs_empty_body">افتح Instagram مرة واحدة مع تفعيل InstaEclipse في LSPosed، ثم عُد إلى هنا واضغط على «تحديث». يُحفظ سجل Instagram هنا تلقائيًا، حتى بعد إغلاق Instagram.</string>
+    <string name="logs_empty_filter_title">لا شيء يطابق هذا الفلتر</string>
+    <string name="logs_empty_filter_body">عُد إلى «الكل» لعرض جميع الإدخالات.</string>
+    <string name="logs_nothing_to_copy">لا توجد سجلات لنسخها</string>
+    <string name="logs_copied">تم نسخ السجلات</string>
+    <string name="logs_entry_copied">تم نسخ الإدخال</string>
+    <string name="logs_cleared">تم مسح السجلات</string>
+    <string name="logs_source_companion">[التطبيق]</string>
+</resources>
