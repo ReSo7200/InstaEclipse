@@ -16,7 +16,7 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  * back to its locally-cached stories/reels (media streams from the CDN, which distraction-free does
  * not block), so they stay visible. To make them actually disappear we collapse the real Views by
  * their stable public resource names (verified from the live view tree, never obfuscated X.* ids):
- *   - story tray  -> com.instagram.android:id/reels_tray_container   (gated on disableStories)
+ *   - story tray  -> com.instagram.android:id/reels_tray_container   (disableStories or hideStoriesTray)
  *   - Reels tab   -> com.instagram.android:id/clips_tab              (gated on disableReels)
  *
  * Armed from {@link UIHookManager#setupHooks} on every resume; a one-time global-layout listener per
@@ -72,7 +72,7 @@ public class DistractionFreeUIHook {
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
 
     private static boolean anyFlag() {
-        return FeatureFlags.disableStories || FeatureFlags.disableReels || anyNavTabHidden() || FeatureFlags.hidePlusUpsells
+        return FeatureFlags.disableStories || FeatureFlags.hideStoriesTray || FeatureFlags.disableReels || anyNavTabHidden() || FeatureFlags.hidePlusUpsells
                 || !FeatureFlags.navTabOrder.isEmpty();
     }
 
@@ -117,7 +117,7 @@ public class DistractionFreeUIHook {
         try {
             View root = a.getWindow() != null ? a.getWindow().getDecorView() : null;
             if (!(root instanceof ViewGroup)) return;
-            if (FeatureFlags.disableStories && trayId != 0) collapseAllById((ViewGroup) root, trayId);
+            if ((FeatureFlags.disableStories || FeatureFlags.hideStoriesTray) && trayId != 0) collapseAllById((ViewGroup) root, trayId);
             if (FeatureFlags.disableReels && clipsTabId != 0) collapseAllById((ViewGroup) root, clipsTabId);
             if (FeatureFlags.disableReels && tabPagerId != 0) disableTabSwipe((ViewGroup) root);
             for (int i = 0; i < NAV_TAB_NAMES.length; i++)

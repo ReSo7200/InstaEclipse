@@ -11,4 +11,5 @@
     <string name="ig_dialog_extras_high_res_images">Загружать изображения в максимальном разрешении</string>
     <string name="ig_dialog_extras_hide_onboarding">Скрыть запросы контактов и геолокации</string>
     <string name="ig_dialog_extras_fix_notifications">Исправить старую регистрацию уведомлений на Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Скрыть только ленту историй</string>
 </resources>

@@ -11,4 +11,5 @@
     <string name="ig_dialog_extras_high_res_images">Cargar imágenes en la máxima resolución</string>
     <string name="ig_dialog_extras_hide_onboarding">Ocultar avisos de contactos y ubicación</string>
     <string name="ig_dialog_extras_fix_notifications">Corregir el registro antiguo de notificaciones en Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Ocultar solo la barra de historias</string>
 </resources>

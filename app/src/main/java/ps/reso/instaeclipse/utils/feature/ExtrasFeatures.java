@@ -33,6 +33,7 @@ public final class ExtrasFeatures {
             new Entry("highResolutionImages", R.string.ig_dialog_extras_high_res_images, R.drawable.ic_search),
             new Entry("hideOnboardingPrompts", R.string.ig_dialog_extras_hide_onboarding, R.drawable.ic_block),
             new Entry("fixNotificationRegistration", R.string.ig_dialog_extras_fix_notifications, R.drawable.ic_notification),
+            new Entry("hideStoriesTray", R.string.ig_dialog_extras_hide_stories_tray, R.drawable.ic_story_ring),
     };
 
     private ExtrasFeatures() {}

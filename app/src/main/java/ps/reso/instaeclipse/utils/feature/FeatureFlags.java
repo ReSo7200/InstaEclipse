@@ -57,6 +57,7 @@ public class FeatureFlags {
     public static boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
     public static boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)
     // Extras (see ExtrasFeatures)
+    public static boolean hideStoriesTray = false; // hide the story tray only; stories still open from profiles
     public static boolean fixNotificationRegistration = false; // add FLAG_IMMUTABLE to IG's legacy push registration intent
     public static boolean hideOnboardingPrompts = false; // skip contact/location onboarding pages
     public static boolean highResolutionImages = false; // pick the largest image candidate
