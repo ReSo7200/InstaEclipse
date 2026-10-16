@@ -257,7 +257,6 @@
     <string name="ig_dialog_ghost_allow_screenshots_dms">Cho phép chụp ảnh màn hình trong DM</string>
     <string name="ig_dialog_ghost_bypass_screenshot">Bỏ qua phát hiện chụp ảnh màn hình</string>
     <string name="ig_dialog_ghost_hide_view_once">Ẩn trạng thái mở media Xem 1 lần</string>
-    <string name="ig_dialog_ghost_unlimited_replays">Xem lại phương tiện Xem 1 lần không giới hạn</string>
     <string name="ig_dialog_ghost_permanent_view_once">Lưu vĩnh viễn media Xem 1 lần (thử nghiệm)</string>
     <string name="ig_dialog_ghost_keep_disappearing">Giữ lại tin nhắn tự biến mất</string>
     <string name="ig_dialog_customize_quick_toggle">Tùy chỉnh menu Bật/Tắt nhanh</string>
@@ -270,7 +269,6 @@
     <string name="ig_dialog_quick_hide_story_seen">Bao gồm Ẩn đã xem Story</string>
     <string name="ig_dialog_quick_hide_live_seen">Bao gồm Ẩn sự hiện diện xem Live</string>
     <string name="ig_dialog_quick_keep_ephemeral">Bao gồm Giữ tin nhắn tự biến mất</string>
-    <string name="ig_dialog_quick_unlimited_replays">Bao gồm Xem lại phương tiện Xem 1 lần không giới hạn</string>
     <string name="ig_dialog_quick_permanent_view">Bao gồm Giữ vĩnh viễn phương tiện Xem 1 lần</string>
     <string name="ig_dialog_quick_allow_screenshots">Bao gồm Cho phép chụp màn hình DM</string>
 
