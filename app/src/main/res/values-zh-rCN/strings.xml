@@ -224,6 +224,8 @@
     <string name="ig_dialog_ad_disable_tracking">禁用追踪链接</string>
     <string name="ig_dialog_open_links_externally">在外部浏览器中打开链接</string>
     <string name="theme_light_mode">浅色模式</string>
+    <string name="theme_set_light">浅色模式主题</string>
+    <string name="theme_set_dark">深色模式主题</string>
     <string name="theme_light_same">与深色模式相同的主题</string>
     <string name="theme_light_stock">原版 Instagram（仅在深色模式下应用主题）</string>
 

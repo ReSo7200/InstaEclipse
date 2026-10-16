@@ -223,6 +223,8 @@
     <string name="ig_dialog_ad_disable_tracking">השבת קישורי מעקב</string>
     <string name="ig_dialog_open_links_externally">פתח קישורים בדפדפן חיצוני</string>
     <string name="theme_light_mode">מצב בהיר</string>
+    <string name="theme_set_light">ערכות נושא למצב בהיר</string>
+    <string name="theme_set_dark">ערכות נושא למצב כהה</string>
     <string name="theme_light_same">אותה ערכת נושא כמו במצב כהה</string>
     <string name="theme_light_stock">Instagram המקורי (ערכת נושא רק במצב כהה)</string>
 

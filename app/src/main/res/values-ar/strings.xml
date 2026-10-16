@@ -189,6 +189,8 @@
     <string name="ig_dialog_ad_disable_tracking">تعطيل روابط التتبع</string>
     <string name="ig_dialog_open_links_externally">فتح الروابط في متصفح خارجي</string>
     <string name="theme_light_mode">الوضع الفاتح</string>
+    <string name="theme_set_light">سمات الوضع الفاتح</string>
+    <string name="theme_set_dark">سمات الوضع الداكن</string>
     <string name="theme_light_same">نفس سمة الوضع الداكن</string>
     <string name="theme_light_stock">Instagram الأصلي (السمة في الوضع الداكن فقط)</string>
     <string name="ig_dialog_distraction_extreme_mode">الوضع المتطرف (لا رجعة حتى إعادة التثبيت)</string>

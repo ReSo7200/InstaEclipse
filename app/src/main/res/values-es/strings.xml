@@ -193,6 +193,8 @@
     <string name="ig_dialog_ad_disable_tracking">Desactivar enlaces de rastreo</string>
     <string name="ig_dialog_open_links_externally">Abrir enlaces en navegador externo</string>
     <string name="theme_light_mode">Modo claro</string>
+    <string name="theme_set_light">Temas del modo claro</string>
+    <string name="theme_set_dark">Temas del modo oscuro</string>
     <string name="theme_light_same">Mismo tema que en modo oscuro</string>
     <string name="theme_light_stock">Instagram original (tema solo en modo oscuro)</string>
     <string name="ig_dialog_distraction_extreme_mode">Modo extremo (Irreversible hasta reinstalar)</string>

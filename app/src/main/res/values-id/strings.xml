@@ -223,6 +223,8 @@
     <string name="ig_dialog_ad_disable_tracking">Nonaktifkan Tautan Pelacakan</string>
     <string name="ig_dialog_open_links_externally">Buka Tautan di Browser Eksternal</string>
     <string name="theme_light_mode">Mode terang</string>
+    <string name="theme_set_light">Tema mode terang</string>
+    <string name="theme_set_dark">Tema mode gelap</string>
     <string name="theme_light_same">Tema sama seperti mode gelap</string>
     <string name="theme_light_stock">Instagram bawaan (tema hanya di mode gelap)</string>
 

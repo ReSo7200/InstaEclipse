@@ -190,6 +190,8 @@
     <string name="ig_dialog_ad_disable_tracking">停用追蹤連結</string>
     <string name="ig_dialog_open_links_externally">在外部瀏覽器中開啟連結</string>
     <string name="theme_light_mode">淺色模式</string>
+    <string name="theme_set_light">淺色模式主題</string>
+    <string name="theme_set_dark">深色模式主題</string>
     <string name="theme_light_same">與深色模式相同的主題</string>
     <string name="theme_light_stock">原版 Instagram（僅在深色模式下套用主題）</string>
     <string name="ig_dialog_distraction_extreme_mode">極端模式 （重新安裝前不可逆）</string>

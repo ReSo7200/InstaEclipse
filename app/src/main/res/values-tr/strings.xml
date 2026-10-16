@@ -191,6 +191,8 @@
     <string name="ig_dialog_ad_disable_tracking">Takip Bağlantılarını Devre Dışı Bırak</string>
     <string name="ig_dialog_open_links_externally">Bağlantıları Harici Tarayıcıda Aç</string>
     <string name="theme_light_mode">Açık mod</string>
+    <string name="theme_set_light">Açık mod temaları</string>
+    <string name="theme_set_dark">Koyu mod temaları</string>
     <string name="theme_light_same">Karanlık modla aynı tema</string>
     <string name="theme_light_stock">Standart Instagram (tema yalnızca karanlık modda)</string>
     <string name="ig_dialog_distraction_extreme_mode">Aşırı Mod (Yeniden yükleyene kadar geri alınamaz)</string>

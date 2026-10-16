@@ -304,6 +304,8 @@
     <string name="ig_dialog_ad_disable_tracking">Wyłącz linki śledzące</string>
     <string name="ig_dialog_open_links_externally">Otwieraj linki w zewnętrznej przeglądarce</string>
     <string name="theme_light_mode">Tryb jasny</string>
+    <string name="theme_set_light">Motywy trybu jasnego</string>
+    <string name="theme_set_dark">Motywy trybu ciemnego</string>
     <string name="theme_light_same">Ten sam motyw co w trybie ciemnym</string>
     <string name="theme_light_stock">Oryginalny Instagram (motyw tylko w trybie ciemnym)</string>
 
