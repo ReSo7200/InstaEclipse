@@ -246,7 +246,7 @@ public class FeaturesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_features, container, false);
-        localCache = requireContext().getSharedPreferences("instaeclipse_cache", Context.MODE_PRIVATE);
+        localCache = ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(requireContext());
 
         // Request POST_NOTIFICATIONS permission (required API 33+ for download progress notifications)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

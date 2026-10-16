@@ -203,7 +203,7 @@ public class LocationPickerActivity extends AppCompatActivity {
         ChipGroup group = findViewById(R.id.recent_chips);
         HorizontalScrollView scroll = findViewById(R.id.recent_scroll);
         List<LocationPresets.Preset> recent = LocationPresets.parse(
-                getSharedPreferences("instaeclipse_cache", MODE_PRIVATE).getString("spoofRecent", ""));
+                ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this).getString("spoofRecent", ""));
         group.removeAllViews();
         for (LocationPresets.Preset p : recent) {
             Chip chip = new Chip(this, null, com.google.android.material.R.attr.chipStyle);

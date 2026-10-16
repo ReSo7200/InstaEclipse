@@ -118,7 +118,7 @@ public final class LocationPresets {
      * pushes them to Instagram's process, where the spoof picks them up without a restart.
      */
     public static void applyFromCompanion(Context context, Preset picked) {
-        android.content.SharedPreferences cache = context.getSharedPreferences("instaeclipse_cache", Context.MODE_PRIVATE);
+        android.content.SharedPreferences cache = CommonUtils.companionCache(context);
         String recent = serialize(remember(parse(cache.getString("spoofRecent", "")), picked));
         String[][] values = {
                 {"spoofLat", String.valueOf(picked.lat)},
@@ -127,7 +127,8 @@ public final class LocationPresets {
                 {"spoofRecent", recent},
         };
         for (String store : new String[]{"instaeclipse_prefs", "instaeclipse_cache"}) {
-            android.content.SharedPreferences.Editor e = context.getSharedPreferences(store, Context.MODE_PRIVATE).edit();
+            android.content.SharedPreferences.Editor e = ("instaeclipse_cache".equals(store)
+                    ? CommonUtils.companionCache(context) : context.getSharedPreferences(store, Context.MODE_PRIVATE)).edit();
             for (String[] kv : values) e.putString(kv[0], kv[1]);
             e.apply();
         }

@@ -140,7 +140,7 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
     }
 
     private SharedPreferences cache() {
-        return getSharedPreferences(CACHE_NAME, Context.MODE_PRIVATE);
+        return ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this);
     }
 
     private void reloadPaletteState() {

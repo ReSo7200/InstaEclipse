@@ -195,7 +195,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        localCache = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        localCache = ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(requireContext());
 
         launchInstagramButton = view.findViewById(R.id.launch_instagram_button);
         restartInstagramButton = view.findViewById(R.id.restart_instagram_button);

@@ -132,7 +132,7 @@ public class DownloadSaveService extends Service {
             mimeType = null;
         }
 
-        SharedPreferences cache = getSharedPreferences(CACHE_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences cache = ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this);
         String saveUri          = cache.getString("downloaderCustomUri", "");
         boolean usernameFolder  = cache.getBoolean("downloaderUsernameFolder", false);
 
@@ -374,7 +374,7 @@ public class DownloadSaveService extends Service {
         final String[] mimes = intent.getStringArrayExtra("mediaMimes");
         final int messageCount = intent.getIntExtra("messageCount", 0);
 
-        SharedPreferences cache = getSharedPreferences(CACHE_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences cache = ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this);
         String saveUri = cache.getString("downloaderCustomUri", "");
         if (saveUri.isEmpty()) saveUri = intent.getStringExtra("saveUri");
         final String fSave = saveUri;

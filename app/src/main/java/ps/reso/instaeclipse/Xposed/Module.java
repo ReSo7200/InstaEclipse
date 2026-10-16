@@ -197,7 +197,24 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Setup context, preferences
                     Context context = (Context) param.args[0];
                     SettingsManager.init(context);
+                    // Settings changed in the companion while Instagram wasn't running.
+                    ps.reso.instaeclipse.utils.core.CompanionSync.pull(context);
                     SettingsManager.loadAllFlags(context);
+                    // ...and while it sat frozen in the background: check again on every resume.
+                    if (param.thisObject instanceof android.app.Application) {
+                        ((android.app.Application) param.thisObject).registerActivityLifecycleCallbacks(
+                                new android.app.Application.ActivityLifecycleCallbacks() {
+                                    @Override public void onActivityResumed(android.app.Activity a) {
+                                        ps.reso.instaeclipse.utils.core.CompanionSync.pullAsync(a);
+                                    }
+                                    @Override public void onActivityCreated(android.app.Activity a, Bundle b) {}
+                                    @Override public void onActivityStarted(android.app.Activity a) {}
+                                    @Override public void onActivityPaused(android.app.Activity a) {}
+                                    @Override public void onActivityStopped(android.app.Activity a) {}
+                                    @Override public void onActivitySaveInstanceState(android.app.Activity a, Bundle b) {}
+                                    @Override public void onActivityDestroyed(android.app.Activity a) {}
+                                });
+                    }
 
                     // In-app log viewer: every ModuleLog.line(...) call across the hook codebase
                     // appends to this buffer, which the companion app can read via IPC.
@@ -769,6 +786,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 String action = intent.getAction();
                 if ("ps.reso.instaeclipse.ACTION_UPDATE_PREF".equals(action)) {
                     String key = intent.getStringExtra("key");
+                    ps.reso.instaeclipse.utils.core.CompanionSync.markApplied(ctx, key, intent.getLongExtra("ts", 0));
                     boolean value = intent.getBooleanExtra("value", false);
 
                     ModuleLog.line("(InstaEclipse) Sync: Updating " + key + " to " + value);
@@ -777,12 +795,14 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     prefs.edit().putBoolean(key, value).apply();
 
                     SettingsManager.loadAllFlags(ctx);
+                    if ("airplaneMode".equals(key)) ps.reso.instaeclipse.mods.extras.AirplaneModeHook.apply();
                     FeatureManager.refreshFeatureStatus();
                     IgThemeEngine.invalidate();
                     IgThemeHook.refreshCurrentActivity();
 
                 } else if ("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING".equals(action)) {
                     String key = intent.getStringExtra("key");
+                    ps.reso.instaeclipse.utils.core.CompanionSync.markApplied(ctx, key, intent.getLongExtra("ts", 0));
                     String value = intent.getStringExtra("value");
 
                     ModuleLog.line("(InstaEclipse) Sync: Updating string pref " + key);
@@ -796,6 +816,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
                 } else if ("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT".equals(action)) {
                     String key = intent.getStringExtra("key");
+                    ps.reso.instaeclipse.utils.core.CompanionSync.markApplied(ctx, key, intent.getLongExtra("ts", 0));
                     int value = intent.getIntExtra("value", 0);
 
                     ModuleLog.line("(InstaEclipse) Sync: Updating int pref " + key + " to " + value);

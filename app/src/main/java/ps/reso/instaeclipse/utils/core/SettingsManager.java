@@ -18,6 +18,8 @@ public class SettingsManager {
     }
 
     public static void saveAllFlags() {
+        // Snapshot to stamp the keys this save changes (see CompanionSync).
+        java.util.Map<String, ?> before = new java.util.HashMap<>(prefs.getAll());
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putBoolean("isDevEnabled", FeatureFlags.isDevEnabled);
@@ -160,8 +162,23 @@ public class SettingsManager {
         for (String flag : ExtrasFeatures.flags()) editor.putBoolean(flag, ExtrasFeatures.get(flag));
 
         editor.apply();
+        stampChangedKeys(before);
 
         FeatureManager.refreshFeatureStatus();
+    }
+
+    /** Marks keys whose value this save changed, so an older companion value never overrides them. */
+    private static void stampChangedKeys(java.util.Map<String, ?> before) {
+        long now = System.currentTimeMillis();
+        SharedPreferences.Editor e = null;
+        for (java.util.Map.Entry<String, ?> entry : prefs.getAll().entrySet()) {
+            String k = entry.getKey();
+            if (k.startsWith("__")) continue;
+            if (java.util.Objects.equals(before.get(k), entry.getValue())) continue;
+            if (e == null) e = prefs.edit();
+            e.putLong("__igts_" + k, now);
+        }
+        if (e != null) e.apply();
     }
 
     public static void loadAllFlags(Context context) {

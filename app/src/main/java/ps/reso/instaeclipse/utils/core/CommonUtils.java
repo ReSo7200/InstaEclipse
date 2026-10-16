@@ -56,8 +56,48 @@ public class CommonUtils {
         return Character.toUpperCase(best.charAt(0)) + best.substring(1).toLowerCase();
     }
 
+    /**
+     * Companion side of CompanionSync: a setting sent to Instagram is also written, with a
+     * timestamp ("__ts_<key>"), to the companion's instaeclipse_cache prefs that Instagram reads
+     * through XSharedPreferences. Instagram applies it on its next start or activity resume when
+     * the live broadcast didn't reach it (not running, or frozen in the background).
+     */
+    /**
+     * The companion's instaeclipse_cache prefs, opened MODE_WORLD_READABLE so Instagram can read
+     * it through XSharedPreferences. LSPosed (xposedsharedprefs) allows that mode and keeps the
+     * file under /data/misc/<id>/prefs; MODE_PRIVATE made it 0660 there, unreadable from
+     * Instagram. Without LSPosed the platform rejects the mode, so fall back to MODE_PRIVATE.
+     * Every companion-side open must go through here: a process keeps the first mode it used.
+     */
+    @SuppressWarnings("deprecation")
+    public static android.content.SharedPreferences companionCache(Context context) {
+        try {
+            return context.getSharedPreferences("instaeclipse_cache", Context.MODE_WORLD_READABLE);
+        } catch (SecurityException e) {
+            return context.getSharedPreferences("instaeclipse_cache", Context.MODE_PRIVATE);
+        }
+    }
+
+    private static void stampSetting(Context context, Intent intent) {
+        String action = intent.getAction();
+        String key = intent.getStringExtra("key");
+        if (action == null || key == null || !action.startsWith("ps.reso.instaeclipse.ACTION_UPDATE_PREF")) return;
+        try {
+            long now = System.currentTimeMillis();
+            android.content.SharedPreferences.Editor e =
+                    companionCache(context).edit();
+            Object v = intent.getExtras() != null ? intent.getExtras().get("value") : null;
+            if (v instanceof Boolean) e.putBoolean(key, (Boolean) v);
+            else if (v instanceof Integer) e.putInt(key, (Integer) v);
+            else if (v instanceof String) e.putString(key, (String) v);
+            e.putLong("__ts_" + key, now).commit();
+            intent.putExtra("ts", now);
+        } catch (Throwable ignored) {}
+    }
+
     /** Sends a broadcast to every supported Instagram variant currently installed. */
     public static void broadcastToInstagram(Context context, Intent intent) {
+        stampSetting(context, intent);
         PackageManager pm = context.getPackageManager();
         for (String pkg : SUPPORTED_PACKAGES) {
             try {
