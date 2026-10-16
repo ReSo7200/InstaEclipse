@@ -1,0 +1,29 @@
+--- app/src/main/java/ps/reso/instaeclipse/utils/backup/SettingsBackupManager.java
++++ app/src/main/java/ps/reso/instaeclipse/utils/backup/SettingsBackupManager.java
+@@ -30,6 +30,12 @@
+         s.put("permanentViewMode",       FeatureFlags.permanentViewMode);
+         s.put("keepUnsentMessages",      FeatureFlags.keepUnsentMessages);
+
++        // Direct
++        s.put("hideChatsMode",                 FeatureFlags.hideChatsMode);
++        s.put("hideChatsBackLongPressSeconds", FeatureFlags.hideChatsBackLongPressSeconds);
++        s.put("emptyGeneralFolder",            FeatureFlags.emptyGeneralFolder);
++        s.put("hideDirectFoldersBar",          FeatureFlags.hideDirectFoldersBar);
++
+         // Quick Toggles
+         s.put("quickToggleSeen",         FeatureFlags.quickToggleSeen);
+         s.put("quickToggleTyping",       FeatureFlags.quickToggleTyping);
+@@ -114,6 +120,13 @@
+         if (s.has("permanentViewMode"))        FeatureFlags.permanentViewMode        = s.getBoolean("permanentViewMode");
+         if (s.has("keepUnsentMessages"))       FeatureFlags.keepUnsentMessages       = s.getBoolean("keepUnsentMessages");
+
++        boolean legacyHideChats = s.has("hideSpecificChats") ? s.getBoolean("hideSpecificChats") : false;
++        if (s.has("hideChatsMode"))          FeatureFlags.hideChatsMode          = s.getInt("hideChatsMode");
++        else                                 FeatureFlags.hideChatsMode          = legacyHideChats ? 1 : 0;
++        FeatureFlags.hideSpecificChats = (FeatureFlags.hideChatsMode != 0);
++        if (s.has("hideChatsBackLongPressSeconds")) FeatureFlags.hideChatsBackLongPressSeconds = s.getInt("hideChatsBackLongPressSeconds");
++        if (s.has("emptyGeneralFolder"))     FeatureFlags.emptyGeneralFolder     = s.getBoolean("emptyGeneralFolder");
++        if (s.has("hideDirectFoldersBar"))   FeatureFlags.hideDirectFoldersBar   = s.getBoolean("hideDirectFoldersBar");
++
+         if (s.has("quickToggleSeen"))        FeatureFlags.quickToggleSeen        = s.getBoolean("quickToggleSeen");
+         if (s.has("quickToggleTyping"))      FeatureFlags.quickToggleTyping      = s.getBoolean("quickToggleTyping");

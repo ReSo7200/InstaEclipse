@@ -41,8 +41,15 @@ public class SettingsManager {
         editor.putString("lockDirectSalt", FeatureFlags.lockDirectSalt);
         editor.putBoolean("lockDirectAlways", FeatureFlags.lockDirectAlways);
         editor.putBoolean("lockWholeApp", FeatureFlags.lockWholeApp);
-        editor.putBoolean("hideSpecificChats", FeatureFlags.hideSpecificChats);
         editor.putBoolean("lockUseFingerprint", FeatureFlags.lockUseFingerprint);
+
+        editor.putInt("hideChatsMode", FeatureFlags.hideChatsMode);
+        editor.putInt("hideChatsBackLongPressSeconds", FeatureFlags.hideChatsBackLongPressSeconds);
+        editor.putBoolean("emptyGeneralFolder", FeatureFlags.emptyGeneralFolder);
+        editor.putBoolean("hideDirectFoldersBar", FeatureFlags.hideDirectFoldersBar);
+        // keep hideSpecificChats synced for backward compatibility
+        FeatureFlags.hideSpecificChats = (FeatureFlags.hideChatsMode != 0);
+        editor.putBoolean("hideSpecificChats", FeatureFlags.hideSpecificChats);
 
         // Quick Toggles
         editor.putBoolean("quickToggleSeen", FeatureFlags.quickToggleSeen);
@@ -147,8 +154,16 @@ public class SettingsManager {
         FeatureFlags.lockDirectSalt = prefs.getString("lockDirectSalt", "");
         FeatureFlags.lockDirectAlways = prefs.getBoolean("lockDirectAlways", false);
         FeatureFlags.lockWholeApp = prefs.getBoolean("lockWholeApp", false);
-        FeatureFlags.hideSpecificChats = prefs.getBoolean("hideSpecificChats", false);
         FeatureFlags.lockUseFingerprint = prefs.getBoolean("lockUseFingerprint", true);
+
+        // Handle migration: if hideSpecificChats is true but hideChatsMode is 0, upgrade to EYE mode
+        boolean legacyHideChats = prefs.getBoolean("hideSpecificChats", false);
+        FeatureFlags.hideChatsMode = prefs.getInt("hideChatsMode", legacyHideChats ? 1 : 0);
+        FeatureFlags.hideChatsBackLongPressSeconds = prefs.getInt("hideChatsBackLongPressSeconds", 2);
+        FeatureFlags.emptyGeneralFolder = prefs.getBoolean("emptyGeneralFolder", false);
+        FeatureFlags.hideDirectFoldersBar = prefs.getBoolean("hideDirectFoldersBar", false);
+        // keep hideSpecificChats synced
+        FeatureFlags.hideSpecificChats = (FeatureFlags.hideChatsMode != 0);
 
         // Quick Toggles
         FeatureFlags.quickToggleSeen = prefs.getBoolean("quickToggleSeen", false);

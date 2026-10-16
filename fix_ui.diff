@@ -1,0 +1,69 @@
+--- app/src/main/java/ps/reso/instaeclipse/fragments/FeaturesFragment.java
++++ app/src/main/java/ps/reso/instaeclipse/fragments/FeaturesFragment.java
+@@ -37,6 +37,7 @@
+
+     private SharedPreferences localCache;
+     private Map<String, Boolean> stagedChanges = new HashMap<>();
++    private Map<String, Integer> stagedIntChanges = new HashMap<>();
+     private FloatingActionButton fabSave;
+
+     private String currentMenu = "main"; // Tracks current sub-menu (e.g. "main", "ghost", "lock")
+@@ -1288,14 +1289,27 @@
+     private void stageChange(String prefKey, boolean isChecked) {
+         if (localCache.getBoolean(prefKey, false) == isChecked) {
+             stagedChanges.remove(prefKey);
+         } else {
+             stagedChanges.put(prefKey, isChecked);
+         }
+
+-        if (stagedChanges.isEmpty()) {
++        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) {
++            fabSave.hide();
++        } else {
++            fabSave.show();
++        }
++    }
++
++    private void stageChangeInt(String prefKey, int value) {
++        if (localCache.getInt(prefKey, 0) == value) {
++            stagedIntChanges.remove(prefKey);
++        } else {
++            stagedIntChanges.put(prefKey, value);
++        }
++
++        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) {
+             fabSave.hide();
+         } else {
+             fabSave.show();
+         }
+     }
+@@ -1300,7 +1314,7 @@
+     }
+
+     private void commitStagedChanges() {
+-        if (stagedChanges.isEmpty()) return;
++        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) return;
+
+         SharedPreferences.Editor editor = localCache.edit();
+         for (Map.Entry<String, Boolean> entry : stagedChanges.entrySet()) {
+@@ -1313,9 +1327,19 @@
+             intent.putExtra("value", value);
+             requireContext().sendBroadcast(intent);
+         }
++        for (Map.Entry<String, Integer> entry : stagedIntChanges.entrySet()) {
++            String key = entry.getKey();
++            int value = entry.getValue();
++
++            editor.putInt(key, value);
++
++            Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
++            intent.putExtra("key", key);
++            intent.putExtra("value", value);
++            requireContext().sendBroadcast(intent);
++        }
+         editor.apply();
+         stagedChanges.clear();
++        stagedIntChanges.clear();
+         fabSave.hide();
+         Toast.makeText(requireContext(), getString(R.string.ig_toast_settings_applied), Toast.LENGTH_SHORT).show();
+     }

@@ -74,6 +74,7 @@
     <string name="feat_group_privacy">Privacy</string>
     <string name="feat_group_media">Media</string>
     <string name="feat_group_tools">Tools</string>
+    <string name="feat_group_direct">Direct</string>
     <string name="feat_features">Features:</string>
     <string name="feat_config">Config:</string>
     <string name="feat_options">Options:</string>
@@ -313,6 +314,15 @@
     <string name="ig_dialog_misc_lock_whole_app">Lock whole app</string>
     <string name="ig_dialog_misc_lock_section">Lock</string>
     <string name="ig_dialog_misc_lock_fingerprint">Use fingerprint to unlock</string>
+
+    <string name="ig_direct_hide_chats_mode">Hide Specific Chats Mode</string>
+    <string name="ig_direct_hide_chats_mode_off">Off</string>
+    <string name="ig_direct_hide_chats_mode_eye">Eye button</string>
+    <string name="ig_direct_hide_chats_mode_back">Back button long-press</string>
+    <string name="ig_direct_back_long_press_duration">Back Long-Press Duration</string>
+    <string name="ig_direct_empty_general_folder">Show \'General\' Folder as Empty</string>
+    <string name="ig_direct_hide_folders_bar">Hide Folders Bar</string>
+
     <string name="ig_hide_chats_title">Hide Specific Chats</string>
     <string name="ig_dialog_misc_hide_chats">Hide Specific Chats</string>
     <string name="ig_hide_chats_manage">Manage hidden chats</string>

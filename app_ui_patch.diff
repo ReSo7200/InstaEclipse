@@ -1,0 +1,49 @@
+--- app/src/main/java/ps/reso/instaeclipse/fragments/FeaturesFragment.java
++++ app/src/main/java/ps/reso/instaeclipse/fragments/FeaturesFragment.java
+@@ -48,6 +48,7 @@
+     private static final String A_PRIVACY    = "#5E5CE6";
+     private static final String A_MEDIA      = "#FF9F0A";
+     private static final String A_TOOLS      = "#8E8E93";
++    private static final String A_DIRECT     = "#0A84FF";
+
+     private LinearLayout contentContainer;
+     private TextView menuTitle;
+@@ -699,11 +700,15 @@
+         ));
+
++        defs.add(getString(R.string.feat_group_direct));
++        defs.add(Arrays.asList(
++                createNav(R.drawable.ic_eye_off, A_DIRECT, getString(R.string.ig_hide_chats_title), this::loadHideChatsMenu)
++        ));
++
+         defs.add(getString(R.string.feat_group_privacy));
+         defs.add(Arrays.asList(
+                 createNav(R.drawable.ic_eye, A_PRIVACY, getString(R.string.ig_dialog_menu_ghost_settings), this::loadGhostMenu),
+                 createNav(R.drawable.ic_shield, A_PRIVACY, getString(R.string.ig_dialog_misc_lock_section), this::loadLockMenu),
+-                createNav(R.drawable.ic_eye_off, A_PRIVACY, getString(R.string.ig_hide_chats_title), this::loadHideChatsMenu),
+                 createNav(R.drawable.ic_block, A_PRIVACY, getString(R.string.ig_dialog_menu_ad_analytics), this::loadAdsMenu),
+                 createNav(R.drawable.ic_notification, A_PRIVACY, getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu)
+         ));
+@@ -936,10 +941,20 @@
+     private void loadHideChatsMenu() {
+         List<Object> defs = new ArrayList<>();
+
+-        defs.add(getString(R.string.feat_features));
++        final String[] hideModeLabels = {
++                getString(R.string.ig_direct_hide_chats_mode_off),
++                getString(R.string.ig_direct_hide_chats_mode_eye),
++                getString(R.string.ig_direct_hide_chats_mode_back)
++        };
++
+         defs.add(Arrays.asList(
+-                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats")
++                createChoice(R.drawable.ic_eye_off, A_DIRECT, getString(R.string.ig_direct_hide_chats_mode), hideModeLabels, "hideChatsMode", 0, v -> {}),
++                createChoice(R.drawable.ic_timer, A_DIRECT, getString(R.string.ig_direct_back_long_press_duration), new String[]{"1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "10s"}, "hideChatsBackLongPressSeconds", 1, v -> {})
+         ));
++
++        defs.add(Arrays.asList(
++                createSwitch(R.drawable.ic_folder, A_DIRECT, getString(R.string.ig_direct_empty_general_folder), "emptyGeneralFolder"),
++                createSwitch(R.drawable.ic_eye_off, A_DIRECT, getString(R.string.ig_direct_hide_folders_bar), "hideDirectFoldersBar")
++        ));
+
+         // Note: hiding/unhiding a specific chat is done from inside Instagram.

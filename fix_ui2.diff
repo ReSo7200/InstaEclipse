@@ -1,0 +1,62 @@
+--- app/src/main/java/ps/reso/instaeclipse/fragments/FeaturesFragment.java
++++ app/src/main/java/ps/reso/instaeclipse/fragments/FeaturesFragment.java
+@@ -76,6 +76,7 @@
+
+     // STAGING SYSTEM: Holds changes before applying
+     private final Map<String, Boolean> stagedChanges = new HashMap<>();
++    private final Map<String, Integer> stagedIntChanges = new HashMap<>();
+
+     private final BroadcastReceiver prefsReceiver = new BroadcastReceiver() {
+         @Override
+@@ -1292,14 +1293,25 @@
+             stagedChanges.put(prefKey, isChecked);
+         }
+
+-        if (stagedChanges.isEmpty()) {
++        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) {
++            fabSave.hide();
++        } else {
++            fabSave.show();
++        }
++    }
++
++    private void stageChangeInt(String prefKey, int value) {
++        if (localCache.getInt(prefKey, 0) == value) {
++            stagedIntChanges.remove(prefKey);
++        } else {
++            stagedIntChanges.put(prefKey, value);
++        }
++
++        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) {
+             fabSave.hide();
+         } else {
+             fabSave.show();
+         }
+     }
+
+     private void commitStagedChanges() {
+-        if (stagedChanges.isEmpty()) return;
++        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) return;
+
+         SharedPreferences.Editor editor = localCache.edit();
+@@ -1315,8 +1327,18 @@
+             intent.putExtra("value", value);
+             requireContext().sendBroadcast(intent);
+         }
++        for (Map.Entry<String, Integer> entry : stagedIntChanges.entrySet()) {
++            String key = entry.getKey();
++            int value = entry.getValue();
++
++            editor.putInt(key, value);
++
++            Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
++            intent.putExtra("key", key);
++            intent.putExtra("value", value);
++            requireContext().sendBroadcast(intent);
++        }
+         editor.apply();
+         stagedChanges.clear();
++        stagedIntChanges.clear();
+         fabSave.hide();
+         Toast.makeText(requireContext(), getString(R.string.ig_toast_settings_applied), Toast.LENGTH_SHORT).show();
+     }

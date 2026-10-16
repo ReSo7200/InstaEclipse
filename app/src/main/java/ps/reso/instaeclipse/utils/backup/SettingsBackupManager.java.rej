@@ -1,0 +1,15 @@
+--- app/src/main/java/ps/reso/instaeclipse/utils/backup/SettingsBackupManager.java
++++ app/src/main/java/ps/reso/instaeclipse/utils/backup/SettingsBackupManager.java
+@@ -49,7 +49,11 @@
+         s.put("lockDirectSalt",          FeatureFlags.lockDirectSalt);
+         s.put("lockDirectAlways",        FeatureFlags.lockDirectAlways);
+         s.put("lockWholeApp",            FeatureFlags.lockWholeApp);
+         s.put("lockUseFingerprint",      FeatureFlags.lockUseFingerprint);
+-        s.put("hideSpecificChats",       FeatureFlags.hideSpecificChats);
++
++        s.put("hideChatsMode",                 FeatureFlags.hideChatsMode);
++        s.put("hideChatsBackLongPressSeconds", FeatureFlags.hideChatsBackLongPressSeconds);
++        s.put("emptyGeneralFolder",            FeatureFlags.emptyGeneralFolder);
++        s.put("hideDirectFoldersBar",          FeatureFlags.hideDirectFoldersBar);
+
+         // Quick Toggles

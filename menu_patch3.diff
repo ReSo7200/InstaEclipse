@@ -1,0 +1,91 @@
+--- app/src/main/java/ps/reso/instaeclipse/utils/dialog/DialogUtils.java
++++ app/src/main/java/ps/reso/instaeclipse/utils/dialog/DialogUtils.java
+@@ -1353,23 +1353,46 @@
+
+-    /** Top-level "Hide Specific Chats" section (Privacy group) — enable toggle + unhide manager.
+-     *  Hiding itself is done from inside a chat (the eye-off button in the thread header). */
+-    private static void showHideChatsOptions(Context context) {
++    private static void showDirectOptions(Context context) {
+         LinearLayout layout = createSwitchLayout(context);
+
+         LinearLayout hideCard = card(context);
+-        ToggleRow hideChats = createSwitch(context, R.drawable.ic_eye_off, A_PRIVACY,
+-                I18n.t(context, R.string.ig_dialog_misc_hide_chats), FeatureFlags.hideSpecificChats);
+-        hideChats.setOnCheckedChangeListener((b, checked) -> {
+-            FeatureFlags.hideSpecificChats = checked;
+-            SettingsManager.saveAllFlags();
++
++        final String[] hideModeLabels = {
++                I18n.t(context, R.string.ig_direct_hide_chats_mode_off),
++                I18n.t(context, R.string.ig_direct_hide_chats_mode_eye),
++                I18n.t(context, R.string.ig_direct_hide_chats_mode_back)
++        };
++
++        View hideModeRow = createActionRow(context, R.drawable.ic_eye_off,
++                I18n.t(context, R.string.ig_direct_hide_chats_mode) + ": " + hideModeLabels[FeatureFlags.hideChatsMode], A_DIRECT, v -> {
++            showChoiceDialog(context, I18n.t(context, R.string.ig_direct_hide_chats_mode), hideModeLabels, FeatureFlags.hideChatsMode, (dialog, which) -> {
++                FeatureFlags.hideChatsMode = which;
++                FeatureFlags.hideSpecificChats = (which != 0);
++                SettingsManager.saveAllFlags();
++                ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activityOf(context));
++                ((android.widget.TextView) ((android.view.ViewGroup) v).getChildAt(1))
++                        .setText(I18n.t(context, R.string.ig_direct_hide_chats_mode) + ": " + hideModeLabels[which]);
++            });
+         });
+-        hideCard.addView(hideChats);
++
++        View durationRow = createActionRow(context, R.drawable.ic_timer,
++                I18n.t(context, R.string.ig_direct_back_long_press_duration) + ": " + FeatureFlags.hideChatsBackLongPressSeconds + "s", A_DIRECT, v -> {
++            String[] durs = new String[10];
++            for (int i = 0; i < 10; i++) durs[i] = (i + 1) + "s";
++            showChoiceDialog(context, I18n.t(context, R.string.ig_direct_back_long_press_duration), durs, FeatureFlags.hideChatsBackLongPressSeconds - 1, (dialog, which) -> {
++                FeatureFlags.hideChatsBackLongPressSeconds = which + 1;
++                SettingsManager.saveAllFlags();
++                ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activityOf(context));
++                ((android.widget.TextView) ((android.view.ViewGroup) v).getChildAt(1))
++                        .setText(I18n.t(context, R.string.ig_direct_back_long_press_duration) + ": " + (which + 1) + "s");
++            });
++        });
++
++        hideCard.addView(hideModeRow);
++        hideCard.addView(durationRow);
+         hideCard.addView(createActionRow(context, R.drawable.ic_eye,
+-                I18n.t(context, R.string.ig_hide_chats_manage), A_PRIVACY, v -> showHiddenChats(context)));
++                I18n.t(context, R.string.ig_hide_chats_manage), A_DIRECT, v -> showHiddenChats(context)));
+         layout.addView(hideCard);
+
++        LinearLayout foldersCard = card(context);
++
++        ToggleRow emptyGeneral = createSwitch(context, R.drawable.ic_folder, A_DIRECT,
++                I18n.t(context, R.string.ig_direct_empty_general_folder), FeatureFlags.emptyGeneralFolder);
++        emptyGeneral.setOnCheckedChangeListener((b, checked) -> {
++            FeatureFlags.emptyGeneralFolder = checked;
++            SettingsManager.saveAllFlags();
++            ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activityOf(context));
++        });
++
++        ToggleRow hideBar = createSwitch(context, R.drawable.ic_eye_off, A_DIRECT,
++                I18n.t(context, R.string.ig_direct_hide_folders_bar), FeatureFlags.hideDirectFoldersBar);
++        hideBar.setOnCheckedChangeListener((b, checked) -> {
++            FeatureFlags.hideDirectFoldersBar = checked;
++            SettingsManager.saveAllFlags();
++            ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activityOf(context));
++        });
++
++        foldersCard.addView(emptyGeneral);
++        foldersCard.addView(hideBar);
++        layout.addView(foldersCard);
++
+         layout.addView(createInfoSection(context, "",
+                 I18n.t(context, R.string.ig_hide_chats_hint)));
+
+@@ -1404,7 +1427,10 @@
+             cardView.addView(createActionRow(context, R.drawable.ic_eye,
+                     id + (title.isEmpty() ? "" : " (" + title + ")"), "#30D158", v -> {
+                         ps.reso.instaeclipse.utils.ghost.HiddenThreads.unhide(id);
+-                        Toast.makeText(context, I18n.t(context, R.string.ig_hide_chats_unhide) + " " + id, Toast.LENGTH_SHORT).show();
++                        Toast.makeText(context, I18n.t(context, R.string.ig_hide_chats_unhide) + " " + (title.isEmpty() ? id : title), Toast.LENGTH_SHORT).show();
++                        ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activityOf(context));
+                         showHiddenChats(context); // re-render list
+                     }));
+         }

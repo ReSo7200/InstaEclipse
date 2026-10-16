@@ -1,0 +1,36 @@
+--- app/src/main/java/ps/reso/instaeclipse/utils/dialog/DialogUtils.java
++++ app/src/main/java/ps/reso/instaeclipse/utils/dialog/DialogUtils.java
+@@ -876,6 +876,33 @@
+         currentDialog = createBottomSheetDialog(context, createScrollableContainer(context, container));
+         currentDialog.show();
+     }
++
++    private static void showChoiceDialog(Context context, String title, String[] items, int checkedItem, android.content.DialogInterface.OnClickListener listener) {
++        LinearLayout layout = createSwitchLayout(context);
++        LinearLayout card = card(context);
++
++        for (int i = 0; i < items.length; i++) {
++            final int index = i;
++            boolean isSelected = (i == checkedItem);
++
++            View row = createActionRow(context, isSelected ? R.drawable.ic_check : R.drawable.ic_circle, items[i], isSelected ? "#30D158" : C_TEXT2 + "", v -> {
++                listener.onClick(null, index);
++                if (currentDialog != null) {
++                    currentDialog.dismiss();
++                }
++            });
++            card.addView(row);
++        }
++        layout.addView(card);
++
++        AlertDialog.Builder builder = new AlertDialog.Builder(context)
++                .setTitle(title)
++                .setView(layout)
++                .setNegativeButton(I18n.t(context, R.string.ig_dialog_cancel), null);
++
++        currentDialog = builder.create();
++        currentDialog.show();
++    }
+
+     private static void showQualityOptions(Context context) {
+         LinearLayout layout = createSwitchLayout(context);

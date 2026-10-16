@@ -2,19 +2,20 @@ package ps.reso.instaeclipse.mods.ghost;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.HapticFeedbackConstants;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import org.luckypray.dexkit.DexKitBridge;
-import org.luckypray.dexkit.query.FindMethod;
-import org.luckypray.dexkit.query.matchers.MethodMatcher;
-import org.luckypray.dexkit.result.MethodData;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -23,10 +24,17 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.WeakHashMap;
+import java.util.Collection;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import org.luckypray.dexkit.DexKitBridge;
+import org.luckypray.dexkit.query.FindMethod;
+import org.luckypray.dexkit.query.matchers.MethodMatcher;
+import org.luckypray.dexkit.result.MethodData;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -43,6 +51,10 @@ public class HideChatsHook {
     private static int threadHeaderId, backButtonId, tagKeyId;
     public static volatile String currentOpenThreadId = null;
 
+    private static volatile boolean isGeneralTabSelected = false;
+    private static final WeakHashMap<View, Boolean> backButtonTouchAttached = new WeakHashMap<>();
+    private static final WeakHashMap<View, int[]> originalPillsBarLayout = new WeakHashMap<>();
+
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         installInboxFilter(bridge, classLoader);
         installThreadTracker(bridge, classLoader);
@@ -54,17 +66,56 @@ public class HideChatsHook {
         XC_MethodHook filter = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.hideSpecificChats || HiddenThreads.isEmpty()) return;
+                // A. Check for emptyGeneralFolder intent from args
+                if (FeatureFlags.emptyGeneralFolder) {
+                    boolean isGeneralCall = false;
+                    for (Object arg : param.args) {
+                        if (arg instanceof Collection<?>) {
+                            for (Object el : (Collection<?>) arg) {
+                                if (el == null) continue;
+                                try {
+                                    for (Field f : el.getClass().getDeclaredFields()) {
+                                        if (Modifier.isStatic(f.getModifiers())) continue;
+                                        f.setAccessible(true);
+                                        Object fv = f.get(el);
+                                        if (fv instanceof Enum<?> e && e.name().toUpperCase().contains("GENERAL")) {
+                                            isGeneralCall = true; break;
+                                        }
+                                        if (fv instanceof String s && s.equalsIgnoreCase("general")) {
+                                            isGeneralCall = true; break;
+                                        }
+                                    }
+                                } catch (Throwable ignored) {}
+                                if (isGeneralCall) break;
+                            }
+                        } else if (arg instanceof Enum<?> e && e.name().toUpperCase().contains("GENERAL")) {
+                            isGeneralCall = true;
+                        } else if (arg instanceof String s && s.equalsIgnoreCase("general")) {
+                            isGeneralCall = true;
+                        }
+                        if (isGeneralCall) break;
+                    }
+                    if (isGeneralCall || isGeneralTabSelected) {
+                        param.setResult(new ArrayList<>());
+                        return;
+                    }
+                }
+
+                // B. Filter hidden chats via defensive copy (no it.remove)
+                if (FeatureFlags.hideChatsMode == 0 || HiddenThreads.isEmpty()) return;
+
                 Object r = param.getResult();
                 if (!(r instanceof List<?> list) || list.isEmpty()) return;
+
                 try {
-                    java.util.Iterator<?> it = list.iterator();
-                    while (it.hasNext()) {
-                        String id = threadIdOfRow(it.next());
-                        if (id != null && HiddenThreads.isHidden(id)) {
-                            it.remove();
+                    ArrayList<Object> filteredCopy = new ArrayList<>(list.size());
+                    for (Object item : list) {
+                        String id = threadIdOfRow(item);
+                        if (id == null || !HiddenThreads.isHidden(id)) {
+                            filteredCopy.add(item);
                         }
                     }
+                    param.setResult(filteredCopy);
                 } catch (Throwable ignored) {}
             }
         };
@@ -87,98 +138,110 @@ public class HideChatsHook {
     // ── 1b. Active Thread Tracker (PrebindThreadHeader + igThreadIgid) ─────────
     private void installThreadTracker(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            List<MethodData> openMethods = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create()
-                            .usingStrings(THREAD_OPEN_ANCHOR)
-                            .paramTypes("com.instagram.model.direct.DirectThreadKey", "boolean")));
-            XC_MethodHook openHook = new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    if (param.args.length > 0 && param.args[0] != null) {
-                        String id = firstStringField(param.args[0]);
-                        Object flag = param.args.length > 1 ? param.args[1] : Boolean.TRUE;
-                        if (id != null && Boolean.TRUE.equals(flag)) {
-                            currentOpenThreadId = id;
-                            ModuleLog.line("(IE|HideChats) tracked open thread (igThreadIgid)=" + id);
-                        }
-                    }
-                    if (currentOpenThreadId == null && param.thisObject != null) {
-                        String id = extractThreadIdDeep(param.thisObject, 3);
-                        if (id != null) currentOpenThreadId = id;
-                    }
-                }
-            };
-            for (MethodData md : openMethods) {
-                try { XposedBridge.hookMethod(md.getMethodInstance(classLoader), openHook); }
-                catch (Throwable ignored) {}
-            }
-        } catch (Throwable ignored) {}
-
-        try {
-            List<MethodData> headerMethods = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create().usingStrings(HEADER_ANCHOR)));
             XC_MethodHook headerHook = new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    if (param.args != null) {
-                        for (Object arg : param.args) {
-                            if (arg == null) continue;
-                            String cn = arg.getClass().getName();
-                            if (cn.startsWith("X.")) {
-                                String id = extractThreadIdDeep(arg, 4);
-                                if (id != null) {
-                                    currentOpenThreadId = id;
-                                    ModuleLog.line("(IE|HideChats) tracked open thread (PrebindThreadHeader)=" + id);
-                                    break;
+                protected void afterHookedMethod(MethodHookParam param) {
+                    try {
+                        Object r2 = param.args[1];
+                        if (r2 == null) return;
+                        Field[] r2f = r2.getClass().getDeclaredFields();
+                        for (Field f : r2f) {
+                            if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+                            f.setAccessible(true);
+                            Object presenter = f.get(r2);
+                            if (presenter != null && presenter.getClass().getName().startsWith("X.")) {
+                                for (Field pf : presenter.getClass().getDeclaredFields()) {
+                                    if (Modifier.isStatic(pf.getModifiers())) continue;
+                                    pf.setAccessible(true);
+                                    Object row = pf.get(presenter);
+                                    if (row != null && row.getClass().getName().startsWith("X.")) {
+                                        String tid = threadIdOfRow(row);
+                                        if (tid != null) {
+                                            currentOpenThreadId = tid;
+                                            return;
+                                        }
+                                    }
                                 }
+                            }
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            };
+            int hn = 0;
+            for (MethodData md : bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create().usingStrings(HEADER_ANCHOR)))) {
+                try {
+                    XposedBridge.hookMethod(md.getMethodInstance(classLoader), headerHook);
+                    hn++;
+                } catch (Throwable ignored) {}
+            }
+            ModuleLog.line("(IE|HideChats) tracker[header] hooked " + hn + " method(s)");
+
+            XC_MethodHook fgHook = new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    try {
+                        Object dtk = param.args[0];
+                        if (dtk != null) {
+                            String tid = extractThreadIdDeep(dtk, 3);
+                            if (tid != null) {
+                                currentOpenThreadId = tid;
+                            }
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            };
+            int fn = 0;
+            for (MethodData md : bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create().usingStrings(THREAD_OPEN_ANCHOR)))) {
+                try {
+                    XposedBridge.hookMethod(md.getMethodInstance(classLoader), fgHook);
+                    fn++;
+                } catch (Throwable ignored) {}
+            }
+            ModuleLog.line("(IE|HideChats) tracker[fg] hooked " + fn + " method(s)");
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|HideChats) ⚠️ tracker: " + t.getMessage());
+        }
+    }
+
+    private static String threadIdOfRow(Object row) {
+        if (row == null) return null;
+        try {
+            for (Field f : row.getClass().getDeclaredFields()) {
+                if (Modifier.isStatic(f.getModifiers())) continue;
+                f.setAccessible(true);
+                Object val = f.get(row);
+                if (val != null) {
+                    String cn = val.getClass().getName();
+                    if (cn.contains("DirectThreadKey")) {
+                        String id = extractThreadIdDeep(val, 2);
+                        if (id != null) return id;
+                    } else if (cn.startsWith("X.")) {
+                        for (Field sub : val.getClass().getDeclaredFields()) {
+                            if (sub.getType() == String.class) {
+                                sub.setAccessible(true);
+                                String s = (String) sub.get(val);
+                                if (s != null && s.matches("\\\\d{15,}")) return s;
                             }
                         }
                     }
                 }
-            };
-            for (MethodData md : headerMethods) {
-                try { XposedBridge.hookMethod(md.getMethodInstance(classLoader), headerHook); }
-                catch (Throwable ignored) {}
             }
-        } catch (Throwable ignored) {}
-    }
-
-    /**
-     * Finds the DirectThreadKey on an inbox row object (e.g. X.C00WH) and returns its thread id.
-     * In IG 447+, C00WH.A00 (DirectThreadKey) is lazily initialized by calling CTG().
-     */
-    private static String threadIdOfRow(Object row) {
-        if (row == null) return null;
-        try {
-            if (row.getClass().getName().contains("DirectThreadKey")) {
-                return firstStringField(row);
-            }
-            Class<?> c = row.getClass();
-            while (c != null && c != Object.class) {
-                for (Field f : c.getDeclaredFields()) {
-                    if (!f.getType().getName().contains("DirectThreadKey")) continue;
-                    f.setAccessible(true);
-                    Object key = f.get(row);
-                    String id = firstStringField(key);
+            try {
+                Method m = row.getClass().getMethod("CTG");
+                Object dtk = m.invoke(row);
+                if (dtk != null) {
+                    String id = extractThreadIdDeep(dtk, 2);
                     if (id != null) return id;
                 }
-                for (Method m : c.getDeclaredMethods()) {
-                    if (m.getParameterCount() == 0 && m.getReturnType().getName().contains("DirectThreadKey")) {
-                        m.setAccessible(true);
-                        Object key = m.invoke(row);
-                        String id = firstStringField(key);
-                        if (id != null) return id;
-                    }
-                }
-                c = c.getSuperclass();
-            }
+            } catch (Throwable ignored) {}
         } catch (Throwable ignored) {}
         return null;
     }
 
-    private static String extractThreadIdDeep(Object root, int maxDepth) {
-        Object found = scan(root, 0, Collections.newSetFromMap(new IdentityHashMap<>()), maxDepth);
-        if (found == null) return null;
+    private static String extractThreadIdDeep(Object obj, int maxDepth) {
+        Object found = scan(obj, 0, Collections.newSetFromMap(new IdentityHashMap<>()), maxDepth);
         if (found instanceof String s) return s;
         return firstStringField(found);
     }
@@ -188,7 +251,8 @@ public class HideChatsHook {
         XC_MethodHook resume = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.hideSpecificChats) return;
+                // We always want to register the listener so it can apply the folders bar hiding
+                // or track the active tab, even if Hide Specific Chats is off.
                 final Activity a = (Activity) param.thisObject;
                 a.runOnUiThread(() -> registerListener(a));
             }
@@ -217,11 +281,16 @@ public class HideChatsHook {
     private void registerListener(final Activity activity) {
         try {
             ensureIds(activity);
+            applyFoldersBarVisibility(activity);
+            trackGeneralFolderPill(activity);
+
             if (tryInject(activity)) return;
             final View decor = activity.getWindow().getDecorView();
             decor.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
+                    applyFoldersBarVisibility(activity);
+                    trackGeneralFolderPill(activity);
                     if (tryInject(activity)) {
                         try { decor.getViewTreeObserver().removeOnGlobalLayoutListener(this); }
                         catch (Throwable ignored) {}
@@ -234,11 +303,69 @@ public class HideChatsHook {
     private boolean tryInject(Activity activity) {
         try {
             View header = threadHeaderId != 0 ? activity.findViewById(threadHeaderId) : null;
+            View back = backButtonId != 0 ? activity.findViewById(backButtonId) : null;
+
+            // Setup Back Button Hold Trigger if mode is 2
+            if (back != null && !backButtonTouchAttached.containsKey(back)) {
+                backButtonTouchAttached.put(back, true);
+                back.setOnTouchListener(new View.OnTouchListener() {
+                    private final boolean[] triggered = {false};
+                    private final Handler handler = new Handler(Looper.getMainLooper());
+                    private final Runnable longPressAction = new Runnable() {
+                        @Override
+                        public void run() {
+                            triggered[0] = true;
+                            back.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                            String threadId = resolveThreadId(activity, header, currentOpenThreadId);
+                            if (threadId != null) {
+                                boolean nowHidden = HiddenThreads.toggle(threadId, threadTitle(activity));
+                                Toast.makeText(activity,
+                                        I18n(activity, nowHidden ? R.string.ig_hide_chat_hidden : R.string.ig_hide_chat_unhidden),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    };
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (FeatureFlags.hideChatsMode != 2) {
+                            handler.removeCallbacks(longPressAction);
+                            return false;
+                        }
+
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+                                triggered[0] = false;
+                                handler.postDelayed(longPressAction, Math.max(1, FeatureFlags.hideChatsBackLongPressSeconds) * 1000L);
+                                break;
+                            case MotionEvent.ACTION_MOVE:
+                                int slop = ViewConfiguration.get(v.getContext()).getScaledTouchSlop();
+                                if (event.getX() < -slop || event.getY() < -slop ||
+                                    event.getX() > v.getWidth() + slop || event.getY() > v.getHeight() + slop) {
+                                    handler.removeCallbacks(longPressAction);
+                                }
+                                break;
+                            case MotionEvent.ACTION_UP:
+                                handler.removeCallbacks(longPressAction);
+                                if (triggered[0]) {
+                                    v.setPressed(false);
+                                    return true; // Consume event so normal back doesn't fire
+                                }
+                                break;
+                            case MotionEvent.ACTION_CANCEL:
+                                handler.removeCallbacks(longPressAction);
+                                triggered[0] = false;
+                                break;
+                        }
+                        return false;
+                    }
+                });
+            }
+
             if (header == null) return false;
 
             ViewGroup target;
             int insertAt;
-            View back = backButtonId != 0 ? activity.findViewById(backButtonId) : null;
             if (back != null && back.getParent() instanceof ViewGroup) {
                 target = (ViewGroup) back.getParent();
                 int bi = target.indexOfChild(back);
@@ -249,7 +376,17 @@ public class HideChatsHook {
                 insertAt = 0;
             } else return false;
 
-            if (target.findViewWithTag(TAG) != null) return true;
+            View existingEye = target.findViewWithTag(TAG);
+
+            if (FeatureFlags.hideChatsMode != 1) {
+                if (existingEye != null) existingEye.setVisibility(View.GONE);
+                return true;
+            }
+
+            if (existingEye != null) {
+                existingEye.setVisibility(View.VISIBLE);
+                return true;
+            }
 
             android.widget.ImageView btn = new android.widget.ImageView(activity);
             btn.setTag(TAG);
@@ -290,6 +427,259 @@ public class HideChatsHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|HideChats) ⚠️ inject: " + t.getMessage());
             return false;
+        }
+    }
+
+    // ── Apply visibility of direct folders bar ──────────────────────────────────
+    private static void applyFoldersBarVisibility(Activity activity) {
+        try {
+            View decor = activity.getWindow().getDecorView();
+            View bar = findFoldersBar(decor);
+            if (bar == null) return;
+
+            if (!originalPillsBarLayout.containsKey(bar)) {
+                ViewGroup.LayoutParams lp = bar.getLayoutParams();
+                int tm = 0, bm = 0;
+                if (lp instanceof ViewGroup.MarginLayoutParams) {
+                    tm = ((ViewGroup.MarginLayoutParams) lp).topMargin;
+                    bm = ((ViewGroup.MarginLayoutParams) lp).bottomMargin;
+                }
+                originalPillsBarLayout.put(bar, new int[]{
+                    lp.height, bar.getPaddingTop(), bar.getPaddingBottom(), tm, bm
+                });
+            }
+
+            if (FeatureFlags.hideDirectFoldersBar) {
+                bar.setVisibility(View.GONE);
+                ViewGroup.LayoutParams lp = bar.getLayoutParams();
+                lp.height = 0;
+                bar.setPadding(bar.getPaddingLeft(), 0, bar.getPaddingRight(), 0);
+                if (lp instanceof ViewGroup.MarginLayoutParams) {
+                    ((ViewGroup.MarginLayoutParams) lp).topMargin = 0;
+                    ((ViewGroup.MarginLayoutParams) lp).bottomMargin = 0;
+                }
+                bar.setLayoutParams(lp);
+            } else {
+                int[] orig = originalPillsBarLayout.get(bar);
+                if (orig != null) {
+                    ViewGroup.LayoutParams lp = bar.getLayoutParams();
+                    lp.height = orig[0];
+                    bar.setPadding(bar.getPaddingLeft(), orig[1], bar.getPaddingRight(), orig[2]);
+                    if (lp instanceof ViewGroup.MarginLayoutParams) {
+                        ((ViewGroup.MarginLayoutParams) lp).topMargin = orig[3];
+                        ((ViewGroup.MarginLayoutParams) lp).bottomMargin = orig[4];
+                    }
+                    bar.setLayoutParams(lp);
+                    bar.setVisibility(View.VISIBLE);
+                    bar.requestLayout();
+                }
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    private static View findFoldersBar(View v) {
+        if (v == null) return null;
+        if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            String resName = "";
+            try {
+                resName = v.getResources().getResourceEntryName(v.getId());
+            } catch (Throwable ignored) {}
+
+            if (resName != null && (resName.contains("direct_inbox_folder") ||
+                resName.contains("direct_inbox_filter_pill") ||
+                resName.contains("inbox_folder_pills") ||
+                resName.contains("direct_inbox_pills") ||
+                resName.contains("cf_hub_pills") ||
+                (resName.contains("inbox") && (resName.contains("pill") || resName.contains("folder") || resName.contains("filter"))))) {
+                return v;
+            }
+
+            if (vg.getClass().getName().contains("RecyclerView") ||
+                vg.getClass().getName().contains("HorizontalScrollView") ||
+                (vg instanceof LinearLayout && ((LinearLayout) vg).getOrientation() == LinearLayout.HORIZONTAL)) {
+
+                int childCount = vg.getChildCount();
+                if (childCount >= 2) {
+                    int h = vg.getHeight();
+                    if (h > 0 && h >= dp(v.getContext(), 20) && h <= dp(v.getContext(), 75)) {
+                        int pillChildren = 0;
+                        for (int i = 0; i < childCount; i++) {
+                            View child = vg.getChildAt(i);
+                            String cResName = "";
+                            try { cResName = child.getResources().getResourceEntryName(child.getId()); } catch (Throwable ignored) {}
+                            if (cResName != null && cResName.contains("pill")) {
+                                pillChildren++;
+                            } else if (hasPillText(child)) {
+                                pillChildren++;
+                            }
+                        }
+                        if (pillChildren >= 2) return v;
+                    }
+                }
+            }
+
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View found = findFoldersBar(vg.getChildAt(i));
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    private static boolean hasPillText(View v) {
+        if (v instanceof android.widget.TextView) {
+            String text = ((android.widget.TextView) v).getText().toString().toLowerCase();
+            return text.matches("^(primary|principale|general|generale|requests|richieste|channels|canali)$");
+        } else if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                if (hasPillText(vg.getChildAt(i))) return true;
+            }
+        }
+        return false;
+    }
+
+    // ── Track General Folder Pill ──────────────────────────────────────────────
+    private static void trackGeneralFolderPill(Activity activity) {
+        if (!FeatureFlags.emptyGeneralFolder) return;
+
+        try {
+            View decor = activity.getWindow().getDecorView();
+            View bar = findFoldersBar(decor);
+            if (bar == null || !(bar instanceof ViewGroup)) return;
+
+            boolean wasGeneral = isGeneralTabSelected;
+            boolean foundGeneralSelected = false;
+
+            ViewGroup vg = (ViewGroup) bar;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View pill = vg.getChildAt(i);
+                if (isGeneralPill(pill)) {
+                    if (pill.isSelected() || pill.isActivated() || isAnyChildCheckedOrSelected(pill)) {
+                        foundGeneralSelected = true;
+                        break;
+                    }
+                }
+            }
+
+            isGeneralTabSelected = foundGeneralSelected;
+            if (wasGeneral != isGeneralTabSelected) {
+                refreshActiveInbox(activity);
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    private static boolean isGeneralPill(View v) {
+        if (v instanceof android.widget.TextView) {
+            String text = ((android.widget.TextView) v).getText().toString();
+            return text.matches("(?i)^(general|generale|général|allgemein|geral|genel|общие|عام)(\s.*)?$");
+        }
+        if (v.getContentDescription() != null) {
+            String desc = v.getContentDescription().toString();
+            if (desc.matches("(?i)^(general|generale|général|allgemein|geral|genel|общие|عام)(\s.*)?$")) return true;
+        }
+        if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                if (isGeneralPill(vg.getChildAt(i))) return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isAnyChildCheckedOrSelected(View v) {
+        if (v.isSelected() || v.isActivated()) return true;
+        if (v instanceof android.widget.Checkable && ((android.widget.Checkable) v).isChecked()) return true;
+        if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                if (isAnyChildCheckedOrSelected(vg.getChildAt(i))) return true;
+            }
+        }
+        return false;
+    }
+
+    // ── Live Inbox Refresh ─────────────────────────────────────────────────────
+    public static void refreshActiveInbox(Activity activity) {
+        if (activity == null || activity.isFinishing()) return;
+
+        activity.runOnUiThread(() -> {
+            try {
+                // Ensure UI state (eye button, bar visibility) is updated immediately
+                HideChatsHook inst = new HideChatsHook();
+                inst.ensureIds(activity);
+                inst.tryInject(activity);
+                applyFoldersBarVisibility(activity);
+
+                // Force IG to re-query the thread store by cycling visible fragments
+                Method getSfm = activity.getClass().getMethod("getSupportFragmentManager");
+                Object fm = getSfm.invoke(activity);
+                if (fm != null) {
+                    Method getFrags = fm.getClass().getMethod("getFragments");
+                    List<?> frags = (List<?>) getFrags.invoke(fm);
+                    if (frags != null) cycleVisibleFragments(frags);
+                }
+
+                // Also poke RecyclerView adapters to redraw immediately
+                View decor = activity.getWindow().getDecorView();
+                notifyRecyclerViews(decor);
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|HideChats) refresh error: " + t.getMessage());
+            }
+        });
+    }
+
+    private static void cycleVisibleFragments(List<?> frags) {
+        for (Object frag : frags) {
+            if (frag == null) continue;
+            try {
+                Method isVisible = frag.getClass().getMethod("isVisible");
+                if (Boolean.TRUE.equals(isVisible.invoke(frag))) {
+                    // Skip dialog fragments to avoid glitching overlays
+                    if (frag.getClass().getName().contains("Dialog")) continue;
+
+                    try {
+                        Method onPause = frag.getClass().getMethod("onPause");
+                        onPause.invoke(frag);
+                    } catch (Throwable ignored) {}
+                    try {
+                        Method onResume = frag.getClass().getMethod("onResume");
+                        onResume.invoke(frag);
+                    } catch (Throwable ignored) {}
+
+                    // Recurse into child fragment managers
+                    try {
+                        Method getCfm = frag.getClass().getMethod("getChildFragmentManager");
+                        Object cfm = getCfm.invoke(frag);
+                        if (cfm != null) {
+                            Method getChildFrags = cfm.getClass().getMethod("getFragments");
+                            List<?> childFrags = (List<?>) getChildFrags.invoke(cfm);
+                            if (childFrags != null) cycleVisibleFragments(childFrags);
+                        }
+                    } catch (Throwable ignored) {}
+                }
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    private static void notifyRecyclerViews(View v) {
+        if (v == null) return;
+        if (v.getClass().getName().contains("RecyclerView")) {
+            try {
+                Method getAdapter = v.getClass().getMethod("getAdapter");
+                Object adapter = getAdapter.invoke(v);
+                if (adapter != null) {
+                    Method notifyData = adapter.getClass().getMethod("notifyDataSetChanged");
+                    notifyData.invoke(adapter);
+                }
+            } catch (Throwable ignored) {}
+        }
+        if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) v;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                notifyRecyclerViews(vg.getChildAt(i));
+            }
         }
     }
 
@@ -442,7 +832,7 @@ public class HideChatsHook {
         return null;
     }
 
-    private static int dp(Activity a, int v) {
+    private static int dp(Context a, int v) {
         return Math.round(v * a.getResources().getDisplayMetrics().density);
     }
 }

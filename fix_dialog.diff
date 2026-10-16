@@ -1,0 +1,15 @@
+--- app/src/main/java/ps/reso/instaeclipse/utils/dialog/DialogUtils.java
++++ app/src/main/java/ps/reso/instaeclipse/utils/dialog/DialogUtils.java
+@@ -889,7 +889,11 @@
+             final int index = i;
+             boolean isSelected = (i == checkedItem);
+
+-            View row = createActionRow(context, isSelected ? R.drawable.ic_check : R.drawable.ic_circle, items[i], isSelected ? "#30D158" : "#9A9AA3", v -> {
++            // use text representation since we don't have proper drawables for radio buttons
++            String prefix = isSelected ? "✓" : "○";
++            String label = prefix + "  " + items[i];
++
++            View row = createActionRow(context, isSelected ? "✓" : "○", items[i], isSelected ? "#30D158" : "#9A9AA3", v -> {
+                 listener.onClick(null, index);
+                 if (currentDialog != null) {
+                     currentDialog.dismiss();

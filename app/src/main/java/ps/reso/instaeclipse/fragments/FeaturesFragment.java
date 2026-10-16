@@ -76,6 +76,7 @@ public class FeaturesFragment extends Fragment {
 
     // STAGING SYSTEM: Holds changes before applying
     private final Map<String, Boolean> stagedChanges = new HashMap<>();
+    private final Map<String, Integer> stagedIntChanges = new HashMap<>();
 
     private final BroadcastReceiver prefsReceiver = new BroadcastReceiver() {
         @Override
@@ -691,6 +692,7 @@ public class FeaturesFragment extends Fragment {
         // Grouped to match the in-IG dialog: Appearance / Privacy / Media / Tools.
         final String A_APPEARANCE = "#FF375F", A_PRIVACY = "#5E5CE6", A_MEDIA = "#FF9F0A", A_TOOLS = "#8E8E93";
 
+
         defs.add(getString(R.string.feat_group_appearance));
         defs.add(Arrays.asList(
                 createNav(R.drawable.ic_palette, A_APPEARANCE, getString(R.string.ig_dialog_menu_theme), this::loadThemeMenu),
@@ -698,11 +700,15 @@ public class FeaturesFragment extends Fragment {
                 createNav(R.drawable.ic_sparkle, A_APPEARANCE, getString(R.string.ig_dialog_menu_clean_feed), this::loadCleanFeedMenu)
         ));
 
+        defs.add(getString(R.string.feat_group_direct));
+        defs.add(Arrays.asList(
+                createNav(R.drawable.ic_eye_off, "#0A84FF", getString(R.string.ig_hide_chats_title), this::loadHideChatsMenu)
+        ));
+
         defs.add(getString(R.string.feat_group_privacy));
         defs.add(Arrays.asList(
                 createNav(R.drawable.ic_eye, A_PRIVACY, getString(R.string.ig_dialog_menu_ghost_settings), this::loadGhostMenu),
                 createNav(R.drawable.ic_shield, A_PRIVACY, getString(R.string.ig_dialog_misc_lock_section), this::loadLockMenu),
-                createNav(R.drawable.ic_eye_off, A_PRIVACY, getString(R.string.ig_hide_chats_title), this::loadHideChatsMenu),
                 createNav(R.drawable.ic_block, A_PRIVACY, getString(R.string.ig_dialog_menu_ad_analytics), this::loadAdsMenu),
                 createNav(R.drawable.ic_notification, A_PRIVACY, getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu)
         ));
@@ -937,9 +943,40 @@ public class FeaturesFragment extends Fragment {
     private void loadHideChatsMenu() {
         List<Object> defs = new ArrayList<>();
 
-        defs.add(getString(R.string.feat_features));
+        final String[] hideModeLabels = {
+                getString(R.string.ig_direct_hide_chats_mode_off),
+                getString(R.string.ig_direct_hide_chats_mode_eye),
+                getString(R.string.ig_direct_hide_chats_mode_back)
+        };
         defs.add(Arrays.asList(
-                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats")
+                createClickable(R.drawable.ic_eye_off, "#0A84FF", getString(R.string.ig_direct_hide_chats_mode), () -> {
+                    new android.app.AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.ig_direct_hide_chats_mode))
+                        .setSingleChoiceItems(hideModeLabels, localCache.getInt("hideChatsMode", 0), (dialog, which) -> {
+                            stageChangeInt("hideChatsMode", which);
+                            stageChange("hideSpecificChats", which != 0);
+                            dialog.dismiss();
+                            if ("hidechats".equals(currentMenu)) loadHideChatsMenu();
+                        })
+                        .show();
+                }),
+                createClickable(R.drawable.ic_timer, "#0A84FF", getString(R.string.ig_direct_back_long_press_duration), () -> {
+                    String[] durs = new String[10];
+                    for (int j = 0; j < 10; j++) durs[j] = (j + 1) + "s";
+                    new android.app.AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.ig_direct_back_long_press_duration))
+                        .setSingleChoiceItems(durs, localCache.getInt("hideChatsBackLongPressSeconds", 2) - 1, (dialog, which) -> {
+                            stageChangeInt("hideChatsBackLongPressSeconds", which + 1);
+                            dialog.dismiss();
+                            if ("hidechats".equals(currentMenu)) loadHideChatsMenu();
+                        })
+                        .show();
+                })
+        ));
+
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_folder, "#0A84FF", getString(R.string.ig_direct_empty_general_folder), "emptyGeneralFolder"),
+                createSwitch(R.drawable.ic_eye_off, "#0A84FF", getString(R.string.ig_direct_hide_folders_bar), "hideDirectFoldersBar")
         ));
 
         // Note: hiding/unhiding a specific chat is done from inside Instagram.
@@ -1256,7 +1293,21 @@ public class FeaturesFragment extends Fragment {
             stagedChanges.put(prefKey, isChecked);
         }
 
-        if (stagedChanges.isEmpty()) {
+        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) {
+            fabSave.hide();
+        } else {
+            fabSave.show();
+        }
+    }
+
+    private void stageChangeInt(String prefKey, int value) {
+        if (localCache.getInt(prefKey, 0) == value) {
+            stagedIntChanges.remove(prefKey);
+        } else {
+            stagedIntChanges.put(prefKey, value);
+        }
+
+        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) {
             fabSave.hide();
         } else {
             fabSave.show();
@@ -1264,7 +1315,7 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void commitStagedChanges() {
-        if (stagedChanges.isEmpty()) return;
+        if (stagedChanges.isEmpty() && stagedIntChanges.isEmpty()) return;
 
         SharedPreferences.Editor editor = localCache.edit();
         for (Map.Entry<String, Boolean> entry : stagedChanges.entrySet()) {
@@ -1278,8 +1329,20 @@ public class FeaturesFragment extends Fragment {
             intent.putExtra("value", value);
             requireContext().sendBroadcast(intent);
         }
+        for (Map.Entry<String, Integer> entry : stagedIntChanges.entrySet()) {
+            String key = entry.getKey();
+            int value = entry.getValue();
+
+            editor.putInt(key, value);
+
+            Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
+            intent.putExtra("key", key);
+            intent.putExtra("value", value);
+            requireContext().sendBroadcast(intent);
+        }
         editor.apply();
         stagedChanges.clear();
+        stagedIntChanges.clear();
         fabSave.hide();
         Toast.makeText(requireContext(), getString(R.string.ig_toast_settings_applied), Toast.LENGTH_SHORT).show();
     }
