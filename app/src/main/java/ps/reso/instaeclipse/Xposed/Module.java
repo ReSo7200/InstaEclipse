@@ -379,6 +379,34 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | UnlimitedAccounts): ❌ Failed to hook: " + t);
                     }
 
+                    // Extras: keep Instagram's realtime connection down (appear offline)
+                    try {
+                        if (!skip("AirplaneModeHook")) new ps.reso.instaeclipse.mods.extras.AirplaneModeHook().install(hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | Airplane): ❌ Failed to hook: " + t);
+                    }
+
+                    // Extras: pick the largest image candidate
+                    try {
+                        if (!skip("HighResolutionImageHook")) new ps.reso.instaeclipse.mods.extras.HighResolutionImageHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | HighResImages): ❌ Failed to hook: " + t);
+                    }
+
+                    // Extras: skip contact/location onboarding pages
+                    try {
+                        if (!skip("OnboardingPromptHook")) new ps.reso.instaeclipse.mods.extras.OnboardingPromptHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | Onboarding): ❌ Failed to hook: " + t);
+                    }
+
+                    // Extras: add FLAG_IMMUTABLE to IG's legacy push registration intent
+                    try {
+                        if (!skip("NotificationRegistrationHook")) new ps.reso.instaeclipse.mods.extras.NotificationRegistrationHook().install();
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | NotificationFix): ❌ Failed to hook: " + t);
+                    }
+
                     // Extras: no swipe to camera from the feed
                     try {
                         if (!skip("SwipeToCameraHook")) new ps.reso.instaeclipse.mods.extras.SwipeToCameraHook().install(hostClassLoader);

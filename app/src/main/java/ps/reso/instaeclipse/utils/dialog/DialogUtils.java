@@ -1370,6 +1370,8 @@ public class DialogUtils {
             row.setOnCheckedChangeListener((b, checked) -> {
                 ExtrasFeatures.set(e.flag, checked);
                 SettingsManager.saveAllFlags();
+                // Airplane mode takes effect at once: stop / restart the live MQTT connection.
+                if ("airplaneMode".equals(e.flag)) ps.reso.instaeclipse.mods.extras.AirplaneModeHook.apply();
             });
             group.addView(row);
         }

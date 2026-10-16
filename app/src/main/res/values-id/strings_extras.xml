@@ -7,4 +7,8 @@
     <string name="ig_dialog_extras_reels_auto_scroll">Opsi Gulir Otomatis Reels</string>
     <string name="ig_dialog_extras_reels_lock_scroll">Kunci Gulir Reels</string>
     <string name="ig_dialog_extras_unlimited_accounts">Akun Tanpa Batas</string>
+    <string name="ig_dialog_extras_airplane_mode">Mode Pesawat (tampak offline)</string>
+    <string name="ig_dialog_extras_high_res_images">Muat gambar dengan resolusi tertinggi</string>
+    <string name="ig_dialog_extras_hide_onboarding">Sembunyikan ajakan kontak dan lokasi</string>
+    <string name="ig_dialog_extras_fix_notifications">Perbaiki pendaftaran notifikasi lama di Android 12+</string>
 </resources>

@@ -29,6 +29,10 @@ public final class ExtrasFeatures {
             new Entry("reelsAutoScroll", R.string.ig_dialog_extras_reels_auto_scroll, R.drawable.ic_movie),
             new Entry("reelsLockScroll", R.string.ig_dialog_extras_reels_lock_scroll, R.drawable.ic_movie),
             new Entry("unlimitedAccounts", R.string.ig_dialog_extras_unlimited_accounts, R.drawable.ic_settings_gear),
+            new Entry("airplaneMode", R.string.ig_dialog_extras_airplane_mode, R.drawable.ic_eye_off),
+            new Entry("highResolutionImages", R.string.ig_dialog_extras_high_res_images, R.drawable.ic_search),
+            new Entry("hideOnboardingPrompts", R.string.ig_dialog_extras_hide_onboarding, R.drawable.ic_block),
+            new Entry("fixNotificationRegistration", R.string.ig_dialog_extras_fix_notifications, R.drawable.ic_notification),
     };
 
     private ExtrasFeatures() {}
