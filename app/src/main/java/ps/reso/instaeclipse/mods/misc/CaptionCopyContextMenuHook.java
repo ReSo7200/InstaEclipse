@@ -1165,6 +1165,17 @@ public class CaptionCopyContextMenuHook {
                 });
                 sheet.addView(btnCopy);
 
+                final String noTags = stripHashtags(text);
+                if (!noTags.equals(text.trim())) {
+                    Button btnNoTags = makeButton(ctx,
+                            I18n.t(ctx, R.string.ig_caption_copy_no_hashtags), secondBg, secondText, dp);
+                    btnNoTags.setOnClickListener(v -> {
+                        dialog.dismiss();
+                        copyToClipboard(ctx, noTags);
+                    });
+                    sheet.addView(btnNoTags);
+                }
+
                 Button btnSelect = makeButton(ctx,
                         I18n.t(ctx, R.string.ig_comment_select_part), secondBg, secondText, dp);
                 btnSelect.setOnClickListener(v -> {
