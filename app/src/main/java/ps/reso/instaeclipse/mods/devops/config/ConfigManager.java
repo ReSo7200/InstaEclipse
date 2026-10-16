@@ -74,15 +74,14 @@ public class ConfigManager {
     /** Validates and writes JSON to Instagram's mc_overrides.json file. */
     private static void writeConfigJson(Context context, String json) throws Exception {
         if (json == null || json.isEmpty()) throw new IllegalArgumentException("Empty JSON");
-        if (!json.startsWith("{") || !json.endsWith("}")) throw new IllegalArgumentException("Not valid JSON");
+        // Parse for real: a truncated/garbled file must never replace Instagram's overrides.
+        new org.json.JSONObject(json);
 
         File dest = new File(context.getFilesDir(), "mobileconfig/mc_overrides.json");
         File parent = dest.getParentFile();
         if (parent != null && !parent.exists()) parent.mkdirs();
 
-        try (FileOutputStream fos = new FileOutputStream(dest, false)) {
-            fos.write(json.getBytes(StandardCharsets.UTF_8));
-            fos.flush();
-        }
+        // Temp file + rename, so a crash mid-write can't leave a half file behind.
+        ps.reso.instaeclipse.utils.core.AtomicFiles.write(dest, json);
     }
 }
