@@ -96,11 +96,28 @@
     </application>
 
     <!-- Permissions -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="ManifestOrder,QueryAllPackagesPermission" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Package visibility: only the Instagram variants in CommonUtils.SUPPORTED_PACKAGES
+         (instead of QUERY_ALL_PACKAGES). Downloads go through the SAF folder the user picks,
+         so no storage permissions are needed. -->
+    <queries>
+        <package android:name="com.instagram.android" />
+        <package android:name="com.instagold.android" />
+        <package android:name="com.instaflux.app" />
+        <package android:name="com.myinsta.android" />
+        <package android:name="cc.honista.app" />
+        <package android:name="com.instaprime.android" />
+        <package android:name="com.instafel.android" />
+        <package android:name="com.instadm.android" />
+        <package android:name="com.dfistagram.android" />
+        <package android:name="com.Instander.android" />
+        <package android:name="com.aero.instagram" />
+        <package android:name="com.instapro.android" />
+        <package android:name="com.instaflow.android" />
+        <package android:name="com.instagram1.android" />
+        <package android:name="com.instagram2.android" />
+        <package android:name="com.instagramclone.android" />
+        <package android:name="com.instaclone.android" />
+    </queries>
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Signature permission guarding the companion -> Instagram broadcast bridge. Receivers
@@ -112,10 +129,6 @@
     <uses-permission android:name="ps.reso.instaeclipse.permission.MODULE_IPC" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
-
-    <!-- For Android 11+ broad storage access -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
 
     <!-- Foreground service (required API 28+) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
