@@ -292,6 +292,11 @@ public class KeepUnsentMessagesHook {
                 ModuleLog.line("(IE|KeepUnsent) blocked local removal; thread=" + threadId + " ids=[" + ids.toString().trim() + "]");
                 if (ids.length() > 0) persistIds();
                 param.setResult(null); // skip local removal
+                if (FeatureFlags.markUnsentInThread && param.args.length > 0) {
+                    for (Object a : param.args) {
+                        if (a instanceof String && ((String) a).length() >= 6) markLive(param.thisObject, param.args[0], (String) a);
+                    }
+                }
             }
         };
 
@@ -336,6 +341,104 @@ public class KeepUnsentMessagesHook {
             FeatureStatusTracker.setHooked("KeepUnsentMessages");
         } catch (Throwable t) {
             ModuleLog.line("(IE|KeepUnsent) ❌ remove: " + t);
+        }
+    }
+
+    // ── 1b. Marker without reopening the chat ───────────────────────────────────
+    /** The per-thread entry class (01eV on 452): reconcile's declaring class. */
+    private static Class<?> entryClass;
+    /** Thread change event (08fA on 452) built as (type, DirectThreadKey, added, removed, updated, boolean). */
+    private static java.lang.reflect.Constructor<?> updateEventCtor;
+    private static Object messageUpdatedType;
+
+    /** Resolves Instagram's MESSAGE_UPDATED thread event, which re-renders a message in place. */
+    private static void resolveUpdateEvent(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            for (org.luckypray.dexkit.result.ClassData cd : bridge.findClass(org.luckypray.dexkit.query.FindClass.create()
+                    .matcher(org.luckypray.dexkit.query.matchers.ClassMatcher.create().usingStrings("MESSAGE_UPDATED", "MESSAGE_REMOVED")))) {
+                Class<?> type = cd.getInstance(classLoader);
+                if (!type.isEnum()) continue;
+                Object updated = null;
+                for (Object k : type.getEnumConstants()) if ("MESSAGE_UPDATED".equals(((Enum<?>) k).name())) updated = k;
+                if (updated == null) continue;
+                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                        .name("<init>")
+                        .paramTypes(type.getName(), DTK, "java.util.List", "java.util.List", "java.util.List", "boolean")))) {
+                    updateEventCtor = md.getConstructorInstance(classLoader);
+                    updateEventCtor.setAccessible(true);
+                    messageUpdatedType = updated;
+                    ModuleLog.line("(IE|KeepUnsent) ✅ update event → " + updateEventCtor.getDeclaringClass().getName());
+                    return;
+                }
+            }
+            ModuleLog.line("(IE|KeepUnsent) ⚠️ update event not found; marker shows on reopen");
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|KeepUnsent) ⚠️ update event: " + t);
+        }
+    }
+
+    /**
+     * Marks the message whose removal was just blocked and re-renders it right away: finds it in
+     * the thread entry the store holds for {@code threadKey}, prefixes its text, and posts
+     * MESSAGE_UPDATED on the store's event bus the way Instagram does after an edit.
+     */
+    @SuppressWarnings("unchecked")
+    private static void markLive(Object store, Object threadKey, String id) {
+        if (entryClass == null || store == null || threadKey == null) return;
+        try {
+            Object entry = null;
+            for (Method m : store.getClass().getDeclaredMethods()) {
+                Class<?>[] p = m.getParameterTypes();
+                if (p.length == 1 && p[0].getName().equals(DTK) && m.getReturnType() == entryClass) {
+                    m.setAccessible(true);
+                    entry = m.invoke(store, threadKey);
+                    break;
+                }
+            }
+            if (entry == null) return;
+            Object msg = null;
+            for (Field f : entryClass.getDeclaredFields()) {
+                if (msg != null) break;
+                if (!List.class.isAssignableFrom(f.getType()) || Modifier.isStatic(f.getModifiers())) continue;
+                f.setAccessible(true);
+                Object v = f.get(entry);
+                if (!(v instanceof List)) continue;
+                synchronized (v) {
+                    for (Object cur : (List<Object>) v) {
+                        if (id.equals(matchProtected(cur))) { msg = cur; break; }
+                    }
+                }
+            }
+            if (msg == null) return;
+            java.util.Map<String, Object> owned = keptByThread.get(entry);
+            if (owned == null) { owned = new java.util.LinkedHashMap<>(); keptByThread.put(entry, owned); }
+            owned.put(id, msg);
+            markUnsent(msg, id);
+            postUpdated(store, threadKey, msg);
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|KeepUnsent) ⚠️ live marker: " + t);
+        }
+    }
+
+    /** Posts MESSAGE_UPDATED for {@code msg} on the store's event bus (a field whose type takes the event). */
+    private static void postUpdated(Object store, Object threadKey, Object msg) throws Exception {
+        if (updateEventCtor == null) return;
+        Object event = updateEventCtor.newInstance(messageUpdatedType, threadKey, null, null,
+                Collections.singletonList(msg), false);
+        for (Field f : store.getClass().getDeclaredFields()) {
+            if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+            for (Method m : f.getType().getDeclaredMethods()) {
+                Class<?>[] p = m.getParameterTypes();
+                if (m.getReturnType() != void.class || p.length != 1 || !p[0].isInterface()
+                        || !p[0].isAssignableFrom(event.getClass()) || Modifier.isStatic(m.getModifiers())) continue;
+                f.setAccessible(true);
+                Object bus = f.get(store);
+                if (bus == null) continue;
+                m.setAccessible(true);
+                m.invoke(bus, event);
+                ModuleLog.line("(IE|KeepUnsent) ✅ marker shown live");
+                return;
+            }
         }
     }
 
@@ -428,7 +531,9 @@ public class KeepUnsentMessagesHook {
                     if (!rest) continue;
                     m.setAccessible(true);
                     XposedBridge.hookMethod(m, hook);
+                    entryClass = c;
                     ModuleLog.line("(IE|KeepUnsent) ✅ reconcile hook → " + c.getName() + "." + m.getName());
+                    resolveUpdateEvent(bridge, classLoader);
                     return;
                 }
             }
