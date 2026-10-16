@@ -145,6 +145,8 @@ public final class IgThemeEngine {
         if (map == null) return null;
         int slotIndex = map.get(resId, -1);
         if (slotIndex < 0) return null;
+        Integer fix = IgColorRemapEngine.polarityFix(resId);
+        if (fix != null) return fix;
         return getActivePalette().get(IgThemePalette.SLOT_KEYS[slotIndex]);
     }
 

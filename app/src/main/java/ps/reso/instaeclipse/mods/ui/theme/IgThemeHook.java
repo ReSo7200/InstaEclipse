@@ -49,6 +49,7 @@ public class IgThemeHook {
             hookGetColor(classLoader);
             hookContextGetColor();
             hookTypedArrayGetColor(classLoader);
+            IgThemeColorSourceHooks.install();
             hookActivityLifecycle();
             hookPhoneWindowColors(classLoader);
             installed = true;
@@ -220,6 +221,17 @@ public class IgThemeHook {
             }
         });
         XposedHelpers.findAndHookMethod(Activity.class, "onCreate", Bundle.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                // Build the remap table before the activity inflates its layout (setContentView runs
+                // inside onCreate); otherwise the first header/feed backgrounds are created unthemed
+                // and then reused from Android's drawable cache.
+                if (!IgThemeEngine.isActive()) return;
+                Activity activity = (Activity) param.thisObject;
+                IgThemeEngine.ensureInitialized(activity);
+                IgColorRemapEngine.ensureBuilt(activity);
+            }
+
             @Override
             protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!IgThemeEngine.isActive()) return;
