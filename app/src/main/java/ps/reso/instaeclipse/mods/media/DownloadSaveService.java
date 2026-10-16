@@ -125,7 +125,7 @@ public class DownloadSaveService extends Service {
                 postDoneNotification(sid, "Saved: " + saved.filename, saved.mimeType, saved.uri);
                 showToast(getString(R.string.ig_toast_file_saved, saved.filename));
             } catch (Throwable e) {
-                postDoneNotification(sid, "Download failed: " + e.getMessage(), null, null);
+                postDoneNotification(sid, "Download failed: " + e.getMessage(), null, null, false);
                 showToast(getString(R.string.ig_toast_download_failed, e.getMessage()));
             } finally {
                 stopSelf(sid);
@@ -308,6 +308,7 @@ public class DownloadSaveService extends Service {
                     } finally { //noinspection ResultOfMethodCallIgnored
                         tmp.delete(); }
                 }
+                Uri htmlUri = null;
                 if (html != null && htmlFilename != null) {
                     pushProgress("Saving chat export…", 99, 100, true);
                     File htmp = File.createTempFile("ie_html_", ".html", getCacheDir());
@@ -315,17 +316,17 @@ public class DownloadSaveService extends Service {
                         try (FileOutputStream fo = new FileOutputStream(htmp)) {
                             fo.write(html.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
                         }
-                        writeFileToDir(dir, htmp, htmlFilename, "text/html");
+                        htmlUri = writeFileToDir(dir, htmp, htmlFilename, "text/html");
                     } finally { //noinspection ResultOfMethodCallIgnored
                         htmp.delete(); }
                 }
                 final int fSaved = saved;
                 ModuleLog.line("(IE|Export|Service) saved html + " + fSaved + "/" + total + " media to " + subdir);
-                postDoneNotification(startId, getString(R.string.ig_export_media_saved, fSaved, subdir), "text/html", null);
+                postDoneNotification(startId, getString(R.string.ig_export_media_saved, fSaved, subdir), "text/html", htmlUri, true);
                 showToast(getString(R.string.ig_export_media_saved, fSaved, subdir));
             } catch (Throwable e) {
                 ModuleLog.line("(IE|ChatExport|Service) failed: " + e);
-                postDoneNotification(startId, "Chat export failed: " + e.getMessage(), null, null);
+                postDoneNotification(startId, "Export failed: " + e.getMessage(), null, null, false);
                 showToast(getString(R.string.ig_toast_download_failed, String.valueOf(e.getMessage())));
             } finally {
                 stopSelf(startId);
@@ -513,7 +514,13 @@ public class DownloadSaveService extends Service {
      * in the device's default viewer (gallery, video player, etc.).
      */
     private void postDoneNotification(int startId, String text, String mimeType, Uri fileUri) {
-        int icon = fileUri != null
+        postDoneNotification(startId, text, mimeType, fileUri, true);
+    }
+
+    /** @param ok false only for a real failure (uses the error icon); success uses the download-done
+     *  check icon even when there is no file to open, so a finished export never looks like a warning. */
+    private void postDoneNotification(int startId, String text, String mimeType, Uri fileUri, boolean ok) {
+        int icon = ok
                 ? android.R.drawable.stat_sys_download_done
                 : android.R.drawable.stat_notify_error;
 

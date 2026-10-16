@@ -205,8 +205,16 @@ public class ChatExportHook {
                     }
                 }
 
+                // Who is "me": in a 1:1 chat the title is the other person, so the viewer is the other
+                // sender → their messages align right (self-coloured bubbles).
+                java.util.LinkedHashSet<String> senders = new java.util.LinkedHashSet<>();
+                for (Object[] r : rows) senders.add(names.getOrDefault(((JSONObject) r[1]).optString("user_id", ""), ""));
+                String selfName = null;
+                if (senders.size() == 2) for (String s : senders) if (!s.isEmpty() && !s.equalsIgnoreCase(title)) selfName = s;
+                SimpleDateFormat daySep = new SimpleDateFormat("EEEE, d MMM yyyy", Locale.getDefault());
+
                 StringBuilder body = new StringBuilder();
-                long first = 0, last = 0;
+                long first = 0, last = 0, lastDay = -1;
                 Map<String, Integer> perUser = new LinkedHashMap<>();
                 for (int i = 0; i < rows.size(); i++) {
                     Object[] r = rows.get(i);
@@ -215,47 +223,28 @@ public class ChatExportHook {
                     String who = names.getOrDefault(uid, uid);
                     perUser.merge(who, 1, Integer::sum);
                     long ts = timestampMs(j);
-                    if (ts > 0) { if (first == 0) first = ts; last = ts; }
-                    body.append("<div class=m><span class=u>").append(Html.escapeHtml(who)).append("</span> <span class=t>")
-                            .append(ts > 0 ? fmt.format(new Date(ts)) : "");
-                    if (j.optInt("edit_count", 0) > 0 || j.has("edit_history")) body.append(" · edited");
-                    if (j.optBoolean("is_pinned", false)) body.append(" · pinned");
-                    if (j.optBoolean("show_forward_attribution", false)) body.append(" · forwarded");
-                    body.append("</span>");
+                    if (ts > 0) {
+                        if (first == 0) first = ts;
+                        last = ts;
+                        long day = (ts + java.util.TimeZone.getDefault().getOffset(ts)) / 86400000L;
+                        if (day != lastDay) { lastDay = day; body.append("<div class=date-sep><span>").append(esc(daySep.format(new Date(ts)))).append("</span></div>"); }
+                    }
+                    boolean self = selfName != null && who.equals(selfName);
                     JSONObject replied = repliedTo(r[0], j.optString("item_id", ""), byId);
-                    if (replied != null) {
-                        String ru = replied.optString("user_id", "");
-                        body.append("<div class=q>↪ ").append(Html.escapeHtml(names.getOrDefault(ru, ru))).append(": ")
-                                .append(Html.escapeHtml(clip(describe(replied), 120))).append("</div>");
-                    } else body.append("<br>");
-                    String[] mrel = media.get(i);
-                    if (mrel != null) body.append(mediaHtml(mrel[0], mrel[1]));
-                    // caption: for direct media keep only the user's own text (the "[photo]" placeholder
-                    // is replaced by the media itself); for previews / no media keep the full description.
-                    String caption = (mrel != null && !"preview".equals(mrel[1])) ? j.optString("text", "") : describe(j);
-                    if (!caption.isEmpty()) body.append(Html.escapeHtml(caption).replace("\n", "<br>"));
-                    body.append(editHistory(j, fmt));
-                    String react = reactions(j, names);
-                    if (!react.isEmpty()) body.append("<div class=r>").append(Html.escapeHtml(react)).append("</div>");
-                    body.append("</div>");
+                    body.append(messageHtml(j, self, who, ts, replied, names, media.get(i), fmt));
                 }
                 int n = rows.size();
                 StringBuilder html = new StringBuilder();
-                html.append("<!doctype html><meta charset=utf-8><meta name=viewport content=\"width=device-width\"><title>")
-                        .append(Html.escapeHtml(title))
-                        .append("</title><style>body{font-family:sans-serif;max-width:720px;margin:auto;padding:0 12px;background:#111;color:#eee}"
-                                + ".m{margin:6px 0;padding:8px 12px;border-radius:12px;background:#262626;overflow-wrap:anywhere}"
-                                + ".u{color:#9ad;font-weight:bold}.t{color:#888;font-size:12px}"
-                                + ".q{border-left:3px solid #555;padding-left:8px;margin:4px 0;color:#aaa;font-size:13px}"
-                                + ".r{margin-top:4px;font-size:13px;color:#ccc}.h{color:#aaa;font-size:13px}.e{color:#999;font-size:12px;margin-top:2px}"
-                                + ".media{display:block;max-width:260px;max-height:360px;border-radius:10px;margin:6px 0}audio.media{width:240px;height:40px}</style>")
-                        .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlBanner("Chat export")).append("<h2>")
-                        .append(Html.escapeHtml(title)).append("</h2><p class=h>").append(n).append(" messages");
+                html.append("<!doctype html><html><head><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>")
+                        .append(esc(title)).append("</title><style>").append(CHAT_CSS).append("</style></head><body><div class=wrap>")
+                        .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlBanner("Chat export"))
+                        .append("<div class=head><h1>").append(esc(title)).append("</h1><div class=sub>").append(n).append(" messages");
                 if (first > 0) html.append(" · ").append(fmt.format(new Date(first))).append(" – ").append(fmt.format(new Date(last)));
-                html.append("<br>");
+                html.append("</div><div class=chips>");
                 for (Map.Entry<String, Integer> e : perUser.entrySet())
-                    html.append(Html.escapeHtml(e.getKey())).append(": ").append(e.getValue()).append("<br>");
-                html.append("Exported ").append(fmt.format(new Date())).append("</p>").append(body).append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlFooter());
+                    html.append("<span class=chip>").append(esc(e.getKey())).append(" · ").append(e.getValue()).append("</span>");
+                html.append("</div></div>").append(body)
+                        .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlFooter()).append("</div></body></html>");
 
                 final int count = n;
                 // Preferred path: hand the HTML + media list to the companion app's DownloadSaveService,
@@ -489,6 +478,164 @@ public class ChatExportHook {
             default:      return "<img class=media loading=lazy src=\"" + rel + "\" onerror=\"this.remove()\">"; // photo, gif, preview
         }
     }
+
+    private static String esc(String s) { return Html.escapeHtml(s == null ? "" : s); }
+
+    private static final int[] AVATAR = {0xE1306C, 0x833AB4, 0xF77737, 0x0095F6, 0x00A86B, 0xC13584, 0xFD1D1D, 0x5851DB};
+
+    private static String avatarColor(String u) {
+        return String.format(Locale.US, "%06X", AVATAR[((u == null ? 0 : u.hashCode()) & 0x7fffffff) % AVATAR.length]);
+    }
+
+    private static String initial(String u) {
+        return u == null || u.isEmpty() ? "?" : u.substring(0, 1).toUpperCase(Locale.ROOT);
+    }
+
+    private static Object payloadOf(JSONObject j, String type) {
+        Object payload = j.opt(type);
+        if (!(payload instanceof JSONObject) && !"text".equals(type)) { Object m = j.opt("media"); if (m != null) payload = m; }
+        return payload;
+    }
+
+    private static String stripBrackets(String s) {
+        s = s.trim();
+        if (s.startsWith("[") && s.endsWith("]")) s = s.substring(1, s.length() - 1);
+        return s;
+    }
+
+    /** One message as a chat row (bubble), or a centered system line for action/call logs. */
+    private static String messageHtml(JSONObject j, boolean self, String who, long ts,
+                                      JSONObject replied, Map<String, String> names, String[] mrel, SimpleDateFormat fmt) {
+        String type = j.optString("item_type", "");
+        if (type.equals("action_log") || type.equals("video_call_event")
+                || type.equals("placeholder") || type.equals("expired_placeholder")) {
+            String t = stripBrackets(describe(j));
+            return "<div class=sys><span>" + esc(t) + (ts > 0 ? " · " + esc(fmt.format(new Date(ts))) : "") + "</span></div>";
+        }
+        StringBuilder b = new StringBuilder();
+        b.append("<div class=\"row").append(self ? " me" : "").append("\">");
+        if (!self) b.append("<div class=av style=\"background:#").append(avatarColor(who)).append("\">").append(esc(initial(who))).append("</div>");
+        b.append("<div class=bub>");
+        if (!self) b.append("<div class=nm>").append(esc(who)).append("</div>");
+        if (replied != null) {
+            String ru = replied.optString("user_id", "");
+            b.append("<div class=q><b>").append(esc(names.getOrDefault(ru, ru))).append("</b> ")
+             .append(esc(clip(describe(replied), 100))).append("</div>");
+        }
+        b.append(contentHtml(j, type, mrel));
+        b.append(editHistory(j, fmt));
+        b.append("<div class=meta>");
+        if (ts > 0) b.append(esc(fmt.format(new Date(ts))));
+        if (j.optInt("edit_count", 0) > 0 || j.has("edit_history")) b.append("<span class=badge>edited</span>");
+        if (j.optBoolean("is_pinned", false)) b.append("<span class=badge>📌 pinned</span>");
+        if (j.optBoolean("show_forward_attribution", false)) b.append("<span class=badge>↪ forwarded</span>");
+        b.append("</div>");
+        String react = reactions(j, names);
+        if (!react.isEmpty()) {
+            b.append("<div class=react>");
+            for (String part : react.split(", ")) b.append("<span class=rx>").append(esc(part)).append("</span>");
+            b.append("</div>");
+        }
+        return b.append("</div></div>").toString();
+    }
+
+    /** The message body HTML, styled per item type (media, shared card, story reply, like, text). */
+    private static String contentHtml(JSONObject j, String type, String[] mrel) {
+        String text = j.optString("text", "");
+        switch (type) {
+            case "like":
+                return "<div class=like>❤️</div>";
+            case "media": case "raven_media": case "visual_media": case "animated_media": case "voice_media": {
+                StringBuilder s = new StringBuilder();
+                if (mrel != null) s.append(mediaHtml(mrel[0], mrel[1]));
+                else s.append("<div class=ph>").append(esc(describe(j))).append("</div>");
+                if (!text.isEmpty()) s.append("<div class=txt>").append(esc(text).replace("\n", "<br>")).append("</div>");
+                return s.toString();
+            }
+            case "media_share": case "clip": case "felix_share":
+            case "xma_media_share": case "xma_clip": case "xma_felix_share":
+            case "story_share": case "xma_story_share":
+                return sharedCard(j, type, mrel, text, false);
+            case "reel_share": case "xma_reel_share":
+                return sharedCard(j, type, mrel, text, true);
+            case "xma_reel_mention": case "xma_story_mention": {
+                String s = "<div class=card><div class=ci><div class=cl>✨ Mentioned you in a story</div></div></div>";
+                return mrel != null ? "<div class=card><img loading=lazy src=\"" + mrel[0] + "\" onerror=\"this.remove()\"><div class=ci><div class=cl>✨ Story mention</div></div></div>" : s;
+            }
+            case "profile": case "xma_profile": {
+                String u = first(payloadOf(j, type), "username");
+                return "<div class=card><div class=ci><div class=cl>👤 Shared profile</div>"
+                        + (u.isEmpty() ? "" : "<div class=cu>@" + esc(u) + "</div>") + "</div></div>";
+            }
+            case "text":
+                return "<div class=txt>" + esc(text).replace("\n", "<br>") + "</div>";
+            default: {
+                StringBuilder s = new StringBuilder();
+                if (mrel != null) s.append(mediaHtml(mrel[0], mrel[1]));
+                String d = text.isEmpty() ? describe(j) : text;
+                if (!d.isEmpty()) s.append("<div class=txt>").append(esc(d).replace("\n", "<br>")).append("</div>");
+                return s.toString();
+            }
+        }
+    }
+
+    /** A card for a shared post/reel/story, or a story-reply card (preview + label + @user + caption). */
+    private static String sharedCard(JSONObject j, String type, String[] mrel, String text, boolean storyReply) {
+        Object payload = payloadOf(j, type);
+        String user = first(payload, "username");
+        String caption = first(findObj(payload, "caption", 0), "text");
+        String code = first(payload, "code");
+        boolean story = type.contains("story");
+        boolean reel = storyReply || "clips".equals(first(payload, "product_type")) || findObj(payload, "clips_metadata", 0) != null;
+        String label = storyReply ? "↩ Story reply" : story ? "↗ Shared story" : reel ? "↗ Shared reel" : "↗ Shared post";
+        String link = code.isEmpty() ? "" : "https://www.instagram.com/" + (reel && !storyReply ? "reel/" : "p/") + code + "/";
+        StringBuilder s = new StringBuilder();
+        boolean hasPrev = mrel != null && "preview".equals(mrel[1]);
+        s.append(link.isEmpty() ? "<div class=card>" : "<a class=card href=\"" + link + "\" target=_blank rel=noopener>");
+        if (hasPrev) s.append("<img loading=lazy src=\"").append(mrel[0]).append("\" onerror=\"this.remove()\">");
+        s.append("<div class=ci><div class=cl>").append(label).append("</div>");
+        if (!user.isEmpty()) s.append("<div class=cu>").append(storyReply ? "to @" : "@").append(esc(user)).append("</div>");
+        if (!caption.isEmpty()) s.append("<div class=cc>").append(esc(clip(caption, 220))).append("</div>");
+        s.append("</div>").append(link.isEmpty() ? "</div>" : "</a>");
+        // the reply text / any accompanying caption text sits under the card
+        if (!text.isEmpty()) s.append("<div class=txt>").append(esc(text).replace("\n", "<br>")).append("</div>");
+        return s.toString();
+    }
+
+    private static final String CHAT_CSS =
+            ":root{--bg:#f4f4f6;--panel:#fff;--text:#0b0b0c;--sub:#8a8a92;--line:#e7e7ec;--other:#fff;--me:#3797f0;--meTx:#fff;--accent:#c13584}"
+            + "@media(prefers-color-scheme:dark){:root{--bg:#0a0a0b;--panel:#161618;--text:#f2f2f3;--sub:#9a9aa0;--line:#262629;--other:#232326;--me:#3797f0;--meTx:#fff;--accent:#e06ebb}}"
+            + "*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}"
+            + ".wrap{max-width:760px;margin:0 auto;padding:16px}"
+            + ".head{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:8px}"
+            + ".head h1{margin:0;font-size:21px;word-break:break-word}.head .sub{color:var(--sub);font-size:13px;margin-top:4px}"
+            + ".chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}"
+            + ".chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--sub)}"
+            + ".date-sep{text-align:center;margin:18px 0 8px}.date-sep span{background:var(--panel);border:1px solid var(--line);color:var(--sub);font-size:12px;border-radius:999px;padding:4px 12px}"
+            + ".row{display:flex;gap:8px;margin:8px 0;align-items:flex-end}.row.me{flex-direction:row-reverse}"
+            + ".av{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}"
+            + ".bub{max-width:78%;background:var(--other);border:1px solid var(--line);border-radius:18px;padding:9px 13px;overflow-wrap:anywhere}"
+            + ".row.me .bub{background:var(--me);color:var(--meTx);border-color:transparent}"
+            + ".nm{font-weight:700;font-size:12.5px;color:var(--accent);margin-bottom:3px}"
+            + ".txt{white-space:normal}.ph{opacity:.8;font-style:italic}"
+            + ".meta{font-size:11px;color:var(--sub);margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}"
+            + ".row.me .meta{color:rgba(255,255,255,.82);justify-content:flex-end}"
+            + ".badge{font-size:10.5px;padding:1px 7px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--sub)}"
+            + ".row.me .badge{background:rgba(255,255,255,.2);border-color:transparent;color:#fff}"
+            + ".q{border-left:3px solid var(--accent);padding:4px 9px;margin:0 0 6px;font-size:13px;color:var(--sub);background:var(--bg);border-radius:9px}"
+            + ".row.me .q{background:rgba(255,255,255,.16);color:rgba(255,255,255,.92);border-left-color:rgba(255,255,255,.65)}"
+            + ".media{display:block;max-width:100%;max-height:420px;border-radius:14px;margin:3px 0}audio.media{width:min(260px,70vw);height:40px}"
+            + ".react{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}.row.me .react{justify-content:flex-end}"
+            + ".rx{font-size:12px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--text)}"
+            + ".card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:3px 0;background:var(--bg)}"
+            + ".row.me .card{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28)}"
+            + ".card img{display:block;width:100%;max-height:280px;object-fit:cover}.card .ci{padding:9px 12px}"
+            + ".card .cl{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--accent);font-weight:800}"
+            + ".row.me .card .cl{color:#fff}.card .cu{font-weight:700;font-size:13px;margin-top:2px}"
+            + ".card .cc{font-size:12.5px;color:var(--sub);margin-top:3px}.row.me .card .cc{color:rgba(255,255,255,.86)}"
+            + ".sys{text-align:center;color:var(--sub);font-size:12.5px;margin:12px 0}.sys span{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 12px}"
+            + ".e{font-size:12px;opacity:.78;margin-top:4px;border-left:2px solid var(--line);padding-left:8px}.row.me .e{border-left-color:rgba(255,255,255,.5)}"
+            + ".like{font-size:30px;line-height:1.1}";
 
     private static long timestampMs(JSONObject j) {
         try { return Long.parseLong(j.optString("timestamp", "0")) / 1000L; } catch (Throwable t) { return 0; }
