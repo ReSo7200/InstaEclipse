@@ -49,8 +49,8 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  * message's String fields for an id present in the protected set (so per-version id-field renames
  * don't matter).
  *
- * NOTE: protection is populated when GYr/GYs fires this session, so a within-session pull-to-refresh
- * is covered. Cross-restart persistence and an "unsent" visual marker are follow-ups.
+ * Protected ids (and their thread) are saved to Instagram's filesDir, so after a restart the kept
+ * message is still recognised on its next reconcile and gets its "Unsent" marker back.
  */
 public class KeepUnsentMessagesHook {
 
@@ -76,6 +76,56 @@ public class KeepUnsentMessagesHook {
             java.util.Collections.synchronizedMap(new java.util.LinkedHashMap<String, String>() {
                 @Override protected boolean removeEldestEntry(java.util.Map.Entry<String, String> e) { return size() > 500; }
             });
+
+    private static final String IDS_FILE = "ie_unsent_ids.json";
+    private static volatile boolean idsLoaded = false;
+
+    /** Restores the ids protected in earlier sessions (once, lazily: the app context must exist). */
+    private static void ensureIdsLoaded() {
+        if (idsLoaded) return;
+        synchronized (protectedIds) {
+            if (idsLoaded) return;
+            java.io.File f = idsFile();
+            if (f == null) return;
+            idsLoaded = true;
+            if (!f.exists()) return;
+            try {
+                org.json.JSONObject o = new org.json.JSONObject(new String(
+                        java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8));
+                for (java.util.Iterator<String> it = o.keys(); it.hasNext(); ) {
+                    String id = it.next();
+                    protectedIds.add(id);
+                    String th = o.optString(id, "");
+                    if (!th.isEmpty()) threadIdByMsg.put(id, th);
+                }
+                ModuleLog.line("(IE|KeepUnsent) restored " + o.length() + " protected id(s)");
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|KeepUnsent) ids load failed: " + t.getMessage());
+            }
+        }
+    }
+
+    private static void persistIds() {
+        java.io.File f = idsFile();
+        if (f == null) return;
+        try {
+            org.json.JSONObject o = new org.json.JSONObject();
+            synchronized (protectedIds) {
+                for (String id : protectedIds) {
+                    String th = threadIdByMsg.get(id);
+                    o.put(id, th == null ? "" : th);
+                }
+            }
+            ps.reso.instaeclipse.utils.core.AtomicFiles.write(f, o.toString());
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|KeepUnsent) ids save failed: " + t.getMessage());
+        }
+    }
+
+    private static java.io.File idsFile() {
+        android.content.Context ctx = android.app.AndroidAppHelper.currentApplication();
+        return ctx == null ? null : new java.io.File(ctx.getFilesDir(), IDS_FILE);
+    }
 
     /** Extract the thread id string from a DirectThreadKey (first non-empty String field). */
     private static String threadIdOf(Object dtk) {
@@ -228,6 +278,7 @@ public class KeepUnsentMessagesHook {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.keepUnsentMessages) return;
+                ensureIdsLoaded();
                 // Record the message-id String arg(s) (GYr/GYs pass id as the String params).
                 String threadId = param.args.length > 0 ? threadIdOf(param.args[0]) : null;
                 StringBuilder ids = new StringBuilder();
@@ -239,6 +290,7 @@ public class KeepUnsentMessagesHook {
                     }
                 }
                 ModuleLog.line("(IE|KeepUnsent) blocked local removal; thread=" + threadId + " ids=[" + ids.toString().trim() + "]");
+                if (ids.length() > 0) persistIds();
                 param.setResult(null); // skip local removal
             }
         };
@@ -295,7 +347,9 @@ public class KeepUnsentMessagesHook {
             @Override
             @SuppressWarnings("unchecked")
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                if (!FeatureFlags.keepUnsentMessages || protectedIds.isEmpty()) return;
+                if (!FeatureFlags.keepUnsentMessages) return;
+                ensureIdsLoaded();
+                if (protectedIds.isEmpty()) return;
                 Object[] args = param.args;
                 if (args == null || args.length == 0 || args[0] == null) return;
                 try {
