@@ -67,6 +67,10 @@ public class CommentSearchHook {
     /** {username, text, comment id, parent comment id ("" = top level), likes, reply count, created (s), media id};
      *  the post caption row has no ids (its user = the post author) */
     private static volatile List<String[]> latest = new ArrayList<>();
+    /** The latest comment UI-state object and the comments-sheet fragment — walked at export time to
+     *  find the post's Media object (so the post's own photos/videos can be saved with the comments). */
+    private static volatile Object lastState;
+    private static java.lang.ref.WeakReference<Object> lastFragment = new java.lang.ref.WeakReference<>(null);
     // IG's own comment JSON serializer (static void (generator, Comment) using "parent_comment_id")
     // and the JSON factory's (Writer) -> generator method: field names stay readable across versions
     private static Method commentSerializer, jsonWriterMethod;
@@ -76,6 +80,8 @@ public class CommentSearchHook {
     private static java.lang.ref.WeakReference<View> sheet = new java.lang.ref.WeakReference<>(null);
     private static final android.os.Handler MAIN = new android.os.Handler(android.os.Looper.getMainLooper());
     private static volatile Runnable loading;
+    /** Remembered state of the "Also save the post's photos/videos" export option. */
+    private static boolean exportPostMedia = true;
     /** ids / tracking tokens (long, no spaces, base64-ish) are never the comment text */
     private static final java.util.regex.Pattern TOKEN = java.util.regex.Pattern.compile("[A-Za-z0-9+/=_-]{32,}");
 
@@ -100,7 +106,7 @@ public class CommentSearchHook {
                     protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!FeatureFlags.commentSearch || param.getResult() == null) return;
                         List<String[]> rows = collect(param.getResult());
-                        if (!rows.isEmpty()) latest = rows;
+                        if (!rows.isEmpty()) { latest = rows; lastState = param.getResult(); }
                     }
                 });
                 builders++;
@@ -135,6 +141,7 @@ public class CommentSearchHook {
                     XposedBridge.hookMethod(ovc, new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                            if (param.thisObject != null) lastFragment = new java.lang.ref.WeakReference<>(param.thisObject);
                             if (FeatureFlags.commentSearch && param.args[0] instanceof View root) root.post(() -> addPill(host(root)));
                         }
                     });
@@ -524,8 +531,17 @@ public class CommentSearchHook {
         exportBtn.setBackground(outline);
         exportBtn.setOnClickListener(v -> {
             if (all.isEmpty()) return;
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_working), Toast.LENGTH_SHORT).show();
-            exportComments(ctx, new ArrayList<>(all));
+            List<String[]> rows = new ArrayList<>(all);
+            ps.reso.instaeclipse.utils.dialog.IeDialog exDlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                    .title(I18n.t(ctx, R.string.ig_comment_export));
+            android.widget.CheckBox postBox = exDlg.checkBox(I18n.t(ctx, R.string.ig_comment_export_post_media), exportPostMedia);
+            exDlg.secondary(I18n.t(ctx, R.string.ig_dialog_cancel), null);
+            exDlg.primary(I18n.t(ctx, R.string.ig_comment_export), () -> {
+                exportPostMedia = postBox.isChecked();
+                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_working), Toast.LENGTH_SHORT).show();
+                exportComments(ctx, rows, exportPostMedia);
+            });
+            exDlg.show();
         });
         LinearLayout.LayoutParams elp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         elp.setMarginEnd((int) (8 * d));
@@ -785,7 +801,7 @@ public class CommentSearchHook {
     }
 
     /** Saves the loaded comments as a self-contained HTML page (tree of replies, search box). */
-    private static void exportComments(Context ctx, List<String[]> rows) {
+    private static void exportComments(Context ctx, List<String[]> rows, boolean includePostMedia) {
         new Thread(() -> {
             try {
                 String author = "", caption = "", mediaId = "";
@@ -798,6 +814,30 @@ public class CommentSearchHook {
                 }
                 String code = shortcode(mediaId);
                 String link = code.isEmpty() ? "" : "https://www.instagram.com/p/" + code + "/";
+
+                // Media the companion service will download + embed: {url, local name, mime}.
+                List<String[]> media = new ArrayList<>();
+                int[] ctr = {0};
+                // The post's own photos/videos (carousel-aware) via the downloader's extractor, shown
+                // in the hero. Downloaded + embedded so they stay on device and never expire.
+                StringBuilder postGallery = new StringBuilder();
+                if (includePostMedia && !mediaId.isEmpty()) {
+                    try {
+                        List<String> purls = postMediaUrls(ctx, mediaId);
+                        int pi = 0;
+                        for (String u : purls) {
+                            if (u == null || !u.startsWith("http")) continue;
+                            boolean vid = u.contains(".mp4");
+                            String ext = vid ? ".mp4" : mediaExt(u, "image");
+                            String name = String.format(Locale.US, "post_%02d%s", ++pi, ext);
+                            media.add(new String[]{u, name, vid ? "video/mp4" : mediaMime(ext)});
+                            postGallery.append(vid
+                                    ? "<video class=media controls preload=none src=\"" + name + "\" onerror=\"this.remove()\"></video>"
+                                    : "<img class=media loading=lazy src=\"" + name + "\" onerror=\"this.remove()\">");
+                        }
+                        ModuleLog.line(TAG + "post media: " + pi + " item(s) for " + mediaId);
+                    } catch (Throwable t) { ModuleLog.line(TAG + "post media failed: " + t); }
+                }
                 Map<String, List<String[]>> kids = new java.util.HashMap<>();
                 Set<String> ids = new java.util.HashSet<>();
                 for (String[] r : comments) ids.add(r[2]);
@@ -835,6 +875,7 @@ public class CommentSearchHook {
                  .append("details>summary::before{content:'— ';}mark{background:var(--mark);color:inherit;border-radius:3px}")
                  .append(".foot{color:var(--sub);font-size:12px;text-align:center;margin:20px 0 8px}.hide{display:none!important}")
                  .append(".media{display:block;margin-top:8px;max-width:min(260px,100%);max-height:320px;border-radius:12px;border:1px solid var(--line)}")
+                 .append(".postmedia{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.postmedia .media{margin-top:0;max-width:min(200px,46%)}")
                  .append(".tag{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--sub);font-size:12px}")
                  .append("</style></head><body><div class=wrap>");
                 h.append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlBanner("Comments export"));
@@ -842,11 +883,10 @@ public class CommentSearchHook {
                  .append(author.isEmpty() ? "" : " on @" + esc(author) + "'s post").append("</h1>");
                 if (!link.isEmpty()) h.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
                 if (!caption.isEmpty()) h.append("<div class=cap>").append(esc(caption)).append("</div>");
+                if (postGallery.length() > 0) h.append("<div class=postmedia>").append(postGallery).append("</div>");
                 h.append("<div class=stats><span class=chip>").append(tops.size()).append(" comments</span><span class=chip>")
                  .append(replies).append(" replies</span><span class=chip>Exported ").append(esc(now)).append("</span></div></div></div>");
                 h.append("<div class=search><input id=q placeholder=\"Search names or words…\" autocomplete=off></div><div id=list>");
-                List<String[]> media = new ArrayList<>();   // {url, local name, mime}
-                int[] ctr = {0};
                 for (String[] t : tops) {
                     h.append("<div class=thread>");
                     commentHtml(h, t, fmt, media, ctr);
@@ -971,6 +1011,67 @@ public class CommentSearchHook {
             case ".mp4":  return "video/mp4";
             default:       return "image/jpeg";
         }
+    }
+
+    /** The post's own media URLs (photos/videos, carousel-aware): finds the post Media object in the
+     *  retained comment UI state by matching its getId() to the post's media id, then reuses the
+     *  downloader's extractor. Empty when the Media object can't be found. */
+    private static List<String> postMediaUrls(Context ctx, String mediaId) {
+        if (mediaId == null || mediaId.isEmpty()) return new ArrayList<>();
+        String pk = mediaId.split("_")[0];
+        for (Object root : new Object[]{lastFragment.get(), lastState}) {
+            if (root == null) continue;
+            List<String> urls = walkForMedia(ctx, root, mediaId, pk);
+            if (!urls.isEmpty()) return urls;
+        }
+        return new ArrayList<>();
+    }
+
+    /** BFS a graph for the Media whose getId() matches the post id, then extract its URLs. */
+    private static List<String> walkForMedia(Context ctx, Object root, String mediaId, String pk) {
+        Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        java.util.ArrayDeque<Object> q = new java.util.ArrayDeque<>();
+        q.add(root);
+        Map<Class<?>, Method> idGetters = new java.util.HashMap<>();
+        int candidates = 0;
+        while (!q.isEmpty() && seen.size() < 12000) {
+            Object o = q.poll();
+            if (o == null || !seen.add(o)) continue;
+            try {
+                if (o instanceof List<?> l) { for (Object it : l) q.add(it); continue; }
+                if (o instanceof java.util.Map<?, ?> mp) { for (Object v : mp.values()) q.add(v); continue; }
+                String n = o.getClass().getName();
+                if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
+                // Is this the post Media? Media objects expose a public getId().
+                if (!idGetters.containsKey(o.getClass())) {
+                    Method g = null;
+                    try { g = o.getClass().getMethod("getId"); if (g.getReturnType() != String.class) g = null; }
+                    catch (Throwable ignored) {}
+                    idGetters.put(o.getClass(), g);
+                }
+                Method g = idGetters.get(o.getClass());
+                if (g != null) {
+                    Object id = g.invoke(o);
+                    if (id instanceof String s && !s.isEmpty()) {
+                        candidates++;
+                        if (s.equals(mediaId) || s.split("_")[0].equals(pk)) {
+                            List<String> urls;
+                            try { urls = ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, o); }
+                            catch (Throwable ex) { urls = null; }
+                            ModuleLog.line(TAG + "post media candidate " + o.getClass().getName() + " id=" + s + " urls=" + (urls == null ? 0 : urls.size()));
+                            if (urls != null && !urls.isEmpty()) return urls;
+                        }
+                    }
+                }
+                for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+                    for (Field f : k.getDeclaredFields()) {
+                        if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
+                        try { f.setAccessible(true); Object v = f.get(o); if (v != null) q.add(v); } catch (Throwable ignored) {}
+                    }
+            } catch (Throwable ignored) {}
+        }
+        ModuleLog.line(TAG + "walkForMedia: " + seen.size() + " nodes, " + candidates + " id-bearing, no match for " + mediaId);
+        return new ArrayList<>();
     }
 
     private static GradientDrawable round(int color, float radius) {

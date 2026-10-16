@@ -486,6 +486,7 @@
     <string name="ig_comment_search_hide_replies">Hide replies</string>
     <string name="ig_comment_export">Export</string>
     <string name="ig_comment_export_working">Exporting loaded comments…</string>
+    <string name="ig_comment_export_post_media">Also save the post\'s photos/videos</string>
     <string name="ig_comment_export_done">Exported %1$d comments to %2$s</string>
     <string name="ig_dialog_misc_follow_export">Export Followers/Following to CSV</string>
     <string name="ig_follow_export">Export CSV</string>
