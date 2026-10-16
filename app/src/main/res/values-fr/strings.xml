@@ -453,6 +453,8 @@
     <string name="theme_section_colors">Couleurs</string>
     <string name="theme_section_fonts">Polices &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Qualité maximale</string>
+    <string name="ig_dialog_max_upload_quality">Toujours envoyer en qualité maximale</string>
+    <string name="ig_feat_max_upload_quality">Qualité d\'envoi max</string>
     <string name="ig_dialog_location_spoof_enable">Simuler la position GPS</string>
     <string name="ig_dialog_location_pick">Choisir un lieu sur la carte</string>
     <string name="ig_dialog_location_unset">Aucune position définie</string>

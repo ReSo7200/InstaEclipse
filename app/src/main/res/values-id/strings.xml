@@ -451,6 +451,8 @@
     <string name="theme_section_colors">Warna</string>
     <string name="theme_section_fonts">Font &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Maksimum Tersedia</string>
+    <string name="ig_dialog_max_upload_quality">Selalu unggah dengan kualitas tertinggi</string>
+    <string name="ig_feat_max_upload_quality">Kualitas unggah maks</string>
     <string name="ig_dialog_location_spoof_enable">Palsukan Lokasi GPS</string>
     <string name="ig_dialog_location_pick">Pilih Lokasi di Peta</string>
     <string name="ig_dialog_location_unset">Belum ada lokasi yang diatur</string>

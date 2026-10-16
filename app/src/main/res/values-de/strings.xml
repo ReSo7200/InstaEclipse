@@ -428,6 +428,8 @@
     <string name="theme_section_colors">Farben</string>
     <string name="theme_section_fonts">Schriften &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Maximal verfügbar</string>
+    <string name="ig_dialog_max_upload_quality">Immer in höchster Qualität hochladen</string>
+    <string name="ig_feat_max_upload_quality">Max. Upload-Qualität</string>
     <string name="ig_dialog_location_spoof_enable">GPS-Standort fälschen</string>
     <string name="ig_dialog_location_pick">Standort auf Karte wählen</string>
     <string name="ig_dialog_location_unset">Kein Standort festgelegt</string>

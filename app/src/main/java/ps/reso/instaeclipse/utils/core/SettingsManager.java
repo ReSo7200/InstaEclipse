@@ -78,6 +78,7 @@ public class SettingsManager {
         editor.putBoolean("offerCopyImage", FeatureFlags.offerCopyImage);
         editor.putBoolean("offerMediaInfo", FeatureFlags.offerMediaInfo);
         editor.putBoolean("offerPlaybackSpeed", FeatureFlags.offerPlaybackSpeed);
+        editor.putBoolean("maxUploadQuality", FeatureFlags.maxUploadQuality);
         editor.putBoolean("forceReelScrubber", FeatureFlags.forceReelScrubber);
         editor.putBoolean("markUnsentInThread", FeatureFlags.markUnsentInThread);
         editor.putBoolean("keepEditHistory", FeatureFlags.keepEditHistory);
@@ -219,6 +220,7 @@ public class SettingsManager {
         FeatureFlags.offerCopyImage = prefs.getBoolean("offerCopyImage", false);
         FeatureFlags.offerMediaInfo = prefs.getBoolean("offerMediaInfo", false);
         FeatureFlags.offerPlaybackSpeed = prefs.getBoolean("offerPlaybackSpeed", false);
+        FeatureFlags.maxUploadQuality = prefs.getBoolean("maxUploadQuality", false);
         FeatureFlags.forceReelScrubber = prefs.getBoolean("forceReelScrubber", false);
         FeatureFlags.markUnsentInThread = prefs.getBoolean("markUnsentInThread", false);
         FeatureFlags.keepEditHistory = prefs.getBoolean("keepEditHistory", false);

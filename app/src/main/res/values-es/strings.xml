@@ -424,6 +424,8 @@
     <string name="theme_section_colors">Colores</string>
     <string name="theme_section_fonts">Fuentes &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Máxima disponible</string>
+    <string name="ig_dialog_max_upload_quality">Subir siempre con la máxima calidad</string>
+    <string name="ig_feat_max_upload_quality">Calidad de subida máx.</string>
     <string name="ig_dialog_location_spoof_enable">Falsear ubicación GPS</string>
     <string name="ig_dialog_location_pick">Elegir ubicación en el mapa</string>
     <string name="ig_dialog_location_unset">No hay ubicación establecida</string>

@@ -419,6 +419,8 @@
     <string name="theme_section_colors">Cores</string>
     <string name="theme_section_fonts">Tipos de Letra &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Máxima Disponível</string>
+    <string name="ig_dialog_max_upload_quality">Carregar sempre na máxima qualidade</string>
+    <string name="ig_feat_max_upload_quality">Qualidade máx. de carregamento</string>
     <string name="ig_dialog_location_spoof_enable">Simular Localização GPS</string>
     <string name="ig_dialog_location_pick">Escolher Localização no Mapa</string>
     <string name="ig_dialog_location_unset">Nenhuma localização definida</string>

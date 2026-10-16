@@ -420,6 +420,8 @@
     <string name="theme_section_colors">Renkler</string>
     <string name="theme_section_fonts">Yazı Tipleri &amp; Emoji</string>
     <string name="ig_dialog_quality_max">En Yüksek</string>
+    <string name="ig_dialog_max_upload_quality">Her zaman en yüksek kalitede yükle</string>
+    <string name="ig_feat_max_upload_quality">Maks. yükleme kalitesi</string>
     <string name="ig_dialog_location_spoof_enable">GPS Konumunu Sahtele</string>
     <string name="ig_dialog_location_pick">Haritada Konum Seç</string>
     <string name="ig_dialog_location_unset">Konum ayarlanmadı</string>

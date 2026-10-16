@@ -451,6 +451,8 @@
     <string name="theme_section_colors">צבעים</string>
     <string name="theme_section_fonts">גופנים &amp; אימוג\'י</string>
     <string name="ig_dialog_quality_max">האיכות המרבית</string>
+    <string name="ig_dialog_max_upload_quality">העלה תמיד באיכות הגבוהה ביותר</string>
+    <string name="ig_feat_max_upload_quality">איכות העלאה מרבית</string>
     <string name="ig_dialog_location_spoof_enable">זייף מיקום GPS</string>
     <string name="ig_dialog_location_pick">בחר מיקום במפה</string>
     <string name="ig_dialog_location_unset">לא הוגדר מיקום</string>

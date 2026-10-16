@@ -169,6 +169,8 @@
     <string name="theme_slot_error">Errore</string>
     <string name="theme_slot_destructive">Distruttivo</string>
     <string name="ig_dialog_quality_max">Massima disponibile</string>
+    <string name="ig_dialog_max_upload_quality">Carica sempre alla massima qualità</string>
+    <string name="ig_feat_max_upload_quality">Qualità di caricamento max</string>
     <string name="ig_dialog_location_spoof_enable">Falsifica posizione GPS</string>
     <string name="ig_dialog_location_pick">Scegli posizione sulla mappa</string>
     <string name="ig_dialog_location_unset">Nessuna posizione impostata</string>

@@ -2051,6 +2051,13 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         copyLinkCard.addView(audioSwitch);
+        ToggleRow maxQualitySwitch = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
+                I18n.t(context, R.string.ig_dialog_max_upload_quality), FeatureFlags.maxUploadQuality);
+        maxQualitySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FeatureFlags.maxUploadQuality = isChecked;
+            SettingsManager.saveAllFlags();
+        });
+        copyLinkCard.addView(maxQualitySwitch);
         ToggleRow copyImageSwitch = createSwitch(context, R.drawable.ic_content_copy, "#FF9F0A",
                 I18n.t(context, R.string.ig_dialog_downloader_offer_copy_image), FeatureFlags.offerCopyImage);
         copyImageSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

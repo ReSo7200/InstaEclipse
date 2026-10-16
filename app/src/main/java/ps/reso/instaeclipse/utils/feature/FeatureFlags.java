@@ -52,6 +52,7 @@ public class FeatureFlags {
     public static boolean offerCopyImage = false; // offer "Copy image to clipboard" when downloading a photo (#228)
     public static boolean enableVoiceDownload = false; // Download row for DM voice messages (#223)
     public static boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)
+    public static boolean maxUploadQuality = false; // force IG's "Upload at highest quality" switch always on
     public static boolean expandCaptions = false; // feed captions without "… more" (#246)
     public static boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
     public static boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)

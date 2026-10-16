@@ -422,6 +422,8 @@
     <string name="theme_section_colors">Rənglər</string>
     <string name="theme_section_fonts">Şriftlər &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Maksimum Mövcud</string>
+    <string name="ig_dialog_max_upload_quality">Həmişə ən yüksək keyfiyyətdə yüklə</string>
+    <string name="ig_feat_max_upload_quality">Maks. yükləmə keyfiyyəti</string>
     <string name="ig_dialog_location_spoof_enable">GPS Məkanını Saxtalaşdır</string>
     <string name="ig_dialog_location_pick">Xəritədə Məkan Seç</string>
     <string name="ig_dialog_location_unset">Məkan təyin edilməyib</string>

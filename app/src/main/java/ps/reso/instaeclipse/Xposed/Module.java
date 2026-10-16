@@ -516,6 +516,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ Failed to hook");
                     }
 
+                    // Force "Upload at highest quality" always on
+                    try {
+                        if (!skip("MaxUploadQualityHook")) new ps.reso.instaeclipse.mods.media.MaxUploadQualityHook().install(dexKitBridge, lpparam.classLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|MaxUploadQuality) ❌ Failed to hook");
+                    }
+
                     try {
                         if (!skip("DisableVideoAutoPlayHook")) new DisableVideoAutoPlayHook().handleAutoPlayDisable(dexKitBridge); // Video Autoplay
                     } catch (Throwable ignored) {

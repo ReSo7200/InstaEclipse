@@ -53,6 +53,7 @@ public class SettingsBackupManager {
         s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
         s.put("offerMediaInfo",             FeatureFlags.offerMediaInfo);
         s.put("offerPlaybackSpeed",         FeatureFlags.offerPlaybackSpeed);
+        s.put("maxUploadQuality",           FeatureFlags.maxUploadQuality);
         s.put("forceReelScrubber",          FeatureFlags.forceReelScrubber);
         s.put("markUnsentInThread",         FeatureFlags.markUnsentInThread);
         s.put("keepEditHistory",            FeatureFlags.keepEditHistory);
@@ -164,6 +165,7 @@ public class SettingsBackupManager {
         if (s.has("offerCopyImage"))            FeatureFlags.offerCopyImage            = s.getBoolean("offerCopyImage");
         if (s.has("offerMediaInfo"))            FeatureFlags.offerMediaInfo            = s.getBoolean("offerMediaInfo");
         if (s.has("offerPlaybackSpeed"))        FeatureFlags.offerPlaybackSpeed        = s.getBoolean("offerPlaybackSpeed");
+        if (s.has("maxUploadQuality"))          FeatureFlags.maxUploadQuality          = s.getBoolean("maxUploadQuality");
         if (s.has("forceReelScrubber"))         FeatureFlags.forceReelScrubber         = s.getBoolean("forceReelScrubber");
         if (s.has("markUnsentInThread"))        FeatureFlags.markUnsentInThread        = s.getBoolean("markUnsentInThread");
         if (s.has("keepEditHistory"))           FeatureFlags.keepEditHistory           = s.getBoolean("keepEditHistory");

@@ -452,6 +452,8 @@
     <string name="theme_section_colors">Χρώματα</string>
     <string name="theme_section_fonts">Γραμματοσειρές &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Μέγιστη Διαθέσιμη</string>
+    <string name="ig_dialog_max_upload_quality">Πάντα μεταφόρτωση στη μέγιστη ποιότητα</string>
+    <string name="ig_feat_max_upload_quality">Μέγ. ποιότητα μεταφόρτωσης</string>
     <string name="ig_dialog_location_spoof_enable">Πλαστογράφηση Τοποθεσίας GPS</string>
     <string name="ig_dialog_location_pick">Επιλογή Τοποθεσίας στον Χάρτη</string>
     <string name="ig_dialog_location_unset">Δεν έχει οριστεί τοποθεσία</string>

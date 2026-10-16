@@ -418,6 +418,8 @@
     <string name="theme_section_colors">الألوان</string>
     <string name="theme_section_fonts">الخطوط والإيموجي</string>
     <string name="ig_dialog_quality_max">أعلى جودة متاحة</string>
+    <string name="ig_dialog_max_upload_quality">الرفع دائمًا بأعلى جودة</string>
+    <string name="ig_feat_max_upload_quality">أعلى جودة للرفع</string>
     <string name="ig_dialog_location_spoof_enable">تزييف موقع GPS</string>
     <string name="ig_dialog_location_pick">اختر الموقع على الخريطة</string>
     <string name="ig_dialog_location_unset">لم يتم تعيين موقع</string>

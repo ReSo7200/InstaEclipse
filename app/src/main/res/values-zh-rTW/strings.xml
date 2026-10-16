@@ -420,6 +420,8 @@
     <string name="theme_section_colors">顏色</string>
     <string name="theme_section_fonts">字體和表情符號</string>
     <string name="ig_dialog_quality_max">最高可用</string>
+    <string name="ig_dialog_max_upload_quality">一律以最高畫質上傳</string>
+    <string name="ig_feat_max_upload_quality">最高上傳畫質</string>
     <string name="ig_dialog_location_spoof_enable">偽造 GPS 位置</string>
     <string name="ig_dialog_location_pick">在地圖上選擇位置</string>
     <string name="ig_dialog_location_unset">未設定位置</string>

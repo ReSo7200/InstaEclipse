@@ -335,6 +335,7 @@
     <string name="ig_feat_saved_on_profile">Saved on profile</string>
     <string name="ig_feat_hide_notes">Hide Notes tray</string>
     <string name="ig_feat_voice_download">Voice download</string>
+    <string name="ig_feat_max_upload_quality">Max upload quality</string>
     <string name="ig_feat_photo_zoom">Photo zoom</string>
     <string name="ig_chat_export_none">No messages loaded for this chat yet</string>
     <string name="ig_dialog_ghost_jump_first">Jump-to-First-Message Button in Chats</string>
@@ -474,6 +475,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Add Media Info to the Post Menu</string>
     <string name="ig_dialog_downloader_offer_speed">Add Playback Speed to the Post Menu</string>
     <string name="ig_dialog_downloader_reel_scrubber">Always Show the Reel Seek Bar</string>
+    <string name="ig_dialog_max_upload_quality">Always Upload at Highest Quality</string>
     <string name="ig_media_info_title">Media info</string>
     <string name="ig_media_info_copy">Copy</string>
     <string name="ig_playback_speed_title">Playback speed</string>

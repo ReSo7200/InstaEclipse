@@ -420,6 +420,8 @@
     <string name="theme_section_colors">Цвета</string>
     <string name="theme_section_fonts">Шрифты &amp; Эмодзи</string>
     <string name="ig_dialog_quality_max">Максимально доступное</string>
+    <string name="ig_dialog_max_upload_quality">Всегда загружать в наилучшем качестве</string>
+    <string name="ig_feat_max_upload_quality">Макс. качество загрузки</string>
     <string name="ig_dialog_location_spoof_enable">Подменять GPS-местоположение</string>
     <string name="ig_dialog_location_pick">Выбрать место на карте</string>
     <string name="ig_dialog_location_unset">Место не задано</string>

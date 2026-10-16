@@ -419,6 +419,8 @@
     <string name="theme_section_colors">Färger</string>
     <string name="theme_section_fonts">Teckensnitt &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Högsta Tillgängliga</string>
+    <string name="ig_dialog_max_upload_quality">Ladda alltid upp i högsta kvalitet</string>
+    <string name="ig_feat_max_upload_quality">Max uppladdningskvalitet</string>
     <string name="ig_dialog_location_spoof_enable">Förfalska GPS-plats</string>
     <string name="ig_dialog_location_pick">Välj plats på kartan</string>
     <string name="ig_dialog_location_unset">Ingen plats angiven</string>

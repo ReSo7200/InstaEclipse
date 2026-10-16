@@ -224,6 +224,8 @@
     <string name="theme_slot_error">Błąd</string>
     <string name="theme_slot_destructive">Destrukcyjny</string>
     <string name="ig_dialog_quality_max">Maksymalna dostępna</string>
+    <string name="ig_dialog_max_upload_quality">Zawsze przesyłaj w najwyższej jakości</string>
+    <string name="ig_feat_max_upload_quality">Maks. jakość przesyłania</string>
 
     <!-- Location Spoof -->
     <string name="ig_dialog_location_spoof_enable">Podmień lokalizację GPS</string>
