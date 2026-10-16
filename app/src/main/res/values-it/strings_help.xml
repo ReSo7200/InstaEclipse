@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">Ottieni aiuto</string>
+    <string name="help_get_help_body">Hai trovato un bug o qualcosa ha smesso di funzionare? Apri una segnalazione su GitHub o chiedi alla community su Telegram.</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">Informazioni</string>
+    <string name="help_version">Versione %1$s</string>
+    <string name="help_source_code">Codice sorgente su GitHub</string>
+    <string name="help_faq_expand">Espandi risposta</string>
+    <string name="help_faq_collapse">Comprimi risposta</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">Få hjälp</string>
+    <string name="help_get_help_body">Hittat en bugg eller har något slutat fungera? Skapa ett issue på GitHub eller fråga communityn på Telegram.</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">Om</string>
+    <string name="help_version">Version %1$s</string>
+    <string name="help_source_code">Källkod på GitHub</string>
+    <string name="help_faq_expand">Visa svar</string>
+    <string name="help_faq_collapse">Dölj svar</string>
+</resources>
