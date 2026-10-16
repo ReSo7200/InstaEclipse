@@ -1102,7 +1102,8 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_shield, "#FF453A", getString(R.string.ig_dialog_ad_block_ads), "isAdBlockEnabled"),
                 createSwitch(R.drawable.ic_shield, "#FF453A", getString(R.string.ig_dialog_ad_block_analytics), "isAnalyticsBlocked"),
                 createSwitch(R.drawable.ic_link, "#FF453A", getString(R.string.ig_dialog_ad_disable_tracking), "disableTrackingLinks"),
-                createSwitch(R.drawable.ic_link, "#FF453A", getString(R.string.ig_dialog_open_links_externally), "openLinksExternally")
+                createSwitch(R.drawable.ic_link, "#FF453A", getString(R.string.ig_dialog_open_links_externally), "openLinksExternally"),
+                createClickable(R.drawable.ic_link, "#FF453A", shareDomainLabel(), this::showShareDomainDialog)
         ));
 
         return defs;
@@ -1279,6 +1280,46 @@ public class FeaturesFragment extends Fragment {
                 .setView(box)
                 .setPositiveButton(android.R.string.ok, (d, w) -> saveTabOrder(String.join(",", order)))
                 .setNeutralButton(R.string.ig_nav_tab_order_reset, (d, w) -> saveTabOrder(""))
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private String shareDomainLabel() {
+        String d = localCache.getString("customShareDomain", "");
+        return getString(R.string.ig_dialog_extras_share_domain) + "  ·  "
+                + (d.isEmpty() ? getString(R.string.ig_dialog_extras_share_domain_off) : d);
+    }
+
+    /** Custom share domain (saved as the "customShareDomain" string pref). */
+    private void showShareDomainDialog() {
+        final android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setSingleLine(true);
+        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        input.setHint("ddinstagram.com");
+        input.setText(localCache.getString("customShareDomain", ""));
+        int pad = (int) (20 * getResources().getDisplayMetrics().density);
+        android.widget.FrameLayout box = new android.widget.FrameLayout(requireContext());
+        box.setPadding(pad, pad / 2, pad, 0);
+        box.addView(input);
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.ig_dialog_extras_share_domain)
+                .setMessage(R.string.ig_dialog_extras_share_domain_hint)
+                .setView(box)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    String domain = ps.reso.instaeclipse.mods.ads.ShareDomain.normalize(input.getText().toString());
+                    if (domain == null) {
+                        android.widget.Toast.makeText(requireContext(), R.string.ig_dialog_extras_share_domain_invalid,
+                                android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    localCache.edit().putString("customShareDomain", domain).commit();
+                    makeLocalCacheWorldReadable();
+                    Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
+                    b.putExtra("key", "customShareDomain");
+                    b.putExtra("value", domain);
+                    requireContext().sendBroadcast(b);
+                    loadAdsMenu();
+                })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }

@@ -1091,6 +1091,8 @@ public class DialogUtils {
         for (ToggleRow s :switches) {
             groupCard.addView(s);
         }
+        groupCard.addView(createActionRow(context, R.drawable.ic_link, shareDomainLabel(context), "#FF453A",
+                v -> showShareDomainDialog(context, (TextView) findFirstText(v))));
         layout.addView(groupCard);
 
         // Show the dialog
@@ -1849,6 +1851,59 @@ public class DialogUtils {
                         } else {
                             Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
                         }
+                    })
+                    .show();
+        } catch (Throwable ignored) {}
+    }
+
+    private static String shareDomainLabel(Context context) {
+        String d = FeatureFlags.customShareDomain;
+        return I18n.t(context, R.string.ig_dialog_extras_share_domain) + "  ·  "
+                + (d.isEmpty() ? I18n.t(context, R.string.ig_dialog_extras_share_domain_off) : d);
+    }
+
+    private static View findFirstText(View v) {
+        if (v instanceof TextView) return v;
+        if (v instanceof android.view.ViewGroup) {
+            android.view.ViewGroup g = (android.view.ViewGroup) v;
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View c = g.getChildAt(i);
+                if (c instanceof TextView && ((TextView) c).getText().length() > 2) return c;
+                View inner = findFirstText(c);
+                if (inner != null && ((TextView) inner).getText().length() > 2) return inner;
+            }
+        }
+        return null;
+    }
+
+    /** Custom share domain: replaces instagram.com in links Instagram copies or shares. */
+    private static void showShareDomainDialog(Context context, TextView label) {
+        try {
+            Context themed = new android.view.ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
+            final android.widget.EditText input = new android.widget.EditText(themed);
+            input.setSingleLine(true);
+            input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+            input.setHint("ddinstagram.com");
+            input.setText(FeatureFlags.customShareDomain);
+            LinearLayout box = new LinearLayout(themed);
+            int pad = dp(context, 20);
+            box.setPadding(pad, dp(context, 8), pad, 0);
+            box.addView(input, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            new AlertDialog.Builder(themed)
+                    .setTitle(I18n.t(context, R.string.ig_dialog_extras_share_domain))
+                    .setMessage(I18n.t(context, R.string.ig_dialog_extras_share_domain_hint))
+                    .setView(box)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, (d, w) -> {
+                        String raw = input.getText().toString();
+                        String domain = ps.reso.instaeclipse.mods.ads.ShareDomain.normalize(raw);
+                        if (domain == null) {
+                            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_extras_share_domain_invalid), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        FeatureFlags.customShareDomain = domain;
+                        SettingsManager.saveAllFlags();
+                        if (label != null) label.setText(shareDomainLabel(context));
                     })
                     .show();
         } catch (Throwable ignored) {}

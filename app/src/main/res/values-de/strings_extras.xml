@@ -12,4 +12,8 @@
     <string name="ig_dialog_extras_hide_onboarding">Aufforderungen zu Kontakten und Standort ausblenden</string>
     <string name="ig_dialog_extras_fix_notifications">Alte Benachrichtigungsregistrierung unter Android 12+ reparieren</string>
     <string name="ig_dialog_extras_hide_stories_tray">Nur die Story-Leiste ausblenden</string>
+    <string name="ig_dialog_extras_share_domain">Eigene Teilen-Domain</string>
+    <string name="ig_dialog_extras_share_domain_off">Aus</string>
+    <string name="ig_dialog_extras_share_domain_hint">Ersetzt instagram.com in kopierten oder geteilten Links, z. B. für Einbettungsvorschauen. Leer lassen zum Ausschalten.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Ungültige Domain</string>
 </resources>

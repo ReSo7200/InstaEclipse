@@ -157,6 +157,7 @@ public class FeatureFlags {
     public static boolean uploadInstants = false;      // #199 — send an Instant from gallery (bitmap-swap into quicksnap send)
     public static boolean cacheStories = false;        // cache viewed stories locally for 24h (survive expiry/deletion)
     public static boolean customFontEnabled = false;   // replace IG's UI text font with a user .ttf/.otf
+    public static String  customShareDomain = "";       // replaces instagram.com in copied/shared links ("" = off)
     public static String  navTabOrder = "";             // #238: comma-separated bottom-nav tab id names ("" = Instagram's order)
     public static String  customFontPath = "";         // path to the user-picked font in the module's filesDir
     public static boolean customEmojiEnabled = false;  // replace IG's emoji font (needs an EmojiCompat-format .ttf)

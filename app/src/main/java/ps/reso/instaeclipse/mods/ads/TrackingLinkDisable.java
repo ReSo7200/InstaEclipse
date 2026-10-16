@@ -16,7 +16,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 //      that bypasses path 1 entirely).
 //   3. android.content.Intent.putExtra(EXTRA_TEXT) - the external "Share to app" sheet, which
 //      never touches the clipboard.
-// Gated on FeatureFlags.disableTrackingLinks.
+// Gated on FeatureFlags.disableTrackingLinks; also swaps the host for FeatureFlags.customShareDomain.
 public class TrackingLinkDisable {
 
     public void disableTrackingLinks(ClassLoader classLoader) throws Throwable {
@@ -28,13 +28,13 @@ public class TrackingLinkDisable {
                 Class.forName("android.content.ClipData"), new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                        if (!FeatureFlags.disableTrackingLinks) return;
+                        if (!active()) return;
                         ClipData clipData = (ClipData) param.args[0];
                         if (clipData == null || clipData.getItemCount() == 0) return;
                         ClipData.Item item = clipData.getItemAt(0);
                         if (item == null || item.getText() == null) return;
                         ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) setPrimaryClip intercepted");
-                        String cleaned = stripIfTracking(item.getText().toString());
+                        String cleaned = rewrite(item.getText().toString());
                         if (cleaned != null) param.args[0] = ClipData.newPlainText("URL", cleaned);
                     }
                 });
@@ -45,10 +45,10 @@ public class TrackingLinkDisable {
             XposedHelpers.findAndHookMethod(legacyClipboard, "setText", CharSequence.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                    if (!FeatureFlags.disableTrackingLinks) return;
+                    if (!active()) return;
                     if (param.args[0] == null) return;
                     ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) setText intercepted");
-                    String cleaned = stripIfTracking(param.args[0].toString());
+                    String cleaned = rewrite(param.args[0].toString());
                     if (cleaned != null) param.args[0] = cleaned;
                 }
             });
@@ -58,11 +58,11 @@ public class TrackingLinkDisable {
         XC_MethodHook putExtraHook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                if (!FeatureFlags.disableTrackingLinks) return;
+                if (!active()) return;
                 if (!(param.args[0] instanceof String) || param.args[1] == null) return;
                 if (!Intent.EXTRA_TEXT.equals(param.args[0])) return;
                 ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) EXTRA_TEXT intercepted");
-                String cleaned = stripIfTracking(param.args[1].toString());
+                String cleaned = rewrite(param.args[1].toString());
                 if (cleaned != null) param.args[1] = cleaned;
             }
         };
@@ -80,7 +80,7 @@ public class TrackingLinkDisable {
         XC_MethodHook chooserHook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                if (!FeatureFlags.disableTrackingLinks) return;
+                if (!active()) return;
                 if (param.args.length == 0 || !(param.args[0] instanceof Intent target)) return;
                 sanitizeIntentText(target);
             }
@@ -102,18 +102,31 @@ public class TrackingLinkDisable {
             CharSequence text = target.getCharSequenceExtra(Intent.EXTRA_TEXT);
             if (text != null) {
                 ps.reso.instaeclipse.utils.log.ModuleLog.probe("(IE|Track) chooser EXTRA_TEXT intercepted");
-                String cleaned = stripIfTracking(text.toString());
+                String cleaned = rewrite(text.toString());
                 if (cleaned != null) target.putExtra(Intent.EXTRA_TEXT, cleaned);
             }
             android.content.ClipData cd = target.getClipData();
             if (cd != null && cd.getItemCount() > 0 && cd.getItemAt(0).getText() != null) {
-                String cleaned = stripIfTracking(cd.getItemAt(0).getText().toString());
+                String cleaned = rewrite(cd.getItemAt(0).getText().toString());
                 if (cleaned != null) target.setClipData(android.content.ClipData.newPlainText("URL", cleaned));
             }
         } catch (Throwable ignored) {}
     }
 
-    private static String stripIfTracking(String text) {
-        return TrackingParamStripper.strip(text);
+    /** Tracking-param stripping and/or the custom share domain are on. */
+    static boolean active() {
+        return FeatureFlags.disableTrackingLinks || !FeatureFlags.customShareDomain.isEmpty();
+    }
+
+    /** Applies both link rewrites; null when nothing changed. */
+    static String rewrite(String text) {
+        if (text == null) return null;
+        String out = text;
+        if (FeatureFlags.disableTrackingLinks) {
+            String stripped = TrackingParamStripper.strip(out);
+            if (stripped != null) out = stripped;
+        }
+        out = ShareDomain.apply(out, FeatureFlags.customShareDomain);
+        return out.equals(text) ? null : out;
     }
 }

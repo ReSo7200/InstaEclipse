@@ -12,4 +12,8 @@
     <string name="ig_dialog_extras_hide_onboarding">Ocultar avisos de contactos y ubicación</string>
     <string name="ig_dialog_extras_fix_notifications">Corregir el registro antiguo de notificaciones en Android 12+</string>
     <string name="ig_dialog_extras_hide_stories_tray">Ocultar solo la barra de historias</string>
+    <string name="ig_dialog_extras_share_domain">Dominio para compartir</string>
+    <string name="ig_dialog_extras_share_domain_off">Desactivado</string>
+    <string name="ig_dialog_extras_share_domain_hint">Reemplaza instagram.com en los enlaces que copias o compartes, p. ej. para vistas previas. Déjalo vacío para desactivarlo.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Dominio no válido</string>
 </resources>
