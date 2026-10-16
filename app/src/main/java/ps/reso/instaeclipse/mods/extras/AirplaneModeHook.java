@@ -46,7 +46,7 @@ public class AirplaneModeHook {
 
         XC_MethodHook track = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 synchronized (MANAGERS) {
                     MANAGERS.add(new WeakReference<>(param.thisObject));
                 }
@@ -58,7 +58,7 @@ public class AirplaneModeHook {
 
         XposedBridge.hookMethod(start, new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.airplaneMode) return;
                 param.setResult(null);
                 if (!loggedBlock) {
@@ -72,7 +72,7 @@ public class AirplaneModeHook {
             Class<?> handler = XposedHelpers.findClass("com.instagram.realtimeclient.MainRealtimeEventHandler", cl);
             XposedBridge.hookAllMethods(handler, "onRealtimeEvent", new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.airplaneMode) param.setResult(null);
                 }
             });

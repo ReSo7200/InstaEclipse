@@ -175,7 +175,7 @@ final class IgThemeColorSourceHooks {
                             composeDrawDepth++;
                         }
 
-                        @Override protected void afterHookedMethod(MethodHookParam p) {
+                        @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                             if (composeDrawDepth > 0) composeDrawDepth--;
                         }
                     });

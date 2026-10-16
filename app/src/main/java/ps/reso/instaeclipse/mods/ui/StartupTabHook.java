@@ -49,7 +49,7 @@ public class StartupTabHook {
         // so hook the framework's activity-creation entry point and match it by name.
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.startupTab.isEmpty() || !(param.args[0] instanceof Activity)) return;
                 if (param.args.length > 1 && param.args[1] != null) return; // recreated: keep the user's tab
                 Activity activity = (Activity) param.args[0];
@@ -81,7 +81,7 @@ public class StartupTabHook {
             XposedBridge.hookMethod(Intent.class.getDeclaredMethod("getBooleanExtra", String.class, boolean.class),
                     new XC_MethodHook() {
                         @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {
+                        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (FeatureFlags.startupTab.isEmpty()) return;
                             if (coldStart.contains(param.args[0]) && ((Intent) param.thisObject).hasExtra(MARK)) {
                                 param.setResult(false);
@@ -97,7 +97,7 @@ public class StartupTabHook {
             if (!m.getName().equals("callActivityOnResume")) continue;
             XposedBridge.hookMethod(m, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.startupTab.isEmpty() || !(param.args[0] instanceof Activity)) return;
                     Activity activity = (Activity) param.args[0];
                     if (!isMainActivity(activity)) return;

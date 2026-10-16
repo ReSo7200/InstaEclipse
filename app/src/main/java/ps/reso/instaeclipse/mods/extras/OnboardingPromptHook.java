@@ -60,7 +60,7 @@ public final class OnboardingPromptHook {
             }
             XposedBridge.hookMethod(m, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam p) throws Throwable {
+                protected void beforeHookedMethod(MethodHookParam p) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     if (!FeatureFlags.hideOnboardingPrompts) return;
                     for (Field field : fields) {
                         Object id = field.get(p.thisObject);

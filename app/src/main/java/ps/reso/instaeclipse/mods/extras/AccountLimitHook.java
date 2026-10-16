@@ -30,7 +30,7 @@ public class AccountLimitHook {
         if (check == null) return;
         XposedBridge.hookMethod(check, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.unlimitedAccounts) param.setResult(true);
             }
         });

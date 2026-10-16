@@ -55,7 +55,7 @@ public final class HighResolutionImageHook {
             }
             XposedBridge.hookMethod(m, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam p) throws Throwable {
+                protected void afterHookedMethod(MethodHookParam p) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     if (!FeatureFlags.highResolutionImages) return;
                     if (p.hasThrowable() || !(p.args[1] instanceof List)) return;
                     Object best = null;

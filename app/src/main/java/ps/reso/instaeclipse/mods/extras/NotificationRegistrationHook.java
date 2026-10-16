@@ -23,7 +23,7 @@ public final class NotificationRegistrationHook {
         XposedHelpers.findAndHookMethod(PendingIntent.class, "getBroadcast", Context.class, int.class,
                 Intent.class, int.class, new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam p) {
+                    protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         if (!FeatureFlags.fixNotificationRegistration || !(p.args[2] instanceof Intent)
                                 || !"com.google.example.invalidpackage".equals(((Intent) p.args[2]).getPackage())) return;
                         int flags = (int) p.args[3];

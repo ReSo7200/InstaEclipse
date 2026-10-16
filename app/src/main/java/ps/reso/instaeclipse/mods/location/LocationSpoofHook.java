@@ -67,7 +67,7 @@ public class LocationSpoofHook {
         Method create = Location.CREATOR.getClass().getDeclaredMethod("createFromParcel", Parcel.class);
         XposedBridge.hookMethod(create, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (spoofing() && param.getResult() instanceof Location) apply((Location) param.getResult());
             }
         });
@@ -77,7 +77,7 @@ public class LocationSpoofHook {
     private static void hookGetters() throws NoSuchMethodException {
         XC_MethodHook lazy = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!spoofing() || !(param.thisObject instanceof Location)) return;
                 Location loc = (Location) param.thisObject;
                 if (isDeviceFix(loc) && !isSpoofed(loc)) apply(loc);
@@ -88,7 +88,7 @@ public class LocationSpoofHook {
 
         XC_MethodHook ACTIVE_ONLY_FALSE = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (spoofing()) param.setResult(false);
             }
         };
@@ -109,7 +109,7 @@ public class LocationSpoofHook {
                     // No cached fix (or no permission, see hookPermissions): hand out the target.
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (!spoofing()) return;
                             if (param.getThrowable() instanceof SecurityException || param.getResult() == null) {
                                 param.setResult(fakeLocation(LocationManager.GPS_PROVIDER));
@@ -124,7 +124,7 @@ public class LocationSpoofHook {
                     // is swallowed so the app keeps working with the spoofed fix alone.
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (!spoofing()) return;
                             if (param.getThrowable() instanceof SecurityException) param.setResult(null);
                             LocationListener listener = findListener(param.args);
@@ -142,7 +142,7 @@ public class LocationSpoofHook {
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @SuppressWarnings("unchecked")
                         @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {
+                        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (!spoofing()) return;
                             java.util.concurrent.Executor executor = null;
                             java.util.function.Consumer<Location> consumer = null;
@@ -163,7 +163,7 @@ public class LocationSpoofHook {
                 case "isLocationEnabledForUser":
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (spoofing() && m.getReturnType() == boolean.class) param.setResult(true);
                         }
                     });
@@ -185,7 +185,7 @@ public class LocationSpoofHook {
             Class<?> impl = Class.forName("android.app.ContextImpl");
             XC_MethodHook grant = new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!spoofing() || param.args.length == 0 || !(param.args[0] instanceof String)) return;
                     String perm = (String) param.args[0];
                     if (!perm.equals(android.Manifest.permission.ACCESS_FINE_LOCATION)

@@ -86,7 +86,7 @@ public class FollowingOnlyFeedHook {
 
         XposedBridge.hookMethod(build, new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.followingOnlyFeed) return;
                 CallState st = new CallState();
                 st.builder = param.args[builderArg];
@@ -94,7 +94,7 @@ public class FollowingOnlyFeedHook {
             }
 
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 CallState st = STATE.get();
                 STATE.remove();
                 if (st == null || st.paramSeen || st.paramAdder == null || st.builder == null) return;
@@ -110,7 +110,7 @@ public class FollowingOnlyFeedHook {
 
         XC_MethodHook adderHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 CallState st = STATE.get();
                 if (st == null || param.thisObject != st.builder || !(param.args[0] instanceof String)) return;
                 String key = (String) param.args[0];

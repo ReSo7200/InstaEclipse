@@ -37,21 +37,21 @@ public class DoubleTapExtrasHook {
 
     private static final XC_MethodHook CONSUME = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) {
+        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (FeatureFlags.disableDoubleTapLike) param.setResult(true);
         }
     };
 
     private static final XC_MethodHook SKIP = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) {
+        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (FeatureFlags.disableDoubleTapLike) param.setResult(null);
         }
     };
 
     private static final XC_MethodHook SKIP_UNDER_DOUBLE_TAP = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) {
+        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (!FeatureFlags.disableDoubleTapLike) return;
             for (StackTraceElement e : Thread.currentThread().getStackTrace()) {
                 if ("onDoubleTap".equals(e.getMethodName()) || "onDoubleTapEvent".equals(e.getMethodName())) {

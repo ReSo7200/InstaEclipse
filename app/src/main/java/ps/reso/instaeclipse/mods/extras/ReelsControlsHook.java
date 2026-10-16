@@ -48,7 +48,7 @@ public class ReelsControlsHook {
         if (gate == null) return;
         XposedBridge.hookMethod(gate, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.reelsAutoScroll) param.setResult(true);
             }
         });
@@ -71,7 +71,7 @@ public class ReelsControlsHook {
                 private boolean failLogged;
 
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!(pager.get(param.thisObject) instanceof View vp)) return;
                     if (!ViewPager2Input.setEnabled(vp, !FeatureFlags.reelsLockScroll) && !failLogged) {
                         failLogged = true;
@@ -88,7 +88,7 @@ public class ReelsControlsHook {
             Class<?> refresh = XposedHelpers.findClass("instagram.features.clips.viewer.ui.ClipsSwipeRefreshLayout", cl);
             XposedHelpers.findAndHookMethod(refresh, "onInterceptTouchEvent", android.view.MotionEvent.class, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.reelsLockScroll) param.setResult(false);
                 }
             });
