@@ -200,6 +200,9 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Settings changed in the companion while Instagram wasn't running.
                     ps.reso.instaeclipse.utils.core.CompanionSync.pull(context);
                     SettingsManager.loadAllFlags(context);
+                    // ...and the other way: bring the companion's copy up to date with changes
+                    // made in this menu (newer side wins per key, see PrefsMerge).
+                    ps.reso.instaeclipse.utils.core.CompanionSync.pushAsync(context);
                     // ...and while it sat frozen in the background: check again on every resume.
                     if (param.thisObject instanceof android.app.Application) {
                         ((android.app.Application) param.thisObject).registerActivityLifecycleCallbacks(
@@ -866,7 +869,10 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     for (Map.Entry<String, ?> entry : prefs.getAll().entrySet()) {
                         // The lock passcode hash and its salt never leave Instagram's process.
                         if ("lockDirectPasscode".equals(entry.getKey()) || "lockDirectSalt".equals(entry.getKey())) continue;
-                        if (entry.getValue() instanceof Boolean) {
+                        // Change stamps, so the companion keeps its own newer changes (PrefsMerge).
+                        if (ps.reso.instaeclipse.utils.core.PrefsMerge.isSharedStamp(entry.getKey(), entry.getValue())) {
+                            bundle.putLong(entry.getKey(), (Long) entry.getValue());
+                        } else if (entry.getValue() instanceof Boolean) {
                             bundle.putBoolean(entry.getKey(), (Boolean) entry.getValue());
                         } else if (entry.getValue() instanceof String) {
                             bundle.putString(entry.getKey(), (String) entry.getValue());

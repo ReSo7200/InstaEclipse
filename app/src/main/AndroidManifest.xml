@@ -77,6 +77,14 @@
             android:authorities="ps.reso.instaeclipse.logmirror"
             android:exported="true" />
 
+        <!-- Settings sync, Instagram -> companion: the hooked Instagram process pushes its
+             settings into the companion's copy after changes made in its own menu. Only
+             supported Instagram packages may call it (checked in call()). -->
+        <provider
+            android:name=".utils.core.PrefsSyncProvider"
+            android:authorities="ps.reso.instaeclipse.prefsync"
+            android:exported="true" />
+
         <!-- Xposed Meta-data -->
         <meta-data
             android:name="xposedmodule"

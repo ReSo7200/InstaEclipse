@@ -50,6 +50,20 @@ public final class IpcSecurity {
         ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_EXPORTED);
     }
 
+    /**
+     * Companion side, inside a ContentProvider call: the supported Instagram package the calling
+     * uid belongs to, or null. The uid comes from the binder, so the caller can't fake it.
+     */
+    public static String supportedCallerPackage(Context context, int callingUid) {
+        if (context == null || callingUid == android.os.Process.myUid()) return null;
+        String[] pkgs = context.getPackageManager().getPackagesForUid(callingUid);
+        if (pkgs == null) return null;
+        for (String p : pkgs) {
+            if (CommonUtils.SUPPORTED_PACKAGES.contains(p)) return p;
+        }
+        return null;
+    }
+
     public static String newNonce() {
         byte[] b = new byte[16];
         RNG.nextBytes(b);

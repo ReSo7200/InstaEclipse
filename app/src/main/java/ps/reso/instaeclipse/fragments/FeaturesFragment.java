@@ -105,8 +105,17 @@ public class FeaturesFragment extends Fragment {
                     boolean suppressPath = localCache.getBoolean("pathJustSetLocally", false);
                     SharedPreferences.Editor editor = localCache.edit();
                     if (suppressPath) editor.remove("pathJustSetLocally");
-                    for (String key : bundle.keySet()) {
-                        Object value = bundle.get(key);
+                    // Older builds stored the reply's nonce extra as if it were a setting.
+                    editor.remove(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE);
+                    // Instagram's values, minus the ones this app changed more recently (pending
+                    // in Instagram) — see PrefsMerge. Also drops the nonce and stamp extras.
+                    Map<String, Object> incoming = new HashMap<>();
+                    for (String key : bundle.keySet()) incoming.put(key, bundle.get(key));
+                    Map<String, Object> changes =
+                            ps.reso.instaeclipse.utils.core.PrefsMerge.select(incoming, localCache.getAll());
+                    for (Map.Entry<String, Object> change : changes.entrySet()) {
+                        String key = change.getKey();
+                        Object value = change.getValue();
                         if (value instanceof Boolean) {
                             editor.putBoolean(key, (Boolean) value);
                         } else if (value instanceof String) {

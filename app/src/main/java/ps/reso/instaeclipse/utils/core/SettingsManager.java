@@ -10,8 +10,13 @@ import ps.reso.instaeclipse.utils.feature.FeatureManager;
 public class SettingsManager {
     private static final String PREF_NAME = "instaeclipse_prefs";
     private static SharedPreferences prefs;
+    /** Application context, for pushing in-app changes to the companion (CompanionSync). */
+    private static Context appContext;
 
     public static void init(Context context) {
+        if (appContext == null && context != null) {
+            appContext = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        }
         if (prefs == null) {
             prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         }
@@ -162,6 +167,8 @@ public class SettingsManager {
 
         editor.apply();
         stampChangedKeys(before);
+        // Instagram -> companion: so the companion app shows what was just changed here.
+        CompanionSync.pushAsync(appContext);
 
         FeatureManager.refreshFeatureStatus();
     }

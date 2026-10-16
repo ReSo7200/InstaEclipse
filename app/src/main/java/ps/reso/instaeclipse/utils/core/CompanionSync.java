@@ -13,7 +13,8 @@ import ps.reso.instaeclipse.utils.feature.FeatureManager;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 /**
- * Instagram side of the companion -> Instagram settings sync, for changes the live broadcast
+ * Instagram side of the settings sync. Instagram -> companion: {@link #pushAsync}. The rest of
+ * this class is the companion -> Instagram half, for changes the live broadcast
  * missed: Instagram was not running, or was frozen in the background when the companion sent
  * them.
  *
@@ -94,6 +95,50 @@ public final class CompanionSync {
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse) Sync: companion pull failed: " + t);
             return false;
+        }
+    }
+
+    /**
+     * Instagram -> companion: pushes Instagram's settings (with their __igts_ / __applied_
+     * stamps) to the companion's {@link PrefsSyncProvider}, which keeps any newer companion
+     * change (see {@link PrefsMerge}). Called at startup and after every in-app change, so the
+     * companion shows the same values without having to reach a live Instagram process.
+     * Back-to-back requests are coalesced into one push.
+     */
+    public static void pushAsync(Context context) {
+        if (context == null) return;
+        Context app = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        if (!PUSH_PENDING.compareAndSet(false, true)) return;
+        WORKER.execute(() -> {
+            PUSH_PENDING.set(false);
+            push(app);
+        });
+    }
+
+    private static final java.util.concurrent.atomic.AtomicBoolean PUSH_PENDING =
+            new java.util.concurrent.atomic.AtomicBoolean();
+
+    private static void push(Context context) {
+        try {
+            Map<String, ?> all = context.getSharedPreferences("instaeclipse_prefs", Context.MODE_PRIVATE).getAll();
+            android.os.Bundle b = new android.os.Bundle();
+            for (Map.Entry<String, ?> entry : all.entrySet()) {
+                String k = entry.getKey();
+                Object v = entry.getValue();
+                if (PrefsMerge.isSharedStamp(k, v)) b.putLong(k, (Long) v);
+                else if (!PrefsMerge.isSharedSetting(k, v)) continue;
+                else if (v instanceof Boolean) b.putBoolean(k, (Boolean) v);
+                else if (v instanceof Integer) b.putInt(k, (Integer) v);
+                else b.putString(k, (String) v);
+            }
+            android.os.Bundle r = context.getContentResolver()
+                    .call(PrefsSyncProvider.URI, PrefsSyncProvider.METHOD_PUSH, null, b);
+            int n = r != null ? r.getInt(PrefsSyncProvider.RESULT_UPDATED, 0) : 0;
+            if (n > 0) ModuleLog.line("(InstaEclipse) Sync: updated " + n + " setting(s) in the companion app");
+        } catch (Throwable t) {
+            // Companion not installed / too old (no provider): the ACTION_REQUEST_PREFS reply
+            // still syncs when the companion is opened while Instagram is running.
+            ModuleLog.line("(InstaEclipse) Sync: companion push failed: " + t);
         }
     }
 
