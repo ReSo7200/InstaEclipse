@@ -19,6 +19,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,6 +44,8 @@ import com.google.android.material.color.MaterialColors;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.shape.ShapeAppearanceModel;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,10 +54,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.mods.location.LocationPickerActivity;
@@ -66,6 +75,10 @@ public class FeaturesFragment extends Fragment {
     private TextView tvHeaderTitle;
     private ImageButton btnBack;
     private ExtendedFloatingActionButton fabSave;
+    private TextInputLayout tilSearch;
+    private TextInputEditText etSearch;
+    /** True while the search text is being changed programmatically (skip re-filtering). */
+    private boolean suppressSearchWatcher = false;
     private ActivityResultLauncher<Uri> dirPickerLauncher;
     private ActivityResultLauncher<String[]> restoreFileLauncher;
     private ActivityResultLauncher<String> notifPermLauncher;
@@ -107,8 +120,9 @@ public class FeaturesFragment extends Fragment {
                         loadDownloaderMenu();
                     } else if ("quality".equals(currentMenu)) {
                         loadQualityMenu();
-                    } else if (adapter != null) {
-                        adapter.notifyDataSetChanged();
+                    } else {
+                        // Also recomputes the main-menu "N on" counts
+                        refreshVisibleMenu();
                     }
                 }
             }
@@ -139,7 +153,7 @@ public class FeaturesFragment extends Fragment {
                     }
                 }
                 editor.apply();
-                if (adapter != null) adapter.notifyDataSetChanged();
+                refreshVisibleMenu();
                 Toast.makeText(requireContext(), getString(R.string.ig_toast_settings_restored), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -250,6 +264,36 @@ public class FeaturesFragment extends Fragment {
         btnBack = fragmentView.findViewById(R.id.btn_back);
         fabSave = fragmentView.findViewById(R.id.fab_save);
 
+        tilSearch = fragmentView.findViewById(R.id.til_search);
+        etSearch = fragmentView.findViewById(R.id.et_search);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (suppressSearchWatcher) return;
+                runSearch(s.toString());
+            }
+        });
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                hideKeyboard();
+                etSearch.clearFocus();
+                return true;
+            }
+            return false;
+        });
+        // Dismiss the keyboard once the user starts scrolling through results
+        recyclerFeatures.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView rv, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && etSearch.hasFocus()) {
+                    hideKeyboard();
+                    etSearch.clearFocus();
+                }
+            }
+        });
+
         btnBack.setOnClickListener(v -> loadMainMenu());
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
@@ -257,6 +301,11 @@ public class FeaturesFragment extends Fragment {
             public void handleOnBackPressed() {
                 if (!"main".equals(currentMenu)) {
                     loadMainMenu();
+                } else if (isSearching()) {
+                    // Back while searching clears the query (the watcher restores the main menu)
+                    etSearch.setText("");
+                    etSearch.clearFocus();
+                    hideKeyboard();
                 } else {
                     setEnabled(false);
                     requireActivity().getOnBackPressedDispatcher().onBackPressed();
@@ -302,6 +351,17 @@ public class FeaturesFragment extends Fragment {
 
         public int segmentPosition;
         public int segmentSize;
+
+        /** Secondary line under the title (e.g. "3 on" on main-menu category rows). */
+        public String subtitle;
+        /** Subtitle drawn in the accent (primary) colour instead of the muted variant colour. */
+        public boolean subtitleActive;
+        /** Row navigates into a sub-menu: shows a trailing chevron. */
+        public boolean isNav;
+        /** Main-menu row: rendered as a standalone rounded card. */
+        public boolean isCategory;
+        /** Sub-menu this main-menu row opens (used to recompute its count). */
+        Category category;
     }
 
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
@@ -314,12 +374,16 @@ public class FeaturesFragment extends Fragment {
 
     static class ItemViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle;
+        TextView tvSubtitle;
         ImageView ivIcon;
+        ImageView ivChevron;
         MaterialSwitch swToggle;
         MaterialCardView cardView;
         ItemViewHolder(View v) {
             super(v);
             tvTitle = v.findViewById(R.id.tv_title);
+            tvSubtitle = v.findViewById(R.id.tv_subtitle);
+            ivChevron = v.findViewById(R.id.iv_chevron);
             ivIcon = v.findViewById(R.id.iv_icon);
             swToggle = v.findViewById(R.id.sw_toggle);
             cardView = (MaterialCardView) v;
@@ -385,7 +449,9 @@ public class FeaturesFragment extends Fragment {
                     itemHolder.tvTitle.setTextColor(fg);
                     itemHolder.tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
                 } else {
-                    int bg = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorSurfaceContainerLow);
+                    int bg = MaterialColors.getColor(itemHolder.itemView, item.isCategory
+                            ? com.google.android.material.R.attr.colorSurfaceContainer
+                            : com.google.android.material.R.attr.colorSurfaceContainerLow);
                     int defaultTextColor = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorOnSurface);
                     itemHolder.cardView.setCardBackgroundColor(bg);
                     itemHolder.tvTitle.setTextColor(item.textColor != 0 ? item.textColor : defaultTextColor);
@@ -397,7 +463,28 @@ public class FeaturesFragment extends Fragment {
 
                 ShapeAppearanceModel.Builder shapeBuilder = itemHolder.cardView.getShapeAppearanceModel().toBuilder();
 
-                if (item.segmentSize == 1) {
+                // Subtitle (category counts) + trailing chevron for rows that open a sub-menu
+                if (item.subtitle != null) {
+                    itemHolder.tvSubtitle.setVisibility(View.VISIBLE);
+                    itemHolder.tvSubtitle.setText(item.subtitle);
+                    itemHolder.tvSubtitle.setTextColor(MaterialColors.getColor(itemHolder.itemView, item.subtitleActive
+                            ? androidx.appcompat.R.attr.colorPrimary
+                            : com.google.android.material.R.attr.colorOnSurfaceVariant));
+                } else {
+                    itemHolder.tvSubtitle.setVisibility(View.GONE);
+                }
+                itemHolder.ivChevron.setVisibility(item.isNav ? View.VISIBLE : View.GONE);
+
+                // Main-menu rows are standalone rounded cards with a small gap; sub-menu rows stay segmented
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) itemHolder.itemView.getLayoutParams();
+                int wantBottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                        item.isCategory ? 6f : 2f, getResources().getDisplayMetrics());
+                if (lp.bottomMargin != wantBottom) {
+                    lp.bottomMargin = wantBottom;
+                    itemHolder.itemView.setLayoutParams(lp);
+                }
+
+                if (item.isCategory || item.segmentSize == 1) {
                     shapeBuilder.setAllCornerSizes(largeRadius);
                 } else if (item.segmentPosition == 0) {
                     shapeBuilder.setTopLeftCornerSize(largeRadius).setTopRightCornerSize(largeRadius)
@@ -555,11 +642,22 @@ public class FeaturesFragment extends Fragment {
     // =========================================================
 
     private void showMenu(String title, List<Object> definitions) {
-        ViewGroup headerLayout = fragmentView.findViewById(R.id.header_layout);
-        TransitionManager.beginDelayedTransition(headerLayout, new AutoTransition().setDuration(200));
+        showMenu(title, definitions, true);
+    }
+
+    /** @param animate false for live search updates (no header transition / list slide-in per keystroke). */
+    private void showMenu(String title, List<Object> definitions, boolean animate) {
+        boolean isMain = title.equals(getString(R.string.features));
+        if (animate) {
+            ViewGroup topBar = fragmentView.findViewById(R.id.top_bar);
+            TransitionManager.beginDelayedTransition(topBar, new AutoTransition().setDuration(200));
+        }
 
         tvHeaderTitle.setText(title);
-        btnBack.setVisibility(title.equals(getString(R.string.features)) ? View.GONE : View.VISIBLE);
+        btnBack.setVisibility(isMain ? View.GONE : View.VISIBLE);
+        // Search lives on the main menu only; leaving it (e.g. via a nav row in the results) resets it
+        tilSearch.setVisibility(isMain ? View.VISIBLE : View.GONE);
+        if (!isMain) clearSearchSilently();
 
         List<FeatureItem> displayList = new ArrayList<>();
         for (int di = 0; di < definitions.size(); di++) {
@@ -587,6 +685,15 @@ public class FeaturesFragment extends Fragment {
             }
         }
 
+        if (!animate) {
+            recyclerFeatures.animate().cancel();
+            recyclerFeatures.setAlpha(1f);
+            recyclerFeatures.setTranslationY(0f);
+            adapter.setItems(displayList);
+            recyclerFeatures.scrollToPosition(0);
+            return;
+        }
+
         recyclerFeatures.setAlpha(0f);
         recyclerFeatures.setTranslationY(60f);
 
@@ -606,6 +713,7 @@ public class FeaturesFragment extends Fragment {
         item.type = FeatureItem.TYPE_CLICKABLE;
         item.title = title;
         item.onClick = navAction;
+        item.isNav = true;
         return item;
     }
 
@@ -685,50 +793,215 @@ public class FeaturesFragment extends Fragment {
     // MENUS
     // =========================================================
 
+    private static final String A_APPEARANCE = "#FF375F", A_PRIVACY = "#5E5CE6", A_MEDIA = "#FF9F0A", A_TOOLS = "#8E8E93";
+    private static final int GROUP_APPEARANCE = 0, GROUP_PRIVACY = 1, GROUP_MEDIA = 2, GROUP_TOOLS = 3;
+    /** Searchable category that is not listed on the main menu (reached from inside another sub-menu). */
+    private static final int GROUP_HIDDEN = -1;
+
+    /** Builds a sub-menu's definitions (section header Strings + List of FeatureItem) without showing it. */
+    private interface DefsBuilder {
+        List<Object> build();
+    }
+
+    /** One sub-menu: used for the main-menu nav row, its "N on" count, and global search. */
+    static final class Category {
+        final String key;
+        final int group;
+        final int iconRes;
+        final String accentHex;
+        final String title;
+        final DefsBuilder builder;
+        final Runnable loader;
+
+        Category(String key, int group, int iconRes, String accentHex, String title, DefsBuilder builder, Runnable loader) {
+            this.key = key;
+            this.group = group;
+            this.iconRes = iconRes;
+            this.accentHex = accentHex;
+            this.title = title;
+            this.builder = builder;
+            this.loader = loader;
+        }
+    }
+
+    /** All sub-menus, in main-menu order. Grouped to match the in-IG dialog: Appearance / Privacy / Media / Tools. */
+    private List<Category> getCategories() {
+        List<Category> c = new ArrayList<>();
+        c.add(new Category("theme", GROUP_APPEARANCE, R.drawable.ic_palette, A_APPEARANCE, getString(R.string.ig_dialog_menu_theme), this::buildThemeDefs, this::loadThemeMenu));
+        c.add(new Category("quality", GROUP_APPEARANCE, R.drawable.ic_movie, A_APPEARANCE, getString(R.string.ig_dialog_menu_quality), this::buildQualityDefs, this::loadQualityMenu));
+        c.add(new Category("cleanfeed", GROUP_APPEARANCE, R.drawable.ic_sparkle, A_APPEARANCE, getString(R.string.ig_dialog_menu_clean_feed), this::buildCleanFeedDefs, this::loadCleanFeedMenu));
+
+        c.add(new Category("ghost", GROUP_PRIVACY, R.drawable.ic_eye, A_PRIVACY, getString(R.string.ig_dialog_menu_ghost_settings), this::buildGhostDefs, this::loadGhostMenu));
+        c.add(new Category("lock", GROUP_PRIVACY, R.drawable.ic_shield, A_PRIVACY, getString(R.string.ig_dialog_misc_lock_section), this::buildLockDefs, this::loadLockMenu));
+        c.add(new Category("hidechats", GROUP_PRIVACY, R.drawable.ic_eye_off, A_PRIVACY, getString(R.string.ig_hide_chats_title), this::buildHideChatsDefs, this::loadHideChatsMenu));
+        c.add(new Category("ads", GROUP_PRIVACY, R.drawable.ic_block, A_PRIVACY, getString(R.string.ig_dialog_menu_ad_analytics), this::buildAdsDefs, this::loadAdsMenu));
+        c.add(new Category("distract", GROUP_PRIVACY, R.drawable.ic_notification, A_PRIVACY, getString(R.string.ig_dialog_menu_distraction_free), this::buildDistractionDefs, this::loadDistractionMenu));
+        c.add(new Category("navigation", GROUP_PRIVACY, R.drawable.ic_tune, A_PRIVACY, getString(R.string.ig_nav_settings_title), this::buildNavigationDefs, this::loadNavigationMenu));
+
+        c.add(new Category("downloader", GROUP_MEDIA, R.drawable.ic_download, A_MEDIA, getString(R.string.ig_dialog_menu_downloader), this::buildDownloaderDefs, this::loadDownloaderMenu));
+        c.add(new Category("location", GROUP_MEDIA, R.drawable.ic_pin, A_MEDIA, getString(R.string.ig_dialog_menu_location), this::buildLocationDefs, this::loadLocationMenu));
+
+        c.add(new Category("misc", GROUP_TOOLS, R.drawable.ic_settings_gear, A_TOOLS, getString(R.string.ig_dialog_menu_misc), this::buildMiscDefs, this::loadMiscMenu));
+        c.add(new Category("dev", GROUP_TOOLS, R.drawable.ic_tune, A_TOOLS, getString(R.string.ig_dialog_menu_dev_options), this::buildDevDefs, this::loadDevMenu));
+
+        // Quick toggles live inside Ghost Mode; searchable, but not a main-menu row.
+        c.add(new Category("qt", GROUP_HIDDEN, R.drawable.ic_tune, A_PRIVACY, getString(R.string.ig_dialog_section_quick_toggle), this::buildQuickTogglesDefs, this::loadQuickTogglesMenu));
+        return c;
+    }
+
     private void loadMainMenu() {
+        showMenu(getString(R.string.features), buildMainDefs());
+        currentMenu = "main";
+    }
+
+    private List<Object> buildMainDefs() {
         List<Object> defs = new ArrayList<>();
+        int[] groupTitles = {
+                R.string.feat_group_appearance, R.string.feat_group_privacy,
+                R.string.feat_group_media, R.string.feat_group_tools
+        };
+        List<Category> categories = getCategories();
 
-        // Grouped to match the in-IG dialog: Appearance / Privacy / Media / Tools.
-        final String A_APPEARANCE = "#FF375F", A_PRIVACY = "#5E5CE6", A_MEDIA = "#FF9F0A", A_TOOLS = "#8E8E93";
+        for (int g = 0; g < groupTitles.length; g++) {
+            List<FeatureItem> rows = new ArrayList<>();
+            for (Category cat : categories) {
+                if (cat.group != g) continue;
+                FeatureItem nav = createNav(cat.iconRes, cat.accentHex, cat.title, cat.loader);
+                nav.category = cat;
+                applyCategorySubtitle(nav);
+                rows.add(nav);
+            }
+            if (g == GROUP_TOOLS) {
+                rows.add(createClickable(R.drawable.ic_save, A_TOOLS, getString(R.string.ig_dialog_backup_settings), this::backupSettings));
+                rows.add(createClickable(R.drawable.ic_folder, A_TOOLS, getString(R.string.ig_dialog_restore_settings), this::restoreSettings));
+                rows.add(createClickable(R.drawable.ic_restart, A_TOOLS, getString(R.string.ig_dialog_menu_restart), this::restartInstagram));
+                rows.add(createClickable(R.drawable.ic_info, A_TOOLS, getString(R.string.ig_dialog_menu_about), this::showAboutDialog));
+            }
+            for (FeatureItem row : rows) row.isCategory = true;
+            defs.add(getString(groupTitles[g]));
+            defs.add(rows);
+        }
+        return defs;
+    }
 
-        defs.add(getString(R.string.feat_group_appearance));
-        defs.add(Arrays.asList(
-                createNav(R.drawable.ic_palette, A_APPEARANCE, getString(R.string.ig_dialog_menu_theme), this::loadThemeMenu),
-                createNav(R.drawable.ic_movie, A_APPEARANCE, getString(R.string.ig_dialog_menu_quality), this::loadQualityMenu),
-                createNav(R.drawable.ic_sparkle, A_APPEARANCE, getString(R.string.ig_dialog_menu_clean_feed), this::loadCleanFeedMenu)
-        ));
+    /** Flattens a builder's definitions into its FeatureItems (section headers dropped). */
+    private static List<FeatureItem> flattenItems(List<Object> defs) {
+        List<FeatureItem> out = new ArrayList<>();
+        for (Object def : defs) {
+            if (def instanceof List) {
+                for (Object o : (List<?>) def) {
+                    if (o instanceof FeatureItem) out.add((FeatureItem) o);
+                }
+            }
+        }
+        return out;
+    }
 
-        defs.add(getString(R.string.feat_group_privacy));
-        defs.add(Arrays.asList(
-                createNav(R.drawable.ic_eye, A_PRIVACY, getString(R.string.ig_dialog_menu_ghost_settings), this::loadGhostMenu),
-                createNav(R.drawable.ic_shield, A_PRIVACY, getString(R.string.ig_dialog_misc_lock_section), this::loadLockMenu),
-                createNav(R.drawable.ic_eye_off, A_PRIVACY, getString(R.string.ig_hide_chats_title), this::loadHideChatsMenu),
-                createNav(R.drawable.ic_block, A_PRIVACY, getString(R.string.ig_dialog_menu_ad_analytics), this::loadAdsMenu),
-                createNav(R.drawable.ic_notification, A_PRIVACY, getString(R.string.ig_dialog_menu_distraction_free), this::loadDistractionMenu),
-                createNav(R.drawable.ic_tune, A_PRIVACY, getString(R.string.ig_nav_settings_title), this::loadNavigationMenu)
-        ));
+    /**
+     * Sets the "N on" / "Off" subtitle of a main-menu category row: the number of plain boolean
+     * switches (master switches excluded, keys de-duplicated) in that sub-menu that are currently on,
+     * including staged-but-unapplied changes. Sub-menus without switches get no subtitle, except
+     * Reel quality which shows its current value.
+     */
+    private void applyCategorySubtitle(FeatureItem nav) {
+        Category cat = nav.category;
+        if (cat == null) return;
+        if ("quality".equals(cat.key)) {
+            int q = localCache.getInt("forceReelQuality", 0);
+            nav.subtitle = qualityLabel(q);
+            nav.subtitleActive = q != 0;
+            return;
+        }
+        Set<String> seen = new HashSet<>();
+        int on = 0;
+        for (FeatureItem fi : flattenItems(cat.builder.build())) {
+            if (fi.type != FeatureItem.TYPE_SWITCH || fi.prefKey == null || !seen.add(fi.prefKey)) continue;
+            if (getCurrentState(fi.prefKey)) on++;
+        }
+        if (seen.isEmpty()) {
+            nav.subtitle = null;
+            nav.subtitleActive = false;
+        } else {
+            nav.subtitle = on > 0 ? getString(R.string.feat_count_on, on) : getString(R.string.feat_count_off);
+            nav.subtitleActive = on > 0;
+        }
+    }
 
-        defs.add(getString(R.string.feat_group_media));
-        defs.add(Arrays.asList(
-                createNav(R.drawable.ic_download, A_MEDIA, getString(R.string.ig_dialog_menu_downloader), this::loadDownloaderMenu),
-                createNav(R.drawable.ic_pin, A_MEDIA, getString(R.string.ig_dialog_menu_location), this::loadLocationMenu)
-        ));
+    /** Recomputes the category counts when the main menu is showing, then rebinds the visible rows. */
+    private void refreshVisibleMenu() {
+        if (adapter == null || localCache == null || !isAdded()) return;
+        if ("main".equals(currentMenu)) {
+            for (FeatureItem fi : adapter.items) {
+                if (fi.category != null) applyCategorySubtitle(fi);
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
 
-        defs.add(getString(R.string.feat_group_tools));
-        defs.add(Arrays.asList(
-                createNav(R.drawable.ic_settings_gear, A_TOOLS, getString(R.string.ig_dialog_menu_misc), this::loadMiscMenu),
-                createNav(R.drawable.ic_tune, A_TOOLS, getString(R.string.ig_dialog_menu_dev_options), this::loadDevMenu),
-                createClickable(R.drawable.ic_save, A_TOOLS, getString(R.string.ig_dialog_backup_settings), this::backupSettings),
-                createClickable(R.drawable.ic_folder, A_TOOLS, getString(R.string.ig_dialog_restore_settings), this::restoreSettings),
-                createClickable(R.drawable.ic_restart, A_TOOLS, getString(R.string.ig_dialog_menu_restart), this::restartInstagram),
-                createClickable(R.drawable.ic_info, A_TOOLS, getString(R.string.ig_dialog_menu_about), this::showAboutDialog)
-        ));
+    // =========================================================
+    // SEARCH
+    // =========================================================
 
-        showMenu(getString(R.string.features), defs);
+    private boolean isSearching() {
+        return etSearch != null && etSearch.getText() != null && etSearch.getText().toString().trim().length() > 0;
+    }
+
+    /** Clears the search field without re-rendering (used when navigating away from the main menu). */
+    private void clearSearchSilently() {
+        if (etSearch == null) return;
+        if (etSearch.getText() != null && etSearch.getText().length() > 0) {
+            suppressSearchWatcher = true;
+            etSearch.setText("");
+            suppressSearchWatcher = false;
+        }
+        if (etSearch.hasFocus()) {
+            etSearch.clearFocus();
+            hideKeyboard();
+        }
+    }
+
+    private void hideKeyboard() {
+        if (etSearch == null) return;
+        InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+    }
+
+    /**
+     * Searches every switch / clickable row of every sub-menu. Rows come straight from the same
+     * builders the sub-menus use, so toggling here goes through the exact same staging, dependsOn,
+     * cascade-off and locked-by-extreme logic. A query matching a category name lists all its rows.
+     */
+    private void runSearch(String raw) {
+        String q = raw == null ? "" : raw.trim().toLowerCase(Locale.getDefault());
+        if (q.isEmpty()) {
+            loadMainMenu();
+            return;
+        }
+        List<Object> defs = new ArrayList<>();
+        for (Category cat : getCategories()) {
+            boolean categoryMatch = cat.title.toLowerCase(Locale.getDefault()).contains(q);
+            List<FeatureItem> hits = new ArrayList<>();
+            for (FeatureItem fi : flattenItems(cat.builder.build())) {
+                if (fi.type != FeatureItem.TYPE_SWITCH && fi.type != FeatureItem.TYPE_CLICKABLE) continue;
+                if (fi.title == null) continue;
+                if (categoryMatch || fi.title.toLowerCase(Locale.getDefault()).contains(q)) hits.add(fi);
+            }
+            if (!hits.isEmpty()) {
+                defs.add(cat.title);
+                defs.add(hits);
+            }
+        }
+        if (defs.isEmpty()) defs.add(getString(R.string.feat_search_no_results));
+        showMenu(getString(R.string.features), defs, false);
         currentMenu = "main";
     }
 
     private void loadDevMenu() {
+        showMenu(getString(R.string.ig_dialog_section_dev_options), buildDevDefs());
+        currentMenu = "dev";
+    }
+
+    private List<Object> buildDevDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -744,11 +1017,15 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_options));
         defs.add(Arrays.asList(createSwitch(R.drawable.ic_block, "#FF453A", getString(R.string.ig_dialog_dev_remove_build_expired), "removeBuildExpiredPopup")));
 
-        showMenu(getString(R.string.ig_dialog_section_dev_options), defs);
-        currentMenu = "dev";
+        return defs;
     }
 
     private void loadGhostMenu() {
+        showMenu(getString(R.string.ig_dialog_section_ghost_mode), buildGhostDefs());
+        currentMenu = "ghost";
+    }
+
+    private List<Object> buildGhostDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_quick_toggle));
@@ -777,11 +1054,15 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport")
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_ghost_mode), defs);
-        currentMenu = "ghost";
+        return defs;
     }
 
     private void loadQuickTogglesMenu() {
+        showMenu(getString(R.string.ig_dialog_section_quick_toggle), buildQuickTogglesDefs());
+        currentMenu = "qt";
+    }
+
+    private List<Object> buildQuickTogglesDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -803,11 +1084,15 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_quick_allow_screenshots), "quickToggleAllowScreenshots")
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_quick_toggle), defs);
-        currentMenu = "qt";
+        return defs;
     }
 
     private void loadAdsMenu() {
+        showMenu(getString(R.string.ig_dialog_section_ad_analytics), buildAdsDefs());
+        currentMenu = "ads";
+    }
+
+    private List<Object> buildAdsDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -819,11 +1104,15 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_link, "#FF453A", getString(R.string.ig_dialog_open_links_externally), "openLinksExternally")
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_ad_analytics), defs);
-        currentMenu = "ads";
+        return defs;
     }
 
     private void loadCleanFeedMenu() {
+        showMenu(getString(R.string.ig_dialog_section_clean_feed), buildCleanFeedDefs());
+        currentMenu = "cleanfeed";
+    }
+
+    private List<Object> buildCleanFeedDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -836,11 +1125,15 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_expand_captions), "expandCaptions")
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_clean_feed), defs);
-        currentMenu = "cleanfeed";
+        return defs;
     }
 
     private void loadDistractionMenu() {
+        showMenu(getString(R.string.ig_dialog_section_distraction_free), buildDistractionDefs());
+        currentMenu = "distract";
+    }
+
+    private List<Object> buildDistractionDefs() {
         List<Object> defs = new ArrayList<>();
 
         List<String> distractionKeys = Arrays.asList(
@@ -879,12 +1172,16 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray")
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_distraction_free), defs);
-        currentMenu = "distract";
+        return defs;
     }
 
     /** Navigation bar editor (#238): hide and reorder the bottom-nav tabs, in their own menu. */
     private void loadNavigationMenu() {
+        showMenu(getString(R.string.ig_nav_settings_title), buildNavigationDefs());
+        currentMenu = "navigation";
+    }
+
+    private List<Object> buildNavigationDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.ig_nav_tabs_title));
@@ -902,8 +1199,7 @@ public class FeaturesFragment extends Fragment {
                 createClickable(R.drawable.ic_tune, "#30D158", getString(R.string.ig_nav_tab_order), this::showTabOrderDialog)
         ));
 
-        showMenu(getString(R.string.ig_nav_settings_title), defs);
-        currentMenu = "navigation";
+        return defs;
     }
 
     /** #238: reorder the bottom-nav tabs (saved as the "navTabOrder" string pref). */
@@ -992,6 +1288,11 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void loadMiscMenu() {
+        showMenu(getString(R.string.ig_dialog_section_misc), buildMiscDefs());
+        currentMenu = "misc";
+    }
+
+    private List<Object> buildMiscDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -1025,13 +1326,17 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_download, "#BF5AF2", getString(R.string.ig_dialog_misc_follow_export), "followListExport")
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_misc), defs);
-        currentMenu = "misc";
+        return defs;
     }
 
     /** Lock (Privacy). Companion app only toggles the persisted flags — the passcode itself is set
      *  from inside Instagram (the module has no passcode field here). */
     private void loadLockMenu() {
+        showMenu(getString(R.string.ig_dialog_misc_lock_section), buildLockDefs());
+        currentMenu = "lock";
+    }
+
+    private List<Object> buildLockDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -1044,13 +1349,17 @@ public class FeaturesFragment extends Fragment {
 
         // Note: setting the passcode itself is done from inside Instagram.
 
-        showMenu(getString(R.string.ig_dialog_misc_lock_section), defs);
-        currentMenu = "lock";
+        return defs;
     }
 
     /** Hide Specific Chats (Privacy). The companion app toggles the feature; hiding/unhiding a
      *  specific chat is done from inside Instagram. */
     private void loadHideChatsMenu() {
+        showMenu(getString(R.string.ig_hide_chats_title), buildHideChatsDefs());
+        currentMenu = "hidechats";
+    }
+
+    private List<Object> buildHideChatsDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -1061,11 +1370,15 @@ public class FeaturesFragment extends Fragment {
 
         // Note: hiding/unhiding a specific chat is done from inside Instagram.
 
-        showMenu(getString(R.string.ig_hide_chats_title), defs);
-        currentMenu = "hidechats";
+        return defs;
     }
 
     private void loadLocationMenu() {
+        showMenu(getString(R.string.ig_dialog_section_location), buildLocationDefs());
+        currentMenu = "location";
+    }
+
+    private List<Object> buildLocationDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -1090,11 +1403,15 @@ public class FeaturesFragment extends Fragment {
                     locationPickerLauncher.launch(i);
                 })));
 
-        showMenu(getString(R.string.ig_dialog_section_location), defs);
-        currentMenu = "location";
+        return defs;
     }
 
     private void loadThemeMenu() {
+        showMenu(getString(R.string.theme_title), buildThemeDefs());
+        currentMenu = "theme";
+    }
+
+    private List<Object> buildThemeDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.theme_section_colors));
@@ -1116,8 +1433,7 @@ public class FeaturesFragment extends Fragment {
         ));
         // Note: font & emoji files are picked from inside Instagram.
 
-        showMenu(getString(R.string.theme_title), defs);
-        currentMenu = "theme";
+        return defs;
     }
 
     private String lightModeLabel(int value) {
@@ -1167,6 +1483,11 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void loadQualityMenu() {
+        showMenu(getString(R.string.ig_dialog_section_quality), buildQualityDefs());
+        currentMenu = "quality";
+    }
+
+    private List<Object> buildQualityDefs() {
         List<Object> defs = new ArrayList<>();
         int current = localCache.getInt("forceReelQuality", 0);
 
@@ -1174,8 +1495,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(createClickable(R.drawable.ic_movie, "#32D74B",
                 getString(R.string.ig_dialog_quality_force_reels) + ": " + qualityLabel(current), () -> pickQuality(current))));
 
-        showMenu(getString(R.string.ig_dialog_section_quality), defs);
-        currentMenu = "quality";
+        return defs;
     }
 
     private void pickQuality(int current) {
@@ -1213,6 +1533,11 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void loadDownloaderMenu() {
+        showMenu(getString(R.string.ig_dialog_section_downloader), buildDownloaderDefs());
+        currentMenu = "downloader";
+    }
+
+    private List<Object> buildDownloaderDefs() {
         List<Object> defs = new ArrayList<>();
 
         defs.add(getString(R.string.feat_features));
@@ -1254,8 +1579,7 @@ public class FeaturesFragment extends Fragment {
                 createClickable(R.drawable.ic_delete, "#FF453A", getString(R.string.feat_downloader_reset_folder), this::resetDownloadFolder)
         ));
 
-        showMenu(getString(R.string.ig_dialog_section_downloader), defs);
-        currentMenu = "downloader";
+        return defs;
     }
 
     // =========================================================
@@ -1468,6 +1792,8 @@ public class FeaturesFragment extends Fragment {
             ContextCompat.registerReceiver(requireContext(), prefsReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
         }
         requireContext().sendBroadcast(new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS"));
+        // Prefs may have changed while away (e.g. toggled from inside Instagram): refresh counts
+        refreshVisibleMenu();
     }
 
     @Override

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">Tìm tính năng</string>
+    <string name="feat_search_no_results">Không có tính năng phù hợp</string>
+    <string name="feat_count_on">Bật %1$d</string>
+    <string name="feat_count_off">Tắt</string>
+</resources>

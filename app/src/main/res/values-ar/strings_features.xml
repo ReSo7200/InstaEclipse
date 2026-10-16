@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">البحث في الميزات</string>
+    <string name="feat_search_no_results">لا توجد ميزات مطابقة</string>
+    <string name="feat_count_on">%1$d مفعّلة</string>
+    <string name="feat_count_off">معطّلة</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">Αναζήτηση λειτουργιών</string>
+    <string name="feat_search_no_results">Δεν βρέθηκαν λειτουργίες</string>
+    <string name="feat_count_on">%1$d ενεργές</string>
+    <string name="feat_count_off">Ανενεργές</string>
+</resources>

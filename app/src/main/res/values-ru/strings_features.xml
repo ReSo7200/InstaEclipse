@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">Поиск функций</string>
+    <string name="feat_search_no_results">Ничего не найдено</string>
+    <string name="feat_count_on">Вкл.: %1$d</string>
+    <string name="feat_count_off">Выкл.</string>
+</resources>

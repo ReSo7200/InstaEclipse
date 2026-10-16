@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">Search features</string>
+    <string name="feat_search_no_results">No matching features</string>
+    <string name="feat_count_on">%1$d on</string>
+    <string name="feat_count_off">Off</string>
+</resources>
