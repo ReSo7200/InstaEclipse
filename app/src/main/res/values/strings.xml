@@ -469,6 +469,8 @@
     <string name="ig_dialog_misc_comment_search">Search Comments</string>
     <string name="ig_comment_search">Search comments</string>
     <string name="ig_comment_search_hint">Search %1$d loaded comments</string>
+    <string name="ig_comment_search_load_all">Load all</string>
+    <string name="ig_comment_search_loading">Loading… %1$d (tap to stop)</string>
     <string name="ig_dialog_misc_follow_export">Export Followers/Following to CSV</string>
     <string name="ig_follow_export">Export CSV</string>
     <string name="ig_follow_export_done">Exported %1$d accounts to %2$s</string>

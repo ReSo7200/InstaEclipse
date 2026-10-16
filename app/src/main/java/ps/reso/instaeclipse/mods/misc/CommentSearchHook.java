@@ -65,6 +65,12 @@ public class CommentSearchHook {
     private static final String TAG = "(IE|CommentSearch) ";
     private static final String USER = "com.instagram.user.model.User";
     private static volatile List<String[]> latest = new ArrayList<>(); // {username, text}
+    /** the open comments sheet (its list is scrolled by "Load all") */
+    private static java.lang.ref.WeakReference<View> sheet = new java.lang.ref.WeakReference<>(null);
+    private static final android.os.Handler MAIN = new android.os.Handler(android.os.Looper.getMainLooper());
+    private static volatile Runnable loading;
+    /** ids / tracking tokens (long, no spaces, base64-ish) are never the comment text */
+    private static final java.util.regex.Pattern TOKEN = java.util.regex.Pattern.compile("[A-Za-z0-9+/=_-]{32,}");
 
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
@@ -143,7 +149,8 @@ public class CommentSearchHook {
                         if (v == null) continue;
                         if (f.getType().getName().equals(USER)) user = v;
                         else if (v instanceof String s) {
-                            if (!s.startsWith("http") && (text == null || s.length() > text.length())) text = s;
+                            if (!s.startsWith("http") && !TOKEN.matcher(s).matches()
+                                    && (text == null || s.length() > text.length())) text = s;
                         } else if (d < 4 && !f.getType().isPrimitive() && !(v instanceof Number) && !(v instanceof Boolean)) {
                             q.add(new Object[]{v, d + 1});
                         }
@@ -167,6 +174,7 @@ public class CommentSearchHook {
     }
 
     private static void addPill(View root) {
+        sheet = new java.lang.ref.WeakReference<>(root);
         if (!(root instanceof ViewGroup g) || root.findViewWithTag("ie_comment_search") != null) return;
         ViewGroup row = headerRow(g);
         if (row != null && row.findViewWithTag("ie_comment_search") != null) return;
@@ -341,10 +349,121 @@ public class CommentSearchHook {
             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_comment_copied), Toast.LENGTH_SHORT).show();
         });
         refresh.run();
-        new AlertDialog.Builder(ctx, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+        AlertDialog dlg = new AlertDialog.Builder(ctx, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle(I18n.t(ctx, R.string.ig_comment_search))
                 .setView(box)
                 .setPositiveButton(android.R.string.ok, null)
-                .show();
+                .setNeutralButton(I18n.t(ctx, R.string.ig_comment_search_load_all), null)
+                .create();
+        dlg.setOnDismissListener(x -> stopLoading());
+        dlg.setOnShowListener(x -> {
+            android.widget.Button btn = dlg.getButton(AlertDialog.BUTTON_NEUTRAL);
+            btn.setOnClickListener(v -> { // keeps the dialog open
+                if (loading != null) { stopLoading(); btn.setText(I18n.t(ctx, R.string.ig_comment_search_load_all)); return; }
+                loadAll(count -> btn.setText(I18n.t(ctx, R.string.ig_comment_search_loading, count)), () -> {
+                    btn.setText(I18n.t(ctx, R.string.ig_comment_search_load_all));
+                    all.clear();
+                    all.addAll(latest);
+                    et.setHint(I18n.t(ctx, R.string.ig_comment_search_hint, all.size()));
+                    refresh.run();
+                });
+            });
+        });
+        dlg.show();
+    }
+
+    private static void stopLoading() {
+        if (loading != null) MAIN.removeCallbacks(loading);
+        loading = null;
+    }
+
+    /** Scrolls the sheet's comment list to its end until nothing new loads for 3 s (IG fetches
+     *  the next page itself near the end). Progress = comments collected so far. */
+    private static void loadAll(java.util.function.IntConsumer progress, Runnable done) {
+        View root = sheet.get();
+        View list = root != null ? scrollable(root) : null; // inside the sheet, not the feed behind it
+        ModuleLog.line(TAG + "load all: list=" + (list != null ? list.getClass().getName() + " h=" + list.getHeight() : null));
+        if (list == null) {
+            ModuleLog.line(TAG + "⚠️ load all: comment list not found");
+            done.run();
+            return;
+        }
+        final long started = System.currentTimeMillis();
+        final long[] lastChange = {started};
+        final int[] lastCount = {latest.size()};
+        loading = new Runnable() {
+            @Override
+            public void run() {
+                if (loading != this) return;
+                if (!list.isAttachedToWindow() || System.currentTimeMillis() - started > 5 * 60_000) {
+                    loading = null;
+                    done.run();
+                    return;
+                }
+                scrollDown(list);
+                int count = latest.size();
+                progress.accept(count);
+                if (count != lastCount[0] || list.canScrollVertically(1)) {
+                    if (count != lastCount[0]) lastChange[0] = System.currentTimeMillis();
+                    lastCount[0] = count;
+                }
+                // RecyclerView: at the end + nothing new for 3 s. Compose: nothing new for 4 s.
+                boolean rv = isRecyclerView(list.getClass());
+                long idle = System.currentTimeMillis() - lastChange[0];
+                if (rv ? idle > 3000 && !list.canScrollVertically(1) : idle > 4000) {
+                    loading = null; // at the end and nothing new for 3 s
+                    ModuleLog.line(TAG + "load all: " + count + " comments");
+                    done.run();
+                    return;
+                }
+                MAIN.postDelayed(this, rv ? 300 : 450);
+            }
+        };
+        MAIN.post(loading);
+    }
+
+    /** The comment list: the tallest shown RecyclerView, else the tallest vertically scrollable view. */
+    private static View scrollable(View root) {
+        View rv = null, any = null, compose = null;
+        java.util.ArrayDeque<View> st = new java.util.ArrayDeque<>();
+        st.push(root);
+        while (!st.isEmpty()) {
+            View v = st.pop();
+            if (!v.isShown()) continue;
+            if (isRecyclerView(v.getClass()) && (rv == null || v.getHeight() > rv.getHeight())) rv = v;
+            if ((v.canScrollVertically(1) || v.canScrollVertically(-1)) && (any == null || v.getHeight() > any.getHeight())) any = v;
+            // 452: the list is a Compose LazyColumn (doesn't report scrollability to the View system)
+            if (v.getClass().getName().equals("androidx.compose.ui.platform.AndroidComposeView")
+                    && (compose == null || v.getHeight() > compose.getHeight())) compose = v;
+            if (v instanceof ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) st.push(g.getChildAt(i));
+        }
+        return rv != null ? rv : any != null ? any : compose;
+    }
+
+    private static boolean isRecyclerView(Class<?> c) {
+        for (; c != null; c = c.getSuperclass()) if (c.getName().equals("androidx.recyclerview.widget.RecyclerView")) return true;
+        return false;
+    }
+
+    /** RecyclerView scrolls directly; other lists (Compose) get a synthetic upward drag. */
+    private static void scrollDown(View list) {
+        if (isRecyclerView(list.getClass())) {
+            list.scrollBy(0, list.getHeight() * 3);
+            return;
+        }
+        long t = android.os.SystemClock.uptimeMillis();
+        float x = list.getWidth() / 2f, y0 = list.getHeight() * 0.8f, y1 = list.getHeight() * 0.2f;
+        android.view.MotionEvent down = android.view.MotionEvent.obtain(t, t, android.view.MotionEvent.ACTION_DOWN, x, y0, 0);
+        list.dispatchTouchEvent(down);
+        for (int i = 1; i <= 6; i++) {
+            android.view.MotionEvent mv = android.view.MotionEvent.obtain(t, t + i * 10L,
+                    android.view.MotionEvent.ACTION_MOVE, x, y0 + (y1 - y0) * i / 6f, 0);
+            list.dispatchTouchEvent(mv);
+            mv.recycle();
+        }
+        android.view.MotionEvent up = android.view.MotionEvent.obtain(t, t + 70, android.view.MotionEvent.ACTION_UP, x, y1, 0);
+        list.dispatchTouchEvent(up);
+        down.recycle();
+        up.recycle();
     }
 }
