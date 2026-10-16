@@ -116,10 +116,14 @@ public class LoggingFragment extends Fragment {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final AtomicInteger loadGeneration = new AtomicInteger(0);
 
+    /** Nonce of the last ACTION_REQUEST_LOGS; replies without it are ignored (IpcSecurity). */
+    private String logsNonce;
+
     private final BroadcastReceiver logReplyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (!CommonUtils.ACTION_LOGS_REPLY.equals(intent.getAction()) || listView == null) return;
+            if (!ps.reso.instaeclipse.utils.core.IpcSecurity.nonceMatches(logsNonce, intent)) return;
             String src = intent.getStringExtra(CommonUtils.EXTRA_LOG_SOURCE);
             if (src == null) src = CommonUtils.IG_PACKAGE_NAME;
             String body = intent.getStringExtra(CommonUtils.EXTRA_LOG_TEXT);
@@ -235,9 +239,11 @@ public class LoggingFragment extends Fragment {
         List<String> targets = findInstalledTargets(ctx);
         noTargetInstalled = targets.isEmpty();
         if (noTargetInstalled) return;
+        logsNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
         for (String pkg : targets) {
             Intent request = new Intent(CommonUtils.ACTION_REQUEST_LOGS);
             request.setPackage(pkg);
+            request.putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, logsNonce);
             ctx.sendBroadcast(request);
         }
         waitingForInstagram = true;

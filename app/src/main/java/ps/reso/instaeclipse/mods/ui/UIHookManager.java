@@ -293,16 +293,8 @@ public class UIHookManager {
                 }
             }
         };
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(receiver,
-                    new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"),
-                    android.content.Context.RECEIVER_EXPORTED);
-        } else {
-            androidx.core.content.ContextCompat.registerReceiver(context,
-                    receiver,
-                    new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"),
-                    androidx.core.content.ContextCompat.RECEIVER_EXPORTED);
-        }
+        ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver,
+                new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"));
     }
 
     /** Registers a receiver in the Instagram process to restore settings from a backup JSON. */
@@ -329,16 +321,8 @@ public class UIHookManager {
             }
         };
         try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                context.registerReceiver(receiver,
-                        new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"),
-                        android.content.Context.RECEIVER_EXPORTED);
-            } else {
-                androidx.core.content.ContextCompat.registerReceiver(context,
-                        receiver,
-                        new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"),
-                        androidx.core.content.ContextCompat.RECEIVER_EXPORTED);
-            }
+            ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver,
+                    new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"));
             } catch (Throwable e) {
             ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
         }

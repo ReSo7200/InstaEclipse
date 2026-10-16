@@ -786,12 +786,14 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             // Mirror active -> companion reads the file; skip the big (binder-limited) extra.
                             reply.putExtra(CommonUtils.EXTRA_LOG_TEXT, Logging.isMirrorActive() ? "" : Logging.getSnapshotForIpc());
                             reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
+                            ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
                             ctx.sendBroadcast(reply);
                         } catch (Throwable t) {
                             Intent reply = new Intent(CommonUtils.ACTION_LOGS_REPLY);
                             reply.setPackage(CommonUtils.MY_PACKAGE_NAME);
                             reply.putExtra(CommonUtils.EXTRA_LOG_ERROR, String.valueOf(t.getMessage()));
                             reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
+                            ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
                             ctx.sendBroadcast(reply);
                         }
                     });
@@ -808,6 +810,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
                     Bundle bundle = new Bundle();
                     for (Map.Entry<String, ?> entry : prefs.getAll().entrySet()) {
+                        // The lock passcode hash and its salt never leave Instagram's process.
+                        if ("lockDirectPasscode".equals(entry.getKey()) || "lockDirectSalt".equals(entry.getKey())) continue;
                         if (entry.getValue() instanceof Boolean) {
                             bundle.putBoolean(entry.getKey(), (Boolean) entry.getValue());
                         } else if (entry.getValue() instanceof String) {
@@ -817,7 +821,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         }
                     }
                     reply.putExtras(bundle);
-                    ctx.sendBroadcast(reply);
+                    ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
+                            ctx.sendBroadcast(reply);
 
                 } else if ("ps.reso.instaeclipse.ACTION_EXPORT_CONFIG".equals(action)) {
                     ModuleLog.line("(InstaEclipse) Sync: Companion app requested Dev Config export.");
@@ -828,6 +833,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             Intent reply = new Intent("ps.reso.instaeclipse.ACTION_SEND_CONFIG");
                             reply.setPackage("ps.reso.instaeclipse");
                             reply.putExtra("error", "mc_overrides.json not found.");
+                            ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
                             ctx.sendBroadcast(reply);
                             return;
                         }
@@ -839,7 +845,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         Intent reply = new Intent("ps.reso.instaeclipse.ACTION_SEND_CONFIG");
                         reply.setPackage("ps.reso.instaeclipse");
                         reply.putExtra("json_content", sb.toString().trim());
-                        ctx.sendBroadcast(reply);
+                        ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
+                            ctx.sendBroadcast(reply);
                         ModuleLog.line("(InstaEclipse) Export: config reply sent to companion.");
                     } catch (Exception e) {
                         ModuleLog.line("(InstaEclipse) Export: failed: " + e.getMessage());
@@ -872,10 +879,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         filter.addAction("ps.reso.instaeclipse.ACTION_EXPORT_CONFIG");
         filter.addAction("ps.reso.instaeclipse.ACTION_BACKUP_SETTINGS");
 
-        if (Build.VERSION.SDK_INT >= 33) {
-            context.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
-        } else {
-            ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_EXPORTED);
-        }
+        // Only the companion (holding the signature permission) can reach this receiver.
+        ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver, filter);
     }
 }

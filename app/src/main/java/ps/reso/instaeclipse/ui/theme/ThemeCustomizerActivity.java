@@ -219,17 +219,17 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
         Intent enabledIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
         enabledIntent.putExtra("key", KEY_ENABLED);
         enabledIntent.putExtra("value", enabled);
-        sendBroadcast(enabledIntent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, enabledIntent);
 
         Intent presetIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
         presetIntent.putExtra("key", KEY_PRESET_ID);
         presetIntent.putExtra("value", presetId);
-        sendBroadcast(presetIntent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, presetIntent);
 
         Intent paletteIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
         paletteIntent.putExtra("key", KEY_PALETTE_JSON);
         paletteIntent.putExtra("value", paletteJson);
-        sendBroadcast(paletteIntent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, paletteIntent);
 
         Toast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
     }
@@ -245,13 +245,13 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
         Intent enabledIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
         enabledIntent.putExtra("key", KEY_ENABLED);
         enabledIntent.putExtra("value", enabled);
-        sendBroadcast(enabledIntent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, enabledIntent);
 
         if (selectedPresetId > 0) {
             Intent presetIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
             presetIntent.putExtra("key", KEY_LIGHT_PRESET_ID);
             presetIntent.putExtra("value", selectedPresetId);
-            sendBroadcast(presetIntent);
+            ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, presetIntent);
         }
         Toast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
     }

@@ -103,6 +103,14 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Signature permission guarding the companion -> Instagram broadcast bridge. Receivers
+         registered inside the hooked process require senders to hold it, so only this APK
+         (signed with the same key) can change settings there. See IpcSecurity. -->
+    <permission
+        android:name="ps.reso.instaeclipse.permission.MODULE_IPC"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="ps.reso.instaeclipse.permission.MODULE_IPC" />
+
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- For Android 11+ broad storage access -->

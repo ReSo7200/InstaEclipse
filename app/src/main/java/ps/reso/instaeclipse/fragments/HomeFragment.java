@@ -177,10 +177,13 @@ public class HomeFragment extends Fragment {
      * Instagram isn't running, so we fall back to the plain install state. We only use the reply
      * as a signal — FeaturesFragment remains the one that syncs its contents into the cache.
      */
+    private String pingNonce;
+
     private final BroadcastReceiver pingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("ps.reso.instaeclipse.ACTION_SEND_PREFS".equals(intent.getAction())) {
+            if ("ps.reso.instaeclipse.ACTION_SEND_PREFS".equals(intent.getAction())
+                    && ps.reso.instaeclipse.utils.core.IpcSecurity.nonceMatches(pingNonce, intent)) {
                 moduleConfirmed = true;
                 if (isAdded() && getView() != null) updateStatusPill();
             }
@@ -393,13 +396,12 @@ public class HomeFragment extends Fragment {
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_PREFS");
         try {
             // Same registration as FeaturesFragment: the reply comes from the Instagram process.
-            if (Build.VERSION.SDK_INT >= 33) {
-                requireContext().registerReceiver(pingReceiver, filter, Context.RECEIVER_EXPORTED);
-            } else {
-                ContextCompat.registerReceiver(requireContext(), pingReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
-            }
+            ps.reso.instaeclipse.utils.core.IpcSecurity.registerReplyReceiver(requireContext(), pingReceiver, filter);
             pingReceiverRegistered = true;
-            requireContext().sendBroadcast(new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS"));
+            pingNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
+            ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(),
+                    new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS")
+                            .putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, pingNonce));
         } catch (Throwable ignored) { }
     }
 
@@ -569,7 +571,7 @@ public class HomeFragment extends Fragment {
         Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
         intent.putExtra("key", key);
         intent.putExtra("value", value);
-        requireContext().sendBroadcast(intent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intent);
     }
 
     private void makeLocalCacheWorldReadable() {

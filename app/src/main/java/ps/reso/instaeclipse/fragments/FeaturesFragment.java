@@ -90,10 +90,14 @@ public class FeaturesFragment extends Fragment {
     // STAGING SYSTEM: Holds changes before applying
     private final Map<String, Boolean> stagedChanges = new HashMap<>();
 
+    /** Nonce of the last ACTION_REQUEST_PREFS; replies without it are ignored (IpcSecurity). */
+    private String prefsNonce;
+
     private final BroadcastReceiver prefsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("ps.reso.instaeclipse.ACTION_SEND_PREFS".equals(intent.getAction())) {
+            if ("ps.reso.instaeclipse.ACTION_SEND_PREFS".equals(intent.getAction())
+                    && ps.reso.instaeclipse.utils.core.IpcSecurity.nonceMatches(prefsNonce, intent)) {
                 Bundle bundle = intent.getExtras();
                 if (bundle != null) {
                     // If we just set the path locally (via dirPickerLauncher), the incoming
@@ -149,7 +153,7 @@ public class FeaturesFragment extends Fragment {
                         Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
                         intent.putExtra("key", key);
                         intent.putExtra("value", (boolean) (Boolean) val);
-                        requireContext().sendBroadcast(intent);
+                        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intent);
                     }
                 }
                 editor.apply();
@@ -178,12 +182,12 @@ public class FeaturesFragment extends Fragment {
                     Intent b1 = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
                     b1.putExtra("key", "spoofLat");
                     b1.putExtra("value", String.valueOf(lat));
-                    requireContext().sendBroadcast(b1);
+                    ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b1);
 
                     Intent b2 = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
                     b2.putExtra("key", "spoofLng");
                     b2.putExtra("value", String.valueOf(lng));
-                    requireContext().sendBroadcast(b2);
+                    ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b2);
 
                     if ("location".equals(currentMenu)) loadLocationMenu();
                 });
@@ -222,12 +226,12 @@ public class FeaturesFragment extends Fragment {
                 Intent intentUri = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
                 intentUri.putExtra("key", "downloaderCustomUri");
                 intentUri.putExtra("value", uriString);
-                requireContext().sendBroadcast(intentUri);
+                ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intentUri);
 
                 Intent intentPath = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
                 intentPath.putExtra("key", "downloaderCustomPath");
                 intentPath.putExtra("value", path);
-                requireContext().sendBroadcast(intentPath);
+                ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intentPath);
 
                 Toast.makeText(requireContext(), getString(R.string.ig_toast_download_folder_updated), Toast.LENGTH_SHORT).show();
 
@@ -1318,7 +1322,7 @@ public class FeaturesFragment extends Fragment {
                     Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
                     b.putExtra("key", "customShareDomain");
                     b.putExtra("value", domain);
-                    requireContext().sendBroadcast(b);
+                    ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
                     loadAdsMenu();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -1353,7 +1357,7 @@ public class FeaturesFragment extends Fragment {
                     Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
                     b.putExtra("key", "startupTab");
                     b.putExtra("value", tabs[which]);
-                    requireContext().sendBroadcast(b);
+                    ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
                     d.dismiss();
                     loadNavigationMenu();
                 })
@@ -1367,7 +1371,7 @@ public class FeaturesFragment extends Fragment {
         Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
         b.putExtra("key", "navTabOrder");
         b.putExtra("value", value);
-        requireContext().sendBroadcast(b);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
     }
 
     private FeatureItem createSwitchLockedByExtreme(String title, String prefKey) {
@@ -1560,7 +1564,7 @@ public class FeaturesFragment extends Fragment {
                     Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
                     b.putExtra("key", "themeLightPresetId");
                     b.putExtra("value", value);
-                    requireContext().sendBroadcast(b);
+                    ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
 
                     dialog.dismiss();
                     loadThemeMenu();
@@ -1619,7 +1623,7 @@ public class FeaturesFragment extends Fragment {
                     Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
                     b.putExtra("key", "forceReelQuality");
                     b.putExtra("value", value);
-                    requireContext().sendBroadcast(b);
+                    ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
 
                     dialog.dismiss();
                     loadQualityMenu();
@@ -1711,12 +1715,12 @@ public class FeaturesFragment extends Fragment {
         Intent intentUri = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
         intentUri.putExtra("key", "downloaderCustomUri");
         intentUri.putExtra("value", "");
-        requireContext().sendBroadcast(intentUri);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intentUri);
 
         Intent intentPath = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
         intentPath.putExtra("key", "downloaderCustomPath");
         intentPath.putExtra("value", "");
-        requireContext().sendBroadcast(intentPath);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intentPath);
 
         Toast.makeText(requireContext(), getString(R.string.ig_toast_download_folder_reset), Toast.LENGTH_SHORT).show();
 
@@ -1763,9 +1767,11 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void exportDevConfig() {
+        final String nonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
         BroadcastReceiver configReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                if (!ps.reso.instaeclipse.utils.core.IpcSecurity.nonceMatches(nonce, intent)) return;
                 context.unregisterReceiver(this);
                 Activity activity = getActivity();
                 if (activity == null || activity.isFinishing()) return;
@@ -1786,14 +1792,11 @@ public class FeaturesFragment extends Fragment {
             }
         };
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_CONFIG");
-        if (Build.VERSION.SDK_INT >= 33) {
-            requireContext().registerReceiver(configReceiver, filter, Context.RECEIVER_EXPORTED);
-        } else {
-            ContextCompat.registerReceiver(requireContext(), configReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
-        }
+        ps.reso.instaeclipse.utils.core.IpcSecurity.registerReplyReceiver(requireContext(), configReceiver, filter);
         Intent request = new Intent("ps.reso.instaeclipse.ACTION_EXPORT_CONFIG");
+        request.putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, nonce);
         request.setPackage("com.instagram.android");
-        requireContext().sendBroadcast(request);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), request);
     }
 
     private void restoreDefaultConfig() {
@@ -1811,7 +1814,7 @@ public class FeaturesFragment extends Fragment {
                         Intent broadcast = new Intent("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG");
                         broadcast.setPackage("com.instagram.android");
                         broadcast.putExtra("json_content", json);
-                        requireContext().sendBroadcast(broadcast);
+                        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), broadcast);
                         Toast.makeText(requireContext(), getString(R.string.ig_toast_default_config_restored), Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                         Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1860,7 +1863,7 @@ public class FeaturesFragment extends Fragment {
             Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
             intent.putExtra("key", key);
             intent.putExtra("value", value);
-            requireContext().sendBroadcast(intent);
+            ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intent);
         }
         editor.apply();
         stagedChanges.clear();
@@ -1882,12 +1885,11 @@ public class FeaturesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_PREFS");
-        if (Build.VERSION.SDK_INT >= 33) {
-            requireContext().registerReceiver(prefsReceiver, filter, Context.RECEIVER_EXPORTED);
-        } else {
-            ContextCompat.registerReceiver(requireContext(), prefsReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
-        }
-        requireContext().sendBroadcast(new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS"));
+        ps.reso.instaeclipse.utils.core.IpcSecurity.registerReplyReceiver(requireContext(), prefsReceiver, filter);
+        prefsNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(),
+                new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS")
+                        .putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, prefsNonce));
         // Prefs may have changed while away (e.g. toggled from inside Instagram): refresh counts
         refreshVisibleMenu();
     }
