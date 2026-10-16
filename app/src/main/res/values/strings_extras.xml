@@ -2,4 +2,6 @@
 <resources>
     <string name="ig_caption_copy_no_hashtags">Copy without Hashtags</string>
     <string name="ig_dialog_clean_feed_following_only">Following-only Feed</string>
+    <string name="ig_dialog_menu_extras">Extras</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Disable Swipe to Camera</string>
 </resources>

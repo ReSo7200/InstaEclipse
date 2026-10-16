@@ -301,6 +301,11 @@ public class FeatureManager {
         reg(FeatureFlags.enableCaptionCopy,    "CaptionCopy",          R.string.ig_caption_copy_title);
         reg(FeatureFlags.enableCopyComment,    "CopyComment",          R.string.ig_dialog_misc_copy_comment);
         reg(FeatureFlags.enablePhotoZoom,      "PhotoZoom",            R.string.ig_feat_photo_zoom);
+
+        for (ExtrasFeatures.Entry e : ExtrasFeatures.ALL) {
+            if (ExtrasFeatures.get(e.flag)) FeatureStatusTracker.setEnabled(e.flag, e.label);
+            else FeatureStatusTracker.setDisabled(e.flag);
+        }
     }
 
     /** Register a feature in the load toast when enabled, or drop it when off. */

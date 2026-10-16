@@ -1,5 +1,6 @@
 package ps.reso.instaeclipse.utils.core;
 
+import ps.reso.instaeclipse.utils.feature.ExtrasFeatures;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -151,6 +152,8 @@ public class SettingsManager {
         editor.putInt("themePresetId", FeatureFlags.themePresetId);
         editor.putInt("themeLightPresetId", FeatureFlags.themeLightPresetId);
         editor.putString("themePaletteJson", FeatureFlags.themePaletteJson);
+
+        for (String flag : ExtrasFeatures.flags()) editor.putBoolean(flag, ExtrasFeatures.get(flag));
 
         editor.apply();
 
@@ -305,6 +308,8 @@ public class SettingsManager {
                     .apply();
         }
         FeatureFlags.themePaletteJson = prefs.getString("themePaletteJson", "");
+
+        for (String flag : ExtrasFeatures.flags()) ExtrasFeatures.set(flag, prefs.getBoolean(flag, false));
 
         FeatureManager.refreshFeatureStatus();
     }

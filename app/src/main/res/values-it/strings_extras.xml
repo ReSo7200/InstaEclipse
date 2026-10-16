@@ -2,4 +2,6 @@
 <resources>
     <string name="ig_caption_copy_no_hashtags">Copia senza hashtag</string>
     <string name="ig_dialog_clean_feed_following_only">Feed solo account seguiti</string>
+    <string name="ig_dialog_menu_extras">Extra</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Disattiva scorrimento verso la fotocamera</string>
 </resources>

@@ -2,4 +2,6 @@
 <resources>
     <string name="ig_caption_copy_no_hashtags">複製（不含主題標籤）</string>
     <string name="ig_dialog_clean_feed_following_only">僅顯示追蹤的動態</string>
+    <string name="ig_dialog_menu_extras">額外功能</string>
+    <string name="ig_dialog_extras_no_swipe_camera">停用滑動進入相機</string>
 </resources>

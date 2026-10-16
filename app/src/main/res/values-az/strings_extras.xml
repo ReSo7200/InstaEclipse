@@ -2,4 +2,6 @@
 <resources>
     <string name="ig_caption_copy_no_hashtags">Heşteqsiz Kopyala</string>
     <string name="ig_dialog_clean_feed_following_only">Yalnız İzlənilənlər Axını</string>
+    <string name="ig_dialog_menu_extras">Əlavələr</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Kameraya sürüşdürməni söndür</string>
 </resources>

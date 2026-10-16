@@ -2,4 +2,6 @@
 <resources>
     <string name="ig_caption_copy_no_hashtags">Sao chép không kèm hashtag</string>
     <string name="ig_dialog_clean_feed_following_only">Bảng tin chỉ từ người bạn theo dõi</string>
+    <string name="ig_dialog_menu_extras">Bổ sung</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Tắt vuốt để mở camera</string>
 </resources>

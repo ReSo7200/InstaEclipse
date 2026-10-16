@@ -382,6 +382,9 @@ public class HomeFragment extends Fragment {
         for (String key : FEATURE_KEYS) {
             if (localCache.getBoolean(key, false)) count++;
         }
+        for (String key : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags()) {
+            if (localCache.getBoolean(key, false)) count++;
+        }
         featuresCountText.setText(getResources().getQuantityString(R.plurals.home_features_enabled, count, count));
     }
 

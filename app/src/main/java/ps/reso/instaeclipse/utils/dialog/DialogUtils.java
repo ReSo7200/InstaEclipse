@@ -1,5 +1,6 @@
 package ps.reso.instaeclipse.utils.dialog;
 
+import ps.reso.instaeclipse.utils.feature.ExtrasFeatures;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -186,6 +187,7 @@ public class DialogUtils {
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_tools)));
         LinearLayout tools = createGroupCard(context);
         tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.ig_dialog_menu_misc), A_TOOLS, () -> showMiscOptions(context), onCount(context, "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast", "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment", "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI", "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "savedOnProfile", "storyViewerSearch", "commentSearch", "followListExport")));
+        tools.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.ig_dialog_menu_extras), A_TOOLS, () -> showExtrasOptions(context), onCount(context, ExtrasFeatures.flags())));
         tools.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_menu_dev_options), A_TOOLS, () -> showDevOptions(context), onCount(context, "isDevEnabled", "removeBuildExpiredPopup")));
         tools.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.ig_dialog_menu_backup_restore), A_TOOLS, () -> showBackupRestoreOptions(context)));
         tools.addView(createMenuRow(context, R.drawable.ic_restart, I18n.t(context, R.string.ig_dialog_menu_restart), A_TOOLS, () -> showRestartSection(context)));
@@ -1359,6 +1361,21 @@ public class DialogUtils {
         });
     }
 
+
+    private static void showExtrasOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+        LinearLayout group = card(context);
+        for (ExtrasFeatures.Entry e : ExtrasFeatures.ALL) {
+            ToggleRow row = createSwitch(context, e.icon, "#BF5AF2", I18n.t(context, e.label), ExtrasFeatures.get(e.flag));
+            row.setOnCheckedChangeListener((b, checked) -> {
+                ExtrasFeatures.set(e.flag, checked);
+                SettingsManager.saveAllFlags();
+            });
+            group.addView(row);
+        }
+        layout.addView(group);
+        showSectionDialog(context, I18n.t(context, R.string.ig_dialog_menu_extras), layout, () -> {});
+    }
 
     private static void showCleanFeedOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);

@@ -56,6 +56,8 @@ public class FeatureFlags {
     public static boolean expandCaptions = false; // feed captions without "… more" (#246)
     public static boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
     public static boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)
+    // Extras (see ExtrasFeatures)
+    public static boolean disableSwipeToCamera = false; // sideways swipe on the feed no longer opens the camera
     public static boolean followingOnlyFeed = false; // home feed shows only accounts you follow
     public static boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)

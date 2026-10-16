@@ -2,4 +2,6 @@
 <resources>
     <string name="ig_caption_copy_no_hashtags">Копировать без хештегов</string>
     <string name="ig_dialog_clean_feed_following_only">Лента только подписок</string>
+    <string name="ig_dialog_menu_extras">Дополнительно</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Отключить свайп к камере</string>
 </resources>

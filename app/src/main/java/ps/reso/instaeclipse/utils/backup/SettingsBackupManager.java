@@ -117,6 +117,8 @@ public class SettingsBackupManager {
 
         JSONObject root = new JSONObject();
         root.put("version",  VERSION);
+        for (String flag : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags())
+            s.put(flag, ps.reso.instaeclipse.utils.feature.ExtrasFeatures.get(flag));
         root.put("settings", s);
         return root.toString(2);
     }
@@ -130,6 +132,8 @@ public class SettingsBackupManager {
     public static void fromJson(String json) throws JSONException {
         JSONObject root = new JSONObject(json);
         JSONObject s = root.has("settings") ? root.getJSONObject("settings") : root;
+        for (String flag : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags())
+            if (s.has(flag)) ps.reso.instaeclipse.utils.feature.ExtrasFeatures.set(flag, s.getBoolean(flag));
 
         if (s.has("isDevEnabled"))            FeatureFlags.isDevEnabled            = s.getBoolean("isDevEnabled");
         if (s.has("removeBuildExpiredPopup")) FeatureFlags.removeBuildExpiredPopup = s.getBoolean("removeBuildExpiredPopup");

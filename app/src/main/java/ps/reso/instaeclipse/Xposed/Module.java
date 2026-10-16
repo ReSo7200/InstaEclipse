@@ -365,6 +365,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | CommunityNotes): ❌ Failed to hook");
                     }
 
+                    // Extras: no swipe to camera from the feed
+                    try {
+                        if (!skip("SwipeToCameraHook")) new ps.reso.instaeclipse.mods.extras.SwipeToCameraHook().install(hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | SwipeCamera): ❌ Failed to hook: " + t);
+                    }
+
                     // home feed shows only accounts you follow
                     try {
                         if (!skip("FollowingOnlyFeedHook")) new ps.reso.instaeclipse.mods.feed.FollowingOnlyFeedHook().install(dexKitBridge, hostClassLoader);

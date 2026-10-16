@@ -842,6 +842,7 @@ public class FeaturesFragment extends Fragment {
         c.add(new Category("location", GROUP_MEDIA, R.drawable.ic_pin, A_MEDIA, getString(R.string.ig_dialog_menu_location), this::buildLocationDefs, this::loadLocationMenu));
 
         c.add(new Category("misc", GROUP_TOOLS, R.drawable.ic_settings_gear, A_TOOLS, getString(R.string.ig_dialog_menu_misc), this::buildMiscDefs, this::loadMiscMenu));
+        c.add(new Category("extras", GROUP_TOOLS, R.drawable.ic_sparkle, A_TOOLS, getString(R.string.ig_dialog_menu_extras), this::buildExtrasDefs, this::loadExtrasMenu));
         c.add(new Category("dev", GROUP_TOOLS, R.drawable.ic_tune, A_TOOLS, getString(R.string.ig_dialog_menu_dev_options), this::buildDevDefs, this::loadDevMenu));
 
         // Quick toggles live inside Ghost Mode; searchable, but not a main-menu row.
@@ -1104,6 +1105,22 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_link, "#FF453A", getString(R.string.ig_dialog_open_links_externally), "openLinksExternally")
         ));
 
+        return defs;
+    }
+
+    private void loadExtrasMenu() {
+        showMenu(getString(R.string.ig_dialog_menu_extras), buildExtrasDefs());
+        currentMenu = "extras";
+    }
+
+    private List<Object> buildExtrasDefs() {
+        List<Object> defs = new ArrayList<>();
+        List<Object> rows = new ArrayList<>();
+        for (ps.reso.instaeclipse.utils.feature.ExtrasFeatures.Entry e : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.ALL) {
+            rows.add(createSwitch(e.icon, "#BF5AF2", getString(e.label), e.flag));
+        }
+        defs.add(getString(R.string.feat_features));
+        defs.add(rows);
         return defs;
     }
 

@@ -2,4 +2,6 @@
 <resources>
     <string name="ig_caption_copy_no_hashtags">نسخ بدون وسوم</string>
     <string name="ig_dialog_clean_feed_following_only">خلاصة المتابَعين فقط</string>
+    <string name="ig_dialog_menu_extras">إضافات</string>
+    <string name="ig_dialog_extras_no_swipe_camera">تعطيل السحب إلى الكاميرا</string>
 </resources>
