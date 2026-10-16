@@ -297,6 +297,7 @@ public class DialogUtils {
                 else inactive.add(FeatureStatusTracker.getLabel(context, e.getKey()));
             }
         }
+        final int finalActive = active;
         if (total > 0) {
             int color = active == total ? 0xFF30D158 : 0xFFFF9F0A;
             View health = statusChip(context, "●  " + I18n.t(context, R.string.menu_chip_active, active, total), color, v -> {
@@ -308,7 +309,8 @@ public class DialogUtils {
                     java.util.Collections.sort(inactive);
                     for (String label : inactive) msg.append("\n•  ").append(label);
                 }
-                showSimpleDialog(context, I18n.t(context, R.string.menu_inactive_title), msg.toString());
+                // Title is the count itself ("55/55 active"); the body says all-good or lists what failed.
+                showSimpleDialog(context, I18n.t(context, R.string.menu_chip_active, finalActive, total), msg.toString());
             });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);

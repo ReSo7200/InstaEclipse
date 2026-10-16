@@ -2,7 +2,6 @@
 <resources>
     <string name="menu_chip_instagram">Instagram %1$s</string>
     <string name="menu_chip_active">%1$d/%2$d aktif</string>
-    <string name="menu_inactive_title">Belum aktif saat ini</string>
     <string name="menu_inactive_all_good">Semua fitur yang dinyalakan berjalan di versi Instagram ini.</string>
     <string name="menu_inactive_hint">Fitur ini sudah dinyalakan, tetapi tidak bisa berjalan di versi Instagram ini:</string>
 </resources>

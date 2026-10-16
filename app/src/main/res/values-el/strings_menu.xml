@@ -2,7 +2,6 @@
 <resources>
     <string name="menu_chip_instagram">Instagram %1$s</string>
     <string name="menu_chip_active">%1$d/%2$d ενεργές</string>
-    <string name="menu_inactive_title">Μη ενεργές αυτή τη στιγμή</string>
     <string name="menu_inactive_all_good">Όλες οι ενεργοποιημένες λειτουργίες δουλεύουν σε αυτή την έκδοση του Instagram.</string>
     <string name="menu_inactive_hint">Αυτές είναι ενεργοποιημένες, αλλά δεν λειτούργησαν σε αυτή την έκδοση του Instagram:</string>
 </resources>

@@ -2,7 +2,6 @@
 <resources>
     <string name="menu_chip_instagram">Instagram %1$s</string>
     <string name="menu_chip_active">%1$d/%2$d ativas</string>
-    <string name="menu_inactive_title">Inativas neste momento</string>
     <string name="menu_inactive_all_good">Todas as funcionalidades ativadas funcionam nesta versão do Instagram.</string>
     <string name="menu_inactive_hint">Estas estão ativadas, mas não foi possível aplicá-las nesta versão do Instagram:</string>
 </resources>

@@ -2,7 +2,6 @@
 <resources>
     <string name="menu_chip_instagram">Instagram %1$s</string>
     <string name="menu_chip_active">%1$d/%2$d aktif</string>
-    <string name="menu_inactive_title">Şu an aktif değil</string>
     <string name="menu_inactive_all_good">Açık olan tüm özellikler bu Instagram sürümünde çalışıyor.</string>
     <string name="menu_inactive_hint">Bunlar açık, ancak bu Instagram sürümünde devreye giremedi:</string>
 </resources>
