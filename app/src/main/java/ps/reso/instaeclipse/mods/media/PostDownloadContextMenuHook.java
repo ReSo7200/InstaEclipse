@@ -622,7 +622,7 @@ public class PostDownloadContextMenuHook {
         if (urls.size() > 1) {
             final Object slide = audioMedia;
             FeedVideoDownloadHook.mainHandler.post(() ->
-                    FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx, slide));
+                    FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx, slide, media));
             return;
         }
         FeedVideoDownloadHook.offerAudioOrRun(ctx, audioMedia, shownUrl, finalUser, finalId, "post", () ->

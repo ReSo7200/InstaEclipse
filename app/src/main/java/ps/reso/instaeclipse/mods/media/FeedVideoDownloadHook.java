@@ -106,6 +106,10 @@ public class FeedVideoDownloadHook {
     private static Method   extendedImageUrlGetUrl; // ExtendedImageUrl.getUrl(), when methodImageUrl returns it
     private static Method   carouselMediaGetter;    // Media."carousel_media" getter: () -> List<Media> (IG 447+)
     private static Method   hasAudioGetter;         // "has_audio" getter: () -> Boolean (Media)
+    // Posts with Instagram music: the video is silent and the song is a separate file.
+    private static Method   musicMetadataGetter;    // "music_metadata" getter (feed posts)
+    private static Method   clipsMetadataGetter;    // "clips_metadata" getter (reels)
+    static final long       MUSIC_CLIP_MS = 30_000; // length of a post's music clip
     private static Method   dashManifestGetter;     // "video_dash_manifest" getter: () -> String (Media 447+, LiveTreeMediaDict <= 446)
 
     // VideoVersionIntf – stable public interface with getUrl()
@@ -1106,6 +1110,8 @@ public class FeedVideoDownloadHook {
         resolveCarouselGetter(bridge, classLoader);
         resolveDashManifestGetter(bridge, classLoader);
         resolveHasAudioGetter(bridge, classLoader);
+        musicMetadataGetter = resolveMediaGetter(bridge, classLoader, "music_metadata");
+        clipsMetadataGetter = resolveMediaGetter(bridge, classLoader, "clips_metadata");
         resolveIsVideoMethod(bridge, classLoader);
         XC_MethodHook urlHook = new XC_MethodHook() {
             @Override
@@ -1463,6 +1469,17 @@ public class FeedVideoDownloadHook {
      * Returns {url, extractFromVideo}.
      */
     static Object[] audioSource(Object media) {
+        return audioSource(media, media);
+    }
+
+    /**
+     * Audio to save for {@code media} (a single post or the carousel slide being viewed): its own
+     * sound track, or else the song attached to the post ({@code post}; for a carousel the music
+     * belongs to the album, not the slide). Returns {url, extract, trimStartMs, trimDurationMs}
+     * where extract means "run through the extractor" (video → audio track, or song → clip), and
+     * a duration of -1 keeps everything.
+     */
+    static Object[] audioSource(Object media, Object post) {
         if (!FeatureFlags.offerAudioDownload || media == null) return null;
         String dashAudio = extractAudioUrl(media);
         String videoForAudio = dashAudio == null ? bestVideoUrlFromMedia(media) : null;
@@ -1470,8 +1487,104 @@ public class FeedVideoDownloadHook {
         ModuleLog.line("(IE|DL|Audio) has_audio=" + sound + " dash=" + (dashAudio != null)
                 + " video=" + (videoForAudio != null));
         String url = dashAudio != null ? dashAudio : videoForAudio;
-        if (url == null || Boolean.FALSE.equals(sound)) return null;
-        return new Object[]{url, dashAudio == null};
+        if (url != null && !Boolean.FALSE.equals(sound)) return new Object[]{url, dashAudio == null, 0L, -1L};
+        Object[] music = musicSource(post);
+        if (music == null && post != media) music = musicSource(media);
+        return music;
+    }
+
+    /** The song attached to a post (Instagram music) as {url, true, startMs, MUSIC_CLIP_MS}, or null. */
+    static Object[] musicSource(Object media) {
+        if (media == null) return null;
+        for (Method getter : new Method[]{musicMetadataGetter, clipsMetadataGetter}) {
+            if (getter == null || !getter.getDeclaringClass().isInstance(media)) continue;
+            try {
+                Object meta = getter.invoke(media);
+                Object info = meta == null ? null : callByReturnType(meta, "com.instagram.api.schemas.MusicInfo");
+                Object track = info == null ? null : callByReturnType(info, "com.instagram.api.schemas.TrackData");
+                java.util.Map<?, ?> tm = fieldMap(track);
+                if (tm == null) continue;
+                Object url = tm.get("progressive_download_url");
+                if (!(url instanceof String) || ((String) url).isEmpty()) url = tm.get("fast_start_progressive_download_url");
+                if (!(url instanceof String) || ((String) url).isEmpty()) continue;
+                long start = 0;
+                java.util.Map<?, ?> cm = fieldMap(callByReturnType(info, "com.instagram.music.common.model.MusicConsumptionModel"));
+                if (cm != null && cm.get("audio_asset_start_time_in_ms") instanceof Number) {
+                    start = ((Number) cm.get("audio_asset_start_time_in_ms")).longValue();
+                }
+                ModuleLog.line("(IE|DL|Music) song=\"" + tm.get("title") + "\" by " + tm.get("display_artist")
+                        + " start=" + start + "ms");
+                return new Object[]{url, true, start, MUSIC_CLIP_MS};
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|DL|Music) lookup: " + t);
+            }
+        }
+        return null;
+    }
+
+    /** First non-null value of a no-arg method on {@code obj} whose return type is {@code typeName}. */
+    private static Object callByReturnType(Object obj, String typeName) {
+        if (obj == null) return null;
+        Class<?> type;
+        try {
+            type = Class.forName(typeName, false, obj.getClass().getClassLoader());
+        } catch (Throwable t) {
+            return null;
+        }
+        for (Method m : obj.getClass().getMethods()) {
+            if (m.getParameterCount() != 0 || !type.isAssignableFrom(m.getReturnType())) continue;
+            try {
+                Object v = m.invoke(obj);
+                if (v != null) return v;
+            } catch (Throwable ignored) {}
+        }
+        return null;
+    }
+
+    /**
+     * Instagram's own "model as named fields" map (keys are the JSON field names, e.g.
+     * "progressive_download_url"); some models take a context object built with its no-arg
+     * constructor. Field names are stable where the getter names are obfuscated per version.
+     */
+    private static java.util.Map<?, ?> fieldMap(Object obj) {
+        if (obj == null) return null;
+        for (Method m : obj.getClass().getMethods()) {
+            if (!java.util.Map.class.isAssignableFrom(m.getReturnType())) continue;
+            try {
+                Object r = null;
+                if (m.getParameterCount() == 0) {
+                    r = m.invoke(obj);
+                } else if (m.getParameterCount() == 1 && !m.getParameterTypes()[0].isPrimitive()) {
+                    java.lang.reflect.Constructor<?> c = m.getParameterTypes()[0].getDeclaredConstructor();
+                    c.setAccessible(true);
+                    r = m.invoke(obj, c.newInstance());
+                }
+                if (r instanceof java.util.Map) return (java.util.Map<?, ?>) r;
+            } catch (Throwable ignored) {}
+        }
+        return null;
+    }
+
+    /** A no-arg getter on Media that reads the given JSON field (matched by its field-name string). */
+    private static Method resolveMediaGetter(DexKitBridge bridge, ClassLoader classLoader, String field) {
+        try {
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .declaredClass("com.instagram.feed.media.Media")
+                    .paramCount(0)
+                    .usingEqStrings(List.of(field))))) {
+                if (md.getName().startsWith("<")) continue; // <clinit>/<init> also mention the field
+                try {
+                    Method m = md.getMethodInstance(classLoader);
+                    if (m.getReturnType() == void.class) continue;
+                    m.setAccessible(true);
+                    ModuleLog.line("(IE|DL|DexKit) " + field + " getter=" + m.getName());
+                    return m;
+                } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|DexKit) " + field + " getter failed: " + t);
+        }
+        return null;
     }
 
     static void offerAudioOrRun(Context ctx, Object media, String imageUrl, String username, String mediaId,
@@ -1480,6 +1593,7 @@ public class FeedVideoDownloadHook {
         if (src == null) { downloadAction.run(); return; }
         final String audio = (String) src[0];
         final boolean extractFromVideo = (Boolean) src[1];
+        final long trimStart = (Long) src[2], trimDuration = (Long) src[3];
         Context host = ctx instanceof android.app.Activity ? ctx
                 : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         if (host == null) { downloadAction.run(); return; }
@@ -1491,7 +1605,7 @@ public class FeedVideoDownloadHook {
         labels.add(I18n.t(host, R.string.ig_download_choice_audio));
         actions.add(() -> downloadAudio(host, audio,
                 buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user,
-                extractFromVideo));
+                extractFromVideo, trimStart, trimDuration));
         mainHandler.post(() -> {
             try {
                 new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
@@ -1510,9 +1624,17 @@ public class FeedVideoDownloadHook {
         downloadAudio(ctx, url, filename, username, false);
     }
 
-    /** @param extractFromVideo {@code url} is a video; save only its audio track (.m4a). */
     static void downloadAudio(Context ctx, String url, String filename, String username,
                               boolean extractFromVideo) {
+        downloadAudio(ctx, url, filename, username, extractFromVideo, 0, -1);
+    }
+
+    /**
+     * @param extractFromVideo run {@code url} through the extractor: keep only its audio track and,
+     *                         when trimDurationMs &gt; 0, only that range (a post's music clip).
+     */
+    static void downloadAudio(Context ctx, String url, String filename, String username,
+                              boolean extractFromVideo, long trimStartMs, long trimDurationMs) {
         Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
             try {
@@ -1527,6 +1649,8 @@ public class FeedVideoDownloadHook {
                     intent.putExtra("mimeType", "audio/mp4");
                     intent.putExtra("username", username);
                     intent.putExtra("extractAudio", extractFromVideo);
+                    intent.putExtra("trimStartMs", trimStartMs);
+                    intent.putExtra("trimDurationMs", trimDurationMs);
                     ctx.startForegroundService(intent);
                     return;
                 }
@@ -1535,7 +1659,8 @@ public class FeedVideoDownloadHook {
                 try {
                     if (video != null) {
                         downloadToFileAndGetType(url, video);
-                        DownloadSaveService.extractAudioTrack(video.getAbsolutePath(), temp.getAbsolutePath());
+                        DownloadSaveService.extractAudioTrack(video.getAbsolutePath(), temp.getAbsolutePath(),
+                                trimStartMs * 1000, trimDurationMs > 0 ? trimDurationMs * 1000 : -1);
                     } else {
                         downloadToFileAndGetType(url, temp);
                     }
@@ -2412,6 +2537,13 @@ public class FeedVideoDownloadHook {
     static void showPostDownloadDialog(Context ctx, List<String> urls,
                                        String username, String mediaId, int currentIndex,
                                        Object slideMedia) {
+        showPostDownloadDialog(ctx, urls, username, mediaId, currentIndex, slideMedia, slideMedia);
+    }
+
+    /** @param postMedia the whole post (its attached song is the audio when the slide is silent). */
+    static void showPostDownloadDialog(Context ctx, List<String> urls,
+                                       String username, String mediaId, int currentIndex,
+                                       Object slideMedia, Object postMedia) {
         if (urls.isEmpty()) {
             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_post_url_not_found), Toast.LENGTH_SHORT).show();
             return;
@@ -2442,7 +2574,7 @@ public class FeedVideoDownloadHook {
         int n = urls.size();
         int safeIdx = (currentIndex >= 0 && currentIndex < n) ? currentIndex : 0;
         showCarouselBottomSheet(ctx, urls, username, mediaId, n, safeIdx,
-                slideMedia != null ? audioSource(slideMedia) : null);
+                slideMedia != null ? audioSource(slideMedia, postMedia) : null);
     }
 
     // ── Modern bottom sheet for carousel download ─────────────────────────────
@@ -2605,7 +2737,7 @@ public class FeedVideoDownloadHook {
                     downloadAudio(ctx, (String) audioSrc[0],
                             withSlide(buildFilename(user, "post_audio", mediaId, true)
                                     .replaceAll("\\.mp4$", ".m4a"), safeIdx + 1, n),
-                            user, (Boolean) audioSrc[1]);
+                            user, (Boolean) audioSrc[1], (Long) audioSrc[2], (Long) audioSrc[3]);
                 });
                 sheet.addView(btnAudio);
             }

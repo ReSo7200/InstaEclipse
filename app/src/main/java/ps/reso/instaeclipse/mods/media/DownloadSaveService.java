@@ -101,6 +101,9 @@ public class DownloadSaveService extends Service {
         String username  = intent.getStringExtra("username");
         // Audio-only from a plain MP4 (no separate DASH audio track): pull the audio out locally.
         boolean extractAudio = intent.getBooleanExtra("extractAudio", false);
+        // Only part of the source (a post's music clip): start and length in ms; -1 = all of it.
+        long trimStartMs    = intent.getLongExtra("trimStartMs", 0);
+        long trimDurationMs = intent.getLongExtra("trimDurationMs", -1);
 
         if (url == null || filename == null) { stopSelf(startId); return START_NOT_STICKY; }
 
@@ -119,11 +122,12 @@ public class DownloadSaveService extends Service {
         final String fMime  = mimeType, fUser = username, fSave = saveUri;
         final boolean fUF   = usernameFolder;
         final boolean fExtract = extractAudio;
+        final long fTrimStart = trimStartMs, fTrimDur = trimDurationMs;
 
         new Thread(() -> {
             try {
                 SavedMedia saved = fExtract
-                        ? downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF)
+                        ? downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF, fTrimStart, fTrimDur)
                         : fAudio != null
                         ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
                         : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
@@ -222,7 +226,8 @@ public class DownloadSaveService extends Service {
 
     /** Downloads a video and saves only its audio track as .m4a (AAC copied as-is, no re-encode). */
     private SavedMedia downloadExtractAudioAndSave(String videoUrl, String filename, String saveUri,
-                                                   String username, boolean usernameFolder)
+                                                   String username, boolean usernameFolder,
+                                                   long trimStartMs, long trimDurationMs)
             throws Exception {
         File cacheDir = getCacheDir();
         long ts = System.currentTimeMillis();
@@ -234,7 +239,8 @@ public class DownloadSaveService extends Service {
                 if (total > 0) maybeUpdateProgress("Downloading audio…", (int) (done * 85 / total), 100);
             });
             pushProgress("Extracting audio…", 90, 100, true);
-            extractAudioTrack(tv.getAbsolutePath(), out.getAbsolutePath());
+            extractAudioTrack(tv.getAbsolutePath(), out.getAbsolutePath(),
+                    trimStartMs * 1000, trimDurationMs > 0 ? trimDurationMs * 1000 : -1);
             String name = filename.replaceAll("\\.(mp4|m4a)$", "") + ".m4a";
             Uri uri = writeViaSaf(out, name, "audio/mp4", saveUri, username, usernameFolder);
             return new SavedMedia(uri, name, "audio/mp4");
@@ -248,6 +254,15 @@ public class DownloadSaveService extends Service {
 
     /** Copies the audio track of {@code videoPath} into an audio-only MP4 (.m4a) at {@code outPath}. */
     static void extractAudioTrack(String videoPath, String outPath) throws Exception {
+        extractAudioTrack(videoPath, outPath, 0, -1);
+    }
+
+    /**
+     * Same, keeping only {@code durationUs} of audio from {@code startUs} (re-timed to start at 0);
+     * a duration of -1 keeps the rest of the track. Samples are copied, never re-encoded.
+     */
+    static void extractAudioTrack(String videoPath, String outPath, long startUs, long durationUs)
+            throws Exception {
         MediaExtractor ex = new MediaExtractor();
         MediaMuxer mux = null;
         try {
@@ -257,11 +272,34 @@ public class DownloadSaveService extends Service {
             mux = new MediaMuxer(outPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
             int ao = mux.addTrack(ex.getTrackFormat(ai));
             mux.start();
-            copyTrack(ex, mux, ao, ByteBuffer.allocate(1024 * 1024), new MediaCodec.BufferInfo());
+            copyTrackRange(ex, mux, ao, startUs, durationUs);
             mux.stop();
         } finally {
             ex.release();
             if (mux != null) mux.release();
+        }
+    }
+
+    @SuppressLint("WrongConstant")
+    private static void copyTrackRange(MediaExtractor ex, MediaMuxer mux, int outTrack,
+                                       long startUs, long durationUs) {
+        ByteBuffer buf = ByteBuffer.allocate(1024 * 1024);
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        long end = durationUs > 0 ? startUs + durationUs : Long.MAX_VALUE;
+        ex.seekTo(Math.max(0, startUs), MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
+        while (true) {
+            int sz = ex.readSampleData(buf, 0);
+            if (sz < 0) break;
+            long t = ex.getSampleTime();
+            if (t > end) break;
+            if (t >= startUs) {
+                info.offset = 0;
+                info.size = sz;
+                info.presentationTimeUs = t - startUs;
+                info.flags = ex.getSampleFlags();
+                mux.writeSampleData(outTrack, buf, info);
+            }
+            ex.advance();
         }
     }
 
