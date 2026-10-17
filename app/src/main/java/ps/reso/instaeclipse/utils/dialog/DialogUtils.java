@@ -2824,6 +2824,12 @@ public class DialogUtils {
         int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
         MaxHeightScrollView scrollView = new MaxHeightScrollView(context, Math.round(screenHeight * heightFraction));
         scrollView.addView(content);
+        // Keep the sheet's rounded top corners while scrolling: the rounded background lives on the
+        // content, which scrolls away, so give the scroll view the same shape and clip to it.
+        if (content.getBackground() instanceof GradientDrawable g && g.getConstantState() != null) {
+            scrollView.setBackground(g.getConstantState().newDrawable().mutate());
+            scrollView.setClipToOutline(true);
+        }
         return scrollView;
     }
 
