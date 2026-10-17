@@ -527,6 +527,7 @@
 
     <string name="ig_dialog_open_links_externally">Bağlantıları Harici Tarayıcıda Aç</string>
     <string name="theme_light_mode">Açık mod</string>
+    <string name="theme_dark_mode">Koyu mod</string>
     <string name="theme_set_light">Açık mod temaları</string>
     <string name="theme_set_dark">Koyu mod temaları</string>
     <string name="theme_light_same">Karanlık modla aynı tema</string>

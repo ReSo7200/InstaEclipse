@@ -190,6 +190,7 @@
     <string name="ig_dialog_ad_disable_tracking">İzləmə Bağlantılarını Deaktiv Et</string>
     <string name="ig_dialog_open_links_externally">Bağlantıları Xarici Brauzerdə Aç</string>
     <string name="theme_light_mode">İşıqlı rejim</string>
+    <string name="theme_dark_mode">Qaranlıq rejim</string>
     <string name="theme_set_light">İşıqlı rejim temaları</string>
     <string name="theme_set_dark">Qaranlıq rejim temaları</string>
     <string name="theme_light_same">Qaranlıq rejimlə eyni tema</string>

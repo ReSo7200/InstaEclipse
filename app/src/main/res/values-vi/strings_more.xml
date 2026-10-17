@@ -131,6 +131,7 @@
     <string name="ig_dialog_unsent_unknown_chat">Đoạn chat không xác định</string>
     <string name="ig_dialog_open_links_externally">Mở liên kết bằng trình duyệt ngoài</string>
     <string name="theme_light_mode">Chế độ sáng</string>
+    <string name="theme_dark_mode">Chế độ tối</string>
     <string name="theme_set_light">Giao diện chế độ sáng</string>
     <string name="theme_set_dark">Giao diện chế độ tối</string>
     <string name="theme_light_same">Giống giao diện chế độ tối</string>

@@ -1855,9 +1855,17 @@ public class DialogUtils {
                         }
                     }
                 }));
-        colorsCard.addView(createActionRow(context, R.drawable.ic_palette,
-                I18n.t(context, R.string.theme_light_mode) + ": " + lightModeLabel(context, FeatureFlags.themeLightPresetId),
-                "#FF2D55", v -> pickLightModeTheme(context)));
+        // Follow the phone's mode, like the customizer: in dark mode pick the dark theme, in light
+        // mode the light-mode behaviour.
+        if (ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.isNightNow()) {
+            colorsCard.addView(createActionRow(context, R.drawable.ic_palette,
+                    I18n.t(context, R.string.theme_dark_mode) + ": " + darkModeLabel(context, FeatureFlags.themePresetId),
+                    "#FF2D55", v -> pickDarkModeTheme(context)));
+        } else {
+            colorsCard.addView(createActionRow(context, R.drawable.ic_palette,
+                    I18n.t(context, R.string.theme_light_mode) + ": " + lightModeLabel(context, FeatureFlags.themeLightPresetId),
+                    "#FF2D55", v -> pickLightModeTheme(context)));
+        }
         layout.addView(sectionHeader(context, I18n.t(context, R.string.theme_section_colors)));
         layout.addView(colorsCard);
 
@@ -1876,6 +1884,42 @@ public class DialogUtils {
         if (value == 0) return I18n.t(context, R.string.theme_light_same);
         if (value == -1) return I18n.t(context, R.string.theme_light_stock);
         return ps.reso.instaeclipse.mods.ui.theme.ThemePresets.getDisplayName(context, value);
+    }
+
+    private static String darkModeLabel(Context context, int value) {
+        if (value == 0) return I18n.t(context, R.string.theme_section_custom);
+        return ps.reso.instaeclipse.mods.ui.theme.ThemePresets.getDisplayName(context, value);
+    }
+
+    /** Dark-mode theme: one of the dark presets, or the custom palette when that is in use. */
+    private static void pickDarkModeTheme(Context context) {
+        int[] presets = ps.reso.instaeclipse.mods.ui.theme.ThemePresets.darkModeChoices();
+        final int[] values;
+        if (FeatureFlags.themePresetId == 0) {
+            values = new int[presets.length + 1];
+            System.arraycopy(presets, 0, values, 1, presets.length);
+        } else {
+            values = presets;
+        }
+        String[] labels = new String[values.length];
+        int sel = 0;
+        for (int i = 0; i < values.length; i++) {
+            labels[i] = darkModeLabel(context, values[i]);
+            if (values[i] == FeatureFlags.themePresetId) sel = i;
+        }
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.theme_dark_mode))
+                .choices(labels, sel, which -> {
+                    FeatureFlags.themePresetId = values[which];
+                    SettingsManager.saveAllFlags();
+                    if (currentDialog != null) {
+                        try { currentDialog.dismiss(); } catch (Exception ignored) {}
+                        currentDialog = null;
+                    }
+                    ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.invalidate();
+                    ps.reso.instaeclipse.mods.ui.theme.IgThemeHook.refreshCurrentActivity();
+                })
+                .show();
     }
 
     /** Light-mode behaviour of the custom theme (#251): same theme, stock Instagram, or a preset. */

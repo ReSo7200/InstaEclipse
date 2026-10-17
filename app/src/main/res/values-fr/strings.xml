@@ -222,6 +222,7 @@
     <string name="ig_dialog_ad_disable_tracking">Désactiver liens de suivi</string>
     <string name="ig_dialog_open_links_externally">Ouvrir les liens dans un navigateur externe</string>
     <string name="theme_light_mode">Mode clair</string>
+    <string name="theme_dark_mode">Mode sombre</string>
     <string name="theme_set_light">Thèmes du mode clair</string>
     <string name="theme_set_dark">Thèmes du mode sombre</string>
     <string name="theme_light_same">Même thème qu\'en mode sombre</string>

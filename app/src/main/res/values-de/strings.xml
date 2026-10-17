@@ -195,6 +195,7 @@
     <string name="ig_dialog_ad_disable_tracking">Tracking-Links deaktivieren</string>
     <string name="ig_dialog_open_links_externally">Links im externen Browser öffnen</string>
     <string name="theme_light_mode">Heller Modus</string>
+    <string name="theme_dark_mode">Dunkler Modus</string>
     <string name="theme_set_light">Themes für den hellen Modus</string>
     <string name="theme_set_dark">Themes für den dunklen Modus</string>
     <string name="theme_light_same">Gleiches Design wie im dunklen Modus</string>

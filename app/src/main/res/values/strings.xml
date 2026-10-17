@@ -429,6 +429,7 @@
     <string name="ig_dialog_ad_disable_tracking">Disable Tracking Links</string>
     <string name="ig_dialog_open_links_externally">Open Links in External Browser</string>
     <string name="theme_light_mode">Light mode</string>
+    <string name="theme_dark_mode">Dark mode</string>
     <string name="theme_set_light">Light mode themes</string>
     <string name="theme_set_dark">Dark mode themes</string>
     <string name="theme_light_same">Same theme as dark mode</string>

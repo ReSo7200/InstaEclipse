@@ -223,6 +223,7 @@
     <string name="ig_dialog_ad_disable_tracking">Απενεργοποίηση Συνδέσμων Παρακολούθησης</string>
     <string name="ig_dialog_open_links_externally">Άνοιγμα Συνδέσμων σε Εξωτερικό Πρόγραμμα Περιήγησης</string>
     <string name="theme_light_mode">Φωτεινή λειτουργία</string>
+    <string name="theme_dark_mode">Σκοτεινή λειτουργία</string>
     <string name="theme_set_light">Θέματα φωτεινής λειτουργίας</string>
     <string name="theme_set_dark">Θέματα σκοτεινής λειτουργίας</string>
     <string name="theme_light_same">Ίδιο θέμα με τη σκοτεινή λειτουργία</string>

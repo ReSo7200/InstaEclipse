@@ -189,6 +189,7 @@
     <string name="ig_dialog_ad_disable_tracking">Inaktivera spårningslänkar</string>
     <string name="ig_dialog_open_links_externally">Öppna länkar i extern webbläsare</string>
     <string name="theme_light_mode">Ljust läge</string>
+    <string name="theme_dark_mode">Mörkt läge</string>
     <string name="theme_set_light">Teman för ljust läge</string>
     <string name="theme_set_dark">Teman för mörkt läge</string>
     <string name="theme_light_same">Samma tema som i mörkt läge</string>
