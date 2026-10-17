@@ -42,7 +42,7 @@ public class SavedOnProfileHook {
     private static final String SESSION = "com.instagram.common.session.UserSession";
     private static final String BTN_TAG = "ie_saved_profile_btn";
 
-    private static Method factory, navigator, navPush, navCommit;
+    private static Method factory, navigator, navPush, navCommit, navMake;
     private static java.lang.reflect.Constructor<?> navCtor;
     private static boolean logged;
     private static final java.util.Set<View> watched =
@@ -57,9 +57,18 @@ public class SavedOnProfileHook {
                     if (!inv.isMethod()) continue;
                     Method m;
                     try { m = inv.getMethodInstance(cl); } catch (Throwable t) { continue; }
-                    if (!Modifier.isStatic(m.getModifiers())) continue;
                     Class<?>[] p = m.getParameterTypes();
                     Class<?> fragment = cl.loadClass("androidx.fragment.app.Fragment");
+                    // 452+: the handler builds the navigator itself (make(activity, session) ->
+                    // push(Bundle, Fragment) -> commit()) instead of calling one static helper.
+                    if (!Modifier.isStatic(m.getModifiers())) {
+                        if (p.length == 2 && p[0] == android.os.Bundle.class && p[1] == fragment) navPush = m;
+                        else if (p.length == 0 && m.getReturnType() == void.class && navPush != null
+                                && m.getDeclaringClass() == navPush.getDeclaringClass()) navCommit = m;
+                        continue;
+                    }
+                    if (p.length == 2 && Activity.class.isAssignableFrom(p[0]) && m.getReturnType() != void.class
+                            && !m.getReturnType().isPrimitive()) { navMake = m; continue; }
                     if (p.length == 4 && p[1] == String.class && p[2] == boolean.class && p[3] == boolean.class
                             && fragment.isAssignableFrom(m.getReturnType())) factory = m;
                     else if (p.length == 3 && p[0] == fragment && Activity.class.isAssignableFrom(p[1])
@@ -81,12 +90,16 @@ public class SavedOnProfileHook {
                     }
                 }
             }
-            if (factory == null || navigator == null) {
-                ModuleLog.line(TAG + "❌ factory=" + factory + " navigator=" + navigator);
+            boolean built = navMake != null && navPush != null && navCommit != null
+                    && navMake.getReturnType() == navPush.getDeclaringClass();
+            if (!built) navMake = null;
+            if (factory == null || (navigator == null && navMake == null)) {
+                ModuleLog.line(TAG + "❌ factory=" + factory + " navigator=" + navigator + " navMake=" + navMake);
                 return;
             }
             factory.setAccessible(true);
-            navigator.setAccessible(true);
+            if (navigator != null) navigator.setAccessible(true);
+            if (navMake != null) { navMake.setAccessible(true); navPush.setAccessible(true); navCommit.setAccessible(true); }
             XposedHelpers.findAndHookMethod(cl.loadClass("androidx.fragment.app.Fragment"), "onResume", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) { JitGuard.tick(param.method);
@@ -105,7 +118,7 @@ public class SavedOnProfileHook {
             });
             FeatureStatusTracker.setHooked("SavedOnProfile");
             ModuleLog.line(TAG + "✅ " + factory.getDeclaringClass().getName() + "." + factory.getName()
-                    + " / " + navigator.getDeclaringClass().getName() + "." + navigator.getName());
+                    + " / " + (navigator != null ? navigator : navMake));
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ " + t);
         }
@@ -182,7 +195,11 @@ public class SavedOnProfileHook {
                 return;
             }
             Object saved = factory.invoke(null, session, null, false, false);
-            if (navCtor != null && navPush != null && navCommit != null
+            if (navMake != null) {
+                Object nav = navMake.invoke(null, act, session);
+                navPush.invoke(nav, null, saved);
+                navCommit.invoke(nav);
+            } else if (navCtor != null && navPush != null && navCommit != null
                     && navCtor.getParameterTypes().length == 2 && navCtor.getDeclaringClass() == navPush.getDeclaringClass()) {
                 Object nav = navCtor.newInstance(act, session); // back stack on by default
                 navPush.invoke(nav, null, saved);
