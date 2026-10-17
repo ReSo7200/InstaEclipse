@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. הטקסט לא מופיע?</b>\n- השבת את HMA (HideMyApplist) עבור אינסטגרם. InstaEclipse קורא את הטקסטים מהאפליקציה שלו, ו-HMA מסתיר אותה.</string>
+    <string name="faq_8"><b>8. חלק מהתכונות לא עובדות גם כשהן מופעלות?</b>\n- ההגדרות הפנימיות של אינסטגרם עלולות לחסום אותן. אפשרויות מפתחים ← שחזור הגדרות ברירת מחדל.</string>
+    <string name="faq_9"><b>9. עדיין תקוע?</b>\n- שאל בקבוצת הטלגרם (t.me/instaEclipse_discussion).</string>
+</resources>

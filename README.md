@@ -288,6 +288,9 @@ Force stop Instagram and clear its cache after enabling it, then reopen.
 **It is not working on the Play Store version.**
 Install Instagram from [APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/) instead.
 
+**Text is missing in the InstaEclipse menus inside Instagram.**
+Disable HMA (HideMyApplist) for Instagram. InstaEclipse reads its text from its own app, and HMA hides it from Instagram.
+
 **Some features still will not work even when enabled.**
 Instagram's own internal config can silently block certain features. There is a ready-made config that clears the common ones, and InstaEclipse ships it as the default under Developer Options, Restore Default Config. You can also grab it from [Telegram](https://t.me/InstaEclipse/52).
 

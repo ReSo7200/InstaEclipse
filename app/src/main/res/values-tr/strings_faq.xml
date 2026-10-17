@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. Metinler görünmüyor mu?</b>\n- Instagram için HMA\'yı (HideMyApplist) kapatın. InstaEclipse metinlerini kendi uygulamasından okur, HMA ise onu gizler.</string>
+    <string name="faq_8"><b>8. Bazı özellikler açık olmasına rağmen çalışmıyor mu?</b>\n- Instagram\'ın iç yapılandırması bunları engelleyebilir. Geliştirici seçenekleri → Varsayılan yapılandırmayı geri yükle.</string>
+    <string name="faq_9"><b>9. Hâlâ sorun mu var?</b>\n- Telegram grubunda sorun (t.me/instaEclipse_discussion).</string>
+</resources>

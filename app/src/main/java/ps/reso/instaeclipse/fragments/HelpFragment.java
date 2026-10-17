@@ -35,7 +35,8 @@ public class HelpFragment extends Fragment {
 
     private static final int[] FAQ_STRINGS = {
             R.string.faq_1, R.string.faq_2, R.string.faq_3,
-            R.string.faq_4, R.string.faq_5, R.string.faq_6
+            R.string.faq_4, R.string.faq_5, R.string.faq_6,
+            R.string.faq_7, R.string.faq_8, R.string.faq_9
     };
 
     @Nullable

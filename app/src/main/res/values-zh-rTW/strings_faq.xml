@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. 文字沒有顯示？</b>\n- 為 Instagram 關閉 HMA（HideMyApplist）。InstaEclipse 從自己的應用程式讀取文字，而 HMA 會隱藏它。</string>
+    <string name="faq_8"><b>8. 部分功能開啟後仍然無效？</b>\n- Instagram 的內部設定可能會阻擋它們。開發者選項 → 還原預設設定。</string>
+    <string name="faq_9"><b>9. 還是有問題？</b>\n- 到 Telegram 群組提問（t.me/instaEclipse_discussion）。</string>
+</resources>

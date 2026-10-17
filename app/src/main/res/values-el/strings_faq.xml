@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. Το κείμενο δεν εμφανίζεται;</b>\n- Απενεργοποίησε το HMA (HideMyApplist) για το Instagram. Το InstaEclipse διαβάζει τα κείμενά του από τη δική του εφαρμογή και το HMA την κρύβει.</string>
+    <string name="faq_8"><b>8. Κάποιες λειτουργίες δεν δουλεύουν ενώ είναι ενεργές;</b>\n- Η εσωτερική ρύθμιση του Instagram μπορεί να τις μπλοκάρει. Επιλογές προγραμματιστή → Επαναφορά προεπιλεγμένων ρυθμίσεων.</string>
+    <string name="faq_9"><b>9. Ακόμα έχεις πρόβλημα;</b>\n- Ρώτα στην ομάδα Telegram (t.me/instaEclipse_discussion).</string>
+</resources>
