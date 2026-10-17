@@ -382,7 +382,8 @@ public class StoryMentionHook {
                         .title(I18n.t(ctx, R.string.ig_mention_dialog_title))
                         .message(usernames.isEmpty()
                                 ? I18n.t(ctx, R.string.ig_mention_no_mentions)
-                                : I18n.t(ctx, R.string.ig_mention_subtitle, usernames.size()));
+                                : I18n.t(ctx, R.string.ig_mention_subtitle, usernames.size())
+                                        + "\n" + I18n.t(ctx, R.string.ig_mention_hold_hint));
 
                 // One row per mention; tapping copies that username and keeps the list open.
                 for (String username : usernames) {
@@ -400,6 +401,18 @@ public class StoryMentionHook {
                             cm.setPrimaryClip(ClipData.newPlainText("username", username));
                             Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_mention_copied, username), Toast.LENGTH_SHORT).show();
                         }
+                    });
+                    // Hold opens the profile inside Instagram (its own deep-link handler).
+                    row.setOnLongClickListener(v -> {
+                        try {
+                            ctx.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse("https://www.instagram.com/" + username + "/"))
+                                    .setPackage(ctx.getPackageName())
+                                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+                        } catch (Throwable t) {
+                            ModuleLog.line("(IE|Mention) open profile: " + t);
+                        }
+                        return true;
                     });
                     dlg.view(row);
                 }

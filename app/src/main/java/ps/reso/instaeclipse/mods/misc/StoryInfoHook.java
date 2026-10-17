@@ -527,28 +527,38 @@ public class StoryInfoHook {
         LinearLayout bar = new LinearLayout(ctx);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         String q = Uri.encode(query);
-        String[][] apps = {
-                {"Spotify", "https://open.spotify.com/search/" + q, "#1DB954"},
-                {"YT Music", "https://music.youtube.com/search?q=" + q, "#FF0033"},
-                {"Apple Music", "https://music.apple.com/search?term=" + q, "#FA2D48"},
+        Object[][] apps = {
+                {"Spotify", "https://open.spotify.com/search/" + q, R.drawable.ic_logo_spotify},
+                {"YouTube Music", "https://music.youtube.com/search?q=" + q, R.drawable.ic_logo_ytmusic},
+                {"Apple Music", "https://music.apple.com/search?term=" + q, R.drawable.ic_logo_applemusic},
         };
         for (int i = 0; i < apps.length; i++) {
-            String[] a = apps[i];
-            TextView b = new TextView(ctx);
-            b.setText(a[0]);
-            b.setTextColor(android.graphics.Color.WHITE);
-            b.setTypeface(null, Typeface.BOLD);
-            b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            b.setGravity(Gravity.CENTER);
-            b.setMaxLines(1);
-            b.setPadding(dlg.dp(6), dlg.dp(10), dlg.dp(6), dlg.dp(10));
-            b.setBackground(dlg.round(android.graphics.Color.parseColor(a[2]), 14));
-            b.setOnClickListener(v -> open(ctx, a[1]));
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            Object[] a = apps[i];
+            String url = (String) a[1];
+            android.widget.ImageView b = new android.widget.ImageView(ctx);
+            android.graphics.drawable.Drawable logo = moduleDrawable((Integer) a[2]);
+            if (logo != null) b.setImageDrawable(logo);
+            b.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+            b.setContentDescription((String) a[0]);
+            b.setPadding(dlg.dp(6), dlg.dp(9), dlg.dp(6), dlg.dp(9));
+            b.setBackground(dlg.round(dlg.field, 14));
+            b.setOnClickListener(v -> open(ctx, url));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dlg.dp(50), 1f);
             if (i > 0) lp.setMarginStart(dlg.dp(8));
             bar.addView(b, lp);
         }
         return bar;
+    }
+
+    /** A drawable from the module's own resources, in its own colours (no tint). */
+    private static android.graphics.drawable.Drawable moduleDrawable(int res) {
+        try {
+            return android.content.res.XModuleResources
+                    .createInstance(ps.reso.instaeclipse.Xposed.Module.moduleSourceDir, null)
+                    .getDrawable(res, null);
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     private static String join(List<String> parts, String sep) {
