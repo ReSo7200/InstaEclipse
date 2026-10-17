@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.view.WindowInsets;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -52,8 +56,12 @@ public class InstantUploadHook {
     static volatile Bitmap pendingBitmap;
     private static volatile long pendingSetAt = 0;   // when pendingBitmap was armed (staleness guard)
     private static final long PENDING_TTL_MS = 5 * 60 * 1000;
-    private static TextView chip;              // the injected gallery chip (main thread only)
-    private static ImageView preview;          // full-screen preview of the picked image
+    private static FrameLayout chip;           // the injected gallery button (main thread only)
+    private static View preview;               // "tap shutter" hint shown once a photo is picked
+    private static FrameLayout chipBtn;        // the round button inside chip
+    private static View chipIcon;              // gallery glyph (idle state)
+    private static ImageView chipThumb;        // picked photo, circle-cropped (ready state)
+    private static View chipBadge;             // green check badge (ready state)
     private static Activity chipHost;          // the Activity we injected them on
     private static boolean lifecycleRegistered = false;
     // True while OUR gallery picker is on top of the camera. The camera screen pauses/stops while
@@ -204,46 +212,132 @@ public class InstantUploadHook {
     }
 
     /**
-     * Show a SMALL thumbnail of the picked image just above the chip (so the shutter stays fully
-     * visible and tappable — a full-screen preview would cover IG's shutter and block sending),
-     * and turn the chip green with a ✓ prompting the shutter tap.
+     * Ready state: the button shows the picked photo (circle-cropped, white ring, green check
+     * badge) and a small "tap shutter" hint sits just above the shutter, never covering it.
      */
     private static void markChipReady(Activity act, Bitmap bmp) {
         try {
             View decor = act.getWindow().getDecorView();
-            if (preview != null) {
-                try { if (preview.getParent() instanceof ViewGroup) ((ViewGroup) preview.getParent()).removeView(preview); }
-                catch (Throwable ignored) {}
-                preview = null;
-            }
+            removePreview();
             if (decor instanceof ViewGroup) {
-                ImageView iv = new ImageView(act);
-                iv.setImageBitmap(bmp);
-                iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                int side = dp(act, 84);
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(side, side);
-                lp.gravity = Gravity.BOTTOM | Gravity.START;
-                lp.leftMargin = dp(act, 20);
-                lp.bottomMargin = dp(act, 172); // sits above the chip, clear of the centre shutter
-                iv.setLayoutParams(lp);
-                GradientDrawable frame = new GradientDrawable();
-                frame.setColor(Color.BLACK);
-                frame.setCornerRadius(dp(act, 12));
-                frame.setStroke(dp(act, 2), Color.parseColor("#30D158"));
-                iv.setBackground(frame);
-                iv.setClipToOutline(true);
-                ((ViewGroup) decor).addView(iv);
-                preview = iv;
-            }
-            if (chip != null) {
-                chip.setText(I18n.t(act, R.string.ig_instant_upload_chip_ready));
+                TextView hint = new TextView(act);
+                hint.setText(cleanLabel(I18n.t(act, R.string.ig_instant_upload_chip_ready)));
+                hint.setTextColor(Color.WHITE);
+                hint.setTextSize(13);
+                hint.setSingleLine(true);
+                hint.setGravity(Gravity.CENTER_VERTICAL);
+                int padH = dp(act, 12), padV = dp(act, 6);
+                hint.setPaddingRelative(dp(act, 8), padV, padH, padV);
+                Drawable check = moduleDrawable(act, R.drawable.ic_check_circle);
+                if (check != null) {
+                    check = check.mutate();
+                    check.setTint(GREEN);
+                    int s = dp(act, 16);
+                    check.setBounds(0, 0, s, s);
+                    hint.setCompoundDrawablesRelative(check, null, null, null);
+                    hint.setCompoundDrawablePadding(dp(act, 6));
+                }
                 GradientDrawable bg = new GradientDrawable();
-                bg.setColor(Color.parseColor("#CC30D158"));
-                bg.setCornerRadius(dp(act, 22));
-                chip.setBackground(bg);
-                chip.bringToFront();
+                bg.setColor(Color.parseColor("#A6000000"));
+                bg.setStroke(dp(act, 1), Color.parseColor("#26FFFFFF"));
+                bg.setCornerRadius(dp(act, 16));
+                hint.setBackground(bg);
+                hint.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+                // The shutter ring's top edge is ~188dp above the navigation bar; float just above it.
+                lp.bottomMargin = navInset(act, decor) + dp(act, 198);
+                hint.setLayoutParams(lp);
+                hint.setVisibility(chip != null ? chip.getVisibility() : View.VISIBLE);
+                hint.setAlpha(0f);
+                ((ViewGroup) decor).addView(hint);
+                hint.animate().alpha(1f).setDuration(180).start();
+                preview = hint;
+            }
+            applyChipState(act, bmp);
+            if (chip != null) chip.bringToFront();
+        } catch (Throwable ignored) {}
+    }
+
+    private static final int GREEN = Color.parseColor("#30D158");
+
+    /** Idle (bmp == null): gallery glyph on a dark disc. Ready: the picked photo + check badge. */
+    private static void applyChipState(Activity act, Bitmap bmp) {
+        if (chip == null || chipBtn == null) return;
+        boolean ready = bmp != null;
+        GradientDrawable disc = new GradientDrawable();
+        disc.setShape(GradientDrawable.OVAL);
+        disc.setColor(Color.parseColor("#33FFFFFF"));       // same grey as IG's flash/flip discs
+        disc.setStroke(dp(act, ready ? 2 : 1), ready ? Color.WHITE : Color.parseColor("#26FFFFFF"));
+        GradientDrawable mask = new GradientDrawable();
+        mask.setShape(GradientDrawable.OVAL);
+        mask.setColor(Color.WHITE);
+        chipBtn.setBackground(new RippleDrawable(
+                ColorStateList.valueOf(Color.parseColor("#40FFFFFF")), disc, mask));
+        if (chipThumb != null) {
+            chipThumb.setImageBitmap(ready ? bmp : null);
+            chipThumb.setVisibility(ready ? View.VISIBLE : View.GONE);
+        }
+        if (chipIcon != null) chipIcon.setVisibility(ready ? View.GONE : View.VISIBLE);
+        if (chipBadge != null) {
+            chipBadge.setVisibility(ready ? View.VISIBLE : View.GONE);
+            if (ready) {
+                chipBadge.setScaleX(0.4f);
+                chipBadge.setScaleY(0.4f);
+                chipBadge.animate().scaleX(1f).scaleY(1f).setDuration(200)
+                        .setInterpolator(new android.view.animation.OvershootInterpolator()).start();
+            }
+        }
+        chipBtn.setContentDescription(cleanLabel(I18n.t(act,
+                ready ? R.string.ig_instant_upload_chip_ready : R.string.ig_instant_upload_chip)));
+    }
+
+    private static void removePreview() {
+        try {
+            if (preview != null && preview.getParent() instanceof ViewGroup)
+                ((ViewGroup) preview.getParent()).removeView(preview);
+        } catch (Throwable ignored) {}
+        preview = null;
+    }
+
+    /** Strip the leading emoji/✓ the chip strings carry — the button draws real icons instead. */
+    static String cleanLabel(String s) {
+        if (s == null) return "";
+        int i = 0;
+        while (i < s.length()) {
+            int cp = s.codePointAt(i);
+            if (Character.isLetterOrDigit(cp)) break;
+            i += Character.charCount(cp);
+        }
+        return i < s.length() ? s.substring(i).trim() : s.trim();
+    }
+
+    /** A drawable from the module APK (R.drawable ids only resolve against the module's Resources). */
+    private static Drawable moduleDrawable(Activity act, int id) {
+        try {
+            return I18n.moduleResources(act).getDrawable(id, null);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** Height of the navigation bar overlapping the bottom of the (edge-to-edge) decor. */
+    @SuppressLint({"DiscouragedApi", "InternalInsetResource"})
+    private static int navInset(Activity act, View decor) {
+        try {
+            WindowInsets wi = decor.getRootWindowInsets();
+            if (wi != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                    return wi.getInsets(WindowInsets.Type.navigationBars()).bottom;
+                return wi.getSystemWindowInsetBottom();
             }
         } catch (Throwable ignored) {}
+        try {
+            int id = act.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+            if (id != 0) return act.getResources().getDimensionPixelSize(id);
+        } catch (Throwable ignored) {}
+        return dp(act, 48);
     }
 
     private static void removeChip() {
@@ -257,6 +351,10 @@ public class InstantUploadHook {
         } catch (Throwable ignored) {}
         chip = null;
         preview = null;
+        chipBtn = null;
+        chipIcon = null;
+        chipThumb = null;
+        chipBadge = null;
         chipHost = null;
     }
 
@@ -271,28 +369,99 @@ public class InstantUploadHook {
             View decor = act.getWindow().getDecorView();
             if (!(decor instanceof ViewGroup)) return;
 
-            TextView c = new TextView(act);
-            c.setText(I18n.t(act, R.string.ig_instant_upload_chip));
-            c.setTextColor(Color.WHITE);
-            c.setTextSize(14);
-            int padH = dp(act, 16), padV = dp(act, 10);
-            c.setPadding(padH, padV, padH, padV);
-            GradientDrawable bg = new GradientDrawable();
-            bg.setColor(Color.parseColor("#CC0A84FF"));
-            bg.setCornerRadius(dp(act, 22));
-            c.setBackground(bg);
+            // A round dark button in IG's own control style (like the flash/flip discs), sitting in
+            // the "Friends" row directly under the flash button — clear of shutter, flash and pill.
+            int btnSize = dp(act, 48), badgeSize = dp(act, 18), box = btnSize + dp(act, 6);
+            FrameLayout c = new FrameLayout(act);
+            c.setClipChildren(false);
+            c.setClipToPadding(false);
 
-            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.gravity = Gravity.BOTTOM | Gravity.START;
-            lp.leftMargin = dp(act, 20);
-            lp.bottomMargin = dp(act, 120);
+            FrameLayout btn = new FrameLayout(act);
+            btn.setLayoutParams(new FrameLayout.LayoutParams(btnSize, btnSize, Gravity.CENTER));
+            btn.setClickable(true);
+            btn.setFocusable(true);
+            btn.setOnClickListener(v -> launchPicker(act));
+            btn.setOnTouchListener((v, e) -> {
+                int a = e.getActionMasked();
+                if (a == android.view.MotionEvent.ACTION_DOWN)
+                    v.animate().scaleX(0.88f).scaleY(0.88f).setDuration(90).start();
+                else if (a == android.view.MotionEvent.ACTION_UP || a == android.view.MotionEvent.ACTION_CANCEL)
+                    v.animate().scaleX(1f).scaleY(1f).setDuration(140).start();
+                return false; // let the click + ripple run
+            });
+
+            ImageView thumb = new ImageView(act);
+            thumb.setLayoutParams(new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            int ring = dp(act, 2);
+            thumb.setPadding(ring, ring, ring, ring);
+            thumb.setCropToPadding(true);
+            thumb.setOutlineProvider(new android.view.ViewOutlineProvider() {
+                @Override public void getOutline(View v, android.graphics.Outline o) {
+                    int r = dp(act, 2);
+                    o.setOval(r, r, v.getWidth() - r, v.getHeight() - r);
+                }
+            });
+            thumb.setClipToOutline(true);
+            thumb.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            thumb.setVisibility(View.GONE);
+            btn.addView(thumb);
+
+            View icon;
+            Drawable glyph = moduleDrawable(act, R.drawable.ic_gallery);
+            if (glyph != null) {
+                ImageView iv = new ImageView(act);
+                iv.setImageDrawable(glyph);
+                iv.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                int s = dp(act, 24);
+                iv.setLayoutParams(new FrameLayout.LayoutParams(s, s, Gravity.CENTER));
+                icon = iv;
+            } else {                                    // module resources unavailable: emoji glyph
+                TextView tv = new TextView(act);
+                tv.setText("🖼");
+                tv.setTextSize(18);
+                tv.setLayoutParams(new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+                icon = tv;
+            }
+            icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            btn.addView(icon);
+            c.addView(btn);
+
+            ImageView badge = new ImageView(act);
+            Drawable check = moduleDrawable(act, R.drawable.ic_check_circle);
+            if (check != null) badge.setImageDrawable(check);
+            badge.setImageTintList(ColorStateList.valueOf(GREEN));
+            GradientDrawable badgeBg = new GradientDrawable();
+            badgeBg.setShape(GradientDrawable.OVAL);
+            badgeBg.setColor(Color.WHITE);                // shows through the check cut-out
+            badgeBg.setStroke(dp(act, 1), Color.BLACK);
+            badge.setBackground(badgeBg);
+            badge.setLayoutParams(new FrameLayout.LayoutParams(badgeSize, badgeSize, Gravity.TOP | Gravity.END));
+            badge.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            badge.setVisibility(View.GONE);
+            c.addView(badge);
+
+            // IG centres its row on the screen: flash disc at centre - 106dp, "Friends" pill row
+            // ~40dp above the navigation bar.
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(box, box);
+            lp.gravity = Gravity.BOTTOM | Gravity.LEFT;
+            int width = decor.getWidth() > 0 ? decor.getWidth() : act.getResources().getDisplayMetrics().widthPixels;
+            lp.leftMargin = Math.max(dp(act, 8), width / 2 - dp(act, 106) - box / 2);
+            lp.bottomMargin = navInset(act, decor) + dp(act, 40) - box / 2;
             c.setLayoutParams(lp);
-            c.setOnClickListener(v -> launchPicker(act));
 
+            c.setAlpha(0f);
             ((ViewGroup) decor).addView(c);
+            c.animate().alpha(1f).setDuration(160).start();
             chip = c;
+            chipBtn = btn;
+            chipIcon = icon;
+            chipThumb = thumb;
+            chipBadge = badge;
             chipHost = act;
+            applyChipState(act, null);
             watchCamera();
             ModuleLog.line("(IE|InstantUpload) ✅ gallery chip injected");
         } catch (Throwable t) {
@@ -383,21 +552,13 @@ public class InstantUploadHook {
      */
     private static void restoreChipAfterCancel(Activity act) {
         pendingBitmap = null;
-        try {
-            if (preview != null && preview.getParent() instanceof ViewGroup)
-                ((ViewGroup) preview.getParent()).removeView(preview);
-        } catch (Throwable ignored) {}
-        preview = null;
+        removePreview();
         if (chip == null || chipHost != act || chip.getParent() == null) {
             removeChip();
             injectChip(act);
             return;
         }
-        chip.setText(I18n.t(act, R.string.ig_instant_upload_chip));
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(Color.parseColor("#CC0A84FF"));
-        bg.setCornerRadius(dp(act, 22));
-        chip.setBackground(bg);
+        applyChipState(act, null);
         chip.bringToFront();
     }
 
