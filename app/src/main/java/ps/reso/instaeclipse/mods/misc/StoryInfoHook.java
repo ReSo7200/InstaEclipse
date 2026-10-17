@@ -702,6 +702,11 @@ public class StoryInfoHook {
         return total > 0 ? Math.round(count * 100.0 / total) + "%  ·  " + count : String.valueOf(count);
     }
 
+    private static String votesLine(Context ctx, long n) {
+        String w = I18n.t(ctx, R.string.ig_si_votes);
+        return (w.isEmpty() ? w : Character.toUpperCase(w.charAt(0)) + w.substring(1)) + ": " + n;
+    }
+
     private static int withAlpha(int color, int alpha) {
         return (color & 0x00FFFFFF) | (alpha << 24);
     }
