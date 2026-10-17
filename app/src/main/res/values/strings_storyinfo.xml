@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">Story info</string>
     <string name="ig_si_add_yours">Add yours</string>
     <string name="ig_si_joined">joined</string>
+    <string name="ig_si_paid_partnership">Paid partnership with (hold to open)</string>
+    <string name="ig_si_collaborators">Collaborator (hold to open)</string>
 </resources>

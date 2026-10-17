@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">Πληροφορίες ιστορίας</string>
     <string name="ig_si_add_yours">Πρόσθεσε το δικό σου</string>
     <string name="ig_si_joined">συμμετείχαν</string>
+    <string name="ig_si_paid_partnership">Πληρωμένη συνεργασία με (κράτα για άνοιγμα)</string>
+    <string name="ig_si_collaborators">Συνεργάτης (κράτα για άνοιγμα)</string>
 </resources>

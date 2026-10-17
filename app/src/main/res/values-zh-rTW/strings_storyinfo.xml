@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">限時動態資訊</string>
     <string name="ig_si_add_yours">加入你的</string>
     <string name="ig_si_joined">人參與</string>
+    <string name="ig_si_paid_partnership">付費合作夥伴（長按開啟）</string>
+    <string name="ig_si_collaborators">共同創作者（長按開啟）</string>
 </resources>

@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">Storyinfo</string>
     <string name="ig_si_add_yours">Lägg till din</string>
     <string name="ig_si_joined">har deltagit</string>
+    <string name="ig_si_paid_partnership">Betalt samarbete med (håll in för att öppna)</string>
+    <string name="ig_si_collaborators">Medskapare (håll in för att öppna)</string>
 </resources>

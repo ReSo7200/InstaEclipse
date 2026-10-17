@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">Hikâye bilgisi</string>
     <string name="ig_si_add_yours">Seninkini ekle</string>
     <string name="ig_si_joined">katıldı</string>
+    <string name="ig_si_paid_partnership">Ücretli iş ortaklığı (açmak için basılı tut)</string>
+    <string name="ig_si_collaborators">Ortak çalışan (açmak için basılı tut)</string>
 </resources>

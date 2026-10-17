@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">معلومات القصة</string>
     <string name="ig_si_add_yours">أضف ما لديك</string>
     <string name="ig_si_joined">شاركوا</string>
+    <string name="ig_si_paid_partnership">شراكة مدفوعة مع (اضغط مطولاً للفتح)</string>
+    <string name="ig_si_collaborators">متعاون (اضغط مطولاً للفتح)</string>
 </resources>

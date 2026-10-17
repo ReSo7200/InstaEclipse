@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">פרטי סטורי</string>
     <string name="ig_si_add_yours">הוסיפו משלכם</string>
     <string name="ig_si_joined">הצטרפו</string>
+    <string name="ig_si_paid_partnership">שותפות בתשלום עם (לחיצה ארוכה לפתיחה)</string>
+    <string name="ig_si_collaborators">משתף פעולה (לחיצה ארוכה לפתיחה)</string>
 </resources>

@@ -65,7 +65,7 @@ public class StoryInfoHook {
             "reshared_story_media_author", "story_feed_media", "story_app_attribution",
             "accessibility_caption", "original_width", "original_height", "has_audio",
             "story_countdowns", "story_questions", "story_mention_request_info",
-            "story_quizs", "story_polls", "story_sliders", "story_prompts", "story_reaction_stickers", "story_emoji_reactions",
+            "story_quizs", "story_polls", "story_sliders", "story_prompts", "sponsor_tags", "is_paid_partnership", "coauthor_producers",
     };
     private static final Map<String, Method> getters = new LinkedHashMap<>();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -445,6 +445,16 @@ public class StoryInfoHook {
         rows += row(dlg, ctx, R.string.ig_si_shared_from, author == null ? null : "@" + author, null);
         for (String p : posts) rows += row(dlg, ctx, R.string.ig_si_original_post, p, p);
 
+        // Paid partnership / collab partners are not stickers, so Mentions never lists them.
+        List<String> sponsors = usernames(raw(media, "sponsor_tags"));
+        for (String u : sponsors)
+            rows += row(dlg, ctx, R.string.ig_si_paid_partnership, "@" + u, "https://www.instagram.com/" + u + "/");
+        if (sponsors.isEmpty() && Boolean.TRUE.equals(value(media, "is_paid_partnership")))
+            rows += row(dlg, ctx, R.string.ig_si_paid_partnership, I18n.t(ctx, R.string.ig_si_yes), null);
+        for (String u : usernames(raw(media, "coauthor_producers")))
+            if (!sponsors.contains(u))
+                rows += row(dlg, ctx, R.string.ig_si_collaborators, "@" + u, "https://www.instagram.com/" + u + "/");
+
         Object app = value(media, "story_app_attribution");
         String appName = str(app, "name");
         if (appName == null) appName = str(app, "app_action_text");
@@ -694,7 +704,49 @@ public class StoryInfoHook {
 
     private static void open(Context ctx, String url) {
         try {
-            ctx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (url.startsWith("https://www.instagram.com/")) i.setPackage(ctx.getPackageName());
+            ctx.startActivity(i);
         } catch (Throwable ignored) {}
+    }
+
+    /** Usernames of every User found in a raw model graph (User objects or JSON-keyed user maps). */
+    private static List<String> usernames(Object root) {
+        List<String> out = new ArrayList<>();
+        collectUsers(root, 0, out, Collections.newSetFromMap(new IdentityHashMap<>()));
+        if (out.isEmpty()) {
+            Object t = tree(root, 0, Collections.newSetFromMap(new IdentityHashMap<>()));
+            collectUsernameKeys(t, out);
+        }
+        return out;
+    }
+
+    private static void collectUsers(Object o, int depth, List<String> out, Set<Object> seen) {
+        if (o == null || depth > 5 || o instanceof CharSequence || o instanceof Number || o instanceof Boolean) return;
+        if (!seen.add(o)) return;
+        if (o.getClass().getName().equals("com.instagram.user.model.User")) {
+            String u = ps.reso.instaeclipse.utils.users.UserUtils.callUsernameGetter(o);
+            if (u != null && !u.isEmpty() && !out.contains(u)) out.add(u);
+            return;
+        }
+        if (o instanceof Collection<?> c) { for (Object v : c) collectUsers(v, depth + 1, out, seen); return; }
+        if (o instanceof Map<?, ?> m) { for (Object v : m.values()) collectUsers(v, depth + 1, out, seen); return; }
+        String n = o.getClass().getName();
+        if (!n.startsWith("com.instagram.") && !n.startsWith("X.")) return;
+        for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass())
+            for (Field f : c.getDeclaredFields()) {
+                if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+                try { f.setAccessible(true); collectUsers(f.get(o), depth + 1, out, seen); } catch (Throwable ignored) {}
+            }
+    }
+
+    private static void collectUsernameKeys(Object t, List<String> out) {
+        if (t instanceof Map<?, ?> m) {
+            Object u = m.get("username");
+            if (u instanceof String s && !s.isEmpty() && !out.contains(s)) out.add(s);
+            for (Object v : m.values()) collectUsernameKeys(v, out);
+        } else if (t instanceof List<?> l) {
+            for (Object v : l) collectUsernameKeys(v, out);
+        }
     }
 }

@@ -30,4 +30,6 @@
     <string name="ig_feat_story_info">快拍信息</string>
     <string name="ig_si_add_yours">添加你的</string>
     <string name="ig_si_joined">人参与</string>
+    <string name="ig_si_paid_partnership">付费合作伙伴（长按打开）</string>
+    <string name="ig_si_collaborators">合作者（长按打开）</string>
 </resources>
