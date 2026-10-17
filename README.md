@@ -301,8 +301,8 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 
 | | |
 |---|---|
-| **Tested on** | Instagram `452.0.0.22.64` |
-| **Recommended build** | Beta or Alpha, from [APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/) |
+| **Tested on** | Instagram `451.0.0.20.80` |
+| **Get this version** | [Instagram 451.0.0.20.80 on APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) |
 | **Survives updates** | Yes, DexKit finds what it needs at runtime |
 | **Android** | 9 and newer |
 
@@ -312,7 +312,7 @@ A big Instagram update can still knock a feature out until it is patched. The me
 
 ## Installation
 
-> Get Instagram from [APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/) rather than the Play Store. The Play build is not always fully supported.
+> Get Instagram [451.0.0.20.80 from APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) rather than the Play Store. The Play build is not always fully supported.
 
 Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone.
 
@@ -376,7 +376,7 @@ That happens on Instagram's Stable build. Use a Beta or Alpha build from APKMirr
 Force stop Instagram and clear its cache, then open it again.
 
 **It does not work on the Play Store version.**
-Install Instagram from [APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/) instead.
+Install [Instagram 451.0.0.20.80 from APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) instead.
 
 **Still stuck?**
 Ask in the [Telegram group](https://t.me/instaEclipse_discussion). Someone will help.
