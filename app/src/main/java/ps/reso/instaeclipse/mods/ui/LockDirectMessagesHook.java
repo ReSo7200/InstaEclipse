@@ -324,6 +324,7 @@ public class LockDirectMessagesHook {
     }
 
     /** True when the device has biometric hardware with something enrolled. */
+    @android.annotation.SuppressLint("MissingPermission") // runs in Instagram, which holds USE_BIOMETRIC
     static boolean canAuthenticate(Activity a) {
         try {
             if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return false;
@@ -344,6 +345,7 @@ public class LockDirectMessagesHook {
     }
 
     /** Shows the system biometric prompt; runs onSuccess on the UI thread when auth succeeds. */
+    @android.annotation.SuppressLint("MissingPermission") // runs in Instagram, which holds USE_BIOMETRIC
     static void promptBiometric(Activity a, Runnable onSuccess) {
         try {
             // Use plain literals — our module's R.string ids aren't in Instagram's resource table,

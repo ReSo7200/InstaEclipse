@@ -507,10 +507,6 @@
     <string name="ig_toast_image_copied">图片已复制到剪贴板</string>
     <string name="ig_toast_downloading_audio">正在下载音频…</string>
     <string name="ig_toast_audio_saved">音频已保存</string>
-    <string name="ig_read_receipts_title">发送已读回执给…</string>
-    <string name="ig_read_receipts_hint">在此开启的对话仍会看到你何时读了他们的消息，即使已开启“隐藏私信已读状态”。</string>
-    <string name="ig_read_receipts_empty">暂无对话。打开一次对话后，它就会显示在这里。</string>
-    <string name="ig_hide_chats_stealth">隐身：不显示眼睛图标（长按对话名称以隐藏）</string>
     <string name="ig_dialog_misc_hide_chats">隐藏特定对话</string>
     <string name="ig_hide_chats_manage">管理已隐藏对话</string>
     <string name="ig_hide_chats_empty">暂无已隐藏对话。打开一个对话并点击隐藏眼睛按钮即可将其隐藏。</string>

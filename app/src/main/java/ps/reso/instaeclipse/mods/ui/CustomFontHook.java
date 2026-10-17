@@ -125,7 +125,7 @@ public class CustomFontHook {
                     if (path != null && (path.toString().toLowerCase().contains("icon") || path.toString().toLowerCase().contains("glyph"))) return;
                 } catch (Throwable ignored) {}
                 Typeface tf = getActiveTypeface();
-                if (tf != null) p.setResult(Typeface.create(tf, ((Typeface) p.getResult()).getWeight(), ((Typeface) p.getResult()).isItalic()));
+                if (tf != null) p.setResult(Typeface.create(tf, weightOf((Typeface) p.getResult()), ((Typeface) p.getResult()).isItalic()));
             }
         };
         for (String b : new String[]{"android.graphics.Typeface$Builder", "android.graphics.Typeface$CustomFallbackBuilder"}) {
@@ -148,7 +148,7 @@ public class CustomFontHook {
             for (String f : new String[]{"DEFAULT", "DEFAULT_BOLD", "SANS_SERIF"}) {
                 try {
                     Typeface old = (Typeface) XposedHelpers.getStaticObjectField(Typeface.class, f);
-                    XposedHelpers.setStaticObjectField(Typeface.class, f, Typeface.create(tf, old.getWeight(), old.isItalic()));
+                    XposedHelpers.setStaticObjectField(Typeface.class, f, Typeface.create(tf, weightOf(old), old.isItalic()));
                     n++;
                 } catch (Throwable ignored) {}
             }
@@ -167,7 +167,7 @@ public class CustomFontHook {
                     if (!(k.startsWith("sans-serif") || k.startsWith("roboto") || k.startsWith("google-sans"))
                             || k.contains("mono")) continue;
                     Typeface old = e.getValue();
-                    map.put(e.getKey(), Typeface.create(tf, old.getWeight(), old.isItalic()));
+                    map.put(e.getKey(), Typeface.create(tf, weightOf(old), old.isItalic()));
                     n++;
                 }
                 XposedHelpers.setStaticObjectField(Typeface.class, "sSystemFontMap", map);
@@ -451,5 +451,11 @@ public class CustomFontHook {
             ModuleLog.line("(IE|Emoji) saveEmoji: " + t);
             return false;
         }
+    }
+
+    /** Typeface.create(…, weight, …) only accepts 1..1000; getWeight() can report 0. */
+    private static int weightOf(Typeface t) {
+        int w = t.getWeight();
+        return w < 1 || w > 1000 ? 400 : w;
     }
 }

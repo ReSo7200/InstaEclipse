@@ -576,10 +576,6 @@
     <string name="ig_toast_image_copied">Görsel panoya kopyalandı</string>
     <string name="ig_toast_downloading_audio">Ses indiriliyor…</string>
     <string name="ig_toast_audio_saved">Ses kaydedildi</string>
-    <string name="ig_read_receipts_title">Okundu bilgisi gönderilecek sohbetler…</string>
-    <string name="ig_read_receipts_hint">Burada açılan sohbetler, DM Okundu Bilgisini Gizle açıkken bile mesajlarını ne zaman okuduğunuzu görmeye devam eder.</string>
-    <string name="ig_read_receipts_empty">Henüz sohbet yok. Bir sohbeti bir kez açın, burada görünecektir.</string>
-    <string name="ig_hide_chats_stealth">Gizli mod: göz simgesi yok (gizlemek için sohbet adına uzun basın)</string>
     <string name="ig_dialog_clean_feed_hide_liked">Zaten Beğendiğiniz Gönderileri Gizle</string>
     <string name="ig_nav_settings_title">Gezinme ayarları</string>
     <string name="ig_nav_name_home">Ana Sayfa</string>

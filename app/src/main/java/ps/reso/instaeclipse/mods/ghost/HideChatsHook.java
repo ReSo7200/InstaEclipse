@@ -164,11 +164,20 @@ public class HideChatsHook {
             View oldBtn = header.getRootView().findViewWithTag(TAG); // pre-menu builds' eye button
             if (oldBtn != null && oldBtn.getParent() instanceof ViewGroup p) p.removeView(oldBtn);
             if (ThreadHeaderMenu.has(activity, "hide")) return true;
-            return ThreadHeaderMenu.add(activity, "hide", I18n(activity, R.string.ig_hide_chat_toggle), () -> toggleCurrent(activity));
+            return addEntry(activity);
         } catch (Throwable t) {
             ModuleLog.line("(IE|HideChats) ⚠️ inject: " + t.getMessage());
             return false;
         }
+    }
+
+    /** "Hide chat" or "Unhide chat", matching this chat's current state; re-added after a toggle. */
+    private boolean addEntry(Activity activity) {
+        String threadId = resolveThreadId(activity);
+        boolean hidden = threadId != null && HiddenThreads.isHidden(threadId);
+        return ThreadHeaderMenu.add(activity, "hide",
+                I18n(activity, hidden ? R.string.ig_unhide_chat : R.string.ig_hide_chat),
+                () -> { toggleCurrent(activity); addEntry(activity); });
     }
 
     private void toggleCurrent(Activity activity) {

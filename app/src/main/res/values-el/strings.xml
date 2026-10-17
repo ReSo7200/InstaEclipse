@@ -507,10 +507,6 @@
     <string name="ig_toast_image_copied">Η εικόνα αντιγράφηκε στο πρόχειρο</string>
     <string name="ig_toast_downloading_audio">Λήψη ήχου…</string>
     <string name="ig_toast_audio_saved">Ο ήχος αποθηκεύτηκε</string>
-    <string name="ig_read_receipts_title">Αποστολή επιβεβαιώσεων ανάγνωσης σε…</string>
-    <string name="ig_read_receipts_hint">Οι συνομιλίες που ενεργοποιείτε εδώ θα βλέπουν πότε διαβάζετε τα μηνύματά τους, ακόμη και όταν είναι ενεργή η Απόκρυψη Ανάγνωσης DM.</string>
-    <string name="ig_read_receipts_empty">Δεν υπάρχουν ακόμη συνομιλίες. Ανοίξτε μια συνομιλία μία φορά και θα εμφανιστεί εδώ.</string>
-    <string name="ig_hide_chats_stealth">Αθόρυβη λειτουργία: χωρίς εικονίδιο ματιού (παρατεταμένο πάτημα στο όνομα της συνομιλίας για απόκρυψη)</string>
     <string name="ig_dialog_misc_hide_chats">Απόκρυψη Συγκεκριμένων Συνομιλιών</string>
     <string name="ig_hide_chats_manage">Διαχείριση κρυμμένων συνομιλιών</string>
     <string name="ig_hide_chats_empty">Δεν υπάρχουν κρυμμένες συνομιλίες. Ανοίξτε μια συνομιλία και πατήστε το κουμπί με το διαγραμμένο μάτι για να την κρύψετε.</string>

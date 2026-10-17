@@ -506,10 +506,6 @@
     <string name="ig_toast_image_copied">Gambar disalin ke clipboard</string>
     <string name="ig_toast_downloading_audio">Mengunduh audio…</string>
     <string name="ig_toast_audio_saved">Audio disimpan</string>
-    <string name="ig_read_receipts_title">Kirim tanda dibaca ke…</string>
-    <string name="ig_read_receipts_hint">Obrolan yang diaktifkan di sini tetap dapat melihat saat Anda membaca pesan mereka, meskipun Sembunyikan Tanda Baca DM aktif.</string>
-    <string name="ig_read_receipts_empty">Belum ada obrolan. Buka obrolan sekali dan obrolan itu akan muncul di sini.</string>
-    <string name="ig_hide_chats_stealth">Mode senyap: tanpa ikon mata (tekan lama nama obrolan untuk menyembunyikan)</string>
     <string name="ig_dialog_misc_hide_chats">Sembunyikan Obrolan Tertentu</string>
     <string name="ig_hide_chats_manage">Kelola obrolan tersembunyi</string>
     <string name="ig_hide_chats_empty">Belum ada obrolan tersembunyi. Buka obrolan dan ketuk tombol mata-dicoret untuk menyembunyikannya.</string>

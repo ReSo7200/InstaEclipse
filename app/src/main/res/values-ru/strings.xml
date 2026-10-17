@@ -475,10 +475,6 @@
     <string name="ig_toast_image_copied">Изображение скопировано в буфер обмена</string>
     <string name="ig_toast_downloading_audio">Загрузка аудио…</string>
     <string name="ig_toast_audio_saved">Аудио сохранено</string>
-    <string name="ig_read_receipts_title">Кому отправлять отчёты о прочтении…</string>
-    <string name="ig_read_receipts_hint">Включённые здесь чаты по-прежнему видят, когда вы читаете их сообщения, даже при включённом «Скрыть прочтение в личных сообщениях».</string>
-    <string name="ig_read_receipts_empty">Чатов пока нет. Откройте чат один раз, и он появится здесь.</string>
-    <string name="ig_hide_chats_stealth">Скрытно: без значка глаза (долгое нажатие на имя чата, чтобы скрыть)</string>
     <string name="ig_dialog_misc_hide_chats">Скрыть определённые чаты</string>
     <string name="ig_hide_chats_manage">Управление скрытыми чатами</string>
     <string name="ig_hide_chats_empty">Скрытых чатов нет. Откройте чат и нажмите значок перечёркнутого глаза, чтобы скрыть его.</string>

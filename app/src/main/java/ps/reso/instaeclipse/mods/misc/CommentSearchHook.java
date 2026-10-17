@@ -1181,6 +1181,7 @@ public class CommentSearchHook {
 
     /** Clicks the "View N (more) replies" links currently on screen through the list's accessibility
      *  tree (Compose draws them, so there are no Views to click). Returns how many were clicked. */
+    @android.annotation.SuppressLint("SoonBlockedPrivateApi") // guarded; falls back when blocked
     private static int expandReplies(View list) {
         try {
             android.view.accessibility.AccessibilityNodeProvider p = list.getAccessibilityNodeProvider();
@@ -1228,6 +1229,7 @@ public class CommentSearchHook {
 
     private static Method parentIdMethod;
 
+    @android.annotation.SuppressLint("SoonBlockedPrivateApi") // guarded; callers fall back when blocked
     private static Method parentIdMethod() throws NoSuchMethodException {
         if (parentIdMethod == null) {
             parentIdMethod = android.view.accessibility.AccessibilityNodeInfo.class.getDeclaredMethod("getParentNodeId");

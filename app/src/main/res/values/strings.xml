@@ -379,10 +379,6 @@
     <string name="ig_toast_image_copied">Image copied to clipboard</string>
     <string name="ig_toast_downloading_audio">Downloading audio…</string>
     <string name="ig_toast_audio_saved">Audio saved</string>
-    <string name="ig_read_receipts_title">Send read receipts to…</string>
-    <string name="ig_read_receipts_hint">Chats switched on here still see when you read their messages, even while Hide DM Seen is on.</string>
-    <string name="ig_read_receipts_empty">No chats yet. Open a chat once and it will appear here.</string>
-    <string name="ig_hide_chats_stealth">Stealth: no eye icon (long-press the chat name to hide)</string>
     <string name="ig_dialog_misc_hide_chats">Hide Specific Chats</string>
     <string name="ig_hide_chats_manage">Manage hidden chats</string>
     <string name="ig_hide_chats_empty">No hidden chats. Open a chat, tap the InstaEclipse button in its header and choose Hide / unhide chat.</string>

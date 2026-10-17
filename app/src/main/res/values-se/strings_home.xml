@@ -10,6 +10,7 @@
     <string name="home_status_no_version">Installera Instagram för att använda InstaEclipse</string>
     <plurals name="home_features_enabled">
         <item quantity="one">%d funktion aktiverad</item>
+        <item quantity="two">%d funktioner aktiverade</item>
         <item quantity="other">%d funktioner aktiverade</item>
     </plurals>
     <string name="home_action_launch">Starta</string>

@@ -483,10 +483,6 @@
     <string name="ig_toast_image_copied">Bild in die Zwischenablage kopiert</string>
     <string name="ig_toast_downloading_audio">Audio wird heruntergeladen…</string>
     <string name="ig_toast_audio_saved">Audio gespeichert</string>
-    <string name="ig_read_receipts_title">Lesebestätigungen senden an…</string>
-    <string name="ig_read_receipts_hint">Hier aktivierte Chats sehen weiterhin, wann du ihre Nachrichten liest, auch wenn „DM-Gelesen-Status verbergen“ aktiv ist.</string>
-    <string name="ig_read_receipts_empty">Noch keine Chats. Öffne einen Chat einmal, dann erscheint er hier.</string>
-    <string name="ig_hide_chats_stealth">Tarnmodus: kein Augensymbol (Chatnamen lange drücken zum Verbergen)</string>
     <string name="ig_dialog_misc_hide_chats">Bestimmte Chats verbergen</string>
     <string name="ig_hide_chats_manage">Verborgene Chats verwalten</string>
     <string name="ig_hide_chats_empty">Keine verborgenen Chats. Öffne einen Chat und tippe auf die Auge-aus-Schaltfläche, um ihn zu verbergen.</string>

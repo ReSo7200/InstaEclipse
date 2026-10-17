@@ -14,6 +14,7 @@ import android.widget.ImageView;
  * feed photo full-screen without navigating away (issue #174). Standard
  * ScaleGestureDetector/Matrix pattern; no Instagram internals involved.
  */
+@android.annotation.SuppressLint("AppCompatCustomView") // runs inside Instagram
 class ZoomableImageView extends ImageView {
 
     private static final float MIN_SCALE = 1f;

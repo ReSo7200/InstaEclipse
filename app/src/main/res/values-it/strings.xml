@@ -264,10 +264,6 @@
     <string name="ig_toast_image_copied">Immagine copiata negli appunti</string>
     <string name="ig_toast_downloading_audio">Download dell\'audio…</string>
     <string name="ig_toast_audio_saved">Audio salvato</string>
-    <string name="ig_read_receipts_title">Invia conferme di lettura a…</string>
-    <string name="ig_read_receipts_hint">Le chat attivate qui vedranno comunque quando leggi i loro messaggi, anche con Nascondi conferma di lettura DM attivo.</string>
-    <string name="ig_read_receipts_empty">Ancora nessuna chat. Apri una chat una volta e apparirà qui.</string>
-    <string name="ig_hide_chats_stealth">Modalità invisibile: nessuna icona dell\'occhio (tieni premuto il nome della chat per nasconderla)</string>
     <string name="ig_dialog_misc_hide_chats">Nascondi chat specifiche</string>
     <string name="ig_hide_chats_manage">Gestisci chat nascoste</string>
     <string name="ig_hide_chats_empty">Nessuna chat nascosta. Apri una chat e tocca il pulsante con l\'occhio barrato per nasconderla.</string>

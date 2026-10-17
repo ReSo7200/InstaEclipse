@@ -4,4 +4,6 @@
     <string name="ig_dialog_hide_threads_button">Nascondi il pulsante Threads sui profili</string>
     <string name="ig_feat_hide_blend">Nascondi Blend</string>
     <string name="ig_feat_hide_threads">Nascondi Threads</string>
+    <string name="ig_hide_chat">Nascondi chat</string>
+    <string name="ig_unhide_chat">Mostra chat</string>
 </resources>

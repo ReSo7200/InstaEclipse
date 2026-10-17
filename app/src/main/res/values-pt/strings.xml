@@ -474,10 +474,6 @@
     <string name="ig_toast_image_copied">Imagem copiada para a área de transferência</string>
     <string name="ig_toast_downloading_audio">A transferir áudio…</string>
     <string name="ig_toast_audio_saved">Áudio guardado</string>
-    <string name="ig_read_receipts_title">Enviar confirmações de leitura para…</string>
-    <string name="ig_read_receipts_hint">As conversas ativadas aqui continuam a ver quando lê as mensagens delas, mesmo com Ocultar leitura em mensagens diretas ativo.</string>
-    <string name="ig_read_receipts_empty">Ainda não há conversas. Abra uma conversa uma vez e ela aparecerá aqui.</string>
-    <string name="ig_hide_chats_stealth">Modo furtivo: sem ícone de olho (toque prolongado no nome da conversa para ocultar)</string>
     <string name="ig_dialog_misc_hide_chats">Ocultar Conversas Específicas</string>
     <string name="ig_hide_chats_manage">Gerir conversas ocultas</string>
     <string name="ig_hide_chats_empty">Nenhuma conversa oculta. Abra uma conversa e toque no botão de olho riscado para a ocultar.</string>

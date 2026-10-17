@@ -474,10 +474,6 @@
     <string name="ig_toast_image_copied">Bilden kopierades till urklipp</string>
     <string name="ig_toast_downloading_audio">Laddar ned ljud…</string>
     <string name="ig_toast_audio_saved">Ljudet sparades</string>
-    <string name="ig_read_receipts_title">Skicka läskvitton till…</string>
-    <string name="ig_read_receipts_hint">Chattar som är påslagna här ser fortfarande när du läser deras meddelanden, även när Dölj läst i direktmeddelanden är på.</string>
-    <string name="ig_read_receipts_empty">Inga chattar ännu. Öppna en chatt en gång så visas den här.</string>
-    <string name="ig_hide_chats_stealth">Smygläge: ingen ögonikon (långtryck på chattens namn för att dölja)</string>
     <string name="ig_dialog_misc_hide_chats">Dölj specifika chattar</string>
     <string name="ig_hide_chats_manage">Hantera dolda chattar</string>
     <string name="ig_hide_chats_empty">Inga dolda chattar. Öppna en chatt och tryck på knappen med överkryssat öga för att dölja den.</string>

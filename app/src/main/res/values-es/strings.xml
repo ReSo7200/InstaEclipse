@@ -479,10 +479,6 @@
     <string name="ig_toast_image_copied">Imagen copiada al portapapeles</string>
     <string name="ig_toast_downloading_audio">Descargando audio…</string>
     <string name="ig_toast_audio_saved">Audio guardado</string>
-    <string name="ig_read_receipts_title">Enviar confirmaciones de lectura a…</string>
-    <string name="ig_read_receipts_hint">Los chats activados aquí seguirán viendo cuándo lees sus mensajes, incluso con Ocultar lectura en mensajes directos activado.</string>
-    <string name="ig_read_receipts_empty">Aún no hay chats. Abre un chat una vez y aparecerá aquí.</string>
-    <string name="ig_hide_chats_stealth">Modo sigiloso: sin icono del ojo (mantén pulsado el nombre del chat para ocultarlo)</string>
     <string name="ig_dialog_misc_hide_chats">Ocultar chats concretos</string>
     <string name="ig_hide_chats_manage">Gestionar chats ocultos</string>
     <string name="ig_hide_chats_empty">No hay chats ocultos. Abre un chat y toca el botón del ojo tachado para ocultarlo.</string>

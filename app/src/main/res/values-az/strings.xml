@@ -477,10 +477,6 @@
     <string name="ig_toast_image_copied">Şəkil mübadilə buferinə kopyalandı</string>
     <string name="ig_toast_downloading_audio">Səs yüklənir…</string>
     <string name="ig_toast_audio_saved">Səs saxlanıldı</string>
-    <string name="ig_read_receipts_title">Oxundu bildirişi göndəriləcək söhbətlər…</string>
-    <string name="ig_read_receipts_hint">Burada aktiv edilən söhbətlər, DM Oxundu Bildirişini Gizlət aktiv olsa belə, mesajlarını nə vaxt oxuduğunuzu görəcək.</string>
-    <string name="ig_read_receipts_empty">Hələ söhbət yoxdur. Bir söhbəti bir dəfə açın və o burada görünəcək.</string>
-    <string name="ig_hide_chats_stealth">Gizli rejim: göz ikonu yoxdur (gizlətmək üçün söhbət adına uzun basın)</string>
     <string name="ig_dialog_misc_hide_chats">Müəyyən Söhbətləri Gizlət</string>
     <string name="ig_hide_chats_manage">Gizli söhbətləri idarə et</string>
     <string name="ig_hide_chats_empty">Gizli söhbət yoxdur. Söhbəti açın və gizlətmək üçün göz-söndür düyməsinə toxunun.</string>

@@ -4,4 +4,6 @@
     <string name="ig_dialog_hide_threads_button">Απόκρυψη κουμπιού Threads στα προφίλ</string>
     <string name="ig_feat_hide_blend">Απόκρυψη Blend</string>
     <string name="ig_feat_hide_threads">Απόκρυψη Threads</string>
+    <string name="ig_hide_chat">Απόκρυψη συνομιλίας</string>
+    <string name="ig_unhide_chat">Εμφάνιση συνομιλίας</string>
 </resources>

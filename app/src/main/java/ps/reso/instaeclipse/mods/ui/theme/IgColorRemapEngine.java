@@ -375,7 +375,7 @@ public final class IgColorRemapEngine {
         for (int i = 0; i < table.size(); i++) {
             int to = table.valueAt(i);
             int fixed = lightPolarity(table.keyAt(i), to, palette);
-            if (fixed != to) table.setValueAt(i, (to & 0xFF000000) == 0 ? (0x00FFFFFF & fixed)
+            if (fixed != to) table.put(table.keyAt(i), (to & 0xFF000000) == 0 ? (0x00FFFFFF & fixed)
                     : ((to & 0xFF000000) | (0x00FFFFFF & fixed)));
         }
     }

@@ -551,10 +551,6 @@
     <string name="ig_toast_image_copied">Skopiowano obraz do schowka</string>
     <string name="ig_toast_downloading_audio">Pobieranie dźwięku…</string>
     <string name="ig_toast_audio_saved">Zapisano dźwięk</string>
-    <string name="ig_read_receipts_title">Wysyłaj potwierdzenia odczytu do…</string>
-    <string name="ig_read_receipts_hint">Czaty włączone tutaj nadal widzą, kiedy czytasz ich wiadomości, nawet przy włączonej opcji Ukryj status przeczytania.</string>
-    <string name="ig_read_receipts_empty">Brak czatów. Otwórz czat raz, a pojawi się tutaj.</string>
-    <string name="ig_hide_chats_stealth">Tryb ukryty: bez ikony oka (przytrzymaj nazwę czatu, aby go ukryć)</string>
     <string name="ig_dialog_misc_hide_chats">Ukryj wybrane czaty</string>
     <string name="ig_hide_chats_manage">Zarządzaj ukrytymi czatami</string>
     <string name="ig_hide_chats_empty">Brak ukrytych czatów. Otwórz czat i dotknij przycisku przekreślonego oka, aby go ukryć.</string>

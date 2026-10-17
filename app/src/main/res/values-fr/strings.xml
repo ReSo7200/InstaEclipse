@@ -508,10 +508,6 @@
     <string name="ig_toast_image_copied">Image copiée dans le presse-papiers</string>
     <string name="ig_toast_downloading_audio">Téléchargement de l\'audio…</string>
     <string name="ig_toast_audio_saved">Audio enregistré</string>
-    <string name="ig_read_receipts_title">Envoyer les confirmations de lecture à…</string>
-    <string name="ig_read_receipts_hint">Les conversations activées ici voient toujours quand vous lisez leurs messages, même si Masquer Lu DM est activé.</string>
-    <string name="ig_read_receipts_empty">Aucune conversation pour l\'instant. Ouvrez une conversation une fois et elle apparaîtra ici.</string>
-    <string name="ig_hide_chats_stealth">Discret : pas d\'icône œil (appui long sur le nom de la conversation pour la masquer)</string>
     <string name="ig_dialog_misc_hide_chats">Masquer des conversations</string>
     <string name="ig_hide_chats_manage">Gérer les conversations masquées</string>
     <string name="ig_hide_chats_empty">Aucune conversation masquée. Ouvrez une conversation et touchez le bouton œil barré pour la masquer.</string>

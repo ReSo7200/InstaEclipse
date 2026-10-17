@@ -506,10 +506,6 @@
     <string name="ig_toast_image_copied">התמונה הועתקה ללוח</string>
     <string name="ig_toast_downloading_audio">מוריד שמע…</string>
     <string name="ig_toast_audio_saved">השמע נשמר</string>
-    <string name="ig_read_receipts_title">שלח אישורי קריאה אל…</string>
-    <string name="ig_read_receipts_hint">צ\'אטים שהופעלו כאן עדיין יראו מתי קראת את ההודעות שלהם, גם כאשר הסתר קריאת הודעות מופעל.</string>
-    <string name="ig_read_receipts_empty">אין עדיין צ\'אטים. פתח צ\'אט פעם אחת והוא יופיע כאן.</string>
-    <string name="ig_hide_chats_stealth">מצב חשאי: ללא סמל עין (לחיצה ארוכה על שם הצ\'אט כדי להסתיר)</string>
     <string name="ig_dialog_misc_hide_chats">הסתר צ\'אטים מסוימים</string>
     <string name="ig_hide_chats_manage">נהל צ\'אטים מוסתרים</string>
     <string name="ig_hide_chats_empty">אין צ\'אטים מוסתרים. פתח צ\'אט והקש על כפתור העין החצויה כדי להסתיר אותו.</string>

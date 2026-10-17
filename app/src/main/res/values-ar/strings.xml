@@ -473,10 +473,6 @@
     <string name="ig_toast_image_copied">تم نسخ الصورة إلى الحافظة</string>
     <string name="ig_toast_downloading_audio">جارٍ تنزيل الصوت…</string>
     <string name="ig_toast_audio_saved">تم حفظ الصوت</string>
-    <string name="ig_read_receipts_title">إرسال إشعارات القراءة إلى…</string>
-    <string name="ig_read_receipts_hint">المحادثات المفعّلة هنا ستظل ترى متى تقرأ رسائلها، حتى عند تفعيل إخفاء رؤية الرسائل المباشرة.</string>
-    <string name="ig_read_receipts_empty">لا توجد محادثات بعد. افتح أي محادثة مرة واحدة وستظهر هنا.</string>
-    <string name="ig_hide_chats_stealth">وضع التخفي: بدون أيقونة العين (اضغط مطولاً على اسم المحادثة لإخفائها)</string>
     <string name="ig_dialog_misc_hide_chats">إخفاء محادثات محددة</string>
     <string name="ig_hide_chats_manage">إدارة المحادثات المخفية</string>
     <string name="ig_hide_chats_empty">لا توجد محادثات مخفية. افتح محادثة واضغط على زر إخفاء العين لإخفائها.</string>
