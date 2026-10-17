@@ -93,7 +93,16 @@ public class PlaybackSpeedHook {
                 List<ClassData> players = bridge.findClass(FindClass.create().matcher(ClassMatcher.create()
                         .usingStrings("IgFeedVideoPlayer: Persistent Visible Cover Image")));
                 start = null;
+                // 452.0.0.22+ moved the (Media, …)boolean start method into a subclass of the class
+                // that holds the string, so look there too.
+                List<ClassData> scan = new ArrayList<>(players);
                 for (ClassData cd : players) {
+                    try {
+                        scan.addAll(bridge.findClass(FindClass.create().matcher(ClassMatcher.create()
+                                .superClass(cd.getName()))));
+                    } catch (Throwable ignored) {}
+                }
+                for (ClassData cd : scan) {
                     for (Method m : cd.getInstance(cl).getDeclaredMethods()) {
                         Class<?>[] p = m.getParameterTypes();
                         if (p.length > 0 && p[0].getName().equals("com.instagram.feed.media.Media")
