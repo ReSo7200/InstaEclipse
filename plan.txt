@@ -1,5 +1,5 @@
-1. Update `HideChatsHook.java` Logic (Filter & Refresh)
-   - Update `installInboxFilter` and replace `isGeneralEnum` check with the new `isGeneralFolderQuery` method targeting `C425100Gmm` or `Gmm` as requested by the user.
+1. Update `HideChatsHook.java` completely
+   - Replace the entire contents of `HideChatsHook.java` with the code provided by the user, which implements the robust architecture based on real IG 447 classes (`C425100Gmm`, etc.).
 2. Pre-commit Steps
    - Run `./gradlew testDebugUnitTest assembleDebug`. Verify it compiles perfectly.
 3. Submit
