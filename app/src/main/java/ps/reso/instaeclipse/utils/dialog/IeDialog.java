@@ -263,11 +263,12 @@ public class IeDialog {
 
     public IeDialog onDismiss(Runnable r) { onDismiss = r; return this; }
 
-    /** What the ✕ does besides closing (e.g. the same as Cancel). */
+    /** What the ✕, Back and a tap outside do besides closing (e.g. the same as Cancel). */
     public IeDialog onClose(Runnable r) { onClose = r; return this; }
 
     public Dialog show() {
         dialog.setContentView(card);
+        dialog.setOnCancelListener(x -> { if (onClose != null) onClose.run(); });
         dialog.setOnDismissListener(x -> { if (onDismiss != null) onDismiss.run(); });
         dialog.show();
         Window w = dialog.getWindow();

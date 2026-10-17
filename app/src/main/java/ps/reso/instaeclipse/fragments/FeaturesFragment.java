@@ -1,7 +1,6 @@
 package ps.reso.instaeclipse.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -553,7 +552,7 @@ public class FeaturesFragment extends Fragment {
 
                     itemHolder.swToggle.setOnCheckedChangeListener((btn, checked) -> {
                         if (item.isExtreme && checked) {
-                            new AlertDialog.Builder(itemHolder.itemView.getContext())
+                            new MaterialAlertDialogBuilder(itemHolder.itemView.getContext())
                                     .setTitle(getString(R.string.ig_dialog_distraction_extreme_title))
                                     .setMessage(getString(R.string.ig_dialog_distraction_extreme_message))
                                     .setPositiveButton(getString(R.string.ig_dialog_yes), (dialog, which) -> {
@@ -565,6 +564,8 @@ public class FeaturesFragment extends Fragment {
                                     .setNegativeButton(getString(R.string.ig_dialog_cancel), (dialog, which) -> {
                                         itemHolder.swToggle.setChecked(false);
                                     })
+                                    // Back / tap outside = Cancel, so the switch never shows on while it isn't
+                                    .setOnCancelListener(dialog -> itemHolder.swToggle.setChecked(false))
                                     .show();
                             return;
                         }
@@ -1899,7 +1900,7 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void restoreDefaultConfig() {
-        new AlertDialog.Builder(requireContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.ig_dialog_dev_restore_default_config))
                 .setMessage(getString(R.string.ig_dialog_dev_restore_default_config_confirm))
                 .setPositiveButton(getString(R.string.ig_dialog_yes), (dialog, which) -> {
@@ -1924,11 +1925,20 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void showAboutDialog() {
-        new AlertDialog.Builder(requireContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("InstaEclipse 🌘")
-                .setMessage("Created by @reso7200\n\nGitHub: https://github.com/ReSo7200/InstaEclipse\nTelegram: https://t.me/InstaEclipse")
-                .setPositiveButton("Close", null)
+                .setMessage("Created by @reso7200")
+                .setPositiveButton("GitHub", (d, w) -> openUrl("https://github.com/ReSo7200/InstaEclipse"))
+                .setNeutralButton("Telegram", (d, w) -> openUrl("https://t.me/InstaEclipse"))
+                .setNegativeButton("Close", null)
                 .show();
+    }
+
+    private void openUrl(String url) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (Exception ignored) {
+        }
     }
 
     // =========================================================
