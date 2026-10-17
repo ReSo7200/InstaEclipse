@@ -214,7 +214,7 @@ public class DevOptionsUnlockHook {
             m.setAccessible(true);
             XposedBridge.hookMethod(m, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.isDevEnabled) {
                         param.setResult(true);
                         FeatureStatusTracker.setHooked("DevOptions");
@@ -260,7 +260,7 @@ public class DevOptionsUnlockHook {
             Class<?> clazz = Module.hostClassLoader.loadClass(className);
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.isDevEnabled) {
                         param.setResult(true);
                         FeatureStatusTracker.setHooked("DevOptions");
@@ -299,7 +299,7 @@ public class DevOptionsUnlockHook {
                         Method targetMethod = method.getMethodInstance(Module.hostClassLoader);
                         XposedHelpers.findAndHookMethod(targetMethod.getDeclaringClass(), targetMethod.getName(), targetMethod.getParameterTypes()[0], new XC_MethodHook() {
                             @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
+                            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                                 if (FeatureFlags.isDevEnabled) {
                                     param.setResult(true);
                                     FeatureStatusTracker.setHooked("DevOptions");

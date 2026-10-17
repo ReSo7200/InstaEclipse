@@ -1,18 +1,12 @@
 package ps.reso.instaeclipse.mods.media;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
@@ -24,18 +18,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -56,6 +45,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -73,7 +63,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -101,8 +90,16 @@ public class FeedVideoDownloadHook {
     private static MediaModelResolver.Result mediaModel;
     private static final List<Method> resolvedVideoVersionsGetters = new ArrayList<>();
     private static Method resolvedIsVideoMethod;
-    private static Method   methodImageUrl;         // MediaExtKt: static (Context, Media) -> String
+    private static Method   methodImageUrl;         // MediaExtKt: static (Context, Media) -> String, or
+                                                    // (Context, Media) -> ExtendedImageUrl on IG 452+
+    private static Method   extendedImageUrlGetUrl; // ExtendedImageUrl.getUrl(), when methodImageUrl returns it
     private static Method   carouselMediaGetter;    // Media."carousel_media" getter: () -> List<Media> (IG 447+)
+    private static Method   hasAudioGetter;         // "has_audio" getter: () -> Boolean (Media)
+    // Posts with Instagram music: the video is silent and the song is a separate file.
+    private static Method   musicMetadataGetter;    // "music_metadata" getter (feed posts)
+    private static Method   clipsMetadataGetter;    // "clips_metadata" getter (reels)
+    static final long       MUSIC_CLIP_MS = 30_000; // length of a post's music clip
+    private static Method   dashManifestGetter;     // "video_dash_manifest" getter: () -> String (Media 447+, LiveTreeMediaDict <= 446)
 
     // VideoVersionIntf – stable public interface with getUrl()
     static Class<?> videoVersionIntfClass;
@@ -130,7 +127,8 @@ public class FeedVideoDownloadHook {
     private static final Deque<UrlEntry> urlBuffer      = new ArrayDeque<>();
     private static final Deque<UrlEntry> videoUrlBuffer = new ArrayDeque<>(); // DexKit-captured video URLs
     private static final WeakHashMap<View, List<String>> buttonUrls = new WeakHashMap<>();
-    static final ExecutorService executor    = Executors.newCachedThreadPool();
+    // Bounded: at most 4 downloads/lookups at once, extra work queues instead of spawning a thread each.
+    static final ExecutorService executor    = MediaHttp.newDownloadExecutor(4);
     static final Handler         mainHandler = new Handler(Looper.getMainLooper());
 
     // Username + media ID resolved at download trigger time
@@ -144,18 +142,31 @@ public class FeedVideoDownloadHook {
         try {
             mediaClass      = classLoader.loadClass("com.instagram.feed.media.Media");
             mediaExtKtClass = classLoader.loadClass("com.instagram.feed.media.MediaExtKt");
-            // Find static (Context, Media) -> String method (name changes every version)
+            // Find static (Context, Media) -> String method (name changes every version).
+            // IG 452 dropped it; the same lookup now ends one step earlier and returns the
+            // ExtendedImageUrl (MediaExtKt.A0Y), whose URL we read via its getUrl().
+            Method extVariant = null;
             for (Method m : mediaExtKtClass.getDeclaredMethods()) {
                 Class<?>[] p = m.getParameterTypes();
-                if (p.length == 2
-                        && "android.content.Context".equals(p[0].getName())
-                        && p[1] == mediaClass
-                        && m.getReturnType() == String.class) {
+                if (p.length != 2 || !Modifier.isStatic(m.getModifiers())
+                        || !"android.content.Context".equals(p[0].getName()) || p[1] != mediaClass) continue;
+                if (m.getReturnType() == String.class) {
                     m.setAccessible(true);
                     methodImageUrl = m;
                     break;
                 }
+                if (extVariant == null
+                        && "com.instagram.model.mediasize.ExtendedImageUrl".equals(m.getReturnType().getName())) {
+                    extVariant = m;
+                }
             }
+            if (methodImageUrl == null && extVariant != null) {
+                extendedImageUrlGetUrl = extVariant.getReturnType().getMethod("getUrl");
+                extVariant.setAccessible(true);
+                methodImageUrl = extVariant;
+            }
+            ModuleLog.line("(IE|DL) image url method=" + (methodImageUrl == null ? "not found"
+                    : methodImageUrl.getName() + (extendedImageUrlGetUrl != null ? " (ExtendedImageUrl)" : "")));
         } catch (Throwable ignored) {}
 
         // Load VideoVersionIntf (stable public interface with getUrl())
@@ -177,7 +188,10 @@ public class FeedVideoDownloadHook {
                 + (liveTreeMediaDictClass != null) + " listCandidates="
                 + carouselCandidates.size());
 
-        installUriCaptureHook();
+        // The Uri.parse URL buffer only fed the old floating-button path (installViewHook, no longer
+        // installed). Hooking Uri.parse app-wide — one of the hottest framework methods — triggers
+        // ART's JIT SIGSEGV on IG 451+, so it is not installed any more.
+        FeatureStatusTracker.setHooked("PostDownload");
     }
 
     // ── Hook 1: Uri.parse (fallback buffer) ──────────────────────────────────
@@ -187,7 +201,7 @@ public class FeedVideoDownloadHook {
             XposedHelpers.findAndHookMethod(Uri.class, "parse", String.class,
                     new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             try {
                                 if (!FeatureFlags.enablePostDownload) return;
                                 if (param.args.length == 0 || !(param.args[0] instanceof String s)) return;
@@ -216,20 +230,15 @@ public class FeedVideoDownloadHook {
             XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow",
                     new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
+                        protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             if (!FeatureFlags.enablePostDownload) return;
                             View view = (View) param.thisObject;
                             Context ctx = view.getContext();
 
-                            @SuppressLint("DiscouragedApi")
-                            int feedLikeId = ctx.getResources().getIdentifier(
-                                    "row_feed_button_like", "id", ctx.getPackageName());
-                            @SuppressLint("DiscouragedApi")
-                            int reelLikeId = ctx.getResources().getIdentifier(
-                                    "like_button", "id", ctx.getPackageName());
-                            @SuppressLint("DiscouragedApi")
-                            int clipsUfiId = ctx.getResources().getIdentifier(
-                                    "clips_ufi_component", "id", ctx.getPackageName());
+                            // Cached ids: this runs for every view attached anywhere in the app.
+                            int feedLikeId = ps.reso.instaeclipse.utils.ui.ResIds.id(ctx, "row_feed_button_like");
+                            int reelLikeId = ps.reso.instaeclipse.utils.ui.ResIds.id(ctx, "like_button");
+                            int clipsUfiId = ps.reso.instaeclipse.utils.ui.ResIds.id(ctx, "clips_ufi_component");
 
                             int viewId = view.getId();
                             boolean isFeedLike = feedLikeId != 0 && viewId == feedLikeId;
@@ -271,7 +280,7 @@ public class FeedVideoDownloadHook {
                                     for (String u : all) { if (u.contains("/m86/") || u.contains("%2Fm86%2F")) m86.add(u); }
                                     List<String> pick = m86.isEmpty() ? all : m86;
                                     if (pick.isEmpty()) {
-                                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_reel_url_scroll), Toast.LENGTH_SHORT).show();
+                                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_reel_url_scroll), Toast.LENGTH_SHORT).show();
                                         return true;
                                     }
                                     ModuleLog.line("(IE|Reel) buffer fallback, m86=" + m86.size() + " total=" + all.size());
@@ -318,7 +327,7 @@ public class FeedVideoDownloadHook {
         btn.setOnClickListener(v -> {
             List<String> urls = resolveUrls(saveBtn, v);
             if (urls.isEmpty()) {
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
                 return;
             }
             onDownloadClicked(ctx, urls, saveBtn);
@@ -330,7 +339,7 @@ public class FeedVideoDownloadHook {
             if (!FeatureFlags.enablePostDownload) return false;
             List<String> urls = resolveUrls(saveBtn, btn);
             if (urls.isEmpty()) {
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media), Toast.LENGTH_SHORT).show();
                 return true;
             }
             onDownloadClicked(ctx, urls, saveBtn);
@@ -492,7 +501,7 @@ public class FeedVideoDownloadHook {
                                         //    (piko shows newer Instagram carousel items are Media objects)
                                         if (methodImageUrl != null) {
                                             try {
-                                                Object r = methodImageUrl.invoke(null, saveBtn.getContext(), item);
+                                                Object r = invokeImageUrl(saveBtn.getContext(), item);
                                                 if (r instanceof String s && isCdnMediaUrl(s)) {
                                                     ModuleLog.line("(IE|Car) item[" + idx + "] mediaExtKt=" + s.substring(0, Math.min(60, s.length())));
                                                     carouselUrls.add(s);
@@ -523,7 +532,7 @@ public class FeedVideoDownloadHook {
                     // ── Step C: Single photo ───────────────────────────────────
                     if (methodImageUrl != null) {
                         try {
-                            Object img = methodImageUrl.invoke(null, saveBtn.getContext(), media);
+                            Object img = invokeImageUrl(saveBtn.getContext(), media);
                             if (img instanceof String s && isCdnMediaUrl(s))
                                 return List.of(s);
                         } catch (Throwable ignored) {}
@@ -734,6 +743,11 @@ public class FeedVideoDownloadHook {
     static String bestVideoUrlFromMedia(Object media) {
         List<String> all = new ArrayList<>();
         collectVideoUrlsFromDictionary(media, all);
+        // When IG's own video_versions getter ran on this exact media object and returned no
+        // video, it is a photo. Don't fall back to the deep graph walk: it reaches other media
+        // held by this one (related/suggested posts, sibling slides) and returned an unrelated
+        // video for photo posts on IG 452.
+        if (all.isEmpty() && isDirectVideoVersionsOwner(media)) return null;
         if (all.isEmpty()) {
             Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
             collectAllVideoUrls(media, all, visited, 0);
@@ -763,6 +777,14 @@ public class FeedVideoDownloadHook {
      * Java fields until the JNI getter is called, so the regular object-graph walk misses
      * them on current Instagram builds.
      */
+    private static boolean isDirectVideoVersionsOwner(Object media) {
+        if (media == null) return false;
+        for (Method getter : resolvedVideoVersionsGetters) {
+            if (getter.getDeclaringClass().isInstance(media)) return true;
+        }
+        return false;
+    }
+
     private static void collectVideoUrlsFromDictionary(Object media, List<String> out) {
         for (Method getter : resolvedVideoVersionsGetters) {
             Object owner = getter.getDeclaringClass().isInstance(media)
@@ -1071,10 +1093,14 @@ public class FeedVideoDownloadHook {
         discoverDynamicMediaModel(bridge, classLoader);
         resolveVideoVersionsGetters(bridge, classLoader);
         resolveCarouselGetter(bridge, classLoader);
+        resolveDashManifestGetter(bridge, classLoader);
+        resolveHasAudioGetter(bridge, classLoader);
+        musicMetadataGetter = resolveMediaGetter(bridge, classLoader, "music_metadata");
+        clipsMetadataGetter = resolveMediaGetter(bridge, classLoader, "clips_metadata");
         resolveIsVideoMethod(bridge, classLoader);
         XC_MethodHook urlHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enablePostDownload) return;
                 Object result = param.getResult();
                 if (!(result instanceof String url)) return;
@@ -1281,6 +1307,367 @@ public class FeedVideoDownloadHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|DL|DexKit) carousel getter resolution failed: " + t);
         }
+    }
+
+    /** Audio-only download (#234): the DASH manifest accessor, anchored like has_liked / carousel. */
+    /** Audio-only (#234): Instagram's own "has_audio" flag, so silent videos aren't offered audio. */
+    private static void resolveHasAudioGetter(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                Method cached = DexKitCache.loadMethod("MediaDownload_HasAudio", classLoader);
+                if (cached != null) { cached.setAccessible(true); hasAudioGetter = cached; return; }
+            }
+            List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .declaredClass("com.instagram.feed.media.Media")
+                    .paramCount(0)
+                    .returnType("java.lang.Boolean")
+                    .usingEqStrings(List.of("has_audio"))));
+            if (found.size() == 1) {
+                Method m = found.get(0).getMethodInstance(classLoader);
+                m.setAccessible(true);
+                hasAudioGetter = m;
+                DexKitCache.saveMethod("MediaDownload_HasAudio", m);
+            }
+            ModuleLog.line("(IE|DL|DexKit) has_audio getter="
+                    + (hasAudioGetter == null ? "not found" : hasAudioGetter.getName()));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|DexKit) has_audio getter failed: " + t);
+        }
+    }
+
+    /** Instagram's has_audio for this media: TRUE / FALSE, or null when unknown. */
+    static Boolean hasAudio(Object media) {
+        Method getter = hasAudioGetter;
+        if (media == null || getter == null || !getter.getDeclaringClass().isInstance(media)) return null;
+        try {
+            Object v = getter.invoke(media);
+            return v instanceof Boolean ? (Boolean) v : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    private static void resolveDashManifestGetter(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                Method cached = DexKitCache.loadMethod("MediaDownload_DashManifest", classLoader);
+                if (cached != null) { cached.setAccessible(true); dashManifestGetter = cached; return; }
+            }
+            for (String owner : new String[]{"com.instagram.feed.media.Media",
+                    "com.instagram.feed.media.LiveTreeMediaDict"}) {
+                List<MethodData> found;
+                try {
+                    found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                            .declaredClass(owner)
+                            .paramCount(0)
+                            .returnType("java.lang.String")
+                            .usingEqStrings(List.of("video_dash_manifest"))));
+                } catch (Throwable t) { continue; }
+                if (found.size() != 1) continue;
+                Method m = found.get(0).getMethodInstance(classLoader);
+                m.setAccessible(true);
+                dashManifestGetter = m;
+                DexKitCache.saveMethod("MediaDownload_DashManifest", m);
+                break;
+            }
+            ModuleLog.line("(IE|DL|DexKit) dash manifest getter="
+                    + (dashManifestGetter == null ? "not found"
+                       : dashManifestGetter.getDeclaringClass().getName() + "." + dashManifestGetter.getName()));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|DexKit) dash manifest getter failed: " + t);
+        }
+    }
+
+    /** Audio track URL of a video/reel (from its DASH manifest), or null (photos, no manifest). */
+    /** Child Media of a carousel (carousel_media getter), or null when not a carousel / unavailable. */
+    static List<?> carouselChildren(Object media) {
+        if (media == null || carouselMediaGetter == null) return null;
+        try {
+            Object owner = carouselMediaGetter.getDeclaringClass().isInstance(media) ? media
+                    : MediaModelResolver.findObjectOfType(media, carouselMediaGetter.getDeclaringClass(), 5);
+            Object r = owner != null ? carouselMediaGetter.invoke(owner) : null;
+            return r instanceof List<?> l ? l : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** The media's DASH manifest XML (video_dash_manifest), or null. */
+    static String dashManifest(Object media) {
+        Method getter = dashManifestGetter;
+        if (media == null || getter == null) return null;
+        try {
+            Object target = getter.getDeclaringClass().isInstance(media) ? media
+                    : MediaModelResolver.findObjectOfType(media, getter.getDeclaringClass(), 5);
+            Object r = target != null ? getter.invoke(target) : null;
+            return r instanceof String s ? s : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    static String extractAudioUrl(Object media) {
+        Method getter = dashManifestGetter;
+        if (media == null || getter == null) return null;
+        try {
+            Object target = media;
+            Class<?> owner = getter.getDeclaringClass();
+            if (!owner.isInstance(media)) {
+                target = null;
+                for (Field f : media.getClass().getDeclaredFields()) {
+                    if (!owner.isAssignableFrom(f.getType())) continue;
+                    f.setAccessible(true);
+                    target = f.get(media);
+                    break;
+                }
+                if (target == null) return null;
+            }
+            Object manifest = getter.invoke(target);
+            String audio = manifest instanceof String s ? DashAudio.audioUrl(s) : null;
+            if (audio != null) return audio;
+            // Carousel container: the manifest lives on the child video item(s), not the album.
+            // Fall back to the first child that has an audio track (per-slide resolution is done
+            // at the call site, which passes the specific child; this is the safety net).
+            List<?> children = carouselChildren(media);
+            if (children != null) {
+                for (Object child : children) {
+                    if (child == null || child == media) continue;
+                    String a = extractAudioUrl(child);
+                    if (a != null) return a;
+                }
+            }
+            return null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /**
+     * Optional download chooser. Offers "Audio only" (#234, when enabled and the media has an audio
+     * track) next to the normal download. Otherwise it just runs {@code downloadAction}, so the
+     * default download path is unchanged. (Copy image, #228, is its own post-menu row.)
+     */
+    /**
+     * Where the audio of {@code media} can be saved from, or null when audio-only should not be
+     * offered (option off, not a video, or Instagram marks it silent). Prefers the DASH audio track;
+     * a video served only as a progressive MP4 has none, so its audio is pulled out after download.
+     * Returns {url, extractFromVideo}.
+     */
+    static Object[] audioSource(Object media) {
+        return audioSource(media, media);
+    }
+
+    /**
+     * Audio to save for {@code media} (a single post or the carousel slide being viewed): its own
+     * sound track, or else the song attached to the post ({@code post}; for a carousel the music
+     * belongs to the album, not the slide). Returns {url, extract, trimStartMs, trimDurationMs,
+     * postWide} where extract means "run through the extractor" (video → audio track, or song →
+     * clip), a duration of -1 keeps everything, and postWide marks the post's song (the same audio
+     * for every item) as opposed to one slide's own sound.
+     */
+    static Object[] audioSource(Object media, Object post) {
+        if (!FeatureFlags.offerAudioDownload || media == null) return null;
+        String dashAudio = extractAudioUrl(media);
+        String videoForAudio = dashAudio == null ? bestVideoUrlFromMedia(media) : null;
+        Boolean sound = hasAudio(media);
+        ModuleLog.line("(IE|DL|Audio) has_audio=" + sound + " dash=" + (dashAudio != null)
+                + " video=" + (videoForAudio != null));
+        String url = dashAudio != null ? dashAudio : videoForAudio;
+        if (url != null && !Boolean.FALSE.equals(sound)) return new Object[]{url, dashAudio == null, 0L, -1L, false};
+        Object[] music = musicSource(post);
+        if (music == null && post != media) music = musicSource(media);
+        return music;
+    }
+
+    /** The song attached to a post (Instagram music) as {url, true, startMs, MUSIC_CLIP_MS, true}, or null. */
+    static Object[] musicSource(Object media) {
+        if (media == null) return null;
+        for (Method getter : new Method[]{musicMetadataGetter, clipsMetadataGetter}) {
+            if (getter == null || !getter.getDeclaringClass().isInstance(media)) continue;
+            try {
+                Object meta = getter.invoke(media);
+                Object info = meta == null ? null : callByReturnType(meta, "com.instagram.api.schemas.MusicInfo");
+                Object track = info == null ? null : callByReturnType(info, "com.instagram.api.schemas.TrackData");
+                java.util.Map<?, ?> tm = fieldMap(track);
+                if (tm == null) continue;
+                Object url = tm.get("progressive_download_url");
+                if (!(url instanceof String) || ((String) url).isEmpty()) url = tm.get("fast_start_progressive_download_url");
+                if (!(url instanceof String) || ((String) url).isEmpty()) continue;
+                long start = 0;
+                java.util.Map<?, ?> cm = fieldMap(callByReturnType(info, "com.instagram.music.common.model.MusicConsumptionModel"));
+                if (cm != null && cm.get("audio_asset_start_time_in_ms") instanceof Number) {
+                    start = ((Number) cm.get("audio_asset_start_time_in_ms")).longValue();
+                }
+                ModuleLog.line("(IE|DL|Music) song=\"" + tm.get("title") + "\" by " + tm.get("display_artist")
+                        + " start=" + start + "ms");
+                return new Object[]{url, true, start, MUSIC_CLIP_MS, true};
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|DL|Music) lookup: " + t);
+            }
+        }
+        return null;
+    }
+
+    /** First non-null value of a no-arg method on {@code obj} whose return type is {@code typeName}. */
+    private static Object callByReturnType(Object obj, String typeName) {
+        if (obj == null) return null;
+        Class<?> type;
+        try {
+            type = Class.forName(typeName, false, obj.getClass().getClassLoader());
+        } catch (Throwable t) {
+            return null;
+        }
+        for (Method m : obj.getClass().getMethods()) {
+            if (m.getParameterCount() != 0 || !type.isAssignableFrom(m.getReturnType())) continue;
+            try {
+                Object v = m.invoke(obj);
+                if (v != null) return v;
+            } catch (Throwable ignored) {}
+        }
+        return null;
+    }
+
+    /**
+     * Instagram's own "model as named fields" map (keys are the JSON field names, e.g.
+     * "progressive_download_url"); some models take a context object built with its no-arg
+     * constructor. Field names are stable where the getter names are obfuscated per version.
+     */
+    private static java.util.Map<?, ?> fieldMap(Object obj) {
+        if (obj == null) return null;
+        for (Method m : obj.getClass().getMethods()) {
+            if (!java.util.Map.class.isAssignableFrom(m.getReturnType())) continue;
+            try {
+                Object r = null;
+                if (m.getParameterCount() == 0) {
+                    r = m.invoke(obj);
+                } else if (m.getParameterCount() == 1 && !m.getParameterTypes()[0].isPrimitive()) {
+                    java.lang.reflect.Constructor<?> c = m.getParameterTypes()[0].getDeclaredConstructor();
+                    c.setAccessible(true);
+                    r = m.invoke(obj, c.newInstance());
+                }
+                if (r instanceof java.util.Map) return (java.util.Map<?, ?>) r;
+            } catch (Throwable ignored) {}
+        }
+        return null;
+    }
+
+    /** A no-arg getter on Media that reads the given JSON field (matched by its field-name string). */
+    private static Method resolveMediaGetter(DexKitBridge bridge, ClassLoader classLoader, String field) {
+        try {
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .declaredClass("com.instagram.feed.media.Media")
+                    .paramCount(0)
+                    .usingEqStrings(List.of(field))))) {
+                if (md.getName().startsWith("<")) continue; // <clinit>/<init> also mention the field
+                try {
+                    Method m = md.getMethodInstance(classLoader);
+                    if (m.getReturnType() == void.class) continue;
+                    m.setAccessible(true);
+                    ModuleLog.line("(IE|DL|DexKit) " + field + " getter=" + m.getName());
+                    return m;
+                } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|DL|DexKit) " + field + " getter failed: " + t);
+        }
+        return null;
+    }
+
+    static void offerAudioOrRun(Context ctx, Object media, String imageUrl, String username, String mediaId,
+                                String type, Runnable downloadAction) {
+        Object[] src = audioSource(media);
+        if (src == null) { downloadAction.run(); return; }
+        final String audio = (String) src[0];
+        final boolean extractFromVideo = (Boolean) src[1];
+        final long trimStart = (Long) src[2], trimDuration = (Long) src[3];
+        Context host = ctx instanceof android.app.Activity ? ctx
+                : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (host == null) { downloadAction.run(); return; }
+        final String user = username != null ? username : type;
+        java.util.List<String> labels = new ArrayList<>();
+        java.util.List<Runnable> actions = new ArrayList<>();
+        labels.add(I18n.t(host, R.string.ig_download_choice_video));
+        actions.add(downloadAction);
+        labels.add(I18n.t(host, R.string.ig_download_choice_audio));
+        actions.add(() -> downloadAudio(host, audio,
+                buildFilename(user, type + "_audio", mediaId, true).replaceAll("\\.mp4$", ".m4a"), user,
+                extractFromVideo, trimStart, trimDuration));
+        mainHandler.post(() -> {
+            try {
+                new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
+                        .title(I18n.t(host, R.string.ig_download_choice_title))
+                        .choices(labels.toArray(new String[0]), -1, which -> actions.get(which).run())
+                        .show();
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|DL) chooser failed: " + t);
+                downloadAction.run();
+            }
+        });
+    }
+
+    /** Saves an audio-only (.m4a) stream; same destinations as other downloads. */
+    static void downloadAudio(Context ctx, String url, String filename, String username) {
+        downloadAudio(ctx, url, filename, username, false);
+    }
+
+    static void downloadAudio(Context ctx, String url, String filename, String username,
+                              boolean extractFromVideo) {
+        downloadAudio(ctx, url, filename, username, extractFromVideo, 0, -1);
+    }
+
+    /**
+     * @param extractFromVideo run {@code url} through the extractor: keep only its audio track and,
+     *                         when trimDurationMs &gt; 0, only that range (a post's music clip).
+     */
+    static void downloadAudio(Context ctx, String url, String filename, String username,
+                              boolean extractFromVideo, long trimStartMs, long trimDurationMs) {
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
+        executor.submit(() -> {
+            try {
+                String uri = FeatureFlags.downloaderCustomUri.isEmpty()
+                        ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
+                if (!uri.isEmpty()) {
+                    android.content.Intent intent = new android.content.Intent();
+                    intent.setClassName("ps.reso.instaeclipse",
+                            "ps.reso.instaeclipse.mods.media.DownloadSaveService");
+                    intent.putExtra("url", url);
+                    intent.putExtra("filename", filename);
+                    intent.putExtra("mimeType", "audio/mp4");
+                    intent.putExtra("username", username);
+                    intent.putExtra("extractAudio", extractFromVideo);
+                    intent.putExtra("trimStartMs", trimStartMs);
+                    intent.putExtra("trimDurationMs", trimDurationMs);
+                    ctx.startForegroundService(intent);
+                    return;
+                }
+                File temp = File.createTempFile("ie_dl_", ".m4a", ctx.getCacheDir());
+                File video = extractFromVideo ? File.createTempFile("ie_dv_", ".mp4", ctx.getCacheDir()) : null;
+                try {
+                    if (video != null) {
+                        downloadToFileAndGetType(url, video);
+                        DownloadSaveService.extractAudioTrack(video.getAbsolutePath(), temp.getAbsolutePath(),
+                                trimStartMs * 1000, trimDurationMs > 0 ? trimDurationMs * 1000 : -1);
+                    } else {
+                        downloadToFileAndGetType(url, temp);
+                    }
+                    try (FileInputStream in = new FileInputStream(temp);
+                         OutputStream out = openOutputStream(ctx, filename, "audio/mp4", username)) {
+                        byte[] buf = new byte[32768]; int n;
+                        while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+                    }
+                } finally {
+                    //noinspection ResultOfMethodCallIgnored
+                    temp.delete();
+                    //noinspection ResultOfMethodCallIgnored
+                    if (video != null) video.delete();
+                }
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_audio_saved), Toast.LENGTH_SHORT).show());
+            } catch (Throwable e) {
+                ModuleLog.line("(IE|DL|Audio) failed: " + e);
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                        I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private static void resolveIsVideoMethod(DexKitBridge bridge, ClassLoader classLoader) {
@@ -1629,6 +2016,18 @@ public class FeedVideoDownloadHook {
 
     // ── Filename + directory helpers (package-accessible for StoryDownloadHook) ──
 
+    /**
+     * Carousel item name: inserts the slide number before the extension ("…_03of10.mp4") so every
+     * item of an album gets its own, ordered file instead of N copies of the same name.
+     */
+    static String withSlide(String filename, int slide, int total) {
+        if (total <= 1 || slide < 1) return filename;
+        int width = String.valueOf(total).length();
+        String tag = String.format(Locale.US, "_%0" + width + "dof%d", slide, total);
+        int dot = filename.lastIndexOf('.');
+        return dot > 0 ? filename.substring(0, dot) + tag + filename.substring(dot) : filename + tag;
+    }
+
     static String buildFilename(String username, String type, String mediaId, boolean isVideo) {
         String u  = (username != null && !username.isEmpty()) ? username : "unknown";
         String id = (mediaId  != null && !mediaId.isEmpty())  ? mediaId  : String.valueOf(System.currentTimeMillis());
@@ -1649,12 +2048,54 @@ public class FeedVideoDownloadHook {
      */
     static OutputStream openOutputStream(Context ctx, String filename, boolean isVideo, String username)
             throws Exception {
-        String mimeType = isVideo ? "video/mp4" : "image/jpeg";
+        return openOutputStream(ctx, filename, isVideo ? "video/mp4" : "image/jpeg", username);
+    }
+
+    /** Output stream for an exported chat (HTML) in the downloads location, "chats" subfolder. */
+    /** Output stream for an exported file (CSV etc.) in the downloads location, "exports" subfolder. */
+    public static OutputStream openExport(Context ctx, String filename, String mime) throws Exception {
+        return openOutputStream(ctx, filename, mime, "exports");
+    }
+
+    /** Comment exports: <download folder>/comments/<file>. */
+    public static OutputStream openCommentsExport(Context ctx, String filename) throws Exception {
+        return openOutputStream(ctx, filename, "text/html", "comments");
+    }
+
+    public static OutputStream openChatExport(Context ctx, String filename) throws Exception {
+        return openOutputStream(ctx, filename, "text/html", "chats");
+    }
+
+    /**
+     * A file inside a chat export's own folder: {@code <download>/chats/<sub>/<filename>}
+     * ({@code sub} may itself be nested, e.g. {@code <folder>/media}). The chat's HTML and its
+     * media/ folder must stay side by side, so the subfolder is always applied here regardless of
+     * the "username folder" downloader setting.
+     */
+    public static OutputStream openChatExportFile(Context ctx, String sub, String filename, String mime)
+            throws Exception {
+        String user = "chats" + (sub == null || sub.isEmpty() ? "" : "/" + sub);
+        return openOutputStream(ctx, filename, mime, user, true);
+    }
+
+    static OutputStream openOutputStream(Context ctx, String filename, String mimeType, String username)
+            throws Exception {
+        return openOutputStream(ctx, filename, mimeType, username, FeatureFlags.downloaderUsernameFolder);
+    }
+
+    /**
+     * As {@link #openOutputStream(Context, String, String, String)}, but {@code nestFolder} forces
+     * (or suppresses) the {@code username} subfolder regardless of the downloader setting. Chat
+     * exports pass {@code true} so an export's HTML and its media/ folder always stay together.
+     * {@code username} may contain '/'; every segment is created.
+     */
+    static OutputStream openOutputStream(Context ctx, String filename, String mimeType, String username,
+                                         boolean nestFolder) throws Exception {
 
         // 1. Raw path — preferred when set; bypasses SAF authority entirely
         if (!FeatureFlags.downloaderCustomPath.isEmpty()) {
             try {
-                return openRawPathOutputStream(filename, username);
+                return openRawPathOutputStream(filename, username, nestFolder);
             } catch (Exception e) {
                 ModuleLog.line("(InstaEclipse|DL) Raw path failed, trying SAF: " + e.getMessage());
             }
@@ -1664,7 +2105,7 @@ public class FeedVideoDownloadHook {
         //    (so Instagram holds the persistable URI permission, not the companion app)
         if (!FeatureFlags.downloaderCustomUri.isEmpty()) {
             try {
-                return openSafOutputStream(ctx, filename, mimeType, username);
+                return openSafOutputStream(ctx, filename, mimeType, username, nestFolder);
             } catch (Exception e) {
                 ModuleLog.line("(InstaEclipse|DL) SAF failed, falling back to MediaStore: " + e.getMessage());
             }
@@ -1672,12 +2113,12 @@ public class FeedVideoDownloadHook {
 
         // 3. MediaStore (API 29+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return openMediaStoreOutputStream(ctx, filename, mimeType, username);
+            return openMediaStoreOutputStream(ctx, filename, mimeType, username, nestFolder);
         }
 
         // 4. Legacy API < 29: direct file write
         File dir = new File(Environment.getExternalStorageDirectory(), "InstaEclipse");
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+        if (nestFolder && username != null && !username.isEmpty()) {
             dir = new File(dir, username);
         }
         //noinspection ResultOfMethodCallIgnored
@@ -1685,14 +2126,14 @@ public class FeedVideoDownloadHook {
         return new FileOutputStream(new File(dir, filename));
     }
 
-    private static OutputStream openRawPathOutputStream(String filename, String username) throws Exception {
+    private static OutputStream openRawPathOutputStream(String filename, String username, boolean nestFolder) throws Exception {
         String rawPath = FeatureFlags.downloaderCustomPath;
         // Reject if path conversion failed and we got a content URI string as fallback
         if (rawPath.startsWith("content://")) {
             throw new Exception("Not a raw file path: " + rawPath);
         }
         File dir = new File(rawPath);
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+        if (nestFolder && username != null && !username.isEmpty()) {
             dir = new File(dir, username);
         }
         if (!dir.exists() && !dir.mkdirs()) {
@@ -1701,13 +2142,18 @@ public class FeedVideoDownloadHook {
         return new FileOutputStream(new File(dir, filename));
     }
 
-    private static OutputStream openSafOutputStream(Context ctx, String filename, String mimeType, String username)
+    private static OutputStream openSafOutputStream(Context ctx, String filename, String mimeType, String username, boolean nestFolder)
             throws Exception {
         Uri treeUri = Uri.parse(FeatureFlags.downloaderCustomUri);
         String rootDocId = DocumentsContract.getTreeDocumentId(treeUri);
         Uri dirUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, rootDocId);
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
-            dirUri = findOrCreateSafDir(ctx, treeUri, rootDocId, username);
+        if (nestFolder && username != null && !username.isEmpty()) {
+            String parentDocId = rootDocId;
+            for (String seg : username.split("/")) {
+                if (seg.isEmpty()) continue;
+                dirUri = findOrCreateSafDir(ctx, treeUri, parentDocId, seg);
+                parentDocId = DocumentsContract.getDocumentId(dirUri);
+            }
         }
         Uri fileUri = DocumentsContract.createDocument(ctx.getContentResolver(), dirUri, mimeType, filename);
         if (fileUri == null) throw new Exception("SAF createDocument returned null");
@@ -1738,9 +2184,9 @@ public class FeedVideoDownloadHook {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("NewApi")
-    private static OutputStream openMediaStoreOutputStream(Context ctx, String filename, String mimeType, String username)
+    private static OutputStream openMediaStoreOutputStream(Context ctx, String filename, String mimeType, String username, boolean nestFolder)
             throws Exception {
-        String relPath = buildMediaStoreRelPath(username);
+        String relPath = buildMediaStoreRelPath(username, nestFolder);
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
         values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
@@ -1765,7 +2211,7 @@ public class FeedVideoDownloadHook {
      * - Otherwise the path is nested under Download/ (e.g. /sdcard/Test55 → Download/Test55).
      * - Falls back to Download/InstaEclipse when no custom path is set.
      */
-    private static String buildMediaStoreRelPath(String username) {
+    private static String buildMediaStoreRelPath(String username, boolean nestFolder) {
         String customPath = FeatureFlags.downloaderCustomPath;
         String base = "Download/InstaEclipse"; // default
 
@@ -1778,7 +2224,7 @@ public class FeedVideoDownloadHook {
             }
         }
 
-        if (FeatureFlags.downloaderUsernameFolder && username != null && !username.isEmpty()) {
+        if (nestFolder && username != null && !username.isEmpty()) {
             base += "/" + username;
         }
         return base;
@@ -1806,9 +2252,9 @@ public class FeedVideoDownloadHook {
                 if (!src.exists()) return;
                 String fn = buildFilename(author, "story", id, video);
                 saveFileToDestination(ctx, src, fn, video, author);
-                mainHandler.post(() -> android.widget.Toast.makeText(ctx, okMsg, android.widget.Toast.LENGTH_SHORT).show());
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, okMsg, android.widget.Toast.LENGTH_SHORT).show());
             } catch (Throwable t) {
-                mainHandler.post(() -> android.widget.Toast.makeText(ctx, failMsg, android.widget.Toast.LENGTH_SHORT).show());
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, failMsg, android.widget.Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -1909,10 +2355,17 @@ public class FeedVideoDownloadHook {
      * Package-accessible: extracts the image URL from a Media object using MediaExtKt helper.
      * Returns null if not available (e.g. MediaExtKt not resolved or media is a video-only post).
      */
+    /** Calls the resolved MediaExtKt image-url method; returns the URL String (or null). */
+    private static Object invokeImageUrl(Context ctx, Object media) throws Exception {
+        Object r = methodImageUrl.invoke(null, ctx, media);
+        if (r != null && extendedImageUrlGetUrl != null) r = extendedImageUrlGetUrl.invoke(r);
+        return r;
+    }
+
     static String imageUrlFromMedia(Context ctx, Object media) {
         if (methodImageUrl == null || ctx == null || media == null) return null;
         try {
-            Object r = methodImageUrl.invoke(null, ctx, media);
+            Object r = invokeImageUrl(ctx, media);
             return (r instanceof String s && isCdnMediaUrl(s)) ? s : null;
         } catch (Throwable ignored) {
             return null;
@@ -1924,7 +2377,7 @@ public class FeedVideoDownloadHook {
      * Returns a single-entry list for plain photo/video posts, multi-entry for carousels.
      * Steps: (A) video, (B) carousel via MutableMediaDictIntf, (C) single photo, (D) CDN scan.
      */
-    static List<String> extractAllUrlsFromMedia(Context ctx, Object media) {
+    public static List<String> extractAllUrlsFromMedia(Context ctx, Object media) {
         if (media == null) return new ArrayList<>();
 
         // Step 0 (IG 447+): carousel-first. Must run BEFORE the single-video short-circuit —
@@ -1968,7 +2421,7 @@ public class FeedVideoDownloadHook {
                             if (itemVideo != null) { carouselUrls.add(itemVideo); continue; }
                             if (methodImageUrl != null && ctx != null) {
                                 try {
-                                    Object r = methodImageUrl.invoke(null, ctx, item);
+                                    Object r = invokeImageUrl(ctx, item);
                                     if (r instanceof String s && isCdnMediaUrl(s)) {
                                         carouselUrls.add(s); continue;
                                     }
@@ -2040,7 +2493,7 @@ public class FeedVideoDownloadHook {
                 if (img != null) { urls.add(img); continue; }
                 if (methodImageUrl != null && ctx != null) {
                     try {
-                        Object r = methodImageUrl.invoke(null, ctx, child);
+                        Object r = invokeImageUrl(ctx, child);
                         if (r instanceof String s && isCdnMediaUrl(s)) urls.add(s);
                     } catch (Throwable ignored) {}
                 }
@@ -2060,26 +2513,43 @@ public class FeedVideoDownloadHook {
     @SuppressLint("DefaultLocale")
     static void showPostDownloadDialog(Context ctx, List<String> urls,
                                        String username, String mediaId, int currentIndex) {
+        showPostDownloadDialog(ctx, urls, username, mediaId, currentIndex, null);
+    }
+
+    /**
+     * @param slideMedia the carousel slide being viewed; when it is a video with sound the carousel
+     *                   sheet also offers "Audio only" for it, so every choice is on one screen.
+     */
+    static void showPostDownloadDialog(Context ctx, List<String> urls,
+                                       String username, String mediaId, int currentIndex,
+                                       Object slideMedia) {
+        showPostDownloadDialog(ctx, urls, username, mediaId, currentIndex, slideMedia, slideMedia);
+    }
+
+    /** @param postMedia the whole post (its attached song is the audio when the slide is silent). */
+    static void showPostDownloadDialog(Context ctx, List<String> urls,
+                                       String username, String mediaId, int currentIndex,
+                                       Object slideMedia, Object postMedia) {
         if (urls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_post_url_not_found), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_post_url_not_found), Toast.LENGTH_SHORT).show();
             return;
         }
         if (urls.size() == 1) {
             String url = urls.get(0);
             boolean isVid = isVideoUrl(url);
             String fn = buildFilename(username, "post", mediaId, isVid);
-            Toast.makeText(ctx, isVid ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, isVid ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
             executor.submit(() -> {
                 try {
                     boolean delegated = downloadAndSave(ctx, url, fn, isVid, username);
                     if (!delegated) {
-                        mainHandler.post(() -> Toast.makeText(ctx,
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                 isVid ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
                                 Toast.LENGTH_SHORT).show());
                     }
                 } catch (Throwable e) {
                     ModuleLog.line("(IE|Post|DL) single failed: " + e);
-                    mainHandler.post(() -> Toast.makeText(ctx,
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                             I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                 }
             });
@@ -2089,136 +2559,50 @@ public class FeedVideoDownloadHook {
         // Carousel: modern bottom sheet with two pill buttons
         int n = urls.size();
         int safeIdx = (currentIndex >= 0 && currentIndex < n) ? currentIndex : 0;
-        showCarouselBottomSheet(ctx, urls, username, mediaId, n, safeIdx);
+        showCarouselBottomSheet(ctx, urls, username, mediaId, n, safeIdx,
+                slideMedia != null ? audioSource(slideMedia, postMedia) : null);
     }
 
-    // ── Modern bottom sheet for carousel download ─────────────────────────────
-
-    private static boolean isDarkTheme(Context ctx) {
-        return (ctx.getResources().getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-    }
-
-    private static GradientDrawable roundRect(int color, float radiusDp, Context ctx) {
-        float r = radiusDp * ctx.getResources().getDisplayMetrics().density;
-        GradientDrawable d = new GradientDrawable();
-        d.setColor(color);
-        d.setCornerRadius(r);
-        return d;
-    }
-
-    private static Button makePillButton(Context ctx, String label,
-                                         int bgColor, int textColor, float dp) {
-        Button btn = new Button(ctx);
-        btn.setText(label);
-        btn.setTextColor(textColor);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        btn.setTypeface(null, Typeface.BOLD);
-        btn.setBackground(roundRect(bgColor, 14, ctx));
-        btn.setAllCaps(false);
-        btn.setPadding((int)(20 * dp), (int)(14 * dp), (int)(20 * dp), (int)(14 * dp));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = (int)(10 * dp);
-        btn.setLayoutParams(lp);
-        return btn;
-    }
+    // ── Carousel download chooser ─────────────────────────────────────────────
 
     private static void showCarouselBottomSheet(Context ctx, List<String> urls,
                                                  String username, String mediaId,
-                                                 int n, int safeIdx) {
+                                                 int n, int safeIdx, Object[] audioSrc) {
         try {
-            float dp   = ctx.getResources().getDisplayMetrics().density;
-            boolean dk = isDarkTheme(ctx);
+            java.util.List<CharSequence> labels = new ArrayList<>();
+            java.util.List<Runnable> actions = new ArrayList<>();
 
-            int sheetBg    = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-            int textPrim   = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int textSec    = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
-            int accentBg   = Color.parseColor("#0A84FF");
-            int secondBg   = dk ? Color.parseColor("#3A3A3C") : Color.parseColor("#E5E5EA");
-            int secondText = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int handleClr  = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
-            LinearLayout sheet = new LinearLayout(ctx);
-            sheet.setOrientation(LinearLayout.VERTICAL);
-            sheet.setBackground(roundRect(sheetBg, 20, ctx));
-            int hPad = (int)(20 * dp);
-            sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
-
-            // Drag handle
-            View handle = new View(ctx);
-            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
-                    (int)(40 * dp), (int)(4 * dp));
-            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-            handleLp.bottomMargin = (int)(16 * dp);
-            handle.setLayoutParams(handleLp);
-            handle.setBackground(roundRect(handleClr, 2, ctx));
-            sheet.addView(handle);
-
-            // Title
-            TextView title = new TextView(ctx);
-            title.setText(I18n.t(ctx, R.string.ig_dl_title));
-            title.setTextColor(textPrim);
-            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            title.setTypeface(null, Typeface.BOLD);
-            LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            titleLp.bottomMargin = (int)(4 * dp);
-            title.setLayoutParams(titleLp);
-            sheet.addView(title);
-
-            // Subtitle
-            TextView subtitle = new TextView(ctx);
-            subtitle.setText(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n));
-            subtitle.setTextColor(textSec);
-            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            subLp.bottomMargin = (int)(14 * dp);
-            subtitle.setLayoutParams(subLp);
-            sheet.addView(subtitle);
-
-            Dialog dialog = new Dialog(ctx);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-            // Button: Download current
-            String currentLabel = I18n.t(ctx, R.string.ig_dl_carousel_current, safeIdx + 1, n);
-            Button btnCurrent = makePillButton(ctx, currentLabel, accentBg, Color.WHITE, dp);
-            btnCurrent.setOnClickListener(v -> {
-                dialog.dismiss();
+            // Download current
+            labels.add(I18n.t(ctx, R.string.ig_dl_carousel_current, safeIdx + 1, n));
+            actions.add(() -> {
                 String url = urls.get(safeIdx);
                 boolean isVid = isVideoUrl(url);
-                String fn = buildFilename(username, "post", mediaId, isVid);
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), Toast.LENGTH_SHORT).show();
+                String fn = withSlide(buildFilename(username, "post", mediaId, isVid), safeIdx + 1, n);
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
                     try {
                         boolean delegated = downloadAndSave(ctx, url, fn, isVid, username);
                         if (!delegated) {
-                            mainHandler.post(() -> Toast.makeText(ctx,
+                            mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                     I18n.t(ctx, R.string.ig_toast_saved), Toast.LENGTH_SHORT).show());
                         }
                     } catch (Throwable e) {
-                        mainHandler.post(() -> Toast.makeText(ctx,
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                 I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                     }
                 });
             });
-            sheet.addView(btnCurrent);
 
-            // Button: Download all
-            Button btnAll = makePillButton(ctx, I18n.t(ctx, R.string.ig_dl_carousel_all, n),
-                    secondBg, secondText, dp);
-            btnAll.setOnClickListener(v -> {
-                dialog.dismiss();
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_all_n_items, n), Toast.LENGTH_SHORT).show();
+            // Download all
+            labels.add(I18n.t(ctx, R.string.ig_dl_carousel_all, n));
+            actions.add(() -> {
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_all_n_items, n), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
                     int failed = 0;
-                    for (String url : urls) {
+                    for (int i = 0; i < urls.size(); i++) {
+                        String url = urls.get(i);
                         boolean isVid = isVideoUrl(url);
-                        String fn = buildFilename(username, "post", mediaId, isVid);
+                        String fn = withSlide(buildFilename(username, "post", mediaId, isVid), i + 1, n);
                         try {
                             downloadAndSave(ctx, url, fn, isVid, username);
                         } catch (Throwable e) {
@@ -2229,31 +2613,38 @@ public class FeedVideoDownloadHook {
                     final int finalFailed = failed;
                     mainHandler.post(() -> {
                         if (finalFailed == 0) {
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_items_saved, n),
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_items_saved, n),
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_items_partial_saved,
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_items_partial_saved,
                                     n - finalFailed, n, finalFailed), Toast.LENGTH_SHORT).show();
                         }
                     });
                 });
             });
-            sheet.addView(btnAll);
 
-            dialog.setContentView(sheet);
-            Window w = dialog.getWindow();
-            if (w != null) {
-                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                w.setGravity(Gravity.BOTTOM);
-                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT);
-                WindowManager.LayoutParams wlp = w.getAttributes();
-                int margin = (int)(12 * dp);
-                wlp.x = margin;
-                wlp.y = margin;
-                w.setAttributes(wlp);
+            // Audio of the slide being viewed (only when it is a video with sound)
+            if (audioSrc != null) {
+                String user = username != null ? username : "post";
+                boolean postWide = (Boolean) audioSrc[4];
+                // The post's song plays over every item, so it is offered once for the post; a
+                // slide's own sound is tied to that slide and keeps its slide number.
+                String audioLabel = I18n.t(ctx, R.string.ig_download_choice_audio)
+                        + (postWide ? "" : "  ·  " + (safeIdx + 1) + "/" + n);
+                String audioName = buildFilename(user, postWide ? "post_music" : "post_audio", mediaId, true)
+                        .replaceAll("\\.mp4$", ".m4a");
+                if (!postWide) audioName = withSlide(audioName, safeIdx + 1, n);
+                final String fAudioName = audioName;
+                labels.add(audioLabel);
+                actions.add(() -> downloadAudio(ctx, (String) audioSrc[0], fAudioName,
+                        user, (Boolean) audioSrc[1], (Long) audioSrc[2], (Long) audioSrc[3]));
             }
-            dialog.show();
+
+            new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                    .title(I18n.t(ctx, R.string.ig_dl_title))
+                    .message(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n))
+                    .choices(labels.toArray(new CharSequence[0]), -1, which -> actions.get(which).run())
+                    .show();
 
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ showCarouselBottomSheet: " + t);
@@ -2279,7 +2670,7 @@ public class FeedVideoDownloadHook {
             try {
                 ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
                 cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", url));
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
             } catch (Throwable t) {
                 ModuleLog.line("(IE|Post) ❌ copyLinkToClipboard: " + t);
             }
@@ -2289,89 +2680,21 @@ public class FeedVideoDownloadHook {
     @SuppressLint("DefaultLocale")
     static void showCopyLinkSheet(Context ctx, List<String> urls) {
         if (urls == null || urls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
             return;
         }
         if (urls.size() == 1) { copyLinkToClipboard(ctx, urls.get(0)); return; }
 
         try {
-            float dp   = ctx.getResources().getDisplayMetrics().density;
-            boolean dk = isDarkTheme(ctx);
-
-            int sheetBg    = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-            int textPrim   = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int textSec    = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
-            int accentBg   = Color.parseColor("#0A84FF");
-            int secondBg   = dk ? Color.parseColor("#3A3A3C") : Color.parseColor("#E5E5EA");
-            int secondText = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int handleClr  = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
             final int n = urls.size();
-
-            LinearLayout sheet = new LinearLayout(ctx);
-            sheet.setOrientation(LinearLayout.VERTICAL);
-            sheet.setBackground(roundRect(sheetBg, 20, ctx));
-            int hPad = (int)(20 * dp);
-            sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
-
-            View handle = new View(ctx);
-            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams((int)(40 * dp), (int)(4 * dp));
-            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-            handleLp.bottomMargin = (int)(16 * dp);
-            handle.setLayoutParams(handleLp);
-            handle.setBackground(roundRect(handleClr, 2, ctx));
-            sheet.addView(handle);
-
-            TextView title = new TextView(ctx);
-            title.setText(I18n.t(ctx, R.string.ig_copy_link_title));
-            title.setTextColor(textPrim);
-            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            title.setTypeface(null, Typeface.BOLD);
-            sheet.addView(title);
-
-            TextView subtitle = new TextView(ctx);
-            subtitle.setText(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n));
-            subtitle.setTextColor(textSec);
-            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            subLp.bottomMargin = (int)(10 * dp);
-            subtitle.setLayoutParams(subLp);
-            sheet.addView(subtitle);
-
-            Dialog dialog = new Dialog(ctx);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-            // One pill per slide (scrollable, capped height for long carousels)
-            LinearLayout pillList = new LinearLayout(ctx);
-            pillList.setOrientation(LinearLayout.VERTICAL);
-            for (int i = 0; i < n; i++) {
-                final int idx = i;
-                Button b = makePillButton(ctx,
-                        I18n.t(ctx, R.string.ig_copy_link_slide, i + 1, n), secondBg, secondText, dp);
-                b.setOnClickListener(v -> { dialog.dismiss(); copyLinkToClipboard(ctx, urls.get(idx)); });
-                pillList.addView(b);
-            }
-            ScrollView scroller = new ScrollView(ctx);
-            scroller.addView(pillList);
-            LinearLayout.LayoutParams svLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            svLp.weight = 1f;
-            scroller.setLayoutParams(svLp);
-            // Cap so many slides don't push the "copy all" pill off-screen
-            scroller.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                int cap = (int)(300 * dp);
-                if (scroller.getHeight() > cap && scroller.getLayoutParams().height != cap) {
-                    scroller.getLayoutParams().height = cap;
-                    scroller.requestLayout();
-                }
-            });
-            sheet.addView(scroller);
-
-            Button btnAll = makePillButton(ctx, I18n.t(ctx, R.string.ig_copy_link_all, n),
-                    accentBg, Color.WHITE, dp);
-            btnAll.setOnClickListener(v -> {
-                dialog.dismiss();
+            CharSequence[] slides = new CharSequence[n];
+            for (int i = 0; i < n; i++) slides[i] = I18n.t(ctx, R.string.ig_copy_link_slide, i + 1, n);
+            ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                    .title(I18n.t(ctx, R.string.ig_copy_link_title))
+                    .message(I18n.t(ctx, R.string.ig_dl_carousel_subtitle, n))
+                    // One row per slide (the dialog body scrolls for long carousels)
+                    .choices(slides, -1, idx -> copyLinkToClipboard(ctx, urls.get(idx)));
+            dlg.primary(I18n.t(ctx, R.string.ig_copy_link_all, n), () -> {
                 StringBuilder sb = new StringBuilder();
                 for (String u : urls) sb.append(u).append('\n');
                 final String allText = sb.toString().trim();
@@ -2381,27 +2704,13 @@ public class FeedVideoDownloadHook {
                     try {
                         ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
                         cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", allText));
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
                     } catch (Throwable t) {
                         ModuleLog.line("(IE|Post) ❌ copy all links: " + t);
                     }
                 }, 350);
             });
-            sheet.addView(btnAll);
-
-            dialog.setContentView(sheet);
-            Window w = dialog.getWindow();
-            if (w != null) {
-                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                w.setGravity(Gravity.BOTTOM);
-                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                WindowManager.LayoutParams wlp = w.getAttributes();
-                int margin = (int)(12 * dp);
-                wlp.x = margin;
-                wlp.y = margin;
-                w.setAttributes(wlp);
-            }
-            dialog.show();
+            dlg.show();
 
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ showCopyLinkSheet: " + t);
@@ -2547,18 +2856,19 @@ public class FeedVideoDownloadHook {
         if (idx >= urls.size()) idx = 0;
         final int current = idx;
         int n = urls.size();
-        new AlertDialog.Builder(ctx)
-                .setTitle(I18n.t(ctx, R.string.ig_dl_title))
-                .setItems(new CharSequence[]{
+        new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
+                .title(I18n.t(ctx, R.string.ig_dl_title))
+                .choices(new CharSequence[]{
                         I18n.t(ctx, R.string.ig_dl_carousel_current, current + 1, n),
                         I18n.t(ctx, R.string.ig_dl_carousel_all, n)
-                }, (d, w) -> {
+                }, -1, w -> {
                     if (w == 0) {
                         String url = urls.get(current);
-                        startDirectDownload(ctx, url, isVideoUrl(url));
+                        startDirectDownload(ctx, url, isVideoUrl(url), current + 1, n);
                     } else {
-                        for (String u : urls) startDirectDownload(ctx, u, isVideoUrl(u));
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_n_items, n), Toast.LENGTH_SHORT).show();
+                        for (int i = 0; i < urls.size(); i++)
+                            startDirectDownload(ctx, urls.get(i), isVideoUrl(urls.get(i)), i + 1, n);
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_n_items, n), Toast.LENGTH_SHORT).show();
                     }
                 }).show();
     }
@@ -2593,27 +2903,32 @@ public class FeedVideoDownloadHook {
     }
 
     private void startDirectDownload(Context ctx, String url, boolean isVideo) {
-        String fn = buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, isVideo);
+        startDirectDownload(ctx, url, isVideo, 0, 0);
+    }
+
+    private void startDirectDownload(Context ctx, String url, boolean isVideo, int slide, int total) {
+        String fn = withSlide(buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, isVideo),
+                slide, total);
         ModuleLog.line("(IE|DL) startDirectDownload file=" + fn);
-        Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
             try {
                 boolean delegated = downloadAndSave(ctx, url, fn, isVideo, currentDownloadUsername);
                 if (!delegated) {
-                    mainHandler.post(() -> Toast.makeText(ctx,
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                             isVideo ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
                             Toast.LENGTH_SHORT).show());
                 }
             } catch (Throwable e) {
                 ModuleLog.line("(IE|DL) download failed: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                mainHandler.post(() -> Toast.makeText(ctx,
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                         I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
             }
         });
     }
 
     private void downloadAndMerge(Context ctx, String videoUrl, String audioUrl) {
-        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_merging_video_audio), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_merging_video_audio), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
             // Companion always holds the SAF permission — delegate whenever a URI is set.
             String uri = FeatureFlags.downloaderCustomUri.isEmpty()
@@ -2644,7 +2959,7 @@ public class FeedVideoDownloadHook {
                 String fn = buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, true);
                 mergeVideoAudio(tv.getAbsolutePath(), ta.getAbsolutePath(), merged.getAbsolutePath());
                 saveFileToDestination(ctx, merged, fn, true, currentDownloadUsername);
-                mainHandler.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_video_saved),
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_video_saved),
                         Toast.LENGTH_SHORT).show());
             } catch (Throwable e) {
                 mainHandler.post(() -> startDirectDownload(ctx, videoUrl, true));
@@ -2663,8 +2978,9 @@ public class FeedVideoDownloadHook {
         downloadToFileAndGetType(url, dest);
     }
 
-    private static String downloadToFileAndGetType(String url, File dest) throws Exception {
+    static String downloadToFileAndGetType(String url, File dest) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();
         String contentType = conn.getContentType();
@@ -2677,6 +2993,7 @@ public class FeedVideoDownloadHook {
 
     static void downloadToStream(String url, OutputStream out) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();
         try (InputStream in = conn.getInputStream()) {

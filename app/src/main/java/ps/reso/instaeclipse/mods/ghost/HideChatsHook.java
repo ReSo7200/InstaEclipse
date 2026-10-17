@@ -20,10 +20,11 @@ import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.mods.ui.utils.LifecycleHookUtil;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
+import ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker;
 import ps.reso.instaeclipse.utils.ghost.HiddenThreads;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -44,8 +45,10 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 public class HideChatsHook {
 
     private static final String TAG = "ie_hidechat_btn";
+    private static final java.util.Set<View> pendingDecors =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
     private static final String INBOX_ANCHOR = "DirectThreadStoreImpl.getSortedCopyOfThreadSummaries";
-    private static int threadHeaderId, backButtonId;
+    private static int threadHeaderId, backButtonId, headerTitleId;
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         installInboxFilter(bridge, classLoader);
@@ -55,7 +58,7 @@ public class HideChatsHook {
     // ── 1. Inbox thread-list filter ────────────────────────────────────────────
     private void installInboxFilter(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook filter = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
+            @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.hideSpecificChats || HiddenThreads.isEmpty()) return;
                 Object r = param.getResult();
                 if (!(r instanceof java.util.List<?> list) || list.isEmpty()) return;
@@ -103,18 +106,24 @@ public class HideChatsHook {
 
     // ── 2. Hide/unhide button in the thread header ─────────────────────────────
     private void installHeaderButton(ClassLoader classLoader) {
-        XC_MethodHook resume = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.hideSpecificChats) return;
-                final Activity a = (Activity) param.thisObject;
-                a.runOnUiThread(() -> registerListener(a));
-            }
-        };
+        // IG 448+ no longer declares onResume on InstagramMainActivity (inherited from
+        // IgFragmentActivity), so a plain findAndHookMethod throws; LifecycleHookUtil hooks the
+        // declaring class and filters by instance (works on old builds too).
         for (String act : new String[]{"com.instagram.modal.ModalActivity",
                 "com.instagram.mainactivity.InstagramMainActivity"}) {
-            try { XposedHelpers.findAndHookMethod(act, classLoader, "onResume", resume); }
-            catch (Throwable t) { ModuleLog.line("(IE|HideChats) ⚠️ hook " + act + ": " + t.getMessage()); }
+            try {
+                LifecycleHookUtil.hookAfter(classLoader, act, "onResume", (a, param) -> {
+                    if (!FeatureFlags.hideSpecificChats) return;
+                    a.runOnUiThread(() -> registerListener(a));
+                });
+            } catch (Throwable t) { ModuleLog.line("(IE|HideChats) ⚠️ hook " + act + ": " + t); }
         }
+        // A thread opened inside InstagramMainActivity is a fragment transaction (no activity
+        // onResume) — inject when the thread fragment itself resumes.
+        CurrentThreadTracker.install(classLoader);
+        CurrentThreadTracker.addListener((a, threadId) -> {
+            if (FeatureFlags.hideSpecificChats) registerListener(a);
+        });
         ModuleLog.line("(IE|HideChats) ✅ installed");
     }
 
@@ -125,6 +134,7 @@ public class HideChatsHook {
         android.content.res.Resources r = a.getResources();
         threadHeaderId = r.getIdentifier("direct_thread_header", "id", pkg);
         backButtonId   = r.getIdentifier("action_bar_button_back", "id", pkg);
+        headerTitleId  = r.getIdentifier("header_title", "id", pkg);
     }
 
     private void registerListener(final Activity activity) {
@@ -132,9 +142,13 @@ public class HideChatsHook {
             ensureIds(activity);
             if (tryInject(activity)) return;
             final View decor = activity.getWindow().getDecorView();
+            // One pending listener per window: registerListener runs on every activity resume and
+            // every thread-fragment resume, and listeners used to pile up on the main activity.
+            if (!pendingDecors.add(decor)) return;
             decor.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override public void onGlobalLayout() {
                     if (tryInject(activity)) {
+                        pendingDecors.remove(decor);
                         try { decor.getViewTreeObserver().removeOnGlobalLayoutListener(this); } catch (Throwable ignored) {}
                     }
                 }
@@ -147,56 +161,36 @@ public class HideChatsHook {
             View header = threadHeaderId != 0 ? activity.findViewById(threadHeaderId) : null;
             if (header == null) return false;
 
-            ViewGroup target;
-            int insertAt;
-            View back = backButtonId != 0 ? activity.findViewById(backButtonId) : null;
-            if (back != null && back.getParent() instanceof ViewGroup) {
-                target = (ViewGroup) back.getParent();
-                int bi = target.indexOfChild(back);
-                boolean rtl = target.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
-                insertAt = rtl ? bi : bi + 1;
-            } else if (header instanceof ViewGroup) {
-                target = (ViewGroup) header;
-                insertAt = 0;
-            } else return false;
-
-            if (target.findViewWithTag(TAG) != null) return true;
-
-            android.widget.ImageView btn = new android.widget.ImageView(activity);
-            btn.setTag(TAG);
-            android.graphics.drawable.Drawable icon =
-                    ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_eye_off, Color.WHITE);
-            if (icon != null) btn.setImageDrawable(icon);
-            btn.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE);
-            int pad = dp(activity, 9);
-            btn.setPadding(pad, pad, pad, pad);
-            btn.setClickable(true);
-            btn.setFocusable(true);
-            btn.setContentDescription("Hide chat");
-            int sz = dp(activity, 40);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(sz, sz);
-            lp.gravity = Gravity.CENTER_VERTICAL;
-            btn.setLayoutParams(lp);
-
-            btn.setOnClickListener(v -> {
-                String threadId = resolveThreadId(activity);
-                if (threadId == null) {
-                    Toast.makeText(activity, I18n(activity, R.string.ig_hide_chat_no_thread), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                boolean nowHidden = HiddenThreads.toggle(threadId, threadTitle(activity));
-                Toast.makeText(activity,
-                        I18n(activity, nowHidden ? R.string.ig_hide_chat_hidden : R.string.ig_hide_chat_unhidden),
-                        Toast.LENGTH_SHORT).show();
-                ModuleLog.line("(IE|HideChats) toggled thread=" + threadId + " hidden=" + nowHidden);
-            });
-            try { target.addView(btn, Math.min(insertAt, target.getChildCount())); }
-            catch (Throwable t) { target.addView(btn); }
-            return true;
+            View oldBtn = header.getRootView().findViewWithTag(TAG); // pre-menu builds' eye button
+            if (oldBtn != null && oldBtn.getParent() instanceof ViewGroup p) p.removeView(oldBtn);
+            if (ThreadHeaderMenu.has(activity, "hide")) return true;
+            return addEntry(activity);
         } catch (Throwable t) {
             ModuleLog.line("(IE|HideChats) ⚠️ inject: " + t.getMessage());
             return false;
         }
+    }
+
+    /** "Hide chat" or "Unhide chat", matching this chat's current state; re-added after a toggle. */
+    private boolean addEntry(Activity activity) {
+        String threadId = resolveThreadId(activity);
+        boolean hidden = threadId != null && HiddenThreads.isHidden(threadId);
+        return ThreadHeaderMenu.add(activity, "hide",
+                I18n(activity, hidden ? R.string.ig_unhide_chat : R.string.ig_hide_chat),
+                () -> { toggleCurrent(activity); addEntry(activity); });
+    }
+
+    private void toggleCurrent(Activity activity) {
+        String threadId = resolveThreadId(activity);
+        if (threadId == null) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(activity, I18n(activity, R.string.ig_hide_chat_no_thread), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        boolean nowHidden = HiddenThreads.toggle(threadId, threadTitle(activity));
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(activity,
+                I18n(activity, nowHidden ? R.string.ig_hide_chat_hidden : R.string.ig_hide_chat_unhidden),
+                Toast.LENGTH_SHORT).show();
+        ModuleLog.line("(IE|HideChats) toggled thread=" + threadId + " hidden=" + nowHidden);
     }
 
     private static String I18n(Activity a, int res) {
@@ -232,8 +226,13 @@ public class HideChatsHook {
     }
 
     // ── thread-id resolution (mirrors UnsentThreadButtonHook.resolveFromActivity — proven) ──
-    private String resolveThreadId(Activity activity) {
+    /** The open DM thread's id for {@code activity} (shared with ReadReceiptChatHook). */
+    static String resolveThreadId(Activity activity) {
         try {
+            // 0. The resumed thread fragment's DirectThreadKey (works for threads hosted in
+            //    InstagramMainActivity as well as ModalActivity — issue #254).
+            String tracked = CurrentThreadTracker.currentThreadId();
+            if (tracked != null) return tracked;
             // 1. Intent extras (thread key usually passed here); depth 4.
             android.os.Bundle ex = activity.getIntent() != null ? activity.getIntent().getExtras() : null;
             if (ex != null) {
@@ -251,7 +250,7 @@ public class HideChatsHook {
     }
 
     /** Find a DirectThreadKey in obj's field graph (depth-limited; descends IG/obfuscated + Bundles). */
-    private Object scan(Object obj, int depth, java.util.Set<Object> seen, int maxDepth) {
+    private static Object scan(Object obj, int depth, java.util.Set<Object> seen, int maxDepth) {
         if (obj == null || depth > maxDepth || !seen.add(obj)) return null;
         String cn = obj.getClass().getName();
         if (cn.contains("DirectThreadKey")) return obj;

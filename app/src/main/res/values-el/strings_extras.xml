@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Αντιγραφή χωρίς hashtags</string>
+    <string name="ig_dialog_clean_feed_following_only">Ροή μόνο από όσους ακολουθείτε</string>
+    <string name="ig_dialog_menu_extras">Επιπλέον</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Απενεργοποίηση σύρσιμου προς κάμερα</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Επιλογή αυτόματης κύλισης Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Κλείδωμα κύλισης Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Απεριόριστοι λογαριασμοί</string>
+    <string name="ig_dialog_extras_airplane_mode">Λειτουργία πτήσης (εμφάνιση εκτός σύνδεσης)</string>
+    <string name="ig_dialog_extras_high_res_images">Φόρτωση εικόνων στη μέγιστη ανάλυση</string>
+    <string name="ig_dialog_extras_hide_onboarding">Απόκρυψη προτροπών για επαφές και τοποθεσία</string>
+    <string name="ig_dialog_extras_fix_notifications">Διόρθωση παλιάς εγγραφής ειδοποιήσεων σε Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Απόκρυψη μόνο της μπάρας ιστοριών</string>
+    <string name="ig_dialog_extras_share_domain">Προσαρμοσμένο domain κοινοποίησης</string>
+    <string name="ig_dialog_extras_share_domain_off">Ανενεργό</string>
+    <string name="ig_dialog_extras_share_domain_hint">Αντικαθιστά το instagram.com στους συνδέσμους που αντιγράφετε ή κοινοποιείτε. Αφήστε κενό για απενεργοποίηση.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Μη έγκυρο domain</string>
+    <string name="ig_dialog_extras_startup_tab">Καρτέλα εκκίνησης</string>
+    <string name="ig_media_open_with">Άνοιγμα με…</string>
+    <string name="ig_lock_try_again_in">Πάρα πολλές προσπάθειες. Δοκιμάστε ξανά σε %1$d δ</string>
+    <string name="loc_picker_locating">Εύρεση τοποθεσίας…</string>
+    <string name="loc_picker_unnamed">Τοποθεσία χωρίς όνομα</string>
+    <string name="ig_dialog_location_current_title">Τρέχουσα τοποθεσία</string>
+    <string name="ig_dialog_location_recent">Πρόσφατες τοποθεσίες</string>
+    <string name="ig_dialog_location_applied">Η τοποθεσία εφαρμόστηκε</string>
+</resources>

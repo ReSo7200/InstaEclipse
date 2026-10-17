@@ -109,12 +109,65 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("HideThreadsSuggestions");
         }
 
+        if (FeatureFlags.expandCaptions) {
+            FeatureStatusTracker.setEnabled("ExpandCaptions", R.string.ig_dialog_clean_feed_expand_captions);
+        } else {
+            FeatureStatusTracker.setDisabled("ExpandCaptions");
+        }
+
+        if (FeatureFlags.hideCommunityNotes) {
+            FeatureStatusTracker.setEnabled("HideCommunityNotes", R.string.ig_dialog_clean_feed_hide_community_notes);
+        } else {
+            FeatureStatusTracker.setDisabled("HideCommunityNotes");
+        }
+        if (FeatureFlags.followingOnlyFeed) {
+            FeatureStatusTracker.setEnabled("FollowingOnlyFeed", R.string.ig_dialog_clean_feed_following_only);
+        } else {
+            FeatureStatusTracker.setDisabled("FollowingOnlyFeed");
+        }
+
+        if (FeatureFlags.hideLikedPosts) {
+            FeatureStatusTracker.setEnabled("HideLikedPosts", R.string.ig_dialog_clean_feed_hide_liked);
+        } else {
+            FeatureStatusTracker.setDisabled("HideLikedPosts");
+        }
+
 
         // Miscellaneous
         if (FeatureFlags.disableTrackingLinks) {
             FeatureStatusTracker.setEnabled("DisableTrackingLinks", R.string.ig_dialog_ad_disable_tracking);
         } else {
             FeatureStatusTracker.setDisabled("DisableTrackingLinks");
+        }
+
+        if (FeatureFlags.profileFollowsYouLabel) {
+            FeatureStatusTracker.setEnabled("ProfileFollowsYou", R.string.ig_dialog_misc_profile_follows_label);
+        } else {
+            FeatureStatusTracker.setDisabled("ProfileFollowsYou");
+        }
+
+        if (FeatureFlags.likeUndo) {
+            FeatureStatusTracker.setEnabled("LikeUndo", R.string.ig_dialog_misc_like_undo);
+        } else {
+            FeatureStatusTracker.setDisabled("LikeUndo");
+        }
+
+        if (FeatureFlags.exactTimestamps) {
+            FeatureStatusTracker.setEnabled("ExactTimestamps", R.string.ig_dialog_misc_exact_timestamps);
+        } else {
+            FeatureStatusTracker.setDisabled("ExactTimestamps");
+        }
+
+        if (FeatureFlags.hideShareCreateGroup) {
+            FeatureStatusTracker.setEnabled("HideShareCreateGroup", R.string.ig_dialog_misc_hide_share_create_group);
+        } else {
+            FeatureStatusTracker.setDisabled("HideShareCreateGroup");
+        }
+
+        if (FeatureFlags.openLinksExternally) {
+            FeatureStatusTracker.setEnabled("OpenLinksExternally", R.string.ig_dialog_open_links_externally);
+        } else {
+            FeatureStatusTracker.setDisabled("OpenLinksExternally");
         }
 
         if (FeatureFlags.showFollowerToast) {
@@ -230,5 +283,46 @@ public class FeatureManager {
         } else {
             FeatureStatusTracker.setDisabled("DisableDoubleTapLike");
         }
+
+        // ── Newer features (concise labels for the load toast's dense grid) ───
+        reg(FeatureFlags.chatExport,           "ChatExport",           R.string.ig_chat_export);
+        reg(FeatureFlags.keepEditHistory,      "EditHistory",          R.string.ig_feat_edit_history);
+        reg(FeatureFlags.jumpToFirstMessage,   "JumpToFirstMessage",   R.string.ig_jump_first_message);
+        reg(FeatureFlags.translateMessages,    "ChatTranslate",        R.string.ig_dialog_translate_messages);
+        reg(FeatureFlags.lockSavedCollections, "LockSavedCollections", R.string.ig_feat_lock_collections);
+        reg(FeatureFlags.disableRepost,        "DisableRepost",        R.string.ig_dialog_misc_disable_repost);
+        reg(FeatureFlags.commentSearch,        "CommentSearch",        R.string.ig_feat_comment_search);
+        reg(FeatureFlags.storyViewerSearch,    "StoryViewerSearch",    R.string.ig_feat_viewer_search);
+        reg(FeatureFlags.storyLinks,           "StoryLinks",           R.string.ig_feat_story_links);
+        reg(FeatureFlags.storyInfo,            "StoryInfo",            R.string.ig_feat_story_info);
+        reg(FeatureFlags.followListExport,     "FollowListExport",     R.string.ig_feat_follow_export);
+        reg(FeatureFlags.savedOnProfile,       "SavedOnProfile",       R.string.ig_feat_saved_on_profile);
+        reg(FeatureFlags.hideNotesTray,        "HideNotesTray",        R.string.ig_feat_hide_notes);
+        reg(FeatureFlags.hideDmBlend,          "HideDmBlend",          R.string.ig_feat_hide_blend);
+        reg(FeatureFlags.readReceiptChats,     "ReadReceiptChats",     R.string.ig_feat_read_receipt_chats);
+        reg(FeatureFlags.hideThreadsButton,    "HideThreadsButton",    R.string.ig_feat_hide_threads);
+        reg(FeatureFlags.offerPlaybackSpeed,   "PlaybackSpeed",        R.string.ig_playback_speed_title);
+        reg(FeatureFlags.enableVoiceDownload,  "VoiceDownload",        R.string.ig_feat_voice_download);
+        reg(FeatureFlags.maxUploadQuality,     "MaxUploadQuality",     R.string.ig_feat_max_upload_quality);
+        reg(FeatureFlags.enableCaptionCopy,    "CaptionCopy",          R.string.ig_caption_copy_title);
+        reg(FeatureFlags.enableCopyComment,    "CopyComment",          R.string.ig_dialog_misc_copy_comment);
+        reg(FeatureFlags.enablePhotoZoom,      "PhotoZoom",            R.string.ig_feat_photo_zoom);
+
+        if (!FeatureFlags.startupTab.isEmpty()) {
+            FeatureStatusTracker.setEnabled("StartupTab", R.string.ig_dialog_extras_startup_tab);
+        } else {
+            FeatureStatusTracker.setDisabled("StartupTab");
+        }
+
+        for (ExtrasFeatures.Entry e : ExtrasFeatures.ALL) {
+            if (ExtrasFeatures.get(e.flag)) FeatureStatusTracker.setEnabled(e.flag, e.label);
+            else FeatureStatusTracker.setDisabled(e.flag);
+        }
+    }
+
+    /** Register a feature in the load toast when enabled, or drop it when off. */
+    private static void reg(boolean enabled, String key, int labelResId) {
+        if (enabled) FeatureStatusTracker.setEnabled(key, labelResId);
+        else FeatureStatusTracker.setDisabled(key);
     }
 }

@@ -91,9 +91,8 @@ public class StoryCache {
                 o.put("expiringAt", e.expiringAt);
                 arr.put(o);
             }
-            try (FileOutputStream out = new FileOutputStream(f)) {
-                out.write(arr.toString().getBytes(StandardCharsets.UTF_8));
-            }
+            // temp file + rename: a crash mid-write keeps the previous version intact
+            ps.reso.instaeclipse.utils.core.AtomicFiles.write(f, arr.toString());
         } catch (Throwable t) { ModuleLog.line("(IE|StoryCache) save failed: " + t); }
     }
 

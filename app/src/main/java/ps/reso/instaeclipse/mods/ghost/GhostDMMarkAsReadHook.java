@@ -36,20 +36,15 @@ public class GhostDMMarkAsReadHook {
         try {
             XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow", new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     // Bail immediately if the feature is off — this hook fires for every
                     // view attachment in the entire app, so the fast path must be trivial.
                     if (!FeatureFlags.isGhostSeen) return;
 
                     View view = (View) param.thisObject;
 
-                    if (sCachedContainerId == 0) {
-                        @SuppressLint("DiscouragedApi")
-                        int id = view.getContext().getResources().getIdentifier(
-                                "row_thread_composer_buttons_container", "id",
-                                view.getContext().getPackageName());
-                        sCachedContainerId = id;
-                    }
+                    // Cached, including "not found" (a miss used to be looked up on every attach).
+                    sCachedContainerId = ps.reso.instaeclipse.utils.ui.ResIds.id(view.getContext(), "row_thread_composer_buttons_container");
 
                     if (sCachedContainerId == 0 || view.getId() != sCachedContainerId) return;
                     if (!(view.getParent() instanceof ViewGroup parent)) return;
@@ -115,7 +110,7 @@ public class GhostDMMarkAsReadHook {
                 view.postDelayed(() -> {
                     group.scrollBy(0, 200);
                     FeatureFlags.isGhostSeen = true;
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_seen_sent), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_seen_sent), Toast.LENGTH_SHORT).show();
                 }, 300);
             }
         } catch (Exception e) {

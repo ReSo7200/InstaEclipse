@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">Получить помощь</string>
+    <string name="help_get_help_body">Нашли ошибку или что-то перестало работать? Создайте issue на GitHub или спросите сообщество в Telegram.</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">О приложении</string>
+    <string name="help_version">Версия %1$s</string>
+    <string name="help_source_code">Исходный код на GitHub</string>
+    <string name="help_faq_expand">Развернуть ответ</string>
+    <string name="help_faq_collapse">Свернуть ответ</string>
+    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
+    <string name="help_lsposed_sub">Есть root? Используйте эту версию</string>
+    <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
+    <string name="help_lspatch_sub">Нет root? Установите это</string>
+    <string name="help_lspatch_guide">Открыть инструкцию по установке</string>
+</resources>

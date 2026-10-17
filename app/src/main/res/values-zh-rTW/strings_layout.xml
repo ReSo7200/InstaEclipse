@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feat_group_social">社交</string>
+    <string name="menu_feed">動態</string>
+    <string name="menu_navigation">導覽</string>
+    <string name="menu_reels_stories">限時動態與 Reels</string>
+    <string name="menu_messages">訊息</string>
+    <string name="menu_post_menu">貼文選單與上傳</string>
+    <string name="menu_likes_comments">讚與留言</string>
+    <string name="menu_profiles">個人檔案</string>
+    <string name="menu_app">應用程式與帳號</string>
+    <string name="menu_ads_tracking">廣告與追蹤</string>
+    <string name="menu_nav_tabs">分頁</string>
+    <string name="menu_nav_order">順序與啟動</string>
+    <string name="menu_nav_gestures">手勢</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">限時動態</string>
+    <string name="nav_tab_order_changed">分頁順序已變更</string>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">搜尋功能</string>
+    <string name="feat_search_no_results">沒有符合的功能</string>
+    <string name="feat_count_on">%1$d 項已開</string>
+    <string name="feat_count_off">未開啟</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_chip_instagram">Instagram %1$s</string>
+    <string name="menu_chip_active">%1$d/%2$d aktiv</string>
+    <string name="menu_inactive_all_good">Aktiv edilmiş bütün funksiyalar bu Instagram versiyasında işləyir.</string>
+    <string name="menu_inactive_hint">Bunlar aktiv edilib, lakin bu Instagram versiyasında işə düşə bilmədi:</string>
+</resources>

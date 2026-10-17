@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">פעולות מהירות</string>
+    <string name="home_section_shortcuts">קיצורי דרך</string>
+    <string name="home_status_installed">מותקן</string>
+    <string name="home_status_not_installed">לא מותקן</string>
+    <string name="home_status_module_active">המודול פעיל</string>
+    <string name="home_status_version">גרסה %1$s</string>
+    <string name="home_status_no_version">התקן את Instagram כדי להשתמש ב-InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d תכונה מופעלת</item>
+        <item quantity="two">%d תכונות מופעלות</item>
+        <item quantity="many">%d תכונות מופעלות</item>
+        <item quantity="other">%d תכונות מופעלות</item>
+    </plurals>
+    <string name="home_action_launch">הפעל</string>
+    <string name="home_action_restart">הפעל מחדש</string>
+    <string name="home_action_download">הורד APK</string>
+    <string name="home_restart_done">Instagram הופעל מחדש</string>
+    <string name="home_shortcuts_edit">ערוך קיצורים</string>
+    <string name="home_shortcuts_dialog_title">הצמד קיצורים</string>
+    <string name="home_shortcuts_empty">אין קיצורים מוצמדים. הקש על העיפרון כדי להצמיד עד 8 מתגים שבהם אתה משתמש הכי הרבה.</string>
+    <string name="home_shortcuts_hint">השינויים נשלחים ל-Instagram באופן מיידי.</string>
+    <string name="home_shortcuts_limit">ניתן להצמיד עד %1$d קיצורים</string>
+    <string name="home_shortcuts_locked_extreme">נעול על ידי המצב הקיצוני</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">Αντιγραφή συνδέσμου</string>
+    <string name="ig_story_links_title">Σύνδεσμοι ιστορίας</string>
+    <string name="ig_story_links_hint">Πάτα για αντιγραφή · κράτα για άνοιγμα</string>
+    <string name="ig_toast_link_copied">Ο σύνδεσμος αντιγράφηκε</string>
+    <string name="ig_toast_links_copied">Όλοι οι σύνδεσμοι αντιγράφηκαν</string>
+    <string name="ig_dialog_misc_story_links">Αντιγραφή συνδέσμων ιστοριών</string>
+    <string name="ig_feat_story_links">Σύνδεσμοι ιστοριών</string>
+</resources>

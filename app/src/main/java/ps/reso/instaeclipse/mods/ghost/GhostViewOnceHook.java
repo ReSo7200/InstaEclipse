@@ -88,7 +88,7 @@ public class GhostViewOnceHook {
     private static XC_MethodHook buildViewOnceHook() {
         return new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 // The hooked method is the visual/view-once seen-reporter only (selected via
                 // "raven_media" on 447 / hardcoded "visual_item_seen" on 436). Skipping it
                 // suppresses just the view-once "seen/opened" report; voice/other sends are

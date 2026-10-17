@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">複製連結</string>
+    <string name="ig_story_links_title">限時動態連結</string>
+    <string name="ig_story_links_hint">點按複製 · 長按開啟</string>
+    <string name="ig_toast_link_copied">連結已複製</string>
+    <string name="ig_toast_links_copied">已複製所有連結</string>
+    <string name="ig_dialog_misc_story_links">複製限時動態連結</string>
+    <string name="ig_feat_story_links">限時動態連結</string>
+</resources>

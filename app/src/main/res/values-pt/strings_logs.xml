@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">Todos</string>
+    <string name="logs_filter_hooked">Sucesso ✅</string>
+    <string name="logs_filter_errors">Erros ❌</string>
+    <string name="logs_filter_warnings">Avisos ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">Atualizar</string>
+    <string name="logs_copy">Copiar</string>
+    <string name="logs_share">Partilhar</string>
+    <string name="logs_clear">Limpar</string>
+    <string name="logs_share_title">Partilhar registos do InstaEclipse</string>
+    <string name="logs_share_subject">Registos do InstaEclipse</string>
+    <string name="logs_loading">A carregar registos…</string>
+    <string name="logs_count_format">%1$d de %2$d entradas</string>
+    <string name="logs_status_live">Instagram em execução · ao vivo</string>
+    <string name="logs_status_saved">Registo guardado · Instagram não está em execução</string>
+    <string name="logs_status_none">Nenhuma app do Instagram compatível instalada</string>
+    <string name="logs_empty_title">Ainda não há registos</string>
+    <string name="logs_empty_body">Abra o Instagram uma vez com o InstaEclipse ativado no LSPosed, depois volte aqui e toque em Atualizar. O registo do Instagram é guardado aqui automaticamente, mesmo depois de o Instagram ser fechado.</string>
+    <string name="logs_empty_filter_title">Nada corresponde a este filtro</string>
+    <string name="logs_empty_filter_body">Volte a Todos para ver todas as entradas.</string>
+    <string name="logs_nothing_to_copy">Não há registos para copiar</string>
+    <string name="logs_copied">Registos copiados</string>
+    <string name="logs_entry_copied">Entrada copiada</string>
+    <string name="logs_cleared">Registos limpos</string>
+    <string name="logs_source_companion">[app]</string>
+</resources>

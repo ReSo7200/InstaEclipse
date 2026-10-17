@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">Yardım alın</string>
+    <string name="help_get_help_body">Bir hata mı buldunuz ya da bir şey çalışmayı mı bıraktı? GitHub\'da bir issue açın veya Telegram\'da topluluğa sorun.</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">Hakkında</string>
+    <string name="help_version">Sürüm %1$s</string>
+    <string name="help_source_code">GitHub\'da kaynak kod</string>
+    <string name="help_faq_expand">Yanıtı genişlet</string>
+    <string name="help_faq_collapse">Yanıtı daralt</string>
+    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
+    <string name="help_lsposed_sub">Root var mı? Bu sürümü kullanın</string>
+    <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
+    <string name="help_lspatch_sub">Root yok mu? Bunu kurun</string>
+    <string name="help_lspatch_guide">Kurulum rehberini izleyin</string>
+</resources>

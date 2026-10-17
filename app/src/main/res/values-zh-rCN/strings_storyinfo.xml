@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">快拍信息</string>
+    <string name="ig_btn_quiz_answer">测验答案</string>
+    <string name="ig_btn_poll_results">投票结果</string>
+    <string name="ig_story_info_hint">点按一行即可复制</string>
+    <string name="ig_si_posted">发布于</string>
+    <string name="ig_si_expires">过期于</string>
+    <string name="ig_si_edited">已编辑</string>
+    <string name="ig_si_yes">是</string>
+    <string name="ig_si_music">音乐</string>
+    <string name="ig_si_location">位置</string>
+    <string name="ig_si_hashtags">话题标签</string>
+    <string name="ig_si_shared_from">分享自</string>
+    <string name="ig_si_original_post">原帖（长按打开）</string>
+    <string name="ig_si_posted_with">发布工具</string>
+    <string name="ig_si_alt_text">替代文本</string>
+    <string name="ig_si_size">尺寸</string>
+    <string name="ig_si_sound_on">有声音</string>
+    <string name="ig_si_sound_off">无声音</string>
+    <string name="ig_si_countdown">倒计时</string>
+    <string name="ig_si_question">问题</string>
+    <string name="ig_si_highlights">在精选快拍中</string>
+    <string name="ig_si_mention_request">提及请求</string>
+    <string name="ig_si_none">此快拍没有其他信息。</string>
+    <string name="ig_si_your_answer">你的答案</string>
+    <string name="ig_si_average">平均</string>
+    <string name="ig_si_copied">已复制</string>
+    <string name="ig_dialog_misc_story_info">快拍信息、测验和投票答案</string>
+    <string name="ig_feat_story_info">快拍信息</string>
+    <string name="ig_si_add_yours">添加你的</string>
+    <string name="ig_si_joined">人参与</string>
+    <string name="ig_si_paid_partnership">付费合作伙伴（长按打开）</string>
+    <string name="ig_si_collaborators">合作者（长按打开）</string>
+    <string name="ig_btn_slider_results">滑块结果</string>
+    <string name="ig_si_votes">票</string>
+</resources>

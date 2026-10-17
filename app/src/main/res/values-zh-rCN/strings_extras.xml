@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">复制（不含话题标签）</string>
+    <string name="ig_dialog_clean_feed_following_only">仅显示关注的动态</string>
+    <string name="ig_dialog_menu_extras">额外功能</string>
+    <string name="ig_dialog_extras_no_swipe_camera">禁用滑动进入相机</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels 自动滚动选项</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">锁定 Reels 滑动</string>
+    <string name="ig_dialog_extras_unlimited_accounts">无限账户</string>
+    <string name="ig_dialog_extras_airplane_mode">飞行模式（显示离线）</string>
+    <string name="ig_dialog_extras_high_res_images">加载最高分辨率的图片</string>
+    <string name="ig_dialog_extras_hide_onboarding">隐藏通讯录和位置引导提示</string>
+    <string name="ig_dialog_extras_fix_notifications">修复 Android 12+ 上的旧版通知注册</string>
+    <string name="ig_dialog_extras_hide_stories_tray">仅隐藏快拍栏</string>
+    <string name="ig_dialog_extras_share_domain">自定义分享域名</string>
+    <string name="ig_dialog_extras_share_domain_off">关闭</string>
+    <string name="ig_dialog_extras_share_domain_hint">替换你复制或分享的链接中的 instagram.com。留空即可关闭。</string>
+    <string name="ig_dialog_extras_share_domain_invalid">域名无效</string>
+    <string name="ig_dialog_extras_startup_tab">启动标签页</string>
+    <string name="ig_media_open_with">打开方式…</string>
+    <string name="ig_lock_try_again_in">尝试次数过多，请在 %1$d 秒后重试</string>
+    <string name="loc_picker_locating">正在查找地点…</string>
+    <string name="loc_picker_unnamed">未命名地点</string>
+    <string name="ig_dialog_location_current_title">当前位置</string>
+    <string name="ig_dialog_location_recent">最近使用的地点</string>
+    <string name="ig_dialog_location_applied">已应用位置</string>
+</resources>

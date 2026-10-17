@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">全部</string>
+    <string name="logs_filter_hooked">成功 ✅</string>
+    <string name="logs_filter_errors">错误 ❌</string>
+    <string name="logs_filter_warnings">警告 ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">刷新</string>
+    <string name="logs_copy">复制</string>
+    <string name="logs_share">分享</string>
+    <string name="logs_clear">清除</string>
+    <string name="logs_share_title">分享 InstaEclipse 日志</string>
+    <string name="logs_share_subject">InstaEclipse 日志</string>
+    <string name="logs_loading">正在加载日志…</string>
+    <string name="logs_count_format">显示 %1$d 条，共 %2$d 条</string>
+    <string name="logs_status_live">Instagram 正在运行 · 实时</string>
+    <string name="logs_status_saved">已保存的日志 · Instagram 未运行</string>
+    <string name="logs_status_none">未安装受支持的 Instagram 应用</string>
+    <string name="logs_empty_title">暂无日志</string>
+    <string name="logs_empty_body">请在 LSPosed 中启用 InstaEclipse 后打开一次 Instagram，然后回到这里点击“刷新”。即使 Instagram 已关闭，其日志也会自动保存在这里。</string>
+    <string name="logs_empty_filter_title">没有符合此筛选条件的内容</string>
+    <string name="logs_empty_filter_body">切换回“全部”即可查看所有条目。</string>
+    <string name="logs_nothing_to_copy">没有可复制的日志</string>
+    <string name="logs_copied">日志已复制</string>
+    <string name="logs_entry_copied">条目已复制</string>
+    <string name="logs_cleared">日志已清除</string>
+    <string name="logs_source_companion">[应用]</string>
+</resources>

@@ -21,7 +21,7 @@ public class JsonExportActivity extends Activity {
         super.onCreate(savedInstanceState);
         jsonContent = getIntent().getStringExtra("json_content");
         if (jsonContent == null || jsonContent.isEmpty()) {
-            Toast.makeText(this, getString(R.string.export_no_config_data), Toast.LENGTH_LONG).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.export_no_config_data), Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -39,7 +39,7 @@ public class JsonExportActivity extends Activity {
             if (resultCode == RESULT_OK && data != null) {
                 Uri uri = data.getData();
                 if (uri == null) {
-                    Toast.makeText(this, getString(R.string.export_invalid_uri), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.export_invalid_uri), Toast.LENGTH_SHORT).show();
                     finish();
                     return;
                 }
@@ -47,9 +47,9 @@ public class JsonExportActivity extends Activity {
                     assert out != null;
                     out.write(jsonContent.getBytes(StandardCharsets.UTF_8));
                     out.flush();
-                    Toast.makeText(this, getString(R.string.export_config_success), Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.export_config_success), Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
-                    Toast.makeText(this, getString(R.string.export_config_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.export_config_failed, e.getMessage()), Toast.LENGTH_LONG).show();
                 }
             }
             finish();

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. Text not showing?</b>\n- Disable HMA (HideMyApplist) for Instagram. InstaEclipse reads its text from its own app, and HMA hides it.</string>
+    <string name="faq_8"><b>8. Some features still won\'t work even when enabled?</b>\n- Instagram\'s own config can block them. Use Developer Options → Restore Default Config.</string>
+    <string name="faq_9"><b>9. Still stuck?</b>\n- Ask in the Telegram group (t.me/instaEclipse_discussion).</string>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Hızlı işlemler</string>
+    <string name="home_section_shortcuts">Hızlı kısayollar</string>
+    <string name="home_status_installed">Yüklü</string>
+    <string name="home_status_not_installed">Yüklü değil</string>
+    <string name="home_status_module_active">Modül etkin</string>
+    <string name="home_status_version">Sürüm %1$s</string>
+    <string name="home_status_no_version">InstaEclipse\'i kullanmak için Instagram\'ı yükleyin</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d özellik etkin</item>
+        <item quantity="other">%d özellik etkin</item>
+    </plurals>
+    <string name="home_action_launch">Başlat</string>
+    <string name="home_action_restart">Yeniden başlat</string>
+    <string name="home_action_download">APK indir</string>
+    <string name="home_restart_done">Instagram yeniden başlatıldı</string>
+    <string name="home_shortcuts_edit">Kısayolları düzenle</string>
+    <string name="home_shortcuts_dialog_title">Kısayolları sabitle</string>
+    <string name="home_shortcuts_empty">Sabitlenmiş kısayol yok. En sık kullandığınız 8 seçeneğe kadar sabitlemek için kaleme dokunun.</string>
+    <string name="home_shortcuts_hint">Değişiklikler Instagram\'a anında gönderilir.</string>
+    <string name="home_shortcuts_limit">En fazla %1$d kısayol sabitleyebilirsiniz</string>
+    <string name="home_shortcuts_locked_extreme">Aşırı Mod tarafından kilitlendi</string>
+</resources>

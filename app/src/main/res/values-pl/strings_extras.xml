@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Kopiuj bez hashtagów</string>
+    <string name="ig_dialog_clean_feed_following_only">Tylko obserwowani w feedzie</string>
+    <string name="ig_dialog_menu_extras">Dodatki</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Wyłącz przesuwanie do aparatu</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Opcja autoprzewijania Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Zablokuj przewijanie Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Nieograniczona liczba kont</string>
+    <string name="ig_dialog_extras_airplane_mode">Tryb samolotowy (wyglądaj offline)</string>
+    <string name="ig_dialog_extras_high_res_images">Wczytuj zdjęcia w najwyższej rozdzielczości</string>
+    <string name="ig_dialog_extras_hide_onboarding">Ukryj prośby o kontakty i lokalizację</string>
+    <string name="ig_dialog_extras_fix_notifications">Napraw starą rejestrację powiadomień na Androidzie 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Ukryj tylko pasek relacji</string>
+    <string name="ig_dialog_extras_share_domain">Własna domena udostępniania</string>
+    <string name="ig_dialog_extras_share_domain_off">Wył.</string>
+    <string name="ig_dialog_extras_share_domain_hint">Zastępuje instagram.com w kopiowanych lub udostępnianych linkach, np. dla podglądów. Zostaw puste, aby wyłączyć.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Nieprawidłowa domena</string>
+    <string name="ig_dialog_extras_startup_tab">Karta startowa</string>
+    <string name="ig_media_open_with">Otwórz za pomocą…</string>
+    <string name="ig_lock_try_again_in">Zbyt wiele prób. Spróbuj ponownie za %1$d s</string>
+    <string name="loc_picker_locating">Szukanie miejsca…</string>
+    <string name="loc_picker_unnamed">Miejsce bez nazwy</string>
+    <string name="ig_dialog_location_current_title">Bieżąca lokalizacja</string>
+    <string name="ig_dialog_location_recent">Ostatnie miejsca</string>
+    <string name="ig_dialog_location_applied">Lokalizacja ustawiona</string>
+</resources>

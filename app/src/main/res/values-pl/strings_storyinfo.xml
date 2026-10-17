@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Informacje o relacji</string>
+    <string name="ig_btn_quiz_answer">Odpowiedź w quizie</string>
+    <string name="ig_btn_poll_results">Wyniki ankiety</string>
+    <string name="ig_story_info_hint">Dotknij wiersza, aby go skopiować</string>
+    <string name="ig_si_posted">Opublikowano</string>
+    <string name="ig_si_expires">Wygasa</string>
+    <string name="ig_si_edited">Edytowano</string>
+    <string name="ig_si_yes">Tak</string>
+    <string name="ig_si_music">Muzyka</string>
+    <string name="ig_si_location">Lokalizacja</string>
+    <string name="ig_si_hashtags">Hashtagi</string>
+    <string name="ig_si_shared_from">Udostępnione od</string>
+    <string name="ig_si_original_post">Oryginalny post (przytrzymaj, aby otworzyć)</string>
+    <string name="ig_si_posted_with">Opublikowano przez</string>
+    <string name="ig_si_alt_text">Tekst alternatywny</string>
+    <string name="ig_si_size">Rozmiar</string>
+    <string name="ig_si_sound_on">z dźwiękiem</string>
+    <string name="ig_si_sound_off">bez dźwięku</string>
+    <string name="ig_si_countdown">Odliczanie</string>
+    <string name="ig_si_question">Pytanie</string>
+    <string name="ig_si_highlights">W wyróżnionych</string>
+    <string name="ig_si_mention_request">Prośba o oznaczenie</string>
+    <string name="ig_si_none">Brak dodatkowych informacji o tej relacji.</string>
+    <string name="ig_si_your_answer">twoja odpowiedź</string>
+    <string name="ig_si_average">Średnia</string>
+    <string name="ig_si_copied">Skopiowano</string>
+    <string name="ig_dialog_misc_story_info">Info o relacjach, odpowiedzi w quizach i ankietach</string>
+    <string name="ig_feat_story_info">Info o relacjach</string>
+    <string name="ig_si_add_yours">Dodaj swoje</string>
+    <string name="ig_si_joined">dołączyło</string>
+    <string name="ig_si_paid_partnership">Płatna współpraca z (przytrzymaj, aby otworzyć)</string>
+    <string name="ig_si_collaborators">Współtwórca (przytrzymaj, aby otworzyć)</string>
+    <string name="ig_btn_slider_results">Wyniki suwaka</string>
+    <string name="ig_si_votes">głosów</string>
+</resources>

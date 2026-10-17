@@ -1,27 +1,12 @@
 package ps.reso.instaeclipse.mods.misc;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.luckypray.dexkit.DexKitBridge;
@@ -40,6 +25,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.utils.dialog.IeDialog;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -91,15 +77,16 @@ public class CommentCopyHook {
     private static java.lang.reflect.Method resolverMethod; // static (Object,String,String) -> EGL
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        ps.reso.instaeclipse.mods.media.CommentMedia.trackCommentSheet(bridge, classLoader);
         // Track current Activity for showing dialogs
         try {
             XposedHelpers.findAndHookMethod(Activity.class, "onResume", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
+                @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     currentActivity = (Activity) p.thisObject;
                 }
             });
             XposedHelpers.findAndHookMethod(Activity.class, "onDestroy", new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam p) {
+                @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     if (currentActivity == p.thisObject) currentActivity = null;
                 }
             });
@@ -281,7 +268,7 @@ public class CommentCopyHook {
 
     private static final XC_MethodHook LONG_PRESS_HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) {
+        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (!FeatureFlags.enableCopyComment) return;
             try {
                 String text = extractCommentTextLegacy(param.thisObject);
@@ -446,7 +433,7 @@ public class CommentCopyHook {
 
     private static final XC_MethodHook SHOW_MENU_HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) {
+        protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (!FeatureFlags.enableCopyComment) return;
             try {
                 Activity ctx = currentActivity;
@@ -464,9 +451,13 @@ public class CommentCopyHook {
                 if (comment == null) return;
 
                 String text = findLongestTextField(comment);
-                if (text == null || text.trim().isEmpty()) return;
+                // #242: image / GIF comments get a Download button (GIF-only comments have no text)
+                java.util.List<String> media = ps.reso.instaeclipse.mods.media.CommentMedia.urls(ctx, comment);
+                if ((text == null || text.trim().isEmpty()) && media.isEmpty()) return;
 
-                showCopyPopup(ctx, text.trim());
+                String[] names = media.isEmpty() ? new String[2] // {commenter, post author} for the file name
+                        : ps.reso.instaeclipse.mods.media.CommentMedia.names(comment, mediaId, heldValue, repo, param.thisObject);
+                showCopyPopup(ctx, text == null ? "" : text.trim(), media, commentId, names);
             } catch (Throwable t) {
                 ModuleLog.line("(InstaEclipse | CopyComment): ❌ hook body – " + t);
             }
@@ -492,130 +483,40 @@ public class CommentCopyHook {
         return best;
     }
 
-    private static boolean isDarkTheme(Context ctx) {
-        return (ctx.getResources().getConfiguration().uiMode
-                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-    }
-
-    private static GradientDrawable roundRect(int color, float radiusDp, Context ctx) {
-        float r = radiusDp * ctx.getResources().getDisplayMetrics().density;
-        GradientDrawable d = new GradientDrawable();
-        d.setColor(color);
-        d.setCornerRadius(r);
-        return d;
-    }
-
-    private static Button makeButton(Context ctx, String label,
-                                     int bgColor, int textColor, float dp) {
-        Button btn = new Button(ctx);
-        btn.setText(label);
-        btn.setTextColor(textColor);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        btn.setTypeface(null, Typeface.BOLD);
-        btn.setBackground(roundRect(bgColor, 14, ctx));
-        btn.setAllCaps(false);
-        btn.setPadding((int)(20 * dp), (int)(14 * dp), (int)(20 * dp), (int)(14 * dp));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = (int)(10 * dp);
-        btn.setLayoutParams(lp);
-        return btn;
-    }
-
     // ── Copy popup ────────────────────────────────────────────────────────────
 
     private static void showCopyPopup(final Context ctx, final String text) {
+        showCopyPopup(ctx, text, java.util.Collections.emptyList(), null, new String[2]);
+    }
+
+    private static void showCopyPopup(final Context ctx, final String text,
+                                      final java.util.List<String> media, final String commentId,
+                                      final String[] names) {
         MAIN.post(() -> {
             try {
-                float dp = ctx.getResources().getDisplayMetrics().density;
-                boolean dark = isDarkTheme(ctx);
+                IeDialog dlg = new IeDialog(ctx).title(I18n.t(ctx, R.string.ig_comment_copy_title));
+                if (!text.isEmpty()) dlg.quote(text, 5);
 
-                int sheetBg    = dark ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-                int cardBg     = dark ? Color.parseColor("#2C2C2E") : Color.parseColor("#FFFFFF");
-                int textPrim   = dark ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-                int accentBg   = Color.parseColor("#0A84FF");
-                int secondBg   = dark ? Color.parseColor("#3A3A3C") : Color.parseColor("#E5E5EA");
-                int secondText = dark ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-                int handleClr  = dark ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
-                LinearLayout sheet = new LinearLayout(ctx);
-                sheet.setOrientation(LinearLayout.VERTICAL);
-                sheet.setBackground(roundRect(sheetBg, 20, ctx));
-                int hPad = (int)(20 * dp);
-                sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
-
-                View handle = new View(ctx);
-                LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
-                        (int)(40 * dp), (int)(4 * dp));
-                handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-                handleLp.bottomMargin = (int)(16 * dp);
-                handle.setLayoutParams(handleLp);
-                handle.setBackground(roundRect(handleClr, 2, ctx));
-                sheet.addView(handle);
-
-                TextView titleTv = new TextView(ctx);
-                titleTv.setText(I18n.t(ctx, R.string.ig_comment_copy_title));
-                titleTv.setTextColor(textPrim);
-                titleTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                titleTv.setTypeface(null, Typeface.BOLD);
-                LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                titleLp.bottomMargin = (int)(14 * dp);
-                titleTv.setLayoutParams(titleLp);
-                sheet.addView(titleTv);
-
-                TextView commentTv = new TextView(ctx);
-                commentTv.setText(text);
-                commentTv.setTextColor(textPrim);
-                commentTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-                commentTv.setMaxLines(5);
-                commentTv.setEllipsize(TextUtils.TruncateAt.END);
-                int cardPad = (int)(14 * dp);
-                commentTv.setPadding(cardPad, cardPad, cardPad, cardPad);
-                commentTv.setBackground(roundRect(cardBg, 12, ctx));
-                LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                cardLp.bottomMargin = (int)(6 * dp);
-                commentTv.setLayoutParams(cardLp);
-                sheet.addView(commentTv);
-
-                Dialog dialog = new Dialog(ctx);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-                Button btnCopy = makeButton(ctx,
-                        I18n.t(ctx, R.string.ig_comment_copy_full), accentBg, Color.WHITE, dp);
-                btnCopy.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    copyToClipboard(ctx, text);
-                });
-                sheet.addView(btnCopy);
-
-                Button btnSelect = makeButton(ctx,
-                        I18n.t(ctx, R.string.ig_comment_select_part), secondBg, secondText, dp);
-                btnSelect.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    showSelectDialog(ctx, text);
-                });
-                sheet.addView(btnSelect);
-
-                dialog.setContentView(sheet);
-                Window w = dialog.getWindow();
-                if (w != null) {
-                    w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    w.setGravity(Gravity.BOTTOM);
-                    w.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                            WindowManager.LayoutParams.WRAP_CONTENT);
-                    WindowManager.LayoutParams wlp = w.getAttributes();
-                    int margin = (int)(12 * dp);
-                    wlp.x = margin;
-                    wlp.y = margin;
-                    w.setAttributes(wlp);
+                java.util.List<CharSequence> labels = new java.util.ArrayList<>();
+                java.util.List<Runnable> actions = new java.util.ArrayList<>();
+                if (!media.isEmpty()) {
+                    labels.add(I18n.t(ctx, R.string.ig_dl_title));
+                    actions.add(() -> ps.reso.instaeclipse.mods.media.CommentMedia.download(ctx, media, commentId, names[0], names[1]));
+                    // GIF / photo comments: copy the media link (Android can't put an animated GIF on the clipboard)
+                    labels.add(I18n.t(ctx, R.string.ig_comment_copy_media_link));
+                    actions.add(() -> copyToClipboard(ctx, media.get(0)));
                 }
-                dialog.show();
-
+                if (!text.isEmpty()) {
+                    labels.add(I18n.t(ctx, R.string.ig_comment_copy_full));
+                    actions.add(() -> copyToClipboard(ctx, text));
+                    labels.add(I18n.t(ctx, R.string.ig_comment_select_part));
+                    actions.add(() -> showSelectDialog(ctx, text));
+                    // Translate (#233): hand the text to the user's translation app.
+                    labels.add(I18n.t(ctx, R.string.ig_translate_text));
+                    actions.add(() -> ps.reso.instaeclipse.utils.core.TextTranslator.translate(ctx, text));
+                }
+                dlg.choices(labels.toArray(new CharSequence[0]), -1, which -> actions.get(which).run());
+                dlg.show();
             } catch (Throwable t) {
                 ModuleLog.line("(InstaEclipse | CopyComment): ❌ Popup – " + t.getMessage());
             }
@@ -627,102 +528,15 @@ public class CommentCopyHook {
     private static void showSelectDialog(final Context ctx, final String text) {
         MAIN.post(() -> {
             try {
-                float dp = ctx.getResources().getDisplayMetrics().density;
-                boolean dark = isDarkTheme(ctx);
-
-                int sheetBg  = dark ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-                int cardBg   = dark ? Color.parseColor("#2C2C2E") : Color.parseColor("#FFFFFF");
-                int textPrim = dark ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-                int accentBg = Color.parseColor("#0A84FF");
-                int secondBg = dark ? Color.parseColor("#3A3A3C") : Color.parseColor("#E5E5EA");
-                int handleClr= dark ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
-                LinearLayout sheet = new LinearLayout(ctx);
-                sheet.setOrientation(LinearLayout.VERTICAL);
-                sheet.setBackground(roundRect(sheetBg, 20, ctx));
-                int hPad = (int)(20 * dp);
-                sheet.setPadding(hPad, (int)(12 * dp), hPad, (int)(28 * dp));
-
-                View handle = new View(ctx);
-                LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams(
-                        (int)(40 * dp), (int)(4 * dp));
-                handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-                handleLp.bottomMargin = (int)(16 * dp);
-                handle.setLayoutParams(handleLp);
-                handle.setBackground(roundRect(handleClr, 2, ctx));
-                sheet.addView(handle);
-
-                TextView titleTv = new TextView(ctx);
-                titleTv.setText(I18n.t(ctx, R.string.ig_comment_select_title));
-                titleTv.setTextColor(textPrim);
-                titleTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                titleTv.setTypeface(null, Typeface.BOLD);
-                LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                titleLp.bottomMargin = (int)(14 * dp);
-                titleTv.setLayoutParams(titleLp);
-                sheet.addView(titleTv);
-
-                EditText et = new EditText(ctx);
-                et.setText(text);
-                et.setTextColor(textPrim);
-                et.setTextIsSelectable(true);
-                et.setFocusableInTouchMode(true);
-                et.setInputType(android.text.InputType.TYPE_NULL);
-                et.setKeyListener(null);
-                et.setHorizontallyScrolling(false);
-                et.setMaxLines(8);
-                et.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-                int cardPad = (int)(14 * dp);
-                et.setPadding(cardPad, cardPad, cardPad, cardPad);
-                et.setBackground(roundRect(cardBg, 12, ctx));
-                et.setSelection(0, text.length());
-                LinearLayout.LayoutParams etLp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                etLp.bottomMargin = (int)(6 * dp);
-                et.setLayoutParams(etLp);
-                sheet.addView(et);
-
-                Dialog dialog = new Dialog(ctx);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-                Button btnCopySel = makeButton(ctx,
-                        I18n.t(ctx, R.string.ig_comment_copy_selected), accentBg, Color.WHITE, dp);
-                btnCopySel.setOnClickListener(v -> {
+                IeDialog dlg = new IeDialog(ctx).title(I18n.t(ctx, R.string.ig_comment_select_title));
+                final EditText et = dlg.selectableText(text, 8);
+                dlg.secondary(I18n.t(ctx, R.string.ig_mention_copy_all), () -> copyToClipboard(ctx, text));
+                dlg.primary(I18n.t(ctx, R.string.ig_comment_copy_selected), () -> {
                     int s = et.getSelectionStart(), e = et.getSelectionEnd();
-                    String sel = (s >= 0 && e > s) ? text.substring(s, e) : text;
-                    dialog.dismiss();
-                    copyToClipboard(ctx, sel);
+                    copyToClipboard(ctx, (s >= 0 && e > s) ? text.substring(s, e) : text);
                 });
-                sheet.addView(btnCopySel);
-
-                Button btnCopyAll = makeButton(ctx,
-                        I18n.t(ctx, R.string.ig_mention_copy_all), secondBg,
-                        dark ? Color.WHITE : Color.parseColor("#1C1C1E"), dp);
-                btnCopyAll.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    copyToClipboard(ctx, text);
-                });
-                sheet.addView(btnCopyAll);
-
-                dialog.setContentView(sheet);
-                Window w = dialog.getWindow();
-                if (w != null) {
-                    w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    w.setGravity(Gravity.BOTTOM);
-                    w.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
-                            WindowManager.LayoutParams.WRAP_CONTENT);
-                    WindowManager.LayoutParams wlp = w.getAttributes();
-                    int margin = (int)(12 * dp);
-                    wlp.x = margin;
-                    wlp.y = margin;
-                    w.setAttributes(wlp);
-                }
-                dialog.show();
+                dlg.show();
                 et.requestFocus();
-
             } catch (Throwable t) {
                 ModuleLog.line("(InstaEclipse | CopyComment): ❌ SelectDialog – " + t.getMessage());
             }
@@ -738,7 +552,7 @@ public class CommentCopyHook {
             if (cm != null) {
                 cm.setPrimaryClip(ClipData.newPlainText("comment", text));
                 MAIN.post(() ->
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_comment_copied),
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_comment_copied),
                                 Toast.LENGTH_SHORT).show());
             }
         } catch (Throwable t) {

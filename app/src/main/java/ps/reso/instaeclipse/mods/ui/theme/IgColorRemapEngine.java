@@ -28,6 +28,9 @@ public final class IgColorRemapEngine {
     private static volatile SparseIntArray exactTable;
     private static volatile SparseIntArray rgbTable;
     private static volatile SparseIntArray fuzzyCache;
+    // Light theme in light mode: resource id -> corrected color for name-mapped resources whose slot
+    // would flip ink/paper (see keepLightPolarity). Null when not in that mode.
+    private static volatile SparseIntArray resPolarityFix;
     private static volatile int moduleUiDepth;
 
     private static volatile int fuzzyBg, fuzzySurface, fuzzyPrimary, fuzzySecondary, fuzzyButton, fuzzyLink, fuzzyDestructive;
@@ -105,11 +108,28 @@ public final class IgColorRemapEngine {
         }
     }
 
+    // Bumped whenever the table is dropped, so caches derived from it (themed ColorStateLists) refresh.
+    private static volatile int generation;
+
+    public static int generation() {
+        return generation;
+    }
+
     public static void invalidate() {
+        generation++;
         built = false;
         exactTable = null;
         rgbTable = null;
         fuzzyCache = null;
+        resPolarityFix = null;
+    }
+
+    /** Corrected color for a name-mapped resource when a light theme runs in light mode, else null. */
+    public static Integer polarityFix(int resId) {
+        SparseIntArray fix = resPolarityFix;
+        if (fix == null) return null;
+        int v = fix.get(resId, CACHE_MISS);
+        return v == CACHE_MISS ? null : v;
     }
 
     public static boolean isReady() {
@@ -204,12 +224,14 @@ public final class IgColorRemapEngine {
         fuzzyDarkTheme = ((r * 0.299d) + (g * 0.587d) + (b * 0.114d)) / 255.0d < 0.2d;
     }
 
+    // Both need real saturation: a near-white with a faint blue tint (e.g. a light theme's own
+    // background) is a surface, not a link or a button.
     private static boolean isAccentBlue(int r, int g, int b) {
-        return b > 160 && b > r + 30 && b > g + 10;
+        return b > 160 && b > r + 30 && b > g + 10 && b - Math.min(r, g) > 60;
     }
 
     private static boolean isLinkBlue(int r, int g, int b) {
-        return b > 120 && b >= r && g < b;
+        return b > 120 && b >= r && g < b && b - Math.min(r, g) > 60;
     }
 
     private static boolean isDestructiveRed(int r, int g, int b) {
@@ -227,6 +249,20 @@ public final class IgColorRemapEngine {
         mapResourceNames(exact, rgb, res, pkg, palette);
         mapFromSlots(exact, rgb, res, pkg, palette);
         mapAllResourceColors(exact, rgb, res, context.getClassLoader(), palette);
+        // The canonical table assumes Instagram's dark resources (black = background, white = text).
+        // When a light theme runs while Instagram is in light mode, IG draws its text and icons in
+        // black, so that assumption would paint them in the light background color and hide them.
+        if (!fuzzyDarkTheme && !IgThemeEngine.isNightNow()) {
+            keepLightPolarity(exact, palette);
+            keepLightPolarity(rgb, palette);
+            resPolarityFix = buildResourcePolarityFix(res, palette);
+        }
+        // The palette's own colors are already final: never remap them a second time (a view that
+        // gets our background and is then re-colored would otherwise go through the classifier).
+        for (String key : IgThemePalette.SLOT_KEYS) {
+            int v = palette.get(key) & 0x00FFFFFF;
+            if (rgb.get(v, CACHE_MISS) == CACHE_MISS) rgb.put(v, v);
+        }
         exactTable = exact;
         rgbTable = rgb;
         fuzzyCache = new SparseIntArray(256);
@@ -326,6 +362,68 @@ public final class IgColorRemapEngine {
             int original = sampleColor(res, resId);
             if (original != 0) put(exact, rgb, original, palette.get(IgThemePalette.SLOT_KEYS[slot]));
         }
+    }
+
+    /**
+     * Light theme in light mode: an original and its replacement must stay on the same side of the
+     * light/dark line — dark ink stays ink, light paper stays paper. Entries that flip (dark text
+     * mapped to a light surface, or a white surface mapped to dark text) are re-pointed at the
+     * matching slot of the light palette. Accent/link/destructive colors aren't gray, so they are
+     * left alone.
+     */
+    private static void keepLightPolarity(SparseIntArray table, IgThemePalette palette) {
+        for (int i = 0; i < table.size(); i++) {
+            int to = table.valueAt(i);
+            int fixed = lightPolarity(table.keyAt(i), to, palette);
+            if (fixed != to) table.put(table.keyAt(i), (to & 0xFF000000) == 0 ? (0x00FFFFFF & fixed)
+                    : ((to & 0xFF000000) | (0x00FFFFFF & fixed)));
+        }
+    }
+
+    /** Same rule for colors assigned by resource name (IgThemeEngine.colorForResource). */
+    private static SparseIntArray buildResourcePolarityFix(Resources res, IgThemePalette palette) {
+        SparseIntArray out = new SparseIntArray(64);
+        SparseIntArray colorResToSlot = IgThemeEngine.getColorResToSlot();
+        if (colorResToSlot == null) return out;
+        for (int i = 0; i < colorResToSlot.size(); i++) {
+            int resId = colorResToSlot.keyAt(i);
+            int original = sampleColor(res, resId);
+            if (original == 0) continue;
+            int to = palette.get(IgThemePalette.SLOT_KEYS[colorResToSlot.valueAt(i)]);
+            int fixed = lightPolarity(original, to, palette);
+            if (fixed != to) out.put(resId, (to & 0xFF000000) | (0x00FFFFFF & fixed));
+        }
+        return out;
+    }
+
+    /** {@code to}, or the light-palette slot on the same ink/paper side as the gray {@code from}. */
+    private static int lightPolarity(int from, int to, IgThemePalette palette) {
+        if (!isNeutral(from)) return to;
+        double lf = lum(from), lt = lum(to);
+        // A light gray (a surface) never becomes a saturated accent: a button-named resource whose
+        // light-mode value is a gray surface would otherwise flood trays/bars with the accent color.
+        // Dark ink turning into a dark accent (themed icons) is intended and left alone.
+        boolean flips = (isStrongColor(to) && lf > 0.6d)
+                || (lf < 0.6d && lt > 0.75d)
+                || (lf > 0.8d && lt < 0.4d);
+        if (!flips) return to;
+        if (lf > 0.8d) return lf > 0.97d ? palette.background : palette.surface;
+        return lf < 0.25d ? palette.primaryText : palette.secondaryText;
+    }
+
+    /** A clearly colored (accent-like) value, as opposed to a gray or a lightly tinted gray. */
+    private static boolean isStrongColor(int c) {
+        int r = (c >> 16) & 0xFF, g = (c >> 8) & 0xFF, b = c & 0xFF;
+        return Math.max(r, Math.max(g, b)) - Math.min(r, Math.min(g, b)) > 70;
+    }
+
+    private static boolean isNeutral(int c) {
+        int r = (c >> 16) & 0xFF, g = (c >> 8) & 0xFF, b = c & 0xFF;
+        return Math.max(r, Math.max(g, b)) - Math.min(r, Math.min(g, b)) < 28;
+    }
+
+    private static double lum(int c) {
+        return (((c >> 16) & 0xFF) * 0.299d + ((c >> 8) & 0xFF) * 0.587d + (c & 0xFF) * 0.114d) / 255.0d;
     }
 
     private static void put(SparseIntArray exact, SparseIntArray rgb, int from, int to) {

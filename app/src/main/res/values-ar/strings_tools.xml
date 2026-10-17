@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">احفظ كل الإعدادات في ملف</string>
+    <string name="tool_restore_sub">حمّل الإعدادات من ملف نسخة احتياطية</string>
+    <string name="tool_restart_sub">أوقف إنستغرام وأعد فتحه</string>
+    <string name="tool_about_sub">الإصدار والشكر والروابط</string>
+    <string name="about_tagline">إنستغرام أنظف وأكثر خصوصية</string>
+    <string name="about_source">الشيفرة المصدرية</string>
+    <string name="about_channel">قناة تيليغرام</string>
+    <string name="about_contributors">المساهمون</string>
+    <string name="about_footer">من إنشاء @reso7200 · مفتوح المصدر</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">Dapatkan bantuan</string>
+    <string name="help_get_help_body">Menemukan bug atau ada yang berhenti berfungsi? Buka issue di GitHub atau tanyakan ke komunitas di Telegram.</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">Tentang</string>
+    <string name="help_version">Versi %1$s</string>
+    <string name="help_source_code">Kode sumber di GitHub</string>
+    <string name="help_faq_expand">Tampilkan jawaban</string>
+    <string name="help_faq_collapse">Sembunyikan jawaban</string>
+    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
+    <string name="help_lsposed_sub">Sudah root? Pakai versi ini</string>
+    <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
+    <string name="help_lspatch_sub">Belum root? Pasang ini</string>
+    <string name="help_lspatch_guide">Ikuti panduan pemasangan</string>
+</resources>

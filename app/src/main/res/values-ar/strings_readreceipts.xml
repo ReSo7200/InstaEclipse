@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">إرسال إشعارات القراءة لمحادثات محددة</string>
+    <string name="ig_read_receipt_chat_on">إرسال إشعارات القراءة في هذه المحادثة</string>
+    <string name="ig_read_receipt_chat_off">إيقاف إشعارات القراءة في هذه المحادثة</string>
+    <string name="ig_toast_read_receipt_on">تم تفعيل إشعارات القراءة لهذه المحادثة</string>
+    <string name="ig_toast_read_receipt_off">تم إيقاف إشعارات القراءة لهذه المحادثة</string>
+    <string name="ig_feat_read_receipt_chats">إشعارات قراءة لكل محادثة</string>
+</resources>

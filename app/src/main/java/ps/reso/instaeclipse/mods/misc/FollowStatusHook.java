@@ -19,6 +19,7 @@ import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.toast.CustomToast;
 import ps.reso.instaeclipse.utils.tracker.FollowIndicatorTracker;
+import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 
 /**
  * Handles the follow-status (follower toast) feature.
@@ -75,7 +76,7 @@ public class FollowStatusHook {
             try {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam p) {
+                    protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         int hash = System.identityHashCode(p.thisObject);
                         String uid = sPendingCallbacks.get(hash);
                         if (uid == null) return;
@@ -85,6 +86,7 @@ public class FollowStatusHook {
                             Boolean followedBy = parseFollowedBy(arg);
                             if (followedBy != null) {
                                 sPendingCallbacks.remove(hash);
+                                ps.reso.instaeclipse.mods.ui.ProfileFollowsYouHook.onFollowResult(uid, followedBy);
                                 showFollowToast(uid, followedBy);
                                 return;
                             }
@@ -95,6 +97,7 @@ public class FollowStatusHook {
                         Boolean followedByFromObj = parseFollowedBy(p.thisObject);
                         if (followedByFromObj != null) {
                             sPendingCallbacks.remove(hash);
+                            ps.reso.instaeclipse.mods.ui.ProfileFollowsYouHook.onFollowResult(uid, followedByFromObj);
                             showFollowToast(uid, followedByFromObj);
                         }
                     }
@@ -182,7 +185,8 @@ public class FollowStatusHook {
                         ? I18n.t(ctx, R.string.ig_toast_follows_you)
                         : I18n.t(ctx, R.string.ig_toast_not_follows_you);
 
-                CustomToast.showCustomToast(ctx, "(" + userId + ") " + statusStr);
+                if (FeatureFlags.showFollowerToast)
+                    CustomToast.showCustomToast(ctx, "(" + userId + ") " + statusStr);
 
                 // Clear tracker so we don't process duplicate callback triggers
                 FollowIndicatorTracker.currentlyViewedUserId = null;

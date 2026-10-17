@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Info do story</string>
+    <string name="ig_btn_quiz_answer">Resposta do quiz</string>
+    <string name="ig_btn_poll_results">Resultados da enquete</string>
+    <string name="ig_story_info_hint">Toque numa linha para copiar</string>
+    <string name="ig_si_posted">Publicado</string>
+    <string name="ig_si_expires">Expira</string>
+    <string name="ig_si_edited">Editado</string>
+    <string name="ig_si_yes">Sim</string>
+    <string name="ig_si_music">Música</string>
+    <string name="ig_si_location">Localização</string>
+    <string name="ig_si_hashtags">Hashtags</string>
+    <string name="ig_si_shared_from">Compartilhado de</string>
+    <string name="ig_si_original_post">Post original (toque e segure para abrir)</string>
+    <string name="ig_si_posted_with">Publicado com</string>
+    <string name="ig_si_alt_text">Texto alternativo</string>
+    <string name="ig_si_size">Tamanho</string>
+    <string name="ig_si_sound_on">com som</string>
+    <string name="ig_si_sound_off">sem som</string>
+    <string name="ig_si_countdown">Contagem regressiva</string>
+    <string name="ig_si_question">Pergunta</string>
+    <string name="ig_si_highlights">Nos destaques</string>
+    <string name="ig_si_mention_request">Pedido de menção</string>
+    <string name="ig_si_none">Sem informações extras neste story.</string>
+    <string name="ig_si_your_answer">sua resposta</string>
+    <string name="ig_si_average">Média</string>
+    <string name="ig_si_copied">Copiado</string>
+    <string name="ig_dialog_misc_story_info">Info dos stories, respostas de quiz e enquetes</string>
+    <string name="ig_feat_story_info">Info dos stories</string>
+    <string name="ig_si_add_yours">Adicione o seu</string>
+    <string name="ig_si_joined">participaram</string>
+    <string name="ig_si_paid_partnership">Parceria paga com (segure para abrir)</string>
+    <string name="ig_si_collaborators">Colaborador (segure para abrir)</string>
+    <string name="ig_btn_slider_results">Resultados do controle deslizante</string>
+    <string name="ig_si_votes">votos</string>
+</resources>

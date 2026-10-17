@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Sao chép không kèm hashtag</string>
+    <string name="ig_dialog_clean_feed_following_only">Bảng tin chỉ từ người bạn theo dõi</string>
+    <string name="ig_dialog_menu_extras">Bổ sung</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Tắt vuốt để mở camera</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Tùy chọn tự cuộn Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Khóa cuộn Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Không giới hạn tài khoản</string>
+    <string name="ig_dialog_extras_airplane_mode">Chế độ máy bay (hiện ngoại tuyến)</string>
+    <string name="ig_dialog_extras_high_res_images">Tải ảnh ở độ phân giải cao nhất</string>
+    <string name="ig_dialog_extras_hide_onboarding">Ẩn lời nhắc danh bạ và vị trí</string>
+    <string name="ig_dialog_extras_fix_notifications">Sửa đăng ký thông báo cũ trên Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Chỉ ẩn thanh tin</string>
+    <string name="ig_dialog_extras_share_domain">Tên miền chia sẻ tùy chỉnh</string>
+    <string name="ig_dialog_extras_share_domain_off">Tắt</string>
+    <string name="ig_dialog_extras_share_domain_hint">Thay instagram.com trong các liên kết bạn sao chép hoặc chia sẻ, ví dụ để có bản xem trước nhúng. Để trống để tắt.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Tên miền không hợp lệ</string>
+    <string name="ig_dialog_extras_startup_tab">Tab khi khởi động</string>
+    <string name="ig_media_open_with">Mở bằng…</string>
+    <string name="ig_lock_try_again_in">Thử quá nhiều lần. Thử lại sau %1$d giây</string>
+    <string name="loc_picker_locating">Đang tìm địa điểm…</string>
+    <string name="loc_picker_unnamed">Địa điểm chưa có tên</string>
+    <string name="ig_dialog_location_current_title">Vị trí hiện tại</string>
+    <string name="ig_dialog_location_recent">Gần đây</string>
+    <string name="ig_dialog_location_applied">Đã áp dụng vị trí</string>
+</resources>

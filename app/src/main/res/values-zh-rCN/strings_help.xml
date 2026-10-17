@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">获取帮助</string>
+    <string name="help_get_help_body">发现 Bug 或某些功能失效？请在 GitHub 上提交 Issue，或在 Telegram 上向社区求助。</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">关于</string>
+    <string name="help_version">版本 %1$s</string>
+    <string name="help_source_code">GitHub 上的源代码</string>
+    <string name="help_faq_expand">展开回答</string>
+    <string name="help_faq_collapse">收起回答</string>
+    <string name="help_lsposed_title">LSPosed（JingMatrix）</string>
+    <string name="help_lsposed_sub">已 Root？请使用此版本</string>
+    <string name="help_lspatch_title">LSPatch（JingMatrix）</string>
+    <string name="help_lspatch_sub">未 Root？请安装此版本</string>
+    <string name="help_lspatch_guide">查看安装指南</string>
+</resources>

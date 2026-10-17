@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">Lưu mọi cài đặt ra tệp</string>
+    <string name="tool_restore_sub">Tải cài đặt từ tệp sao lưu</string>
+    <string name="tool_restart_sub">Buộc dừng và mở lại Instagram</string>
+    <string name="tool_about_sub">Phiên bản, ghi công và liên kết</string>
+    <string name="about_tagline">Instagram gọn gàng và riêng tư hơn</string>
+    <string name="about_source">Mã nguồn</string>
+    <string name="about_channel">Kênh Telegram</string>
+    <string name="about_contributors">Người đóng góp</string>
+    <string name="about_footer">Tạo bởi @reso7200 · Mã nguồn mở</string>
+</resources>

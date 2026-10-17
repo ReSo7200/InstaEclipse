@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">Todos</string>
+    <string name="logs_filter_hooked">Correctos ✅</string>
+    <string name="logs_filter_errors">Errores ❌</string>
+    <string name="logs_filter_warnings">Avisos ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">Actualizar</string>
+    <string name="logs_copy">Copiar</string>
+    <string name="logs_share">Compartir</string>
+    <string name="logs_clear">Borrar</string>
+    <string name="logs_share_title">Compartir registros de InstaEclipse</string>
+    <string name="logs_share_subject">Registros de InstaEclipse</string>
+    <string name="logs_loading">Cargando registros…</string>
+    <string name="logs_count_format">%1$d de %2$d entradas</string>
+    <string name="logs_status_live">Instagram en ejecución · en vivo</string>
+    <string name="logs_status_saved">Registro guardado · Instagram no está en ejecución</string>
+    <string name="logs_status_none">No hay ninguna app de Instagram compatible instalada</string>
+    <string name="logs_empty_title">Aún no hay registros</string>
+    <string name="logs_empty_body">Abre Instagram una vez con InstaEclipse activado en LSPosed, luego vuelve aquí y toca Actualizar. El registro de Instagram se guarda aquí automáticamente, incluso después de cerrar Instagram.</string>
+    <string name="logs_empty_filter_title">Nada coincide con este filtro</string>
+    <string name="logs_empty_filter_body">Vuelve a Todos para ver todas las entradas.</string>
+    <string name="logs_nothing_to_copy">No hay registros para copiar</string>
+    <string name="logs_copied">Registros copiados</string>
+    <string name="logs_entry_copied">Entrada copiada</string>
+    <string name="logs_cleared">Registros borrados</string>
+    <string name="logs_source_companion">[app]</string>
+</resources>

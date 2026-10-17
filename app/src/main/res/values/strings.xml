@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.7.0</string>
+    <string name="version" translatable="false">v0.8.0</string>
     <string name="home">Home</string>
     <string name="features">Features</string>
     <string name="help">Help</string>
@@ -65,7 +65,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">Module still isn\'t working?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[If you are <b>rooted</b> try using <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>If you are <b>not rooted</b> install <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> then follow <a href="https://t.me/instaEclipse_discussion/158/5149">this guide</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">Categories:</string>
@@ -291,7 +290,59 @@
     <string name="ig_dialog_ghost_hide_view_once">Hide View Once Opened</string>
     <string name="ig_dialog_ghost_permanent_view_once">Unlock View-Once/Twice</string>
     <string name="ig_dialog_ghost_keep_disappearing">Keep Disappearing Messages</string>
-    <string name="ig_dialog_ghost_keep_unsent">Keep Unsent Messages</string>
+    <string name="ig_dialog_ghost_keep_unsent">Log Unsent Messages</string>
+    <string name="ig_dialog_ghost_chat_export">Export-Chat Button in Chats</string>
+    <string name="ig_chat_export">Export chat</string>
+    <string name="ig_locked_coll_setting">Lockable Saved collections (🔒 button in a collection; uses the passcode set in Instagram)</string>
+    <string name="ig_locked_coll_setting_short">Lockable Saved collections (🔒 in a collection)</string>
+    <string name="ig_locked_coll_title">Locked collection</string>
+    <string name="ig_locked_coll_open">Open</string>
+    <string name="ig_locked_coll_hint">Passcode</string>
+    <string name="ig_locked_coll_lock">Lock this collection</string>
+    <string name="ig_locked_coll_unlock">Unlock this collection</string>
+    <string name="ig_locked_coll_locked">Collection locked: it will ask for your passcode</string>
+    <string name="ig_locked_coll_unlocked">Collection unlocked</string>
+    <string name="ig_locked_coll_need_passcode">Set a passcode first: InstaEclipse settings in Instagram, Lock</string>
+    <string name="ig_saved_on_profile">Saved button on your profile (restart Instagram)</string>
+    <string name="ig_saved_on_profile_button">Saved</string>
+    <string name="ig_nav_tab_search">Search</string>
+    <string name="ig_nav_tab_order">Tab order</string>
+    <string name="ig_nav_tab_order_hint">Use the arrows to reorder the bottom bar. Hidden tabs keep their place. Takes effect when you return to Instagram.</string>
+    <string name="ig_nav_tab_order_reset">Reset</string>
+    <string name="share_dl_label">Download with InstaEclipse</string>
+    <string name="share_dl_no_link">No Instagram post or reel link found</string>
+    <string name="share_dl_no_instagram">Instagram is not installed</string>
+    <string name="ig_share_dl_loading">InstaEclipse: loading the post to download…</string>
+    <string name="ig_share_dl_saving">InstaEclipse: saving %1$d file(s)…</string>
+    <string name="ig_share_dl_not_found">InstaEclipse: could not load that post</string>
+    <string name="ig_thread_menu">InstaEclipse chat actions</string>
+    <string name="ig_unsent_messages">Unsent messages</string>
+    <string name="ig_hide_chat_toggle">Hide / unhide chat</string>
+    <string name="ig_chat_export_working">Exporting loaded messages…</string>
+    <string name="ig_chat_export_done">Exported %1$d messages to %2$s</string>
+    <string name="ig_chat_export_load_all">Load the whole chat first (jumps to the first message)</string>
+    <string name="ig_chat_export_media">Download media into the export folder</string>
+    <string name="ig_chat_export_media_progress">Downloading media %1$d/%2$d…</string>
+    <string name="ig_chat_export_done_media">Exported %1$d messages and %2$d media files to %3$s</string>
+    <string name="ig_export_media_saved">Export saved — %1$d media file(s) in %2$s</string>
+    <!-- Short labels for the "features loaded" toast grid (kept concise so the dense grid fits) -->
+    <string name="ig_feat_edit_history">Edit history</string>
+    <string name="ig_feat_lock_collections">Lock collections</string>
+    <string name="ig_feat_comment_search">Comment search</string>
+    <string name="ig_feat_viewer_search">Story viewers</string>
+    <string name="ig_feat_follow_export">Follow export</string>
+    <string name="ig_feat_saved_on_profile">Saved on profile</string>
+    <string name="ig_feat_hide_notes">Hide Notes tray</string>
+    <string name="ig_feat_voice_download">Voice download</string>
+    <string name="ig_feat_max_upload_quality">Max upload quality</string>
+    <string name="ig_feat_photo_zoom">Photo zoom</string>
+    <string name="ig_chat_export_none">No messages loaded for this chat yet</string>
+    <string name="ig_dialog_ghost_jump_first">Jump-to-First-Message Button in Chats</string>
+    <string name="ig_jump_first_message">Jump to first message</string>
+    <string name="ig_jump_first_loading">Loading older messages… tap again to stop</string>
+    <string name="ig_jump_first_done">Reached the first message</string>
+    <string name="ig_jump_first_stopped">Stopped</string>
+    <string name="ig_dialog_ghost_edit_history">Keep Edit History of Messages</string>
     <string name="ig_dialog_unsent_title">Unsent Messages</string>
     <string name="ig_dialog_unsent_clear">Clear this chat\'s log</string>
     <string name="ig_dialog_unsent_export">Export as JSON</string>
@@ -314,11 +365,24 @@
     <string name="ig_dialog_misc_lock_section">Lock</string>
     <string name="ig_dialog_misc_lock_fingerprint">Use fingerprint to unlock</string>
     <string name="ig_hide_chats_title">Hide Specific Chats</string>
+    <string name="ig_translate_text">Translate</string>
+    <string name="ig_dialog_downloader_offer_audio">Offer Audio-Only Download for Videos</string>
+    <string name="ig_download_choice_title">Download</string>
+    <string name="ig_download_choice_video">Video</string>
+    <string name="ig_download_choice_audio">Audio only (.m4a)</string>
+    <string name="ig_download_choice_save">Save to device</string>
+    <string name="ig_download_choice_copy_image">Copy image</string>
+    <string name="ig_dialog_downloader_offer_copy_image">Add Copy Image to the Post Menu</string>
+    <string name="ig_toast_copy_image_video">This slide is a video — nothing to copy</string>
+    <string name="ig_toast_copying_image">Copying image…</string>
+    <string name="ig_toast_image_copied">Image copied to clipboard</string>
+    <string name="ig_toast_downloading_audio">Downloading audio…</string>
+    <string name="ig_toast_audio_saved">Audio saved</string>
     <string name="ig_dialog_misc_hide_chats">Hide Specific Chats</string>
     <string name="ig_hide_chats_manage">Manage hidden chats</string>
-    <string name="ig_hide_chats_empty">No hidden chats. Open a chat and tap the eye-off button to hide it.</string>
+    <string name="ig_hide_chats_empty">No hidden chats. Open a chat, tap the InstaEclipse button in its header and choose Hide / unhide chat.</string>
     <string name="ig_hide_chats_unhide">Unhide</string>
-    <string name="ig_hide_chats_hint">To hide a chat, open it and tap the eye-off button in the thread header.</string>
+    <string name="ig_hide_chats_hint">To hide a chat, open it, tap the InstaEclipse button in the chat header and choose Hide / unhide chat.</string>
     <string name="ig_lock_passcode_hint">Set your passcode from inside Instagram (open the InstaEclipse menu → Lock).</string>
     <string name="ig_theme_font_hint">Pick your font &amp; emoji files from inside Instagram (InstaEclipse menu → Custom Theme).</string>
     <string name="ig_hide_chat_hidden">Chat hidden — it will disappear from your inbox</string>
@@ -363,6 +427,17 @@
     <string name="ig_dialog_ad_block_ads">Block Ads</string>
     <string name="ig_dialog_ad_block_analytics">Block Analytics</string>
     <string name="ig_dialog_ad_disable_tracking">Disable Tracking Links</string>
+    <string name="ig_dialog_open_links_externally">Open Links in External Browser</string>
+    <string name="theme_light_mode">Light mode</string>
+    <string name="theme_dark_mode">Dark mode</string>
+    <string name="ig_dialog_translate_messages">Translate Button in Chats</string>
+    <string name="ig_chat_translate_row">Translate with app</string>
+    <string name="ig_downloader_folder_hint">Set the folder from the InstaEclipse app</string>
+    <string name="lock_code_set_in_ig">Set it inside Instagram: InstaEclipse menu &gt; Lock. Tap to open Instagram.</string>
+    <string name="theme_set_light">Light mode themes</string>
+    <string name="theme_set_dark">Dark mode themes</string>
+    <string name="theme_light_same">Same theme as dark mode</string>
+    <string name="theme_light_stock">Stock Instagram (theme only in dark mode)</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">Extreme Mode (Irreversible until reinstall)</string>
@@ -378,12 +453,74 @@
     <!-- Clean Feed options -->
     <string name="ig_dialog_clean_feed_hide_suggested">Hide Suggestions in Feed</string>
     <string name="ig_dialog_clean_feed_hide_threads">Hide Threads Suggestions</string>
+    <string name="ig_dialog_clean_feed_hide_liked">Hide Posts You Already Liked</string>
+    <string name="ig_nav_settings_title">Navigation settings</string>
+    <string name="ig_nav_tabs_title">Hide navigation tabs</string>
+    <string name="ig_nav_name_home">Home</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Create</string>
+    <string name="ig_nav_name_messages">Messages</string>
+    <string name="ig_nav_name_activity">Activity</string>
+    <string name="ig_nav_name_profile">Profile</string>
+    <string name="ig_nav_name_search">Search</string>
+    <string name="ig_nav_tab_home">Hide Home tab</string>
+    <string name="ig_nav_tab_reels">Hide Reels tab</string>
+    <string name="ig_nav_tab_create">Hide Create tab</string>
+    <string name="ig_nav_tab_messages">Hide Messages tab</string>
+    <string name="ig_nav_tab_activity">Hide Activity tab</string>
+    <string name="ig_nav_tab_profile">Hide Profile tab</string>
 
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Disable Story Auto-Swipe</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Disable Video Autoplay</string>
     <string name="ig_dialog_misc_spoof_last_seen">Spoof Last Seen (freeze)</string>
     <string name="ig_dialog_misc_disable_repost">Disable Repost</string>
+    <string name="ig_dialog_clean_feed_expand_captions">Always Show Full Captions (restart IG)</string>
+    <string name="ig_dialog_clean_feed_hide_plus">Hide Instagram Plus Upsells</string>
+    <string name="ig_dialog_clean_feed_hide_community_notes">Hide Community Notes</string>
+    <string name="ig_dialog_misc_profile_follows_label">Show \"Follows You\" on Profiles</string>
+    <string name="ig_profile_follows_you">Follows you</string>
+    <string name="ig_profile_not_following_you">Doesn\'t follow you</string>
+    <string name="ig_dialog_downloader_offer_media_info">Add Media Info to the Post Menu</string>
+    <string name="ig_dialog_downloader_offer_speed">Add Playback Speed to the Post Menu</string>
+    <string name="ig_dialog_downloader_reel_scrubber">Always Show the Reel Seek Bar</string>
+    <string name="ig_dialog_max_upload_quality">Always Upload at Highest Quality</string>
+    <string name="ig_media_info_title">Media info</string>
+    <string name="ig_media_info_copy">Copy</string>
+    <string name="ig_playback_speed_title">Playback speed</string>
+    <string name="ig_playback_speed_next">Speed set — applies to the next video that starts</string>
+    <string name="ig_dialog_distraction_hide_notes_tray">Hide Notes in Messages</string>
+    <string name="ig_dialog_downloader_voice">Download Voice Messages (long-press)</string>
+    <string name="ig_dialog_misc_viewer_search">Search Your Story Viewers</string>
+    <string name="ig_viewer_search_hint">Search viewers</string>
+    <string name="ig_dialog_misc_comment_search">Search Comments</string>
+    <string name="ig_comment_search">Search comments</string>
+    <string name="ig_comment_search_hint">Search %1$d loaded comments</string>
+    <string name="ig_comment_search_load_all">Load all</string>
+    <string name="ig_comment_search_stop">Stop</string>
+    <string name="ig_comment_search_field_hint">Search by name or words</string>
+    <string name="ig_comment_search_count">%1$d comments loaded</string>
+    <string name="ig_comment_search_matches">%2$d of %1$d comments match</string>
+    <string name="ig_comment_search_empty">No matching comments</string>
+    <string name="ig_comment_search_tip">Tap a comment to copy it</string>
+    <string name="ig_comment_search_view_replies">View %1$d replies</string>
+    <string name="ig_comment_search_hide_replies">Hide replies</string>
+    <string name="ig_comment_export">Export</string>
+    <string name="ig_comment_export_working">Exporting loaded comments…</string>
+    <string name="ig_comment_export_post_media">Also save the post\'s photos/videos</string>
+    <string name="ig_comment_export_done">Exported %1$d comments to %2$s</string>
+    <string name="ig_dialog_misc_follow_export">Export Followers/Following to CSV</string>
+    <string name="ig_follow_export">Export CSV</string>
+    <string name="ig_follow_export_done">Exported %1$d accounts to %2$s</string>
+    <string name="ig_follow_export_none">No accounts loaded yet</string>
+    <string name="ig_follow_export_loading">Loading accounts… %1$d so far.
+Stay on this screen until it finishes.</string>
+    <string name="ig_follow_export_stop">Stop &amp; save</string>
+    <string name="ig_dialog_misc_like_undo">Undo Window for Likes (4 s)</string>
+    <string name="ig_like_undo_bar">❤ Liked · UNDO</string>
+    <string name="ig_like_undo_cancelled">Like cancelled — refresh to update the heart</string>
+    <string name="ig_dialog_misc_exact_timestamps">Show Exact Dates Instead of \"2h ago\"</string>
+    <string name="ig_dialog_misc_hide_share_create_group">Hide \"Create group\" on Share Sheet</string>
     <string name="ig_dialog_misc_show_feature_toasts">Show Feature Toasts</string>
     <string name="ig_dialog_misc_show_follower_toast">Show Follower Toast</string>
     <string name="ig_dialog_misc_view_story_mentions">View Story Mentions</string>
@@ -395,6 +532,8 @@
 
     <!-- Comment Copy dialog (runs in IG process) -->
     <string name="ig_comment_copy_title">Copy Comment</string>
+    <string name="ig_comment_gif_downloading">Downloading comment media…</string>
+    <string name="ig_comment_copy_media_link">Copy GIF / image link</string>
     <string name="ig_comment_copy_full">Copy Full Comment</string>
     <string name="ig_comment_select_part">Select Part to Copy</string>
     <string name="ig_comment_select_title">Select to Copy</string>
@@ -403,6 +542,9 @@
 
     <!-- Caption Copy menu + dialog (runs in IG process) -->
     <string name="ig_caption_copy_menu_item">Copy Caption</string>
+    <string name="ig_caption_translate_menu_item">Translate Caption</string>
+    <string name="ig_caption_translate_full">Full caption</string>
+    <string name="ig_caption_translate_no_hashtags">Without hashtags</string>
     <string name="ig_caption_copy_title">Copy Caption</string>
     <string name="ig_caption_copy_full">Copy Full Caption</string>
     <string name="ig_caption_copy_none">No caption on this post</string>
@@ -509,6 +651,13 @@
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">Download</string>
+    <string name="ig_highlight_download_all">Download whole highlight</string>
+    <string name="ig_highlight_loading">Loading highlight…</string>
+    <string name="ig_highlight_downloading">Downloading %1$d highlight items…</string>
+    <string name="ig_highlight_done">Highlight saved: %1$d of %2$d items</string>
+    <string name="ig_story_mark_seen">Mark as seen</string>
+    <string name="ig_story_marked_seen">Marked as seen</string>
+    <string name="ig_story_mark_seen_none">Nothing to send for this story yet — let it play first</string>
     <string name="ig_dl_carousel_subtitle">Carousel • %1$d items</string>
     <string name="ig_dl_carousel_current">Download current (%1$d of %2$d)</string>
     <string name="ig_dl_carousel_all">Download all %1$d items</string>

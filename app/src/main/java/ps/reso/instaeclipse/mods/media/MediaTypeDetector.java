@@ -31,6 +31,11 @@ final class MediaTypeDetector {
 
     static Result resolve(File file, String responseContentType, String requestedMime,
                           String requestedFilename) throws IOException {
+        if (isGif(file)) { // animated comment GIFs etc.: keep the format, a .jpg name would show a still
+            String fn = withCorrectExtension(requestedFilename, Kind.IMAGE);
+            if (fn != null && fn.toLowerCase(Locale.US).endsWith(".jpg")) fn = fn.substring(0, fn.length() - 4) + ".gif";
+            return new Result(Kind.IMAGE, "image/gif", fn);
+        }
         Kind kind = sniff(file);
         if (kind == Kind.UNKNOWN) kind = fromContentType(responseContentType);
         if (kind == Kind.UNKNOWN) kind = fromContentType(requestedMime);
@@ -60,6 +65,13 @@ final class MediaTypeDetector {
         int dot = filename.lastIndexOf('.');
         if (dot > slash) return filename.substring(0, dot) + wanted;
         return filename + wanted;
+    }
+
+    static boolean isGif(File file) throws IOException {
+        try (InputStream in = new FileInputStream(file)) {
+            byte[] h = new byte[4];
+            return in.read(h) == 4 && h[0] == 'G' && h[1] == 'I' && h[2] == 'F' && h[3] == '8';
+        }
     }
 
     static Kind sniff(File file) throws IOException {

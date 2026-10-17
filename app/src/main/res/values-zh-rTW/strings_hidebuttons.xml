@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">隱藏聊天中的 Blend</string>
+    <string name="ig_dialog_hide_threads_button">隱藏個人檔案上的 Threads 按鈕</string>
+    <string name="ig_feat_hide_blend">隱藏 Blend</string>
+    <string name="ig_feat_hide_threads">隱藏 Threads</string>
+    <string name="ig_hide_chat">隱藏聊天</string>
+    <string name="ig_unhide_chat">取消隱藏聊天</string>
+</resources>

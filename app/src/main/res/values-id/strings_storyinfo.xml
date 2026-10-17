@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Info cerita</string>
+    <string name="ig_btn_quiz_answer">Jawaban kuis</string>
+    <string name="ig_btn_poll_results">Hasil polling</string>
+    <string name="ig_story_info_hint">Ketuk baris untuk menyalin</string>
+    <string name="ig_si_posted">Diposting</string>
+    <string name="ig_si_expires">Berakhir</string>
+    <string name="ig_si_edited">Diedit</string>
+    <string name="ig_si_yes">Ya</string>
+    <string name="ig_si_music">Musik</string>
+    <string name="ig_si_location">Lokasi</string>
+    <string name="ig_si_hashtags">Tagar</string>
+    <string name="ig_si_shared_from">Dibagikan dari</string>
+    <string name="ig_si_original_post">Postingan asli (tekan lama untuk membuka)</string>
+    <string name="ig_si_posted_with">Diposting dengan</string>
+    <string name="ig_si_alt_text">Teks alternatif</string>
+    <string name="ig_si_size">Ukuran</string>
+    <string name="ig_si_sound_on">dengan suara</string>
+    <string name="ig_si_sound_off">tanpa suara</string>
+    <string name="ig_si_countdown">Hitung mundur</string>
+    <string name="ig_si_question">Pertanyaan</string>
+    <string name="ig_si_highlights">Di sorotan</string>
+    <string name="ig_si_mention_request">Permintaan sebutan</string>
+    <string name="ig_si_none">Tidak ada info tambahan di cerita ini.</string>
+    <string name="ig_si_your_answer">jawabanmu</string>
+    <string name="ig_si_average">Rata-rata</string>
+    <string name="ig_si_copied">Disalin</string>
+    <string name="ig_dialog_misc_story_info">Info cerita, jawaban kuis &amp; polling</string>
+    <string name="ig_feat_story_info">Info cerita</string>
+    <string name="ig_si_add_yours">Tambahkan milikmu</string>
+    <string name="ig_si_joined">bergabung</string>
+    <string name="ig_si_paid_partnership">Kemitraan berbayar dengan (tahan untuk membuka)</string>
+    <string name="ig_si_collaborators">Kolaborator (tahan untuk membuka)</string>
+    <string name="ig_btn_slider_results">Hasil penggeser</string>
+    <string name="ig_si_votes">suara</string>
+</resources>

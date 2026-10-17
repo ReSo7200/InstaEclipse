@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feat_group_social">Social</string>
+    <string name="menu_feed">Feed</string>
+    <string name="menu_navigation">Navigazione</string>
+    <string name="menu_reels_stories">Reel e storie</string>
+    <string name="menu_messages">Messaggi</string>
+    <string name="menu_post_menu">Menu post e caricamenti</string>
+    <string name="menu_likes_comments">Mi piace e commenti</string>
+    <string name="menu_profiles">Profili</string>
+    <string name="menu_app">App e account</string>
+    <string name="menu_ads_tracking">Pubblicità e tracciamento</string>
+    <string name="menu_nav_tabs">Schede</string>
+    <string name="menu_nav_order">Ordine e avvio</string>
+    <string name="menu_nav_gestures">Gesti</string>
+    <string name="menu_reels">Reel</string>
+    <string name="menu_stories">Storie</string>
+    <string name="nav_tab_order_changed">Ordine delle schede modificato</string>
+</resources>

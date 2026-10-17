@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Инфо об истории</string>
+    <string name="ig_btn_quiz_answer">Ответ на викторину</string>
+    <string name="ig_btn_poll_results">Результаты опроса</string>
+    <string name="ig_story_info_hint">Нажмите на строку, чтобы скопировать</string>
+    <string name="ig_si_posted">Опубликовано</string>
+    <string name="ig_si_expires">Истекает</string>
+    <string name="ig_si_edited">Изменено</string>
+    <string name="ig_si_yes">Да</string>
+    <string name="ig_si_music">Музыка</string>
+    <string name="ig_si_location">Место</string>
+    <string name="ig_si_hashtags">Хештеги</string>
+    <string name="ig_si_shared_from">Репост от</string>
+    <string name="ig_si_original_post">Исходная публикация (удерживайте, чтобы открыть)</string>
+    <string name="ig_si_posted_with">Опубликовано через</string>
+    <string name="ig_si_alt_text">Альтернативный текст</string>
+    <string name="ig_si_size">Размер</string>
+    <string name="ig_si_sound_on">со звуком</string>
+    <string name="ig_si_sound_off">без звука</string>
+    <string name="ig_si_countdown">Обратный отсчёт</string>
+    <string name="ig_si_question">Вопрос</string>
+    <string name="ig_si_highlights">В актуальном</string>
+    <string name="ig_si_mention_request">Запрос на упоминание</string>
+    <string name="ig_si_none">Дополнительной информации нет.</string>
+    <string name="ig_si_your_answer">ваш ответ</string>
+    <string name="ig_si_average">Среднее</string>
+    <string name="ig_si_copied">Скопировано</string>
+    <string name="ig_dialog_misc_story_info">Инфо об историях, ответы викторин и опросов</string>
+    <string name="ig_feat_story_info">Инфо об историях</string>
+    <string name="ig_si_add_yours">Добавьте своё</string>
+    <string name="ig_si_joined">участвуют</string>
+    <string name="ig_si_paid_partnership">Платное партнёрство с (удерживайте, чтобы открыть)</string>
+    <string name="ig_si_collaborators">Соавтор (удерживайте, чтобы открыть)</string>
+    <string name="ig_btn_slider_results">Результаты шкалы</string>
+    <string name="ig_si_votes">голосов</string>
+</resources>

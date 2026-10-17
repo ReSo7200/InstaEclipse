@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">將所有設定儲存到檔案</string>
+    <string name="tool_restore_sub">從備份檔案載入設定</string>
+    <string name="tool_restart_sub">強制停止並重新開啟 Instagram</string>
+    <string name="tool_about_sub">版本、致謝與連結</string>
+    <string name="about_tagline">更清爽、更私密的 Instagram</string>
+    <string name="about_source">原始碼</string>
+    <string name="about_channel">Telegram 頻道</string>
+    <string name="about_contributors">貢獻者</string>
+    <string name="about_footer">由 @reso7200 建立 · 開放原始碼</string>
+</resources>

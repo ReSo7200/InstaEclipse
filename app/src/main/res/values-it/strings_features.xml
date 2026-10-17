@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">Cerca funzionalità</string>
+    <string name="feat_search_no_results">Nessuna funzionalità trovata</string>
+    <string name="feat_count_on">%1$d attive</string>
+    <string name="feat_count_off">Disattivate</string>
+</resources>

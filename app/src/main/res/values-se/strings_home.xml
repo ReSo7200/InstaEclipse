@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Snabbåtgärder</string>
+    <string name="home_section_shortcuts">Snabbgenvägar</string>
+    <string name="home_status_installed">Installerad</string>
+    <string name="home_status_not_installed">Inte installerad</string>
+    <string name="home_status_module_active">Modulen är aktiv</string>
+    <string name="home_status_version">Version %1$s</string>
+    <string name="home_status_no_version">Installera Instagram för att använda InstaEclipse</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d funktion aktiverad</item>
+        <item quantity="two">%d funktioner aktiverade</item>
+        <item quantity="other">%d funktioner aktiverade</item>
+    </plurals>
+    <string name="home_action_launch">Starta</string>
+    <string name="home_action_restart">Starta om</string>
+    <string name="home_action_download">Hämta APK</string>
+    <string name="home_restart_done">Instagram har startats om</string>
+    <string name="home_shortcuts_edit">Redigera genvägar</string>
+    <string name="home_shortcuts_dialog_title">Fäst genvägar</string>
+    <string name="home_shortcuts_empty">Inga fästa genvägar. Tryck på pennan för att fästa upp till 8 reglage som du använder mest.</string>
+    <string name="home_shortcuts_hint">Ändringar skickas direkt till Instagram.</string>
+    <string name="home_shortcuts_limit">Du kan fästa upp till %1$d genvägar</string>
+    <string name="home_shortcuts_locked_extreme">Låst av Extremläge</string>
+</resources>

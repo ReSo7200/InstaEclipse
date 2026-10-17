@@ -41,6 +41,7 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
     private static final String KEY_ENABLED = "customThemeEnabled";
     private static final String KEY_PRESET_ID = "themePresetId";
     private static final String KEY_PALETTE_JSON = "themePaletteJson";
+    private static final String KEY_LIGHT_PRESET_ID = "themeLightPresetId";
 
     private static final int[] SLOT_LABELS = {
             R.string.theme_slot_background, R.string.theme_slot_surface, R.string.theme_slot_primary_text,
@@ -65,6 +66,10 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
     private boolean presetsExpanded = true;
     private boolean customExpanded = true;
     private int selectedPresetId = 1;
+    // The gallery follows the phone's mode: in dark mode it lists and saves the dark theme
+    // (themePresetId), in light mode the light theme (themeLightPresetId). The activity is
+    // recreated when the mode changes, so this is re-read every time.
+    private boolean lightMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +78,10 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
 
         MaterialToolbar toolbar = findViewById(R.id.theme_toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
+        lightMode = (getResources().getConfiguration().uiMode
+                & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                != android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        toolbar.setSubtitle(lightMode ? R.string.theme_set_light : R.string.theme_set_dark);
 
         enableSwitch = findViewById(R.id.theme_enable_switch);
         presetsContent = findViewById(R.id.theme_presets_content);
@@ -95,13 +104,22 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
         enableSwitch.setChecked(enabled);
         enableSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> persist());
 
-        presetAdapter = new PresetAdapter(ThemePresets.all());
+        List<ThemePreset> modePresets = new java.util.ArrayList<>();
+        for (ThemePreset p : ThemePresets.all())
+            if (ThemePresets.isLightPreset(p.id) == lightMode) modePresets.add(p);
+        presetAdapter = new PresetAdapter(modePresets);
         presetList.setLayoutManager(new GridLayoutManager(this, 2));
         presetList.setAdapter(presetAdapter);
 
         slotAdapter = new ColorSlotAdapter();
         colorSlots.setLayoutManager(new LinearLayoutManager(this));
         colorSlots.setAdapter(slotAdapter);
+
+        if (lightMode) {
+            // Custom colors edit the dark theme's palette; the light theme is chosen from the set.
+            findViewById(R.id.theme_custom_header).setVisibility(View.GONE);
+            customContent.setVisibility(View.GONE);
+        }
 
         resetButton.setOnClickListener(v -> {
             workingPalette = ThemePresets.getById(1).palette.copy();
@@ -122,14 +140,26 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
     }
 
     private SharedPreferences cache() {
-        return getSharedPreferences(CACHE_NAME, Context.MODE_PRIVATE);
+        return ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this);
     }
 
     private void reloadPaletteState() {
+        if (lightMode) {
+            selectedPresetId = cache().getInt(KEY_LIGHT_PRESET_ID, -1);
+            customMode = false;
+            int shown = selectedPresetId > 0 ? selectedPresetId : firstLightPresetId();
+            workingPalette = ThemePresets.getById(shown).palette.copy();
+            return;
+        }
         selectedPresetId = cache().getInt(KEY_PRESET_ID, 1);
         String paletteJson = cache().getString(KEY_PALETTE_JSON, "");
         customMode = ThemeSettingsHelper.isCustomMode(selectedPresetId);
         workingPalette = ThemeSettingsHelper.resolveEffectivePalette(selectedPresetId, paletteJson);
+    }
+
+    private static int firstLightPresetId() {
+        for (ThemePreset p : ThemePresets.all()) if (ThemePresets.isLightPreset(p.id)) return p.id;
+        return 1;
     }
 
     private IgThemePalette activePalette() {
@@ -172,6 +202,10 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
      *  other setting's broadcast convention in FeaturesFragment. */
     private void persist() {
         boolean enabled = enableSwitch.isChecked();
+        if (lightMode) {
+            persistLight(enabled);
+            return;
+        }
         int presetId = customMode ? 0 : selectedPresetId;
         String paletteJson = workingPalette.copy().toJson();
 
@@ -185,19 +219,41 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
         Intent enabledIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
         enabledIntent.putExtra("key", KEY_ENABLED);
         enabledIntent.putExtra("value", enabled);
-        sendBroadcast(enabledIntent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, enabledIntent);
 
         Intent presetIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
         presetIntent.putExtra("key", KEY_PRESET_ID);
         presetIntent.putExtra("value", presetId);
-        sendBroadcast(presetIntent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, presetIntent);
 
         Intent paletteIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
         paletteIntent.putExtra("key", KEY_PALETTE_JSON);
         paletteIntent.putExtra("value", paletteJson);
-        sendBroadcast(paletteIntent);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, paletteIntent);
 
-        Toast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
+    }
+
+    /** Light mode: only the enable switch and the light theme id; the dark theme is left as is. */
+    private void persistLight(boolean enabled) {
+        SharedPreferences.Editor editor = cache().edit();
+        editor.putBoolean(KEY_ENABLED, enabled);
+        if (selectedPresetId > 0) editor.putInt(KEY_LIGHT_PRESET_ID, selectedPresetId);
+        editor.commit();
+        makeCacheWorldReadable();
+
+        Intent enabledIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
+        enabledIntent.putExtra("key", KEY_ENABLED);
+        enabledIntent.putExtra("value", enabled);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, enabledIntent);
+
+        if (selectedPresetId > 0) {
+            Intent presetIntent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
+            presetIntent.putExtra("key", KEY_LIGHT_PRESET_ID);
+            presetIntent.putExtra("value", selectedPresetId);
+            ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, presetIntent);
+        }
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
     }
 
     private void makeCacheWorldReadable() {

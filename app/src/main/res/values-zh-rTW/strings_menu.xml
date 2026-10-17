@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_chip_instagram">Instagram %1$s</string>
+    <string name="menu_chip_active">%1$d/%2$d 項生效</string>
+    <string name="menu_inactive_all_good">所有已開啟的功能都在此 Instagram 版本上生效。</string>
+    <string name="menu_inactive_hint">以下功能已開啟，但無法在此 Instagram 版本上生效：</string>
+</resources>

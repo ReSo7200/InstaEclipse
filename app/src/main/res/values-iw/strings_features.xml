@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Features tab: search + per-category counts -->
+    <string name="feat_search_hint">חפש תכונות</string>
+    <string name="feat_search_no_results">לא נמצאו תכונות תואמות</string>
+    <string name="feat_count_on">%1$d פעילות</string>
+    <string name="feat_count_off">כבויות</string>
+</resources>

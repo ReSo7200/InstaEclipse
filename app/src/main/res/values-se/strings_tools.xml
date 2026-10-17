@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">Spara alla inställningar i en fil</string>
+    <string name="tool_restore_sub">Läs in inställningar från en säkerhetskopia</string>
+    <string name="tool_restart_sub">Tvångsstoppa och öppna Instagram igen</string>
+    <string name="tool_about_sub">Version, tack och länkar</string>
+    <string name="about_tagline">Ett renare, mer privat Instagram</string>
+    <string name="about_source">Källkod</string>
+    <string name="about_channel">Telegram-kanal</string>
+    <string name="about_contributors">Bidragsgivare</string>
+    <string name="about_footer">Skapad av @reso7200 · Öppen källkod</string>
+</resources>

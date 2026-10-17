@@ -36,7 +36,11 @@ public class DisableVideoAutoPlayHook {
     private static volatile boolean sOverlayLifecycleHooked = false;
 
     public void handleAutoPlayDisable(DexKitBridge bridge) {
-        hookManualPlayOverlayLifecycle();
+        // The play-overlay hooks sit on very hot framework methods (Resources.getDrawable,
+        // ImageView.setImageDrawable, View.performClick). Hooking those app-wide triggers ART's JIT
+        // SIGSEGV ("Jit thread pool", DexCache::SetResolvedType) on IG 451+, so they are only
+        // installed when the feature is actually on (turning it on later applies after a restart).
+        if (FeatureFlags.disableVideoAutoPlay) hookManualPlayOverlayLifecycle();
         if (DexKitCache.isCacheValid()) {
             Method cached = DexKitCache.loadMethod("AutoPlayDisable", Module.hostClassLoader);
             if (cached != null) {
@@ -97,7 +101,7 @@ public class DisableVideoAutoPlayHook {
     private void hookMethod(Method targetMethod) {
         XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.disableVideoAutoPlay) param.setResult(true);
             }
         });
@@ -123,7 +127,7 @@ public class DisableVideoAutoPlayHook {
     private void hookPlayDrawableLoads() {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.disableVideoAutoPlay) return;
                 if (!(param.thisObject instanceof Resources) || !(param.getResult() instanceof Drawable)) return;
                 if (param.args == null || param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
@@ -143,7 +147,7 @@ public class DisableVideoAutoPlayHook {
     private void hookPlayImageBinding() {
         XposedBridge.hookAllMethods(ImageView.class, "setImageResource", new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.disableVideoAutoPlay) return;
                 if (!(param.thisObject instanceof ImageView)) return;
                 if (param.args == null || param.args.length == 0 || !(param.args[0] instanceof Integer)) return;
@@ -158,7 +162,7 @@ public class DisableVideoAutoPlayHook {
 
         XposedBridge.hookAllMethods(ImageView.class, "setImageDrawable", new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.disableVideoAutoPlay) return;
                 if (!(param.thisObject instanceof ImageView)) return;
                 if (param.args == null || param.args.length == 0 || !(param.args[0] instanceof Drawable)) return;
@@ -174,7 +178,7 @@ public class DisableVideoAutoPlayHook {
     private void hookPlayOverlayClicks() {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.disableVideoAutoPlay || !(param.thisObject instanceof View)) return;
 
                 View view = (View) param.thisObject;

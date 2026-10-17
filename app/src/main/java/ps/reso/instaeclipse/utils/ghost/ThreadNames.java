@@ -50,6 +50,30 @@ public class ThreadNames {
         } catch (Throwable t) {
             ModuleLog.line("(IE|ThreadNames) load failed: " + t.getMessage());
         }
+        cleanupOnce();
+    }
+
+    /**
+     * Older builds labelled threads with whatever chat header (or even message word) was on screen,
+     * so one name ended up on several unrelated ids. Drop every name shared by more than one id,
+     * once; the real names are learned again the next time each chat is opened.
+     */
+    private static void cleanupOnce() {
+        try {
+            Context ctx = AndroidAppHelper.currentApplication();
+            if (ctx == null) return;
+            File marker = new File(ctx.getFilesDir(), "ie_thread_names.v2");
+            if (marker.exists()) return;
+            Map<String, Integer> counts = new HashMap<>();
+            for (String v : cache.values()) counts.merge(v, 1, Integer::sum);
+            int before = cache.size();
+            cache.values().removeIf(v -> counts.getOrDefault(v, 0) > 1);
+            if (cache.size() != before) persist();
+            marker.createNewFile();
+            ModuleLog.line("(IE|ThreadNames) cleanup dropped " + (before - cache.size()) + " ambiguous name(s)");
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|ThreadNames) cleanup failed: " + t.getMessage());
+        }
     }
 
     private static synchronized void persist() {
@@ -58,9 +82,8 @@ public class ThreadNames {
             if (f == null) return;
             JSONObject o = new JSONObject();
             for (Map.Entry<String, String> e : cache.entrySet()) o.put(e.getKey(), e.getValue());
-            try (FileOutputStream out = new FileOutputStream(f)) {
-                out.write(o.toString().getBytes(StandardCharsets.UTF_8));
-            }
+            // temp file + rename: a crash mid-write keeps the previous version intact
+            ps.reso.instaeclipse.utils.core.AtomicFiles.write(f, o.toString());
         } catch (Throwable t) {
             ModuleLog.line("(IE|ThreadNames) persist failed: " + t.getMessage());
         }
@@ -76,11 +99,68 @@ public class ThreadNames {
         persist();
     }
 
+    /** Snapshot of every known thread id -> name (chats opened while the module was active). */
+    public static synchronized Map<String, String> all() {
+        ensureLoaded();
+        return new java.util.LinkedHashMap<>(cache);
+    }
+
     /** Best-known name for a thread id, or "" if unknown. */
     public static synchronized String get(String threadId) {
         if (threadId == null) return "";
         ensureLoaded();
         String v = cache.get(threadId);
         return v == null ? "" : v;
+    }
+
+    /**
+     * Like {@link #get}, but when the chat was never opened (so its header name was never seen)
+     * look the name up in Instagram's own thread cache (direct.db, table threads, thread_info
+     * JSON) and remember it. Must run inside Instagram's process.
+     */
+    public static synchronized String resolve(String threadId) {
+        String v = get(threadId);
+        if (!v.isEmpty() || threadId == null || threadId.isEmpty()) return v;
+        String found = lookupDb(threadId);
+        if (found != null && !found.isEmpty()) {
+            put(threadId, found);
+            return found;
+        }
+        return "";
+    }
+
+    /** Group title, else the other members' display names (full name, or username). */
+    private static String lookupDb(String threadId) {
+        Context ctx = AndroidAppHelper.currentApplication();
+        if (ctx == null) return null;
+        File db = ctx.getDatabasePath("direct.db");
+        if (!db.exists()) return null;
+        try (android.database.sqlite.SQLiteDatabase d = android.database.sqlite.SQLiteDatabase.openDatabase(
+                db.getPath(), null, android.database.sqlite.SQLiteDatabase.OPEN_READONLY);
+             android.database.Cursor c = d.rawQuery(
+                     "SELECT thread_info FROM threads WHERE thread_id = ? LIMIT 1", new String[]{threadId})) {
+            if (!c.moveToFirst()) return null;
+            // thread_info is stored as a UTF-8 JSON blob.
+            String raw = c.getType(0) == android.database.Cursor.FIELD_TYPE_BLOB
+                    ? new String(c.getBlob(0), StandardCharsets.UTF_8) : c.getString(0);
+            JSONObject info = new JSONObject(raw);
+            String title = info.optString("thread_title", "").trim();
+            if (!title.isEmpty()) return title;
+            java.util.List<String> names = new java.util.ArrayList<>();
+            org.json.JSONArray users = info.optJSONArray("recipients");
+            if (users != null) {
+                for (int i = 0; i < users.length(); i++) {
+                    JSONObject u = users.optJSONObject(i);
+                    if (u == null) continue;
+                    String n = u.optString("full_name", "").trim();
+                    if (n.isEmpty()) n = u.optString("username", "").trim();
+                    if (!n.isEmpty()) names.add(n);
+                }
+            }
+            return names.isEmpty() ? null : String.join(", ", names);
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|ThreadNames) db lookup failed: " + t.getMessage());
+            return null;
+        }
     }
 }

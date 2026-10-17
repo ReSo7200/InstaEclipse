@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Hide Blend in Chats</string>
+    <string name="ig_dialog_hide_threads_button">Hide Threads Button on Profiles</string>
+    <string name="ig_feat_hide_blend">Hide Blend</string>
+    <string name="ig_feat_hide_threads">Hide Threads</string>
+    <string name="ig_hide_chat">Hide chat</string>
+    <string name="ig_unhide_chat">Unhide chat</string>
+</resources>

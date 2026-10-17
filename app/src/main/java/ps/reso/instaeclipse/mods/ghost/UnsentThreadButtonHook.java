@@ -2,7 +2,6 @@ package ps.reso.instaeclipse.mods.ghost;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
@@ -16,9 +15,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.mods.ui.utils.LifecycleHookUtil;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
+import ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker;
 import ps.reso.instaeclipse.utils.ghost.UnsentLog;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -34,26 +33,34 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  */
 public class UnsentThreadButtonHook {
 
+    /** Resolves the thread whose header carries the module buttons (set when they are injected). */
+    static volatile java.util.function.Supplier<String> openThread = CurrentThreadTracker::currentThreadId;
+
+
     private static final String TAG = "ie_unsent_btn";
+    private static final java.util.Set<View> pendingDecors =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
     private static int threadHeaderId, actionBarEndId, tagKeyId, backButtonId, leftContainerId, threadTitleId, threadSubtitleId;
 
     public void install(ClassLoader classLoader) {
-        XC_MethodHook resume = new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.keepUnsentMessages) return;
-                final Activity activity = (Activity) param.thisObject;
-                activity.runOnUiThread(() -> registerListener(activity));
-            }
-        };
+        // IG 448+ moved onResume off InstagramMainActivity into IgFragmentActivity, so a plain
+        // findAndHookMethod throws there; LifecycleHookUtil hooks the declaring class instead.
         for (String act : new String[]{"com.instagram.modal.ModalActivity",
                 "com.instagram.mainactivity.InstagramMainActivity"}) {
             try {
-                XposedHelpers.findAndHookMethod(act, classLoader, "onResume", resume);
+                LifecycleHookUtil.hookAfter(classLoader, act, "onResume", (activity, param) -> {
+                    if (!FeatureFlags.keepUnsentMessages) return;
+                    activity.runOnUiThread(() -> registerListener(activity));
+                });
             } catch (Throwable t) {
-                ModuleLog.line("(IE|UnsentBtn) ⚠️ hook " + act + ": " + t.getMessage());
+                ModuleLog.line("(IE|UnsentBtn) ⚠️ hook " + act + ": " + t);
             }
         }
+        // Thread opened as a fragment inside the main activity fires no activity onResume.
+        CurrentThreadTracker.install(classLoader);
+        CurrentThreadTracker.addListener((activity, threadId) -> {
+            if (FeatureFlags.keepUnsentMessages) registerListener(activity);
+        });
         ModuleLog.line("(IE|UnsentBtn) ✅ installed");
     }
 
@@ -117,9 +124,13 @@ public class UnsentThreadButtonHook {
             ensureIds(activity);
             if (tryInject(activity)) return;
             final View decor = activity.getWindow().getDecorView();
+            // One pending listener per window: registerListener runs on every activity resume and
+            // every thread-fragment resume, and listeners used to pile up on the main activity.
+            if (!pendingDecors.add(decor)) return;
             decor.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override public void onGlobalLayout() {
                     if (tryInject(activity)) {
+                        pendingDecors.remove(decor);
                         try { decor.getViewTreeObserver().removeOnGlobalLayoutListener(this); } catch (Throwable ignored) {}
                     }
                 }
@@ -136,66 +147,38 @@ public class UnsentThreadButtonHook {
             View header = threadHeaderId != 0 ? activity.findViewById(threadHeaderId) : null;
             if (header == null) return false;
 
-            // Preferred placement: right after the back button (left cluster). Fallbacks: the
-            // left-aligned container, then the right-side action buttons.
-            ViewGroup target;
-            int insertAt;
-            View back = backButtonId != 0 ? activity.findViewById(backButtonId) : null;
-            if (back != null && back.getParent() instanceof ViewGroup) {
-                target = (ViewGroup) back.getParent();
-                int bi = target.indexOfChild(back);
-                // To sit visually to the RIGHT of the back arrow: after it in LTR, before it in RTL
-                // (in RTL, a later child renders further left).
-                boolean rtl = target.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
-                insertAt = rtl ? bi : bi + 1;
-            } else if (leftContainerId != 0 && activity.findViewById(leftContainerId) instanceof ViewGroup) {
-                target = activity.findViewById(leftContainerId);
-                insertAt = 0;
-            } else if (actionBarEndId != 0 && activity.findViewById(actionBarEndId) instanceof ViewGroup) {
-                target = activity.findViewById(actionBarEndId);
-                insertAt = 0;
-            } else if (header instanceof ViewGroup) {
-                target = (ViewGroup) header;
-                insertAt = 0;
-            } else return false;
-
-            if (target.findViewWithTag(TAG) != null) return true; // already injected
-
-            android.widget.ImageView btn = new android.widget.ImageView(activity);
-            btn.setTag(TAG);
-            android.graphics.drawable.Drawable icon =
-                    ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(
-                            ps.reso.instaeclipse.R.drawable.ic_delete, Color.WHITE);
-            if (icon != null) btn.setImageDrawable(icon);
-            else { btn.setBackgroundColor(Color.TRANSPARENT); } // fail-safe (no crash if icon missing)
-            btn.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE);
-            int pad = dp(activity, 9);
-            btn.setPadding(pad, pad, pad, pad);
-            btn.setClickable(true);
-            btn.setFocusable(true);
-            btn.setContentDescription("Unsent messages");
-            int sz = dp(activity, 40);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(sz, sz);
-            lp.gravity = Gravity.CENTER_VERTICAL;
-            btn.setLayoutParams(lp);
+            if (ThreadHeaderMenu.has(activity, "unsent")) { // already injected
+                if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
+                ChatExportHook.inject(activity);
+                return true;
+            }
 
             final View headerRoot = header;
             // Capture the thread id AT INJECTION (thread just opened, before any refresh churn),
             // bound to THIS button — a stable per-thread fallback if the live read fails.
-            final String[] bound = { KeepUnsentMessagesHook.currentThreadId };
-            btn.setOnClickListener(v -> {
-                // PRIMARY: read the actually-open thread from the foreground fragment (immune to
-                // background igThreadIgid churn). Fallbacks: id bound at open, then tracked, then tags.
-                String threadId = resolveFromActivity(activity);
+            final String[] bound = { CurrentThreadTracker.currentThreadId() != null
+                    ? CurrentThreadTracker.currentThreadId() : KeepUnsentMessagesHook.currentThreadId };
+            // PRIMARY: read the actually-open thread from the foreground fragment (immune to
+            // background igThreadIgid churn). Fallbacks: id bound at open, then tracked, then tags.
+            // Shared with the other header buttons (chat export) so they act on the same thread.
+            openThread = () -> {
+                String threadId = CurrentThreadTracker.currentThreadId();
+                if (threadId == null) threadId = resolveFromActivity(activity);
                 if (threadId == null) threadId = bound[0];
                 if (threadId == null) threadId = KeepUnsentMessagesHook.currentThreadId;
                 if (threadId == null) threadId = resolveThreadId(headerRoot);
+                return threadId;
+            };
+            // Lives in the shared module menu button (one header button for all thread actions).
+            if (!ThreadHeaderMenu.add(activity, "unsent",
+                    ps.reso.instaeclipse.utils.i18n.I18n.t(activity, ps.reso.instaeclipse.R.string.ig_unsent_messages), () -> {
+                String threadId = openThread.get();
                 ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
                 ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
-            });
-            try { target.addView(btn, Math.min(insertAt, target.getChildCount())); }
-            catch (Throwable t) { target.addView(btn); }
-            ModuleLog.line("(IE|UnsentBtn) ✅ injected next to back in " + target.getClass().getSimpleName());
+            })) return false;
+            ModuleLog.line("(IE|UnsentBtn) ✅ added to the thread menu");
+            if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
+            ChatExportHook.inject(activity);
             return true;
         } catch (Throwable t) {
             ModuleLog.line("(IE|UnsentBtn) ⚠️ inject: " + t.getMessage());

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">Linki kopyala</string>
+    <string name="ig_story_links_title">Hekayə linkləri</string>
+    <string name="ig_story_links_hint">Kopyalamaq üçün toxun · açmaq üçün basıb saxla</string>
+    <string name="ig_toast_link_copied">Link kopyalandı</string>
+    <string name="ig_toast_links_copied">Bütün linklər kopyalandı</string>
+    <string name="ig_dialog_misc_story_links">Hekayə linklərini kopyala</string>
+    <string name="ig_feat_story_links">Hekayə linkləri</string>
+</resources>

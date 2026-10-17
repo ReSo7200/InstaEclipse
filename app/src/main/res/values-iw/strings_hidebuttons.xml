@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">הסתרת Blend בצ\'אטים</string>
+    <string name="ig_dialog_hide_threads_button">הסתרת כפתור Threads בפרופילים</string>
+    <string name="ig_feat_hide_blend">הסתרת Blend</string>
+    <string name="ig_feat_hide_threads">הסתרת Threads</string>
+    <string name="ig_hide_chat">הסתרת הצ\'אט</string>
+    <string name="ig_unhide_chat">ביטול הסתרת הצ\'אט</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">复制链接</string>
+    <string name="ig_story_links_title">快拍链接</string>
+    <string name="ig_story_links_hint">点按复制 · 长按打开</string>
+    <string name="ig_toast_link_copied">链接已复制</string>
+    <string name="ig_toast_links_copied">已复制所有链接</string>
+    <string name="ig_dialog_misc_story_links">复制快拍链接</string>
+    <string name="ig_feat_story_links">快拍链接</string>
+</resources>

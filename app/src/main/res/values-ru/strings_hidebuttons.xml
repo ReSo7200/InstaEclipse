@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Скрыть Blend в чатах</string>
+    <string name="ig_dialog_hide_threads_button">Скрыть кнопку Threads в профилях</string>
+    <string name="ig_feat_hide_blend">Скрыть Blend</string>
+    <string name="ig_feat_hide_threads">Скрыть Threads</string>
+    <string name="ig_hide_chat">Скрыть чат</string>
+    <string name="ig_unhide_chat">Показать чат</string>
+</resources>

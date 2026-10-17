@@ -78,9 +78,8 @@ public class UnsentLog {
                 o.put("t", e.time); o.put("th", e.thread); o.put("s", e.sender); o.put("m", e.text);
                 arr.put(o);
             }
-            try (FileOutputStream out = new FileOutputStream(f)) {
-                out.write(arr.toString().getBytes(StandardCharsets.UTF_8));
-            }
+            // temp file + rename: a crash mid-write keeps the previous version intact
+            ps.reso.instaeclipse.utils.core.AtomicFiles.write(f, arr.toString());
         } catch (Throwable t) {
             ModuleLog.line("(IE|UnsentLog) persist failed: " + t.getMessage());
         }

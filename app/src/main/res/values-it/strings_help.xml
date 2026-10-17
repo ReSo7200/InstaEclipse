@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">Ottieni aiuto</string>
+    <string name="help_get_help_body">Hai trovato un bug o qualcosa ha smesso di funzionare? Apri una segnalazione su GitHub o chiedi alla community su Telegram.</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">Informazioni</string>
+    <string name="help_version">Versione %1$s</string>
+    <string name="help_source_code">Codice sorgente su GitHub</string>
+    <string name="help_faq_expand">Espandi risposta</string>
+    <string name="help_faq_collapse">Comprimi risposta</string>
+    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
+    <string name="help_lsposed_sub">Hai il root? Usa questa versione</string>
+    <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
+    <string name="help_lspatch_sub">Senza root? Installa questo</string>
+    <string name="help_lspatch_guide">Segui la guida di installazione</string>
+</resources>

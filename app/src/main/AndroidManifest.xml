@@ -45,6 +45,22 @@
             android:exported="true"
             android:theme="@style/Theme.InstaEclipse" />
 
+        <!-- "Download with InstaEclipse" share target for Instagram post/reel links (#236). -->
+        <activity
+            android:name=".share.ShareDownloadActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/share_dl_label"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
         <!-- Companion-app service: receives downloaded file (via ParcelFileDescriptor) from the
              Xposed module (running in Instagram's process) and writes it to the SAF folder
              whose permission belongs to the companion app. -->
@@ -52,6 +68,22 @@
             android:name=".mods.media.DownloadSaveService"
             android:exported="true"
             android:foregroundServiceType="dataSync" />
+
+        <!-- Logs tab: hands Instagram's hooked process an append-only FD on a file in the
+             companion's storage so module logs survive Instagram being backgrounded/killed.
+             Only supported Instagram packages may open it (checked in openFile). -->
+        <provider
+            android:name=".utils.log.LogMirrorProvider"
+            android:authorities="ps.reso.instaeclipse.logmirror"
+            android:exported="true" />
+
+        <!-- Settings sync, Instagram -> companion: the hooked Instagram process pushes its
+             settings into the companion's copy after changes made in its own menu. Only
+             supported Instagram packages may call it (checked in call()). -->
+        <provider
+            android:name=".utils.core.PrefsSyncProvider"
+            android:authorities="ps.reso.instaeclipse.prefsync"
+            android:exported="true" />
 
         <!-- Xposed Meta-data -->
         <meta-data
@@ -72,18 +104,39 @@
     </application>
 
     <!-- Permissions -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="ManifestOrder,QueryAllPackagesPermission" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Package visibility: only the Instagram variants in CommonUtils.SUPPORTED_PACKAGES
+         (instead of QUERY_ALL_PACKAGES). Downloads go through the SAF folder the user picks,
+         so no storage permissions are needed. -->
+    <queries>
+        <package android:name="com.instagram.android" />
+        <package android:name="com.instagold.android" />
+        <package android:name="com.instaflux.app" />
+        <package android:name="com.myinsta.android" />
+        <package android:name="cc.honista.app" />
+        <package android:name="com.instaprime.android" />
+        <package android:name="com.instafel.android" />
+        <package android:name="com.instadm.android" />
+        <package android:name="com.dfistagram.android" />
+        <package android:name="com.Instander.android" />
+        <package android:name="com.aero.instagram" />
+        <package android:name="com.instapro.android" />
+        <package android:name="com.instaflow.android" />
+        <package android:name="com.instagram1.android" />
+        <package android:name="com.instagram2.android" />
+        <package android:name="com.instagramclone.android" />
+        <package android:name="com.instaclone.android" />
+    </queries>
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Signature permission guarding the companion -> Instagram broadcast bridge. Receivers
+         registered inside the hooked process require senders to hold it, so only this APK
+         (signed with the same key) can change settings there. See IpcSecurity. -->
+    <permission
+        android:name="ps.reso.instaeclipse.permission.MODULE_IPC"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="ps.reso.instaeclipse.permission.MODULE_IPC" />
 
-    <!-- For Android 11+ broad storage access -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Foreground service (required API 28+) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

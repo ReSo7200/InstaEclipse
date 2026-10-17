@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. Teks tidak muncul?</b>\n- Nonaktifkan HMA (HideMyApplist) untuk Instagram. InstaEclipse membaca teksnya dari aplikasinya sendiri, dan HMA menyembunyikannya.</string>
+    <string name="faq_8"><b>8. Beberapa fitur tetap tidak berfungsi walau aktif?</b>\n- Konfigurasi internal Instagram bisa memblokirnya. Opsi Pengembang → Pulihkan Konfigurasi Bawaan.</string>
+    <string name="faq_9"><b>9. Masih bermasalah?</b>\n- Tanyakan di grup Telegram (t.me/instaEclipse_discussion).</string>
+</resources>

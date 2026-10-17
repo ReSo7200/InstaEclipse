@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">Sao chép liên kết</string>
+    <string name="ig_story_links_title">Liên kết trong tin</string>
+    <string name="ig_story_links_hint">Chạm để sao chép · nhấn giữ để mở</string>
+    <string name="ig_toast_link_copied">Đã sao chép liên kết</string>
+    <string name="ig_toast_links_copied">Đã sao chép tất cả liên kết</string>
+    <string name="ig_dialog_misc_story_links">Sao chép liên kết trong tin</string>
+    <string name="ig_feat_story_links">Liên kết trong tin</string>
+</resources>

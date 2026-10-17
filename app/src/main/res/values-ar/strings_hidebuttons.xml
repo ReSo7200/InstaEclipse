@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">إخفاء Blend في المحادثات</string>
+    <string name="ig_dialog_hide_threads_button">إخفاء زر Threads في الملفات الشخصية</string>
+    <string name="ig_feat_hide_blend">إخفاء Blend</string>
+    <string name="ig_feat_hide_threads">إخفاء Threads</string>
+    <string name="ig_hide_chat">إخفاء المحادثة</string>
+    <string name="ig_unhide_chat">إظهار المحادثة</string>
+</resources>

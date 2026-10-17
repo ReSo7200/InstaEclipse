@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home dashboard (HomeFragment) -->
+    <string name="home_section_quick_actions">Sürətli əməliyyatlar</string>
+    <string name="home_section_shortcuts">Sürətli qısayollar</string>
+    <string name="home_status_installed">Quraşdırılıb</string>
+    <string name="home_status_not_installed">Quraşdırılmayıb</string>
+    <string name="home_status_module_active">Modul aktivdir</string>
+    <string name="home_status_version">Versiya %1$s</string>
+    <string name="home_status_no_version">InstaEclipse-dən istifadə etmək üçün Instagram-ı quraşdırın</string>
+    <plurals name="home_features_enabled">
+        <item quantity="one">%d funksiya aktivdir</item>
+        <item quantity="other">%d funksiya aktivdir</item>
+    </plurals>
+    <string name="home_action_launch">Başlat</string>
+    <string name="home_action_restart">Yenidən başlat</string>
+    <string name="home_action_download">APK yüklə</string>
+    <string name="home_restart_done">Instagram yenidən başladıldı</string>
+    <string name="home_shortcuts_edit">Qısayolları redaktə et</string>
+    <string name="home_shortcuts_dialog_title">Qısayolları sabitlə</string>
+    <string name="home_shortcuts_empty">Sabitlənmiş qısayol yoxdur. Ən çox istifadə etdiyiniz 8-ə qədər açarı sabitləmək üçün qələmə toxunun.</string>
+    <string name="home_shortcuts_hint">Dəyişikliklər dərhal Instagram-a göndərilir.</string>
+    <string name="home_shortcuts_limit">Ən çox %1$d qısayol sabitləyə bilərsiniz</string>
+    <string name="home_shortcuts_locked_extreme">Ekstremal Rejim tərəfindən kilidlənib</string>
+</resources>

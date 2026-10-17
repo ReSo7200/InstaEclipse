@@ -51,7 +51,7 @@ public class ReelDownloadHook {
                 FeatureStatusTracker.setHooked("ReelDownload");
                 XposedBridge.hookMethod(cached, new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam param) {
+                    protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!FeatureFlags.enableReelDownload) return;
                         onOptionsBuilt(param);
                     }
@@ -121,7 +121,7 @@ public class ReelDownloadHook {
 
             XposedBridge.hookMethod(target, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!FeatureFlags.enableReelDownload) return;
                     onOptionsBuilt(param);
                 }
@@ -167,12 +167,14 @@ public class ReelDownloadHook {
     // app-wide click-handler hook already covers whatever dispatches its click.
     private static void installReduceOptionsListPatch(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            Object downloadOption = null, copyLinkOption = null;
+            Object downloadOption = null, copyLinkOption = null, infoOption = null, speedOption = null;
             Class<?> optionClass = classLoader.loadClass("com.instagram.feed.media.mediaoption.MediaOption$Option");
             for (Object v : (Object[]) optionClass.getMethod("values").invoke(null)) {
                 String n = v.toString();
                 if (n.equals("DOWNLOAD")) downloadOption = v;
                 else if (n.equals("COPY_LINK")) copyLinkOption = v;
+                else if (n.equals(PostDownloadContextMenuHook.MEDIA_INFO_CARRIER)) infoOption = v;
+                else if (n.equals(PostDownloadContextMenuHook.SPEED_CARRIER)) speedOption = v;
             }
             if (downloadOption == null && copyLinkOption == null) {
                 ModuleLog.line("(IE|Reel) ❌ DOWNLOAD/COPY_LINK enum values not found");
@@ -180,13 +182,16 @@ public class ReelDownloadHook {
             }
             final Object download = downloadOption;
             final Object copyLink = copyLinkOption;   // #117 — clicks handled by PostDownloadContextMenuHook
+            final Object info = infoOption, speedRow = speedOption; // #231 / #247 — same click handler
 
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     boolean wantDl = FeatureFlags.enableReelDownload && download != null;
                     boolean wantCl = FeatureFlags.copyMediaLink && copyLink != null;
-                    if (!wantDl && !wantCl) return;
+                    boolean wantInfo = FeatureFlags.offerMediaInfo && info != null;
+                    boolean wantSpeed = FeatureFlags.offerPlaybackSpeed && speedRow != null;
+                    if (!wantDl && !wantCl && !wantInfo && !wantSpeed) return;
                     try {
                         Object result = param.getResult();
                         if (result instanceof List<?> list) {
@@ -194,6 +199,8 @@ public class ReelDownloadHook {
                             List<Object> mutable = (List<Object>) list;
                             if (wantDl && !mutable.contains(download)) mutable.add(download);
                             if (wantCl && !mutable.contains(copyLink)) mutable.add(copyLink);
+                            if (wantInfo && !mutable.contains(info)) mutable.add(info);
+                            if (wantSpeed && !mutable.contains(speedRow)) mutable.add(speedRow);
                         }
                     } catch (Throwable t) {
                         ModuleLog.line("(IE|Reel) ❌ options-list patch failed: " + t);
@@ -205,6 +212,7 @@ public class ReelDownloadHook {
                 Method cached = DexKitCache.loadMethod("ReelOptionsListBuilder", classLoader);
                 if (cached != null) {
                     XposedBridge.hookMethod(cached, hook);
+                    FeatureStatusTracker.setHooked("ReelDownload");
                     return;
                 }
             }
@@ -264,7 +272,7 @@ public class ReelDownloadHook {
                                          boolean forcedResult) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 ModuleLog.line("(IE|Reel|DEBUG) gate fired: " + cacheKey + " enabled=" + FeatureFlags.enableReelDownload);
                 if (FeatureFlags.enableReelDownload) param.setResult(forcedResult);
             }
@@ -532,6 +540,18 @@ public class ReelDownloadHook {
     }
 
     private static void startReelDownload(Context ctx, Object media, Object controller) {
+        String user = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
+        String id = "0";
+        try {
+            Object v = media.getClass().getMethod("getId").invoke(media);
+            if (v instanceof String s && !s.isEmpty()) id = s;
+        } catch (Throwable ignored) {}
+        // Audio-only option (#234) — only asks when enabled and the reel has an audio track.
+        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, null, user != null ? user : "reel", id, "reel",
+                () -> startReelVideoDownload(ctx, media, controller));
+    }
+
+    private static void startReelVideoDownload(Context ctx, Object media, Object controller) {
         String username = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
         if (username == null) username = "reel";
 
@@ -547,17 +567,17 @@ public class ReelDownloadHook {
             final String fn        = FeedVideoDownloadHook.buildFilename(username, "reel", mediaId, true);
             final String finalUrl  = videoUrl;
             final String finalUser = username;
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_reel), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_reel), Toast.LENGTH_SHORT).show();
             FeedVideoDownloadHook.executor.submit(() -> {
                 try {
                     boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, finalUrl, fn, true, finalUser);
                     if (!delegated) {
                         FeedVideoDownloadHook.mainHandler.post(() ->
-                                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_saved), Toast.LENGTH_SHORT).show());
+                                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_saved), Toast.LENGTH_SHORT).show());
                     }
                 } catch (Throwable e) {
                     FeedVideoDownloadHook.mainHandler.post(() ->
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                 }
             });
             return;
@@ -566,7 +586,7 @@ public class ReelDownloadHook {
         // No direct video — may be a photo carousel reel
         List<String> allUrls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
         if (allUrls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_url_not_found), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_url_not_found), Toast.LENGTH_SHORT).show();
             return;
         }
 

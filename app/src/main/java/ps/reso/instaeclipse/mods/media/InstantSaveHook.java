@@ -27,16 +27,22 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  *    the ctor (after) and cache that item's Media.
  *  - PointerTouchKt$handleTapAndLongPressWithRelease$2$1$1$1 — the viewer's tap/long-press pointer
  *    handler (package com.instagram.quicksnap.viewer.compose, so it only fires inside the Instant
- *    viewer). Its constructor stores the onLongPress callback in field A09 (a kotlin Function0).
- *    We wrap that Function0 so a long-press saves the cached Instant, then still runs IG's original.
+ *    viewer). Its constructor stores the onLongPress callback (a kotlin Function1) in a field.
+ *    We wrap that Function1 so a long-press saves the cached Instant, then still runs IG's original.
  *
- * The item/Media field names (A01/A06/A09) are the obfuscated field letters read reflectively;
- * we do NOT hardcode any obfuscated CLASS name — the two hooked classes are literal-named.
+ * No obfuscated class OR field name is hardcoded: the two hooked classes are literal-named, the
+ * Media is found by field type and the long-press callback by constructor-argument order.
  */
 public class InstantSaveHook {
 
-    private static final String VIEWER_LAMBDA =
-            "com.instagram.quicksnap.viewer.compose.QuickSnapMediaViewerScreenKt$QuickSnapMediaViewerScreen$16$1$8$1";
+    // Compose renumbers this lambda between builds ($16$1$8$1 on 447, $16$1$11$1 on 451). Known
+    // names first (newest first), then a DexKit search by the ctor's stable non-obfuscated types.
+    private static final String VIEWER_PREFIX =
+            "com.instagram.quicksnap.viewer.compose.QuickSnapMediaViewerScreenKt$QuickSnapMediaViewerScreen$";
+    private static final String[] VIEWER_LAMBDAS = {
+            VIEWER_PREFIX + "16$1$11$1",
+            VIEWER_PREFIX + "16$1$8$1",
+    };
     private static final String LONGPRESS_LAMBDA =
             "com.instagram.quicksnap.viewer.compose.PointerTouchKt$handleTapAndLongPressWithRelease$2$1$1$1";
 
@@ -51,10 +57,14 @@ public class InstantSaveHook {
     /** Hook the current-card coroutine ctor and cache arg[6]'s Media (field A01). */
     private void cacheCurrentInstant(ClassLoader cl) {
         try {
-            Class<?> lambda = XposedHelpers.findClass(VIEWER_LAMBDA, cl);
+            Class<?> lambda = resolveViewerLambda(cl);
+            if (lambda == null) {
+                ModuleLog.line("(IE|InstantSave) ⚠️ viewer cache: viewer lambda not found");
+                return;
+            }
             for (java.lang.reflect.Constructor<?> c : lambda.getDeclaredConstructors()) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
-                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                    @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         try {
                             Object media = findInstantMedia(p.args);
                             if (media != null) currentMedia = media;
@@ -62,10 +72,49 @@ public class InstantSaveHook {
                     }
                 });
             }
-            ModuleLog.line("(IE|InstantSave) ✅ viewer cache hooked");
+            ModuleLog.line("(IE|InstantSave) ✅ viewer cache hooked: " + lambda.getName());
         } catch (Throwable t) {
             ModuleLog.line("(IE|InstantSave) ⚠️ viewer cache: " + t.getMessage());
         }
+    }
+
+    private static Class<?> resolveViewerLambda(ClassLoader cl) {
+        for (String name : VIEWER_LAMBDAS) {
+            try {
+                Class<?> c = Class.forName(name, false, cl);
+                if (isViewerLambda(c)) return c;
+            } catch (Throwable ignored) {}
+        }
+        try {
+            if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return null;
+            for (org.luckypray.dexkit.result.ClassData cd : ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findClass(
+                    org.luckypray.dexkit.query.FindClass.create().matcher(
+                            org.luckypray.dexkit.query.matchers.ClassMatcher.create().className(
+                                    VIEWER_PREFIX, org.luckypray.dexkit.query.enums.StringMatchType.StartsWith)))) {
+                if (cd.getName().contains("cardCenter")) continue;
+                try {
+                    Class<?> c = cd.getInstance(cl);
+                    if (isViewerLambda(c)) return c;
+                } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|InstantSave) ⚠️ viewer lambda search: " + t.getMessage());
+        }
+        return null;
+    }
+
+    /** The current-card coroutine: a ctor taking UserSession + AnimatedParticleEffectState (447/451). */
+    private static boolean isViewerLambda(Class<?> c) {
+        for (java.lang.reflect.Constructor<?> k : c.getDeclaredConstructors()) {
+            boolean session = false, particles = false;
+            for (Class<?> t : k.getParameterTypes()) {
+                String n = t.getName();
+                if (n.equals("com.instagram.common.session.UserSession")) session = true;
+                if (n.endsWith(".AnimatedParticleEffectState")) particles = true;
+            }
+            if (session && particles) return true;
+        }
+        return false;
     }
 
     /**
@@ -96,10 +145,11 @@ public class InstantSaveHook {
     private static volatile long lastSaveMs = 0;
 
     /**
-     * Hook the viewer pointer handler and wrap its onLongPress callback (field A0A — verified
-     * on-device: A0A fires exactly once per gesture at the long-press threshold, while A0B is the
-     * ordinary press/tap callback that fires repeatedly). On long-press we save the cached Instant,
-     * then still run IG's original callback so its own behaviour (pause, etc.) is preserved.
+     * Hook the viewer pointer handler and wrap its onLongPress callback (A0A on 452 — verified
+     * on-device: it fires exactly once per gesture at the long-press threshold, while the other
+     * Function1 is the ordinary press/tap callback that fires repeatedly). On long-press we save the
+     * cached Instant, then still run IG's original callback so its own behaviour (pause, etc.) is
+     * preserved. The field is picked by {@link #longPressField}, not by its obfuscated letter.
      */
     private void wrapLongPress(ClassLoader cl) {
         try {
@@ -107,9 +157,11 @@ public class InstantSaveHook {
             Class<?> handler = XposedHelpers.findClass(LONGPRESS_LAMBDA, cl);
             for (java.lang.reflect.Constructor<?> c : handler.getDeclaredConstructors()) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
-                    @Override protected void afterHookedMethod(MethodHookParam p) {
+                    @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         try {
-                            final Object orig = XposedHelpers.getObjectField(p.thisObject, "A0A");
+                            java.lang.reflect.Field field = longPressField(p, function1);
+                            if (field == null) return;
+                            final Object orig = field.get(p.thisObject);
                             if (orig == null || !function1.isInstance(orig)) return;
                             if (orig.getClass().getName().startsWith("$Proxy")) return; // already wrapped
                             Object wrapper = Proxy.newProxyInstance(cl, new Class[]{function1}, (proxy, method, a) -> {
@@ -119,7 +171,7 @@ public class InstantSaveHook {
                                 }
                                 return orig != null ? method.invoke(orig, a) : null;
                             });
-                            XposedHelpers.setObjectField(p.thisObject, "A0A", wrapper);
+                            field.set(p.thisObject, wrapper);
                         } catch (Throwable ignored) {}
                     }
                 });
@@ -131,6 +183,43 @@ public class InstantSaveHook {
         }
     }
 
+    private static volatile java.lang.reflect.Field longPressField;
+    private static volatile boolean longPressMissLogged;
+
+    /**
+     * The pointer lambda captures (continuation, onPress: Function0, onTap: Function1,
+     * onLongPress: Function1, slop: Float, timeout: Long) — Kotlin keeps capture order in the ctor
+     * (452: p3 -> A0B tap, p4 -> A0A long-press). So the long-press callback is the SECOND
+     * Function1 ctor argument; the field is the Function1 field holding that same instance.
+     * Resolved on the first construction and reused (field letters are fixed for one build).
+     */
+    private static java.lang.reflect.Field longPressField(XC_MethodHook.MethodHookParam p, Class<?> function1) {
+        java.lang.reflect.Field cached = longPressField;
+        if (cached != null) return cached;
+        Object longPress = null;
+        int seen = 0;
+        for (Object a : p.args) {
+            if (a != null && function1.isInstance(a) && ++seen == 2) { longPress = a; break; }
+        }
+        if (longPress != null) {
+            for (java.lang.reflect.Field f : p.thisObject.getClass().getDeclaredFields()) {
+                if (f.getType() != function1) continue;
+                try {
+                    f.setAccessible(true);
+                    if (f.get(p.thisObject) == longPress) {
+                        ModuleLog.line("(IE|InstantSave) long-press field = " + f.getName());
+                        return longPressField = f;
+                    }
+                } catch (Throwable ignored) {}
+            }
+        }
+        if (!longPressMissLogged) {
+            longPressMissLogged = true;
+            ModuleLog.line("(IE|InstantSave) ⚠️ long-press field not found (Function1 args: " + seen + ")");
+        }
+        return null;
+    }
+
     /** Saves the cached current Instant's media via the module's downloader. */
     private static void saveCurrent() {
         final Object media = currentMedia;
@@ -138,7 +227,7 @@ public class InstantSaveHook {
         if (ctx == null) return;
         if (media == null) {
             FeedVideoDownloadHook.mainHandler.post(() ->
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
             return;
         }
         FeedVideoDownloadHook.executor.submit(() -> {
@@ -146,7 +235,7 @@ public class InstantSaveHook {
                 List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
                 if (urls == null || urls.isEmpty()) {
                     FeedVideoDownloadHook.mainHandler.post(() ->
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
                     return;
                 }
                 String url = urls.get(0);
@@ -161,11 +250,11 @@ public class InstantSaveHook {
                 String fn = FeedVideoDownloadHook.buildFilename(username, "instant", mediaId, isVid);
                 final String fUser = username;
                 FeedVideoDownloadHook.mainHandler.post(() ->
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saving), Toast.LENGTH_SHORT).show());
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saving), Toast.LENGTH_SHORT).show());
                 boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, isVid, fUser);
                 if (!delegated) {
                     FeedVideoDownloadHook.mainHandler.post(() ->
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saved), Toast.LENGTH_SHORT).show());
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saved), Toast.LENGTH_SHORT).show());
                 }
             } catch (Throwable e) {
                 ModuleLog.line("(IE|InstantSave) ❌ save failed: " + e);

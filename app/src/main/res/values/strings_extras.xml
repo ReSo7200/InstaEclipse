@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Copy without Hashtags</string>
+    <string name="ig_dialog_clean_feed_following_only">Following-only Feed</string>
+    <string name="ig_dialog_menu_extras">Extras</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Disable Swipe to Camera</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels Auto-Scroll Option</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Lock Reels Scrolling</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Unlimited Accounts</string>
+    <string name="ig_dialog_extras_airplane_mode">Airplane Mode (appear offline)</string>
+    <string name="ig_dialog_extras_high_res_images">Load highest resolution images</string>
+    <string name="ig_dialog_extras_hide_onboarding">Hide contact and location onboarding prompts</string>
+    <string name="ig_dialog_extras_fix_notifications">Fix legacy notification registration on Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Hide story tray only</string>
+    <string name="ig_dialog_extras_share_domain">Custom Share Domain</string>
+    <string name="ig_dialog_extras_share_domain_off">Off</string>
+    <string name="ig_dialog_extras_share_domain_hint">Replaces instagram.com in links you copy or share, e.g. for embed previews. Leave empty to turn off.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Invalid domain</string>
+    <string name="ig_dialog_extras_startup_tab">Startup Tab</string>
+    <string name="ig_media_open_with">Open with…</string>
+    <string name="ig_lock_try_again_in">Too many tries. Try again in %1$d s</string>
+    <string name="loc_picker_locating">Finding place…</string>
+    <string name="loc_picker_unnamed">Unnamed place</string>
+    <string name="ig_dialog_location_current_title">Current location</string>
+    <string name="ig_dialog_location_recent">Recent places</string>
+    <string name="ig_dialog_location_applied">Location applied</string>
+</resources>

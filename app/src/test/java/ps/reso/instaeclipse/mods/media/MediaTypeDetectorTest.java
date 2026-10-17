@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class MediaTypeDetectorTest {
@@ -48,5 +50,18 @@ public class MediaTypeDetectorTest {
                 MediaTypeDetector.fromContentType("image/webp"));
         assertEquals(MediaTypeDetector.Kind.UNKNOWN,
                 MediaTypeDetector.sniff("unknown".getBytes(StandardCharsets.US_ASCII), 7));
+    }
+
+    @Test
+    public void keepsGifAsGifEvenWhenRequestedAsJpeg() throws Exception {
+        File f = File.createTempFile("ie_gif", ".bin");
+        try (FileOutputStream out = new FileOutputStream(f)) {
+            out.write("GIF89a".getBytes(StandardCharsets.US_ASCII));
+            out.write(new byte[16]);
+        }
+        MediaTypeDetector.Result r = MediaTypeDetector.resolve(f, "image/gif", "image/jpeg", "comment_gif_1.jpg");
+        assertEquals("image/gif", r.mimeType);
+        assertEquals("comment_gif_1.gif", r.filename);
+        f.delete();
     }
 }

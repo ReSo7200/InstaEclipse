@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Heşteqsiz Kopyala</string>
+    <string name="ig_dialog_clean_feed_following_only">Yalnız İzlənilənlər Axını</string>
+    <string name="ig_dialog_menu_extras">Əlavələr</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Kameraya sürüşdürməni söndür</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels avtomatik sürüşdürmə seçimi</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Reels sürüşdürməsini kilidlə</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Limitsiz hesab</string>
+    <string name="ig_dialog_extras_airplane_mode">Təyyarə rejimi (oflayn görün)</string>
+    <string name="ig_dialog_extras_high_res_images">Şəkilləri ən yüksək keyfiyyətdə yüklə</string>
+    <string name="ig_dialog_extras_hide_onboarding">Kontakt və məkan təkliflərini gizlət</string>
+    <string name="ig_dialog_extras_fix_notifications">Android 12+ üçün köhnə bildiriş qeydiyyatını düzəlt</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Yalnız hekayə zolağını gizlət</string>
+    <string name="ig_dialog_extras_share_domain">Xüsusi paylaşım domeni</string>
+    <string name="ig_dialog_extras_share_domain_off">Söndürülüb</string>
+    <string name="ig_dialog_extras_share_domain_hint">Kopyaladığın və ya paylaşdığın linklərdə instagram.com-u dəyişir. Söndürmək üçün boş burax.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Yanlış domen</string>
+    <string name="ig_dialog_extras_startup_tab">Başlanğıc bölməsi</string>
+    <string name="ig_media_open_with">Bununla aç…</string>
+    <string name="ig_lock_try_again_in">Çox cəhd. %1$d san sonra yenidən cəhd edin</string>
+    <string name="loc_picker_locating">Yer axtarılır…</string>
+    <string name="loc_picker_unnamed">Adsız yer</string>
+    <string name="ig_dialog_location_current_title">Cari məkan</string>
+    <string name="ig_dialog_location_recent">Son məkanlar</string>
+    <string name="ig_dialog_location_applied">Məkan tətbiq edildi</string>
+</resources>

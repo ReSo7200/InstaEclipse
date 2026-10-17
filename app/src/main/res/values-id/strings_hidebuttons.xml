@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Sembunyikan Blend di chat</string>
+    <string name="ig_dialog_hide_threads_button">Sembunyikan tombol Threads di profil</string>
+    <string name="ig_feat_hide_blend">Sembunyikan Blend</string>
+    <string name="ig_feat_hide_threads">Sembunyikan Threads</string>
+    <string name="ig_hide_chat">Sembunyikan chat</string>
+    <string name="ig_unhide_chat">Tampilkan chat</string>
+</resources>

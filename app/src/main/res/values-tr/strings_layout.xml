@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feat_group_social">Sosyal</string>
+    <string name="menu_feed">Akış</string>
+    <string name="menu_navigation">Gezinme</string>
+    <string name="menu_reels_stories">Reels ve Hikayeler</string>
+    <string name="menu_messages">Mesajlar</string>
+    <string name="menu_post_menu">Gönderi Menüsü ve Yüklemeler</string>
+    <string name="menu_likes_comments">Beğeniler ve Yorumlar</string>
+    <string name="menu_profiles">Profiller</string>
+    <string name="menu_app">Uygulama ve Hesap</string>
+    <string name="menu_ads_tracking">Reklam ve İzleme</string>
+    <string name="menu_nav_tabs">Sekmeler</string>
+    <string name="menu_nav_order">Sıra ve Başlangıç</string>
+    <string name="menu_nav_gestures">Hareketler</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Hikâyeler</string>
+    <string name="nav_tab_order_changed">Sekme sırası değiştirildi</string>
+</resources>

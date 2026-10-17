@@ -19,7 +19,7 @@ public class DisableStoryFlippingHook {
 
     private static final XC_MethodHook HOOK = new XC_MethodHook() {
         @Override
-        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+        protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
             if (FeatureFlags.disableStoryFlipping) param.setResult(null);
         }
     };
@@ -42,19 +42,35 @@ public class DisableStoryFlippingHook {
 
     private void findAndHookMethod(DexKitBridge bridge) {
         try {
-            // Step 1: Find methods matching the targeted method structure
+            // Step 1: the "story item finished → advance" callback on ReelViewerFragment.
+            // IG 452+: typed A1L(ReelItem)V holding the "end_scene" check; the (Object)V
+            // interface method became a bare bridge to it, and the progress callback also calls
+            // it at 100%, so hooking it covers both paths.
+            String rvf = "instagram.features.stories.fragment.ReelViewerFragment";
             List<MethodData> methods = bridge.findMethod(
                     FindMethod.create().matcher(
                             MethodMatcher.create()
-                                    .declaredClass("instagram.features.stories.fragment.ReelViewerFragment")
-                                    .paramTypes("java.lang.Object")
+                                    .declaredClass(rvf)
+                                    .paramTypes("com.instagram.model.reels.ReelItem")
                                     .returnType("void")
-                                    .usingStrings("userSession")
+                                    .usingStrings("end_scene")
                     )
             );
+            // IG <=451: the (Object)V interface method itself held the body.
+            if (methods.isEmpty()) {
+                methods = bridge.findMethod(
+                        FindMethod.create().matcher(
+                                MethodMatcher.create()
+                                        .declaredClass(rvf)
+                                        .paramTypes("java.lang.Object")
+                                        .returnType("void")
+                                        .usingStrings("userSession")
+                        )
+                );
+            }
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(InstaEclipse | StoryFlipping): ❌ No methods found referencing 'end_scene'.");
+                ModuleLog.line("(InstaEclipse | StoryFlipping): ❌ story-advance method not found (end_scene / userSession).");
                 return;
             }
 

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feat_group_social">اجتماعي</string>
+    <string name="menu_feed">الخلاصة</string>
+    <string name="menu_navigation">التنقل</string>
+    <string name="menu_reels_stories">الريلز والقصص</string>
+    <string name="menu_messages">الرسائل</string>
+    <string name="menu_post_menu">قائمة المنشور والرفع</string>
+    <string name="menu_likes_comments">الإعجابات والتعليقات</string>
+    <string name="menu_profiles">الملفات الشخصية</string>
+    <string name="menu_app">التطبيق والحساب</string>
+    <string name="menu_ads_tracking">الإعلانات والتتبع</string>
+    <string name="menu_nav_tabs">التبويبات</string>
+    <string name="menu_nav_order">الترتيب والبدء</string>
+    <string name="menu_nav_gestures">الإيماءات</string>
+    <string name="menu_reels">ريلز</string>
+    <string name="menu_stories">القصص</string>
+    <string name="nav_tab_order_changed">تم تغيير ترتيب التبويبات</string>
+</resources>

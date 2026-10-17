@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.7.0</string>
+    <string name="version" translatable="false">v0.8.0</string>
     <string name="home">Beranda</string>
     <string name="features">Fitur</string>
     <string name="help">Bantuan</string>
@@ -58,7 +58,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">Modul masih tidak berfungsi?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jika Anda memiliki <b>root</b>, coba gunakan <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed dari JingMatrix</a><br/><br/>Jika Anda <b>tidak memiliki root</b>, instal <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch dari JingMatrix</a> lalu ikuti <a href="https://t.me/instaEclipse_discussion/158/5149">panduan ini</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">Kategori:</string>
@@ -221,6 +220,17 @@
     <string name="ig_dialog_ad_block_analytics">Blokir Analitik</string>
     <string name="ig_dialog_clean_feed_hide_suggested">Sembunyikan saran di feed</string>
     <string name="ig_dialog_ad_disable_tracking">Nonaktifkan Tautan Pelacakan</string>
+    <string name="ig_dialog_open_links_externally">Buka Tautan di Browser Eksternal</string>
+    <string name="theme_light_mode">Mode terang</string>
+    <string name="theme_dark_mode">Mode gelap</string>
+    <string name="ig_dialog_translate_messages">Tombol terjemahkan di obrolan</string>
+    <string name="ig_chat_translate_row">Terjemahkan dengan aplikasi</string>
+    <string name="ig_downloader_folder_hint">Atur folder dari aplikasi InstaEclipse</string>
+    <string name="lock_code_set_in_ig">Atur di dalam Instagram: menu InstaEclipse &gt; Kunci. Ketuk untuk membuka Instagram.</string>
+    <string name="theme_set_light">Tema mode terang</string>
+    <string name="theme_set_dark">Tema mode gelap</string>
+    <string name="theme_light_same">Tema sama seperti mode gelap</string>
+    <string name="theme_light_stock">Instagram bawaan (tema hanya di mode gelap)</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">Mode Ekstrem (Tidak dapat dipulihkan hingga reinstall)</string>
@@ -237,6 +247,27 @@
     <string name="ig_dialog_misc_disable_story_autoswipe">Nonaktifkan Auto-Geser Story</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Nonaktifkan Putar Otomatis Video</string>
     <string name="ig_dialog_misc_disable_repost">Nonaktifkan Repost</string>
+    <string name="ig_dialog_clean_feed_expand_captions">Selalu Tampilkan Keterangan Lengkap (mulai ulang IG)</string>
+    <string name="ig_dialog_clean_feed_hide_plus">Sembunyikan Promosi Instagram Plus</string>
+    <string name="ig_dialog_clean_feed_hide_community_notes">Sembunyikan Catatan Komunitas</string>
+    <string name="ig_dialog_misc_profile_follows_label">Tampilkan \"Mengikuti Anda\" di Profil</string>
+    <string name="ig_profile_follows_you">Mengikuti Anda</string>
+    <string name="ig_profile_not_following_you">Tidak mengikuti Anda</string>
+    <string name="ig_dialog_downloader_offer_media_info">Tambahkan Info Media ke Menu Postingan</string>
+    <string name="ig_dialog_downloader_offer_speed">Tambahkan Kecepatan Putar ke Menu Postingan</string>
+    <string name="ig_dialog_downloader_reel_scrubber">Selalu Tampilkan Bilah Geser Reels</string>
+    <string name="ig_media_info_title">Info media</string>
+    <string name="ig_playback_speed_title">Kecepatan putar</string>
+    <string name="ig_playback_speed_next">Kecepatan diatur — berlaku untuk video berikutnya yang diputar</string>
+    <string name="ig_dialog_distraction_hide_notes_tray">Sembunyikan Catatan di Pesan</string>
+    <string name="ig_dialog_downloader_voice">Unduh Pesan Suara (tekan lama)</string>
+    <string name="ig_dialog_misc_viewer_search">Cari Penonton Story Anda</string>
+    <string name="ig_viewer_search_hint">Cari penonton</string>
+    <string name="ig_dialog_misc_like_undo">Jendela Urungkan untuk Suka (4 dtk)</string>
+    <string name="ig_like_undo_bar">❤ Disukai · URUNGKAN</string>
+    <string name="ig_like_undo_cancelled">Suka dibatalkan — muat ulang untuk memperbarui ikon hati</string>
+    <string name="ig_dialog_misc_exact_timestamps">Tampilkan Tanggal Pasti, Bukan \"2 jam lalu\"</string>
+    <string name="ig_dialog_misc_hide_share_create_group">Sembunyikan \"Buat grup\" di Menu Bagikan</string>
     <string name="ig_dialog_misc_show_feature_toasts">Tampilkan Toast Fitur</string>
     <string name="ig_dialog_misc_show_follower_toast">Tampilkan Toast Pengikut</string>
     <string name="ig_dialog_misc_view_story_mentions">Lihat Sebutan Story</string>
@@ -336,6 +367,9 @@
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">Unduh</string>
+    <string name="ig_story_mark_seen">Tandai sudah dilihat</string>
+    <string name="ig_story_marked_seen">Ditandai sudah dilihat</string>
+    <string name="ig_story_mark_seen_none">Belum ada yang bisa dikirim untuk story ini — biarkan diputar dulu</string>
     <string name="ig_dl_carousel_subtitle">Carousel • %1$d item</string>
     <string name="ig_dl_carousel_current">Unduh saat ini (%1$d dari %2$d)</string>
     <string name="ig_dl_carousel_all">Unduh semua %1$d item</string>
@@ -423,6 +457,8 @@
     <string name="theme_section_colors">Warna</string>
     <string name="theme_section_fonts">Font &amp; Emoji</string>
     <string name="ig_dialog_quality_max">Maksimum Tersedia</string>
+    <string name="ig_dialog_max_upload_quality">Selalu unggah dengan kualitas tertinggi</string>
+    <string name="ig_feat_max_upload_quality">Kualitas unggah maks</string>
     <string name="ig_dialog_location_spoof_enable">Palsukan Lokasi GPS</string>
     <string name="ig_dialog_location_pick">Pilih Lokasi di Peta</string>
     <string name="ig_dialog_location_unset">Belum ada lokasi yang diatur</string>
@@ -432,7 +468,13 @@
     <string name="loc_picker_use">Gunakan Lokasi Ini</string>
     <string name="loc_picker_search_failed">Lokasi tidak ditemukan</string>
     <string name="loc_picker_search_error">Pencarian gagal: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">Simpan Pesan yang Tidak Terkirim</string>
+    <string name="ig_dialog_ghost_keep_unsent">Catat Pesan yang Ditarik</string>
+    <string name="ig_dialog_ghost_jump_first">Tombol Lompat ke Pesan Pertama di Obrolan</string>
+    <string name="ig_jump_first_message">Lompat ke pesan pertama</string>
+    <string name="ig_jump_first_loading">Memuat pesan lama… ketuk lagi untuk berhenti</string>
+    <string name="ig_jump_first_done">Sudah sampai di pesan pertama</string>
+    <string name="ig_jump_first_stopped">Dihentikan</string>
+    <string name="ig_dialog_ghost_edit_history">Simpan Riwayat Edit Pesan</string>
     <string name="ig_dialog_unsent_title">Pesan Tidak Terkirim</string>
     <string name="ig_dialog_unsent_clear">Bersihkan log obrolan ini</string>
     <string name="ig_dialog_unsent_export">Ekspor sebagai JSON</string>
@@ -455,6 +497,19 @@
     <string name="ig_dialog_misc_lock_section">Kunci</string>
     <string name="ig_dialog_misc_lock_fingerprint">Gunakan sidik jari untuk membuka kunci</string>
     <string name="ig_hide_chats_title">Sembunyikan Obrolan Tertentu</string>
+    <string name="ig_translate_text">Terjemahkan</string>
+    <string name="ig_dialog_downloader_offer_audio">Tawarkan Unduhan Audio Saja untuk Video</string>
+    <string name="ig_download_choice_title">Unduh</string>
+    <string name="ig_download_choice_video">Video</string>
+    <string name="ig_download_choice_audio">Audio saja (.m4a)</string>
+    <string name="ig_download_choice_save">Simpan ke perangkat</string>
+    <string name="ig_download_choice_copy_image">Salin gambar</string>
+    <string name="ig_dialog_downloader_offer_copy_image">Tambahkan Salin Gambar ke Menu Postingan</string>
+    <string name="ig_toast_copy_image_video">Slide ini adalah video — tidak ada yang bisa disalin</string>
+    <string name="ig_toast_copying_image">Menyalin gambar…</string>
+    <string name="ig_toast_image_copied">Gambar disalin ke clipboard</string>
+    <string name="ig_toast_downloading_audio">Mengunduh audio…</string>
+    <string name="ig_toast_audio_saved">Audio disimpan</string>
     <string name="ig_dialog_misc_hide_chats">Sembunyikan Obrolan Tertentu</string>
     <string name="ig_hide_chats_manage">Kelola obrolan tersembunyi</string>
     <string name="ig_hide_chats_empty">Belum ada obrolan tersembunyi. Buka obrolan dan ketuk tombol mata-dicoret untuk menyembunyikannya.</string>
@@ -486,10 +541,29 @@
     <string name="ig_dialog_unsent_empty">Belum ada pesan tidak terkirim yang tertangkap</string>
     <string name="ig_dialog_unsent_unknown_chat">Obrolan tidak dikenal</string>
     <string name="ig_dialog_clean_feed_hide_threads">Sembunyikan Saran Threads</string>
+    <string name="ig_dialog_clean_feed_hide_liked">Sembunyikan Postingan yang Sudah Anda Sukai</string>
+    <string name="ig_nav_settings_title">Pengaturan navigasi</string>
+    <string name="ig_nav_name_home">Beranda</string>
+    <string name="ig_nav_name_reels">Reels</string>
+    <string name="ig_nav_name_create">Buat</string>
+    <string name="ig_nav_name_messages">Pesan</string>
+    <string name="ig_nav_name_activity">Aktivitas</string>
+    <string name="ig_nav_name_profile">Profil</string>
+    <string name="ig_nav_name_search">Cari</string>
+    <string name="ig_nav_tabs_title">Sembunyikan tab navigasi</string>
+    <string name="ig_nav_tab_home">Sembunyikan tab Beranda</string>
+    <string name="ig_nav_tab_reels">Sembunyikan tab Reels</string>
+    <string name="ig_nav_tab_create">Sembunyikan tab Buat</string>
+    <string name="ig_nav_tab_messages">Sembunyikan tab Pesan</string>
+    <string name="ig_nav_tab_activity">Sembunyikan tab Aktivitas</string>
+    <string name="ig_nav_tab_profile">Sembunyikan tab Profil</string>
     <string name="ig_dialog_misc_spoof_last_seen">Palsukan Terakhir Dilihat (bekukan)</string>
     <string name="ig_dialog_misc_copy_caption">Salin Keterangan</string>
     <string name="ig_dialog_misc_photo_zoom">Zoom Foto (Tekan Lama)</string>
     <string name="ig_caption_copy_menu_item">Salin Keterangan</string>
+    <string name="ig_caption_translate_menu_item">Terjemahkan Keterangan</string>
+    <string name="ig_caption_translate_full">Keterangan lengkap</string>
+    <string name="ig_caption_translate_no_hashtags">Tanpa tagar</string>
     <string name="ig_caption_copy_title">Salin Keterangan</string>
     <string name="ig_caption_copy_full">Salin Keterangan Lengkap</string>
     <string name="ig_caption_copy_none">Tidak ada keterangan pada postingan ini</string>
@@ -518,4 +592,78 @@
     <string name="ig_story_download_video_music">Unduh video dengan musik</string>
     <string name="ig_story_cache_clear_confirm">Hapus semua Story yang di-cache? Tindakan ini tidak dapat dibatalkan.</string>
     <string name="ig_story_cache_cleared">Story yang di-cache dihapus</string>
+    <string name="ig_dialog_ghost_chat_export">Tombol Ekspor Obrolan di Obrolan</string>
+    <string name="ig_chat_export">Ekspor obrolan</string>
+    <string name="ig_locked_coll_setting">Koleksi Tersimpan yang dapat dikunci (tombol 🔒 di koleksi; memakai kode sandi yang diatur di Instagram)</string>
+    <string name="ig_locked_coll_setting_short">Koleksi Tersimpan yang dapat dikunci (🔒 di koleksi)</string>
+    <string name="ig_locked_coll_title">Koleksi terkunci</string>
+    <string name="ig_locked_coll_open">Buka</string>
+    <string name="ig_locked_coll_hint">Kode sandi</string>
+    <string name="ig_locked_coll_lock">Kunci koleksi ini</string>
+    <string name="ig_locked_coll_unlock">Buka kunci koleksi ini</string>
+    <string name="ig_locked_coll_locked">Koleksi dikunci: akan meminta kode sandi Anda</string>
+    <string name="ig_locked_coll_unlocked">Koleksi dibuka kuncinya</string>
+    <string name="ig_locked_coll_need_passcode">Atur kode sandi dulu: pengaturan InstaEclipse di Instagram, Kunci</string>
+    <string name="ig_saved_on_profile">Tombol Tersimpan di profil Anda (mulai ulang Instagram)</string>
+    <string name="ig_saved_on_profile_button">Tersimpan</string>
+    <string name="ig_nav_tab_search">Cari</string>
+    <string name="ig_nav_tab_order">Urutan tab</string>
+    <string name="ig_nav_tab_order_hint">Gunakan panah untuk mengurutkan ulang bilah bawah. Tab tersembunyi tetap di tempatnya. Berlaku saat Anda kembali ke Instagram.</string>
+    <string name="ig_nav_tab_order_reset">Reset</string>
+    <string name="share_dl_label">Unduh dengan InstaEclipse</string>
+    <string name="share_dl_no_link">Tautan postingan atau reel Instagram tidak ditemukan</string>
+    <string name="share_dl_no_instagram">Instagram tidak terpasang</string>
+    <string name="ig_share_dl_loading">InstaEclipse: memuat postingan untuk diunduh…</string>
+    <string name="ig_share_dl_saving">InstaEclipse: menyimpan %1$d file…</string>
+    <string name="ig_share_dl_not_found">InstaEclipse: tidak dapat memuat postingan itu</string>
+    <string name="ig_thread_menu">Tindakan obrolan InstaEclipse</string>
+    <string name="ig_unsent_messages">Pesan tidak terkirim</string>
+    <string name="ig_hide_chat_toggle">Sembunyikan / tampilkan obrolan</string>
+    <string name="ig_chat_export_working">Mengekspor pesan yang dimuat…</string>
+    <string name="ig_chat_export_done">Mengekspor %1$d pesan ke %2$s</string>
+    <string name="ig_chat_export_load_all">Muat seluruh obrolan dulu (melompat ke pesan pertama)</string>
+    <string name="ig_chat_export_media">Unduh media ke folder ekspor</string>
+    <string name="ig_chat_export_media_progress">Mengunduh media %1$d/%2$d…</string>
+    <string name="ig_chat_export_done_media">Mengekspor %1$d pesan dan %2$d file media ke %3$s</string>
+    <string name="ig_export_media_saved">Ekspor disimpan — %1$d file media di %2$s</string>
+    <string name="ig_feat_edit_history">Riwayat edit</string>
+    <string name="ig_feat_lock_collections">Kunci koleksi</string>
+    <string name="ig_feat_comment_search">Cari komentar</string>
+    <string name="ig_feat_viewer_search">Penonton Story</string>
+    <string name="ig_feat_follow_export">Ekspor pengikut</string>
+    <string name="ig_feat_saved_on_profile">Tersimpan di profil</string>
+    <string name="ig_feat_hide_notes">Sembunyikan Catatan</string>
+    <string name="ig_feat_voice_download">Unduh pesan suara</string>
+    <string name="ig_feat_photo_zoom">Zoom foto</string>
+    <string name="ig_chat_export_none">Belum ada pesan yang dimuat untuk obrolan ini</string>
+    <string name="ig_media_info_copy">Salin</string>
+    <string name="ig_dialog_misc_comment_search">Cari Komentar</string>
+    <string name="ig_comment_search">Cari komentar</string>
+    <string name="ig_comment_search_hint">Cari di %1$d komentar yang dimuat</string>
+    <string name="ig_comment_search_load_all">Muat semua</string>
+    <string name="ig_comment_search_stop">Hentikan</string>
+    <string name="ig_comment_search_field_hint">Cari berdasarkan nama atau kata</string>
+    <string name="ig_comment_search_count">%1$d komentar dimuat</string>
+    <string name="ig_comment_search_matches">%2$d dari %1$d komentar cocok</string>
+    <string name="ig_comment_search_empty">Tidak ada komentar yang cocok</string>
+    <string name="ig_comment_search_tip">Ketuk komentar untuk menyalinnya</string>
+    <string name="ig_comment_search_view_replies">Lihat %1$d balasan</string>
+    <string name="ig_comment_search_hide_replies">Sembunyikan balasan</string>
+    <string name="ig_comment_export">Ekspor</string>
+    <string name="ig_comment_export_working">Mengekspor komentar yang dimuat…</string>
+    <string name="ig_comment_export_post_media">Simpan juga foto/video postingan</string>
+    <string name="ig_comment_export_done">Mengekspor %1$d komentar ke %2$s</string>
+    <string name="ig_dialog_misc_follow_export">Ekspor Pengikut/Mengikuti ke CSV</string>
+    <string name="ig_follow_export">Ekspor CSV</string>
+    <string name="ig_follow_export_done">Mengekspor %1$d akun ke %2$s</string>
+    <string name="ig_follow_export_none">Belum ada akun yang dimuat</string>
+    <string name="ig_follow_export_loading">Memuat akun… %1$d sejauh ini.
+Tetap di layar ini sampai selesai.</string>
+    <string name="ig_follow_export_stop">Hentikan &amp; simpan</string>
+    <string name="ig_comment_gif_downloading">Mengunduh media komentar…</string>
+    <string name="ig_comment_copy_media_link">Salin tautan GIF / gambar</string>
+    <string name="ig_highlight_download_all">Unduh seluruh Sorotan</string>
+    <string name="ig_highlight_loading">Memuat Sorotan…</string>
+    <string name="ig_highlight_downloading">Mengunduh %1$d item Sorotan…</string>
+    <string name="ig_highlight_done">Sorotan disimpan: %1$d dari %2$d item</string>
 </resources>

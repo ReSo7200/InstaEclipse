@@ -110,6 +110,76 @@ public class GhostStorySeenHook {
         }
     }
 
+    // ── Selective "Mark as seen" (#226) ────────────────────────────────────────
+    // Blocked seen calls are remembered (bounded) with a fingerprint of the strings they carry
+    // (args + the pending item's fields). "Mark as seen" on a story replays the original calls whose
+    // fingerprint contains that story's media id, so only that story is reported.
+    private static final ThreadLocal<Boolean> REPLAYING = new ThreadLocal<>();
+    private static final java.util.ArrayDeque<Object[]> BLOCKED = new java.util.ArrayDeque<>(); // {Member, this, args, fp}
+    private static final int MAX_BLOCKED = 80;
+
+    private static void rememberBlocked(XC_MethodHook.MethodHookParam param) {
+        try {
+            StringBuilder fp = new StringBuilder();
+            for (Object a : param.args) collectStrings(a, fp, 0, java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
+            synchronized (BLOCKED) {
+                BLOCKED.addLast(new Object[]{param.method, param.thisObject, param.args.clone(), fp.toString()});
+                while (BLOCKED.size() > MAX_BLOCKED) BLOCKED.removeFirst();
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    private static void collectStrings(Object o, StringBuilder out, int depth, java.util.Set<Object> seen) {
+        if (o == null || depth > 2 || out.length() > 4000 || !seen.add(o)) return;
+        if (o instanceof CharSequence cs) { out.append(cs).append('|'); return; }
+        if (o instanceof Map<?, ?> m) {
+            for (Map.Entry<?, ?> e : m.entrySet()) {
+                collectStrings(e.getKey(), out, depth + 1, seen);
+                collectStrings(e.getValue(), out, depth + 1, seen);
+            }
+            return;
+        }
+        String cn = o.getClass().getName();
+        if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return;
+        for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+                if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+                try { f.setAccessible(true); collectStrings(f.get(o), out, depth + 1, seen); }
+                catch (Throwable ignored) {}
+            }
+        }
+    }
+
+    /**
+     * Sends the story-seen report(s) that ghost mode blocked for this media id. Returns how many
+     * blocked calls were replayed (0 = nothing remembered for it, e.g. viewed before IG restarted).
+     */
+    public static int markSeen(String mediaId) {
+        if (mediaId == null || mediaId.isEmpty()) return 0;
+        java.util.List<Object[]> hits = new java.util.ArrayList<>();
+        synchronized (BLOCKED) {
+            java.util.Iterator<Object[]> it = BLOCKED.iterator();
+            while (it.hasNext()) {
+                Object[] e = it.next();
+                if (((String) e[3]).contains(mediaId)) { hits.add(e); it.remove(); }
+            }
+        }
+        int n = 0;
+        for (Object[] e : hits) {
+            try {
+                REPLAYING.set(Boolean.TRUE);
+                XposedBridge.invokeOriginalMethod((java.lang.reflect.Member) e[0], e[1], (Object[]) e[2]);
+                n++;
+            } catch (Throwable t) {
+                ModuleLog.line("(InstaEclipse | StoryBlock): ⚠️ mark-seen replay: " + t);
+            } finally {
+                REPLAYING.remove();
+            }
+        }
+        ModuleLog.line("(InstaEclipse | StoryBlock): mark-seen " + mediaId + " -> replayed " + n);
+        return n;
+    }
+
     /** IG <=441 (436): the sender is a single {@code final void ()} method referencing "media/seen/". */
     private boolean tryLegacyBlock(DexKitBridge bridge) {
         try {
@@ -138,7 +208,7 @@ public class GhostStorySeenHook {
     private static XC_MethodHook legacyHook() {
         return new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.isGhostStory) param.setResult(null);
             }
         };
@@ -155,10 +225,12 @@ public class GhostStorySeenHook {
     private int hookStoreSendersScopedTo(final Class<?> storeClass) {
         XC_MethodHook gate = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.isGhostStory
                         && param.thisObject != null
                         && storeClass.isInstance(param.thisObject)) {
+                    if (REPLAYING.get() == Boolean.TRUE) return; // our own "Mark as seen" replay
+                    rememberBlocked(param);
                     param.setResult(null); // void: skip the send / queue — nothing reported
                 }
             }

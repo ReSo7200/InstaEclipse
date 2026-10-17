@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Πληροφορίες ιστορίας</string>
+    <string name="ig_btn_quiz_answer">Απάντηση κουίζ</string>
+    <string name="ig_btn_poll_results">Αποτελέσματα δημοσκόπησης</string>
+    <string name="ig_story_info_hint">Πάτα μια γραμμή για αντιγραφή</string>
+    <string name="ig_si_posted">Δημοσιεύτηκε</string>
+    <string name="ig_si_expires">Λήγει</string>
+    <string name="ig_si_edited">Επεξεργάστηκε</string>
+    <string name="ig_si_yes">Ναι</string>
+    <string name="ig_si_music">Μουσική</string>
+    <string name="ig_si_location">Τοποθεσία</string>
+    <string name="ig_si_hashtags">Hashtag</string>
+    <string name="ig_si_shared_from">Κοινοποίηση από</string>
+    <string name="ig_si_original_post">Αρχική δημοσίευση (κράτα για άνοιγμα)</string>
+    <string name="ig_si_posted_with">Δημοσιεύτηκε με</string>
+    <string name="ig_si_alt_text">Εναλλακτικό κείμενο</string>
+    <string name="ig_si_size">Μέγεθος</string>
+    <string name="ig_si_sound_on">με ήχο</string>
+    <string name="ig_si_sound_off">χωρίς ήχο</string>
+    <string name="ig_si_countdown">Αντίστροφη μέτρηση</string>
+    <string name="ig_si_question">Ερώτηση</string>
+    <string name="ig_si_highlights">Στα highlights</string>
+    <string name="ig_si_mention_request">Αίτημα αναφοράς</string>
+    <string name="ig_si_none">Δεν υπάρχουν επιπλέον πληροφορίες.</string>
+    <string name="ig_si_your_answer">η απάντησή σου</string>
+    <string name="ig_si_average">Μέσος όρος</string>
+    <string name="ig_si_copied">Αντιγράφηκε</string>
+    <string name="ig_dialog_misc_story_info">Πληροφορίες ιστορίας, απαντήσεις κουίζ &amp; δημοσκοπήσεων</string>
+    <string name="ig_feat_story_info">Πληροφορίες ιστορίας</string>
+    <string name="ig_si_add_yours">Πρόσθεσε το δικό σου</string>
+    <string name="ig_si_joined">συμμετείχαν</string>
+    <string name="ig_si_paid_partnership">Πληρωμένη συνεργασία με (κράτα για άνοιγμα)</string>
+    <string name="ig_si_collaborators">Συνεργάτης (κράτα για άνοιγμα)</string>
+    <string name="ig_btn_slider_results">Αποτελέσματα ρυθμιστικού</string>
+    <string name="ig_si_votes">ψήφοι</string>
+</resources>

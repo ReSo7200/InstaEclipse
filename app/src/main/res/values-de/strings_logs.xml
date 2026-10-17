@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logs tab (0.8) -->
+    <string name="logs_filter_all">Alle</string>
+    <string name="logs_filter_hooked">Erfolgreich ✅</string>
+    <string name="logs_filter_errors">Fehler ❌</string>
+    <string name="logs_filter_warnings">Warnungen ⚠️</string>
+    <string name="logs_filter_count">%1$s · %2$d</string>
+    <string name="logs_refresh">Aktualisieren</string>
+    <string name="logs_copy">Kopieren</string>
+    <string name="logs_share">Teilen</string>
+    <string name="logs_clear">Leeren</string>
+    <string name="logs_share_title">InstaEclipse-Protokolle teilen</string>
+    <string name="logs_share_subject">InstaEclipse-Protokolle</string>
+    <string name="logs_loading">Protokolle werden geladen…</string>
+    <string name="logs_count_format">%1$d von %2$d Einträgen</string>
+    <string name="logs_status_live">Instagram läuft · live</string>
+    <string name="logs_status_saved">Gespeichertes Protokoll · Instagram läuft nicht</string>
+    <string name="logs_status_none">Keine unterstützte Instagram-App installiert</string>
+    <string name="logs_empty_title">Noch keine Protokolle</string>
+    <string name="logs_empty_body">Öffne Instagram einmal mit in LSPosed aktiviertem InstaEclipse, komm dann hierher zurück und tippe auf Aktualisieren. Das Instagram-Protokoll wird hier automatisch gespeichert – auch nachdem Instagram geschlossen wurde.</string>
+    <string name="logs_empty_filter_title">Nichts passt zu diesem Filter</string>
+    <string name="logs_empty_filter_body">Wechsle zurück zu „Alle“, um alle Einträge zu sehen.</string>
+    <string name="logs_nothing_to_copy">Keine Protokolle zum Kopieren</string>
+    <string name="logs_copied">Protokolle kopiert</string>
+    <string name="logs_entry_copied">Eintrag kopiert</string>
+    <string name="logs_cleared">Protokolle geleert</string>
+    <string name="logs_source_companion">[App]</string>
+</resources>

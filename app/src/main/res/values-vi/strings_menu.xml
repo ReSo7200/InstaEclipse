@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_chip_instagram">Instagram %1$s</string>
+    <string name="menu_chip_active">%1$d/%2$d đang hoạt động</string>
+    <string name="menu_inactive_all_good">Mọi tính năng đã bật đều hoạt động trên phiên bản Instagram này.</string>
+    <string name="menu_inactive_hint">Các tính năng này đã bật nhưng không thể hoạt động trên phiên bản Instagram này:</string>
+</resources>

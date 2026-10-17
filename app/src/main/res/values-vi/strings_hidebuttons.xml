@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Ẩn Blend trong đoạn chat</string>
+    <string name="ig_dialog_hide_threads_button">Ẩn nút Threads trên trang cá nhân</string>
+    <string name="ig_feat_hide_blend">Ẩn Blend</string>
+    <string name="ig_feat_hide_threads">Ẩn Threads</string>
+    <string name="ig_hide_chat">Ẩn đoạn chat</string>
+    <string name="ig_unhide_chat">Hiện lại đoạn chat</string>
+</resources>

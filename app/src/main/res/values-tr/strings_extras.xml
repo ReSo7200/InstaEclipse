@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Hashtag Olmadan Kopyala</string>
+    <string name="ig_dialog_clean_feed_following_only">Yalnızca Takip Edilenler Akışı</string>
+    <string name="ig_dialog_menu_extras">Ek Özellikler</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Kameraya Kaydırmayı Kapat</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Reels Otomatik Kaydırma Seçeneği</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Reels Kaydırmayı Kilitle</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Sınırsız Hesap</string>
+    <string name="ig_dialog_extras_airplane_mode">Uçak Modu (çevrimdışı görün)</string>
+    <string name="ig_dialog_extras_high_res_images">Görselleri en yüksek çözünürlükte yükle</string>
+    <string name="ig_dialog_extras_hide_onboarding">Kişi ve konum isteklerini gizle</string>
+    <string name="ig_dialog_extras_fix_notifications">Android 12+ için eski bildirim kaydını düzelt</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Yalnızca hikaye şeridini gizle</string>
+    <string name="ig_dialog_extras_share_domain">Özel Paylaşım Domain\'i</string>
+    <string name="ig_dialog_extras_share_domain_off">Kapalı</string>
+    <string name="ig_dialog_extras_share_domain_hint">Kopyaladığın veya paylaştığın linklerde instagram.com\'u değiştirir (ör. gömülü önizleme için). Kapatmak için boş bırak.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Geçersiz domain</string>
+    <string name="ig_dialog_extras_startup_tab">Başlangıç Sekmesi</string>
+    <string name="ig_media_open_with">Birlikte aç…</string>
+    <string name="ig_lock_try_again_in">Çok fazla deneme. %1$d sn sonra tekrar deneyin</string>
+    <string name="loc_picker_locating">Yer aranıyor…</string>
+    <string name="loc_picker_unnamed">Adsız konum</string>
+    <string name="ig_dialog_location_current_title">Geçerli konum</string>
+    <string name="ig_dialog_location_recent">Son konumlar</string>
+    <string name="ig_dialog_location_applied">Konum uygulandı</string>
+</resources>

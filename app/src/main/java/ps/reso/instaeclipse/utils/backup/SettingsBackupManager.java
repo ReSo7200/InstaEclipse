@@ -1,5 +1,6 @@
 package ps.reso.instaeclipse.utils.backup;
 
+import ps.reso.instaeclipse.mods.ads.ShareDomain;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,11 +45,38 @@ public class SettingsBackupManager {
         // Clean Feed
         s.put("hideSuggestionsInFeed",      FeatureFlags.hideSuggestionsInFeed);
         s.put("hideThreadsSuggestions",     FeatureFlags.hideThreadsSuggestions);
+        s.put("hideLikedPosts",             FeatureFlags.hideLikedPosts);
+        s.put("hideCommunityNotes",         FeatureFlags.hideCommunityNotes);
+        s.put("followingOnlyFeed",         FeatureFlags.followingOnlyFeed);
+        s.put("hidePlusUpsells",            FeatureFlags.hidePlusUpsells);
+        s.put("expandCaptions",             FeatureFlags.expandCaptions);
+        s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
+        s.put("enableVoiceDownload",        FeatureFlags.enableVoiceDownload);
+        s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
+        s.put("offerMediaInfo",             FeatureFlags.offerMediaInfo);
+        s.put("offerPlaybackSpeed",         FeatureFlags.offerPlaybackSpeed);
+        s.put("maxUploadQuality",           FeatureFlags.maxUploadQuality);
+        s.put("forceReelScrubber",          FeatureFlags.forceReelScrubber);
+        s.put("keepEditHistory",            FeatureFlags.keepEditHistory);
+        s.put("jumpToFirstMessage",         FeatureFlags.jumpToFirstMessage);
+        s.put("translateMessages",          FeatureFlags.translateMessages);
+        s.put("chatExport",                 FeatureFlags.chatExport);
+        s.put("hideTabHome", FeatureFlags.hideTabHome);
+        s.put("hideTabReels", FeatureFlags.hideTabReels);
+        s.put("hideTabCreate", FeatureFlags.hideTabCreate);
+        s.put("hideTabMessages", FeatureFlags.hideTabMessages);
+        s.put("hideTabActivity", FeatureFlags.hideTabActivity);
+        s.put("hideTabProfile", FeatureFlags.hideTabProfile);
+        s.put("hideNotesTray", FeatureFlags.hideNotesTray);
+        s.put("hideDmBlend", FeatureFlags.hideDmBlend);
+        s.put("readReceiptChats", FeatureFlags.readReceiptChats);
+        s.put("hideThreadsButton", FeatureFlags.hideThreadsButton);
 
         // Ads
         s.put("isAdBlockEnabled",        FeatureFlags.isAdBlockEnabled);
         s.put("isAnalyticsBlocked",      FeatureFlags.isAnalyticsBlocked);
         s.put("disableTrackingLinks",    FeatureFlags.disableTrackingLinks);
+        s.put("openLinksExternally",     FeatureFlags.openLinksExternally);
 
         // Distraction Free
         s.put("isExtremeMode",           FeatureFlags.isExtremeMode);
@@ -69,6 +97,15 @@ public class SettingsBackupManager {
         s.put("spoofLng",                String.valueOf(FeatureFlags.spoofLng));
         s.put("forceReelQuality",        FeatureFlags.forceReelQuality);
         s.put("disableRepost",           FeatureFlags.disableRepost);
+        s.put("hideShareCreateGroup",    FeatureFlags.hideShareCreateGroup);
+        s.put("exactTimestamps",         FeatureFlags.exactTimestamps);
+        s.put("likeUndo",                FeatureFlags.likeUndo);
+        s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
+        s.put("storyViewerSearch",       FeatureFlags.storyViewerSearch);
+        s.put("storyLinks",              FeatureFlags.storyLinks);
+        s.put("storyInfo",               FeatureFlags.storyInfo);
+        s.put("commentSearch",           FeatureFlags.commentSearch);
+        s.put("followListExport",        FeatureFlags.followListExport);
         s.put("showFollowerToast",       FeatureFlags.showFollowerToast);
         s.put("showFeatureToasts",       FeatureFlags.showFeatureToasts);
         s.put("enableStoryMentions",     FeatureFlags.enableStoryMentions);
@@ -86,6 +123,12 @@ public class SettingsBackupManager {
 
         JSONObject root = new JSONObject();
         root.put("version",  VERSION);
+        for (String flag : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags())
+            s.put(flag, ps.reso.instaeclipse.utils.feature.ExtrasFeatures.get(flag));
+        s.put("customShareDomain", FeatureFlags.customShareDomain);
+        s.put("spoofLabel", FeatureFlags.spoofLabel);
+        s.put("spoofRecent", FeatureFlags.spoofRecent);
+        s.put("startupTab", FeatureFlags.startupTab);
         root.put("settings", s);
         return root.toString(2);
     }
@@ -99,6 +142,13 @@ public class SettingsBackupManager {
     public static void fromJson(String json) throws JSONException {
         JSONObject root = new JSONObject(json);
         JSONObject s = root.has("settings") ? root.getJSONObject("settings") : root;
+        if (s.has("startupTab") && java.util.Arrays.asList(ps.reso.instaeclipse.mods.ui.StartupTabHook.TABS)
+                .contains(s.getString("startupTab"))) FeatureFlags.startupTab = s.getString("startupTab");
+        if (s.has("spoofLabel")) FeatureFlags.spoofLabel = s.getString("spoofLabel");
+        if (s.has("spoofRecent")) FeatureFlags.spoofRecent = s.getString("spoofRecent");
+        if (s.has("customShareDomain")) FeatureFlags.customShareDomain = ShareDomain.normalize(s.getString("customShareDomain"));
+        for (String flag : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags())
+            if (s.has(flag)) ps.reso.instaeclipse.utils.feature.ExtrasFeatures.set(flag, s.getBoolean(flag));
 
         if (s.has("isDevEnabled"))            FeatureFlags.isDevEnabled            = s.getBoolean("isDevEnabled");
         if (s.has("removeBuildExpiredPopup")) FeatureFlags.removeBuildExpiredPopup = s.getBoolean("removeBuildExpiredPopup");
@@ -126,10 +176,37 @@ public class SettingsBackupManager {
 
         if (s.has("hideSuggestionsInFeed"))     FeatureFlags.hideSuggestionsInFeed     = s.getBoolean("hideSuggestionsInFeed");
         if (s.has("hideThreadsSuggestions"))    FeatureFlags.hideThreadsSuggestions    = s.getBoolean("hideThreadsSuggestions");
+        if (s.has("hideLikedPosts"))            FeatureFlags.hideLikedPosts            = s.getBoolean("hideLikedPosts");
+        if (s.has("hideCommunityNotes"))        FeatureFlags.hideCommunityNotes        = s.getBoolean("hideCommunityNotes");
+        if (s.has("followingOnlyFeed"))        FeatureFlags.followingOnlyFeed        = s.getBoolean("followingOnlyFeed");
+        if (s.has("hidePlusUpsells"))           FeatureFlags.hidePlusUpsells           = s.getBoolean("hidePlusUpsells");
+        if (s.has("expandCaptions"))            FeatureFlags.expandCaptions            = s.getBoolean("expandCaptions");
+        if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
+        if (s.has("enableVoiceDownload"))       FeatureFlags.enableVoiceDownload       = s.getBoolean("enableVoiceDownload");
+        if (s.has("offerCopyImage"))            FeatureFlags.offerCopyImage            = s.getBoolean("offerCopyImage");
+        if (s.has("offerMediaInfo"))            FeatureFlags.offerMediaInfo            = s.getBoolean("offerMediaInfo");
+        if (s.has("offerPlaybackSpeed"))        FeatureFlags.offerPlaybackSpeed        = s.getBoolean("offerPlaybackSpeed");
+        if (s.has("maxUploadQuality"))          FeatureFlags.maxUploadQuality          = s.getBoolean("maxUploadQuality");
+        if (s.has("forceReelScrubber"))         FeatureFlags.forceReelScrubber         = s.getBoolean("forceReelScrubber");
+        if (s.has("keepEditHistory"))           FeatureFlags.keepEditHistory           = s.getBoolean("keepEditHistory");
+        if (s.has("jumpToFirstMessage"))        FeatureFlags.jumpToFirstMessage        = s.getBoolean("jumpToFirstMessage");
+        if (s.has("translateMessages"))         FeatureFlags.translateMessages         = s.getBoolean("translateMessages");
+        if (s.has("chatExport"))                FeatureFlags.chatExport                = s.getBoolean("chatExport");
+        if (s.has("hideTabHome")) FeatureFlags.hideTabHome = s.getBoolean("hideTabHome");
+        if (s.has("hideTabReels")) FeatureFlags.hideTabReels = s.getBoolean("hideTabReels");
+        if (s.has("hideTabCreate")) FeatureFlags.hideTabCreate = s.getBoolean("hideTabCreate");
+        if (s.has("hideTabMessages")) FeatureFlags.hideTabMessages = s.getBoolean("hideTabMessages");
+        if (s.has("hideTabActivity")) FeatureFlags.hideTabActivity = s.getBoolean("hideTabActivity");
+        if (s.has("hideTabProfile")) FeatureFlags.hideTabProfile = s.getBoolean("hideTabProfile");
+        if (s.has("hideNotesTray")) FeatureFlags.hideNotesTray = s.getBoolean("hideNotesTray");
+        if (s.has("hideDmBlend")) FeatureFlags.hideDmBlend = s.getBoolean("hideDmBlend");
+        if (s.has("readReceiptChats")) FeatureFlags.readReceiptChats = s.getBoolean("readReceiptChats");
+        if (s.has("hideThreadsButton")) FeatureFlags.hideThreadsButton = s.getBoolean("hideThreadsButton");
 
         if (s.has("isAdBlockEnabled"))       FeatureFlags.isAdBlockEnabled       = s.getBoolean("isAdBlockEnabled");
         if (s.has("isAnalyticsBlocked"))     FeatureFlags.isAnalyticsBlocked     = s.getBoolean("isAnalyticsBlocked");
         if (s.has("disableTrackingLinks"))   FeatureFlags.disableTrackingLinks   = s.getBoolean("disableTrackingLinks");
+        if (s.has("openLinksExternally"))    FeatureFlags.openLinksExternally    = s.getBoolean("openLinksExternally");
 
         if (s.has("isExtremeMode"))          FeatureFlags.isExtremeMode          = s.getBoolean("isExtremeMode");
         if (s.has("disableStories"))         FeatureFlags.disableStories         = s.getBoolean("disableStories");
@@ -148,6 +225,15 @@ public class SettingsBackupManager {
         if (s.has("spoofLng"))               FeatureFlags.spoofLng               = parseDouble(s.get("spoofLng"), 0.0);
         if (s.has("forceReelQuality"))        FeatureFlags.forceReelQuality       = s.getInt("forceReelQuality");
         if (s.has("disableRepost"))          FeatureFlags.disableRepost          = s.getBoolean("disableRepost");
+        if (s.has("hideShareCreateGroup"))   FeatureFlags.hideShareCreateGroup   = s.getBoolean("hideShareCreateGroup");
+        if (s.has("exactTimestamps"))        FeatureFlags.exactTimestamps        = s.getBoolean("exactTimestamps");
+        if (s.has("likeUndo"))               FeatureFlags.likeUndo               = s.getBoolean("likeUndo");
+        if (s.has("profileFollowsYouLabel")) FeatureFlags.profileFollowsYouLabel = s.getBoolean("profileFollowsYouLabel");
+        if (s.has("storyViewerSearch"))      FeatureFlags.storyViewerSearch      = s.getBoolean("storyViewerSearch");
+        if (s.has("storyLinks"))             FeatureFlags.storyLinks             = s.getBoolean("storyLinks");
+        if (s.has("storyInfo"))              FeatureFlags.storyInfo              = s.getBoolean("storyInfo");
+        if (s.has("commentSearch"))          FeatureFlags.commentSearch          = s.getBoolean("commentSearch");
+        if (s.has("followListExport"))       FeatureFlags.followListExport       = s.getBoolean("followListExport");
         if (s.has("showFollowerToast"))      FeatureFlags.showFollowerToast      = s.getBoolean("showFollowerToast");
         if (s.has("showFeatureToasts"))      FeatureFlags.showFeatureToasts      = s.getBoolean("showFeatureToasts");
         if (s.has("enableStoryMentions"))    FeatureFlags.enableStoryMentions    = s.getBoolean("enableStoryMentions");

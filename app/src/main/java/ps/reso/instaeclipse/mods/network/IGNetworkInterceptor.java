@@ -31,6 +31,9 @@ public class IGNetworkInterceptor {
         String origPath = original.getPath();
         for (java.lang.reflect.Field f : requestObj.getClass().getDeclaredFields()) {
             try {
+                // Never touch statics: the request class keeps a shared static URI constant
+                // ("https://malformed.url.invalid/") that other requests read.
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Object v = f.get(requestObj);
                 if (v instanceof URI) {
@@ -40,6 +43,39 @@ public class IGNetworkInterceptor {
                     f.set(requestObj, FAKE_URL);
                 }
             } catch (Throwable ignored) {}
+        }
+    }
+
+    /**
+     * TigonServiceLayer is the LAST of ~25 decorator layers (RequestCacheServiceLayer,
+     * ZeroRewriteAsyncServiceLayer, ...) that all implement the same startRequest interface. A
+     * layer that answers from cache never reaches TigonServiceLayer, so also apply the same
+     * (idempotent) drop at the chain ENTRY, AsyncHttpService.startRequest — anchored by its stable
+     * systrace string (present in 447 and 451). Rewritten URLs no longer match any drop rule, so a
+     * request passing through both hooks is handled exactly once. Best-effort: on failure the
+     * TigonServiceLayer hook alone still applies, as before.
+     */
+    private static void hookChainEntry(ClassLoader classLoader, Class<?> p1, Class<?> p2, Class<?> p3,
+                                       XC_MethodHook dropHook) {
+        try {
+            if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return;
+            java.util.List<org.luckypray.dexkit.result.MethodData> found =
+                    ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findMethod(
+                            org.luckypray.dexkit.query.FindMethod.create().matcher(
+                                    org.luckypray.dexkit.query.matchers.MethodMatcher.create()
+                                            .name("startRequest")
+                                            .usingStrings("AsyncHttpService.startRequest")));
+            int n = 0;
+            for (org.luckypray.dexkit.result.MethodData md : found) {
+                Method m = md.getMethodInstance(classLoader);
+                Class<?>[] pt = m.getParameterTypes();
+                if (pt.length != 3 || pt[0] != p1 || pt[1] != p2 || pt[2] != p3) continue;
+                XposedBridge.hookMethod(m, dropHook);
+                n++;
+            }
+            ModuleLog.line("(InstaEclipse | Interceptor): chain-entry hooks: " + n);
+        } catch (Throwable t) {
+            ModuleLog.line("(InstaEclipse | Interceptor): ⚠️ chain-entry hook: " + t.getMessage());
         }
     }
 
@@ -70,7 +106,8 @@ public class IGNetworkInterceptor {
             // Dynamically identify the URI field in the request object
             if (random_param_1 != null) {
                 for (Field field : random_param_1.getDeclaredFields()) {
-                    if (field.getType().equals(URI.class)) {
+                    if (field.getType().equals(URI.class)
+                            && !java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
                         uriFieldName = field.getName();
                         break;
                     }
@@ -80,10 +117,9 @@ public class IGNetworkInterceptor {
             // If classes and fields are resolved, hook the method
             if (random_param_1 != null && random_param_2 != null && random_param_3 != null && uriFieldName != null) {
                 String finalUriFieldName = uriFieldName;
-                XposedHelpers.findAndHookMethod("com.instagram.api.tigon.TigonServiceLayer", classLoader, "startRequest",
-                        random_param_1, random_param_2, random_param_3, new XC_MethodHook() {
+                XC_MethodHook dropHook = new XC_MethodHook() {
                             @Override
-                            protected void beforeHookedMethod(MethodHookParam param) {
+                            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                               try {
                                 Object requestObj = param.args[0];
                                 URI uri = (URI) XposedHelpers.getObjectField(requestObj, finalUriFieldName);
@@ -95,7 +131,8 @@ public class IGNetworkInterceptor {
 
                                     // Ghost Mode URIs
                                     if (FeatureFlags.isGhostSeen) {
-                                        shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened");
+                                        shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened")
+                                                && !ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist.pathMentionsAllowed(uri.getPath());
                                     }
                                     if (FeatureFlags.keepEphemeralMessages) {
                                         shouldDrop |= uri.getPath().contains("/mark_ephemeral_item_ranges_viewed");
@@ -213,7 +250,7 @@ public class IGNetworkInterceptor {
                                     }
 
                                     // Follow status
-                                    if (FeatureFlags.showFollowerToast) {
+                                    if (FeatureFlags.showFollowerToast || FeatureFlags.profileFollowsYouLabel) {
                                         FeatureStatusTracker.setHooked("FollowerToast");
                                         FollowStatusHook.handleRequest(uri, param.args);
                                     }
@@ -222,8 +259,10 @@ public class IGNetworkInterceptor {
                                   // A malformed/opaque request must never crash IG's network dispatch.
                               }
                             }
-                        }
-                );
+                        };
+                XposedHelpers.findAndHookMethod("com.instagram.api.tigon.TigonServiceLayer", classLoader, "startRequest",
+                        random_param_1, random_param_2, random_param_3, dropHook);
+                hookChainEntry(classLoader, random_param_1, random_param_2, random_param_3, dropHook);
             } else {
                 ModuleLog.line("(InstaEclipse | Interceptor): Could not resolve required classes or fields.");
             }

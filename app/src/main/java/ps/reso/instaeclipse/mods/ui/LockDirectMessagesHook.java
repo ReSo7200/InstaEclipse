@@ -1,5 +1,8 @@
 package ps.reso.instaeclipse.mods.ui;
 
+import ps.reso.instaeclipse.utils.i18n.I18n;
+import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.utils.core.PasscodeHasher;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
@@ -44,7 +47,7 @@ public class LockDirectMessagesHook {
         // inside InstagramMainActivity, whose onCreate is obfuscated/inherited (a literal hook
         // fails) — so main is covered from UIHookManager.setupHooks via watchActivity() instead.
         XC_MethodHook start = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
+            @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 watchActivity((Activity) param.thisObject);
             }
         };
@@ -276,13 +279,13 @@ public class LockDirectMessagesHook {
         unlock.setLayoutParams(btnLp);
 
         final Runnable attempt = () -> {
-            if (hashPass(code.getText().toString()).equals(FeatureFlags.lockDirectPasscode)) {
+            if (checkPass(code.getText().toString())) {
                 if (wholeApp) appUnlockedThisSession = true; else unlockedThisSession = true;
                 hideKeyboard(a, code);
                 content.removeView(overlay);
             } else {
                 code.setText("");
-                error.setText("Wrong passcode");
+                error.setText(failureText(a));
                 error.setVisibility(View.VISIBLE);
             }
         };
@@ -321,7 +324,8 @@ public class LockDirectMessagesHook {
     }
 
     /** True when the device has biometric hardware with something enrolled. */
-    private static boolean canAuthenticate(Activity a) {
+    @android.annotation.SuppressLint("MissingPermission") // runs in Instagram, which holds USE_BIOMETRIC
+    static boolean canAuthenticate(Activity a) {
         try {
             if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) return false;
             android.hardware.biometrics.BiometricManager bm =
@@ -341,7 +345,8 @@ public class LockDirectMessagesHook {
     }
 
     /** Shows the system biometric prompt; runs onSuccess on the UI thread when auth succeeds. */
-    private static void promptBiometric(Activity a, Runnable onSuccess) {
+    @android.annotation.SuppressLint("MissingPermission") // runs in Instagram, which holds USE_BIOMETRIC
+    static void promptBiometric(Activity a, Runnable onSuccess) {
         try {
             // Use plain literals — our module's R.string ids aren't in Instagram's resource table,
             // so a.getString(R.string...) throws Resources.NotFoundException in IG's process.
@@ -363,10 +368,10 @@ public class LockDirectMessagesHook {
         }
     }
 
-    private static int dp(Activity a, int v) { return Math.round(v * a.getResources().getDisplayMetrics().density); }
+    static int dp(Activity a, int v) { return Math.round(v * a.getResources().getDisplayMetrics().density); }
 
     /** Dismiss the soft keyboard after a successful unlock so it doesn't linger over the content. */
-    private static void hideKeyboard(Activity a, View focus) {
+    static void hideKeyboard(Activity a, View focus) {
         try {
             android.view.inputmethod.InputMethodManager imm =
                     (android.view.inputmethod.InputMethodManager) a.getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -385,11 +390,50 @@ public class LockDirectMessagesHook {
         } catch (Throwable t) { return s; }
     }
 
-    /** Salted hash of a passcode: sha256(salt + passcode). Legacy passcodes have salt="" so
-     *  sha256(""+pass) == sha256(pass) and keep verifying without a forced reset. */
+    /** Hash for a NEW passcode: PBKDF2 with the per-install salt (see {@link PasscodeHasher}). */
     public static String hashPass(String passcode) {
         String salt = FeatureFlags.lockDirectSalt == null ? "" : FeatureFlags.lockDirectSalt;
-        return sha256(salt + passcode);
+        return PasscodeHasher.hash(passcode, salt);
+    }
+
+    private static final int MAX_FAILURES = 5;
+    private static final long LOCKOUT_MS = 30_000;
+    private static int failures;
+    private static long lockedUntil;
+
+    /** Seconds left in the lockout after too many wrong passcodes, or 0. */
+    public static int lockoutSecondsLeft() {
+        long left = lockedUntil - android.os.SystemClock.elapsedRealtime();
+        return left > 0 ? (int) ((left + 999) / 1000) : 0;
+    }
+
+    /**
+     * Checks a passcode against the stored hash (PBKDF2, or the older salted SHA-256, which is
+     * re-hashed with PBKDF2 on the first successful unlock). Five wrong tries lock entry for 30 s;
+     * during the lockout every attempt fails without being checked.
+     */
+    public static synchronized boolean checkPass(String passcode) {
+        if (lockoutSecondsLeft() > 0) return false;
+        String salt = FeatureFlags.lockDirectSalt == null ? "" : FeatureFlags.lockDirectSalt;
+        if (PasscodeHasher.verify(passcode, salt, FeatureFlags.lockDirectPasscode)) {
+            failures = 0;
+            if (PasscodeHasher.needsUpgrade(FeatureFlags.lockDirectPasscode)) {
+                FeatureFlags.lockDirectPasscode = PasscodeHasher.hash(passcode, salt);
+                ps.reso.instaeclipse.utils.core.SettingsManager.saveAllFlags();
+            }
+            return true;
+        }
+        if (++failures >= MAX_FAILURES) {
+            failures = 0;
+            lockedUntil = android.os.SystemClock.elapsedRealtime() + LOCKOUT_MS;
+        }
+        return false;
+    }
+
+    /** Message for a failed attempt: the lockout countdown when one is running. */
+    public static String failureText(android.content.Context ctx) {
+        int s = lockoutSecondsLeft();
+        return s > 0 ? I18n.t(ctx, R.string.ig_lock_try_again_in, s) : "Wrong passcode";
     }
 
     /** Generate + store a fresh random salt (call right before hashing a NEW passcode). */

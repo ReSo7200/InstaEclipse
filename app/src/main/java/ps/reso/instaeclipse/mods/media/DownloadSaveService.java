@@ -59,8 +59,14 @@ public class DownloadSaveService extends Service {
     private static final long NOTIF_INTERVAL_MS = 250;
 
     private NotificationManager nm;
-    private long lastNotifMs  = 0;
-    private int  lastNotifPct = -1;
+    // Written from every download thread; volatile is enough for the throttle heuristic.
+    private volatile long lastNotifMs  = 0;
+    private volatile int  lastNotifPct = -1;
+
+    private static final int CONNECT_TIMEOUT_MS = 15_000;
+    private static final int READ_TIMEOUT_MS    = 30_000;
+    /** Hard cap on a single download so a hostile or broken stream can't fill the disk. */
+    private static final long MAX_DOWNLOAD_BYTES = 2L * 1024 * 1024 * 1024;
 
     private static final class SavedMedia {
         final Uri uri;
@@ -83,19 +89,50 @@ public class DownloadSaveService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(NOTIF_ID, buildProgressNotification("Starting…", 0, 0, true));
+        android.app.Notification starting = buildProgressNotification("Starting…", 0, 0, true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIF_ID, starting, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        } else {
+            startForeground(NOTIF_ID, starting);
+        }
 
         if (intent == null) { stopSelf(startId); return START_NOT_STICKY; }
+
+        // Chat export (ChatExportHook): write a generated HTML + download its media into a
+        // nested subfolder, so the whole export lands in the user's SAF folder and is visible.
+        if (intent.getStringExtra("chatExportSubdir") != null) {
+            handleChatExport(intent, startId);
+            return START_NOT_STICKY;
+        }
 
         String url       = intent.getStringExtra("url");
         String audioUrl  = intent.getStringExtra("audioUrl"); // null → single-stream
         String filename  = intent.getStringExtra("filename");
         String mimeType  = intent.getStringExtra("mimeType");
         String username  = intent.getStringExtra("username");
+        // Audio-only from a plain MP4 (no separate DASH audio track): pull the audio out locally.
+        boolean extractAudio = intent.getBooleanExtra("extractAudio", false);
+        // Only part of the source (a post's music clip): start and length in ms; -1 = all of it.
+        long trimStartMs    = intent.getLongExtra("trimStartMs", 0);
+        long trimDurationMs = intent.getLongExtra("trimDurationMs", -1);
 
         if (url == null || filename == null) { stopSelf(startId); return START_NOT_STICKY; }
+        // This service is exported so Instagram's process can reach it, which means any app can
+        // start it. Only accept Instagram CDN URLs and single-segment file names.
+        if (!DownloadRequestValidator.isAllowedMediaUrl(url)
+                || (audioUrl != null && !DownloadRequestValidator.isAllowedMediaUrl(audioUrl))) {
+            ModuleLog.line("(IE|DL) Rejected download request: URL is not an Instagram CDN https URL");
+            stopSelf(startId);
+            return START_NOT_STICKY;
+        }
+        filename = DownloadRequestValidator.sanitizeFileName(filename, "instaeclipse_" + System.currentTimeMillis());
+        if (username != null) username = DownloadRequestValidator.sanitizeFileName(username, null);
+        if (mimeType != null && !mimeType.startsWith("image/") && !mimeType.startsWith("video/")
+                && !mimeType.startsWith("audio/")) {
+            mimeType = null;
+        }
 
-        SharedPreferences cache = getSharedPreferences(CACHE_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences cache = ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this);
         String saveUri          = cache.getString("downloaderCustomUri", "");
         boolean usernameFolder  = cache.getBoolean("downloaderUsernameFolder", false);
 
@@ -109,17 +146,22 @@ public class DownloadSaveService extends Service {
         final String fUrl   = url, fAudio = audioUrl, fFile = filename;
         final String fMime  = mimeType, fUser = username, fSave = saveUri;
         final boolean fUF   = usernameFolder;
+        final boolean fExtract = extractAudio;
+        final long fTrimStart = trimStartMs, fTrimDur = trimDurationMs;
 
         new Thread(() -> {
             try {
-                SavedMedia saved = fAudio != null
+                SavedMedia saved = fExtract
+                        ? downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF, fTrimStart, fTrimDur)
+                        : fAudio != null
                         ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
                         : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
                 postDoneNotification(sid, "Saved: " + saved.filename, saved.mimeType, saved.uri);
                 showToast(getString(R.string.ig_toast_file_saved, saved.filename));
             } catch (Throwable e) {
-                postDoneNotification(sid, "Download failed: " + e.getMessage(), null, null);
-                showToast(getString(R.string.ig_toast_download_failed, e.getMessage()));
+                String reason = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+                postDoneNotification(sid, "Download failed: " + reason, null, null, false);
+                showToast(getString(R.string.ig_toast_download_failed, reason));
             } finally {
                 stopSelf(sid);
             }
@@ -144,8 +186,10 @@ public class DownloadSaveService extends Service {
                     maybeUpdateProgress("Downloading…", 0, 0, true);
                 }
             });
-            MediaTypeDetector.Result detected = MediaTypeDetector.resolve(
-                    tmp, responseType, mimeType, filename);
+            // Audio-only (#234): an .m4a is an MP4 container and would be sniffed as video — keep it.
+            MediaTypeDetector.Result detected = mimeType != null && mimeType.startsWith("audio/")
+                    ? new MediaTypeDetector.Result(MediaTypeDetector.Kind.UNKNOWN, mimeType, filename)
+                    : MediaTypeDetector.resolve(tmp, responseType, mimeType, filename);
             ModuleLog.line("(IE|DL|Type) requested=" + mimeType + " response=" + responseType
                     + " detected=" + detected.kind + " file=" + detected.filename);
             pushProgress("Saving…", 97, 100, false);
@@ -206,6 +250,85 @@ public class DownloadSaveService extends Service {
         }
     }
 
+    /** Downloads a video and saves only its audio track as .m4a (AAC copied as-is, no re-encode). */
+    private SavedMedia downloadExtractAudioAndSave(String videoUrl, String filename, String saveUri,
+                                                   String username, boolean usernameFolder,
+                                                   long trimStartMs, long trimDurationMs)
+            throws Exception {
+        File cacheDir = getCacheDir();
+        long ts = System.currentTimeMillis();
+        File tv  = new File(cacheDir, "ie_xv_" + ts + ".mp4");
+        File out = new File(cacheDir, "ie_xa_" + ts + ".m4a");
+        try {
+            pushProgress("Downloading audio…", 0, 100, false);
+            downloadToFile(videoUrl, tv, (done, total) -> {
+                if (total > 0) maybeUpdateProgress("Downloading audio…", (int) (done * 85 / total), 100);
+            });
+            pushProgress("Extracting audio…", 90, 100, true);
+            extractAudioTrack(tv.getAbsolutePath(), out.getAbsolutePath(),
+                    trimStartMs * 1000, trimDurationMs > 0 ? trimDurationMs * 1000 : -1);
+            String name = filename.replaceAll("\\.(mp4|m4a)$", "") + ".m4a";
+            Uri uri = writeViaSaf(out, name, "audio/mp4", saveUri, username, usernameFolder);
+            return new SavedMedia(uri, name, "audio/mp4");
+        } finally {
+            //noinspection ResultOfMethodCallIgnored
+            tv.delete();
+            //noinspection ResultOfMethodCallIgnored
+            out.delete();
+        }
+    }
+
+    /** Copies the audio track of {@code videoPath} into an audio-only MP4 (.m4a) at {@code outPath}. */
+    static void extractAudioTrack(String videoPath, String outPath) throws Exception {
+        extractAudioTrack(videoPath, outPath, 0, -1);
+    }
+
+    /**
+     * Same, keeping only {@code durationUs} of audio from {@code startUs} (re-timed to start at 0);
+     * a duration of -1 keeps the rest of the track. Samples are copied, never re-encoded.
+     */
+    static void extractAudioTrack(String videoPath, String outPath, long startUs, long durationUs)
+            throws Exception {
+        MediaExtractor ex = new MediaExtractor();
+        MediaMuxer mux = null;
+        try {
+            ex.setDataSource(videoPath);
+            int ai = selectTrack(ex, "audio/");
+            if (ai < 0) throw new Exception("This video has no audio track");
+            mux = new MediaMuxer(outPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+            int ao = mux.addTrack(ex.getTrackFormat(ai));
+            mux.start();
+            copyTrackRange(ex, mux, ao, startUs, durationUs);
+            mux.stop();
+        } finally {
+            ex.release();
+            if (mux != null) mux.release();
+        }
+    }
+
+    @SuppressLint("WrongConstant")
+    private static void copyTrackRange(MediaExtractor ex, MediaMuxer mux, int outTrack,
+                                       long startUs, long durationUs) {
+        ByteBuffer buf = ByteBuffer.allocate(1024 * 1024);
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        long end = durationUs > 0 ? startUs + durationUs : Long.MAX_VALUE;
+        ex.seekTo(Math.max(0, startUs), MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
+        while (true) {
+            int sz = ex.readSampleData(buf, 0);
+            if (sz < 0) break;
+            long t = ex.getSampleTime();
+            if (t > end) break;
+            if (t >= startUs) {
+                info.offset = 0;
+                info.size = sz;
+                info.presentationTimeUs = t - startUs;
+                info.flags = ex.getSampleFlags();
+                mux.writeSampleData(outTrack, buf, info);
+            }
+            ex.advance();
+        }
+    }
+
     // ── SAF write ────────────────────────────────────────────────────────────
 
     private Uri writeViaSaf(File src, String filename, String mimeType,
@@ -235,6 +358,146 @@ public class DownloadSaveService extends Service {
         return file.getUri();
     }
 
+    // ── Chat export (HTML + media batch into a nested subfolder) ───────────────
+
+    private void handleChatExport(Intent intent, int startId) {
+        final String subdir       = DownloadRequestValidator.sanitizeSubdir(intent.getStringExtra("chatExportSubdir"));
+        final String htmlFilename = DownloadRequestValidator.sanitizeFileName(intent.getStringExtra("htmlFilename"), null);
+        final String htmlB64      = intent.getStringExtra("htmlB64");
+        final String[] urls  = intent.getStringArrayExtra("mediaUrls");
+        final String[] names = intent.getStringArrayExtra("mediaNames");
+        if (names != null) {
+            for (int i = 0; i < names.length; i++) {
+                names[i] = DownloadRequestValidator.sanitizeFileName(names[i], "media_" + (i + 1));
+            }
+        }
+        final String[] mimes = intent.getStringArrayExtra("mediaMimes");
+        final int messageCount = intent.getIntExtra("messageCount", 0);
+
+        SharedPreferences cache = ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this);
+        String saveUri = cache.getString("downloaderCustomUri", "");
+        if (saveUri.isEmpty()) saveUri = intent.getStringExtra("saveUri");
+        final String fSave = saveUri;
+        if (fSave == null || fSave.isEmpty()) {
+            showToast(getString(R.string.ig_toast_no_download_folder));
+            stopSelf(startId);
+            return;
+        }
+
+        new Thread(() -> {
+            int saved = 0;
+            int total = urls != null ? urls.length : 0;
+            try {
+                DocumentFile dir = resolveNestedDir(fSave, subdir);
+                pushProgress("Saving chat export…", 0, 100, true);
+                // The HTML references media by bare filename (src="0001_photo.jpg"). That only
+                // resolves when the page is opened with file:// access — but file managers open it
+                // through a content:// URI, where sibling files can't be reached. So as each media is
+                // downloaded (and saved to the folder), inline it into the HTML as a base64 data URI,
+                // making the page self-contained and render everywhere. Oversized media (large videos)
+                // are left as a file reference to keep the HTML openable.
+                StringBuilder html = (htmlB64 != null)
+                        ? new StringBuilder(new String(android.util.Base64.decode(htmlB64, android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8))
+                        : null;
+                long inlined = 0;
+                final long INLINE_EACH_MAX  = 16L * 1024 * 1024; // skip inlining a single file over 16 MB
+                final long INLINE_TOTAL_MAX = 48L * 1024 * 1024; // keep the whole HTML openable
+                for (int i = 0; i < total; i++) {
+                    maybeUpdateProgress("Saving media " + (i + 1) + "/" + total,
+                            (int) ((i + 1) * 100L / Math.max(1, total)), 100);
+                    File tmp = File.createTempFile("ie_cm_", ".bin", getCacheDir());
+                    try {
+                        downloadToFile(urls[i], tmp, null);
+                        long len = tmp.length();
+                        if (len > 0) {
+                            writeFileToDir(dir, tmp, names[i], mimes[i]);
+                            saved++;
+                            if (html != null && len <= INLINE_EACH_MAX && inlined + len <= INLINE_TOTAL_MAX) {
+                                String token = "src=\"" + names[i] + "\"";
+                                int idx = html.indexOf(token);
+                                if (idx >= 0) {
+                                    String dataUri = "src=\"data:" + mimes[i] + ";base64,"
+                                            + android.util.Base64.encodeToString(readAll(tmp), android.util.Base64.NO_WRAP) + "\"";
+                                    html.replace(idx, idx + token.length(), dataUri);
+                                    inlined += len;
+                                }
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                    } finally { //noinspection ResultOfMethodCallIgnored
+                        tmp.delete(); }
+                }
+                Uri htmlUri = null;
+                if (html != null && htmlFilename != null) {
+                    pushProgress("Saving chat export…", 99, 100, true);
+                    File htmp = File.createTempFile("ie_html_", ".html", getCacheDir());
+                    try {
+                        try (FileOutputStream fo = new FileOutputStream(htmp)) {
+                            fo.write(html.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                        }
+                        htmlUri = writeFileToDir(dir, htmp, htmlFilename, "text/html");
+                    } finally { //noinspection ResultOfMethodCallIgnored
+                        htmp.delete(); }
+                }
+                final int fSaved = saved;
+                ModuleLog.line("(IE|Export|Service) saved html + " + fSaved + "/" + total + " media to " + subdir);
+                postDoneNotification(startId, getString(R.string.ig_export_media_saved, fSaved, subdir), "text/html", htmlUri, true);
+                showToast(getString(R.string.ig_export_media_saved, fSaved, subdir));
+            } catch (Throwable e) {
+                ModuleLog.line("(IE|ChatExport|Service) failed: " + e);
+                postDoneNotification(startId, "Export failed: " + e.getMessage(), null, null, false);
+                showToast(getString(R.string.ig_toast_download_failed, String.valueOf(e.getMessage())));
+            } finally {
+                stopSelf(startId);
+            }
+        }, "ie-chatexport-" + startId).start();
+    }
+
+    /** Reads a (small) file fully into memory — used to base64-inline media into the export HTML. */
+    private static byte[] readAll(File f) throws Exception {
+        try (FileInputStream in = new FileInputStream(f)) {
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream((int) Math.max(1024, f.length()));
+            byte[] buf = new byte[32768]; int n;
+            while ((n = in.read(buf)) != -1) bos.write(buf, 0, n);
+            return bos.toByteArray();
+        }
+    }
+
+    /** Resolves (creating each segment) a nested subfolder like "chats/chat_x" under the SAF tree. */
+    private DocumentFile resolveNestedDir(String saveUri, String subPath) throws Exception {
+        DocumentFile dir = DocumentFile.fromTreeUri(this, Uri.parse(saveUri));
+        if (dir == null || !dir.canWrite()) {
+            throw new Exception("SAF folder not writable — was the permission revoked?");
+        }
+        if (subPath != null) {
+            for (String seg : subPath.split("/")) {
+                if (seg.isEmpty()) continue;
+                DocumentFile sub = dir.findFile(seg);
+                if (sub == null || !sub.isDirectory()) sub = dir.createDirectory(seg);
+                if (sub == null) throw new Exception("Cannot create folder: " + seg);
+                dir = sub;
+            }
+        }
+        return dir;
+    }
+
+    /** Writes src into an already-resolved SAF directory, replacing any existing file of that name. */
+    private Uri writeFileToDir(DocumentFile dir, File src, String filename, String mimeType)
+            throws Exception {
+        DocumentFile existing = dir.findFile(filename);
+        if (existing != null) //noinspection ResultOfMethodCallIgnored
+            existing.delete();
+        DocumentFile file = dir.createFile(mimeType != null ? mimeType : "application/octet-stream", filename);
+        if (file == null) throw new Exception("SAF createFile returned null: " + filename);
+        try (FileInputStream in = new FileInputStream(src);
+             OutputStream os = getContentResolver().openOutputStream(file.getUri())) {
+            if (os == null) throw new Exception("SAF openOutputStream returned null");
+            byte[] buf = new byte[32768]; int n;
+            while ((n = in.read(buf)) != -1) os.write(buf, 0, n);
+        }
+        return file.getUri();
+    }
+
     // ── Network / merge utilities ─────────────────────────────────────────────
 
     @FunctionalInterface
@@ -245,11 +508,13 @@ public class DownloadSaveService extends Service {
 
     private static String downloadToFile(String url, File dest, ProgressCallback cb)
             throws Exception {
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setRequestProperty("User-Agent", UA);
-        conn.connect();
+        HttpURLConnection conn = openValidatedConnection(url);
         String contentType = conn.getContentType();
         long total = conn.getContentLengthLong(); // -1 if server doesn't send Content-Length
+        if (total > MAX_DOWNLOAD_BYTES) {
+            conn.disconnect();
+            throw new java.io.IOException("File too large");
+        }
         try (InputStream in = conn.getInputStream();
              FileOutputStream fos = new FileOutputStream(dest)) {
             byte[] buf = new byte[32768];
@@ -258,12 +523,38 @@ public class DownloadSaveService extends Service {
             while ((n = in.read(buf)) != -1) {
                 fos.write(buf, 0, n);
                 downloaded += n;
+                if (downloaded > MAX_DOWNLOAD_BYTES) throw new java.io.IOException("File too large");
                 if (cb != null) cb.onProgress(downloaded, total);
             }
         } finally {
             conn.disconnect();
         }
         return contentType;
+    }
+
+    /**
+     * Opens {@code url}, following up to 5 redirects manually so that every hop is checked
+     * against the CDN allowlist. Returns a connection with a 200 response.
+     */
+    private static HttpURLConnection openValidatedConnection(String url) throws Exception {
+        String current = url;
+        for (int hop = 0; hop < 5; hop++) {
+            if (!DownloadRequestValidator.isAllowedMediaUrl(current)) {
+                throw new java.io.IOException("Not an Instagram CDN link");
+            }
+            HttpURLConnection conn = (HttpURLConnection) new URL(current).openConnection();
+            conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            conn.setReadTimeout(READ_TIMEOUT_MS);
+            conn.setInstanceFollowRedirects(false);
+            conn.setRequestProperty("User-Agent", UA);
+            int code = conn.getResponseCode();
+            if (code == HttpURLConnection.HTTP_OK) return conn;
+            String location = conn.getHeaderField("Location");
+            conn.disconnect();
+            if (code / 100 != 3 || location == null) throw new java.io.IOException("HTTP " + code);
+            current = new URL(new URL(current), location).toString();
+        }
+        throw new java.io.IOException("Too many redirects");
     }
 
     private static void mergeVideoAudio(String vp, String ap, String op) throws Exception {
@@ -370,7 +661,13 @@ public class DownloadSaveService extends Service {
      * in the device's default viewer (gallery, video player, etc.).
      */
     private void postDoneNotification(int startId, String text, String mimeType, Uri fileUri) {
-        int icon = fileUri != null
+        postDoneNotification(startId, text, mimeType, fileUri, true);
+    }
+
+    /** @param ok false only for a real failure (uses the error icon); success uses the download-done
+     *  check icon even when there is no file to open, so a finished export never looks like a warning. */
+    private void postDoneNotification(int startId, String text, String mimeType, Uri fileUri, boolean ok) {
+        int icon = ok
                 ? android.R.drawable.stat_sys_download_done
                 : android.R.drawable.stat_notify_error;
 
@@ -408,7 +705,7 @@ public class DownloadSaveService extends Service {
         // Use application context — service context is invalid after stopSelf() fires
         Context appCtx = getApplicationContext();
         new Handler(Looper.getMainLooper()).post(() ->
-                Toast.makeText(appCtx, msg, Toast.LENGTH_SHORT).show());
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(appCtx, msg, Toast.LENGTH_SHORT).show());
     }
 
     private void ensureChannel() {

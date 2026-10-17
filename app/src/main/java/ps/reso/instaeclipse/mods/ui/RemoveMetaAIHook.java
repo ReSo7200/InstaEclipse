@@ -78,7 +78,7 @@ public class RemoveMetaAIHook {
     public void install(ClassLoader classLoader) {
         XC_MethodHook inflateHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 try {
                     if (!(param.args[0] instanceof Integer)) return;
@@ -155,7 +155,7 @@ public class RemoveMetaAIHook {
         // boxed Boolean, so decide at runtime from the hooked method's actual return type (never
         // clobber a non-boolean return).
         XC_MethodHook forceFalse = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 try {
                     Class<?> rt = ((java.lang.reflect.Method) p.method).getReturnType();
@@ -169,7 +169,7 @@ public class RemoveMetaAIHook {
         // Also blank the Content Deep Dive UI-state builder (getUiState) — belt and braces if the
         // gate lives elsewhere: with an empty/blanked ui-state the pill/entry has nothing to show.
         XC_MethodHook blankUiState = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 Object r = p.getResult();
                 if (r == null) return;
@@ -186,7 +186,7 @@ public class RemoveMetaAIHook {
                 "android_purge_26_q3_ContentDeepDiveUseCase_getUiState", "cdd-uistate", null);
         // Fetcher: skip fetching prompt data so there is nothing to render.
         XC_MethodHook skip = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (FeatureFlags.removeMetaAI) p.setResult(null);
             }
         };
@@ -199,7 +199,7 @@ public class RemoveMetaAIHook {
         // so the row is never appended. Only skip if it's void (a side-effecting row-adder) — never
         // clobber a method that returns a value the caller uses.
         XC_MethodHook skipIfVoid = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 try {
                     if (((java.lang.reflect.Method) p.method).getReturnType() == void.class) p.setResult(null);
@@ -237,7 +237,7 @@ public class RemoveMetaAIHook {
      */
     private void installSearchSerpMetaAiHcm(DexKitBridge bridge, ClassLoader cl) {
         XC_MethodHook neuter = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 Object r = p.getResult();
                 if (r == null) return;
@@ -270,7 +270,7 @@ public class RemoveMetaAIHook {
      */
     private void installReelsCardEligibility(DexKitBridge bridge, ClassLoader cl) {
         XC_MethodHook skip = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (FeatureFlags.removeMetaAI) p.setResult(null); // void → skip candidate build/inject
             }
         };
@@ -305,7 +305,7 @@ public class RemoveMetaAIHook {
      */
     private void installVideoAttribution(DexKitBridge bridge, ClassLoader cl) {
         XC_MethodHook blank = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 Object r = p.getResult();
                 if (r == null) return;
@@ -342,14 +342,22 @@ public class RemoveMetaAIHook {
     // a different method that doesn't consult this gate, so they're unaffected.
     private static final long META_AI_GATE_ID_1 = 0x81111100005b47L;
     private static final long META_AI_GATE_ID_2 = 0x81106e000057c2L;
+    // IG 451.0.0.20.80: same gate (X.05cD.A0B — "A && !B" over two MobileConfig booleans, the first
+    // boolean(UserSession) the reel sheet's getBottomSheetHeaderItems builder calls), new ids.
+    // Re-derive on a new build: find the builder via the marker
+    // "android_purge_26_q3_ClipsOrganicMediaItemViewMoreOptionsController_getBottomSheetHeaderItems"
+    // and read the const-wide ids of the first (UserSession)Z it invokes.
+    private static final long META_AI_GATE_451_ID_1 = 0x8110d700005b5bL;
+    private static final long META_AI_GATE_451_ID_2 = 0x81103500005795L;
 
     private void installReelsOverflowGate(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook forceFalse = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam param) {
+            @Override protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.removeMetaAI) param.setResult(false);
             }
         };
-        int n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_1, META_AI_GATE_ID_2});
+        int n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_451_ID_1, META_AI_GATE_451_ID_2});
+        if (n == 0) n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_1, META_AI_GATE_ID_2});
         if (n == 0) n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_1});
         if (n == 0) n = hookGate(bridge, classLoader, forceFalse, new Number[]{META_AI_GATE_ID_2});
         ModuleLog.line("(IE|RemoveMetaAI) reels-overflow gate: " + n + " method(s)");
@@ -381,7 +389,7 @@ public class RemoveMetaAIHook {
     private void installMenuOptionFilter(DexKitBridge bridge, ClassLoader cl) {
         final String od = "Lcom/instagram/feed/media/mediaoption/MediaOption$Option;";
         XC_MethodHook filter = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
+            @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.removeMetaAI) return;
                 Object r = param.getResult();
                 if (!(r instanceof List)) return;

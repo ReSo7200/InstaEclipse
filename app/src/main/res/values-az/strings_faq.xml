@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. Mətnlər görünmür?</b>\n- Instagram üçün HMA (HideMyApplist)-ı söndürün. InstaEclipse mətnlərini öz tətbiqindən oxuyur, HMA isə onu gizlədir.</string>
+    <string name="faq_8"><b>8. Bəzi funksiyalar aktiv olsa da işləmir?</b>\n- Instagram-ın daxili konfiqurasiyası onları bloklaya bilər. Tərtibatçı seçimləri → Standart konfiqurasiyanı bərpa et.</string>
+    <string name="faq_9"><b>9. Hələ də problem var?</b>\n- Telegram qrupunda soruşun (t.me/instaEclipse_discussion).</string>
+</resources>

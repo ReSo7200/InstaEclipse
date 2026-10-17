@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Help tab redesign (0.8) -->
+    <string name="help_get_help_title">الحصول على مساعدة</string>
+    <string name="help_get_help_body">وجدت خطأً أو توقف شيء عن العمل؟ افتح بلاغًا على GitHub أو اسأل المجتمع على Telegram.</string>
+    <string name="help_github_issues">GitHub</string>
+    <string name="help_about">حول</string>
+    <string name="help_version">الإصدار %1$s</string>
+    <string name="help_source_code">الشيفرة المصدرية على GitHub</string>
+    <string name="help_faq_expand">توسيع الإجابة</string>
+    <string name="help_faq_collapse">طي الإجابة</string>
+    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
+    <string name="help_lsposed_sub">جهازك مروّت؟ استخدم هذا الإصدار</string>
+    <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
+    <string name="help_lspatch_sub">جهازك غير مروّت؟ ثبّت هذا</string>
+    <string name="help_lspatch_guide">اتبع دليل الإعداد</string>
+</resources>

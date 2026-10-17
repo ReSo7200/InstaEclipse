@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.7.0</string>
+    <string name="version" translatable="false">v0.8.0</string>
     <string name="home">דף הבית</string>
     <string name="features">תכונות</string>
     <string name="help">עזרה</string>
@@ -58,7 +58,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">המודול עדיין לא עובד?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[If you are <b>rooted</b> try using <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>If you are <b>not rooted</b> install <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> then follow <a href="https://t.me/instaEclipse_discussion/158/5149">this guide</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">קטגוריות:</string>
@@ -221,6 +220,17 @@
     <string name="ig_dialog_ad_block_analytics">חסום אנליטיקות</string>
     <string name="ig_dialog_clean_feed_hide_suggested">הסתר הצעות בעדכון</string>
     <string name="ig_dialog_ad_disable_tracking">השבת קישורי מעקב</string>
+    <string name="ig_dialog_open_links_externally">פתח קישורים בדפדפן חיצוני</string>
+    <string name="theme_light_mode">מצב בהיר</string>
+    <string name="theme_dark_mode">מצב כהה</string>
+    <string name="ig_dialog_translate_messages">כפתור תרגום בצ׳אטים</string>
+    <string name="ig_chat_translate_row">תרגום באפליקציה</string>
+    <string name="ig_downloader_folder_hint">בוחרים את התיקייה מתוך אפליקציית InstaEclipse</string>
+    <string name="lock_code_set_in_ig">מגדירים אותו בתוך Instagram: תפריט InstaEclipse &gt; נעילה. הקישו כדי לפתוח את Instagram.</string>
+    <string name="theme_set_light">ערכות נושא למצב בהיר</string>
+    <string name="theme_set_dark">ערכות נושא למצב כהה</string>
+    <string name="theme_light_same">אותה ערכת נושא כמו במצב כהה</string>
+    <string name="theme_light_stock">Instagram המקורי (ערכת נושא רק במצב כהה)</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">מצב קיצוני (בלתי הפיך עד להתקנה מחדש)</string>
@@ -237,6 +247,27 @@
     <string name="ig_dialog_misc_disable_story_autoswipe">השבת מעבר אוטומטי בין סטורי</string>
     <string name="ig_dialog_misc_disable_video_autoplay">השבת ניגון אוטומטי של סרטונים</string>
     <string name="ig_dialog_misc_disable_repost">השבת שיתוף מחדש</string>
+    <string name="ig_dialog_clean_feed_expand_captions">הצג תמיד כיתובים מלאים (הפעל מחדש את IG)</string>
+    <string name="ig_dialog_clean_feed_hide_plus">הסתר פרסומות של Instagram Plus</string>
+    <string name="ig_dialog_clean_feed_hide_community_notes">הסתר הערות קהילה</string>
+    <string name="ig_dialog_misc_profile_follows_label">הצג \"עוקב/ת אחריך\" בפרופילים</string>
+    <string name="ig_profile_follows_you">עוקב/ת אחריך</string>
+    <string name="ig_profile_not_following_you">לא עוקב/ת אחריך</string>
+    <string name="ig_dialog_downloader_offer_media_info">הוסף מידע מדיה לתפריט הפוסט</string>
+    <string name="ig_dialog_downloader_offer_speed">הוסף מהירות ניגון לתפריט הפוסט</string>
+    <string name="ig_dialog_downloader_reel_scrubber">הצג תמיד את סרגל ההתקדמות בריילז</string>
+    <string name="ig_media_info_title">מידע מדיה</string>
+    <string name="ig_playback_speed_title">מהירות ניגון</string>
+    <string name="ig_playback_speed_next">המהירות הוגדרה — תחול על הסרטון הבא שיתחיל</string>
+    <string name="ig_dialog_distraction_hide_notes_tray">הסתר פתקים בהודעות</string>
+    <string name="ig_dialog_downloader_voice">הורד הודעות קוליות (לחיצה ארוכה)</string>
+    <string name="ig_dialog_misc_viewer_search">חפש בצופי הסטורי שלך</string>
+    <string name="ig_viewer_search_hint">חפש צופים</string>
+    <string name="ig_dialog_misc_like_undo">חלון ביטול ללייקים (4 שנ׳)</string>
+    <string name="ig_like_undo_bar">❤ אהבת · בטל</string>
+    <string name="ig_like_undo_cancelled">הלייק בוטל — רענן כדי לעדכן את הלב</string>
+    <string name="ig_dialog_misc_exact_timestamps">הצג תאריכים מדויקים במקום \"לפני שעתיים\"</string>
+    <string name="ig_dialog_misc_hide_share_create_group">הסתר \"צור קבוצה\" בתפריט השיתוף</string>
     <string name="ig_dialog_misc_show_feature_toasts">הצג הודעות תכונות</string>
     <string name="ig_dialog_misc_show_follower_toast">הצג הודעת עוקב</string>
     <string name="ig_dialog_misc_view_story_mentions">צפה באזכורי סטורי</string>
@@ -336,6 +367,9 @@
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">הורד</string>
+    <string name="ig_story_mark_seen">סמן כנצפה</string>
+    <string name="ig_story_marked_seen">סומן כנצפה</string>
+    <string name="ig_story_mark_seen_none">אין עדיין מה לשלוח עבור הסטורי הזה — תן לו להתנגן קודם</string>
     <string name="ig_dl_carousel_subtitle">קרוסלה • %1$d פריטים</string>
     <string name="ig_dl_carousel_current">הורד נוכחי (%1$d מתוך %2$d)</string>
     <string name="ig_dl_carousel_all">הורד את כל %1$d הפריטים</string>
@@ -423,6 +457,8 @@
     <string name="theme_section_colors">צבעים</string>
     <string name="theme_section_fonts">גופנים &amp; אימוג\'י</string>
     <string name="ig_dialog_quality_max">האיכות המרבית</string>
+    <string name="ig_dialog_max_upload_quality">העלה תמיד באיכות הגבוהה ביותר</string>
+    <string name="ig_feat_max_upload_quality">איכות העלאה מרבית</string>
     <string name="ig_dialog_location_spoof_enable">זייף מיקום GPS</string>
     <string name="ig_dialog_location_pick">בחר מיקום במפה</string>
     <string name="ig_dialog_location_unset">לא הוגדר מיקום</string>
@@ -432,7 +468,13 @@
     <string name="loc_picker_use">השתמש במיקום זה</string>
     <string name="loc_picker_search_failed">המיקום לא נמצא</string>
     <string name="loc_picker_search_error">החיפוש נכשל: %1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">שמור הודעות שבוטלו</string>
+    <string name="ig_dialog_ghost_keep_unsent">תיעוד הודעות שבוטלו</string>
+    <string name="ig_dialog_ghost_jump_first">כפתור מעבר להודעה הראשונה בצ\'אטים</string>
+    <string name="ig_jump_first_message">עבור להודעה הראשונה</string>
+    <string name="ig_jump_first_loading">טוען הודעות ישנות יותר… הקש שוב כדי לעצור</string>
+    <string name="ig_jump_first_done">הגעת להודעה הראשונה</string>
+    <string name="ig_jump_first_stopped">נעצר</string>
+    <string name="ig_dialog_ghost_edit_history">שמור היסטוריית עריכה של הודעות</string>
     <string name="ig_dialog_unsent_title">הודעות שבוטלו</string>
     <string name="ig_dialog_unsent_clear">נקה את יומן הצ\'אט הזה</string>
     <string name="ig_dialog_unsent_export">ייצא כ-JSON</string>
@@ -455,6 +497,19 @@
     <string name="ig_dialog_misc_lock_section">נעילה</string>
     <string name="ig_dialog_misc_lock_fingerprint">השתמש בטביעת אצבע לביטול הנעילה</string>
     <string name="ig_hide_chats_title">הסתר צ\'אטים מסוימים</string>
+    <string name="ig_translate_text">תרגם</string>
+    <string name="ig_dialog_downloader_offer_audio">הצע הורדת שמע בלבד לסרטונים</string>
+    <string name="ig_download_choice_title">הורד</string>
+    <string name="ig_download_choice_video">סרטון</string>
+    <string name="ig_download_choice_audio">שמע בלבד (.m4a)</string>
+    <string name="ig_download_choice_save">שמור במכשיר</string>
+    <string name="ig_download_choice_copy_image">העתק תמונה</string>
+    <string name="ig_dialog_downloader_offer_copy_image">הוסף העתקת תמונה לתפריט הפוסט</string>
+    <string name="ig_toast_copy_image_video">השקופית הזו היא סרטון — אין מה להעתיק</string>
+    <string name="ig_toast_copying_image">מעתיק תמונה…</string>
+    <string name="ig_toast_image_copied">התמונה הועתקה ללוח</string>
+    <string name="ig_toast_downloading_audio">מוריד שמע…</string>
+    <string name="ig_toast_audio_saved">השמע נשמר</string>
     <string name="ig_dialog_misc_hide_chats">הסתר צ\'אטים מסוימים</string>
     <string name="ig_hide_chats_manage">נהל צ\'אטים מוסתרים</string>
     <string name="ig_hide_chats_empty">אין צ\'אטים מוסתרים. פתח צ\'אט והקש על כפתור העין החצויה כדי להסתיר אותו.</string>
@@ -486,10 +541,29 @@
     <string name="ig_dialog_unsent_empty">עדיין לא נלכדו הודעות שבוטלו</string>
     <string name="ig_dialog_unsent_unknown_chat">צ\'אט לא ידוע</string>
     <string name="ig_dialog_clean_feed_hide_threads">הסתר הצעות Threads</string>
+    <string name="ig_dialog_clean_feed_hide_liked">הסתר פוסטים שכבר אהבת</string>
+    <string name="ig_nav_settings_title">הגדרות ניווט</string>
+    <string name="ig_nav_name_home">בית</string>
+    <string name="ig_nav_name_reels">ריילז</string>
+    <string name="ig_nav_name_create">יצירה</string>
+    <string name="ig_nav_name_messages">הודעות</string>
+    <string name="ig_nav_name_activity">פעילות</string>
+    <string name="ig_nav_name_profile">פרופיל</string>
+    <string name="ig_nav_name_search">חיפוש</string>
+    <string name="ig_nav_tabs_title">הסתר לשוניות ניווט</string>
+    <string name="ig_nav_tab_home">הסתר לשונית בית</string>
+    <string name="ig_nav_tab_reels">הסתר לשונית ריילז</string>
+    <string name="ig_nav_tab_create">הסתר לשונית יצירה</string>
+    <string name="ig_nav_tab_messages">הסתר לשונית הודעות</string>
+    <string name="ig_nav_tab_activity">הסתר לשונית פעילות</string>
+    <string name="ig_nav_tab_profile">הסתר לשונית פרופיל</string>
     <string name="ig_dialog_misc_spoof_last_seen">זייף \"נראה לאחרונה\" (הקפא)</string>
     <string name="ig_dialog_misc_copy_caption">העתק כיתוב</string>
     <string name="ig_dialog_misc_photo_zoom">זום בתמונה (לחיצה ארוכה)</string>
     <string name="ig_caption_copy_menu_item">העתק כיתוב</string>
+    <string name="ig_caption_translate_menu_item">תרגם כיתוב</string>
+    <string name="ig_caption_translate_full">הכיתוב המלא</string>
+    <string name="ig_caption_translate_no_hashtags">בלי האשטאגים</string>
     <string name="ig_caption_copy_title">העתק כיתוב</string>
     <string name="ig_caption_copy_full">העתק כיתוב מלא</string>
     <string name="ig_caption_copy_none">אין כיתוב בפוסט הזה</string>
@@ -518,4 +592,77 @@
     <string name="ig_story_download_video_music">הורד וידאו עם מוזיקה</string>
     <string name="ig_story_cache_clear_confirm">למחוק את כל הסטוריז השמורים? לא ניתן לבטל פעולה זו.</string>
     <string name="ig_story_cache_cleared">הסטוריז השמורים נמחקו</string>
+    <string name="ig_chat_export">ייצא צ\'אט</string>
+    <string name="ig_chat_export_done">%1$d הודעות יוצאו אל %2$s</string>
+    <string name="ig_chat_export_done_media">%1$d הודעות ו-%2$d קובצי מדיה יוצאו אל %3$s</string>
+    <string name="ig_chat_export_load_all">טען קודם את כל הצ\'אט (קופץ להודעה הראשונה)</string>
+    <string name="ig_chat_export_media">הורד מדיה לתיקיית הייצוא</string>
+    <string name="ig_chat_export_media_progress">מוריד מדיה %1$d/%2$d…</string>
+    <string name="ig_chat_export_none">עדיין לא נטענו הודעות לצ\'אט הזה</string>
+    <string name="ig_chat_export_working">מייצא את ההודעות שנטענו…</string>
+    <string name="ig_comment_copy_media_link">העתק קישור GIF / תמונה</string>
+    <string name="ig_comment_export">ייצא</string>
+    <string name="ig_comment_export_done">%1$d תגובות יוצאו אל %2$s</string>
+    <string name="ig_comment_export_post_media">שמור גם את התמונות/סרטונים של הפוסט</string>
+    <string name="ig_comment_export_working">מייצא את התגובות שנטענו…</string>
+    <string name="ig_comment_gif_downloading">מוריד מדיה של תגובה…</string>
+    <string name="ig_comment_search">חפש בתגובות</string>
+    <string name="ig_comment_search_count">נטענו %1$d תגובות</string>
+    <string name="ig_comment_search_empty">אין תגובות תואמות</string>
+    <string name="ig_comment_search_field_hint">חפש לפי שם או מילים</string>
+    <string name="ig_comment_search_hide_replies">הסתר תשובות</string>
+    <string name="ig_comment_search_hint">חפש ב-%1$d תגובות שנטענו</string>
+    <string name="ig_comment_search_load_all">טען הכול</string>
+    <string name="ig_comment_search_matches">%2$d מתוך %1$d תגובות תואמות</string>
+    <string name="ig_comment_search_stop">עצור</string>
+    <string name="ig_comment_search_tip">הקש על תגובה כדי להעתיק אותה</string>
+    <string name="ig_comment_search_view_replies">הצג %1$d תשובות</string>
+    <string name="ig_dialog_ghost_chat_export">כפתור ייצוא צ\'אט בצ\'אטים</string>
+    <string name="ig_dialog_misc_comment_search">חיפוש בתגובות</string>
+    <string name="ig_dialog_misc_follow_export">ייצא עוקבים/נעקבים ל-CSV</string>
+    <string name="ig_export_media_saved">הייצוא נשמר — %1$d קובצי מדיה ב-%2$s</string>
+    <string name="ig_feat_comment_search">חיפוש בתגובות</string>
+    <string name="ig_feat_edit_history">היסטוריית עריכה</string>
+    <string name="ig_feat_follow_export">ייצוא עוקבים</string>
+    <string name="ig_feat_hide_notes">הסתר את מגש הפתקים</string>
+    <string name="ig_feat_lock_collections">נעילת אוספים</string>
+    <string name="ig_feat_photo_zoom">זום בתמונה</string>
+    <string name="ig_feat_saved_on_profile">שמורים בפרופיל</string>
+    <string name="ig_feat_viewer_search">צופי הסטורי</string>
+    <string name="ig_feat_voice_download">הורדת הודעות קוליות</string>
+    <string name="ig_follow_export">ייצא CSV</string>
+    <string name="ig_follow_export_done">%1$d חשבונות יוצאו אל %2$s</string>
+    <string name="ig_follow_export_loading">טוען חשבונות… %1$d עד כה.\nהישאר במסך הזה עד שיסתיים.</string>
+    <string name="ig_follow_export_none">עדיין לא נטענו חשבונות</string>
+    <string name="ig_follow_export_stop">עצור ושמור</string>
+    <string name="ig_hide_chat_toggle">הסתר / הצג צ\'אט</string>
+    <string name="ig_highlight_done">ההיילייט נשמר: %1$d מתוך %2$d פריטים</string>
+    <string name="ig_highlight_download_all">הורד את כל ההיילייט</string>
+    <string name="ig_highlight_downloading">מוריד %1$d פריטי היילייט…</string>
+    <string name="ig_highlight_loading">טוען היילייט…</string>
+    <string name="ig_locked_coll_hint">קוד גישה</string>
+    <string name="ig_locked_coll_lock">נעל את האוסף הזה</string>
+    <string name="ig_locked_coll_locked">האוסף ננעל: הוא יבקש את קוד הגישה שלך</string>
+    <string name="ig_locked_coll_need_passcode">הגדר קודם קוד גישה: הגדרות InstaEclipse באינסטגרם, נעילה</string>
+    <string name="ig_locked_coll_open">פתח</string>
+    <string name="ig_locked_coll_setting">אוספים שמורים ניתנים לנעילה (כפתור 🔒 באוסף; משתמש בקוד הגישה שהוגדר באינסטגרם)</string>
+    <string name="ig_locked_coll_setting_short">אוספים שמורים ניתנים לנעילה (🔒 באוסף)</string>
+    <string name="ig_locked_coll_title">אוסף נעול</string>
+    <string name="ig_locked_coll_unlock">בטל נעילה של האוסף הזה</string>
+    <string name="ig_locked_coll_unlocked">נעילת האוסף בוטלה</string>
+    <string name="ig_media_info_copy">העתק</string>
+    <string name="ig_nav_tab_order">סדר הלשוניות</string>
+    <string name="ig_nav_tab_order_hint">השתמש בחיצים כדי לסדר מחדש את הסרגל התחתון. לשוניות מוסתרות שומרות על מקומן. ייכנס לתוקף כשתחזור לאינסטגרם.</string>
+    <string name="ig_nav_tab_order_reset">אפס</string>
+    <string name="ig_nav_tab_search">חיפוש</string>
+    <string name="ig_saved_on_profile">כפתור שמורים בפרופיל שלך (הפעל מחדש את אינסטגרם)</string>
+    <string name="ig_saved_on_profile_button">שמורים</string>
+    <string name="ig_share_dl_loading">InstaEclipse: טוען את הפוסט להורדה…</string>
+    <string name="ig_share_dl_not_found">InstaEclipse: לא ניתן לטעון את הפוסט הזה</string>
+    <string name="ig_share_dl_saving">InstaEclipse: שומר %1$d קבצים…</string>
+    <string name="ig_thread_menu">פעולות צ\'אט של InstaEclipse</string>
+    <string name="ig_unsent_messages">הודעות שבוטלו</string>
+    <string name="share_dl_label">הורד עם InstaEclipse</string>
+    <string name="share_dl_no_instagram">אינסטגרם לא מותקן</string>
+    <string name="share_dl_no_link">לא נמצא קישור לפוסט או לריל של אינסטגרם</string>
 </resources>

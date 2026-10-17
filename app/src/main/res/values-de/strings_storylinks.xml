@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">Link kopieren</string>
+    <string name="ig_story_links_title">Story-Links</string>
+    <string name="ig_story_links_hint">Tippen zum Kopieren · lange drücken zum Öffnen</string>
+    <string name="ig_toast_link_copied">Link kopiert</string>
+    <string name="ig_toast_links_copied">Alle Links kopiert</string>
+    <string name="ig_dialog_misc_story_links">Story-Links kopieren</string>
+    <string name="ig_feat_story_links">Story-Links</string>
+</resources>

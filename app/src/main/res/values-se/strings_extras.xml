@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Kopiera utan hashtaggar</string>
+    <string name="ig_dialog_clean_feed_following_only">Flöde endast från följda</string>
+    <string name="ig_dialog_menu_extras">Extra</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Stäng av svep till kameran</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Alternativ för automatisk rullning i Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Lås rullning i Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Obegränsat antal konton</string>
+    <string name="ig_dialog_extras_airplane_mode">Flygläge (visa som offline)</string>
+    <string name="ig_dialog_extras_high_res_images">Ladda bilder i högsta upplösning</string>
+    <string name="ig_dialog_extras_hide_onboarding">Dölj uppmaningar om kontakter och plats</string>
+    <string name="ig_dialog_extras_fix_notifications">Åtgärda gammal aviseringsregistrering på Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Dölj endast berättelsefältet</string>
+    <string name="ig_dialog_extras_share_domain">Egen delningsdomän</string>
+    <string name="ig_dialog_extras_share_domain_off">Av</string>
+    <string name="ig_dialog_extras_share_domain_hint">Ersätter instagram.com i länkar du kopierar eller delar. Lämna tomt för att stänga av.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Ogiltig domän</string>
+    <string name="ig_dialog_extras_startup_tab">Startflik</string>
+    <string name="ig_media_open_with">Öppna med…</string>
+    <string name="ig_lock_try_again_in">För många försök. Försök igen om %1$d s</string>
+    <string name="loc_picker_locating">Söker plats…</string>
+    <string name="loc_picker_unnamed">Namnlös plats</string>
+    <string name="ig_dialog_location_current_title">Aktuell plats</string>
+    <string name="ig_dialog_location_recent">Senaste platser</string>
+    <string name="ig_dialog_location_applied">Platsen har tillämpats</string>
+</resources>

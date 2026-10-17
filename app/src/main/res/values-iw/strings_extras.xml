@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">העתק ללא האשטגים</string>
+    <string name="ig_dialog_clean_feed_following_only">פיד של נעקבים בלבד</string>
+    <string name="ig_dialog_menu_extras">תוספות</string>
+    <string name="ig_dialog_extras_no_swipe_camera">בטל החלקה למצלמה</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">אפשרות גלילה אוטומטית ב-Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">נעל גלילה ב-Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">חשבונות ללא הגבלה</string>
+    <string name="ig_dialog_extras_airplane_mode">מצב טיסה (להיראות לא מחובר)</string>
+    <string name="ig_dialog_extras_high_res_images">טעינת תמונות ברזולוציה הגבוהה ביותר</string>
+    <string name="ig_dialog_extras_hide_onboarding">הסתרת בקשות לסנכרון אנשי קשר ומיקום</string>
+    <string name="ig_dialog_extras_fix_notifications">תיקון רישום התראות ישן ב-Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">הסתרת סרגל הסטוריז בלבד</string>
+    <string name="ig_dialog_extras_share_domain">דומיין שיתוף מותאם</string>
+    <string name="ig_dialog_extras_share_domain_off">כבוי</string>
+    <string name="ig_dialog_extras_share_domain_hint">מחליף את instagram.com בקישורים שאתה מעתיק או משתף. השאר ריק כדי לכבות.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">דומיין לא תקין</string>
+    <string name="ig_dialog_extras_startup_tab">לשונית פתיחה</string>
+    <string name="ig_media_open_with">פתיחה באמצעות…</string>
+    <string name="ig_lock_try_again_in">יותר מדי ניסיונות. נסו שוב בעוד %1$d שנ׳</string>
+    <string name="loc_picker_locating">מחפש מקום…</string>
+    <string name="loc_picker_unnamed">מקום ללא שם</string>
+    <string name="ig_dialog_location_current_title">מיקום נוכחי</string>
+    <string name="ig_dialog_location_recent">מקומות אחרונים</string>
+    <string name="ig_dialog_location_applied">המיקום הוחל</string>
+</resources>

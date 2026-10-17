@@ -55,6 +55,17 @@ public class PostDownloadContextMenuHook {
     private static Class<?> mediaOptionEnumClass;
     private static Object   downloadOptionValue;     // MediaOption$Option.DOWNLOAD
     private static Object   copyLinkOptionValue;     // MediaOption$Option.COPY_LINK (#117)
+    // "Copy image" row (#228). IG has no such option, so the row borrows an internal debug-only
+    // value that never appears in a normal user's menu (present 436 → 452) and gets our label;
+    // its taps are consumed below before IG's handler sees them.
+    private static final String COPY_IMAGE_CARRIER = "EXPLORE_INTERNAL_DEBUG_LOGS";
+    private static Object   copyImageOptionValue;
+    // "Media info" (#231) and "Playback speed" (#247) rows: two more internal debug-only values
+    // (present 436 → 452) carry our labels the same way.
+    static final String MEDIA_INFO_CARRIER = "DEBUG_SHOPS_AD";
+    static final String SPEED_CARRIER = "PROMOTE_DEBUG";
+    private static Object   mediaInfoOptionValue;
+    private static Object   speedOptionValue;
 
     // Obfuscated creator class found via "MediaOptionsOverflowMenuCreator" string
     private static Class<?> menuCreatorClass;
@@ -101,7 +112,18 @@ public class PostDownloadContextMenuHook {
                     downloadOptionValue = v;
                 } else if (copyLinkOptionValue == null && name.equals("COPY_LINK")) {
                     copyLinkOptionValue = v;
+                } else if (copyImageOptionValue == null && name.equals(COPY_IMAGE_CARRIER)) {
+                    copyImageOptionValue = v;
+                } else if (mediaInfoOptionValue == null && name.equals(MEDIA_INFO_CARRIER)) {
+                    mediaInfoOptionValue = v;
+                } else if (speedOptionValue == null && name.equals(SPEED_CARRIER)) {
+                    speedOptionValue = v;
                 }
+            }
+            ps.reso.instaeclipse.mods.misc.CaptionCopyContextMenuHook.EXTRA_REEL_LABELS.put(MEDIA_INFO_CARRIER, R.string.ig_media_info_title);
+            ps.reso.instaeclipse.mods.misc.CaptionCopyContextMenuHook.EXTRA_REEL_LABELS.put(SPEED_CARRIER, R.string.ig_playback_speed_title);
+            for (Object v : values) {
+                if (v == null) continue;
             }
             if (downloadOptionValue == null)
                 ModuleLog.line("(IE|Post) ❌ DOWNLOAD enum value not found");
@@ -258,7 +280,7 @@ public class PostDownloadContextMenuHook {
         XposedBridge.hookMethod(addButtonMethod, new XC_MethodHook() {
 
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (Boolean.TRUE.equals(sAddingDownload.get())) return;
                 Object opt = param.args[idxOption];
                 // Suppress IG's own native rows — we inject our own versions instead
@@ -266,20 +288,31 @@ public class PostDownloadContextMenuHook {
                     param.setResult(null);
                 } else if (FeatureFlags.copyMediaLink && opt == copyLinkOptionValue) {
                     param.setResult(null);
+                } else if (FeatureFlags.offerCopyImage && opt == copyImageOptionValue) {
+                    param.setResult(null);
+                } else if (FeatureFlags.offerMediaInfo && opt == mediaInfoOptionValue) {
+                    param.setResult(null);
+                } else if (FeatureFlags.offerPlaybackSpeed && opt == speedOptionValue) {
+                    param.setResult(null);
                 }
             }
 
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (Boolean.TRUE.equals(sAddingDownload.get())) return;
 
                 boolean wantDownload = FeatureFlags.enablePostDownload && downloadOptionValue != null;
                 boolean wantCopyLink = FeatureFlags.copyMediaLink && copyLinkOptionValue != null;
-                if (!wantDownload && !wantCopyLink) return;
+                boolean wantCopyImage = FeatureFlags.offerCopyImage && copyImageOptionValue != null;
+                boolean wantInfo = FeatureFlags.offerMediaInfo && mediaInfoOptionValue != null;
+                boolean wantSpeed = FeatureFlags.offerPlaybackSpeed && speedOptionValue != null;
+                if (!wantDownload && !wantCopyLink && !wantCopyImage && !wantInfo && !wantSpeed) return;
 
                 // Don't react to our own target option types (suppressed in beforeHook)
                 Object opt = param.args[idxOption];
-                if (opt == downloadOptionValue || opt == copyLinkOptionValue) return;
+                if (opt == downloadOptionValue || opt == copyLinkOptionValue
+                        || (opt != null && (opt == copyImageOptionValue || opt == mediaInfoOptionValue
+                                || opt == speedOptionValue))) return;
 
                 Object self = param.args[idxSelf];
                 boolean alreadyProcessed;
@@ -291,6 +324,11 @@ public class PostDownloadContextMenuHook {
 
                 if (wantDownload) injectRow(param, downloadOptionValue, R.string.ig_dl_title);
                 if (wantCopyLink) injectRow(param, copyLinkOptionValue, R.string.ig_copy_link_title);
+                if (wantCopyImage) injectRow(param, copyImageOptionValue, R.string.ig_download_choice_copy_image);
+                if (wantInfo) injectRow(param, mediaInfoOptionValue, R.string.ig_media_info_title);
+                if (wantSpeed) injectRow(param, speedOptionValue, R.string.ig_playback_speed_title);
+                // Our carriers are debug options Instagram draws with the Meta logo; give them real icons.
+                if (wantCopyImage || wantInfo || wantSpeed) ps.reso.instaeclipse.mods.ui.MenuIcons.fixSoon();
             }
         });
 
@@ -325,8 +363,10 @@ public class PostDownloadContextMenuHook {
     private static void installClickHandlerHook(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.enablePostDownload && !FeatureFlags.copyMediaLink) return;
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                if (!FeatureFlags.enablePostDownload && !FeatureFlags.enableReelDownload
+                        && !FeatureFlags.copyMediaLink && !FeatureFlags.offerCopyImage
+                        && !FeatureFlags.offerMediaInfo && !FeatureFlags.offerPlaybackSpeed) return;
                 onOptionClicked(param);
             }
         };
@@ -408,7 +448,7 @@ public class PostDownloadContextMenuHook {
     private static void installAllowlistPatchHook(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook allowlistHook = new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 try {
                     Object result = param.getResult();
                     if (!(result instanceof List<?> original)) return;
@@ -417,11 +457,20 @@ public class PostDownloadContextMenuHook {
                             && !original.contains(downloadOptionValue);
                     boolean addCopyLink = FeatureFlags.copyMediaLink && copyLinkOptionValue != null
                             && !original.contains(copyLinkOptionValue);
-                    if (!addDownload && !addCopyLink) return;
+                    boolean addCopyImage = FeatureFlags.offerCopyImage && copyImageOptionValue != null
+                            && !original.contains(copyImageOptionValue);
+                    boolean addInfo = FeatureFlags.offerMediaInfo && mediaInfoOptionValue != null
+                            && !original.contains(mediaInfoOptionValue);
+                    boolean addSpeed = FeatureFlags.offerPlaybackSpeed && speedOptionValue != null
+                            && !original.contains(speedOptionValue);
+                    if (!addDownload && !addCopyLink && !addCopyImage && !addInfo && !addSpeed) return;
 
                     List<Object> patched = new ArrayList<>(original);
                     if (addDownload) patched.add(downloadOptionValue);
                     if (addCopyLink) patched.add(copyLinkOptionValue);
+                    if (addCopyImage) patched.add(copyImageOptionValue);
+                    if (addInfo) patched.add(mediaInfoOptionValue);
+                    if (addSpeed) patched.add(speedOptionValue);
                     param.setResult(patched);
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Post) ❌ allowlist patch failed: " + t);
@@ -491,9 +540,17 @@ public class PostDownloadContextMenuHook {
             if (clicked == null) return;
 
             String option = clicked.toString();
-            boolean isDownload = option.equals("DOWNLOAD") && FeatureFlags.enablePostDownload;
+            // ReelDownloadHook adds DOWNLOAD to the reel menu (and unlocks IG's native row) when
+            // REEL download is on. If we only consumed the tap for POST download, a reel tap with
+            // only Reel download enabled fell through to Instagram's own save flow, which burns in
+            // a watermark (#256). Route it to the module's clean downloader for either toggle.
+            boolean isDownload = option.equals("DOWNLOAD")
+                    && (FeatureFlags.enablePostDownload || FeatureFlags.enableReelDownload);
             boolean isCopyLink = option.equals("COPY_LINK") && FeatureFlags.copyMediaLink;
-            if (!isDownload && !isCopyLink) return;
+            boolean isCopyImage = option.equals(COPY_IMAGE_CARRIER) && FeatureFlags.offerCopyImage;
+            boolean isInfo = option.equals(MEDIA_INFO_CARRIER) && FeatureFlags.offerMediaInfo;
+            boolean isSpeed = option.equals(SPEED_CARRIER) && FeatureFlags.offerPlaybackSpeed;
+            if (!isDownload && !isCopyLink && !isCopyImage && !isInfo && !isSpeed) return;
 
             param.setResult(null); // consume the event
 
@@ -505,16 +562,19 @@ public class PostDownloadContextMenuHook {
                 return;
             }
 
+            if (isSpeed) { PlaybackSpeedHook.showChooser(ctx); return; }
             Object media = findMediaViaMenuCreator(thisObj);
             if (media == null) media = findMedia(thisObj);
             if (media == null) {
                 ModuleLog.line("(IE|Post) ❌ Media not found in click handler");
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (isCopyLink) triggerCopyLink(ctx, media, thisObj);
-            else            triggerDownload(ctx, media, thisObj);
+            if (isInfo) { MediaInfo.show(ctx, media, thisObj); return; }
+            if (isCopyLink)       triggerCopyLink(ctx, media, thisObj);
+            else if (isCopyImage) triggerCopyImage(ctx, media, thisObj);
+            else                  triggerDownload(ctx, media, thisObj);
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ onOptionClicked: " + t);
         }
@@ -548,8 +608,49 @@ public class PostDownloadContextMenuHook {
 
         final String finalUser = username;
         final String finalId   = mediaId;
-        FeedVideoDownloadHook.mainHandler.post(() ->
-                FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx));
+        // Audio-only option (#234) — only asks when enabled and the media has an audio track.
+        // Copy-image (#228) acts on the slide being viewed.
+        String shownUrl = urls.isEmpty() ? null : urls.get(carouselIdx >= 0 && carouselIdx < urls.size() ? carouselIdx : 0);
+        // For a carousel, offer audio for the slide being viewed (its own video item), not the
+        // album container — the container has no video_dash_manifest of its own.
+        Object audioMedia = media;
+        try {
+            java.util.List<?> kids = FeedVideoDownloadHook.carouselChildren(media);
+            if (kids != null && carouselIdx >= 0 && carouselIdx < kids.size() && kids.get(carouselIdx) != null)
+                audioMedia = kids.get(carouselIdx);
+        } catch (Throwable ignored) {}
+        // Carousel: one sheet with every choice (current / all / audio of this slide). A separate
+        // "Video or audio" step first would hide which item gets downloaded.
+        if (urls.size() > 1) {
+            final Object slide = audioMedia;
+            FeedVideoDownloadHook.mainHandler.post(() ->
+                    FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx, slide, media));
+            return;
+        }
+        FeedVideoDownloadHook.offerAudioOrRun(ctx, audioMedia, shownUrl, finalUser, finalId, "post", () ->
+                FeedVideoDownloadHook.mainHandler.post(() ->
+                        FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx)));
+    }
+
+    // ── Copy image (#228) ─────────────────────────────────────────────────────
+    //
+    // Copies the photo being viewed (carousel: the visible slide, resolved the same way as
+    // Download) straight to the clipboard. Video slides have no still image to copy.
+
+    private static void triggerCopyImage(Context ctx, Object media, Object clickHandler) {
+        List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
+        if (urls == null || urls.isEmpty()) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int viewIdx = urls.size() > 1 ? ReelDownloadHook.findCarouselIndexFromView(ctx, urls.size()) : -1;
+        int idx = viewIdx >= 0 ? viewIdx : findCarouselIndex(clickHandler, urls.size());
+        String url = urls.get(idx >= 0 && idx < urls.size() ? idx : 0);
+        if (FeedVideoDownloadHook.isVideoUrl(url)) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_copy_image_video), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ImageClipboard.copy(ctx, url);
     }
 
     // ── Copy Media Link (#117) ────────────────────────────────────────────────
@@ -561,7 +662,7 @@ public class PostDownloadContextMenuHook {
     private static void triggerCopyLink(Context ctx, Object media, Object clickHandler) {
         List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
         if (urls == null || urls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
             return;
         }
         // Single URL copies straight to clipboard; a carousel shows a per-slide chooser
@@ -570,22 +671,14 @@ public class PostDownloadContextMenuHook {
     }
 
     /**
-     * Finds the current carousel slide index from the click handler object.
-     * Tries a known field name first (fast path), then scans all int fields for the
-     * first value in [0, urlCount) — only the index field will be in that range.
+     * Finds the current carousel slide index from the click handler object by scanning its int
+     * fields (no obfuscated field name) for the first value in (0, urlCount) — only the index
+     * field will be in that range. Slide 0 is the default when nothing matches.
      */
     static int findCarouselIndex(Object obj, int urlCount) {
         if (obj == null || urlCount <= 1) return 0;
 
-        // Fast path: try the currently known field name
-        try {
-            Field f = obj.getClass().getDeclaredField("A00");
-            f.setAccessible(true);
-            int v = f.getInt(obj);
-            if (v >= 0 && v < urlCount) return v;
-        } catch (Throwable ignored) {}
-
-        // Fallback: scan all int fields for a value that fits as a carousel index
+        // Scan all int fields for a value that fits as a carousel index
         for (Field f : obj.getClass().getDeclaredFields()) {
             if (f.getType() != int.class) continue;
             f.setAccessible(true);

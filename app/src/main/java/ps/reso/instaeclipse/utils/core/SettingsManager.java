@@ -1,5 +1,6 @@
 package ps.reso.instaeclipse.utils.core;
 
+import ps.reso.instaeclipse.utils.feature.ExtrasFeatures;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -9,14 +10,21 @@ import ps.reso.instaeclipse.utils.feature.FeatureManager;
 public class SettingsManager {
     private static final String PREF_NAME = "instaeclipse_prefs";
     private static SharedPreferences prefs;
+    /** Application context, for pushing in-app changes to the companion (CompanionSync). */
+    private static Context appContext;
 
     public static void init(Context context) {
+        if (appContext == null && context != null) {
+            appContext = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        }
         if (prefs == null) {
             prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         }
     }
 
     public static void saveAllFlags() {
+        // Snapshot to stamp the keys this save changes (see CompanionSync).
+        java.util.Map<String, ?> before = new java.util.HashMap<>(prefs.getAll());
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putBoolean("isDevEnabled", FeatureFlags.isDevEnabled);
@@ -68,11 +76,38 @@ public class SettingsManager {
         // Clean Feed
         editor.putBoolean("hideSuggestionsInFeed", FeatureFlags.hideSuggestionsInFeed);
         editor.putBoolean("hideThreadsSuggestions", FeatureFlags.hideThreadsSuggestions);
+        editor.putBoolean("hideLikedPosts", FeatureFlags.hideLikedPosts);
+        editor.putBoolean("hideCommunityNotes", FeatureFlags.hideCommunityNotes);
+        editor.putBoolean("followingOnlyFeed", FeatureFlags.followingOnlyFeed);
+        editor.putBoolean("hidePlusUpsells", FeatureFlags.hidePlusUpsells);
+        editor.putBoolean("expandCaptions", FeatureFlags.expandCaptions);
+        editor.putBoolean("offerAudioDownload", FeatureFlags.offerAudioDownload);
+        editor.putBoolean("enableVoiceDownload", FeatureFlags.enableVoiceDownload);
+        editor.putBoolean("offerCopyImage", FeatureFlags.offerCopyImage);
+        editor.putBoolean("offerMediaInfo", FeatureFlags.offerMediaInfo);
+        editor.putBoolean("offerPlaybackSpeed", FeatureFlags.offerPlaybackSpeed);
+        editor.putBoolean("maxUploadQuality", FeatureFlags.maxUploadQuality);
+        editor.putBoolean("forceReelScrubber", FeatureFlags.forceReelScrubber);
+        editor.putBoolean("keepEditHistory", FeatureFlags.keepEditHistory);
+        editor.putBoolean("jumpToFirstMessage", FeatureFlags.jumpToFirstMessage);
+        editor.putBoolean("translateMessages", FeatureFlags.translateMessages);
+        editor.putBoolean("chatExport", FeatureFlags.chatExport);
+        editor.putBoolean("hideTabHome", FeatureFlags.hideTabHome);
+        editor.putBoolean("hideTabReels", FeatureFlags.hideTabReels);
+        editor.putBoolean("hideTabCreate", FeatureFlags.hideTabCreate);
+        editor.putBoolean("hideTabMessages", FeatureFlags.hideTabMessages);
+        editor.putBoolean("hideTabActivity", FeatureFlags.hideTabActivity);
+        editor.putBoolean("hideTabProfile", FeatureFlags.hideTabProfile);
+        editor.putBoolean("hideNotesTray", FeatureFlags.hideNotesTray);
+        editor.putBoolean("hideDmBlend", FeatureFlags.hideDmBlend);
+        editor.putBoolean("readReceiptChats", FeatureFlags.readReceiptChats);
+        editor.putBoolean("hideThreadsButton", FeatureFlags.hideThreadsButton);
 
         // Ads
         editor.putBoolean("isAdBlockEnabled", FeatureFlags.isAdBlockEnabled);
         editor.putBoolean("isAnalyticsBlocked", FeatureFlags.isAnalyticsBlocked);
         editor.putBoolean("disableTrackingLinks", FeatureFlags.disableTrackingLinks);
+        editor.putBoolean("openLinksExternally", FeatureFlags.openLinksExternally);
 
         // Misc
         editor.putBoolean("isMiscEnabled", FeatureFlags.isMiscEnabled);
@@ -82,8 +117,22 @@ public class SettingsManager {
         editor.putBoolean("spoofLocation", FeatureFlags.spoofLocation);
         editor.putString("spoofLat", String.valueOf(FeatureFlags.spoofLat));
         editor.putString("spoofLng", String.valueOf(FeatureFlags.spoofLng));
+        editor.putString("spoofLabel", FeatureFlags.spoofLabel);
+        editor.putString("spoofRecent", FeatureFlags.spoofRecent);
         editor.putInt("forceReelQuality", FeatureFlags.forceReelQuality);
         editor.putBoolean("disableRepost", FeatureFlags.disableRepost);
+        editor.putBoolean("hideShareCreateGroup", FeatureFlags.hideShareCreateGroup);
+        editor.putBoolean("exactTimestamps", FeatureFlags.exactTimestamps);
+        editor.putBoolean("likeUndo", FeatureFlags.likeUndo);
+        editor.putBoolean("profileFollowsYouLabel", FeatureFlags.profileFollowsYouLabel);
+        editor.putBoolean("savedOnProfile", FeatureFlags.savedOnProfile);
+        editor.putBoolean("lockSavedCollections", FeatureFlags.lockSavedCollections);
+        editor.putString("lockedCollections", FeatureFlags.lockedCollections);
+        editor.putBoolean("storyViewerSearch", FeatureFlags.storyViewerSearch);
+        editor.putBoolean("storyLinks", FeatureFlags.storyLinks);
+        editor.putBoolean("storyInfo", FeatureFlags.storyInfo);
+        editor.putBoolean("commentSearch", FeatureFlags.commentSearch);
+        editor.putBoolean("followListExport", FeatureFlags.followListExport);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
         editor.putBoolean("showFeatureToasts", FeatureFlags.showFeatureToasts);
         editor.putBoolean("enableStoryMentions", FeatureFlags.enableStoryMentions);
@@ -105,6 +154,9 @@ public class SettingsManager {
         editor.putBoolean("cacheStories", FeatureFlags.cacheStories);
         editor.putBoolean("customFontEnabled", FeatureFlags.customFontEnabled);
         editor.putString("customFontPath", FeatureFlags.customFontPath);
+        editor.putString("navTabOrder", FeatureFlags.navTabOrder);
+        editor.putString("startupTab", FeatureFlags.startupTab);
+        editor.putString("customShareDomain", FeatureFlags.customShareDomain);
         editor.putBoolean("customEmojiEnabled", FeatureFlags.customEmojiEnabled);
         editor.putString("customEmojiPath", FeatureFlags.customEmojiPath);
         editor.putString("downloaderCustomPath", FeatureFlags.downloaderCustomPath);
@@ -113,11 +165,31 @@ public class SettingsManager {
         // Custom Theme
         editor.putBoolean("customThemeEnabled", FeatureFlags.customThemeEnabled);
         editor.putInt("themePresetId", FeatureFlags.themePresetId);
+        editor.putInt("themeLightPresetId", FeatureFlags.themeLightPresetId);
         editor.putString("themePaletteJson", FeatureFlags.themePaletteJson);
 
+        for (String flag : ExtrasFeatures.flags()) editor.putBoolean(flag, ExtrasFeatures.get(flag));
+
         editor.apply();
+        stampChangedKeys(before);
+        // Instagram -> companion: so the companion app shows what was just changed here.
+        CompanionSync.pushAsync(appContext);
 
         FeatureManager.refreshFeatureStatus();
+    }
+
+    /** Marks keys whose value this save changed, so an older companion value never overrides them. */
+    private static void stampChangedKeys(java.util.Map<String, ?> before) {
+        long now = System.currentTimeMillis();
+        SharedPreferences.Editor e = null;
+        for (java.util.Map.Entry<String, ?> entry : prefs.getAll().entrySet()) {
+            String k = entry.getKey();
+            if (k.startsWith("__")) continue;
+            if (java.util.Objects.equals(before.get(k), entry.getValue())) continue;
+            if (e == null) e = prefs.edit();
+            e.putLong("__igts_" + k, now);
+        }
+        if (e != null) e.apply();
     }
 
     public static void loadAllFlags(Context context) {
@@ -140,7 +212,7 @@ public class SettingsManager {
         FeatureFlags.permanentViewMode = prefs.getBoolean("permanentViewMode", false);
         FeatureFlags.keepUnsentMessages = prefs.getBoolean("keepUnsentMessages", false);
         FeatureFlags.autoClearCache = prefs.getBoolean("autoClearCache", false);
-        FeatureFlags.autoClearCacheSizeMb = prefs.getInt("autoClearCacheSizeMb", 500);
+        FeatureFlags.autoClearCacheSizeMb = prefs.getInt("autoClearCacheSizeMb", 100);
         FeatureFlags.removeMetaAI = prefs.getBoolean("removeMetaAI", false);
         FeatureFlags.lockDirectMessages = prefs.getBoolean("lockDirectMessages", false);
         FeatureFlags.lockDirectPasscode = prefs.getString("lockDirectPasscode", "");
@@ -174,11 +246,38 @@ public class SettingsManager {
         // Clean Feed
         FeatureFlags.hideSuggestionsInFeed = prefs.getBoolean("hideSuggestionsInFeed", false);
         FeatureFlags.hideThreadsSuggestions = prefs.getBoolean("hideThreadsSuggestions", false);
+        FeatureFlags.hideLikedPosts = prefs.getBoolean("hideLikedPosts", false);
+        FeatureFlags.hideCommunityNotes = prefs.getBoolean("hideCommunityNotes", false);
+        FeatureFlags.followingOnlyFeed = prefs.getBoolean("followingOnlyFeed", false);
+        FeatureFlags.hidePlusUpsells = prefs.getBoolean("hidePlusUpsells", false);
+        FeatureFlags.expandCaptions = prefs.getBoolean("expandCaptions", false);
+        FeatureFlags.offerAudioDownload = prefs.getBoolean("offerAudioDownload", false);
+        FeatureFlags.enableVoiceDownload = prefs.getBoolean("enableVoiceDownload", false);
+        FeatureFlags.offerCopyImage = prefs.getBoolean("offerCopyImage", false);
+        FeatureFlags.offerMediaInfo = prefs.getBoolean("offerMediaInfo", false);
+        FeatureFlags.offerPlaybackSpeed = prefs.getBoolean("offerPlaybackSpeed", false);
+        FeatureFlags.maxUploadQuality = prefs.getBoolean("maxUploadQuality", false);
+        FeatureFlags.forceReelScrubber = prefs.getBoolean("forceReelScrubber", false);
+        FeatureFlags.keepEditHistory = prefs.getBoolean("keepEditHistory", false);
+        FeatureFlags.jumpToFirstMessage = prefs.getBoolean("jumpToFirstMessage", false);
+        FeatureFlags.translateMessages = prefs.getBoolean("translateMessages", false);
+        FeatureFlags.chatExport = prefs.getBoolean("chatExport", false);
+        FeatureFlags.hideTabHome = prefs.getBoolean("hideTabHome", false);
+        FeatureFlags.hideTabReels = prefs.getBoolean("hideTabReels", false);
+        FeatureFlags.hideTabCreate = prefs.getBoolean("hideTabCreate", false);
+        FeatureFlags.hideTabMessages = prefs.getBoolean("hideTabMessages", false);
+        FeatureFlags.hideTabActivity = prefs.getBoolean("hideTabActivity", false);
+        FeatureFlags.hideTabProfile = prefs.getBoolean("hideTabProfile", false);
+        FeatureFlags.hideNotesTray = prefs.getBoolean("hideNotesTray", false);
+        FeatureFlags.hideDmBlend = prefs.getBoolean("hideDmBlend", false);
+        FeatureFlags.readReceiptChats = prefs.getBoolean("readReceiptChats", false);
+        FeatureFlags.hideThreadsButton = prefs.getBoolean("hideThreadsButton", false);
 
         // Ads
         FeatureFlags.isAdBlockEnabled = prefs.getBoolean("isAdBlockEnabled", false);
         FeatureFlags.isAnalyticsBlocked = prefs.getBoolean("isAnalyticsBlocked", false);
         FeatureFlags.disableTrackingLinks = prefs.getBoolean("disableTrackingLinks", false);
+        FeatureFlags.openLinksExternally = prefs.getBoolean("openLinksExternally", false);
 
         // Misc
         FeatureFlags.isMiscEnabled = prefs.getBoolean("isMiscEnabled", false);
@@ -188,8 +287,22 @@ public class SettingsManager {
         FeatureFlags.spoofLocation = prefs.getBoolean("spoofLocation", false);
         FeatureFlags.spoofLat = readDoublePref(prefs, "spoofLat", 0.0);
         FeatureFlags.spoofLng = readDoublePref(prefs, "spoofLng", 0.0);
+        FeatureFlags.spoofLabel = prefs.getString("spoofLabel", "");
+        FeatureFlags.spoofRecent = prefs.getString("spoofRecent", "");
         FeatureFlags.forceReelQuality = prefs.getInt("forceReelQuality", 0);
         FeatureFlags.disableRepost = prefs.getBoolean("disableRepost", false);
+        FeatureFlags.hideShareCreateGroup = prefs.getBoolean("hideShareCreateGroup", false);
+        FeatureFlags.exactTimestamps = prefs.getBoolean("exactTimestamps", false);
+        FeatureFlags.likeUndo = prefs.getBoolean("likeUndo", false);
+        FeatureFlags.profileFollowsYouLabel = prefs.getBoolean("profileFollowsYouLabel", false);
+        FeatureFlags.savedOnProfile = prefs.getBoolean("savedOnProfile", false);
+        FeatureFlags.lockSavedCollections = prefs.getBoolean("lockSavedCollections", false);
+        FeatureFlags.lockedCollections = prefs.getString("lockedCollections", "");
+        FeatureFlags.storyViewerSearch = prefs.getBoolean("storyViewerSearch", false);
+        FeatureFlags.storyLinks = prefs.getBoolean("storyLinks", false);
+        FeatureFlags.storyInfo = prefs.getBoolean("storyInfo", false);
+        FeatureFlags.commentSearch = prefs.getBoolean("commentSearch", false);
+        FeatureFlags.followListExport = prefs.getBoolean("followListExport", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);
         FeatureFlags.showFeatureToasts = prefs.getBoolean("showFeatureToasts", false);
         FeatureFlags.enableStoryMentions = prefs.getBoolean("enableStoryMentions", false);
@@ -211,6 +324,9 @@ public class SettingsManager {
         FeatureFlags.cacheStories             = prefs.getBoolean("cacheStories", false);
         FeatureFlags.customFontEnabled        = prefs.getBoolean("customFontEnabled", false);
         FeatureFlags.customFontPath           = prefs.getString("customFontPath", "");
+        FeatureFlags.navTabOrder              = prefs.getString("navTabOrder", "");
+        FeatureFlags.startupTab               = prefs.getString("startupTab", "");
+        FeatureFlags.customShareDomain        = prefs.getString("customShareDomain", "");
         FeatureFlags.customEmojiEnabled       = prefs.getBoolean("customEmojiEnabled", false);
         FeatureFlags.customEmojiPath          = prefs.getString("customEmojiPath", "");
         FeatureFlags.downloaderCustomPath     = prefs.getString("downloaderCustomPath", "");
@@ -219,7 +335,21 @@ public class SettingsManager {
         // Custom Theme
         FeatureFlags.customThemeEnabled = prefs.getBoolean("customThemeEnabled", false);
         FeatureFlags.themePresetId = prefs.getInt("themePresetId", 1);
+        // #251: "theme in dark mode only" is the default so a custom theme never breaks light mode
+        // (a dark palette's surfaces/text are illegible on IG's light chrome). The old default was 0
+        // ("same theme as dark mode"), which rendered light mode unreadable; migrate it to -1 once
+        // so existing users are fixed, without overriding anyone who later re-selects it on purpose.
+        FeatureFlags.themeLightPresetId = prefs.getInt("themeLightPresetId", -1);
+        if (!prefs.getBoolean("themeLightMigratedV1", false)) {
+            if (FeatureFlags.themeLightPresetId == 0) FeatureFlags.themeLightPresetId = -1;
+            prefs.edit()
+                    .putInt("themeLightPresetId", FeatureFlags.themeLightPresetId)
+                    .putBoolean("themeLightMigratedV1", true)
+                    .apply();
+        }
         FeatureFlags.themePaletteJson = prefs.getString("themePaletteJson", "");
+
+        for (String flag : ExtrasFeatures.flags()) ExtrasFeatures.set(flag, prefs.getBoolean(flag, false));
 
         FeatureManager.refreshFeatureStatus();
     }

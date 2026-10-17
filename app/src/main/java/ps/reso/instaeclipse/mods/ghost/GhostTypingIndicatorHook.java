@@ -23,7 +23,7 @@ public class GhostTypingIndicatorHook {
     public void handleTypingBlock(DexKitBridge bridge) {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.isGhostTyping) param.setResult(null);
             }
         };

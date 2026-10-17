@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Info de la historia</string>
+    <string name="ig_btn_quiz_answer">Respuesta del quiz</string>
+    <string name="ig_btn_poll_results">Resultados de la encuesta</string>
+    <string name="ig_story_info_hint">Toca una línea para copiarla</string>
+    <string name="ig_si_posted">Publicada</string>
+    <string name="ig_si_expires">Caduca</string>
+    <string name="ig_si_edited">Editada</string>
+    <string name="ig_si_yes">Sí</string>
+    <string name="ig_si_music">Música</string>
+    <string name="ig_si_location">Ubicación</string>
+    <string name="ig_si_hashtags">Hashtags</string>
+    <string name="ig_si_shared_from">Compartida de</string>
+    <string name="ig_si_original_post">Publicación original (mantén pulsado para abrir)</string>
+    <string name="ig_si_posted_with">Publicada con</string>
+    <string name="ig_si_alt_text">Texto alternativo</string>
+    <string name="ig_si_size">Tamaño</string>
+    <string name="ig_si_sound_on">con sonido</string>
+    <string name="ig_si_sound_off">sin sonido</string>
+    <string name="ig_si_countdown">Cuenta atrás</string>
+    <string name="ig_si_question">Pregunta</string>
+    <string name="ig_si_highlights">En destacadas</string>
+    <string name="ig_si_mention_request">Solicitud de mención</string>
+    <string name="ig_si_none">No hay más info en esta historia.</string>
+    <string name="ig_si_your_answer">tu respuesta</string>
+    <string name="ig_si_average">Media</string>
+    <string name="ig_si_copied">Copiado</string>
+    <string name="ig_dialog_misc_story_info">Info de historias, respuestas de quiz y encuestas</string>
+    <string name="ig_feat_story_info">Info de historias</string>
+    <string name="ig_si_add_yours">Añade el tuyo</string>
+    <string name="ig_si_joined">participaron</string>
+    <string name="ig_si_paid_partnership">Colaboración pagada con (mantén pulsado para abrir)</string>
+    <string name="ig_si_collaborators">Colaborador (mantén pulsado para abrir)</string>
+    <string name="ig_btn_slider_results">Resultados del deslizador</string>
+    <string name="ig_si_votes">votos</string>
+</resources>

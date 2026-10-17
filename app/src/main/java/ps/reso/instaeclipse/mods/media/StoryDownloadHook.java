@@ -1,24 +1,10 @@
 package ps.reso.instaeclipse.mods.media;
 
-import android.app.AlertDialog;
 import android.app.AndroidAppHelper;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.luckypray.dexkit.DexKitBridge;
@@ -38,6 +24,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
+import ps.reso.instaeclipse.utils.dialog.IeDialog;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
@@ -45,8 +32,6 @@ import ps.reso.instaeclipse.utils.users.UserUtils;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 public class StoryDownloadHook {
-
-
 
     // VideoVersionIntf resolved once at install time — same interface used by feed downloader
     private static Class<?> videoVersionIntfClass;
@@ -78,7 +63,126 @@ public class StoryDownloadHook {
 
     // ── Entry point ──────────────────────────────────────────────────────────
 
+    // ── Highlight "Download all" (#250) ─────────────────────────────────────
+    // Reel model = class using "Reel with pending media should have an owner." (X.04aX on 452,
+    // X.04ey on 451). A highlight's reel has a String id starting with "highlight:"; its
+    // (UserSession) -> List methods return the ReelItems (the whole highlight is fetched by
+    // feed/reels_media/ when it opens).
+    private static Class<?> reelClass;
+
+    private static Object findHighlightReel(Object root) {
+        if (reelClass == null || root == null) return null;
+        Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        java.util.ArrayDeque<Object[]> q = new java.util.ArrayDeque<>();
+        q.add(new Object[]{root, 0});
+        while (!q.isEmpty() && seen.size() < 2000) {
+            Object[] e = q.poll();
+            Object o = e[0];
+            int d = (int) e[1];
+            if (o == null || !seen.add(o)) continue;
+            if (reelClass.isInstance(o)) {
+                if (isHighlight(o)) return o;
+                continue;
+            }
+            if (d >= 4) continue;
+            if (o instanceof android.app.Activity || o instanceof android.view.View || o instanceof android.content.Context
+                    || o instanceof android.content.res.Resources || o.getClass().getName().startsWith("androidx.")) continue;
+            String n = o.getClass().getName();
+            if (!n.startsWith("X.") && !n.startsWith("com.instagram.") && !n.startsWith("instagram.")) continue;
+            for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+                for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
+                    try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
+                }
+        }
+        return null;
+    }
+
+    private static Object highlightFromParam(XC_MethodHook.MethodHookParam param) {
+        Object holder = findReelItemHolder(param);
+        Object r = findHighlightReel(holder);
+        if (r == null) r = findHighlightReel(param.thisObject);
+        if (r == null && param.args != null) for (Object a : param.args) { r = findHighlightReel(a); if (r != null) break; }
+        return r;
+    }
+
+    private static boolean isHighlight(Object reel) {
+        for (Class<?> k = reel.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                try {
+                    f.setAccessible(true);
+                    Object v = f.get(reel);
+                    if (v instanceof String str && str.startsWith("highlight:")) return true;
+                } catch (Throwable ignored) {}
+            }
+        return false;
+    }
+
+    private static List<?> highlightItems(Object reel, Object holder) {
+        return highlightItemsWith(reel, readFieldByTypeName(holder, "com.instagram.common.session.UserSession"));
+    }
+
+    private static List<?> highlightItemsWith(Object reel, Object session) {
+        List<?> best = null;
+        for (Method m : reel.getClass().getMethods()) {
+            Class<?>[] p = m.getParameterTypes();
+            if (p.length != 1 || !List.class.isAssignableFrom(m.getReturnType())
+                    || !p[0].getName().equals("com.instagram.common.session.UserSession")) continue;
+            try {
+                Object r = m.invoke(reel, session);
+                if (r instanceof List<?> l && (best == null || l.size() > best.size())) best = l;
+            } catch (Throwable ignored) {}
+        }
+        return best;
+    }
+
+    private static void downloadHighlight(Context ctx, Object reel, Object holder) {
+        downloadHighlightItems(ctx, highlightItems(reel, holder));
+    }
+
+    private static void downloadHighlightItems(Context ctx, List<?> items) {
+        if (items == null || items.isEmpty()) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final List<Object> copy = new ArrayList<>(items);
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_downloading, copy.size()), Toast.LENGTH_LONG).show();
+        ModuleLog.line("(IE|Highlight) downloading " + copy.size() + " items");
+        new Thread(() -> {
+            int ok = 0;
+            for (Object item : copy) {
+                try {
+                    StoryMediaOptions m = extractStoryMediaOptions(ctx, item, true);
+                    if (m == null) continue;
+                    boolean video = m.videoUrl != null;
+                    String url = video ? m.videoUrl : m.imageUrl;
+                    String user = extractUsernameFromReelItemHolder(item);
+                    String id = extractMediaIdFromReelItemHolder(item);
+                    String fn = FeedVideoDownloadHook.buildFilename(user, "highlight", id, video);
+                    FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, video, user);
+                    ok++;
+                    Thread.sleep(400);
+                } catch (Throwable t) {
+                    ModuleLog.line("(IE|Highlight) item: " + t);
+                }
+            }
+            final int done = ok;
+            mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_done, done, copy.size()), Toast.LENGTH_LONG).show());
+        }).start();
+    }
+
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("Reel with pending media should have an owner.")))) {
+                reelClass = classLoader.loadClass(md.getClassName());
+                break;
+            }
+            ModuleLog.line("(IE|Highlight) reel class " + (reelClass != null ? reelClass.getName() : "not found"));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Highlight) " + t);
+        }
         try {
             videoVersionIntfClass = classLoader.loadClass("com.instagram.model.mediasize.VideoVersionIntf");
             videoVersionGetUrl    = videoVersionIntfClass.getMethod("getUrl");
@@ -86,8 +190,203 @@ public class StoryDownloadHook {
 
         installButtonInjectorHook(bridge, classLoader);
         installClickHandlerHook(bridge, classLoader);
+        installHighlightTrayHook(bridge, classLoader);
         resolveExpiringGetter(bridge, classLoader);
         installStoryCaptureHook(bridge, classLoader);
+    }
+
+    // ── Highlight long-press menu (profile tray): "Download whole highlight" ──
+    // Helper = class of the menu builder A0G(View, ?, ReelItem, Integer), the only method using
+    // "HighlightsTrayDialogHelper" (X.0MGm on 452); it holds the Activity, UserSession and the highlight
+    // reel. The builder shows either the legacy dialog (rows via add(String, OnClickListener), then a
+    // no-arg -> List collects them) or the newer popup (List of rows passed to set(List); rows come from
+    // the helper's static (rowIface, String) -> List factory, rowIface = boolean method + void click).
+    private static final ThreadLocal<Object> trayHelper = new ThreadLocal<>();
+    private static final Set<Object> trayDialogsDone = Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    private void installHighlightTrayHook(DexKitBridge bridge, ClassLoader cl) {
+        try {
+            MethodData builder = null;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("HighlightsTrayDialogHelper").paramCount(4)))) { builder = md; break; }
+            if (builder == null) { ModuleLog.line("(IE|HighlightTray) builder not found"); return; }
+            Method build = builder.getMethodInstance(cl);
+            final Class<?> helper = build.getDeclaringClass();
+            Method addRow = null, legacyItems = null, popupSet = null, rowFactory = null;
+            for (MethodData inv : builder.getInvokes()) {
+                try {
+                    if (inv.isConstructor()) continue;
+                    Method m = inv.getMethodInstance(cl);
+                    Class<?>[] p = m.getParameterTypes();
+                    if (p.length == 2 && p[0] == String.class && p[1] == View.OnClickListener.class && m.getReturnType() == void.class) addRow = m;
+                    else if (p.length == 1 && p[0] == List.class && m.getReturnType() == void.class && m.getDeclaringClass().getName().startsWith("X.")) popupSet = m;
+                    else if (java.lang.reflect.Modifier.isStatic(m.getModifiers()) && m.getDeclaringClass() == helper && p.length == 2
+                            && p[0].isInterface() && p[1] == String.class && m.getReturnType() == List.class) rowFactory = m;
+                } catch (Throwable ignored) {}
+            }
+            if (addRow != null)
+                for (MethodData inv : builder.getInvokes()) {
+                    try {
+                        if (inv.isConstructor() || !inv.getClassName().equals(addRow.getDeclaringClass().getName())) continue;
+                        Method m = inv.getMethodInstance(cl);
+                        if (m.getParameterCount() == 0 && m.getReturnType() == List.class) legacyItems = m;
+                    } catch (Throwable ignored) {}
+                }
+            XposedBridge.hookMethod(build, new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
+                    if (FeatureFlags.enableStoryDownload) trayHelper.set(p.thisObject);
+                }
+                @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method); trayHelper.remove(); }
+            });
+            if (addRow != null && legacyItems != null) {
+                final Method add = addRow;
+                XposedBridge.hookMethod(legacyItems, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
+                        Object h = trayHelper.get();
+                        if (h == null || !trayDialogsDone.add(p.thisObject)) return;
+                        try {
+                            Context c = AndroidAppHelper.currentApplication();
+                            add.invoke(p.thisObject, I18n.t(c, R.string.ig_highlight_download_all), (View.OnClickListener) v -> trayDownload(h));
+                        } catch (Throwable t) { ModuleLog.line("(IE|HighlightTray) legacy row: " + t); }
+                    }
+                });
+            }
+            if (popupSet != null && rowFactory != null) {
+                final Method factory = rowFactory;
+                final Class<?> iface = rowFactory.getParameterTypes()[0];
+                XposedBridge.hookMethod(popupSet, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
+                        Object h = trayHelper.get();
+                        if (h == null || !(p.args[0] instanceof List<?>)) return;
+                        try {
+                            Object click = java.lang.reflect.Proxy.newProxyInstance(cl, new Class<?>[]{iface}, (proxy, m, a) -> {
+                                if (m.getReturnType() == boolean.class) return true;
+                                if (m.getReturnType() == void.class && m.getDeclaringClass() == iface) { mainHandler.post(() -> trayDownload(h)); return null; }
+                                if (m.getName().equals("hashCode")) return System.identityHashCode(proxy);
+                                if (m.getName().equals("equals")) return proxy == a[0];
+                                if (m.getName().equals("toString")) return "IEHighlightRow";
+                                return null;
+                            });
+                            List<?> rows = (List<?>) factory.invoke(null, click, I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_highlight_download_all));
+                            @SuppressWarnings("unchecked") List<Object> list = (List<Object>) p.args[0];
+                            try { list.addAll(rows); }
+                            catch (UnsupportedOperationException e) { List<Object> copy = new ArrayList<>(list); copy.addAll(rows); p.args[0] = copy; }
+                        } catch (Throwable t) { ModuleLog.line("(IE|HighlightTray) popup row: " + t); }
+                    }
+                });
+            }
+            findReelLoader(bridge, cl);
+            ModuleLog.line("(IE|HighlightTray) ✅ " + helper.getName() + " legacy=" + (addRow != null && legacyItems != null)
+                    + " popup=" + (popupSet != null && rowFactory != null) + " loader=" + (loaderGetter != null && loaderFetch != null));
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|HighlightTray) " + t);
+        }
+    }
+
+    /** Long-press row tapped: download every item of the highlight the helper was built for. */
+    private static void trayDownload(Object helper) {
+        Object reel = reelClass != null ? readFieldByTypeName(helper, reelClass.getName()) : null;
+        Object session = readFieldByTypeName(helper, "com.instagram.common.session.UserSession");
+        Context ctx = (Context) readFieldByTypeName(helper, "android.app.Activity");
+        if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (ctx == null || reel == null) { ModuleLog.line("(IE|HighlightTray) no reel/context"); return; }
+        List<?> items = highlightItemsWith(reel, session);
+        ModuleLog.line("(IE|HighlightTray) items loaded: " + (items != null ? items.size() : -1));
+        if (items != null && !items.isEmpty()) { downloadHighlightItems(ctx, items); return; }
+        loadThenDownload(ctx, reel, session); // highlight never opened: only its cover is known
+    }
+
+    // Reel loader = first ctor param of the class using "reel_store_on_story_unavailable" (X.02jU on
+    // 452), obtained from a static (UserSession) -> loader getter. register(callback, reelId, String,
+    // boolean) calls back at once when the reel is already loaded, else when fetch(reason enum, reelId,
+    // module, Map) completes; callback = success(String id, boolean) / failure(String id). The loader
+    // only keeps a WeakReference to the callback, so a strong one is held here until it fires.
+    private static Method loaderGetter, loaderRegister, loaderUnregister, loaderFetch;
+    private static final Set<Object> pendingLoads = Collections.synchronizedSet(new java.util.HashSet<>());
+
+    private static void findReelLoader(DexKitBridge bridge, ClassLoader cl) {
+        try {
+            Class<?> loader = null;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .usingStrings("reel_store_on_story_unavailable")))) {
+                for (java.lang.reflect.Constructor<?> c : cl.loadClass(md.getClassName()).getDeclaredConstructors())
+                    if (c.getParameterCount() > 0 && c.getParameterTypes()[0].getName().startsWith("X.")) { loader = c.getParameterTypes()[0]; break; }
+                if (loader != null) break;
+            }
+            if (loader == null) return;
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType(loader.getName()).paramTypes("com.instagram.common.session.UserSession")))) {
+                Method m = md.getMethodInstance(cl);
+                if (java.lang.reflect.Modifier.isStatic(m.getModifiers())) { m.setAccessible(true); loaderGetter = m; break; }
+            }
+            for (Method m : loader.getDeclaredMethods()) {
+                Class<?>[] p = m.getParameterTypes();
+                if (p.length == 4 && p[0].isInterface() && p[1] == String.class && p[2] == String.class && p[3] == boolean.class) loaderRegister = m;
+                else if (p.length == 4 && p[0].isEnum() && p[1] == String.class && p[2] == String.class && p[3] == java.util.Map.class) loaderFetch = m;
+            }
+            if (loaderRegister != null)
+                for (Method m : loader.getDeclaredMethods()) {
+                    Class<?>[] p = m.getParameterTypes();
+                    if (p.length == 2 && p[0] == loaderRegister.getParameterTypes()[0] && p[1] == String.class) loaderUnregister = m;
+                }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|HighlightTray) loader: " + t);
+        }
+    }
+
+    private static String highlightId(Object reel) {
+        for (Class<?> k = reel.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+            for (Field f : k.getDeclaredFields()) {
+                if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                try { f.setAccessible(true); if (f.get(reel) instanceof String s && s.startsWith("highlight:")) return s; } catch (Throwable ignored) {}
+            }
+        return null;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void loadThenDownload(Context ctx, Object reel, Object session) {
+        String id = highlightId(reel);
+        if (id == null || session == null || loaderGetter == null || loaderRegister == null || loaderFetch == null) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            Object loader = loaderGetter.invoke(null, session);
+            Class<?> cbType = loaderRegister.getParameterTypes()[0];
+            Object[] self = new Object[1];
+            Object cb = java.lang.reflect.Proxy.newProxyInstance(cbType.getClassLoader(), new Class<?>[]{cbType}, (proxy, m, a) -> {
+                switch (m.getName()) {
+                    case "hashCode": return System.identityHashCode(proxy);
+                    case "equals": return proxy == a[0];
+                    case "toString": return "IEHighlightLoad";
+                }
+                if (a == null || a.length == 0 || !id.equals(a[0])) return null;
+                boolean success = a.length == 2;
+                mainHandler.post(() -> {
+                    if (!pendingLoads.remove(self[0])) return; // fire once
+                    try { if (loaderUnregister != null) loaderUnregister.invoke(loader, self[0], id); } catch (Throwable ignored) {}
+                    List<?> items = success ? highlightItemsWith(reel, session) : null;
+                    ModuleLog.line("(IE|HighlightTray) load " + (success ? "ok" : "failed") + ": " + (items != null ? items.size() : -1) + " items");
+                    downloadHighlightItems(ctx, items);
+                });
+                return null;
+            });
+            self[0] = cb;
+            pendingLoads.add(cb);
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_loading), Toast.LENGTH_SHORT).show();
+            loaderRegister.invoke(loader, cb, id, "profile", false);
+            if (!pendingLoads.contains(cb)) return; // was already loaded: callback ran
+            Class<? extends Enum> reason = (Class<? extends Enum>) loaderFetch.getParameterTypes()[0];
+            Object why;
+            try { why = Enum.valueOf(reason, "PROFILE_HIGHLIGHTS_TRAY"); } catch (Throwable e) { why = Enum.valueOf(reason, "ON_TAP"); }
+            loaderFetch.invoke(loader, why, id, "profile", null);
+            ModuleLog.line("(IE|HighlightTray) fetching " + id);
+            mainHandler.postDelayed(() -> { // give up after 20 s
+                if (pendingLoads.remove(cb)) ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            }, 20000);
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|HighlightTray) load: " + t);
+        }
     }
 
     // ── Story cache: capture each VIEWED story (per-page bind, fires for every story shown) ──
@@ -119,7 +418,7 @@ public class StoryDownloadHook {
      */
     private void installStoryCaptureHook(DexKitBridge bridge, ClassLoader cl) {
         XC_MethodHook capture = new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 if (!FeatureFlags.cacheStories) return;
                 Object reelItem = null;
                 for (Object a : p.args) {
@@ -176,6 +475,56 @@ public class StoryDownloadHook {
     // Found via "[INTERNAL] Pause Playback" string + CharSequence[] return type, 1 param.
     // afterHookedMethod: appends our "Download" entry to the returned CharSequence[] array.
 
+    /**
+     * Every CharSequence[] option builder of the story-options helper class (X.0mt9 on 452).
+     * IG 452 moved the "[INTERNAL] …" rows into a private List helper (A0c), so the builder used
+     * for other people's stories (A0t) no longer contains the anchor string itself; taking all
+     * CharSequence[] methods of the anchor's declaring class(es) catches it again.
+     */
+    /**
+     * Every story-menu tap dispatcher: the void methods behind "[INTERNAL] Pause Playback". Others'
+     * stories and your own story use different ones (your own is a static helper), so features that
+     * add menu rows hook them all and check the tapped label themselves.
+     */
+    public static java.util.List<Method> storyClickDispatchers(DexKitBridge bridge, ClassLoader cl) {
+        java.util.List<Method> out = ps.reso.instaeclipse.utils.core.DexKitCache.isCacheValid()
+                ? ps.reso.instaeclipse.utils.core.DexKitCache.loadMethods("StoryClickDispatchers", cl) : null;
+        if (out != null && !out.isEmpty()) return out;
+        out = new java.util.ArrayList<>();
+        try {
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType("void").usingStrings("[INTERNAL] Pause Playback")))) {
+                try { out.add(md.getMethodInstance(cl)); } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Story) ❌ click dispatchers: " + t);
+        }
+        if (!out.isEmpty()) ps.reso.instaeclipse.utils.core.DexKitCache.saveMethods("StoryClickDispatchers", out);
+        return out;
+    }
+
+    public static java.util.Set<Method> storyOptionBuilders(List<MethodData> anchorMethods, ClassLoader classLoader) {
+        java.util.Set<Method> out = new java.util.LinkedHashSet<>();
+        java.util.Set<Class<?>> owners = new java.util.LinkedHashSet<>();
+        for (MethodData md : anchorMethods) {
+            try {
+                Method m = md.getMethodInstance(classLoader);
+                owners.add(m.getDeclaringClass());
+                if (isCharSequenceArray(m.getReturnType())) out.add(m);
+            } catch (Throwable ignored) {}
+        }
+        for (Class<?> c : owners) {
+            for (Method m : c.getDeclaredMethods()) {
+                if (isCharSequenceArray(m.getReturnType())) out.add(m);
+            }
+        }
+        return out;
+    }
+
+    private static boolean isCharSequenceArray(Class<?> rt) {
+        return rt.isArray() && CharSequence.class.isAssignableFrom(rt.getComponentType());
+    }
+
     private void installButtonInjectorHook(DexKitBridge bridge, ClassLoader classLoader) {
         // Hook EVERY CharSequence[]-returning candidate behind the "[INTERNAL] Pause Playback"
         // anchor — NOT just the first 1-arg one. Instagram builds the option list with a DIFFERENT
@@ -196,32 +545,44 @@ public class StoryDownloadHook {
 
             XC_MethodHook injector = new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
-                    if (!FeatureFlags.enableStoryDownload) return;
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory && !FeatureFlags.offerPlaybackSpeed) return;
                     if (!(param.getResult() instanceof CharSequence[] original) || original == null) return;
 
-                    // Guard: don't inject twice
-                    String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
-                    for (CharSequence cs : original) {
-                        if (cs != null && dlLabel.contentEquals(cs)) return;
-                    }
+                    java.util.List<CharSequence> add = new java.util.ArrayList<>();
+                    if (FeatureFlags.enableStoryDownload)
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title));
+                    // Selective "Mark as seen" (#226): only meaningful while Hide Story Views is on.
+                    // Not on your own story (its menu comes from the static builder): you can't
+                    // "see" your own story.
+                    if (FeatureFlags.isGhostStory && !java.lang.reflect.Modifier.isStatic(param.method.getModifiers()))
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen));
+                    // Highlight "Download all" (#250)
+                    if (FeatureFlags.enableStoryDownload && highlightFromParam(param) != null)
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_highlight_download_all));
+                    // Story playback speed (Instagram Plus–style, our own implementation)
+                    if (FeatureFlags.offerPlaybackSpeed)
+                        add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_playback_speed_title));
 
-                    CharSequence[] extended = new CharSequence[original.length + 1];
+                    // Guard: don't inject twice
+                    for (CharSequence cs : original) {
+                        if (cs == null) continue;
+                        add.removeIf(a -> a.toString().contentEquals(cs));
+                    }
+                    if (add.isEmpty()) return;
+
+                    CharSequence[] extended = new CharSequence[original.length + add.size()];
                     System.arraycopy(original, 0, extended, 0, original.length);
-                    extended[original.length] = dlLabel;
+                    for (int i = 0; i < add.size(); i++) extended[original.length + i] = add.get(i);
                     param.setResult(extended);
                 }
             };
 
             int hooked = 0;
-            for (MethodData md : methods) {
+            for (Method m : storyOptionBuilders(methods, classLoader)) {
                 try {
-                    Method m = md.getMethodInstance(classLoader);
-                    Class<?> rt = m.getReturnType();
-                    if (rt.isArray() && CharSequence.class.isAssignableFrom(rt.getComponentType())) {
-                        XposedBridge.hookMethod(m, injector);
-                        hooked++;
-                    }
+                    XposedBridge.hookMethod(m, injector);
+                    hooked++;
                 } catch (Throwable ignored) {}
             }
             ModuleLog.line("(IE|Story) button injector hooked " + hooked + " builder(s)");
@@ -264,16 +625,68 @@ public class StoryDownloadHook {
 
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.enableStoryDownload) return;
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                if (!FeatureFlags.enableStoryDownload && !FeatureFlags.isGhostStory && !FeatureFlags.offerPlaybackSpeed) return;
 
                 // 1. Find which button was tapped
                 CharSequence tapped = null;
                 for (Object arg : param.args) {
                     if (arg instanceof CharSequence cs) { tapped = cs; break; }
                 }
+                if (tapped == null) return;
+
+                String allLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_highlight_download_all);
+                if (FeatureFlags.enableStoryDownload && allLabel.contentEquals(tapped)) {
+                    param.setResult(null);
+                    Object holder = findReelItemHolder(param);
+                    Object reel = highlightFromParam(param);
+                    Context ctx = findContextAcrossParam(param, holder != null ? holder : param.thisObject);
+                    if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+                    if (ctx != null && reel != null) downloadHighlight(ctx, reel, holder);
+                    return;
+                }
+                String speedLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_playback_speed_title);
+                if (FeatureFlags.offerPlaybackSpeed && speedLabel.contentEquals(tapped)) {
+                    param.setResult(null);
+                    Object holder = findReelItemHolder(param);
+                    Context ctx = findContextAcrossParam(param, holder != null ? holder : param.thisObject);
+                    if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+                    // IG paused the story when its menu opened and resumes it only for options it
+                    // handles itself; we swallowed this tap, so replay the dispatcher with IG's own
+                    // "[INTERNAL] Resume Playback" once our chooser closes.
+                    final java.lang.reflect.Member method = param.method;
+                    final Object self = param.thisObject;
+                    final Object[] args = param.args.clone();
+                    Runnable resume = () -> {
+                        try {
+                            for (int i = 0; i < args.length; i++)
+                                if (args[i] instanceof CharSequence) { args[i] = "[INTERNAL] Resume Playback"; break; }
+                            de.robv.android.xposed.XposedBridge.invokeOriginalMethod(method, self, args);
+                        } catch (Throwable t) {
+                            ModuleLog.line("(IE|Story) resume after speed: " + t);
+                        }
+                    };
+                    if (ctx != null) PlaybackSpeedHook.showChooser(ctx, resume);
+                    return;
+                }
+
+                // Selective "Mark as seen" (#226)
+                String seenLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen);
+                if (FeatureFlags.isGhostStory && seenLabel.contentEquals(tapped)) {
+                    param.setResult(null);
+                    Object holder = findReelItemHolder(param);
+                    Object effective = holder != null ? holder : param.thisObject;
+                    Context ctx = findContextAcrossParam(param, effective);
+                    String id = extractMediaIdFromReelItemHolder(effective);
+                    int n = ps.reso.instaeclipse.mods.ghost.GhostStorySeenHook.markSeen(id);
+                    if (ctx != null) ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, n > 0
+                            ? R.string.ig_story_marked_seen : R.string.ig_story_mark_seen_none), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!FeatureFlags.enableStoryDownload) return;
                 String dlLabel = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
-                if (tapped == null || !dlLabel.contentEquals(tapped)) return;
+                if (!dlLabel.contentEquals(tapped)) return;
 
                 // 2. Consume the event — Instagram won't process an option it didn't add
                 param.setResult(null);
@@ -294,7 +707,7 @@ public class StoryDownloadHook {
                 // 5. Extract story URL via ReelItem → media object field graph
                 StoryMediaOptions media = extractStoryMediaOptions(ctx, effectiveHolder);
                 if (media == null) {
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -379,9 +792,14 @@ public class StoryDownloadHook {
      * finding the MP4: keeping both URLs is what lets the user choose the JPG instead.
      */
     private static StoryMediaOptions extractStoryMediaOptions(Context ctx, Object holder) {
+        return extractStoryMediaOptions(ctx, holder, false);
+    }
+
+    /** {@code direct}: holder IS the ReelItem (don't look for a nested ReelItem field). */
+    private static StoryMediaOptions extractStoryMediaOptions(Context ctx, Object holder, boolean direct) {
         if (holder == null) return null;
         try {
-            Object reelItem = readFieldByTypeName(holder, "com.instagram.model.reels.ReelItem");
+            Object reelItem = direct ? holder : readFieldByTypeName(holder, "com.instagram.model.reels.ReelItem");
             ModuleLog.line("(IE|Story) reelItem=" +
                     (reelItem != null ? reelItem.getClass().getName() : "null"));
 
@@ -887,7 +1305,7 @@ public class StoryDownloadHook {
             case DOWNLOAD_PHOTO -> startDownload(ctx, media.imageUrl, false, username, mediaId);
             case DOWNLOAD_VIDEO -> startDownload(ctx, media.videoUrl, true, username, mediaId);
             case ASK -> showStoryFormatDialog(ctx, media, username, mediaId);
-            case NOT_FOUND -> Toast.makeText(ctx,
+            case NOT_FOUND -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                     I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
         }
     }
@@ -908,124 +1326,24 @@ public class StoryDownloadHook {
         }
 
         try {
-            float dp = ctx.getResources().getDisplayMetrics().density;
-            boolean dk = (ctx.getResources().getConfiguration().uiMode
-                    & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-
-            int sheetBg   = dk ? Color.parseColor("#1C1C1E") : Color.parseColor("#F2F2F7");
-            int cardBg    = dk ? Color.parseColor("#2C2C2E") : Color.parseColor("#FFFFFF");
-            int textPrim  = dk ? Color.WHITE                 : Color.parseColor("#1C1C1E");
-            int textSec   = dk ? Color.parseColor("#AEAEB2") : Color.parseColor("#6C6C70");
-            int handleClr = dk ? Color.parseColor("#48484A") : Color.parseColor("#C7C7CC");
-
-            LinearLayout sheet = new LinearLayout(ctx);
-            sheet.setOrientation(LinearLayout.VERTICAL);
-            sheet.setBackground(roundRect(sheetBg, 20, ctx, dp));
-            int hPad = (int) (20 * dp);
-            sheet.setPadding(hPad, (int) (12 * dp), hPad, (int) (28 * dp));
-
-            // Grab handle
-            View handle = new View(ctx);
-            LinearLayout.LayoutParams handleLp = new LinearLayout.LayoutParams((int) (40 * dp), (int) (4 * dp));
-            handleLp.gravity = Gravity.CENTER_HORIZONTAL;
-            handleLp.bottomMargin = (int) (16 * dp);
-            handle.setLayoutParams(handleLp);
-            handle.setBackground(roundRect(handleClr, 2, ctx, dp));
-            sheet.addView(handle);
-
-            // Title
-            TextView title = new TextView(ctx);
-            title.setText(I18n.t(ctx, R.string.ig_story_download_choice_title));
-            title.setTextColor(textPrim);
-            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            title.setTypeface(null, Typeface.BOLD);
-            sheet.addView(title);
-
-            // Subtitle
-            TextView subtitle = new TextView(ctx);
-            subtitle.setText(I18n.t(ctx, R.string.ig_story_download_choice_subtitle));
-            subtitle.setTextColor(textSec);
-            subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            subLp.topMargin = (int) (2 * dp);
-            subLp.bottomMargin = (int) (14 * dp);
-            subtitle.setLayoutParams(subLp);
-            sheet.addView(subtitle);
-
-            final Dialog dialog = new Dialog(ctx);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-            // One tappable card row per available format (📷 photo / 🎬 video with music).
-            for (int i = 0; i < choices.size(); i++) {
-                final StoryMedia choice = choices.get(i);
-                TextView row = new TextView(ctx);
-                row.setText((choice.video ? "🎬  " : "📷  ") + labels.get(i));
-                row.setTextColor(textPrim);
-                row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                row.setTypeface(null, Typeface.BOLD);
-                int rowPad = (int) (16 * dp);
-                row.setPadding(rowPad, rowPad, rowPad, rowPad);
-                row.setBackground(roundRect(cardBg, 12, ctx, dp));
-                LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                rowLp.bottomMargin = (int) (8 * dp);
-                row.setLayoutParams(rowLp);
-                row.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    startDownload(ctx, choice.url, choice.video, username, mediaId);
-                });
-                sheet.addView(row);
-            }
-
-            // Cancel pill
-            Button cancel = makePillButton(ctx, ctx.getString(android.R.string.cancel), cardBg, textPrim, dp);
-            cancel.setOnClickListener(v -> dialog.dismiss());
-            sheet.addView(cancel);
-
-            dialog.setContentView(sheet);
-            Window w = dialog.getWindow();
-            if (w != null) {
-                w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                w.setGravity(Gravity.BOTTOM);
-                w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                WindowManager.LayoutParams wlp = w.getAttributes();
-                int margin = (int) (12 * dp);
-                wlp.x = margin;
-                wlp.y = margin;
-                w.setAttributes(wlp);
-            }
-            dialog.show();
+            CharSequence[] rows = new CharSequence[choices.size()];
+            // One tappable row per available format (📷 photo / 🎬 video with music).
+            for (int i = 0; i < choices.size(); i++)
+                rows[i] = (choices.get(i).video ? "🎬  " : "📷  ") + labels.get(i);
+            IeDialog dlg = new IeDialog(ctx)
+                    .title(I18n.t(ctx, R.string.ig_story_download_choice_title))
+                    .message(I18n.t(ctx, R.string.ig_story_download_choice_subtitle))
+                    .choices(rows, -1, which -> {
+                        StoryMedia choice = choices.get(which);
+                        startDownload(ctx, choice.url, choice.video, username, mediaId);
+                    });
+            dlg.secondary(ctx.getString(android.R.string.cancel), null);
+            dlg.show();
         } catch (Throwable t) {
             ModuleLog.line("(IE|Story) format dialog failed: " + t);
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed,
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed,
                     t.getMessage()), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    /** Rounded-rect drawable (matches the story-mention sheet styling). */
-    private static GradientDrawable roundRect(int color, float radiusDp, Context ctx, float dp) {
-        GradientDrawable d = new GradientDrawable();
-        d.setColor(color);
-        d.setCornerRadius(radiusDp * dp);
-        return d;
-    }
-
-    /** Pill button (matches the story-mention sheet styling). */
-    private static Button makePillButton(Context ctx, String label, int bgColor, int textColor, float dp) {
-        Button btn = new Button(ctx);
-        btn.setText(label);
-        btn.setTextColor(textColor);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        btn.setTypeface(null, Typeface.BOLD);
-        btn.setBackground(roundRect(bgColor, 14, ctx, dp));
-        btn.setAllCaps(false);
-        btn.setPadding((int) (20 * dp), (int) (14 * dp), (int) (20 * dp), (int) (14 * dp));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = (int) (10 * dp);
-        btn.setLayoutParams(lp);
-        return btn;
     }
 
     private void startDownload(Context ctx, String url, boolean isVideo,
@@ -1033,16 +1351,16 @@ public class StoryDownloadHook {
         String fn = FeedVideoDownloadHook.buildFilename(username, "story", mediaId, isVideo);
         ModuleLog.line("(IE|Story|DL) username=" + username + " mediaId=" + mediaId
                 + " file=" + fn);
-        Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_story_video) : I18n.t(ctx, R.string.ig_toast_downloading_story_photo), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_story_video) : I18n.t(ctx, R.string.ig_toast_downloading_story_photo), Toast.LENGTH_SHORT).show();
         mainHandler.post(() -> new Thread(() -> {
             try {
                 boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, isVideo, username);
                 if (!delegated) {
-                    mainHandler.post(() -> Toast.makeText(ctx,
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                             I18n.t(ctx, R.string.ig_toast_story_saved), Toast.LENGTH_SHORT).show());
                 }
             } catch (Throwable e) {
-                mainHandler.post(() -> Toast.makeText(ctx,
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                         I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
             }
         }).start());
@@ -1050,6 +1368,7 @@ public class StoryDownloadHook {
 
     private static void downloadToStream(String url, java.io.OutputStream out) throws Exception {
         java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();
         try (java.io.InputStream in = conn.getInputStream()) {

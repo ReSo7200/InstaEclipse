@@ -71,7 +71,7 @@ public class GhostModeUtils {
             if (activity != null) {
                 GhostEmojiManager.addGhostEmojiNextToInbox(activity, false);
             }
-            Toast.makeText(context, "❗ " + I18n.t(context, R.string.ig_toast_ghost_no_options), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, "❗ " + I18n.t(context, R.string.ig_toast_ghost_no_options), Toast.LENGTH_SHORT).show();
             return; // Nothing to do
         }
 
@@ -98,9 +98,9 @@ public class GhostModeUtils {
 
         // Toast
         if (newState) {
-            Toast.makeText(context, "👻 " + I18n.t(context, R.string.ig_toast_ghost_enabled), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, "👻 " + I18n.t(context, R.string.ig_toast_ghost_enabled), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(context, "❌ " + I18n.t(context, R.string.ig_toast_ghost_disabled), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, "❌ " + I18n.t(context, R.string.ig_toast_ghost_disabled), Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">限時動態資訊</string>
+    <string name="ig_btn_quiz_answer">測驗答案</string>
+    <string name="ig_btn_poll_results">投票結果</string>
+    <string name="ig_story_info_hint">點按一行即可複製</string>
+    <string name="ig_si_posted">發佈於</string>
+    <string name="ig_si_expires">到期於</string>
+    <string name="ig_si_edited">已編輯</string>
+    <string name="ig_si_yes">是</string>
+    <string name="ig_si_music">音樂</string>
+    <string name="ig_si_location">位置</string>
+    <string name="ig_si_hashtags">主題標籤</string>
+    <string name="ig_si_shared_from">分享自</string>
+    <string name="ig_si_original_post">原始貼文（長按開啟）</string>
+    <string name="ig_si_posted_with">發佈工具</string>
+    <string name="ig_si_alt_text">替代文字</string>
+    <string name="ig_si_size">尺寸</string>
+    <string name="ig_si_sound_on">有聲音</string>
+    <string name="ig_si_sound_off">無聲音</string>
+    <string name="ig_si_countdown">倒數計時</string>
+    <string name="ig_si_question">問題</string>
+    <string name="ig_si_highlights">在精選動態中</string>
+    <string name="ig_si_mention_request">提及請求</string>
+    <string name="ig_si_none">此限時動態沒有其他資訊。</string>
+    <string name="ig_si_your_answer">你的答案</string>
+    <string name="ig_si_average">平均</string>
+    <string name="ig_si_copied">已複製</string>
+    <string name="ig_dialog_misc_story_info">限時動態資訊、測驗和投票答案</string>
+    <string name="ig_feat_story_info">限時動態資訊</string>
+    <string name="ig_si_add_yours">加入你的</string>
+    <string name="ig_si_joined">人參與</string>
+    <string name="ig_si_paid_partnership">付費合作夥伴（長按開啟）</string>
+    <string name="ig_si_collaborators">共同創作者（長按開啟）</string>
+    <string name="ig_btn_slider_results">滑桿結果</string>
+    <string name="ig_si_votes">票</string>
+</resources>

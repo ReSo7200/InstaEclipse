@@ -56,7 +56,7 @@ public class ProfilePicDownloadHook {
         // window type (Activity, Dialog, BottomSheet) without relying on layout listeners.
         XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow", new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) {
+            protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableProfileDownload) return;
                 View v = (View) param.thisObject;
                 int vid = v.getId();
@@ -90,24 +90,24 @@ public class ProfilePicDownloadHook {
 
                 String url = extractUrl(v);
                 if (url == null) {
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_profile_pic_url_not_found), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_profile_pic_url_not_found), Toast.LENGTH_SHORT).show();
                     ModuleLog.line("(IE|ProfileDL) ❌ URL extraction failed");
                     return true;
                 }
                 String username = activity != null ? extractUsername(activity) : null;
                 String filename  = FeedVideoDownloadHook.buildFilename(username, "profile", null, false);
 
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_profile_pic), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_profile_pic), Toast.LENGTH_SHORT).show();
                 new Thread(() -> {
                     try {
                         boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, filename, false, username);
                         if (!delegated) {
-                            mainHandler.post(() -> Toast.makeText(ctx,
+                            mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                     I18n.t(ctx, R.string.ig_toast_profile_pic_saved), Toast.LENGTH_SHORT).show());
                         }
                     } catch (Throwable e) {
                         ModuleLog.line("(IE|ProfileDL) ❌ download: " + e.getMessage());
-                        mainHandler.post(() -> Toast.makeText(ctx,
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                 I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                     }
                 }).start();
@@ -121,17 +121,27 @@ public class ProfilePicDownloadHook {
 
     // ── URL extraction ────────────────────────────────────────────────────────
 
+    private static final String IMAGE_URL = "com.instagram.common.typedurl.ImageUrl";
+
     /**
      * Extracts the image URL from the profile pic view (CircularImageView extends IgImageView).
-     * Scans known ImageUrl-typed fields by name; tries multiple candidates in order.
+     * IgImageView keeps the non-obfuscated getter getTypedUrl() (the displayed ImageUrl); if a
+     * build drops it, scans the hierarchy for ImageUrl-typed fields (A0E/A0D/A0e on 452) by TYPE,
+     * never by the obfuscated field letter. ImageUrl itself is a non-obfuscated interface.
      */
     private static String extractUrl(View view) {
-        for (String fieldName : new String[]{"A0E", "A0D", "A0c"}) {
-            try {
-                String url = getUrlFromImageUrlField(view, fieldName);
+        try {
+            java.lang.reflect.Method getter = findMethod(view.getClass(), "getTypedUrl");
+            if (getter != null) {
+                String url = urlOf(getter.invoke(view));
                 if (url != null) return url;
-            } catch (Throwable ignored) {}
-        }
+            }
+        } catch (Throwable ignored) {}
+
+        try {
+            String url = getUrlFromImageUrlFields(view);
+            if (url != null) return url;
+        } catch (Throwable ignored) {}
 
         // Fallback: tag-based URI
         try {
@@ -145,24 +155,39 @@ public class ProfilePicDownloadHook {
     }
 
     /**
-     * Walks the class hierarchy to find a field by name, reads it as an ImageUrl,
-     * then calls getUrl() on it (ImageUrl is a non-obfuscated interface).
+     * Walks the class hierarchy and reads every field typed as ImageUrl, returning the first one
+     * whose getUrl() yields an http(s) URL. getDeclaredFields() order is unspecified, but all the
+     * candidates point at the same displayed picture (main / tracking / fallback copy).
      */
-    private static String getUrlFromImageUrlField(View view, String fieldName) throws Throwable {
-        Class<?> cls = view.getClass();
-        while (cls != null && cls != Object.class) {
-            try {
-                Field f = cls.getDeclaredField(fieldName);
-                f.setAccessible(true);
-                Object imageUrl = f.get(view);
-                if (imageUrl == null) return null;
-                java.lang.reflect.Method getUrl = imageUrl.getClass().getMethod("getUrl");
-                Object result = getUrl.invoke(imageUrl);
-                if (result instanceof String s && s.startsWith("http")) return s;
-                return null;
-            } catch (NoSuchFieldException e) {
-                cls = cls.getSuperclass();
+    private static String getUrlFromImageUrlFields(View view) {
+        for (Class<?> cls = view.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
+            for (Field f : cls.getDeclaredFields()) {
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                if (!IMAGE_URL.equals(f.getType().getName())) continue;
+                try {
+                    f.setAccessible(true);
+                    String url = urlOf(f.get(view));
+                    if (url != null) return url;
+                } catch (Throwable ignored) {}
             }
+        }
+        return null;
+    }
+
+    /** ImageUrl.getUrl() if it is an http(s) URL, else null. */
+    private static String urlOf(Object imageUrl) throws Throwable {
+        if (imageUrl == null) return null;
+        Object result = imageUrl.getClass().getMethod("getUrl").invoke(imageUrl);
+        return result instanceof String s && s.startsWith("http") ? s : null;
+    }
+
+    private static java.lang.reflect.Method findMethod(Class<?> cls, String name) {
+        for (; cls != null && cls != Object.class; cls = cls.getSuperclass()) {
+            try {
+                java.lang.reflect.Method m = cls.getDeclaredMethod(name);
+                m.setAccessible(true);
+                return m;
+            } catch (NoSuchMethodException ignored) {}
         }
         return null;
     }
@@ -219,6 +244,7 @@ public class ProfilePicDownloadHook {
 
     private static void downloadToStream(String url, OutputStream out) throws Exception {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        MediaHttp.applyTimeouts(conn);
         conn.setRequestProperty("User-Agent",
                 "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36");
         conn.connect();

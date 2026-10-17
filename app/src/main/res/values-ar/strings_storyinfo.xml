@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">معلومات القصة</string>
+    <string name="ig_btn_quiz_answer">إجابة الاختبار</string>
+    <string name="ig_btn_poll_results">نتائج التصويت</string>
+    <string name="ig_story_info_hint">اضغط على سطر لنسخه</string>
+    <string name="ig_si_posted">نُشرت</string>
+    <string name="ig_si_expires">تنتهي</string>
+    <string name="ig_si_edited">عُدّلت</string>
+    <string name="ig_si_yes">نعم</string>
+    <string name="ig_si_music">الموسيقى</string>
+    <string name="ig_si_location">الموقع</string>
+    <string name="ig_si_hashtags">الوسوم</string>
+    <string name="ig_si_shared_from">مشاركة من</string>
+    <string name="ig_si_original_post">المنشور الأصلي (اضغط مطولاً للفتح)</string>
+    <string name="ig_si_posted_with">نُشرت عبر</string>
+    <string name="ig_si_alt_text">النص البديل</string>
+    <string name="ig_si_size">الحجم</string>
+    <string name="ig_si_sound_on">مع صوت</string>
+    <string name="ig_si_sound_off">بدون صوت</string>
+    <string name="ig_si_countdown">العد التنازلي</string>
+    <string name="ig_si_question">السؤال</string>
+    <string name="ig_si_highlights">في القصص المميزة</string>
+    <string name="ig_si_mention_request">طلب إشارة</string>
+    <string name="ig_si_none">لا توجد معلومات إضافية لهذه القصة.</string>
+    <string name="ig_si_your_answer">إجابتك</string>
+    <string name="ig_si_average">المتوسط</string>
+    <string name="ig_si_copied">تم النسخ</string>
+    <string name="ig_dialog_misc_story_info">معلومات القصة وإجابات الاختبارات والتصويت</string>
+    <string name="ig_feat_story_info">معلومات القصة</string>
+    <string name="ig_si_add_yours">أضف ما لديك</string>
+    <string name="ig_si_joined">شاركوا</string>
+    <string name="ig_si_paid_partnership">شراكة مدفوعة مع (اضغط مطولاً للفتح)</string>
+    <string name="ig_si_collaborators">متعاون (اضغط مطولاً للفتح)</string>
+    <string name="ig_btn_slider_results">نتائج شريط التمرير</string>
+    <string name="ig_si_votes">صوت</string>
+</resources>

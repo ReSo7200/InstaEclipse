@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Hikâye bilgisi</string>
+    <string name="ig_btn_quiz_answer">Test cevabı</string>
+    <string name="ig_btn_poll_results">Anket sonuçları</string>
+    <string name="ig_story_info_hint">Kopyalamak için bir satıra dokun</string>
+    <string name="ig_si_posted">Paylaşıldı</string>
+    <string name="ig_si_expires">Bitiş</string>
+    <string name="ig_si_edited">Düzenlendi</string>
+    <string name="ig_si_yes">Evet</string>
+    <string name="ig_si_music">Müzik</string>
+    <string name="ig_si_location">Konum</string>
+    <string name="ig_si_hashtags">Hashtag\'ler</string>
+    <string name="ig_si_shared_from">Paylaşan</string>
+    <string name="ig_si_original_post">Orijinal gönderi (açmak için basılı tut)</string>
+    <string name="ig_si_posted_with">Paylaşılan uygulama</string>
+    <string name="ig_si_alt_text">Alternatif metin</string>
+    <string name="ig_si_size">Boyut</string>
+    <string name="ig_si_sound_on">sesli</string>
+    <string name="ig_si_sound_off">sessiz</string>
+    <string name="ig_si_countdown">Geri sayım</string>
+    <string name="ig_si_question">Soru</string>
+    <string name="ig_si_highlights">Öne çıkanlarda</string>
+    <string name="ig_si_mention_request">Bahsetme isteği</string>
+    <string name="ig_si_none">Bu hikâyede ek bilgi yok.</string>
+    <string name="ig_si_your_answer">senin cevabın</string>
+    <string name="ig_si_average">Ortalama</string>
+    <string name="ig_si_copied">Kopyalandı</string>
+    <string name="ig_dialog_misc_story_info">Hikâye bilgisi, test ve anket cevapları</string>
+    <string name="ig_feat_story_info">Hikâye bilgisi</string>
+    <string name="ig_si_add_yours">Seninkini ekle</string>
+    <string name="ig_si_joined">katıldı</string>
+    <string name="ig_si_paid_partnership">Ücretli iş ortaklığı (açmak için basılı tut)</string>
+    <string name="ig_si_collaborators">Ortak çalışan (açmak için basılı tut)</string>
+    <string name="ig_btn_slider_results">Kaydırıcı sonuçları</string>
+    <string name="ig_si_votes">oy</string>
+</resources>

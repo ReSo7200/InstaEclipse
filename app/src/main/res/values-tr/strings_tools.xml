@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">Tüm ayarları bir dosyaya kaydet</string>
+    <string name="tool_restore_sub">Ayarları yedek dosyasından yükle</string>
+    <string name="tool_restart_sub">Instagram\'ı durdur ve yeniden aç</string>
+    <string name="tool_about_sub">Sürüm, teşekkürler ve bağlantılar</string>
+    <string name="about_tagline">Daha temiz, daha gizli bir Instagram</string>
+    <string name="about_source">Kaynak kodu</string>
+    <string name="about_channel">Telegram kanalı</string>
+    <string name="about_contributors">Katkıda bulunanlar</string>
+    <string name="about_footer">@reso7200 tarafından · Açık kaynak</string>
+</resources>

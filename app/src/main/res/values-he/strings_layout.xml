@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feat_group_social">חברתי</string>
+    <string name="menu_feed">פיד</string>
+    <string name="menu_navigation">ניווט</string>
+    <string name="menu_reels_stories">ריל וסטוריז</string>
+    <string name="menu_messages">הודעות</string>
+    <string name="menu_post_menu">תפריט פוסט והעלאות</string>
+    <string name="menu_likes_comments">לייקים ותגובות</string>
+    <string name="menu_profiles">פרופילים</string>
+    <string name="menu_app">אפליקציה וחשבון</string>
+    <string name="menu_ads_tracking">פרסומות ומעקב</string>
+    <string name="menu_nav_tabs">לשוניות</string>
+    <string name="menu_nav_order">סדר והפעלה</string>
+    <string name="menu_nav_gestures">מחוות</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">סטוריז</string>
+    <string name="nav_tab_order_changed">סדר הלשוניות שונה</string>
+</resources>

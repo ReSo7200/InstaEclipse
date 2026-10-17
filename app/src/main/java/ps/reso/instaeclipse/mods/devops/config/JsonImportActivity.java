@@ -37,24 +37,34 @@ public class JsonImportActivity extends Activity {
                     if (json.startsWith("{") && json.endsWith("}")) {
                         String targetPackage = getIntent().getStringExtra("target_package");
                         if (targetPackage == null || targetPackage.isEmpty()) {
-                            Toast.makeText(this, getString(R.string.json_target_not_specified), Toast.LENGTH_LONG).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_target_not_specified), Toast.LENGTH_LONG).show();
                         } else {
                             String action = getIntent().getStringExtra("broadcast_action");
                             if (action == null || action.isEmpty()) action = ACTION_IMPORT_CONFIG;
+                            // Exported activity: whoever starts it picks these extras, and the
+                            // broadcast goes out with our signature permission. Allow only an
+                            // Instagram variant and the two import actions.
+                            if (!ps.reso.instaeclipse.utils.core.CommonUtils.SUPPORTED_PACKAGES.contains(targetPackage)
+                                    || !(ACTION_IMPORT_CONFIG.equals(action)
+                                    || "ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS".equals(action))) {
+                                ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_target_not_specified), Toast.LENGTH_LONG).show();
+                                finish();
+                                return;
+                            }
                             Intent broadcast = new Intent(action);
                             broadcast.setPackage(targetPackage);
                             broadcast.putExtra("json_content", json);
                             sendBroadcast(broadcast);
-                            Toast.makeText(this, getString(R.string.json_sent), Toast.LENGTH_SHORT).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_sent), Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(this, getString(R.string.json_not_valid), Toast.LENGTH_LONG).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_not_valid), Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
-                    Toast.makeText(this, getString(R.string.json_read_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_read_failed, e.getMessage()), Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(this, getString(R.string.json_cancelled), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_cancelled), Toast.LENGTH_SHORT).show();
             }
         }
         finish();

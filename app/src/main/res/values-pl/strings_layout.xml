@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feat_group_social">Społeczność</string>
+    <string name="menu_feed">Kanał</string>
+    <string name="menu_navigation">Nawigacja</string>
+    <string name="menu_reels_stories">Rolki i relacje</string>
+    <string name="menu_messages">Wiadomości</string>
+    <string name="menu_post_menu">Menu posta i przesyłanie</string>
+    <string name="menu_likes_comments">Polubienia i komentarze</string>
+    <string name="menu_profiles">Profile</string>
+    <string name="menu_app">Aplikacja i konto</string>
+    <string name="menu_ads_tracking">Reklamy i śledzenie</string>
+    <string name="menu_nav_tabs">Karty</string>
+    <string name="menu_nav_order">Kolejność i start</string>
+    <string name="menu_nav_gestures">Gesty</string>
+    <string name="menu_reels">Rolki</string>
+    <string name="menu_stories">Relacje</string>
+    <string name="nav_tab_order_changed">Zmieniono kolejność kart</string>
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Story Info</string>
+    <string name="ig_btn_quiz_answer">Quiz Answer</string>
+    <string name="ig_btn_poll_results">Poll Results</string>
+    <string name="ig_story_info_hint">Tap a line to copy it</string>
+    <string name="ig_si_posted">Posted</string>
+    <string name="ig_si_expires">Expires</string>
+    <string name="ig_si_edited">Edited</string>
+    <string name="ig_si_yes">Yes</string>
+    <string name="ig_si_music">Music</string>
+    <string name="ig_si_location">Location</string>
+    <string name="ig_si_hashtags">Hashtags</string>
+    <string name="ig_si_shared_from">Shared from</string>
+    <string name="ig_si_original_post">Original post (long-press to open)</string>
+    <string name="ig_si_posted_with">Posted with</string>
+    <string name="ig_si_alt_text">Alt text</string>
+    <string name="ig_si_size">Size</string>
+    <string name="ig_si_sound_on">with sound</string>
+    <string name="ig_si_sound_off">no sound</string>
+    <string name="ig_si_countdown">Countdown</string>
+    <string name="ig_si_question">Question</string>
+    <string name="ig_si_highlights">In highlights</string>
+    <string name="ig_si_mention_request">Mention request</string>
+    <string name="ig_si_none">No extra info on this story.</string>
+    <string name="ig_si_your_answer">your answer</string>
+    <string name="ig_si_average">Average</string>
+    <string name="ig_si_copied">Copied</string>
+    <string name="ig_dialog_misc_story_info">Story Info, Quiz &amp; Poll Answers</string>
+    <string name="ig_feat_story_info">Story info</string>
+    <string name="ig_si_add_yours">Add yours</string>
+    <string name="ig_si_joined">joined</string>
+    <string name="ig_si_paid_partnership">Paid partnership with (hold to open)</string>
+    <string name="ig_si_collaborators">Collaborator (hold to open)</string>
+    <string name="ig_btn_slider_results">Slider Results</string>
+    <string name="ig_si_votes">votes</string>
+</resources>

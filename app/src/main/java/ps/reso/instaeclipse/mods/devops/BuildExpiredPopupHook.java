@@ -28,7 +28,7 @@ public class BuildExpiredPopupHook {
         //   3. age threshold exceeded      → shows force-update dialog
         XC_MethodHook noOpHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.removeBuildExpiredPopup) {
                     param.setResult(null); // void return → method becomes no-op
                 }
@@ -40,7 +40,7 @@ public class BuildExpiredPopupHook {
         // check keeps reporting "not expired".
         XC_MethodHook falseHook = new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (FeatureFlags.removeBuildExpiredPopup) {
                     param.setResult(false);
                 }

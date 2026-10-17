@@ -33,7 +33,12 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 public class FeedPhotoZoomHook {
 
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
-    private static final String VIEW_CLASS = "com.instagram.feed.widget.IgProgressImageView";
+    // IG 448+ moved the view to common.ui.widget.imageview; the legacy feed.widget name is kept
+    // as a fallback for older builds. Same API in both (onAttachedToWindow + getIgImageView).
+    private static final String[] VIEW_CLASSES = {
+            "com.instagram.common.ui.widget.imageview.IgProgressImageView",
+            "com.instagram.feed.widget.IgProgressImageView",
+    };
 
     // IgProgressImageView is a shared, general-purpose component — reused for feed rows,
     // DM media previews, and story frames alike — so it carries no identity of its own.
@@ -43,13 +48,24 @@ public class FeedPhotoZoomHook {
 
     public void install(ClassLoader classLoader) {
         try {
-            Class<?> viewClass = classLoader.loadClass(VIEW_CLASS);
+            Class<?> viewClass = null;
+            for (String name : VIEW_CLASSES) {
+                try {
+                    viewClass = classLoader.loadClass(name);
+                    break;
+                } catch (ClassNotFoundException ignored) {
+                }
+            }
+            if (viewClass == null) {
+                ModuleLog.line("(IE|PhotoZoom) ❌ IgProgressImageView not found");
+                return;
+            }
 
             // Hooked at onAttachedToWindow, not the constructor: the view has no parent yet
             // at construction time, so the feed-row ancestor check below would always fail.
             XposedHelpers.findAndHookMethod(viewClass, "onAttachedToWindow", new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     // setOnLongClickListener() has a side effect beyond registering the
                     // callback: it also flips the view's LONG_CLICKABLE flag, which changes
                     // Android's internal tap-vs-long-press disambiguation timing for that
@@ -85,7 +101,7 @@ public class FeedPhotoZoomHook {
             });
 
             FeatureStatusTracker.setHooked("PhotoZoom");
-            ModuleLog.line("(IE|PhotoZoom) ✅ hook installed");
+            ModuleLog.line("(IE|PhotoZoom) ✅ hook installed on " + viewClass.getName());
         } catch (Throwable t) {
             ModuleLog.line("(IE|PhotoZoom) ❌ install: " + t);
         }
@@ -98,10 +114,7 @@ public class FeedPhotoZoomHook {
      * ancestor's own subtree (siblings like the like/save buttons, not just further ancestors).
      */
     private static boolean isInsideFeedRow(View view) {
-        if (sFeedLikeButtonId == 0) {
-            sFeedLikeButtonId = view.getContext().getResources()
-                    .getIdentifier("row_feed_button_like", "id", view.getContext().getPackageName());
-        }
+        sFeedLikeButtonId = ps.reso.instaeclipse.utils.ui.ResIds.id(view.getContext(), "row_feed_button_like");
         if (sFeedLikeButtonId == 0) return false; // can't verify — be conservative and skip
 
         ViewParent parent = view.getParent();

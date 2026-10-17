@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_story_info">Storyinfo</string>
+    <string name="ig_btn_quiz_answer">Quizsvar</string>
+    <string name="ig_btn_poll_results">Omröstningsresultat</string>
+    <string name="ig_story_info_hint">Tryck på en rad för att kopiera</string>
+    <string name="ig_si_posted">Publicerad</string>
+    <string name="ig_si_expires">Upphör</string>
+    <string name="ig_si_edited">Redigerad</string>
+    <string name="ig_si_yes">Ja</string>
+    <string name="ig_si_music">Musik</string>
+    <string name="ig_si_location">Plats</string>
+    <string name="ig_si_hashtags">Hashtaggar</string>
+    <string name="ig_si_shared_from">Delad från</string>
+    <string name="ig_si_original_post">Originalinlägg (håll in för att öppna)</string>
+    <string name="ig_si_posted_with">Publicerad med</string>
+    <string name="ig_si_alt_text">Alternativtext</string>
+    <string name="ig_si_size">Storlek</string>
+    <string name="ig_si_sound_on">med ljud</string>
+    <string name="ig_si_sound_off">utan ljud</string>
+    <string name="ig_si_countdown">Nedräkning</string>
+    <string name="ig_si_question">Fråga</string>
+    <string name="ig_si_highlights">I höjdpunkter</string>
+    <string name="ig_si_mention_request">Begäran om omnämnande</string>
+    <string name="ig_si_none">Ingen extra info om den här storyn.</string>
+    <string name="ig_si_your_answer">ditt svar</string>
+    <string name="ig_si_average">Genomsnitt</string>
+    <string name="ig_si_copied">Kopierat</string>
+    <string name="ig_dialog_misc_story_info">Storyinfo, quiz- och omröstningssvar</string>
+    <string name="ig_feat_story_info">Storyinfo</string>
+    <string name="ig_si_add_yours">Lägg till din</string>
+    <string name="ig_si_joined">har deltagit</string>
+    <string name="ig_si_paid_partnership">Betalt samarbete med (håll in för att öppna)</string>
+    <string name="ig_si_collaborators">Medskapare (håll in för att öppna)</string>
+    <string name="ig_btn_slider_results">Reglagets resultat</string>
+    <string name="ig_si_votes">röster</string>
+</resources>

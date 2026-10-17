@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--  app wide  -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.7.0</string>
+    <string name="version" translatable="false">v0.8.0</string>
     <string name="home">首页</string>
     <string name="features">功能</string>
     <string name="help">帮助</string>
@@ -59,7 +59,6 @@
 
     <!--  guide  -->
     <string name="module_not_working_title">模块仍然无法使用？</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[ 如果您已<b>获取 root 权限</b>，请尝试使用 <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>。如果您未<b>获取 root 权限</b>，请安装<a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a>，然后依据<a href="https://t.me/instaEclipse_discussion/158/5149">指南</a>进行操作 ]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">分类：</string>
@@ -222,6 +221,17 @@
     <string name="ig_dialog_ad_block_analytics">屏蔽分析</string>
     <string name="ig_dialog_clean_feed_hide_suggested">隐藏动态中的推荐内容</string>
     <string name="ig_dialog_ad_disable_tracking">禁用追踪链接</string>
+    <string name="ig_dialog_open_links_externally">在外部浏览器中打开链接</string>
+    <string name="theme_light_mode">浅色模式</string>
+    <string name="theme_dark_mode">深色模式</string>
+    <string name="ig_dialog_translate_messages">聊天中的翻译按钮</string>
+    <string name="ig_chat_translate_row">用应用翻译</string>
+    <string name="ig_downloader_folder_hint">请在 InstaEclipse 应用中设置文件夹</string>
+    <string name="lock_code_set_in_ig">请在 Instagram 内设置：InstaEclipse 菜单 &gt; 锁定。点按打开 Instagram。</string>
+    <string name="theme_set_light">浅色模式主题</string>
+    <string name="theme_set_dark">深色模式主题</string>
+    <string name="theme_light_same">与深色模式相同的主题</string>
+    <string name="theme_light_stock">原版 Instagram（仅在深色模式下应用主题）</string>
 
     <!-- Distraction-Free options -->
     <string name="ig_dialog_distraction_extreme_mode">极端模式 (重新安装前不可逆)</string>
@@ -238,6 +248,27 @@
     <string name="ig_dialog_misc_disable_story_autoswipe">禁用限时动态自动切换</string>
     <string name="ig_dialog_misc_disable_video_autoplay">禁用视频自动播放</string>
     <string name="ig_dialog_misc_disable_repost">禁用转发</string>
+    <string name="ig_dialog_clean_feed_expand_captions">始终显示完整说明文字（需重启 IG）</string>
+    <string name="ig_dialog_clean_feed_hide_plus">隐藏 Instagram Plus 推广</string>
+    <string name="ig_dialog_clean_feed_hide_community_notes">隐藏社区注释</string>
+    <string name="ig_dialog_misc_profile_follows_label">在主页上显示“关注了你”</string>
+    <string name="ig_profile_follows_you">关注了你</string>
+    <string name="ig_profile_not_following_you">未关注你</string>
+    <string name="ig_dialog_downloader_offer_media_info">在帖子菜单中添加“媒体信息”</string>
+    <string name="ig_dialog_downloader_offer_speed">在帖子菜单中添加“播放速度”</string>
+    <string name="ig_dialog_downloader_reel_scrubber">始终显示连续短片进度条</string>
+    <string name="ig_media_info_title">媒体信息</string>
+    <string name="ig_playback_speed_title">播放速度</string>
+    <string name="ig_playback_speed_next">速度已设置 — 将应用于下一个开始播放的视频</string>
+    <string name="ig_dialog_distraction_hide_notes_tray">隐藏消息中的便签</string>
+    <string name="ig_dialog_downloader_voice">下载语音消息（长按）</string>
+    <string name="ig_dialog_misc_viewer_search">搜索你的限时动态观看者</string>
+    <string name="ig_viewer_search_hint">搜索观看者</string>
+    <string name="ig_dialog_misc_like_undo">赞的撤销时间窗口（4 秒）</string>
+    <string name="ig_like_undo_bar">❤ 已赞 · 撤销</string>
+    <string name="ig_like_undo_cancelled">已取消赞 — 刷新以更新爱心</string>
+    <string name="ig_dialog_misc_exact_timestamps">显示确切日期，而非“2小时前”</string>
+    <string name="ig_dialog_misc_hide_share_create_group">在分享面板中隐藏“创建群组”</string>
     <string name="ig_dialog_misc_show_feature_toasts">显示功能提示</string>
     <string name="ig_dialog_misc_show_follower_toast">显示关注者提示</string>
     <string name="ig_dialog_misc_view_story_mentions">查看限时动态提及</string>
@@ -337,6 +368,9 @@
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">下载</string>
+    <string name="ig_story_mark_seen">标记为已看</string>
+    <string name="ig_story_marked_seen">已标记为已看</string>
+    <string name="ig_story_mark_seen_none">此限时动态暂无可发送的内容 — 请先让它播放</string>
     <string name="ig_dl_carousel_subtitle">轮播 • %1$d 个项目</string>
     <string name="ig_dl_carousel_current">下载当前（%1$d / %2$d）</string>
     <string name="ig_dl_carousel_all">下载全部 %1$d 个项目</string>
@@ -424,6 +458,8 @@
     <string name="theme_section_colors">颜色</string>
     <string name="theme_section_fonts">字体和表情符号</string>
     <string name="ig_dialog_quality_max">最高可用</string>
+    <string name="ig_dialog_max_upload_quality">始终以最高画质上传</string>
+    <string name="ig_feat_max_upload_quality">最高上传画质</string>
     <string name="ig_dialog_location_spoof_enable">伪造 GPS 位置</string>
     <string name="ig_dialog_location_pick">在地图上选择位置</string>
     <string name="ig_dialog_location_unset">未设置位置</string>
@@ -433,7 +469,13 @@
     <string name="loc_picker_use">使用此位置</string>
     <string name="loc_picker_search_failed">未找到位置</string>
     <string name="loc_picker_search_error">搜索失败：%1$s</string>
-    <string name="ig_dialog_ghost_keep_unsent">保留已撤回消息</string>
+    <string name="ig_dialog_ghost_keep_unsent">记录已撤回消息</string>
+    <string name="ig_dialog_ghost_jump_first">聊天中的“跳到第一条消息”按钮</string>
+    <string name="ig_jump_first_message">跳到第一条消息</string>
+    <string name="ig_jump_first_loading">正在加载更早的消息… 再次点按以停止</string>
+    <string name="ig_jump_first_done">已到达第一条消息</string>
+    <string name="ig_jump_first_stopped">已停止</string>
+    <string name="ig_dialog_ghost_edit_history">保留消息的编辑历史</string>
     <string name="ig_dialog_unsent_title">已撤回消息</string>
     <string name="ig_dialog_unsent_clear">清除此对话的记录</string>
     <string name="ig_dialog_unsent_export">导出为 JSON</string>
@@ -456,6 +498,19 @@
     <string name="ig_dialog_misc_lock_section">锁定</string>
     <string name="ig_dialog_misc_lock_fingerprint">使用指纹解锁</string>
     <string name="ig_hide_chats_title">隐藏特定对话</string>
+    <string name="ig_translate_text">翻译</string>
+    <string name="ig_dialog_downloader_offer_audio">为视频提供仅音频下载</string>
+    <string name="ig_download_choice_title">下载</string>
+    <string name="ig_download_choice_video">视频</string>
+    <string name="ig_download_choice_audio">仅音频 (.m4a)</string>
+    <string name="ig_download_choice_save">保存到设备</string>
+    <string name="ig_download_choice_copy_image">复制图片</string>
+    <string name="ig_dialog_downloader_offer_copy_image">在帖子菜单中添加“复制图片”</string>
+    <string name="ig_toast_copy_image_video">此页是视频 — 没有可复制的内容</string>
+    <string name="ig_toast_copying_image">正在复制图片…</string>
+    <string name="ig_toast_image_copied">图片已复制到剪贴板</string>
+    <string name="ig_toast_downloading_audio">正在下载音频…</string>
+    <string name="ig_toast_audio_saved">音频已保存</string>
     <string name="ig_dialog_misc_hide_chats">隐藏特定对话</string>
     <string name="ig_hide_chats_manage">管理已隐藏对话</string>
     <string name="ig_hide_chats_empty">暂无已隐藏对话。打开一个对话并点击隐藏眼睛按钮即可将其隐藏。</string>
@@ -487,10 +542,29 @@
     <string name="ig_dialog_unsent_empty">尚未捕获任何撤回消息</string>
     <string name="ig_dialog_unsent_unknown_chat">未知对话</string>
     <string name="ig_dialog_clean_feed_hide_threads">隐藏 Threads 推荐</string>
+    <string name="ig_dialog_clean_feed_hide_liked">隐藏已赞过的帖子</string>
+    <string name="ig_nav_settings_title">导航设置</string>
+    <string name="ig_nav_name_home">首页</string>
+    <string name="ig_nav_name_reels">连续短片</string>
+    <string name="ig_nav_name_create">创建</string>
+    <string name="ig_nav_name_messages">消息</string>
+    <string name="ig_nav_name_activity">活动</string>
+    <string name="ig_nav_name_profile">个人主页</string>
+    <string name="ig_nav_name_search">搜索</string>
+    <string name="ig_nav_tabs_title">隐藏导航标签</string>
+    <string name="ig_nav_tab_home">隐藏首页标签</string>
+    <string name="ig_nav_tab_reels">隐藏连续短片标签</string>
+    <string name="ig_nav_tab_create">隐藏创建标签</string>
+    <string name="ig_nav_tab_messages">隐藏消息标签</string>
+    <string name="ig_nav_tab_activity">隐藏活动标签</string>
+    <string name="ig_nav_tab_profile">隐藏个人主页标签</string>
     <string name="ig_dialog_misc_spoof_last_seen">伪造最后上线时间（冻结）</string>
     <string name="ig_dialog_misc_copy_caption">复制标题</string>
     <string name="ig_dialog_misc_photo_zoom">图片缩放（长按）</string>
     <string name="ig_caption_copy_menu_item">复制标题</string>
+    <string name="ig_caption_translate_menu_item">翻译标题</string>
+    <string name="ig_caption_translate_full">完整标题</string>
+    <string name="ig_caption_translate_no_hashtags">不含话题标签</string>
     <string name="ig_caption_copy_title">复制标题</string>
     <string name="ig_caption_copy_full">复制完整标题</string>
     <string name="ig_caption_copy_none">此帖子没有标题</string>
@@ -519,4 +593,77 @@
     <string name="ig_story_download_video_music">下载带音乐的视频</string>
     <string name="ig_story_cache_clear_confirm">删除所有已缓存的限时动态？此操作无法撤销。</string>
     <string name="ig_story_cache_cleared">已清除缓存的限时动态</string>
+    <string name="ig_dialog_ghost_chat_export">聊天中的“导出聊天”按钮</string>
+    <string name="ig_chat_export">导出聊天</string>
+    <string name="ig_locked_coll_setting">可锁定的收藏夹（收藏夹内的 🔒 按钮；使用在 Instagram 中设置的密码）</string>
+    <string name="ig_locked_coll_setting_short">可锁定的收藏夹（收藏夹内的 🔒）</string>
+    <string name="ig_locked_coll_title">已锁定的收藏夹</string>
+    <string name="ig_locked_coll_open">打开</string>
+    <string name="ig_locked_coll_hint">密码</string>
+    <string name="ig_locked_coll_lock">锁定此收藏夹</string>
+    <string name="ig_locked_coll_unlock">解锁此收藏夹</string>
+    <string name="ig_locked_coll_locked">收藏夹已锁定：将会要求输入密码</string>
+    <string name="ig_locked_coll_unlocked">收藏夹已解锁</string>
+    <string name="ig_locked_coll_need_passcode">请先设置密码：在 Instagram 中打开 InstaEclipse 设置 → 锁定</string>
+    <string name="ig_saved_on_profile">在主页上显示“收藏”按钮（需重启 Instagram）</string>
+    <string name="ig_saved_on_profile_button">收藏</string>
+    <string name="ig_nav_tab_search">搜索</string>
+    <string name="ig_nav_tab_order">标签顺序</string>
+    <string name="ig_nav_tab_order_hint">使用箭头重新排列底部栏。隐藏的标签会保留原位。返回 Instagram 后生效。</string>
+    <string name="ig_nav_tab_order_reset">重置</string>
+    <string name="share_dl_label">使用 InstaEclipse 下载</string>
+    <string name="share_dl_no_link">未找到 Instagram 帖子或连续短片链接</string>
+    <string name="share_dl_no_instagram">未安装 Instagram</string>
+    <string name="ig_share_dl_loading">InstaEclipse：正在加载要下载的帖子…</string>
+    <string name="ig_share_dl_saving">InstaEclipse：正在保存 %1$d 个文件…</string>
+    <string name="ig_share_dl_not_found">InstaEclipse：无法加载该帖子</string>
+    <string name="ig_thread_menu">InstaEclipse 聊天操作</string>
+    <string name="ig_unsent_messages">已撤回消息</string>
+    <string name="ig_hide_chat_toggle">隐藏 / 取消隐藏聊天</string>
+    <string name="ig_chat_export_working">正在导出已加载的消息…</string>
+    <string name="ig_chat_export_done">已将 %1$d 条消息导出到 %2$s</string>
+    <string name="ig_chat_export_load_all">先加载整个聊天（跳到第一条消息）</string>
+    <string name="ig_chat_export_media">将媒体下载到导出文件夹</string>
+    <string name="ig_chat_export_media_progress">正在下载媒体 %1$d/%2$d…</string>
+    <string name="ig_chat_export_done_media">已将 %1$d 条消息和 %2$d 个媒体文件导出到 %3$s</string>
+    <string name="ig_export_media_saved">导出已保存 — %1$d 个媒体文件已存入 %2$s</string>
+    <string name="ig_feat_edit_history">编辑历史</string>
+    <string name="ig_feat_lock_collections">锁定收藏夹</string>
+    <string name="ig_feat_comment_search">评论搜索</string>
+    <string name="ig_feat_viewer_search">限时动态观看者</string>
+    <string name="ig_feat_follow_export">关注导出</string>
+    <string name="ig_feat_saved_on_profile">主页上的收藏</string>
+    <string name="ig_feat_hide_notes">隐藏便签栏</string>
+    <string name="ig_feat_voice_download">语音下载</string>
+    <string name="ig_feat_photo_zoom">图片缩放</string>
+    <string name="ig_chat_export_none">此聊天尚未加载任何消息</string>
+    <string name="ig_media_info_copy">复制</string>
+    <string name="ig_dialog_misc_comment_search">搜索评论</string>
+    <string name="ig_comment_search">搜索评论</string>
+    <string name="ig_comment_search_hint">在 %1$d 条已加载评论中搜索</string>
+    <string name="ig_comment_search_load_all">全部加载</string>
+    <string name="ig_comment_search_stop">停止</string>
+    <string name="ig_comment_search_field_hint">按姓名或关键词搜索</string>
+    <string name="ig_comment_search_count">已加载 %1$d 条评论</string>
+    <string name="ig_comment_search_matches">%1$d 条评论中有 %2$d 条匹配</string>
+    <string name="ig_comment_search_empty">没有匹配的评论</string>
+    <string name="ig_comment_search_tip">点按评论即可复制</string>
+    <string name="ig_comment_search_view_replies">查看 %1$d 条回复</string>
+    <string name="ig_comment_search_hide_replies">隐藏回复</string>
+    <string name="ig_comment_export">导出</string>
+    <string name="ig_comment_export_working">正在导出已加载的评论…</string>
+    <string name="ig_comment_export_post_media">同时保存帖子的照片/视频</string>
+    <string name="ig_comment_export_done">已将 %1$d 条评论导出到 %2$s</string>
+    <string name="ig_dialog_misc_follow_export">将粉丝/关注列表导出为 CSV</string>
+    <string name="ig_follow_export">导出 CSV</string>
+    <string name="ig_follow_export_done">已将 %1$d 个账号导出到 %2$s</string>
+    <string name="ig_follow_export_none">尚未加载任何账号</string>
+    <string name="ig_follow_export_loading">正在加载账号… 已加载 %1$d 个。\n请停留在此页面直到完成。</string>
+    <string name="ig_follow_export_stop">停止并保存</string>
+    <string name="ig_comment_gif_downloading">正在下载评论媒体…</string>
+    <string name="ig_comment_copy_media_link">复制 GIF / 图片链接</string>
+    <string name="ig_highlight_download_all">下载整个精选</string>
+    <string name="ig_highlight_loading">正在加载精选…</string>
+    <string name="ig_highlight_downloading">正在下载 %1$d 个精选项目…</string>
+    <string name="ig_highlight_done">精选已保存：%1$d / %2$d 个项目</string>
 </resources>

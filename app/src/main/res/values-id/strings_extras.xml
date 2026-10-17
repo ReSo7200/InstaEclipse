@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Salin tanpa Tagar</string>
+    <string name="ig_dialog_clean_feed_following_only">Feed Hanya yang Diikuti</string>
+    <string name="ig_dialog_menu_extras">Ekstra</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Nonaktifkan Geser ke Kamera</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Opsi Gulir Otomatis Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Kunci Gulir Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Akun Tanpa Batas</string>
+    <string name="ig_dialog_extras_airplane_mode">Mode Pesawat (tampak offline)</string>
+    <string name="ig_dialog_extras_high_res_images">Muat gambar dengan resolusi tertinggi</string>
+    <string name="ig_dialog_extras_hide_onboarding">Sembunyikan ajakan kontak dan lokasi</string>
+    <string name="ig_dialog_extras_fix_notifications">Perbaiki pendaftaran notifikasi lama di Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Sembunyikan baris cerita saja</string>
+    <string name="ig_dialog_extras_share_domain">Domain Berbagi Kustom</string>
+    <string name="ig_dialog_extras_share_domain_off">Mati</string>
+    <string name="ig_dialog_extras_share_domain_hint">Mengganti instagram.com pada tautan yang kamu salin atau bagikan. Kosongkan untuk mematikan.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Domain tidak valid</string>
+    <string name="ig_dialog_extras_startup_tab">Tab Awal</string>
+    <string name="ig_media_open_with">Buka dengan…</string>
+    <string name="ig_lock_try_again_in">Terlalu banyak percobaan. Coba lagi dalam %1$d dtk</string>
+    <string name="loc_picker_locating">Mencari tempat…</string>
+    <string name="loc_picker_unnamed">Tempat tanpa nama</string>
+    <string name="ig_dialog_location_current_title">Lokasi saat ini</string>
+    <string name="ig_dialog_location_recent">Tempat terbaru</string>
+    <string name="ig_dialog_location_applied">Lokasi diterapkan</string>
+</resources>

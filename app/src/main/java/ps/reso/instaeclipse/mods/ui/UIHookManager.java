@@ -1,6 +1,5 @@
 package ps.reso.instaeclipse.mods.ui;
 
-import static org.luckypray.dexkit.query.FindMethod.create;
 import static ps.reso.instaeclipse.mods.ghost.ui.GhostEmojiManager.addGhostEmojiNextToInbox;
 
 import android.annotation.SuppressLint;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import org.luckypray.dexkit.result.MethodData;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +25,7 @@ import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.mods.devops.config.ConfigManager;
 import ps.reso.instaeclipse.mods.ui.utils.BottomSheetHookUtil;
+import ps.reso.instaeclipse.mods.ui.utils.LifecycleHookUtil;
 import ps.reso.instaeclipse.mods.ui.utils.VibrationUtil;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.dialog.DialogUtils;
@@ -45,6 +44,22 @@ public class UIHookManager {
     private static Activity currentActivity;
     public static Activity getCurrentActivity() {
         return currentActivity;
+    }
+
+    /** Activity to show our dialogs on: the one {@code ctx} belongs to (posts, stories and
+     *  highlights opened from a profile run in their own activity above the main one), else the
+     *  main activity, else {@code ctx} itself. */
+    public static android.content.Context dialogHost(android.content.Context ctx) {
+        android.content.Context c = ctx;
+        while (c instanceof android.content.ContextWrapper) {
+            if (c instanceof Activity a) {
+                if (!a.isFinishing()) return a;
+                break;
+            }
+            c = ((android.content.ContextWrapper) c).getBaseContext();
+        }
+        Activity main = currentActivity;
+        return main != null && !main.isFinishing() ? main : ctx;
     }
 
     /**
@@ -151,114 +166,26 @@ public class UIHookManager {
     }
 
     public void mainActivity(ClassLoader classLoader) {
-        // Hook onCreate of Instagram Main
+        // Hook onCreate / onResume of Instagram Main.
+        // IG 448+ no longer declares these overrides on InstagramMainActivity (they live in the
+        // shared base com.instagram.base.activity.IgFragmentActivity, and the activity only has
+        // obfuscated delegates like A1p(Bundle, X)). The old DexKit lookup (declaredClass +
+        // "onCreate"/(Bundle)V, then a "public void() with >=20 opcodes" guess for onResume) found
+        // nothing there, so setupHooks() — the settings entry, ghost emoji, Distraction-Free view
+        // hooks, feature toast — never ran from the main activity. LifecycleHookUtil hooks the
+        // class that actually declares the method and filters by instance, so it resolves on old
+        // builds (declared override, same as before) and new ones alike.
         try {
-            // Precise search for the standard onCreate(Bundle) signature
-            var methods = Module.dexKitBridge.findMethod(create()
-                    .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                            .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
-                            .name("onCreate")
-                            .paramTypes("android.os.Bundle")
-                            .returnType("void")
-                    )
-            );
-
-            // Fallback: If "onCreate" is renamed/obfuscated but still takes a Bundle
-            if (methods.isEmpty()) {
-                ModuleLog.line("(InstaEclipse): ⚠️ Specific onCreate not found, searching by signature...");
-                methods = Module.dexKitBridge.findMethod(create()
-                        .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                                .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
-                                .paramTypes("android.os.Bundle")
-                                .returnType("void")
-                        )
-                );
-            }
-
-            if (!methods.isEmpty()) {
-                String methodName = methods.get(0).getName();
-                if (methodName == null || methodName.isEmpty()) {
-                    ModuleLog.line("(InstaEclipse): ❌ Invalid onCreate method name discovered");
-                } else {
-                    XposedHelpers.findAndHookMethod(INSTAGRAM_MAIN_ACTIVITY, classLoader, methodName, Bundle.class, new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        final Activity activity = (Activity) param.thisObject;
-                        currentActivity = activity;
-
-                        // Use runOnUiThread to ensure we are touching the UI safely
-                        activity.runOnUiThread(() -> {
-                            try {
-                                // 1. Initialize Hooks
-                                setupHooks(activity);
-
-                                // 2. Delay UI injections slightly.
-                                // Instagram's Main is complex; the Inbox/UI might not be inflated immediately.
-                                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                                    try {
-                                        // Add the Ghost Emoji next to Inbox
-                                        addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
-
-                                        // 3. Show Success Toast
-                                        if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
-                                            CustomToast.toastShown = true;
-
-                                            // Pass the raw KEY -> hooked map; showFeatureGrid resolves
-                                            // each key's label and groups it into a category itself.
-                                            java.util.LinkedHashMap<String, Boolean> status =
-                                                    new java.util.LinkedHashMap<>(FeatureStatusTracker.getStatus());
-                                            CustomToast.showFeatureGrid(activity.getApplicationContext(),
-                                                    I18n.t(activity, R.string.ig_toast_features_loaded), status);
-                                        }
-                                    } catch (Exception innerE) {
-                                        ModuleLog.line("(InstaEclipse): UI Injection Error: " + innerE.getMessage());
-                                    }
-                                }, 1500); // 1.5s delay to let the UI settle
-
-                            } catch (Exception e) {
-                                ModuleLog.line("(InstaEclipse): UI logic error in onCreate: " + e);
-                            }
-                        });
-                    }
-                    });
-                } // end else (valid methodName)
-            } else {
-                ModuleLog.line("(InstaEclipse): ❌ Failed to find any onCreate candidate in InstagramMainActivity");
-            }
-        } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse): ❌ DexKit discovery failed: " + e.getMessage());
+            String where = LifecycleHookUtil.hookAfter(classLoader, INSTAGRAM_MAIN_ACTIVITY, "onCreate",
+                    (activity, param) -> onMainActivityCreated(activity), Bundle.class);
+            ModuleLog.line("(InstaEclipse): ✅ main onCreate hooked via " + where);
+        } catch (Throwable t) {
+            ModuleLog.line("(InstaEclipse): ❌ main onCreate hook failed: " + t);
         }
 
-        // Hook onResume - Instagram Main
         try {
-            List<MethodData> candidates = Module.dexKitBridge.findMethod(org.luckypray.dexkit.query.FindMethod.create()
-                    .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create()
-                            .declaredClass(INSTAGRAM_MAIN_ACTIVITY)
-                            .modifiers(java.lang.reflect.Modifier.PUBLIC)
-                            .paramCount(0)
-                            .returnType("void")
-                    )
-            );
-
-            for (MethodData methodData : candidates) {
-                String methodName = methodData.getName();
-
-                if (methodName == null || methodName.isEmpty()) continue;
-
-                // Skip constructors and static initializers
-                if (methodName.contains("<init>") || methodName.contains("<clinit>")) {
-                    continue;
-                }
-
-                // Filter by opcode size to find the substantial lifecycle method
-                if (methodData.getOpCodes().size() < 20) {
-                    continue;
-                }
-
-                XposedHelpers.findAndHookMethod(INSTAGRAM_MAIN_ACTIVITY, classLoader, methodName, new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) {
-                        final Activity activity = (Activity) param.thisObject;
+            String where = LifecycleHookUtil.hookAfter(classLoader, INSTAGRAM_MAIN_ACTIVITY, "onResume",
+                    (activity, param) -> {
                         currentActivity = activity;
                         activity.runOnUiThread(() -> {
                             try {
@@ -267,12 +194,10 @@ public class UIHookManager {
                                 ModuleLog.line("(InstaEclipse) UI Error: " + e);
                             }
                         });
-                    }
-                });
-                break;
-            }
+                    });
+            ModuleLog.line("(InstaEclipse): ✅ main onResume hooked via " + where);
         } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse): ❌ onResume discovery failed: " + t.getMessage());
+            ModuleLog.line("(InstaEclipse): ❌ main onResume hook failed: " + t);
         }
 
         // Hook getBottomSheetNavigator - Instagram Main
@@ -286,7 +211,7 @@ public class UIHookManager {
         // This only fires when the user actually long-presses something — not a hot path.
         XposedHelpers.findAndHookMethod(View.class, "performLongClick", new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
+            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (sInboxButtonId == 0 && sDirectTabId == 0) return;
                 View view = (View) param.thisObject;
                 int id = view.getId();
@@ -299,19 +224,54 @@ public class UIHookManager {
             }
         });
 
-        // Hook onResume - Model
-        XposedHelpers.findAndHookMethod("com.instagram.modal.ModalActivity", classLoader, "onResume", new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) {
-                Activity activity = (Activity) param.thisObject;
-                if (activity != null) {
-                    activity.runOnUiThread(() -> {
+        // Hook onResume - Modal
+        try {
+            LifecycleHookUtil.hookAfter(classLoader, "com.instagram.modal.ModalActivity", "onResume",
+                    (activity, param) -> activity.runOnUiThread(() -> {
                         try {
                             setupHooks(activity);
                         } catch (Exception ignored) {
                         }
-                    });
-                }
+                    }));
+        } catch (Throwable t) {
+            ModuleLog.line("(InstaEclipse): ⚠️ ModalActivity onResume hook failed: " + t);
+        }
+    }
+
+    private static void onMainActivityCreated(Activity activity) {
+        currentActivity = activity;
+
+        // Use runOnUiThread to ensure we are touching the UI safely
+        activity.runOnUiThread(() -> {
+            try {
+                // 1. Initialize Hooks
+                setupHooks(activity);
+
+                // 2. Delay UI injections slightly.
+                // Instagram's Main is complex; the Inbox/UI might not be inflated immediately.
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    try {
+                        // Add the Ghost Emoji next to Inbox
+                        addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
+
+                        // 3. Show Success Toast
+                        if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
+                            CustomToast.toastShown = true;
+
+                            // Pass the raw KEY -> hooked map; showFeatureGrid resolves
+                            // each key's label and groups it into a category itself.
+                            java.util.LinkedHashMap<String, Boolean> status =
+                                    new java.util.LinkedHashMap<>(FeatureStatusTracker.getStatus());
+                            CustomToast.showFeatureGrid(activity.getApplicationContext(),
+                                    I18n.t(activity, R.string.ig_toast_features_loaded), status);
+                        }
+                    } catch (Exception innerE) {
+                        ModuleLog.line("(InstaEclipse): UI Injection Error: " + innerE.getMessage());
+                    }
+                }, 1500); // 1.5s delay to let the UI settle
+
+            } catch (Exception e) {
+                ModuleLog.line("(InstaEclipse): UI logic error in onCreate: " + e);
             }
         });
     }
@@ -349,16 +309,8 @@ public class UIHookManager {
                 }
             }
         };
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(receiver,
-                    new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"),
-                    android.content.Context.RECEIVER_EXPORTED);
-        } else {
-            androidx.core.content.ContextCompat.registerReceiver(context,
-                    receiver,
-                    new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"),
-                    androidx.core.content.ContextCompat.RECEIVER_EXPORTED);
-        }
+        ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver,
+                new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"));
     }
 
     /** Registers a receiver in the Instagram process to restore settings from a backup JSON. */
@@ -374,27 +326,19 @@ public class UIHookManager {
                         SettingsManager.saveAllFlags();
                         ps.reso.instaeclipse.utils.feature.FeatureManager.refreshFeatureStatus();
                         Handler mainHandler = new Handler(Looper.getMainLooper());
-                        mainHandler.post(() -> Toast.makeText(ctx.getApplicationContext(),
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx.getApplicationContext(),
                                 "✅ " + I18n.t(ctx, R.string.ig_toast_settings_restored), Toast.LENGTH_SHORT).show());
                     } catch (Exception e) {
                         Handler mainHandler = new Handler(Looper.getMainLooper());
-                        mainHandler.post(() -> Toast.makeText(ctx.getApplicationContext(),
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx.getApplicationContext(),
                                 "❌ " + I18n.t(ctx, R.string.ig_toast_restore_failed, e.getMessage()), Toast.LENGTH_LONG).show());
                     }
                 }).start();
             }
         };
         try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                context.registerReceiver(receiver,
-                        new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"),
-                        android.content.Context.RECEIVER_EXPORTED);
-            } else {
-                androidx.core.content.ContextCompat.registerReceiver(context,
-                        receiver,
-                        new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"),
-                        androidx.core.content.ContextCompat.RECEIVER_EXPORTED);
-            }
+            ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver,
+                    new IntentFilter("ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS"));
             } catch (Throwable e) {
             ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
         }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">Kopiera länk</string>
+    <string name="ig_story_links_title">Länkar i storyn</string>
+    <string name="ig_story_links_hint">Tryck för att kopiera · håll in för att öppna</string>
+    <string name="ig_toast_link_copied">Länk kopierad</string>
+    <string name="ig_toast_links_copied">Alla länkar kopierade</string>
+    <string name="ig_dialog_misc_story_links">Kopiera länkar i stories</string>
+    <string name="ig_feat_story_links">Länkar i stories</string>
+</resources>

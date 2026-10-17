@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_chip_instagram">Instagram %1$s</string>
+    <string name="menu_chip_active">%1$d/%2$d attive</string>
+    <string name="menu_inactive_all_good">Tutte le funzioni attivate funzionano su questa versione di Instagram.</string>
+    <string name="menu_inactive_hint">Queste sono attivate, ma non sono riuscite ad agganciarsi a questa versione di Instagram:</string>
+</resources>

@@ -21,28 +21,7 @@ public class CustomToast {
             return;
         }
 
-        new Handler(Looper.getMainLooper()).post(() -> {
-            try {
-                Context safeContext = new android.view.ContextThemeWrapper(context, android.R.style.Theme_Material_Light);
-                TextView toastText = new TextView(safeContext);
-                toastText.setText(message);
-                toastText.setTextColor(Color.WHITE);
-                toastText.setBackgroundColor(Color.parseColor("#CC000000")); // semi-transparent black
-                toastText.setPadding(40, 25, 40, 25);
-                toastText.setTextSize(16);
-                toastText.setGravity(Gravity.CENTER);
-
-                android.widget.Toast toast = new android.widget.Toast(context);
-                toast.setView(toastText);
-                toast.setDuration(android.widget.Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.BOTTOM, 0, 150);
-                toast.show();
-                new Handler(Looper.getMainLooper()).postDelayed(toast::cancel, 1500);
-
-            } catch (Throwable t) {
-                ModuleLog.line("❌ Failed to show custom toast: " + Log.getStackTraceString(t));
-            }
-        });
+        IeToast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show();
     }
 
     // Category order + accent (mirrors the in-IG dialog's 4 groups).
@@ -60,19 +39,21 @@ public class CustomToast {
     private static String categoryOf(String key) {
         switch (key) {
             case "CustomTheme": case "CustomFont": case "CustomEmoji": case "ForceReelQuality":
-            case "HideSuggestionsInFeed": case "HideThreadsSuggestions":
+            case "HideSuggestionsInFeed": case "HideThreadsSuggestions": case "HideLikedPosts":
+            case "HideNotesTray":
                 return "Appearance";
             case "GhostSeen": case "GhostTyping": case "GhostStories": case "GhostLive":
             case "GhostViewOnce": case "GhostScreenshot": case "AllowScreenshots":
             case "KeepEphemeralMessages": case "KeepUnsentMessages": case "PermanentViewMode":
             case "LockDirectMessages": case "HideSpecificChats": case "AdBlocker":
-            case "DisableTrackingLinks": case "RemoveMetaAI": case "SpoofLastSeen":
-            case "DisableDiscoverPeople":
+            case "DisableTrackingLinks": case "OpenLinksExternally": case "RemoveMetaAI": case "SpoofLastSeen":
+            case "DisableDiscoverPeople": case "ChatExport": case "EditHistory":
+            case "LockSavedCollections": case "DisableRepost":
                 return "Privacy";
             case "PostDownload": case "ReelDownload": case "StoryDownload": case "ProfileDownload":
             case "CopyMediaLink": case "SaveInstants": case "UploadInstants": case "CacheStories":
             case "SpoofLocation": case "StoryMentions": case "CaptionCopy": case "CopyComment":
-            case "PhotoZoom":
+            case "PhotoZoom": case "PlaybackSpeed": case "VoiceDownload": case "MaxUploadQuality":
                 return "Media";
             default:
                 return "Tools"; // DevOptions, RemoveBuildExpiredPopup, FollowerToast, DisableDoubleTapLike…
@@ -138,7 +119,9 @@ public class CustomToast {
                     card.addView(catHeader);
 
                     android.widget.GridLayout grid = new android.widget.GridLayout(context);
-                    grid.setColumnCount(2); // 2 cols so full feature names fit without truncation
+                    // 3 columns so the (now ~50) features still fit in one toast-height card; a
+                    // long label ellipsizes rather than pushing the card past the screen.
+                    grid.setColumnCount(3);
                     for (String key : keys) {
                         boolean hooked = Boolean.TRUE.equals(status.get(key));
                         boolean brokenState = !hooked
@@ -147,21 +130,21 @@ public class CustomToast {
                         android.widget.LinearLayout cell = new android.widget.LinearLayout(context);
                         cell.setOrientation(android.widget.LinearLayout.HORIZONTAL);
                         cell.setGravity(Gravity.CENTER_VERTICAL);
-                        int cp = (int) (4 * d);
-                        cell.setPadding(0, cp, (int) (10 * d), cp);
+                        int cp = (int) (3 * d);
+                        cell.setPadding(0, cp, (int) (8 * d), cp);
 
                         android.widget.TextView mark = new android.widget.TextView(context);
                         // ✓ hook confirmed, ✗ enabled but hook failed (broken), ○ enabled/pending.
                         mark.setText(hooked ? "✓" : brokenState ? "✗" : "○");
                         mark.setTextColor(hooked ? on : brokenState ? Color.parseColor("#FF453A") : off);
-                        mark.setTextSize(13);
+                        mark.setTextSize(12);
                         mark.setTypeface(null, android.graphics.Typeface.BOLD);
-                        mark.setPadding(0, 0, (int) (6 * d), 0);
+                        mark.setPadding(0, 0, (int) (5 * d), 0);
 
                         android.widget.TextView lbl = new android.widget.TextView(context);
                         lbl.setText(ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.getLabel(context, key));
                         lbl.setTextColor(hooked ? txt : brokenState ? Color.parseColor("#FF453A") : off);
-                        lbl.setTextSize(12);
+                        lbl.setTextSize(11);
                         lbl.setMaxLines(1);
                         lbl.setEllipsize(android.text.TextUtils.TruncateAt.END);
 
@@ -179,7 +162,7 @@ public class CustomToast {
                 }
 
                 android.widget.FrameLayout wrap = new android.widget.FrameLayout(context);
-                int m = (int) (14 * d);
+                int m = (int) (8 * d);
                 wrap.setPadding(m, 0, m, 0);
                 // Pin the card to (screen width - margins) so the weighted grid columns get real
                 // width — otherwise the Toast wraps to content and every label ellipsizes to ~6 chars.

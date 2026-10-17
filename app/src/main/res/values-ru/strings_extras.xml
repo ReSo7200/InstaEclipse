@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_caption_copy_no_hashtags">Копировать без хештегов</string>
+    <string name="ig_dialog_clean_feed_following_only">Лента только подписок</string>
+    <string name="ig_dialog_menu_extras">Дополнительно</string>
+    <string name="ig_dialog_extras_no_swipe_camera">Отключить свайп к камере</string>
+    <string name="ig_dialog_extras_reels_auto_scroll">Опция автопрокрутки Reels</string>
+    <string name="ig_dialog_extras_reels_lock_scroll">Заблокировать прокрутку Reels</string>
+    <string name="ig_dialog_extras_unlimited_accounts">Неограниченно аккаунтов</string>
+    <string name="ig_dialog_extras_airplane_mode">Режим полёта (быть не в сети)</string>
+    <string name="ig_dialog_extras_high_res_images">Загружать изображения в максимальном разрешении</string>
+    <string name="ig_dialog_extras_hide_onboarding">Скрыть запросы контактов и геолокации</string>
+    <string name="ig_dialog_extras_fix_notifications">Исправить старую регистрацию уведомлений на Android 12+</string>
+    <string name="ig_dialog_extras_hide_stories_tray">Скрыть только ленту историй</string>
+    <string name="ig_dialog_extras_share_domain">Свой домен для ссылок</string>
+    <string name="ig_dialog_extras_share_domain_off">Выкл.</string>
+    <string name="ig_dialog_extras_share_domain_hint">Заменяет instagram.com в копируемых и отправляемых ссылках, например для превью. Оставьте пустым, чтобы отключить.</string>
+    <string name="ig_dialog_extras_share_domain_invalid">Неверный домен</string>
+    <string name="ig_dialog_extras_startup_tab">Стартовая вкладка</string>
+    <string name="ig_media_open_with">Открыть с помощью…</string>
+    <string name="ig_lock_try_again_in">Слишком много попыток. Повторите через %1$d с</string>
+    <string name="loc_picker_locating">Поиск места…</string>
+    <string name="loc_picker_unnamed">Место без названия</string>
+    <string name="ig_dialog_location_current_title">Текущее местоположение</string>
+    <string name="ig_dialog_location_recent">Недавние места</string>
+    <string name="ig_dialog_location_applied">Местоположение применено</string>
+</resources>

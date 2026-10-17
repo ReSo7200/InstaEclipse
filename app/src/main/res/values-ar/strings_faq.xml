@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="faq_7"><b>7. النصوص لا تظهر؟</b>\n- عطّل HMA (HideMyApplist) لإنستغرام. يقرأ InstaEclipse نصوصه من تطبيقه، وHMA يخفيه.</string>
+    <string name="faq_8"><b>8. بعض الميزات لا تعمل رغم تفعيلها؟</b>\n- قد تمنعها إعدادات إنستغرام الداخلية. استخدم خيارات المطوّر ← استعادة الإعدادات الافتراضية.</string>
+    <string name="faq_9"><b>9. ما زلت تواجه مشكلة؟</b>\n- اسأل في مجموعة تيليغرام (t.me/instaEclipse_discussion).</string>
+</resources>

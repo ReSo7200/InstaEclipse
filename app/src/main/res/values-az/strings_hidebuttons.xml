@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Söhbətlərdə Blend-i gizlət</string>
+    <string name="ig_dialog_hide_threads_button">Profillərdə Threads düyməsini gizlət</string>
+    <string name="ig_feat_hide_blend">Blend-i gizlət</string>
+    <string name="ig_feat_hide_threads">Threads-i gizlət</string>
+    <string name="ig_hide_chat">Söhbəti gizlət</string>
+    <string name="ig_unhide_chat">Söhbəti göstər</string>
+</resources>
