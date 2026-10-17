@@ -83,6 +83,7 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Jump to first message | Scroll a chat all the way back to its first message |
 | Voice message downloads | Save voice messages, named by sender |
 | Translate messages | Send a message to your translator app from its long press menu (under More) |
+| Unsend multiple messages | Long press one of your messages, then More, Unsend multiple: check your messages right in the chat and unsend them all at once |
 | Hide specific chats | Hide chats from your inbox and manage them later |
 | Hide the Notes tray | Remove Notes from the top of your inbox |
 | Hide Blend in chats | Remove the Blend button from the chat header |
