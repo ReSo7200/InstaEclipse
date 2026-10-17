@@ -29,7 +29,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.Collection;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -44,6 +43,7 @@ public class HideChatsHook {
 
     private static final String TAG = "ie_hidechat_btn";
     private static final String INBOX_ANCHOR = "DirectThreadStoreImpl.getSortedCopyOfThreadSummaries";
+    private static final String DIFF_UPDATE_ANCHOR = "InboxViewModelGenerator.calculateAndApplyDiffUpdate";
     private static final String HEADER_ANCHOR = "PrebindThreadHeader";
     private static final String THREAD_OPEN_ANCHOR = "igThreadIgid";
 
@@ -56,11 +56,12 @@ public class HideChatsHook {
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         installInboxFilter(bridge, classLoader);
+        installDiffUpdateHook(bridge, classLoader);
         installThreadTracker(bridge, classLoader);
         installHeaderButton(classLoader);
     }
 
-    // ── 1. Inbox Filter & Empty General Folder ─────────────────────────────────
+    // ── 1. Inbox Filter & Empty General Folder (Store Level) ──────────────────
     private void installInboxFilter(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook filter = new XC_MethodHook() {
             @Override
@@ -69,13 +70,11 @@ public class HideChatsHook {
                 Object r = param.getResult();
                 if (!(r instanceof List<?> originalList)) return;
 
-                // 1. Empty General Folder check
                 if (FeatureFlags.emptyGeneralFolder && isGeneralFolderQuery(param.args)) {
                     param.setResult(new ArrayList<>());
                     return;
                 }
 
-                // 2. Non-destructive filtering for Hide Specific Chats
                 if (FeatureFlags.hideChatsMode == 0 || HiddenThreads.isEmpty()) return;
 
                 try {
@@ -106,28 +105,101 @@ public class HideChatsHook {
         }
     }
 
+    // ── 1b. ViewModel DiffUpdate Hook (UI State Level for Empty General) ──────
+    private void installDiffUpdateHook(DexKitBridge bridge, ClassLoader classLoader) {
+        XC_MethodHook diffHook = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.emptyGeneralFolder) return;
+                try {
+                    Object thisObj = param.thisObject;
+                    if (thisObj == null) return;
+                    Field cField = findFieldByType(thisObj.getClass(), "X.05Iq");
+                    if (cField == null) return;
+                    cField.setAccessible(true);
+                    Object state = cField.get(thisObj);
+                    if (state == null) return;
+                    
+                    Field folderField = findFieldByType(state.getClass(), "X.09ZC");
+                    if (folderField == null) return;
+                    folderField.setAccessible(true);
+                    Object folder = folderField.get(state);
+                    if (folder != null && isGeneralDescriptor(folder)) {
+                        Field threadsField = findFieldByType(state.getClass(), List.class);
+                        if (threadsField != null) {
+                            threadsField.setAccessible(true);
+                            threadsField.set(state, new ArrayList<>());
+                        }
+                    }
+                } catch (Throwable ignored) {}
+            }
+        };
+
+        try {
+            int n = 0;
+            for (MethodData md : bridge.findMethod(FindMethod.create()
+                    .matcher(MethodMatcher.create().usingStrings(DIFF_UPDATE_ANCHOR)))) {
+                try {
+                    XposedBridge.hookMethod(md.getMethodInstance(classLoader), diffHook);
+                    n++;
+                } catch (Throwable ignored) {}
+            }
+            ModuleLog.line("(IE|HideChats) diff update hooked " + n + " method(s)");
+        } catch (Throwable ignored) {}
+    }
+
+    private static Field findFieldByType(Class<?> clazz, String typeName) {
+        for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
+            for (Field f : c.getDeclaredFields()) {
+                if (f.getType().getName().contains(typeName)) return f;
+            }
+        }
+        return null;
+    }
+
+    private static Field findFieldByType(Class<?> clazz, Class<?> targetType) {
+        for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
+            for (Field f : c.getDeclaredFields()) {
+                if (f.getType().isAssignableFrom(targetType)) return f;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isGeneralDescriptor(Object obj) {
+        if (obj == null) return false;
+        String name = obj.getClass().getName();
+        if (name.contains("0Gmm") || name.contains("C425100Gmm")) return true;
+        try {
+            for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+                for (Field f : c.getDeclaredFields()) {
+                    if (Modifier.isStatic(f.getModifiers())) continue;
+                    if (f.getType() == String.class) {
+                        f.setAccessible(true);
+                        Object val = f.get(obj);
+                        if ("general".equalsIgnoreCase((String) val)) return true;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
+    }
+
     private static boolean isGeneralFolderQuery(Object[] args) {
         if (args == null) return false;
         for (Object arg : args) {
             if (arg == null) continue;
-            String name = arg.getClass().getName();
-            // C425100Gmm is obfuscated as X.0Gmm at runtime
-            if (name.contains("0Gmm") || name.contains("C425100Gmm") || "general".equalsIgnoreCase(arg.toString())) {
-                return true;
-            }
-            if (arg instanceof Collection<?> list) {
+            if (isGeneralDescriptor(arg)) return true;
+            if (arg instanceof List<?> list) {
                 for (Object elem : list) {
-                    if (elem != null) {
-                        String ename = elem.getClass().getName();
-                        if (ename.contains("0Gmm") || ename.contains("C425100Gmm") || "general".equalsIgnoreCase(elem.toString())) return true;
-                    }
+                    if (isGeneralDescriptor(elem)) return true;
                 }
             }
         }
         return false;
     }
 
-    // ── 1b. Foreground Thread Tracker ──────────────────────────────────────────
+    // ── 1c. Foreground Thread Tracker ──────────────────────────────────────────
     private void installThreadTracker(DexKitBridge bridge, ClassLoader classLoader) {
         try {
             List<MethodData> openMethods = bridge.findMethod(FindMethod.create()
@@ -322,9 +394,10 @@ public class HideChatsHook {
                     }
                 } catch (Throwable ignored) {}
             }
-            // Structural fallback for horizontal pills container
+            // Search specifically for horizontal container holding folder pills (avoiding action bar)
             if (child instanceof ViewGroup subVg) {
-                if (subVg.getChildCount() >= 2 && subVg.getHeight() > 0 && subVg.getHeight() < dpApprox(subVg, 80)) {
+                String cn = subVg.getClass().getName();
+                if (!cn.contains("ActionBar") && !cn.contains("Toolbar") && subVg.getChildCount() >= 2 && subVg.getHeight() > 0 && subVg.getHeight() < dpApprox(subVg, 70)) {
                     return subVg;
                 }
                 View found = findFoldersBar(subVg);
