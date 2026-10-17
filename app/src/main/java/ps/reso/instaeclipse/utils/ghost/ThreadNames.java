@@ -112,4 +112,55 @@ public class ThreadNames {
         String v = cache.get(threadId);
         return v == null ? "" : v;
     }
+
+    /**
+     * Like {@link #get}, but when the chat was never opened (so its header name was never seen)
+     * look the name up in Instagram's own thread cache (direct.db, table threads, thread_info
+     * JSON) and remember it. Must run inside Instagram's process.
+     */
+    public static synchronized String resolve(String threadId) {
+        String v = get(threadId);
+        if (!v.isEmpty() || threadId == null || threadId.isEmpty()) return v;
+        String found = lookupDb(threadId);
+        if (found != null && !found.isEmpty()) {
+            put(threadId, found);
+            return found;
+        }
+        return "";
+    }
+
+    /** Group title, else the other members' display names (full name, or username). */
+    private static String lookupDb(String threadId) {
+        Context ctx = AndroidAppHelper.currentApplication();
+        if (ctx == null) return null;
+        File db = ctx.getDatabasePath("direct.db");
+        if (!db.exists()) return null;
+        try (android.database.sqlite.SQLiteDatabase d = android.database.sqlite.SQLiteDatabase.openDatabase(
+                db.getPath(), null, android.database.sqlite.SQLiteDatabase.OPEN_READONLY);
+             android.database.Cursor c = d.rawQuery(
+                     "SELECT thread_info FROM threads WHERE thread_id = ? LIMIT 1", new String[]{threadId})) {
+            if (!c.moveToFirst()) return null;
+            // thread_info is stored as a UTF-8 JSON blob.
+            String raw = c.getType(0) == android.database.Cursor.FIELD_TYPE_BLOB
+                    ? new String(c.getBlob(0), StandardCharsets.UTF_8) : c.getString(0);
+            JSONObject info = new JSONObject(raw);
+            String title = info.optString("thread_title", "").trim();
+            if (!title.isEmpty()) return title;
+            java.util.List<String> names = new java.util.ArrayList<>();
+            org.json.JSONArray users = info.optJSONArray("recipients");
+            if (users != null) {
+                for (int i = 0; i < users.length(); i++) {
+                    JSONObject u = users.optJSONObject(i);
+                    if (u == null) continue;
+                    String n = u.optString("full_name", "").trim();
+                    if (n.isEmpty()) n = u.optString("username", "").trim();
+                    if (!n.isEmpty()) names.add(n);
+                }
+            }
+            return names.isEmpty() ? null : String.join(", ", names);
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|ThreadNames) db lookup failed: " + t.getMessage());
+            return null;
+        }
+    }
 }

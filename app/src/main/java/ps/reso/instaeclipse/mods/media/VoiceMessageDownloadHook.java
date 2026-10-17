@@ -369,7 +369,7 @@ public class VoiceMessageDownloadHook {
                         }
                 }
             }
-            String chat = ps.reso.instaeclipse.utils.ghost.ThreadNames.get(
+            String chat = ps.reso.instaeclipse.utils.ghost.ThreadNames.resolve(
                     ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.currentThreadId());
             if (chat != null && !chat.isEmpty()) return chat.replaceAll("[^A-Za-z0-9._-]", "_");
         } catch (Throwable t) {

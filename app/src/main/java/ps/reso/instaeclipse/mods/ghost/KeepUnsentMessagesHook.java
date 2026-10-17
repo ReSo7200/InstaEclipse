@@ -314,7 +314,7 @@ public class KeepUnsentMessagesHook {
                         String body = bodyOf(msg);
                         if (body == null) return;
                         loggedIds.add(id);
-                        String who = ThreadNames.get(threadId);
+                        String who = ThreadNames.resolve(threadId);
                         ps.reso.instaeclipse.utils.ghost.UnsentLog.add(threadId, who, body);
                         ModuleLog.line("(IE|KeepUnsent) ✅ logged (thread=" + threadId + " who=" + who + "): "
                                 + (body.length() > 24 ? body.substring(0, 24) + "…" : body));

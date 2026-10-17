@@ -168,7 +168,7 @@ public class ChatExportHook {
             try {
                 List<?> msgs = (List<?>) messagesMethod.invoke(store, true);
                 Map<String, String> names = participants(store);
-                String title = threadId != null ? ThreadNames.get(threadId) : null;
+                String title = threadId != null ? ThreadNames.resolve(threadId) : null;
                 if (title == null || title.isEmpty()) title = "chat";
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                 // first pass: JSON per message + item id -> message (for reply quotes)
