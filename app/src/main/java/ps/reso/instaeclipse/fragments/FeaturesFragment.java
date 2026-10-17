@@ -1092,6 +1092,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_jump_first, "#5E5CE6", getString(R.string.ig_dialog_ghost_jump_first), "jumpToFirstMessage"),
                 createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray"),
+                createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_hide_dm_blend), "hideDmBlend"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_share_create_group), "hideShareCreateGroup")
         ));
 
@@ -1457,6 +1458,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
+                createSwitch(R.drawable.ic_block, A_SOCIAL, getString(R.string.ig_dialog_hide_threads_button), "hideThreadsButton"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_show_follower_toast), "showFollowerToast"),
                 createSwitch(R.drawable.ic_download, A_SOCIAL, getString(R.string.ig_dialog_misc_follow_export), "followListExport"),
                 createSwitch(R.drawable.ic_save, A_SOCIAL, getString(R.string.ig_saved_on_profile), "savedOnProfile")

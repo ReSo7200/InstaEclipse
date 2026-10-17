@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Ukryj Blend w czatach</string>
+    <string name="ig_dialog_hide_threads_button">Ukryj przycisk Threads na profilach</string>
+    <string name="ig_feat_hide_blend">Ukryj Blend</string>
+    <string name="ig_feat_hide_threads">Ukryj Threads</string>
+</resources>

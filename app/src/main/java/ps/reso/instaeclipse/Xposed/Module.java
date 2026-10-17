@@ -699,6 +699,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Saved button on your own profile (#237)
                     try {
                         if (!skip("SavedOnProfileHook")) new ps.reso.instaeclipse.mods.ui.SavedOnProfileHook().install(dexKitBridge, hostClassLoader);
+                        if (!skip("HideHeaderButtonsHook")) new ps.reso.instaeclipse.mods.ui.HideHeaderButtonsHook().install(hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(IE|SavedProfile) ❌ Failed to hook");
                     }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Dölj Blend i chattar</string>
+    <string name="ig_dialog_hide_threads_button">Dölj Threads-knappen på profiler</string>
+    <string name="ig_feat_hide_blend">Dölj Blend</string>
+    <string name="ig_feat_hide_threads">Dölj Threads</string>
+</resources>

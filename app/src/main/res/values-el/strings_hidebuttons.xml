@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_hide_dm_blend">Απόκρυψη Blend στις συνομιλίες</string>
+    <string name="ig_dialog_hide_threads_button">Απόκρυψη κουμπιού Threads στα προφίλ</string>
+    <string name="ig_feat_hide_blend">Απόκρυψη Blend</string>
+    <string name="ig_feat_hide_threads">Απόκρυψη Threads</string>
+</resources>

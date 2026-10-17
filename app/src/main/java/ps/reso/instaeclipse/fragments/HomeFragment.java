@@ -81,7 +81,7 @@ public class HomeFragment extends Fragment {
             "hidePlusUpsells", "expandCaptions",
             // Distraction-free
             "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore",
-            "disableComments", "hideNotesTray",
+            "disableComments", "hideNotesTray", "hideDmBlend", "hideThreadsButton",
             // Navigation bar
             "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile",
             // Misc
