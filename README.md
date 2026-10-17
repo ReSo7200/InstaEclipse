@@ -13,7 +13,6 @@
   </p>
 
   <p>
-    <a href="#whats-new-in-080">What's new</a> •
     <a href="#features">Features</a> •
     <a href="#compatibility">Compatibility</a> •
     <a href="#installation">Installation</a> •
@@ -40,26 +39,6 @@ It comes with a companion app too. That is where you see whether the module is r
 Under the hood, InstaEclipse uses [DexKit](https://github.com/LuckyPray/DexKit) to find what it needs inside Instagram every time Instagram updates, instead of relying on names that change with each build. So when Instagram ships a new version, most features keep working without waiting for a module update.
 
 > InstaEclipse is a personal, educational project. It is not affiliated with Meta or Instagram. See the [Disclaimer](DISCLAIMER.md).
-
----
-
-## What's new in 0.8.0
-
-The biggest update so far. Highlights:
-
-- **Stories got smart.** Story Info shows exact posting and expiry times, the song with Spotify, YouTube Music and Apple Music buttons, location, hashtags, who it was reshared from, paid partnerships, Add Yours counts and more. Polls, sliders and quizzes show their results as bars.
-- **Song links on posts and reels too.** Media info shows the song with the same Spotify, YouTube Music and Apple Music buttons.
-- **Translate chat messages** with your own translator app (Google Translate, DeepL and others), right from the message menu.
-- **Copy links from story link stickers**, and hold a mention to open that profile.
-- **A reorganized menu**, grouped by what things do: Feed, Navigation, Reels, Stories, Ghost Mode, Messages, Downloads, Likes and Comments, Profiles, and more. Same layout in Instagram and in the companion app.
-- **Per chat tools** in one InstaEclipse button inside every chat: unsent messages, export, jump to the first message, read receipts for just that chat, and hide or unhide the chat.
-- **Edit history, unsent message log, chat export, voice message downloads, comment search, follower export.**
-- **Clean up Instagram's own buttons:** hide the Threads button on profiles, the Blend button in chats, the Notes tray, "Create group" on the share sheet, Plus upsells, and community notes.
-- **Navigation:** hide tabs, reorder them, choose the tab Instagram opens on, and turn off swipe to camera.
-- **Extras:** airplane mode, following only feed, high resolution images, unlimited accounts, Reels auto scroll and scroll lock.
-- **A new look everywhere.** Modern dialogs and toasts, a home dashboard, searchable features, an animated About page, light and dark versions of every theme. InstaEclipse's own menus, toggles and dialogs follow your theme's colors, and its menu items get proper icons.
-- **Sturdier.** Safer settings sync with the companion app, crash fixes, security hardening, and every feature found at runtime with DexKit.
-- **New language:** Vietnamese joins the list.
 
 ---
 
