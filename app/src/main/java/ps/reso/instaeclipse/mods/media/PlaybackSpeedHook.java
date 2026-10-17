@@ -82,7 +82,89 @@ public class PlaybackSpeedHook {
 
     public void install(DexKitBridge bridge, ClassLoader cl) {
         installFeed(bridge, cl);
+        installHero(bridge, cl);
         installReelScrubber(bridge, cl);
+    }
+
+    // Hero layer: every IG video (feed, reels, stories, highlights) plays through the Hero player
+    // client (X.09cA on 451). Story viewers never go through the feed/clips wrappers above, so the
+    // speed is set here: (player, speed, pitch) static setter "HeroManager.setPlaybackSpeed",
+    // re-applied each time a player prepares ("HeroManager.prepareAndMayPlay").
+    private static Method heroSet;
+    private static final java.util.Map<Object, Boolean> HEROES =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    private static Method findStatic(DexKitBridge bridge, ClassLoader cl, String key, String str, int params) throws Throwable {
+        Method m = DexKitCache.isCacheValid() ? DexKitCache.loadMethod(key, cl) : null;
+        if (m != null) return m;
+        for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                .usingStrings(str).returnType("void")))) {
+            Method c = md.getMethodInstance(cl);
+            if (Modifier.isStatic(c.getModifiers()) && c.getParameterTypes().length == params) {
+                DexKitCache.saveMethod(key, c);
+                return c;
+            }
+        }
+        return null;
+    }
+
+    private void installHero(DexKitBridge bridge, ClassLoader cl) {
+        try {
+            Method set = findStatic(bridge, cl, "PlaybackSpeed_heroSet", "HeroManager.setPlaybackSpeed", 3);
+            Method prepare = findStatic(bridge, cl, "PlaybackSpeed_heroPrepare", "HeroManager.prepareAndMayPlay", 1);
+            if (set == null || prepare == null) {
+                ModuleLog.line(TAG + "⚠️ hero set=" + set + " prepare=" + prepare);
+                return;
+            }
+            set.setAccessible(true);
+            heroSet = set;
+            XposedBridge.hookMethod(set, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (param.args[0] != null) HEROES.put(param.args[0], Boolean.TRUE);
+                    if (APPLYING.get() == Boolean.TRUE) return;
+                    // IG resets to 1x on its own (e.g. after hold-for-2x); keep the chosen speed.
+                    if (FeatureFlags.offerPlaybackSpeed && speed != 1f && param.args[1] instanceof Float f && f == 1f)
+                        param.args[1] = speed;
+                }
+            });
+            XposedBridge.hookMethod(prepare, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    Object p = param.args[0];
+                    if (p == null) return;
+                    HEROES.put(p, Boolean.TRUE);
+                    if (FeatureFlags.offerPlaybackSpeed && speed != 1f) setHero(p, speed);
+                }
+            });
+            ModuleLog.line(TAG + "✅ hero " + set.getDeclaringClass().getName() + "." + set.getName()
+                    + ", prepare " + prepare.getName());
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ hero: " + t);
+        }
+    }
+
+    private static boolean setHero(Object p, float s) {
+        Method m = heroSet;
+        if (m == null) return false;
+        try {
+            APPLYING.set(Boolean.TRUE);
+            m.invoke(null, p, s, 1f);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        } finally {
+            APPLYING.remove();
+        }
+    }
+
+    /** Applies the speed to every live Hero player; true if any accepted it. */
+    private static boolean applyToHeroes(float s) {
+        Object[] live;
+        synchronized (HEROES) { live = HEROES.keySet().toArray(); }
+        boolean ok = false;
+        for (Object p : live) ok |= setHero(p, s);
+        return ok;
     }
 
     private void installFeed(DexKitBridge bridge, ClassLoader cl) {
@@ -233,13 +315,21 @@ public class PlaybackSpeedHook {
 
     /** Speed chooser from the post ⋯ menu; applies to the playing feed video and the next ones. */
     static void showChooser(Context ctx) {
+        showChooser(ctx, null);
+    }
+
+    /** @param onClosed run when the chooser closes (stories use it to resume the paused viewer). */
+    static void showChooser(Context ctx, Runnable onClosed) {
         String[] labels = new String[SPEEDS.length];
         int checked = 1;
         for (int i = 0; i < SPEEDS.length; i++) {
             labels[i] = (SPEEDS[i] == (int) SPEEDS[i] ? String.valueOf((int) SPEEDS[i]) : String.valueOf(SPEEDS[i])) + "×";
             if (SPEEDS[i] == speed) checked = i;
         }
-        android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        // Prefer the activity the menu was opened from: stories opened from a profile run in their
+        // own activity on top of the main one, and a dialog on the main activity sits behind them.
+        android.app.Activity act = activityOf(ctx);
+        if (act == null || act.isFinishing()) act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         Context host = act != null && !act.isFinishing() ? act : ctx;
         new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
                 .title(I18n.t(ctx, R.string.ig_playback_speed_title))
@@ -247,12 +337,22 @@ public class PlaybackSpeedHook {
                     speed = SPEEDS[which];
                     WeakReference<Object> ref = lastPlayer;
                     Object p = ref != null ? ref.get() : null;
-                    boolean ok = applyToPlayers(speed);
+                    boolean ok = applyToHeroes(speed);
+                    ok |= applyToPlayers(speed);
                     ok |= p != null && apply(p, speed);
                     ModuleLog.line(TAG + "chosen " + speed + "x, applied now=" + ok);
                     if (!ok) ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_playback_speed_next), Toast.LENGTH_SHORT).show();
                 })
+                .onDismiss(onClosed)
                 .show();
+    }
+
+    private static android.app.Activity activityOf(Context c) {
+        while (c instanceof android.content.ContextWrapper) {
+            if (c instanceof android.app.Activity a) return a;
+            c = ((android.content.ContextWrapper) c).getBaseContext();
+        }
+        return null;
     }
 
     /** Finds the Groot player reachable from the feed player and sets its speed. */

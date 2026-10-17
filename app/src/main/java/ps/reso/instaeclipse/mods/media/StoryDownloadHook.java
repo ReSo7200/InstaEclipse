@@ -651,7 +651,22 @@ public class StoryDownloadHook {
                     Object holder = findReelItemHolder(param);
                     Context ctx = findContextAcrossParam(param, holder != null ? holder : param.thisObject);
                     if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-                    if (ctx != null) PlaybackSpeedHook.showChooser(ctx);
+                    // IG paused the story when its menu opened and resumes it only for options it
+                    // handles itself; we swallowed this tap, so replay the dispatcher with IG's own
+                    // "[INTERNAL] Resume Playback" once our chooser closes.
+                    final java.lang.reflect.Member method = param.method;
+                    final Object self = param.thisObject;
+                    final Object[] args = param.args.clone();
+                    Runnable resume = () -> {
+                        try {
+                            for (int i = 0; i < args.length; i++)
+                                if (args[i] instanceof CharSequence) { args[i] = "[INTERNAL] Resume Playback"; break; }
+                            de.robv.android.xposed.XposedBridge.invokeOriginalMethod(method, self, args);
+                        } catch (Throwable t) {
+                            ModuleLog.line("(IE|Story) resume after speed: " + t);
+                        }
+                    };
+                    if (ctx != null) PlaybackSpeedHook.showChooser(ctx, resume);
                     return;
                 }
 
