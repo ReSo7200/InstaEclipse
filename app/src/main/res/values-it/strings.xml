@@ -310,6 +310,8 @@
     <string name="ig_dialog_open_links_externally">Apri i link nel browser esterno</string>
     <string name="theme_light_mode">Modalità chiara</string>
     <string name="theme_dark_mode">Modalità scura</string>
+    <string name="ig_downloader_folder_hint">Imposta la cartella dall\'app InstaEclipse</string>
+    <string name="lock_code_set_in_ig">Si imposta dentro Instagram: menu InstaEclipse &gt; Blocco. Tocca per aprire Instagram.</string>
     <string name="theme_set_light">Temi per la modalità chiara</string>
     <string name="theme_set_dark">Temi per la modalità scura</string>
     <string name="theme_light_same">Stesso tema della modalità scura</string>

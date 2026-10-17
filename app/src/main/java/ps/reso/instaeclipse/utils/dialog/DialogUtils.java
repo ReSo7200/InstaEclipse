@@ -2049,8 +2049,18 @@ public class DialogUtils {
         // so "/storage/emulated/0/Download/InstaEclipse" → "Download/InstaEclipse"
         String folderDisplay = folderRaw.replaceFirst("^.*/0/", "");
         layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_dialog_section_downloader_settings)));
+        // The folder is picked with the system folder picker, which only the companion app can run.
+        TextView folderHint = new TextView(context);
+        folderHint.setText(I18n.t(context, R.string.ig_downloader_folder_hint));
+        folderHint.setTextSize(13);
+        folderHint.setTextColor(C_TEXT2);
+        folderHint.setPadding(40, 0, 32, 20);
+        LinearLayout folderBlock = new LinearLayout(context);
+        folderBlock.setOrientation(LinearLayout.VERTICAL);
+        folderBlock.addView(createInfoSection(context, I18n.t(context, R.string.ig_dialog_downloader_folder), folderDisplay));
+        folderBlock.addView(folderHint);
         layout.addView(cardOf(context,
-                createInfoSection(context, I18n.t(context, R.string.ig_dialog_downloader_folder), folderDisplay),
+                folderBlock,
                 flagSwitch(context, R.drawable.ic_folder, "#FF9F0A", R.string.ig_dialog_downloader_username_subfolder, "downloaderUsernameFolder"),
                 flagSwitch(context, R.drawable.ic_timer, "#FF9F0A", R.string.ig_dialog_downloader_add_timestamp, "downloaderAddTimestamp")));
 

@@ -189,6 +189,8 @@
     <string name="ig_dialog_open_links_externally">فتح الروابط في متصفح خارجي</string>
     <string name="theme_light_mode">الوضع الفاتح</string>
     <string name="theme_dark_mode">الوضع الداكن</string>
+    <string name="ig_downloader_folder_hint">يتم تعيين المجلد من تطبيق InstaEclipse</string>
+    <string name="lock_code_set_in_ig">يتم تعيينه داخل Instagram: قائمة InstaEclipse &gt; القفل. اضغط لفتح Instagram.</string>
     <string name="theme_set_light">سمات الوضع الفاتح</string>
     <string name="theme_set_dark">سمات الوضع الداكن</string>
     <string name="theme_light_same">نفس سمة الوضع الداكن</string>

@@ -191,6 +191,8 @@
     <string name="ig_dialog_open_links_externally">Открывать ссылки во внешнем браузере</string>
     <string name="theme_light_mode">Светлый режим</string>
     <string name="theme_dark_mode">Тёмный режим</string>
+    <string name="ig_downloader_folder_hint">Папку можно выбрать в приложении InstaEclipse</string>
+    <string name="lock_code_set_in_ig">Задаётся внутри Instagram: меню InstaEclipse &gt; Блокировка. Нажмите, чтобы открыть Instagram.</string>
     <string name="theme_set_light">Темы для светлого режима</string>
     <string name="theme_set_dark">Темы для тёмного режима</string>
     <string name="theme_light_same">Та же тема, что и в тёмном режиме</string>

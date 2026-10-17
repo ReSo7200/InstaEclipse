@@ -191,6 +191,8 @@
     <string name="ig_dialog_open_links_externally">Bağlantıları Xarici Brauzerdə Aç</string>
     <string name="theme_light_mode">İşıqlı rejim</string>
     <string name="theme_dark_mode">Qaranlıq rejim</string>
+    <string name="ig_downloader_folder_hint">Qovluğu InstaEclipse tətbiqindən təyin edin</string>
+    <string name="lock_code_set_in_ig">Instagram daxilində təyin edin: InstaEclipse menyusu &gt; Kilid. Instagram-ı açmaq üçün toxunun.</string>
     <string name="theme_set_light">İşıqlı rejim temaları</string>
     <string name="theme_set_dark">Qaranlıq rejim temaları</string>
     <string name="theme_light_same">Qaranlıq rejimlə eyni tema</string>

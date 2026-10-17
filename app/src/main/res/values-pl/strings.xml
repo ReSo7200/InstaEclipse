@@ -304,6 +304,8 @@
     <string name="ig_dialog_open_links_externally">Otwieraj linki w zewnętrznej przeglądarce</string>
     <string name="theme_light_mode">Tryb jasny</string>
     <string name="theme_dark_mode">Tryb ciemny</string>
+    <string name="ig_downloader_folder_hint">Folder ustawisz w aplikacji InstaEclipse</string>
+    <string name="lock_code_set_in_ig">Ustawiasz go w Instagramie: menu InstaEclipse &gt; Blokada. Dotknij, aby otworzyć Instagram.</string>
     <string name="theme_set_light">Motywy trybu jasnego</string>
     <string name="theme_set_dark">Motywy trybu ciemnego</string>
     <string name="theme_light_same">Ten sam motyw co w trybie ciemnym</string>
