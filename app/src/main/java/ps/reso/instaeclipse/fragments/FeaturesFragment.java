@@ -1498,7 +1498,55 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_notification, "#0A84FF", getString(R.string.ig_dialog_misc_show_feature_toasts), "showFeatureToasts")
         ));
 
+        // Auto-clear cache (mirrors the in-IG dialog's Tools section).
+        defs.add(getString(R.string.ig_dialog_section_auto_clear_cache));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_timer, "#FF9F0A", getString(R.string.ig_dialog_auto_clear_cache), "autoClearCache"),
+                createClickable(R.drawable.ic_folder, "#FF9F0A",
+                        getString(R.string.ig_dialog_auto_clear_cache_size, localCache.getInt("autoClearCacheSizeMb", 100)),
+                        this::pickAutoClearSize)
+        ));
+
         return defs;
+    }
+
+    private void openInstagram() {
+        Intent launch = requireContext().getPackageManager()
+                .getLaunchIntentForPackage(ps.reso.instaeclipse.utils.core.CommonUtils.IG_PACKAGE_NAME);
+        if (launch != null) startActivity(launch);
+        else ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(),
+                getString(R.string.not_installed_instagram), Toast.LENGTH_SHORT).show();
+    }
+
+    /** Saves an int setting locally and pushes it to Instagram. */
+    private void putIntPref(String key, int value) {
+        localCache.edit().putInt(key, value).commit();
+        makeLocalCacheWorldReadable();
+        Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_INT");
+        b.putExtra("key", key);
+        b.putExtra("value", value);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
+    }
+
+    private void pickAutoClearSize() {
+        // Same reachable presets as the in-IG dialog (IG's real cache is small).
+        final int[] values = {50, 100, 200, 500};
+        int current = localCache.getInt("autoClearCacheSizeMb", 100);
+        String[] labels = new String[values.length];
+        int sel = 0;
+        for (int i = 0; i < values.length; i++) {
+            labels[i] = values[i] + " MB";
+            if (values[i] == current) sel = i;
+        }
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.ig_dialog_section_auto_clear_cache))
+                .setSingleChoiceItems(labels, sel, (dialog, which) -> {
+                    putIntPref("autoClearCacheSizeMb", values[which]);
+                    dialog.dismiss();
+                    loadAppMenu();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     /** Lock (Privacy). Companion app only toggles the persisted flags — the passcode itself is set
@@ -1514,12 +1562,18 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_dms), "lockDirectMessages"),
+                createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_dms_always), "lockDirectAlways"),
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_whole_app), "lockWholeApp"),
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_locked_coll_setting), "lockSavedCollections"),
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_fingerprint), "lockUseFingerprint")
         ));
 
-        // Note: setting the passcode itself is done from inside Instagram.
+        // The passcode is set from inside Instagram (stored hashed in IG's own prefs), so the app
+        // only points there; tapping opens Instagram.
+        defs.add(Arrays.asList(
+                createTool(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_dialog_misc_lock_dms_set),
+                        getString(R.string.lock_code_set_in_ig), this::openInstagram)
+        ));
 
         return defs;
     }
@@ -1603,9 +1657,14 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_enable), "customThemeEnabled"),
                 createClickable(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_customize), () ->
                         themeCustomizerLauncher.launch(new Intent(requireContext(), ThemeCustomizerActivity.class))),
-                createClickable(R.drawable.ic_palette, "#FF375F",
-                        getString(R.string.theme_light_mode) + ": " + lightModeLabel(localCache.getInt("themeLightPresetId", -1)),
-                        this::pickLightModeTheme)
+                // Follows the phone's mode, like the customizer and the in-IG dialog.
+                isNightMode()
+                        ? createClickable(R.drawable.ic_palette, "#FF375F",
+                                getString(R.string.theme_dark_mode) + ": " + darkModeLabel(localCache.getInt("themePresetId", 1)),
+                                this::pickDarkModeTheme)
+                        : createClickable(R.drawable.ic_palette, "#FF375F",
+                                getString(R.string.theme_light_mode) + ": " + lightModeLabel(localCache.getInt("themeLightPresetId", -1)),
+                                this::pickLightModeTheme)
         ));
 
         // Fonts & Emoji now live under Custom Theme (mirrors the in-IG dialog). File pickers run
@@ -1624,6 +1683,44 @@ public class FeaturesFragment extends Fragment {
         if (value == 0) return getString(R.string.theme_light_same);
         if (value == -1) return getString(R.string.theme_light_stock);
         return ps.reso.instaeclipse.mods.ui.theme.ThemePresets.getDisplayName(requireContext(), value);
+    }
+
+    private boolean isNightMode() {
+        return (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    private String darkModeLabel(int value) {
+        if (value == 0) return getString(R.string.theme_section_custom);
+        return ps.reso.instaeclipse.mods.ui.theme.ThemePresets.getDisplayName(requireContext(), value);
+    }
+
+    /** Dark-mode theme: one of the dark presets, or the custom palette when that is in use. */
+    private void pickDarkModeTheme() {
+        int current = localCache.getInt("themePresetId", 1);
+        int[] presets = ps.reso.instaeclipse.mods.ui.theme.ThemePresets.darkModeChoices();
+        final int[] values;
+        if (current == 0) {
+            values = new int[presets.length + 1];
+            System.arraycopy(presets, 0, values, 1, presets.length);
+        } else {
+            values = presets;
+        }
+        String[] labels = new String[values.length];
+        int sel = 0;
+        for (int i = 0; i < values.length; i++) {
+            labels[i] = darkModeLabel(values[i]);
+            if (values[i] == current) sel = i;
+        }
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.theme_dark_mode))
+                .setSingleChoiceItems(labels, sel, (dialog, which) -> {
+                    putIntPref("themePresetId", values[which]);
+                    dialog.dismiss();
+                    loadThemeMenu();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     /** Light-mode behaviour of the custom theme (#251). */
