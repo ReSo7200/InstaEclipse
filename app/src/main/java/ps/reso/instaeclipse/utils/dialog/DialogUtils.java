@@ -14,6 +14,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.widget.ImageView;
 import android.graphics.drawable.StateListDrawable;
 import android.view.Gravity;
 import android.view.View;
@@ -166,7 +167,7 @@ public class DialogUtils {
         LinearLayout appearance = createGroupCard(context);
         appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
         appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_feed), A_APPEARANCE, () -> showFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "hidePlusUpsells", "followingOnlyFeed", "hideStoriesTray", "disableDiscoverPeople", "expandCaptions", "exactTimestamps", "highResolutionImages", "enablePhotoZoom", "disableVideoAutoPlay")));
-        appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), onCount(context, "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile", "disableSwipeToCamera")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), onCount(context, navExtras(), "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile", "disableSwipeToCamera")));
         appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels), A_APPEARANCE, () -> showReelsOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "disableRepost")));
         appearance.addView(createMenuRow(context, R.drawable.ic_story_ring, I18n.t(context, R.string.menu_stories), A_APPEARANCE, () -> showStoriesOptions(context), onCount(context, "disableStoryFlipping", "enableStoryMentions", "storyLinks", "storyInfo", "storyViewerSearch")));
         mainLayout.addView(appearance);
@@ -255,7 +256,19 @@ public class DialogUtils {
 
     /** "N on" / "Off" for a category, read live from FeatureFlags (counted every time the menu opens). */
     private static String onCount(Context context, String... flagNames) {
-        int on = 0;
+        return onCount(context, 0, flagNames);
+    }
+
+    /** Navigation's non-switch settings: a changed tab order and a chosen startup tab count as on. */
+    private static int navExtras() {
+        int n = 0;
+        if (ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(FeatureFlags.navTabOrder)) n++;
+        if (FeatureFlags.startupTab != null && !FeatureFlags.startupTab.isEmpty()) n++;
+        return n;
+    }
+
+    private static String onCount(Context context, int extra, String... flagNames) {
+        int on = extra;
         for (String name : flagNames) {
             try {
                 java.lang.reflect.Field f = FeatureFlags.class.getField(name);
@@ -2230,50 +2243,102 @@ public class DialogUtils {
     private static void showAboutDialog(Context context) {
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 24, 40, 16);
+        layout.setGravity(Gravity.CENTER_HORIZONTAL);
+        layout.setPadding(dp(context, 8), dp(context, 12), dp(context, 8), dp(context, 8));
+
+        // App icon on a soft accent halo (pops in when the page opens).
+        android.widget.FrameLayout halo = new android.widget.FrameLayout(context);
+        GradientDrawable glow = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{(C_ACCENT & 0x00FFFFFF) | 0x55000000, 0x33BF5AF2});
+        glow.setShape(GradientDrawable.OVAL);
+        halo.setBackground(glow);
+        ImageView icon = new ImageView(context);
+        Drawable launcher = loadModuleDrawable(R.mipmap.ic_launcher_round);
+        if (launcher != null) icon.setImageDrawable(launcher);
+        android.widget.FrameLayout.LayoutParams ilp = new android.widget.FrameLayout.LayoutParams(dp(context, 76), dp(context, 76));
+        ilp.gravity = Gravity.CENTER;
+        halo.addView(icon, ilp);
+        LinearLayout.LayoutParams hlp = new LinearLayout.LayoutParams(dp(context, 104), dp(context, 104));
+        hlp.gravity = Gravity.CENTER_HORIZONTAL;
+        layout.addView(halo, hlp);
 
         TextView title = new TextView(context);
         title.setText(I18n.t(context, R.string.ig_dialog_title));
-        title.setTextColor(Color.WHITE);
-        title.setTextSize(22f);
+        title.setTextColor(C_TEXT);
+        title.setTextSize(24f);
         title.setTypeface(null, Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
-        title.setPadding(0, 0, 0, 8);
-
-        TextView creator = new TextView(context);
-        creator.setText(I18n.t(context, R.string.ig_dialog_about_created_by));
-        creator.setTextColor(C_TEXT2);
-        creator.setTextSize(14f);
-        creator.setGravity(Gravity.CENTER);
-        creator.setPadding(0, 0, 0, 32);
-
+        title.setPadding(0, dp(context, 12), 0, 0);
         layout.addView(title);
-        layout.addView(creator);
-        LinearLayout linksRow = new LinearLayout(context);
-        linksRow.setOrientation(LinearLayout.HORIZONTAL);
-        linksRow.setGravity(Gravity.CENTER);
 
-        View githubBtn = createActionRow(context, R.drawable.ic_github_logo, I18n.t(context, R.string.ig_dialog_about_github), "#8E8E93", v -> {
-            Intent i = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://github.com/ReSo7200/InstaEclipse"));
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(i);
-        });
-        LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        githubBtn.setLayoutParams(btnLp);
+        TextView tagline = new TextView(context);
+        tagline.setText(I18n.t(context, R.string.about_tagline));
+        tagline.setTextColor(C_TEXT2);
+        tagline.setTextSize(14f);
+        tagline.setGravity(Gravity.CENTER);
+        tagline.setPadding(0, dp(context, 2), 0, dp(context, 10));
+        layout.addView(tagline);
 
-        View tgBtn = createActionRow(context, R.drawable.ic_telegram_logo, I18n.t(context, R.string.ig_dialog_about_telegram), "#29B6F6", v -> {
-            Intent i = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://t.me/InstaEclipse"));
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(i);
-        });
-        tgBtn.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        // Version chips + feature health (same chips as the menu header).
+        View chips = buildStatusChips(context);
+        layout.addView(chips);
 
-        linksRow.addView(githubBtn);
-        linksRow.addView(tgBtn);
-        layout.addView(linksRow);
+        LinearLayout links = card(context);
+        links.addView(createActionRow(context, R.drawable.ic_github_logo, I18n.t(context, R.string.about_source), "#8E8E93",
+                v -> openLink(context, ps.reso.instaeclipse.utils.core.ExportBrand.GITHUB)));
+        links.addView(createActionRow(context, R.drawable.ic_telegram_logo, I18n.t(context, R.string.about_channel), "#29B6F6",
+                v -> openLink(context, ps.reso.instaeclipse.utils.core.ExportBrand.TELEGRAM)));
+        links.addView(createActionRow(context, R.drawable.ic_github_logo, I18n.t(context, R.string.about_contributors), "#BF5AF2",
+                v -> openLink(context, ps.reso.instaeclipse.utils.core.ExportBrand.GITHUB + "/graphs/contributors")));
+        layout.addView(links);
+
+        TextView footer = new TextView(context);
+        footer.setText(I18n.t(context, R.string.about_footer));
+        footer.setTextColor(C_TEXT2);
+        footer.setTextSize(12f);
+        footer.setGravity(Gravity.CENTER);
+        footer.setPadding(0, dp(context, 14), 0, 0);
+        layout.addView(footer);
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_about), layout, () -> {
         });
+
+        // Entrance: icon pops in, the rest rises in just after it.
+        halo.setScaleX(0.6f);
+        halo.setScaleY(0.6f);
+        halo.setAlpha(0f);
+        halo.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(420)
+                .setInterpolator(new android.view.animation.OvershootInterpolator(1.6f)).start();
+        icon.setRotation(-25f);
+        icon.animate().rotation(0f).setDuration(520)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+        int i = 0;
+        float d = context.getResources().getDisplayMetrics().density;
+        for (View v : new View[]{title, tagline, chips, links, footer}) {
+            v.setAlpha(0f);
+            v.setTranslationY(12 * d);
+            v.animate().alpha(1f).translationY(0f).setStartDelay(120 + 60L * i++).setDuration(260)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+        }
+    }
+
+    private static void openLink(Context context, String url) {
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(i);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /** A drawable from the module's own APK, in its own colours. */
+    private static Drawable loadModuleDrawable(int res) {
+        try {
+            return android.content.res.XModuleResources.createInstance(ps.reso.instaeclipse.Xposed.Module.moduleSourceDir, null)
+                    .getDrawable(res, null);
+        } catch (Throwable t) {
+            return null;
+        }
     }
 
     @SuppressLint("SetTextI18n")

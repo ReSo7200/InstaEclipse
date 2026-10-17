@@ -939,6 +939,11 @@ public class FeaturesFragment extends Fragment {
             if (fi.type != FeatureItem.TYPE_SWITCH || fi.prefKey == null || !seen.add(fi.prefKey)) continue;
             if (getCurrentState(fi.prefKey)) on++;
         }
+        if ("navigation".equals(cat.key)) {
+            // Tab order / startup tab are choices, not switches: count them when they're changed.
+            if (ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(localCache.getString("navTabOrder", ""))) on++;
+            if (!localCache.getString("startupTab", "").isEmpty()) on++;
+        }
         if (seen.isEmpty()) {
             nav.subtitle = null;
             nav.subtitleActive = false;

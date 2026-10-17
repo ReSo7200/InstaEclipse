@@ -133,6 +133,19 @@ public class DistractionFreeUIHook {
             {"feed_tab", "clips_tab", "search_tab", "creation_tab", "direct_tab", "news_tab", "profile_tab"};
     private static boolean orderLogged;
 
+    /** True when a saved tab order actually differs from Instagram's default order. */
+    public static boolean isCustomTabOrder(String saved) {
+        if (saved == null || saved.trim().isEmpty()) return false;
+        java.util.List<String> order = new java.util.ArrayList<>();
+        java.util.List<String> all = java.util.Arrays.asList(ORDERABLE_TABS);
+        for (String n : saved.split(",")) {
+            String t = n.trim();
+            if (all.contains(t) && !order.contains(t)) order.add(t);
+        }
+        for (String n : ORDERABLE_TABS) if (!order.contains(n)) order.add(n);
+        return !order.equals(all);
+    }
+
     /**
      * Customize navigation bar (#238): puts the tab views in the user's order
      * (FeatureFlags.navTabOrder, comma-separated tab id names; unlisted tabs keep their relative
