@@ -32,4 +32,5 @@
     <string name="ig_si_joined">συμμετείχαν</string>
     <string name="ig_si_paid_partnership">Πληρωμένη συνεργασία με (κράτα για άνοιγμα)</string>
     <string name="ig_si_collaborators">Συνεργάτης (κράτα για άνοιγμα)</string>
+    <string name="ig_btn_slider_results">Αποτελέσματα ρυθμιστικού</string>
 </resources>

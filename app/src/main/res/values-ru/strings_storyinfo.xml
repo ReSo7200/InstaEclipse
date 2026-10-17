@@ -32,4 +32,5 @@
     <string name="ig_si_joined">участвуют</string>
     <string name="ig_si_paid_partnership">Платное партнёрство с (удерживайте, чтобы открыть)</string>
     <string name="ig_si_collaborators">Соавтор (удерживайте, чтобы открыть)</string>
+    <string name="ig_btn_slider_results">Результаты шкалы</string>
 </resources>

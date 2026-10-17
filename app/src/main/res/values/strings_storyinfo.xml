@@ -32,4 +32,5 @@
     <string name="ig_si_joined">joined</string>
     <string name="ig_si_paid_partnership">Paid partnership with (hold to open)</string>
     <string name="ig_si_collaborators">Collaborator (hold to open)</string>
+    <string name="ig_btn_slider_results">Slider Results</string>
 </resources>

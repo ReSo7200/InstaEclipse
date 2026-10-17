@@ -32,4 +32,5 @@
     <string name="ig_si_joined">đã tham gia</string>
     <string name="ig_si_paid_partnership">Quan hệ đối tác có trả phí với (giữ để mở)</string>
     <string name="ig_si_collaborators">Cộng tác viên (giữ để mở)</string>
+    <string name="ig_btn_slider_results">Kết quả thanh trượt</string>
 </resources>

@@ -32,4 +32,5 @@
     <string name="ig_si_joined">katıldı</string>
     <string name="ig_si_paid_partnership">Ücretli iş ortaklığı (açmak için basılı tut)</string>
     <string name="ig_si_collaborators">Ortak çalışan (açmak için basılı tut)</string>
+    <string name="ig_btn_slider_results">Kaydırıcı sonuçları</string>
 </resources>

@@ -156,8 +156,8 @@ public class StoryInfoHook {
                     Object media = findMedia(param);
                     if (media != null) {
                         if (!list(media, "story_quizs").isEmpty()) add.add(I18n.t(app, R.string.ig_btn_quiz_answer));
-                        if (!list(media, "story_polls").isEmpty() || !list(media, "story_sliders").isEmpty())
-                            add.add(I18n.t(app, R.string.ig_btn_poll_results));
+                        if (!list(media, "story_polls").isEmpty()) add.add(I18n.t(app, R.string.ig_btn_poll_results));
+                        if (!list(media, "story_sliders").isEmpty()) add.add(I18n.t(app, R.string.ig_btn_slider_results));
                     }
                     CharSequence[] extended = new CharSequence[original.length + add.size()];
                     System.arraycopy(original, 0, extended, 0, original.length);
@@ -207,6 +207,7 @@ public class StoryInfoHook {
                         if (t.equals(I18n.t(app, R.string.ig_btn_story_info))) which = 0;
                         else if (t.equals(I18n.t(app, R.string.ig_btn_quiz_answer))) which = 1;
                         else if (t.equals(I18n.t(app, R.string.ig_btn_poll_results))) which = 2;
+                        else if (t.equals(I18n.t(app, R.string.ig_btn_slider_results))) which = 3;
                         else return;
 
                         param.setResult(null);
@@ -222,7 +223,8 @@ public class StoryInfoHook {
                             try {
                                 if (which == 0) showInfo(c, media);
                                 else if (which == 1) showQuiz(c, media);
-                                else showPolls(c, media);
+                                else if (which == 2) showPolls(c, media);
+                                else showSliders(c, media);
                             } catch (Throwable e) {
                                 ModuleLog.line("(IE|StoryInfo) dialog: " + e);
                             }
@@ -649,6 +651,11 @@ public class StoryInfoHook {
                 dlg.view(option(dlg, ctx, line, false));
             }
         }
+        dlg.show();
+    }
+
+    private static void showSliders(Context ctx, Object media) {
+        IeDialog dlg = new IeDialog(ctx).title(I18n.t(ctx, R.string.ig_btn_slider_results));
         for (Object sliderItem : list(media, "story_sliders")) {
             Object slider = find(sliderItem, "slider_sticker");
             if (slider == null) slider = sliderItem;
