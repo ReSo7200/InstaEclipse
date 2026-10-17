@@ -62,6 +62,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.utils.core.ExportBrand;
 import ps.reso.instaeclipse.mods.location.LocationPickerActivity;
 import ps.reso.instaeclipse.ui.theme.ThemeCustomizerActivity;
 
@@ -754,6 +755,13 @@ public class FeaturesFragment extends Fragment {
         return item;
     }
 
+    /** Tools action row: own accent, normal title colour, a one-line description and an arrow. */
+    private FeatureItem createTool(int iconRes, String accentHex, String title, String subtitle, Runnable onClick) {
+        FeatureItem item = createNav(iconRes, accentHex, title, onClick);
+        item.subtitle = subtitle;
+        return item;
+    }
+
     private FeatureItem createSwitch(String title, String prefKey) {
         FeatureItem item = new FeatureItem();
         item.type = FeatureItem.TYPE_SWITCH;
@@ -892,10 +900,10 @@ public class FeaturesFragment extends Fragment {
                 rows.add(nav);
             }
             if (g == GROUP_TOOLS) {
-                rows.add(createClickable(R.drawable.ic_save, A_TOOLS, getString(R.string.ig_dialog_backup_settings), this::backupSettings));
-                rows.add(createClickable(R.drawable.ic_folder, A_TOOLS, getString(R.string.ig_dialog_restore_settings), this::restoreSettings));
-                rows.add(createClickable(R.drawable.ic_restart, A_TOOLS, getString(R.string.ig_dialog_menu_restart), this::restartInstagram));
-                rows.add(createClickable(R.drawable.ic_info, A_TOOLS, getString(R.string.ig_dialog_menu_about), this::showAboutDialog));
+                rows.add(createTool(R.drawable.ic_save, "#30D158", getString(R.string.ig_dialog_backup_settings), getString(R.string.tool_backup_sub), this::backupSettings));
+                rows.add(createTool(R.drawable.ic_folder, "#0A84FF", getString(R.string.ig_dialog_restore_settings), getString(R.string.tool_restore_sub), this::restoreSettings));
+                rows.add(createTool(R.drawable.ic_restart, "#FF9F0A", getString(R.string.ig_dialog_menu_restart), getString(R.string.tool_restart_sub), this::restartInstagram));
+                rows.add(createTool(R.drawable.ic_info, "#BF5AF2", getString(R.string.ig_dialog_menu_about), getString(R.string.tool_about_sub), this::showAboutDialog));
             }
             for (FeatureItem row : rows) row.isCategory = true;
             defs.add(getString(groupTitles[g]));
@@ -1939,13 +1947,153 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void showAboutDialog() {
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("InstaEclipse 🌘")
-                .setMessage("Created by @reso7200")
-                .setPositiveButton("GitHub", (d, w) -> openUrl("https://github.com/ReSo7200/InstaEclipse"))
-                .setNeutralButton("Telegram", (d, w) -> openUrl("https://t.me/InstaEclipse"))
-                .setNegativeButton("Close", null)
+        Context ctx = requireContext();
+        float d = getResources().getDisplayMetrics().density;
+        int onSurface = MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSurface, Color.WHITE);
+        int onVariant = MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY);
+        int chipBg = MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorSecondaryContainer, Color.DKGRAY);
+        int chipFg = MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSecondaryContainer, Color.WHITE);
+        int primary = MaterialColors.getColor(ctx, androidx.appcompat.R.attr.colorPrimary, Color.BLUE);
+
+        android.widget.LinearLayout root = new android.widget.LinearLayout(ctx);
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+        root.setPadding((int) (24 * d), (int) (28 * d), (int) (24 * d), (int) (8 * d));
+
+        // App icon on a soft accent halo; pops in when the dialog opens.
+        android.widget.FrameLayout halo = new android.widget.FrameLayout(ctx);
+        android.graphics.drawable.GradientDrawable glow = new android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                new int[]{(primary & 0x00FFFFFF) | 0x55000000, (0xFFBF5AF2 & 0x00FFFFFF) | 0x33000000});
+        glow.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        halo.setBackground(glow);
+        int haloSize = (int) (108 * d);
+        ImageView icon = new ImageView(ctx);
+        icon.setImageResource(R.mipmap.ic_launcher_round);
+        android.widget.FrameLayout.LayoutParams ilp = new android.widget.FrameLayout.LayoutParams((int) (80 * d), (int) (80 * d));
+        ilp.gravity = android.view.Gravity.CENTER;
+        halo.addView(icon, ilp);
+        root.addView(halo, new android.widget.LinearLayout.LayoutParams(haloSize, haloSize));
+
+        TextView name = new TextView(ctx);
+        name.setText(R.string.app_name);
+        name.setTextColor(onSurface);
+        name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
+        name.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL));
+        android.widget.LinearLayout.LayoutParams nlp = new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        nlp.topMargin = (int) (14 * d);
+        root.addView(name, nlp);
+
+        TextView tagline = new TextView(ctx);
+        tagline.setText(R.string.about_tagline);
+        tagline.setTextColor(onVariant);
+        tagline.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tagline.setGravity(android.view.Gravity.CENTER);
+        android.widget.LinearLayout.LayoutParams tlp = new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        tlp.topMargin = (int) (4 * d);
+        root.addView(tagline, tlp);
+
+        // Version chips: module + the Instagram build it is running against.
+        android.widget.LinearLayout chips = new android.widget.LinearLayout(ctx);
+        chips.setGravity(android.view.Gravity.CENTER);
+        chips.addView(aboutChip(ctx, "v" + versionOf(ctx, ctx.getPackageName()), chipBg, chipFg, d));
+        android.widget.LinearLayout.LayoutParams clp = new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        clp.topMargin = (int) (16 * d);
+        root.addView(chips, clp);
+
+        // Link buttons.
+        android.widget.LinearLayout links = new android.widget.LinearLayout(ctx);
+        links.setOrientation(android.widget.LinearLayout.VERTICAL);
+        links.addView(aboutButton(ctx, R.drawable.ic_github_logo, getString(R.string.about_source), ExportBrand.GITHUB, d));
+        links.addView(aboutButton(ctx, R.drawable.ic_telegram_logo, getString(R.string.about_channel), ExportBrand.TELEGRAM, d));
+        links.addView(aboutButton(ctx, R.drawable.ic_github_logo, getString(R.string.about_contributors),
+                ExportBrand.GITHUB + "/graphs/contributors", d));
+        android.widget.LinearLayout.LayoutParams llp = new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        llp.topMargin = (int) (20 * d);
+        root.addView(links, llp);
+
+        TextView footer = new TextView(ctx);
+        footer.setText(R.string.about_footer);
+        footer.setTextColor(onVariant);
+        footer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        footer.setGravity(android.view.Gravity.CENTER);
+        android.widget.LinearLayout.LayoutParams flp = new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        flp.topMargin = (int) (14 * d);
+        root.addView(footer, flp);
+
+        new MaterialAlertDialogBuilder(ctx)
+                .setView(root)
+                .setPositiveButton(R.string.ig_dialog_close, null)
                 .show();
+
+        // Entrance: icon pops in, the rest rises in just after it.
+        halo.setScaleX(0.6f);
+        halo.setScaleY(0.6f);
+        halo.setAlpha(0f);
+        halo.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(420)
+                .setInterpolator(new android.view.animation.OvershootInterpolator(1.6f)).start();
+        icon.setRotation(-25f);
+        icon.animate().rotation(0f).setDuration(520).setInterpolator(new DecelerateInterpolator()).start();
+        int i = 0;
+        for (View v : new View[]{name, tagline, chips, links, footer}) {
+            v.setAlpha(0f);
+            v.setTranslationY(12 * d);
+            v.animate().alpha(1f).translationY(0f).setStartDelay(120 + 60L * i++).setDuration(260)
+                    .setInterpolator(new DecelerateInterpolator()).start();
+        }
+    }
+
+    private static String versionOf(Context ctx, String pkg) {
+        try {
+            String v = ctx.getPackageManager().getPackageInfo(pkg, 0).versionName;
+            return v == null ? "" : v;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static TextView aboutChip(Context ctx, String text, int bg, int fg, float d) {
+        TextView chip = new TextView(ctx);
+        chip.setText(text);
+        chip.setTextColor(fg);
+        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        chip.setSingleLine(true);
+        chip.setPadding((int) (12 * d), (int) (6 * d), (int) (12 * d), (int) (6 * d));
+        android.graphics.drawable.GradientDrawable shape = new android.graphics.drawable.GradientDrawable();
+        shape.setColor(bg);
+        shape.setCornerRadius(20 * d);
+        chip.setBackground(shape);
+        android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.setMarginStart((int) (4 * d));
+        lp.setMarginEnd((int) (4 * d));
+        chip.setLayoutParams(lp);
+        return chip;
+    }
+
+    private View aboutButton(Context ctx, int iconRes, String label, String url, float d) {
+        com.google.android.material.button.MaterialButton b = new com.google.android.material.button.MaterialButton(ctx);
+        // Tonal look (same as the Help tab's GitHub / Telegram buttons).
+        int bg = MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorSecondaryContainer, Color.DKGRAY);
+        int fg = MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSecondaryContainer, Color.WHITE);
+        b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(bg));
+        b.setTextColor(fg);
+        b.setIconTint(android.content.res.ColorStateList.valueOf(fg));
+        b.setText(label);
+        b.setIconResource(iconRes);
+        b.setIconSize((int) (18 * d));
+        b.setIconGravity(com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START);
+        b.setOnClickListener(v -> openUrl(url));
+        android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = (int) (4 * d);
+        b.setLayoutParams(lp);
+        return b;
     }
 
     private void openUrl(String url) {

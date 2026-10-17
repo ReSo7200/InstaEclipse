@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">Bütün ayarları fayla saxla</string>
+    <string name="tool_restore_sub">Ayarları ehtiyat faylından yüklə</string>
+    <string name="tool_restart_sub">Instagram-ı dayandır və yenidən aç</string>
+    <string name="tool_about_sub">Versiya, təşəkkürlər və keçidlər</string>
+    <string name="about_tagline">Daha təmiz, daha məxfi Instagram</string>
+    <string name="about_source">Mənbə kodu</string>
+    <string name="about_channel">Telegram kanalı</string>
+    <string name="about_contributors">Töhfə verənlər</string>
+    <string name="about_footer">@reso7200 tərəfindən · Açıq mənbə</string>
+</resources>

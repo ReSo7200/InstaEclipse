@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">Salva tutte le impostazioni in un file</string>
+    <string name="tool_restore_sub">Carica le impostazioni da un backup</string>
+    <string name="tool_restart_sub">Chiudi e riapri Instagram</string>
+    <string name="tool_about_sub">Versione, crediti e link</string>
+    <string name="about_tagline">Un Instagram più pulito e privato</string>
+    <string name="about_source">Codice sorgente</string>
+    <string name="about_channel">Canale Telegram</string>
+    <string name="about_contributors">Collaboratori</string>
+    <string name="about_footer">Creato da @reso7200 · Open source</string>
+</resources>

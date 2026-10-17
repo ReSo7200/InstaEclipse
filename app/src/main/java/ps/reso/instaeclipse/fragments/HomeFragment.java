@@ -232,7 +232,7 @@ public class HomeFragment extends Fragment {
 
         restartInstagramButton.setOnClickListener(v -> restartInstagram());
         downloadButton.setOnClickListener(v -> {
-            String url = "https://www.apkmirror.com/uploads/?appcategory=instagram-instagram";
+            String url = ps.reso.instaeclipse.utils.core.ExportBrand.TESTED_INSTAGRAM_APK;
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         });
         view.findViewById(R.id.home_shortcuts_edit).setOnClickListener(v -> showEditShortcutsDialog());

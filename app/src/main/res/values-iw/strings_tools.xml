@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">שמירת כל ההגדרות לקובץ</string>
+    <string name="tool_restore_sub">טעינת הגדרות מקובץ גיבוי</string>
+    <string name="tool_restart_sub">עצירה ופתיחה מחדש של אינסטגרם</string>
+    <string name="tool_about_sub">גרסה, קרדיטים וקישורים</string>
+    <string name="about_tagline">אינסטגרם נקי ופרטי יותר</string>
+    <string name="about_source">קוד מקור</string>
+    <string name="about_channel">ערוץ טלגרם</string>
+    <string name="about_contributors">תורמים</string>
+    <string name="about_footer">נוצר על ידי @reso7200 · קוד פתוח</string>
+</resources>

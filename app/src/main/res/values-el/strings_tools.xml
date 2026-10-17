@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">Αποθήκευση όλων των ρυθμίσεων σε αρχείο</string>
+    <string name="tool_restore_sub">Φόρτωση ρυθμίσεων από αντίγραφο ασφαλείας</string>
+    <string name="tool_restart_sub">Τερματισμός και επανεκκίνηση του Instagram</string>
+    <string name="tool_about_sub">Έκδοση, ευχαριστίες και σύνδεσμοι</string>
+    <string name="about_tagline">Ένα πιο καθαρό, πιο ιδιωτικό Instagram</string>
+    <string name="about_source">Πηγαίος κώδικας</string>
+    <string name="about_channel">Κανάλι Telegram</string>
+    <string name="about_contributors">Συντελεστές</string>
+    <string name="about_footer">Δημιουργία: @reso7200 · Ανοιχτού κώδικα</string>
+</resources>

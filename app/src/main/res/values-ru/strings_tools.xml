@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tool_backup_sub">Сохранить все настройки в файл</string>
+    <string name="tool_restore_sub">Загрузить настройки из резервной копии</string>
+    <string name="tool_restart_sub">Закрыть и снова открыть Instagram</string>
+    <string name="tool_about_sub">Версия, благодарности и ссылки</string>
+    <string name="about_tagline">Более чистый и приватный Instagram</string>
+    <string name="about_source">Исходный код</string>
+    <string name="about_channel">Канал в Telegram</string>
+    <string name="about_contributors">Участники</string>
+    <string name="about_footer">Автор: @reso7200 · Открытый код</string>
+</resources>
