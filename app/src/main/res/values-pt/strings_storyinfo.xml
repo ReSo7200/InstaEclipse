@@ -33,4 +33,5 @@
     <string name="ig_si_paid_partnership">Parceria paga com (segure para abrir)</string>
     <string name="ig_si_collaborators">Colaborador (segure para abrir)</string>
     <string name="ig_btn_slider_results">Resultados do controle deslizante</string>
+    <string name="ig_si_votes">votos</string>
 </resources>

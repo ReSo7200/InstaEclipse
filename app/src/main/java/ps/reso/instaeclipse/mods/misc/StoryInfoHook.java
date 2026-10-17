@@ -614,16 +614,19 @@ public class StoryInfoHook {
             Long mine = num(find(quiz, "viewer_answer"));
             Object tallies = find(quiz, "tallies");
             if (!(tallies instanceof List<?> opts)) continue;
+            long total = total(opts);
             for (int i = 0; i < opts.size(); i++) {
                 Object o = opts.get(i);
                 String text = str(o, "text");
+                if (text == null) text = "#" + (i + 1);
                 Long count = num(find(o, "count"));
                 boolean ok = correct != null && correct == i;
-                String line = (ok ? "✓  " : "      ") + (text == null ? "#" + (i + 1) : text)
-                        + (count != null ? "   ·  " + count : "")
-                        + (mine != null && mine == i ? "   (" + I18n.t(ctx, R.string.ig_si_your_answer) + ")" : "");
-                dlg.view(option(dlg, ctx, line, ok));
+                boolean picked = mine != null && mine == i;
+                int fill = ok ? 0x8C30D158 : picked ? withAlpha(dlg.accent, 0x8C) : withAlpha(dlg.text, 0x22);
+                dlg.view(bar(dlg, ctx, (ok ? "✓  " : "") + text + (picked ? "  •" : ""),
+                        votes(count, total), fraction(count, total), fill, ok, text));
             }
+            if (mine != null) dlg.view(note(dlg, ctx, "•  " + I18n.t(ctx, R.string.ig_si_your_answer)));
         }
         dlg.show();
     }
@@ -638,18 +641,21 @@ public class StoryInfoHook {
             Long mine = num(find(poll, "viewer_vote"));
             Object tallies = find(poll, "tallies");
             if (!(tallies instanceof List<?> opts)) continue;
-            long total = 0;
-            for (Object o : opts) { Long c = num(find(o, "count")); if (c != null) total += c; }
+            long total = total(opts);
+            long best = 0;
+            for (Object o : opts) { Long c = num(find(o, "count")); if (c != null && c > best) best = c; }
             for (int i = 0; i < opts.size(); i++) {
                 Object o = opts.get(i);
                 String text = str(o, "text");
+                if (text == null) text = "#" + (i + 1);
                 Long count = num(find(o, "count"));
-                String pct = count != null && total > 0 ? "  " + Math.round(count * 100.0 / total) + "%" : "";
-                String line = (text == null ? "#" + (i + 1) : text)
-                        + (count != null ? "   ·  " + count + pct : "")
-                        + (mine != null && mine == i ? "   (" + I18n.t(ctx, R.string.ig_si_your_answer) + ")" : "");
-                dlg.view(option(dlg, ctx, line, false));
+                boolean picked = mine != null && mine == i;
+                boolean leading = count != null && best > 0 && count == best;
+                int fill = picked ? withAlpha(dlg.accent, 0x8C) : withAlpha(dlg.text, leading ? 0x33 : 0x1C);
+                dlg.view(bar(dlg, ctx, (picked ? "✓  " : "") + text, votes(count, total),
+                        fraction(count, total), fill, leading, text));
             }
+            if (total > 0) dlg.view(note(dlg, ctx, votesLine(ctx, total)));
         }
         dlg.show();
     }
@@ -665,16 +671,82 @@ public class StoryInfoHook {
             Object avg = find(slider, "slider_vote_average");
             Long count = num(find(slider, "slider_vote_count"));
             Object mine = find(slider, "viewer_vote");
-            StringBuilder sb = new StringBuilder();
-            if (avg instanceof Number a && (count == null || count > 0)) sb.append(I18n.t(ctx, R.string.ig_si_average)).append(": ")
-                    .append(Math.round(a.doubleValue() * 100)).append('%');
-            if (count != null) sb.append(sb.length() > 0 ? "   ·  " : "").append(count);
-            if (mine instanceof Number m && m.doubleValue() >= 0)
-                sb.append(sb.length() > 0 ? "\n" : "").append(I18n.t(ctx, R.string.ig_si_your_answer))
-                        .append(": ").append(Math.round(m.doubleValue() * 100)).append('%');
-            if (sb.length() > 0) dlg.view(option(dlg, ctx, sb.toString(), false));
+            String e = emoji == null ? "" : emoji + "  ";
+            if (avg instanceof Number a && (count == null || count > 0)) {
+                int p = (int) Math.round(a.doubleValue() * 100);
+                dlg.view(bar(dlg, ctx, e + I18n.t(ctx, R.string.ig_si_average), p + "%",
+                        a.doubleValue(), withAlpha(dlg.text, 0x33), true, p + "%"));
+            }
+            if (mine instanceof Number m && m.doubleValue() >= 0) {
+                int p = (int) Math.round(m.doubleValue() * 100);
+                dlg.view(bar(dlg, ctx, e + I18n.t(ctx, R.string.ig_si_your_answer), p + "%",
+                        m.doubleValue(), withAlpha(dlg.accent, 0x8C), false, p + "%"));
+            }
+            if (count != null) dlg.view(note(dlg, ctx, votesLine(ctx, count)));
         }
         dlg.show();
+    }
+
+    private static long total(List<?> opts) {
+        long total = 0;
+        for (Object o : opts) { Long c = num(find(o, "count")); if (c != null) total += c; }
+        return total;
+    }
+
+    private static double fraction(Long count, long total) {
+        return count == null || total <= 0 ? 0 : (double) count / total;
+    }
+
+    private static String votes(Long count, long total) {
+        if (count == null) return "";
+        return total > 0 ? Math.round(count * 100.0 / total) + "%  ·  " + count : String.valueOf(count);
+    }
+
+    private static int withAlpha(int color, int alpha) {
+        return (color & 0x00FFFFFF) | (alpha << 24);
+    }
+
+    /** A result row whose background fills to {@code frac} (0..1), like Instagram's own poll sticker. */
+    private static android.view.View bar(IeDialog dlg, Context ctx, String left, String right,
+                                         double frac, int fill, boolean bold, String copyText) {
+        LinearLayout row = new LinearLayout(ctx);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dlg.dp(16), dlg.dp(13), dlg.dp(16), dlg.dp(13));
+        android.graphics.drawable.ClipDrawable filled = new android.graphics.drawable.ClipDrawable(
+                dlg.round(fill, 14), Gravity.START, android.graphics.drawable.ClipDrawable.HORIZONTAL);
+        filled.setLevel((int) Math.round(Math.max(0, Math.min(1, frac)) * 10000));
+        row.setBackground(new android.graphics.drawable.LayerDrawable(
+                new android.graphics.drawable.Drawable[]{dlg.round(dlg.field, 14), filled}));
+
+        TextView l = new TextView(ctx);
+        l.setText(left);
+        l.setTextColor(dlg.text);
+        l.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        if (bold) l.setTypeface(null, Typeface.BOLD);
+        row.addView(l, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        TextView r = new TextView(ctx);
+        r.setText(right);
+        r.setTextColor(dlg.text);
+        r.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        r.setTypeface(null, Typeface.BOLD);
+        LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        rp.setMarginStart(dlg.dp(10));
+        row.addView(r, rp);
+
+        row.setOnClickListener(v -> copy(ctx, copyText));
+        return row;
+    }
+
+    private static TextView note(IeDialog dlg, Context ctx, String text) {
+        TextView t = new TextView(ctx);
+        t.setText(text);
+        t.setTextColor(dlg.sub);
+        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        t.setPadding(dlg.dp(4), 0, dlg.dp(4), dlg.dp(4));
+        return t;
     }
 
     private static TextView heading(IeDialog dlg, Context ctx, String text) {
@@ -684,19 +756,6 @@ public class StoryInfoHook {
         t.setTypeface(null, Typeface.BOLD);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         t.setPadding(dlg.dp(4), dlg.dp(6), dlg.dp(4), dlg.dp(2));
-        return t;
-    }
-
-    private static TextView option(IeDialog dlg, Context ctx, String text, boolean highlight) {
-        TextView t = new TextView(ctx);
-        t.setText(text);
-        t.setTextColor(highlight ? 0xFF30D158 : dlg.text);
-        if (highlight) t.setTypeface(null, Typeface.BOLD);
-        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        t.setGravity(Gravity.CENTER_VERTICAL);
-        t.setPadding(dlg.dp(16), dlg.dp(12), dlg.dp(14), dlg.dp(12));
-        t.setBackground(dlg.round(dlg.field, 14));
-        t.setOnClickListener(v -> copy(ctx, text.replace("✓  ", "").trim()));
         return t;
     }
 

@@ -33,4 +33,5 @@
     <string name="ig_si_paid_partnership">شراكة مدفوعة مع (اضغط مطولاً للفتح)</string>
     <string name="ig_si_collaborators">متعاون (اضغط مطولاً للفتح)</string>
     <string name="ig_btn_slider_results">نتائج شريط التمرير</string>
+    <string name="ig_si_votes">صوت</string>
 </resources>

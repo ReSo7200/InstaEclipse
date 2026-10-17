@@ -33,4 +33,5 @@
     <string name="ig_si_paid_partnership">付费合作伙伴（长按打开）</string>
     <string name="ig_si_collaborators">合作者（长按打开）</string>
     <string name="ig_btn_slider_results">滑块结果</string>
+    <string name="ig_si_votes">票</string>
 </resources>

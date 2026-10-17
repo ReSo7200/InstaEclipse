@@ -33,4 +33,5 @@
     <string name="ig_si_paid_partnership">Płatna współpraca z (przytrzymaj, aby otworzyć)</string>
     <string name="ig_si_collaborators">Współtwórca (przytrzymaj, aby otworzyć)</string>
     <string name="ig_btn_slider_results">Wyniki suwaka</string>
+    <string name="ig_si_votes">głosów</string>
 </resources>

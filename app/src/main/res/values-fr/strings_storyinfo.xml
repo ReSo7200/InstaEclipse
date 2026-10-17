@@ -33,4 +33,5 @@
     <string name="ig_si_paid_partnership">Partenariat rémunéré avec (maintenez pour ouvrir)</string>
     <string name="ig_si_collaborators">Collaborateur (maintenez pour ouvrir)</string>
     <string name="ig_btn_slider_results">Résultats du curseur</string>
+    <string name="ig_si_votes">votes</string>
 </resources>

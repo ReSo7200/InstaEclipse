@@ -33,4 +33,5 @@
     <string name="ig_si_paid_partnership">Bezahlte Partnerschaft mit (halten zum Öffnen)</string>
     <string name="ig_si_collaborators">Mitwirkende/r (halten zum Öffnen)</string>
     <string name="ig_btn_slider_results">Slider-Ergebnisse</string>
+    <string name="ig_si_votes">Stimmen</string>
 </resources>
