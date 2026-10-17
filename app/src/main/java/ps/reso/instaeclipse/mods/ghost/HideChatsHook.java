@@ -225,8 +225,10 @@ public class HideChatsHook {
         }
     }
 
-    // ── thread-id resolution (mirrors UnsentThreadButtonHook.resolveFromActivity — proven) ──
-    /** The open DM thread's id for {@code activity} (shared with ReadReceiptChatHook). */
+    // ── thread-id resolution ──
+    /** The open DM thread's id for {@code activity} (shared with ReadReceiptChatHook), or null.
+     *  Only sources tied to the open chat; no scan of the whole activity graph, which in the main
+     *  activity can return another chat's key (inbox rows, the previous chat). */
     static String resolveThreadId(Activity activity) {
         try {
             // 0. The resumed thread fragment's DirectThreadKey (works for threads hosted in
@@ -242,10 +244,7 @@ public class HideChatsHook {
                     if (dtk != null) { String id = firstStringField(dtk); if (id != null) return id; }
                 }
             }
-            // 2. Activity object graph (hosted thread fragment holds the key); depth 6.
-            Object dtk = scan(activity, 0,
-                    java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()), 6);
-            return dtk != null ? firstStringField(dtk) : null;
+            return null;
         } catch (Throwable t) { return null; }
     }
 

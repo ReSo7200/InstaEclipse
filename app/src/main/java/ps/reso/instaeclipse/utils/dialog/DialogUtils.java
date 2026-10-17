@@ -823,9 +823,10 @@ public class DialogUtils {
     public static void showThreadUnsent(Context context, String threadId, String chatName) {
         LinearLayout layout = createSwitchLayout(context);
 
+        // Never widen to every chat: an unknown thread (null) shows only the entries that were
+        // logged without a chat, so one chat's unsent messages can't appear inside another.
         final java.util.List<ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry> entries =
-                (threadId != null) ? ps.reso.instaeclipse.utils.ghost.UnsentLog.getForThread(threadId)
-                                   : ps.reso.instaeclipse.utils.ghost.UnsentLog.getAll();
+                ps.reso.instaeclipse.utils.ghost.UnsentLog.getForThread(threadId != null ? threadId : "");
 
         java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("MMM d, HH:mm", java.util.Locale.getDefault());
         final String who = (chatName != null && !chatName.trim().isEmpty()) ? chatName.trim()
@@ -845,7 +846,7 @@ public class DialogUtils {
                             .message(I18n.t(context, R.string.ig_dialog_unsent_clear_confirm));
                     dlg.secondary(context.getString(android.R.string.cancel), null);
                     dlg.primary(I18n.t(context, R.string.ig_dialog_unsent_clear_yes), () -> {
-                        ps.reso.instaeclipse.utils.ghost.UnsentLog.clearThread(threadId);
+                        ps.reso.instaeclipse.utils.ghost.UnsentLog.clearThread(threadId != null ? threadId : "");
                         ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
                         showThreadUnsent(context, threadId);
                     });
