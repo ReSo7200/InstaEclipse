@@ -57,7 +57,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">模組仍然無法使用？</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[如果您已<b>獲取 root 權限</b>，請嘗試使用 <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>。如果您未<b>獲取 root 權限</b>，請安裝<a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a>，然後依據<a href="https://t.me/instaEclipse_discussion/158/5149">指南</a>進行操作]]></string>
 
     <!-- features -->
     <string name="developer_options">開發者選項</string>

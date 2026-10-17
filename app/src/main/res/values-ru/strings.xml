@@ -30,7 +30,6 @@
     <string name="download_apk">Скачать APK</string>
     <string name="how_to_use">Как использовать</string>
     <string name="module_not_working_title">Модуль всё ещё не работает?</string>
-    <string name="module_not_working_description" translatable="false"><![CDATA[Если у вас есть <b>root-доступ</b>, попробуйте <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed от JingMatrix</a><br/><br/>Если у вас <b>нет root-доступа</b>, установите <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch от JingMatrix</a>, затем следуйте <a href="https://t.me/instaEclipse_discussion/158/5149">этому руководству</a>]]></string>
 
     <string name="usage_instructions">Удерживайте значок поиска</string>
     <string name="contributors">Участники</string>

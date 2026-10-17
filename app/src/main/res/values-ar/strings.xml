@@ -108,7 +108,6 @@
     <string name="download_apk">تحميل ملف APK</string>
     <string name="how_to_use">كيفية الاستخدام</string>
     <string name="module_not_working_title">هل لا تزال الوحدة معطلة؟</string>
-    <string name="module_not_working_description" translatable="false"><![CDATA[إذا كنت تملك صلاحيات <b>الروت</b> جرّب استخدام <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed من JingMatrix</a><br/><br/>إذا كنت <b>بدون روت</b> ثبّت <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch من JingMatrix</a> ثم اتبع <a href="https://t.me/instaEclipse_discussion/158/5149">هذا الدليل</a>]]></string>
 
     <!-- Dialog strings -->
     <string name="ig_dialog_close">إغلاق</string>

@@ -64,7 +64,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">Moduł wciąż odmawia współpracy?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jeśli <b>masz roota</b>, spróbuj użyć <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed od JingMatrix</a><br/><br/>Jeśli <b>nie masz roota</b>, zainstaluj <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch od JingMatrix</a>, a następnie postępuj zgodnie z <a href="https://t.me/instaEclipse_discussion/158/5149">tym poradnikiem</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">Kategorie:</string>

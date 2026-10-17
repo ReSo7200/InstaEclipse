@@ -33,6 +33,10 @@ import ps.reso.instaeclipse.utils.core.ExportBrand;
 
 public class HelpFragment extends Fragment {
 
+    private static final String LSPOSED_URL = "https://github.com/JingMatrix/LSPosed/releases/latest";
+    private static final String LSPATCH_URL = "https://github.com/JingMatrix/LSPatch/releases/latest";
+    private static final String LSPATCH_GUIDE_URL = "https://t.me/instaEclipse_discussion/158/5149";
+
     private static final int[] FAQ_STRINGS = {
             R.string.faq_1, R.string.faq_2, R.string.faq_3,
             R.string.faq_4, R.string.faq_5, R.string.faq_6,
@@ -47,13 +51,20 @@ public class HelpFragment extends Fragment {
 
         buildFaq(view.findViewById(R.id.faq_container));
 
-        // Troubleshooting text keeps its HTML links (LSPosed / LSPatch / guide).
-        TextView moduleNotWorking = view.findViewById(R.id.module_not_working_description);
-        moduleNotWorking.setText(Html.fromHtml(getString(R.string.module_not_working_description),
-                Html.FROM_HTML_MODE_LEGACY));
-        moduleNotWorking.setMovementMethod(LinkMovementMethod.getInstance());
-        moduleNotWorking.setLinkTextColor(MaterialColors.getColor(moduleNotWorking,
-                com.google.android.material.R.attr.colorPrimary));
+        // Troubleshooting: JingMatrix's LSPosed (rooted) / LSPatch (not rooted) + the LSPatch guide.
+        view.findViewById(R.id.lsposed_row).setOnClickListener(v -> openUrl(LSPOSED_URL));
+        view.findViewById(R.id.lspatch_row).setOnClickListener(v -> openUrl(LSPATCH_URL));
+        view.findViewById(R.id.lspatch_guide_button).setOnClickListener(v -> openUrl(LSPATCH_GUIDE_URL));
+        for (int id : new int[]{R.id.lsposed_logo, R.id.lspatch_logo}) {
+            View logo = view.findViewById(id);
+            logo.setOutlineProvider(new android.view.ViewOutlineProvider() {
+                @Override
+                public void getOutline(View v, android.graphics.Outline o) {
+                    o.setRoundRect(0, 0, v.getWidth(), v.getHeight(), dp(12));
+                }
+            });
+            logo.setClipToOutline(true);
+        }
 
         view.findViewById(R.id.github_button).setOnClickListener(v -> openUrl(ExportBrand.GITHUB + "/issues"));
         view.findViewById(R.id.telegram_button).setOnClickListener(v -> openUrl(ExportBrand.TELEGRAM));

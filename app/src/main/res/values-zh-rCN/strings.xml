@@ -59,7 +59,6 @@
 
     <!--  guide  -->
     <string name="module_not_working_title">模块仍然无法使用？</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[ 如果您已<b>获取 root 权限</b>，请尝试使用 <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>。如果您未<b>获取 root 权限</b>，请安装<a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a>，然后依据<a href="https://t.me/instaEclipse_discussion/158/5149">指南</a>进行操作 ]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">分类：</string>

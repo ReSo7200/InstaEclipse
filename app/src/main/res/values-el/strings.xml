@@ -59,7 +59,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">Το Module εξακολουθεί να μην λειτουργεί;</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[If you are <b>rooted</b> try using <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>If you are <b>not rooted</b> install <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> then follow <a href="https://t.me/instaEclipse_discussion/158/5149">this guide</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">Κατηγορίες:</string>

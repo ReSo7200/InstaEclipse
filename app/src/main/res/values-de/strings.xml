@@ -58,7 +58,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">Modul funktioniert immer noch nicht?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Wenn du <b>Root-Zugang</b> hast, versuche <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a> zu verwenden<br/><br/>Wenn du <b>keinen Root-Zugang</b> hast, installiere <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> und folge dann <a href="https://t.me/instaEclipse_discussion/158/5149">dieser Anleitung</a>]]></string>
 
     <!-- features -->
     <string name="developer_options">Entwickleroptionen</string>

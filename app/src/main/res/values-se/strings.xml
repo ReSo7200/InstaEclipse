@@ -29,7 +29,6 @@
     <string name="download_apk">Lasta APK</string>
     <string name="how_to_use">Mo geavahit</string>
     <string name="module_not_working_title">Modula ii doahttá ain?</string>
-    <string name="module_not_working_description" translatable="false"><![CDATA[Om du är <b>rootad</b>, prova att använda <a href="https://github.com/JingMatrix/LSPosed/releases/latest">JingMatrix\'s LSPosed</a><br/><br/>Om du <b>inte är rootad</b>, installera <a href="https://github.com/JingMatrix/LSPatch/releases/latest">JingMatrix\'s LSPatch</a> och följ sedan <a href="https://t.me/instaEclipse_discussion/158/5149">den här guiden</a>]]></string>
 
     <string name="usage_instructions">Doalvva gitta ohcamušikona</string>
     <string name="contributors">Bidragsgivare</string>

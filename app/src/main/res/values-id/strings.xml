@@ -58,7 +58,6 @@
 
     <!-- guide -->
     <string name="module_not_working_title">Modul masih tidak berfungsi?</string>
-    <string name="module_not_working_description" tools:ignore="MissingTranslation" translatable="false"><![CDATA[Jika Anda memiliki <b>root</b>, coba gunakan <a href="https://github.com/JingMatrix/LSPosed/releases/latest">LSPosed dari JingMatrix</a><br/><br/>Jika Anda <b>tidak memiliki root</b>, instal <a href="https://github.com/JingMatrix/LSPatch/releases/latest">LSPatch dari JingMatrix</a> lalu ikuti <a href="https://t.me/instaEclipse_discussion/158/5149">panduan ini</a>]]></string>
 
     <!-- features fragment section headers -->
     <string name="feat_categories">Kategori:</string>
