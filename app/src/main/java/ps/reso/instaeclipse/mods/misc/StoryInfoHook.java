@@ -176,24 +176,13 @@ public class StoryInfoHook {
     }
 
     private void installClickHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = null;
-        if (DexKitCache.isCacheValid()) method = DexKitCache.loadMethod("MentionClick", classLoader);
-        if (method == null) {
-            try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .returnType("void")
-                                .usingStrings("explore_viewer",
-                                        "friendships/mute_friend_reel/%s/",
-                                        "[INTERNAL] Pause Playback")));
-                if (!methods.isEmpty()) method = methods.get(0).getMethodInstance(classLoader);
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|StoryInfo) ❌ click DexKit: " + t);
-            }
+        List<Method> dispatchers = ps.reso.instaeclipse.mods.media.StoryDownloadHook.storyClickDispatchers(bridge, classLoader);
+        if (dispatchers.isEmpty()) {
+            ModuleLog.line("(IE|StoryInfo) ❌ click handler not found");
+            return;
         }
-        if (method == null) return;
         try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
+            XC_MethodHook clickHook = new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     try {
@@ -214,6 +203,7 @@ public class StoryInfoHook {
                         Object media = findMedia(param);
                         Context ctx = StoryMentionHook.findContext(param.thisObject);
                         for (Object a : param.args) if (ctx == null) ctx = StoryMentionHook.findContext(a);
+                        if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
                         if (media == null || ctx == null) {
                             ModuleLog.line("(IE|StoryInfo) ❌ media/context not found");
                             return;
@@ -233,7 +223,8 @@ public class StoryInfoHook {
                         ModuleLog.line("(IE|StoryInfo) click: " + e);
                     }
                 }
-            });
+            };
+            for (Method m : dispatchers) XposedBridge.hookMethod(m, clickHook);
             ModuleLog.line("(IE|StoryInfo) ✅ click hook installed");
         } catch (Throwable t) {
             ModuleLog.line("(IE|StoryInfo) ❌ click hook: " + t);

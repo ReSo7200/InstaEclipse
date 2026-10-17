@@ -481,6 +481,28 @@ public class StoryDownloadHook {
      * for other people's stories (A0t) no longer contains the anchor string itself; taking all
      * CharSequence[] methods of the anchor's declaring class(es) catches it again.
      */
+    /**
+     * Every story-menu tap dispatcher: the void methods behind "[INTERNAL] Pause Playback". Others'
+     * stories and your own story use different ones (your own is a static helper), so features that
+     * add menu rows hook them all and check the tapped label themselves.
+     */
+    public static java.util.List<Method> storyClickDispatchers(DexKitBridge bridge, ClassLoader cl) {
+        java.util.List<Method> out = ps.reso.instaeclipse.utils.core.DexKitCache.isCacheValid()
+                ? ps.reso.instaeclipse.utils.core.DexKitCache.loadMethods("StoryClickDispatchers", cl) : null;
+        if (out != null && !out.isEmpty()) return out;
+        out = new java.util.ArrayList<>();
+        try {
+            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType("void").usingStrings("[INTERNAL] Pause Playback")))) {
+                try { out.add(md.getMethodInstance(cl)); } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Story) ❌ click dispatchers: " + t);
+        }
+        if (!out.isEmpty()) ps.reso.instaeclipse.utils.core.DexKitCache.saveMethods("StoryClickDispatchers", out);
+        return out;
+    }
+
     public static java.util.Set<Method> storyOptionBuilders(List<MethodData> anchorMethods, ClassLoader classLoader) {
         java.util.Set<Method> out = new java.util.LinkedHashSet<>();
         java.util.Set<Class<?>> owners = new java.util.LinkedHashSet<>();
@@ -531,7 +553,9 @@ public class StoryDownloadHook {
                     if (FeatureFlags.enableStoryDownload)
                         add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title));
                     // Selective "Mark as seen" (#226): only meaningful while Hide Story Views is on.
-                    if (FeatureFlags.isGhostStory)
+                    // Not on your own story (its menu comes from the static builder): you can't
+                    // "see" your own story.
+                    if (FeatureFlags.isGhostStory && !java.lang.reflect.Modifier.isStatic(param.method.getModifiers()))
                         add.add(I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_story_mark_seen));
                     // Highlight "Download all" (#250)
                     if (FeatureFlags.enableStoryDownload && highlightFromParam(param) != null)

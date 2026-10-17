@@ -147,27 +147,13 @@ public class StoryLinksHook {
     // ── Hook 2: handle the tap ───────────────────────────────────────────────
 
     private void installClickHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = null;
-        if (DexKitCache.isCacheValid()) method = DexKitCache.loadMethod("MentionClick", classLoader);
-        if (method == null) {
-            try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .returnType("void")
-                                .usingStrings("explore_viewer",
-                                        "friendships/mute_friend_reel/%s/",
-                                        "[INTERNAL] Pause Playback")));
-                if (!methods.isEmpty()) method = methods.get(0).getMethodInstance(classLoader);
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|StoryLinks) ❌ click DexKit: " + t);
-            }
-        }
-        if (method == null) {
+        List<Method> dispatchers = ps.reso.instaeclipse.mods.media.StoryDownloadHook.storyClickDispatchers(bridge, classLoader);
+        if (dispatchers.isEmpty()) {
             ModuleLog.line("(IE|StoryLinks) ❌ click handler not found");
             return;
         }
         try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
+            XC_MethodHook clickHook = new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     try {
@@ -183,6 +169,7 @@ public class StoryLinksHook {
                         Object media = findMedia(param);
                         Context ctx = StoryMentionHook.findContext(param.thisObject);
                         for (Object a : param.args) if (ctx == null) ctx = StoryMentionHook.findContext(a);
+                        if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
                         if (media == null || ctx == null) return; // let IG handle it; nothing we can do
                         List<String> links = linksOf(media);
                         if (links.isEmpty()) return;
@@ -198,7 +185,8 @@ public class StoryLinksHook {
                         ModuleLog.line("(IE|StoryLinks) click: " + t);
                     }
                 }
-            });
+            };
+            for (Method m : dispatchers) XposedBridge.hookMethod(m, clickHook);
             ModuleLog.line("(IE|StoryLinks) ✅ click hook installed");
         } catch (Throwable t) {
             ModuleLog.line("(IE|StoryLinks) ❌ click hook: " + t);

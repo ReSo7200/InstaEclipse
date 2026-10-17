@@ -221,34 +221,13 @@ public class StoryMentionHook {
     // all other taps pass through to Instagram and to the StoryDownloadHook.
 
     private void installClickHook(DexKitBridge bridge, ClassLoader classLoader) {
-        Method method = null;
-
-        if (DexKitCache.isCacheValid()) {
-            method = DexKitCache.loadMethod("MentionClick", classLoader);
+        List<Method> dispatchers = ps.reso.instaeclipse.mods.media.StoryDownloadHook.storyClickDispatchers(bridge, classLoader);
+        if (dispatchers.isEmpty()) {
+            ModuleLog.line("(IE|Mention) ❌ click handler not found");
+            return;
         }
-
-        if (method == null) {
-            try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
-                        .matcher(MethodMatcher.create()
-                                .returnType("void")
-                                .usingStrings("explore_viewer",
-                                        "friendships/mute_friend_reel/%s/",
-                                        "[INTERNAL] Pause Playback")));
-                if (methods.isEmpty()) {
-                    ModuleLog.line("(IE|Mention) ❌ click handler not found");
-                    return;
-                }
-                method = methods.get(0).getMethodInstance(classLoader);
-                DexKitCache.saveMethod("MentionClick", method);
-            } catch (Throwable t) {
-                ModuleLog.line("(IE|Mention) ❌ click hook DexKit: " + t);
-                return;
-            }
-        }
-
         try {
-            XposedBridge.hookMethod(method, new XC_MethodHook() {
+            XC_MethodHook clickHook = new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     try {
@@ -277,6 +256,7 @@ public class StoryMentionHook {
                             if (ctx == null) ctx = findContext(a);
                         }
 
+                        if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
                         if (ctx == null) { ModuleLog.line("(IE|Mention) ❌ context not found"); return; }
                         if (media == null) { ModuleLog.line("(IE|Mention) ❌ Media not found"); return; }
 
@@ -285,7 +265,8 @@ public class StoryMentionHook {
                         ModuleLog.line("(IE|Mention) ❌ click handler: " + t);
                     }
                 }
-            });
+            };
+            for (Method m : dispatchers) XposedBridge.hookMethod(m, clickHook);
             ModuleLog.line("(IE|Mention) ✅ click hook installed");
         } catch (Throwable t) {
             ModuleLog.line("(IE|Mention) ❌ click hook: " + t);
