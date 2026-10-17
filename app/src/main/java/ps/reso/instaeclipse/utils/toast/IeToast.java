@@ -68,7 +68,7 @@ public final class IeToast {
         int bg = dark ? 0xF21C1C1E : 0xF7FFFFFF;
         int fg = dark ? 0xFFF5F5F5 : 0xFF111111;
         int stroke = dark ? 0x1FFFFFFF : 0x1A000000;
-        int accent = 0xFF0095F6;
+        int accent = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.accentOr(0xFF0095F6);
 
         LinearLayout card = new LinearLayout(app);
         card.setOrientation(LinearLayout.HORIZONTAL);

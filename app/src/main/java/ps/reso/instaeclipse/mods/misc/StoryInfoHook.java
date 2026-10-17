@@ -60,7 +60,7 @@ public class StoryInfoHook {
 
     private static final String[] KEYS = {
             "taken_at", "expiring_at", "story_edited_at", "is_story_edited",
-            "music_metadata", "story_music_stickers", "story_music_lyric_stickers",
+            "music_metadata", "story_music_stickers", "story_music_lyric_stickers", "clips_metadata",
             "story_locations", "story_hashtags",
             "reshared_story_media_author", "story_feed_media", "story_app_attribution",
             "accessibility_caption", "original_width", "original_height", "has_audio",
@@ -403,11 +403,7 @@ public class StoryInfoHook {
         if (edited == null && Boolean.TRUE.equals(value(media, "is_story_edited"))) edited = I18n.t(ctx, R.string.ig_si_yes);
         rows += row(dlg, ctx, R.string.ig_si_edited, edited, null);
 
-        String[] song = music(media);
-        if (song != null) {
-            rows += row(dlg, ctx, R.string.ig_si_music, song[0], null);
-            if (song[1] != null) dlg.view(musicLinks(dlg, ctx, song[1]));
-        }
+        if (addMusic(dlg, ctx, media)) rows++;
 
         List<String> places = new ArrayList<>();
         for (Object loc : list(media, "story_locations")) {
@@ -500,9 +496,20 @@ public class StoryInfoHook {
         dlg.show();
     }
 
+    /** Adds the Music row and, for licensed songs, the streaming buttons; for posts and reels
+     *  (Media Info) as well as stories. Returns false when the media has no music. */
+    public static boolean addMusic(IeDialog dlg, Context ctx, Object media) {
+        String[] song;
+        try { song = music(media); } catch (Throwable t) { return false; }
+        if (song == null) return false;
+        row(dlg, ctx, R.string.ig_si_music, song[0], null);
+        if (song[1] != null) dlg.view(musicLinks(dlg, ctx, song[1]));
+        return true;
+    }
+
     /** {display line, search query (licensed songs only) or null}. */
     private static String[] music(Object media) {
-        String[] keys = {"story_music_stickers", "story_music_lyric_stickers", "music_metadata"};
+        String[] keys = {"story_music_stickers", "story_music_lyric_stickers", "music_metadata", "clips_metadata"};
         for (String k : keys) {
             Object v = value(media, k);
             if (v == null) continue;
@@ -544,7 +551,7 @@ public class StoryInfoHook {
             b.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
             b.setContentDescription((String) a[0]);
             b.setPadding(dlg.dp(6), dlg.dp(9), dlg.dp(6), dlg.dp(9));
-            b.setBackground(dlg.round(dlg.field, 14));
+            b.setBackground(dlg.cardBg());
             b.setOnClickListener(v -> open(ctx, url));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dlg.dp(50), 1f);
             if (i > 0) lp.setMarginStart(dlg.dp(8));
@@ -574,11 +581,13 @@ public class StoryInfoHook {
         LinearLayout box = new LinearLayout(ctx);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dlg.dp(16), dlg.dp(10), dlg.dp(14), dlg.dp(11));
-        box.setBackground(dlg.round(dlg.field, 14));
+        box.setBackground(dlg.cardBg());
         TextView label = new TextView(ctx);
         label.setText(I18n.t(ctx, labelRes));
-        label.setTextColor(dlg.sub);
+        label.setTextColor(dlg.accent);
         label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        label.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        label.setPadding(0, 0, 0, dlg.dp(2));
         TextView val = new TextView(ctx);
         val.setText(value);
         val.setTextColor(dlg.text);

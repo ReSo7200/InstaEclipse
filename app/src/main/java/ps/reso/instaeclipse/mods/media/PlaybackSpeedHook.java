@@ -326,11 +326,7 @@ public class PlaybackSpeedHook {
             labels[i] = (SPEEDS[i] == (int) SPEEDS[i] ? String.valueOf((int) SPEEDS[i]) : String.valueOf(SPEEDS[i])) + "×";
             if (SPEEDS[i] == speed) checked = i;
         }
-        // Prefer the activity the menu was opened from: stories opened from a profile run in their
-        // own activity on top of the main one, and a dialog on the main activity sits behind them.
-        android.app.Activity act = activityOf(ctx);
-        if (act == null || act.isFinishing()) act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-        Context host = act != null && !act.isFinishing() ? act : ctx;
+        Context host = ps.reso.instaeclipse.mods.ui.UIHookManager.dialogHost(ctx);
         new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
                 .title(I18n.t(ctx, R.string.ig_playback_speed_title))
                 .choices(labels, checked, which -> {
@@ -345,14 +341,6 @@ public class PlaybackSpeedHook {
                 })
                 .onDismiss(onClosed)
                 .show();
-    }
-
-    private static android.app.Activity activityOf(Context c) {
-        while (c instanceof android.content.ContextWrapper) {
-            if (c instanceof android.app.Activity a) return a;
-            c = ((android.content.ContextWrapper) c).getBaseContext();
-        }
-        return null;
     }
 
     /** Finds the Groot player reachable from the feed player and sets its speed. */

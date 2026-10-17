@@ -59,17 +59,16 @@ final class MediaInfo {
             final String body = text;
             FeedVideoDownloadHook.mainHandler.post(() -> {
                 try {
-                    // The reel menu's context belongs to a sheet that has closed by now; use the
-                    // foreground Activity for the dialog when there is one.
-                    android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-                    Context host = act != null && !act.isFinishing() ? act : ctx;
+                    // The menu's context may belong to a sheet that has closed by now; show on the
+                    // Activity under it (a post opened from a profile has its own, above the main one).
+                    Context host = ps.reso.instaeclipse.mods.ui.UIHookManager.dialogHost(ctx);
                     ModuleLog.line("(IE|MediaInfo) showing (" + body.length() + " chars) on " + host.getClass().getSimpleName());
                     ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(host)
                             .title(I18n.t(ctx, R.string.ig_media_info_title));
                     // one rounded "label · value" card per line
                     LinearLayout rows = new LinearLayout(dlg.ctx);
                     rows.setOrientation(LinearLayout.VERTICAL);
-                    rows.setBackground(dlg.round(dlg.field, 14));
+                    rows.setBackground(dlg.cardBg());
                     rows.setPadding(dlg.dp(14), dlg.dp(6), dlg.dp(14), dlg.dp(6));
                     for (String ln : body.split("\n")) {
                         if (ln.trim().isEmpty()) continue;
@@ -94,6 +93,8 @@ final class MediaInfo {
                         rows.addView(r);
                     }
                     dlg.view(rows);
+                    // Song + Spotify / YouTube Music / Apple Music, like Story Info.
+                    ps.reso.instaeclipse.mods.misc.StoryInfoHook.addMusic(dlg, host, media);
                     dlg.secondary(I18n.t(ctx, R.string.ig_media_info_copy), () -> {
                         android.content.ClipboardManager cm = (android.content.ClipboardManager) host.getSystemService(Context.CLIPBOARD_SERVICE);
                         cm.setPrimaryClip(android.content.ClipData.newPlainText("media info", body));

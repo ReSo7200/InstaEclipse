@@ -374,7 +374,7 @@ public class StoryMentionHook {
                     row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                     row.setTypeface(null, Typeface.BOLD);
                     row.setPadding(dlg.dp(16), dlg.dp(13), dlg.dp(14), dlg.dp(13));
-                    row.setBackground(dlg.round(dlg.field, 14));
+                    row.setBackground(dlg.cardBg());
                     row.setOnClickListener(v -> {
                         ClipboardManager cm = (ClipboardManager)
                                 ctx.getSystemService(Context.CLIPBOARD_SERVICE);

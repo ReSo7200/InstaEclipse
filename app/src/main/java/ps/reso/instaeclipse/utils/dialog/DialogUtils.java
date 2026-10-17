@@ -61,7 +61,8 @@ public class DialogUtils {
     private static final int C_TEXT2    = 0xFF9A9AA3; // secondary/muted text
     private static final int C_HANDLE   = 0xFF48484A; // drag handle
     private static final int C_DANGER   = 0xFFFF453A; // destructive accent (close, delete)
-    private static final int C_ACCENT   = 0xFF0A84FF; // primary/interactive accent (back, links)
+    // Primary/interactive accent (back, links, toggles): the custom theme's accent when one is on.
+    private static int accent() { return ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.accentOr(0xFF0A84FF); }
 
     /** Section accent palette — assigned per thematic group so each menu section has its own hue. */
     private static final String A_APPEARANCE = "#FF375F"; // vivid pink/red
@@ -858,29 +859,51 @@ public class DialogUtils {
             layout.addView(createInfoSection(context, I18n.t(context, R.string.ig_dialog_unsent_title),
                     I18n.t(context, R.string.ig_dialog_unsent_empty)));
         } else {
-            LinearLayout msgCard = card(context);
+            // One bordered card per deleted message: sender (accent) and time on top, text below.
             for (int i = 0; i < entries.size(); i++) {
                 ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry e = entries.get(i);
                 LinearLayout row = new LinearLayout(context);
                 row.setOrientation(LinearLayout.VERTICAL);
                 int pad = dp(context, 14);
-                row.setPadding(pad, dp(context, 12), pad, dp(context, 12));
-                TextView meta = new TextView(context);
-                meta.setText(fmt.format(new java.util.Date(e.time)) + (e.sender.isEmpty() ? "" : " · " + e.sender));
-                meta.setTextColor(C_TEXT2);
-                meta.setTextSize(12);
+                row.setPadding(pad, dp(context, 11), pad, dp(context, 12));
+                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+                bg.setColor(C_CARD);
+                bg.setCornerRadius(R_CARD);
+                bg.setStroke(Math.max(1, dp(context, 1)), 0x33FFFFFF);
+                row.setBackground(bg);
+
+                LinearLayout meta = new LinearLayout(context);
+                meta.setGravity(Gravity.CENTER_VERTICAL);
+                TextView sender = new TextView(context);
+                sender.setText(e.sender);
+                if (e.sender.isEmpty()) sender.setVisibility(View.GONE);
+                sender.setTextColor(accent());
+                sender.setTextSize(13);
+                sender.setTypeface(Typeface.DEFAULT_BOLD);
+                sender.setSingleLine(true);
+                sender.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                meta.addView(sender, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+                TextView when = new TextView(context);
+                when.setText(fmt.format(new java.util.Date(e.time)));
+                when.setTextColor(C_TEXT2);
+                when.setTextSize(12);
+                when.setPadding(e.sender.isEmpty() ? 0 : dp(context, 8), 0, 0, 0);
+                meta.addView(when);
+
                 TextView body = new TextView(context);
                 body.setText(e.text);
                 body.setTextColor(C_TEXT);
                 body.setTextSize(15);
-                body.setPadding(0, dp(context, 4), 0, 0);
+                body.setPadding(0, dp(context, 5), 0, 0);
                 body.setTextIsSelectable(true);
                 row.addView(meta);
                 row.addView(body);
-                msgCard.addView(row);
-                if (i < entries.size() - 1) msgCard.addView(createHairline(context));
+
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(0, i == 0 ? dp(context, 4) : dp(context, 8), 0, 0);
+                layout.addView(row, lp);
             }
-            layout.addView(msgCard);
         }
 
         showSectionDialog(context, who != null && !who.isEmpty() ? who : I18n.t(context, R.string.ig_dialog_unsent_title), layout, () -> {});
@@ -976,7 +999,7 @@ public class DialogUtils {
             // Prefer the live resolved thread name (updated from the header on every thread open) over
             // the per-entry sender captured at log time — the latter can be stale/wrong (e.g. a token
             // grabbed before the name resolved), and the live map is always the most current label.
-            String name = ps.reso.instaeclipse.utils.ghost.ThreadNames.get(threadId);
+            String name = ps.reso.instaeclipse.utils.ghost.ThreadNames.resolve(threadId);
             if (name == null || name.isEmpty()) {
                 name = nameFor.get(threadId); // stored per-entry sender fallback
             }
@@ -1310,7 +1333,7 @@ public class DialogUtils {
                 LinearLayout row = new LinearLayout(context);
                 row.setGravity(Gravity.CENTER_VERTICAL);
                 row.setPadding(dlg.dp(16), dlg.dp(2), dlg.dp(6), dlg.dp(2));
-                row.setBackground(dlg.round(dlg.field, 14));
+                row.setBackground(dlg.cardBg());
                 TextView name = new TextView(context);
                 name.setText((i + 1) + ".  " + labels.get(order.get(i)));
                 name.setTextColor(dlg.text);
@@ -2009,7 +2032,7 @@ public class DialogUtils {
 
             checkmark = new TextView(context);
             checkmark.setText("✓");
-            checkmark.setTextColor(Color.parseColor("#0A84FF"));
+            checkmark.setTextColor(accent());
             checkmark.setTextSize(18);
             checkmark.setTypeface(null, Typeface.BOLD);
             checkmark.setVisibility(checked ? VISIBLE : INVISIBLE);
@@ -2206,7 +2229,7 @@ public class DialogUtils {
             badge.setTypeface(null, android.graphics.Typeface.BOLD);
             badge.setPadding(Math.round(10 * d), Math.round(4 * d), Math.round(10 * d), Math.round(4 * d));
             android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-            bg.setColor(Color.parseColor(expired ? "#FF453A" : "#0A84FF"));
+            bg.setColor(expired ? Color.parseColor("#FF453A") : accent());
             bg.setCornerRadius(Math.round(10 * d));
             badge.setBackground(bg);
             header.addView(badge);
@@ -2303,7 +2326,7 @@ public class DialogUtils {
         // App icon on a soft accent halo (pops in when the page opens).
         android.widget.FrameLayout halo = new android.widget.FrameLayout(context);
         GradientDrawable glow = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                new int[]{(C_ACCENT & 0x00FFFFFF) | 0x55000000, 0x33BF5AF2});
+                new int[]{(accent() & 0x00FFFFFF) | 0x55000000, 0x33BF5AF2});
         glow.setShape(GradientDrawable.OVAL);
         halo.setBackground(glow);
         ImageView icon = new ImageView(context);
@@ -2535,7 +2558,7 @@ public class DialogUtils {
 
         TextView backBtn = new TextView(context);
         backBtn.setText("‹");
-        backBtn.setTextColor(C_ACCENT);
+        backBtn.setTextColor(accent());
         backBtn.setTextSize(34);
         backBtn.setIncludeFontPadding(false);
         backBtn.setGravity(Gravity.CENTER);
@@ -2648,10 +2671,10 @@ public class DialogUtils {
             toggle.setChecked(checked);
             toggle.setThumbTintList(new ColorStateList(
                     new int[][]{new int[]{-android.R.attr.state_enabled}, new int[]{android.R.attr.state_checked}, new int[]{}},
-                    new int[]{Color.parseColor("#555555"), Color.parseColor("#448AFF"), Color.parseColor("#FFFFFF")}));
+                    new int[]{Color.parseColor("#555555"), accent(), Color.parseColor("#FFFFFF")}));
             toggle.setTrackTintList(new ColorStateList(
                     new int[][]{new int[]{-android.R.attr.state_enabled}, new int[]{android.R.attr.state_checked}, new int[]{}},
-                    new int[]{Color.parseColor("#777777"), Color.parseColor("#1C4C78"), Color.parseColor("#CFD8DC")}));
+                    new int[]{Color.parseColor("#777777"), (accent() & 0x00FFFFFF) | 0x66000000, Color.parseColor("#CFD8DC")}));
             toggle.setClickable(false);
             toggle.setFocusable(false);
             toggle.setOnCheckedChangeListener((b, c) -> {
@@ -2909,9 +2932,9 @@ public class DialogUtils {
 
         // Faint accent tint so the master control reads as distinct from the toggle card below it.
         GradientDrawable background = new GradientDrawable();
-        background.setColor((C_ACCENT & 0x00FFFFFF) | 0x24000000);
+        background.setColor((accent() & 0x00FFFFFF) | 0x24000000);
         background.setCornerRadius(R_CARD);
-        background.setStroke(1, (C_ACCENT & 0x00FFFFFF) | 0x40000000);
+        background.setStroke(1, (accent() & 0x00FFFFFF) | 0x40000000);
         container.setBackground(background);
 
         container.addView(enableAllRow);

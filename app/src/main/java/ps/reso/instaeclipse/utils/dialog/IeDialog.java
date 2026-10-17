@@ -32,7 +32,7 @@ public class IeDialog {
     public final Context ctx;
     public final float d;
     public final boolean dark;
-    public final int bg, field, text, sub, line, accent;
+    public final int bg, field, text, sub, line, accent, border;
 
     private final Dialog dialog;
     private final LinearLayout card, content, buttons;
@@ -54,7 +54,8 @@ public class IeDialog {
         text = dark ? 0xFFF5F5F5 : 0xFF111111;
         sub = dark ? 0xFF9A9AA0 : 0xFF6B6B70;
         line = dark ? 0x22FFFFFF : 0x14000000;
-        accent = 0xFF0095F6;
+        accent = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.accentOr(0xFF0095F6);
+        border = dark ? 0x33FFFFFF : 0x1F000000;
 
         dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -105,6 +106,14 @@ public class IeDialog {
         return g;
     }
 
+    /** Rounded row/card background with a hairline border, so rows stay distinct even when a
+     *  custom theme maps the dialog and row fills to nearly the same colour. */
+    public GradientDrawable cardBg() {
+        GradientDrawable g = round(field, 14);
+        g.setStroke(Math.max(1, dp(1)), border);
+        return g;
+    }
+
     public IeDialog title(CharSequence t) { titleView.setText(t); return this; }
 
     public IeDialog message(CharSequence m) {
@@ -141,7 +150,7 @@ public class IeDialog {
             LinearLayout row = new LinearLayout(ctx);
             row.setGravity(Gravity.CENTER_VERTICAL);
             row.setPadding(dp(16), dp(13), dp(14), dp(13));
-            GradientDrawable g = round(field, 14);
+            GradientDrawable g = cardBg();
             if (on) g.setStroke(Math.max(1, dp(1.5f)), accent);
             row.setBackground(g);
             TextView t = new TextView(ctx);

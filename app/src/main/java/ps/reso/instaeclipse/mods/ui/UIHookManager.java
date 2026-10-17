@@ -46,6 +46,22 @@ public class UIHookManager {
         return currentActivity;
     }
 
+    /** Activity to show our dialogs on: the one {@code ctx} belongs to (posts, stories and
+     *  highlights opened from a profile run in their own activity above the main one), else the
+     *  main activity, else {@code ctx} itself. */
+    public static android.content.Context dialogHost(android.content.Context ctx) {
+        android.content.Context c = ctx;
+        while (c instanceof android.content.ContextWrapper) {
+            if (c instanceof Activity a) {
+                if (!a.isFinishing()) return a;
+                break;
+            }
+            c = ((android.content.ContextWrapper) c).getBaseContext();
+        }
+        Activity main = currentActivity;
+        return main != null && !main.isFinishing() ? main : ctx;
+    }
+
     /**
      * Activities that already have a pending OnGlobalLayoutListener registered.
      * Used only to prevent duplicate listener registrations when the search view

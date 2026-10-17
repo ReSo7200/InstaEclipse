@@ -308,7 +308,7 @@ public class StoryLinksHook {
                 row.setMaxLines(3);
                 row.setEllipsize(android.text.TextUtils.TruncateAt.END);
                 row.setPadding(dlg.dp(16), dlg.dp(13), dlg.dp(14), dlg.dp(13));
-                row.setBackground(dlg.round(dlg.field, 14));
+                row.setBackground(dlg.cardBg());
                 row.setOnClickListener(v -> copy(ctx, url, I18n.t(ctx, R.string.ig_toast_link_copied)));
                 row.setOnLongClickListener(v -> {
                     try {

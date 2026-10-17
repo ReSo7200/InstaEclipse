@@ -35,6 +35,18 @@ public final class IgThemeEngine {
         return themeEnabled() && !IgColorRemapEngine.isBypassing();
     }
 
+    /** The custom theme's accent when a theme is active, else {@code fallback}. For our own UI
+     *  (menus, dialogs, toggles) so highlights match the chosen theme. */
+    public static int accentOr(int fallback) {
+        try {
+            if (!themeEnabled()) return fallback;
+            IgThemePalette p = getActivePalette();
+            return p != null ? (p.get(IgThemePalette.SLOT_ACCENT) | 0xFF000000) : fallback;
+        } catch (Throwable t) {
+            return fallback;
+        }
+    }
+
     /**
      * Custom theme enabled for the CURRENT day/night mode. With themeLightPresetId == -1 the theme
      * applies only in dark mode, so light mode shows stock Instagram (dark presets made light mode

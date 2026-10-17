@@ -439,7 +439,7 @@ public class CommentSearchHook {
         final int cText = dark ? 0xFFF5F5F5 : 0xFF111111;
         final int cSub = dark ? 0xFF9A9AA0 : 0xFF6B6B70;
         final int cDivider = dark ? 0x22FFFFFF : 0x14000000;
-        final int cAccent = 0xFF0095F6;
+        final int cAccent = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.accentOr(0xFF0095F6);
         final int cHighlight = dark ? 0x660095F6 : 0x400095F6;
 
         final List<String[]> all = new ArrayList<>(latest);
