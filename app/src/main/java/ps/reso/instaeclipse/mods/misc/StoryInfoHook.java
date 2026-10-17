@@ -659,7 +659,7 @@ public class StoryInfoHook {
             Long count = num(find(slider, "slider_vote_count"));
             Object mine = find(slider, "viewer_vote");
             StringBuilder sb = new StringBuilder();
-            if (avg instanceof Number a) sb.append(I18n.t(ctx, R.string.ig_si_average)).append(": ")
+            if (avg instanceof Number a && (count == null || count > 0)) sb.append(I18n.t(ctx, R.string.ig_si_average)).append(": ")
                     .append(Math.round(a.doubleValue() * 100)).append('%');
             if (count != null) sb.append(sb.length() > 0 ? "   ·  " : "").append(count);
             if (mine instanceof Number m && m.doubleValue() >= 0)
