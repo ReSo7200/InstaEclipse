@@ -55,11 +55,15 @@ public class LockedCollectionsHook {
                 protected void afterHookedMethod(MethodHookParam param) { JitGuard.tick(param.method);
                     if (!FeatureFlags.lockSavedCollections) return;
                     Bundle args = arguments(param.thisObject);
-                    if (args == null) return;
-                    String id = collectionId(args);
-                    if (id == null) return;
+                    String id = args != null ? collectionId(args) : null;
                     View root;
                     try { root = (View) param.thisObject.getClass().getMethod("getView").invoke(param.thisObject); } catch (Throwable t) { return; }
+                    if (id == null) {
+                        // another screen came up (e.g. back to the Saved list): the action bar is
+                        // shared, so take our button off once the collection is no longer shown
+                        if (root != null) root.postDelayed(() -> removeIfLeft(activityOf(root)), 300);
+                        return;
+                    }
                     Activity a = activityOf(root);
                     if (a == null) return;
                     // ask once per opening: coming back from a post inside it doesn't ask again
@@ -142,6 +146,20 @@ public class LockedCollectionsHook {
         return FeatureFlags.lockDirectPasscode != null && !FeatureFlags.lockDirectPasscode.isEmpty();
     }
 
+    /** Removes the lock button when the collection screen it belongs to is no longer shown. */
+    @android.annotation.SuppressLint("DiscouragedApi")
+    private static void removeIfLeft(Activity a) {
+        try {
+            if (a == null) return;
+            View r = active != null ? active.get() : null;
+            if (r != null && r.isShown()) return;
+            int barId = a.getResources().getIdentifier("action_bar", "id", a.getPackageName());
+            View bar = barId != 0 ? a.findViewById(barId) : null;
+            View btn = bar != null ? bar.findViewWithTag(BTN_TAG) : null;
+            if (btn != null && btn.getParent() instanceof ViewGroup p) p.removeView(btn);
+        } catch (Throwable ignored) {}
+    }
+
     /** 🔒 / 🔓 before the action bar's last button (the collection's ⋮ Options). */
     @android.annotation.SuppressLint("DiscouragedApi")
     private static void addButton(Activity a, String id) {
@@ -154,7 +172,12 @@ public class LockedCollectionsHook {
             if (watchedBars.add(g))
                 g.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
                     View r = active != null ? active.get() : null;
-                    if (!FeatureFlags.lockSavedCollections || r == null || !r.isShown() || activeId == null) return;
+                    if (r == null || !r.isShown()) {
+                        View stale = g.findViewWithTag(BTN_TAG);
+                        if (stale != null && stale.getParent() instanceof ViewGroup p) p.post(() -> p.removeView(stale));
+                        return;
+                    }
+                    if (!FeatureFlags.lockSavedCollections || activeId == null) return;
                     if (g.findViewWithTag(BTN_TAG) == null) g.post(() -> addButton(a, activeId));
                 });
             View old = g.findViewWithTag(BTN_TAG);
