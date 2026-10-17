@@ -474,6 +474,7 @@ public class CaptionCopyContextMenuHook {
                         translateArgs[idxText] = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_caption_translate_menu_item);
                         addButtonMethod.invoke(null, translateArgs);
                     }
+                    ps.reso.instaeclipse.mods.ui.MenuIcons.fixSoon();
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Caption) ❌ addButton invoke failed: " + t);
                 } finally {
@@ -867,6 +868,7 @@ public class CaptionCopyContextMenuHook {
                     if (ctx == null) return;
 
                     args[titleIdx] = I18n.t(ctx, extraLabel != null ? extraLabel : R.string.ig_caption_copy_menu_item);
+                    ps.reso.instaeclipse.mods.ui.MenuIcons.fixSoon();
                 } catch (Throwable t) {
                     ModuleLog.line("(IE|Caption) ❌ reel label override (builder): " + t);
                 }

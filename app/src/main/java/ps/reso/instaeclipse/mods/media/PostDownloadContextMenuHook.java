@@ -327,6 +327,8 @@ public class PostDownloadContextMenuHook {
                 if (wantCopyImage) injectRow(param, copyImageOptionValue, R.string.ig_download_choice_copy_image);
                 if (wantInfo) injectRow(param, mediaInfoOptionValue, R.string.ig_media_info_title);
                 if (wantSpeed) injectRow(param, speedOptionValue, R.string.ig_playback_speed_title);
+                // Our carriers are debug options Instagram draws with the Meta logo; give them real icons.
+                if (wantCopyImage || wantInfo || wantSpeed) ps.reso.instaeclipse.mods.ui.MenuIcons.fixSoon();
             }
         });
 
