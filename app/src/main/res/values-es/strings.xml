@@ -195,6 +195,11 @@
     <string name="theme_dark_mode">Modo oscuro</string>
     <string name="ig_dialog_translate_messages">Botón de traducir en los chats</string>
     <string name="ig_chat_translate_row">Traducir con app</string>
+    <string name="ig_dialog_bulk_unsend">Anular el envío de varios mensajes</string>
+    <string name="ig_bulk_unsend_row">Anular varios</string>
+    <string name="ig_bulk_unsend_go">Anular envío</string>
+    <string name="ig_bulk_unsend_done">Envío anulado de %1$d mensaje(s)</string>
+    <string name="ig_bulk_unsend_unavailable">Anular varios no está disponible en esta versión de Instagram</string>
     <string name="ig_downloader_folder_hint">Elige la carpeta desde la app InstaEclipse</string>
     <string name="lock_code_set_in_ig">Se configura dentro de Instagram: menú de InstaEclipse &gt; Bloqueo. Toca para abrir Instagram.</string>
     <string name="theme_set_light">Temas del modo claro</string>

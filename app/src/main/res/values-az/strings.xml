@@ -193,6 +193,11 @@
     <string name="theme_dark_mode">Qaranlıq rejim</string>
     <string name="ig_dialog_translate_messages">Söhbətlərdə tərcümə düyməsi</string>
     <string name="ig_chat_translate_row">Tətbiqlə tərcümə et</string>
+    <string name="ig_dialog_bulk_unsend">Çoxlu mesajı geri götür</string>
+    <string name="ig_bulk_unsend_row">Çoxlu geri götür</string>
+    <string name="ig_bulk_unsend_go">Geri götür</string>
+    <string name="ig_bulk_unsend_done">%1$d mesaj geri götürüldü</string>
+    <string name="ig_bulk_unsend_unavailable">Toplu geri götürmə bu Instagram versiyasında mövcud deyil</string>
     <string name="ig_downloader_folder_hint">Qovluğu InstaEclipse tətbiqindən təyin edin</string>
     <string name="lock_code_set_in_ig">Instagram daxilində təyin edin: InstaEclipse menyusu &gt; Kilid. Instagram-ı açmaq üçün toxunun.</string>
     <string name="theme_set_light">İşıqlı rejim temaları</string>

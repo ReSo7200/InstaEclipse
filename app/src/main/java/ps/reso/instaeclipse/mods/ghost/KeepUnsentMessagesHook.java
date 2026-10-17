@@ -292,6 +292,7 @@ public class KeepUnsentMessagesHook {
     @SuppressWarnings("unchecked")
     private static void logRemoved(Object store, Object threadKey, String threadId, String id) {
         if (entryClass == null || store == null || threadKey == null || loggedIds.contains(id)) return;
+        if (BulkUnsend.isOwnUnsend(id)) return; // our own bulk unsend, not the other side's
         try {
             Object entry = null;
             for (Method m : store.getClass().getDeclaredMethods()) {

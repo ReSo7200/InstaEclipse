@@ -193,6 +193,11 @@
     <string name="theme_dark_mode">Тёмный режим</string>
     <string name="ig_dialog_translate_messages">Кнопка перевода в чатах</string>
     <string name="ig_chat_translate_row">Перевести в приложении</string>
+    <string name="ig_dialog_bulk_unsend">Отмена отправки нескольких сообщений</string>
+    <string name="ig_bulk_unsend_row">Отменить несколько</string>
+    <string name="ig_bulk_unsend_go">Отменить отправку</string>
+    <string name="ig_bulk_unsend_done">Отменено сообщений: %1$d</string>
+    <string name="ig_bulk_unsend_unavailable">Массовая отмена недоступна в этой версии Instagram</string>
     <string name="ig_downloader_folder_hint">Папку можно выбрать в приложении InstaEclipse</string>
     <string name="lock_code_set_in_ig">Задаётся внутри Instagram: меню InstaEclipse &gt; Блокировка. Нажмите, чтобы открыть Instagram.</string>
     <string name="theme_set_light">Темы для светлого режима</string>

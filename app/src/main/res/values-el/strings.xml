@@ -226,6 +226,11 @@
     <string name="theme_dark_mode">Σκοτεινή λειτουργία</string>
     <string name="ig_dialog_translate_messages">Κουμπί μετάφρασης στις συνομιλίες</string>
     <string name="ig_chat_translate_row">Μετάφραση με εφαρμογή</string>
+    <string name="ig_dialog_bulk_unsend">Αναίρεση αποστολής πολλών μηνυμάτων</string>
+    <string name="ig_bulk_unsend_row">Αναίρεση πολλών</string>
+    <string name="ig_bulk_unsend_go">Αναίρεση</string>
+    <string name="ig_bulk_unsend_done">Αναιρέθηκαν %1$d μηνύματα</string>
+    <string name="ig_bulk_unsend_unavailable">Η μαζική αναίρεση δεν είναι διαθέσιμη σε αυτή την έκδοση του Instagram</string>
     <string name="ig_downloader_folder_hint">Ορίστε τον φάκελο από την εφαρμογή InstaEclipse</string>
     <string name="lock_code_set_in_ig">Ορίζεται μέσα στο Instagram: μενού InstaEclipse &gt; Κλείδωμα. Πατήστε για άνοιγμα του Instagram.</string>
     <string name="theme_set_light">Θέματα φωτεινής λειτουργίας</string>

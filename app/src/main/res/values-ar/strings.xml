@@ -191,6 +191,11 @@
     <string name="theme_dark_mode">الوضع الداكن</string>
     <string name="ig_dialog_translate_messages">زر الترجمة في المحادثات</string>
     <string name="ig_chat_translate_row">ترجمة بتطبيق</string>
+    <string name="ig_dialog_bulk_unsend">إلغاء إرسال عدة رسائل</string>
+    <string name="ig_bulk_unsend_row">إلغاء إرسال عدة رسائل</string>
+    <string name="ig_bulk_unsend_go">إلغاء الإرسال</string>
+    <string name="ig_bulk_unsend_done">تم إلغاء إرسال %1$d رسالة</string>
+    <string name="ig_bulk_unsend_unavailable">إلغاء الإرسال الجماعي غير متاح في هذا الإصدار من إنستغرام</string>
     <string name="ig_downloader_folder_hint">يتم تعيين المجلد من تطبيق InstaEclipse</string>
     <string name="lock_code_set_in_ig">يتم تعيينه داخل Instagram: قائمة InstaEclipse &gt; القفل. اضغط لفتح Instagram.</string>
     <string name="theme_set_light">سمات الوضع الفاتح</string>

@@ -60,6 +60,8 @@ public class VoiceMessageDownloadHook {
     // appears for normal users, so the action alone identifies our tap (COPY_TEXT would be
     // indistinguishable from IG's own Copy row on text messages).
     private static final String TRANSLATE_CARRIER = "DEBUG";
+    // Bulk unsend row carrier: another staff-only action (never shown to normal users).
+    private static final String BULK_CARRIER = "REPORT_BUG_FOR_VISUAL_MEDIA";
 
     private static volatile Object lastMessage;
     private static volatile long lastMessageAt;
@@ -93,6 +95,8 @@ public class VoiceMessageDownloadHook {
                             if (param.getResult() != null) {
                                 lastMessage = param.getResult();
                                 lastMessageAt = System.currentTimeMillis();
+                                if (param.args.length > 0 && !(param.args[0] instanceof String))
+                                    ps.reso.instaeclipse.mods.ghost.BulkUnsend.onLookup(param.args[0]);
                             }
                         }
                     });
@@ -117,18 +121,21 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                        if ((!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages) || ctor == null) return;
+                        if ((!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) || ctor == null) return;
                         Object msg = recentMessage();
                         String url = FeatureFlags.enableVoiceDownload && msg != null ? audioUrl(msg) : null;
                         // Translate (like comments): hand a text message to the user's translator app.
                         String text = FeatureFlags.translateMessages && url == null && msg != null ? messageText(msg) : null;
                         ModuleLog.line(TAG + "menu: message=" + (msg != null) + " voice=" + (url != null) + " text=" + (text != null));
-                        if (url == null && text == null) {
-                            if (msg != null && FeatureFlags.enableVoiceDownload) dumpTypes(msg);
-                            return;
-                        }
                         for (int i = 0; i < param.args.length; i++) {
                             if (!(param.args[i] instanceof List<?> list) || list.isEmpty() || !data.isInstance(list.get(0))) continue;
+                            // Bulk unsend: only on messages IG itself lets you unsend (your own).
+                            boolean bulk = FeatureFlags.bulkUnsend && ps.reso.instaeclipse.mods.ghost.BulkUnsend.ready()
+                                    && hasRow(list, "UNSEND");
+                            if (url == null && text == null && !bulk) {
+                                if (msg != null && FeatureFlags.enableVoiceDownload) dumpTypes(msg);
+                                return;
+                            }
                             // style template: a regular action row (the first item is the
                             // non-clickable timestamp header)
                             Object template = list.get(0);
@@ -137,19 +144,33 @@ public class VoiceMessageDownloadHook {
                                 if ("FORWARD".equals(an) || "REPLY".equals(an) || "PIN".equals(an) || "UNPIN".equals(an)) { template = r; break; }
                             }
                             Context c = param.args[0] instanceof Context cc ? cc : null;
-                            Object row = url != null
-                                    ? buildRow(ctor, template, c, downloadLabel(), "instagram_download_outline_24", CARRIER)
-                                    : buildRow(ctor, template, c, translateLabel(), "instagram_translate_pano_outline_24", TRANSLATE_CARRIER);
-                            if (row == null) return;
                             List<Object> copy = new ArrayList<>(list);
-                            copy.add(row);
-                            param.args[i] = copy;
-                            if (url != null) {
-                                wireRowWhenShown(downloadLabel(), act -> startDownload(act, url));
-                            } else {
-                                pendingText = text;
-                                wireRowWhenShown(translateLabel(), act -> translate(act));
+                            if (url != null || text != null) {
+                                Object row = url != null
+                                        ? buildRow(ctor, template, c, downloadLabel(), "instagram_download_outline_24", CARRIER)
+                                        : buildRow(ctor, template, c, translateLabel(), "instagram_translate_pano_outline_24", TRANSLATE_CARRIER);
+                                if (row != null) {
+                                    copy.add(row);
+                                    if (url != null) {
+                                        wireRowWhenShown(downloadLabel(), act -> startDownload(act, url));
+                                    } else {
+                                        pendingText = text;
+                                        wireRowWhenShown(translateLabel(), act -> translate(act));
+                                    }
+                                }
                             }
+                            if (bulk) {
+                                // styled from IG's own Unsend row, so it keeps the same icon
+                                Object unsendRow = template;
+                                for (Object r : list) if ("UNSEND".equals(actionName(r))) unsendRow = r;
+                                Object row = buildRow(ctor, unsendRow, c, bulkLabel(), "", BULK_CARRIER);
+                                if (row != null) {
+                                    copy.add(row);
+                                    pendingBulk = msg;
+                                    wireRowWhenShown(bulkLabel(), act -> bulkUnsend(act));
+                                }
+                            }
+                            if (copy.size() > list.size()) param.args[i] = copy;
                             return;
                         }
                     }
@@ -165,6 +186,13 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                        if (FeatureFlags.bulkUnsend && hasAction(param.args, BULK_CARRIER)) {
+                            Activity bctx = null;
+                            for (Object a : param.args) if (a instanceof Activity act) bctx = act;
+                            param.setResult(null);
+                            bulkUnsend(bctx);
+                            return;
+                        }
                         if (FeatureFlags.translateMessages && hasAction(param.args, TRANSLATE_CARRIER)) {
                             Context tctx = null;
                             for (Object a : param.args) if (a instanceof Activity act) tctx = act;
@@ -200,10 +228,15 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                        if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages) return;
+                        if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) return;
                         Object row = null;
                         for (Object a : param.args) if (data.isInstance(a)) row = a;
                         if (row == null) return;
+                        if (isOurRow(row, bulkLabel(), BULK_CARRIER)) {
+                            param.setResult(null);
+                            bulkUnsend(null);
+                            return;
+                        }
                         if (isOurRow(row, translateLabel(), TRANSLATE_CARRIER)) {
                             ModuleLog.line(TAG + "row tap: translate");
                             param.setResult(null);
@@ -231,6 +264,11 @@ public class VoiceMessageDownloadHook {
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                            if (FeatureFlags.bulkUnsend && param.args[0] instanceof Enum<?> be && BULK_CARRIER.equals(be.name())) {
+                                param.setResult(null);
+                                bulkUnsend(null);
+                                return;
+                            }
                             if (FeatureFlags.translateMessages && param.args[0] instanceof Enum<?> te && TRANSLATE_CARRIER.equals(te.name())) {
                                 ModuleLog.line(TAG + "action selected: translate");
                                 param.setResult(null);
@@ -284,11 +322,17 @@ public class VoiceMessageDownloadHook {
                         XposedBridge.hookMethod(m, new XC_MethodHook() {
                             @Override
                             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                                if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages) return;
+                                if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) return;
                                 for (int i = 0; i < param.args.length; i++) {
                                     Object orig = param.args[i];
                                     if (!fn1.isInstance(orig) || java.lang.reflect.Proxy.isProxyClass(orig.getClass())) continue;
                                     param.args[i] = java.lang.reflect.Proxy.newProxyInstance(cl, new Class<?>[]{fn1}, (proxy, method, margs) -> {
+                                        if (method.getName().equals("invoke") && margs != null && margs.length == 1
+                                                && data.isInstance(margs[0]) && isOurRow(margs[0], bulkLabel(), BULK_CARRIER)) {
+                                            dismissMenu();
+                                            bulkUnsend(null);
+                                            return null;
+                                        }
                                         if (method.getName().equals("invoke") && margs != null && margs.length == 1
                                                 && data.isInstance(margs[0]) && isOurRow(margs[0], translateLabel(), TRANSLATE_CARRIER)) {
                                             ModuleLog.line(TAG + "compose row tap: translate");
@@ -328,6 +372,7 @@ public class VoiceMessageDownloadHook {
                     + " mapper=" + (audioMapper != null) + " message=" + (messageClass != null ? messageClass.getName() : "?"));
             if (factories > 0 && dispatchers > 0) FeatureStatusTracker.setHooked("VoiceDownload");
             if (factories > 0 && labelFieldRef != null) FeatureStatusTracker.setHooked("ChatTranslate");
+            ps.reso.instaeclipse.mods.ghost.BulkUnsend.install(bridge, cl, messageClass);
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ " + t);
         }
@@ -446,6 +491,31 @@ public class VoiceMessageDownloadHook {
     }
 
     private static volatile long lastTranslateAt;
+    private static volatile long lastBulkAt;
+    private static volatile Object pendingBulk;
+
+    private static String bulkLabel() {
+        Context c = android.app.AndroidAppHelper.currentApplication();
+        return c != null ? I18n.t(c, R.string.ig_bulk_unsend_row) : "Unsend multiple";
+    }
+
+    /** Opens the bulk-unsend picker for the long-pressed message (several tap paths fire). */
+    private static void bulkUnsend(Activity act) {
+        if (System.currentTimeMillis() - lastBulkAt < 1500) return;
+        lastBulkAt = System.currentTimeMillis();
+        Object msg = pendingBulk != null ? pendingBulk : recentMessage();
+        Activity a = act != null ? act : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (a == null) return;
+        // after the menu has closed
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
+                () -> ps.reso.instaeclipse.mods.ghost.BulkUnsend.show(a, msg), 250);
+    }
+
+    /** True when the menu list has a row carrying IG's {@code action}. */
+    private static boolean hasRow(List<?> list, String action) {
+        for (Object r : list) if (action.equals(actionName(r))) return true;
+        return false;
+    }
 
     /** Hands the long-pressed message's text to the user's translator app (same as comments). */
     private static void translate(Context ctx) {
@@ -471,7 +541,7 @@ public class VoiceMessageDownloadHook {
      * (wrapper + model both carry the text). Ids ("mid.…", digits) are skipped. Falls back to the
      * single non-id String field when nothing repeats.
      */
-    static String messageText(Object msg) {
+    public static String messageText(Object msg) {
         try {
             List<String> own = new ArrayList<>();
             List<Object> children = new ArrayList<>();

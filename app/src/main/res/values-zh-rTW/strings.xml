@@ -192,6 +192,11 @@
     <string name="theme_dark_mode">深色模式</string>
     <string name="ig_dialog_translate_messages">聊天中的翻譯按鈕</string>
     <string name="ig_chat_translate_row">用應用程式翻譯</string>
+    <string name="ig_dialog_bulk_unsend">批次收回訊息</string>
+    <string name="ig_bulk_unsend_row">批次收回</string>
+    <string name="ig_bulk_unsend_go">收回</string>
+    <string name="ig_bulk_unsend_done">已收回 %1$d 則訊息</string>
+    <string name="ig_bulk_unsend_unavailable">此 Instagram 版本不支援批次收回</string>
     <string name="ig_downloader_folder_hint">請在 InstaEclipse 應用程式中設定資料夾</string>
     <string name="lock_code_set_in_ig">請在 Instagram 內設定：InstaEclipse 選單 &gt; 鎖定。輕觸以開啟 Instagram。</string>
     <string name="theme_set_light">淺色模式主題</string>

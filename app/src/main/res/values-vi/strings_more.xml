@@ -134,6 +134,11 @@
     <string name="theme_dark_mode">Chế độ tối</string>
     <string name="ig_dialog_translate_messages">Nút dịch trong đoạn chat</string>
     <string name="ig_chat_translate_row">Dịch bằng ứng dụng</string>
+    <string name="ig_dialog_bulk_unsend">Thu hồi nhiều tin nhắn</string>
+    <string name="ig_bulk_unsend_row">Thu hồi nhiều</string>
+    <string name="ig_bulk_unsend_go">Thu hồi</string>
+    <string name="ig_bulk_unsend_done">Đã thu hồi %1$d tin nhắn</string>
+    <string name="ig_bulk_unsend_unavailable">Thu hồi hàng loạt không khả dụng trên phiên bản Instagram này</string>
     <string name="ig_downloader_folder_hint">Chọn thư mục trong ứng dụng InstaEclipse</string>
     <string name="lock_code_set_in_ig">Đặt trong Instagram: menu InstaEclipse &gt; Khóa. Nhấn để mở Instagram.</string>
     <string name="theme_set_light">Giao diện chế độ sáng</string>

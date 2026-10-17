@@ -530,6 +530,11 @@
     <string name="theme_dark_mode">Koyu mod</string>
     <string name="ig_dialog_translate_messages">Sohbetlerde çeviri düğmesi</string>
     <string name="ig_chat_translate_row">Uygulamayla çevir</string>
+    <string name="ig_dialog_bulk_unsend">Birden çok mesajı geri al</string>
+    <string name="ig_bulk_unsend_row">Birden çok geri al</string>
+    <string name="ig_bulk_unsend_go">Geri al</string>
+    <string name="ig_bulk_unsend_done">%1$d mesaj geri alındı</string>
+    <string name="ig_bulk_unsend_unavailable">Toplu geri alma bu Instagram sürümünde kullanılamıyor</string>
     <string name="ig_downloader_folder_hint">Klasörü InstaEclipse uygulamasından ayarlayın</string>
     <string name="lock_code_set_in_ig">Instagram içinde ayarlanır: InstaEclipse menüsü &gt; Kilit. Instagram\'ı açmak için dokunun.</string>
     <string name="theme_set_light">Açık mod temaları</string>

@@ -225,6 +225,11 @@
     <string name="theme_dark_mode">מצב כהה</string>
     <string name="ig_dialog_translate_messages">כפתור תרגום בצ׳אטים</string>
     <string name="ig_chat_translate_row">תרגום באפליקציה</string>
+    <string name="ig_dialog_bulk_unsend">ביטול שליחה של כמה הודעות</string>
+    <string name="ig_bulk_unsend_row">ביטול שליחה מרובה</string>
+    <string name="ig_bulk_unsend_go">בטל שליחה</string>
+    <string name="ig_bulk_unsend_done">בוטלה שליחה של %1$d הודעות</string>
+    <string name="ig_bulk_unsend_unavailable">ביטול שליחה מרובה לא זמין בגרסה זו של אינסטגרם</string>
     <string name="ig_downloader_folder_hint">בוחרים את התיקייה מתוך אפליקציית InstaEclipse</string>
     <string name="lock_code_set_in_ig">מגדירים אותו בתוך Instagram: תפריט InstaEclipse &gt; נעילה. הקישו כדי לפתוח את Instagram.</string>
     <string name="theme_set_light">ערכות נושא למצב בהיר</string>

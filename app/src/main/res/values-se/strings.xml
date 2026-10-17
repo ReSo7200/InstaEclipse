@@ -192,6 +192,11 @@
     <string name="theme_dark_mode">Mörkt läge</string>
     <string name="ig_dialog_translate_messages">Översätt-knapp i chattar</string>
     <string name="ig_chat_translate_row">Översätt med app</string>
+    <string name="ig_dialog_bulk_unsend">Ångra flera meddelanden</string>
+    <string name="ig_bulk_unsend_row">Ångra flera</string>
+    <string name="ig_bulk_unsend_go">Ångra</string>
+    <string name="ig_bulk_unsend_done">%1$d meddelande(n) ångrade</string>
+    <string name="ig_bulk_unsend_unavailable">Ångra flera är inte tillgängligt i den här Instagram-versionen</string>
     <string name="ig_downloader_folder_hint">Välj mappen i InstaEclipse-appen</string>
     <string name="lock_code_set_in_ig">Ställs in i Instagram: InstaEclipse-menyn &gt; Lås. Tryck för att öppna Instagram.</string>
     <string name="theme_set_light">Teman för ljust läge</string>

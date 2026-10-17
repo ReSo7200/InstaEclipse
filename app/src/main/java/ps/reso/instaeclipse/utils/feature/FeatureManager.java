@@ -289,6 +289,7 @@ public class FeatureManager {
         reg(FeatureFlags.keepEditHistory,      "EditHistory",          R.string.ig_feat_edit_history);
         reg(FeatureFlags.jumpToFirstMessage,   "JumpToFirstMessage",   R.string.ig_jump_first_message);
         reg(FeatureFlags.translateMessages,    "ChatTranslate",        R.string.ig_dialog_translate_messages);
+        reg(FeatureFlags.bulkUnsend,           "BulkUnsend",           R.string.ig_dialog_bulk_unsend);
         reg(FeatureFlags.lockSavedCollections, "LockSavedCollections", R.string.ig_feat_lock_collections);
         reg(FeatureFlags.disableRepost,        "DisableRepost",        R.string.ig_dialog_misc_disable_repost);
         reg(FeatureFlags.commentSearch,        "CommentSearch",        R.string.ig_feat_comment_search);

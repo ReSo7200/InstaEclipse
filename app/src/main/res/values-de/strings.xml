@@ -198,6 +198,11 @@
     <string name="theme_dark_mode">Dunkler Modus</string>
     <string name="ig_dialog_translate_messages">Übersetzen-Button in Chats</string>
     <string name="ig_chat_translate_row">Mit App übersetzen</string>
+    <string name="ig_dialog_bulk_unsend">Mehrere Nachrichten zurückziehen</string>
+    <string name="ig_bulk_unsend_row">Mehrere zurückziehen</string>
+    <string name="ig_bulk_unsend_go">Zurückziehen</string>
+    <string name="ig_bulk_unsend_done">%1$d Nachricht(en) zurückgezogen</string>
+    <string name="ig_bulk_unsend_unavailable">Mehrfaches Zurückziehen ist in dieser Instagram-Version nicht verfügbar</string>
     <string name="ig_downloader_folder_hint">Ordner in der InstaEclipse-App festlegen</string>
     <string name="lock_code_set_in_ig">Wird in Instagram festgelegt: InstaEclipse-Menü &gt; Sperre. Tippen, um Instagram zu öffnen.</string>
     <string name="theme_set_light">Themes für den hellen Modus</string>
