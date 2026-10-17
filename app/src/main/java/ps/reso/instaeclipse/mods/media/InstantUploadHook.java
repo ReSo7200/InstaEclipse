@@ -144,6 +144,7 @@ public class InstantUploadHook {
             // on screen. Injection is idempotent + gated to the modal, so hooking several is safe.
             XC_MethodHook onActive = new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
+                    quickSnapActiveAt = android.os.SystemClock.uptimeMillis();
                     if (!FeatureFlags.uploadInstants) return;
                     Activity act = currentActivity();
                     if (act != null) FeedVideoDownloadHook.mainHandler.post(() -> injectChip(act));
@@ -474,12 +475,18 @@ public class InstantUploadHook {
     private static final long WATCH_MS = 300;
     private static int cameraViewId;
     private static Activity watchHost;          // the resumed modal being watched (main thread only)
+    // The camera in a chat (and other cameras) also has a camera_view inside a ModalActivity; only
+    // the Instants (quicksnap) camera drives QuickSnapCameraViewModel. Show the chip only when that
+    // view model has been active since the watched modal came up.
+    private static volatile long quickSnapActiveAt;
+    private static volatile long watchStartedAt;
     private static final Runnable WATCH = new Runnable() {
         @Override public void run() {
             Activity host = watchHost;
             if (host == null || !FeatureFlags.uploadInstants) return;
             boolean hasCam = hasCameraView(host);
-            boolean on = hasCam && cameraOnScreen(host);
+            // 2 s margin: the quicksnap view model can start just before its modal reports resumed.
+            boolean on = hasCam && quickSnapActiveAt >= watchStartedAt - 2000 && cameraOnScreen(host);
             if (on && (chip == null || chipHost != host)) injectChip(host);
             if (chip != null && chipHost == host) {
                 int vis = on || pickerOpen ? View.VISIBLE : View.GONE;
@@ -493,6 +500,7 @@ public class InstantUploadHook {
 
     private static void startWatch(Activity act) {
         watchHost = act;
+        watchStartedAt = android.os.SystemClock.uptimeMillis();
         FeedVideoDownloadHook.mainHandler.removeCallbacks(WATCH);
         FeedVideoDownloadHook.mainHandler.post(WATCH);
     }
