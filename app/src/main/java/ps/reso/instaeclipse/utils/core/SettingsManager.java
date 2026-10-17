@@ -127,6 +127,7 @@ public class SettingsManager {
         editor.putString("lockedCollections", FeatureFlags.lockedCollections);
         editor.putBoolean("storyViewerSearch", FeatureFlags.storyViewerSearch);
         editor.putBoolean("storyLinks", FeatureFlags.storyLinks);
+        editor.putBoolean("storyInfo", FeatureFlags.storyInfo);
         editor.putBoolean("commentSearch", FeatureFlags.commentSearch);
         editor.putBoolean("followListExport", FeatureFlags.followListExport);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
@@ -293,6 +294,7 @@ public class SettingsManager {
         FeatureFlags.lockedCollections = prefs.getString("lockedCollections", "");
         FeatureFlags.storyViewerSearch = prefs.getBoolean("storyViewerSearch", false);
         FeatureFlags.storyLinks = prefs.getBoolean("storyLinks", false);
+        FeatureFlags.storyInfo = prefs.getBoolean("storyInfo", false);
         FeatureFlags.commentSearch = prefs.getBoolean("commentSearch", false);
         FeatureFlags.followListExport = prefs.getBoolean("followListExport", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);

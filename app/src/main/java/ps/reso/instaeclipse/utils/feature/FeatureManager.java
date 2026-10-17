@@ -293,6 +293,7 @@ public class FeatureManager {
         reg(FeatureFlags.commentSearch,        "CommentSearch",        R.string.ig_feat_comment_search);
         reg(FeatureFlags.storyViewerSearch,    "StoryViewerSearch",    R.string.ig_feat_viewer_search);
         reg(FeatureFlags.storyLinks,           "StoryLinks",           R.string.ig_feat_story_links);
+        reg(FeatureFlags.storyInfo,            "StoryInfo",            R.string.ig_feat_story_info);
         reg(FeatureFlags.followListExport,     "FollowListExport",     R.string.ig_feat_follow_export);
         reg(FeatureFlags.savedOnProfile,       "SavedOnProfile",       R.string.ig_feat_saved_on_profile);
         reg(FeatureFlags.hideNotesTray,        "HideNotesTray",        R.string.ig_feat_hide_notes);

@@ -109,6 +109,7 @@ public class FeatureFlags {
     public static volatile boolean disableRepost = false;
     public static volatile boolean followListExport = false; // Export CSV pill on followers/following lists (#224)
     public static volatile boolean commentSearch = false; // search the loaded comments of a post (#230)
+    public static volatile boolean storyInfo = false; // Story Info / Quiz Answer / Poll Results in the story menu
     public static volatile boolean storyLinks = false; // copy link-sticker urls from the story menu
     public static volatile boolean storyViewerSearch = false; // search box over your story viewers list
     public static volatile boolean savedOnProfile = false;        // #237: Saved button on your own profile
