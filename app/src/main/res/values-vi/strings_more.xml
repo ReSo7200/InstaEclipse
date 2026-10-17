@@ -132,6 +132,8 @@
     <string name="ig_dialog_open_links_externally">Mở liên kết bằng trình duyệt ngoài</string>
     <string name="theme_light_mode">Chế độ sáng</string>
     <string name="theme_dark_mode">Chế độ tối</string>
+    <string name="ig_dialog_translate_messages">Nút dịch trong đoạn chat</string>
+    <string name="ig_chat_translate_row">Dịch bằng ứng dụng</string>
     <string name="ig_downloader_folder_hint">Chọn thư mục trong ứng dụng InstaEclipse</string>
     <string name="lock_code_set_in_ig">Đặt trong Instagram: menu InstaEclipse &gt; Khóa. Nhấn để mở Instagram.</string>
     <string name="theme_set_light">Giao diện chế độ sáng</string>

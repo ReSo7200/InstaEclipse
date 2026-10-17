@@ -90,6 +90,7 @@ public class SettingsManager {
         editor.putBoolean("forceReelScrubber", FeatureFlags.forceReelScrubber);
         editor.putBoolean("keepEditHistory", FeatureFlags.keepEditHistory);
         editor.putBoolean("jumpToFirstMessage", FeatureFlags.jumpToFirstMessage);
+        editor.putBoolean("translateMessages", FeatureFlags.translateMessages);
         editor.putBoolean("chatExport", FeatureFlags.chatExport);
         editor.putBoolean("hideTabHome", FeatureFlags.hideTabHome);
         editor.putBoolean("hideTabReels", FeatureFlags.hideTabReels);
@@ -259,6 +260,7 @@ public class SettingsManager {
         FeatureFlags.forceReelScrubber = prefs.getBoolean("forceReelScrubber", false);
         FeatureFlags.keepEditHistory = prefs.getBoolean("keepEditHistory", false);
         FeatureFlags.jumpToFirstMessage = prefs.getBoolean("jumpToFirstMessage", false);
+        FeatureFlags.translateMessages = prefs.getBoolean("translateMessages", false);
         FeatureFlags.chatExport = prefs.getBoolean("chatExport", false);
         FeatureFlags.hideTabHome = prefs.getBoolean("hideTabHome", false);
         FeatureFlags.hideTabReels = prefs.getBoolean("hideTabReels", false);

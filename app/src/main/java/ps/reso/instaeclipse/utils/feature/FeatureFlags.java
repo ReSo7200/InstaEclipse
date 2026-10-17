@@ -48,6 +48,7 @@ public class FeatureFlags {
     public static volatile boolean hideNotesTray = false; // hide the Notes tray in the DM inbox (#241)
     public static volatile boolean chatExport = false; // header button: export the open chat to HTML (#225)
     public static volatile boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
+    public static volatile boolean translateMessages = false; // "Translate" in the DM message long-press menu
     public static volatile boolean keepEditHistory = false; // show previous text of edited DMs (#243)
     public static volatile boolean offerMediaInfo = false; // "Media info" row in the post menu (#231)
     public static volatile boolean offerPlaybackSpeed = false; // "Playback speed" row for feed videos (#247)

@@ -224,6 +224,8 @@
     <string name="ig_dialog_open_links_externally">Άνοιγμα Συνδέσμων σε Εξωτερικό Πρόγραμμα Περιήγησης</string>
     <string name="theme_light_mode">Φωτεινή λειτουργία</string>
     <string name="theme_dark_mode">Σκοτεινή λειτουργία</string>
+    <string name="ig_dialog_translate_messages">Κουμπί μετάφρασης στις συνομιλίες</string>
+    <string name="ig_chat_translate_row">Μετάφραση με εφαρμογή</string>
     <string name="ig_downloader_folder_hint">Ορίστε τον φάκελο από την εφαρμογή InstaEclipse</string>
     <string name="lock_code_set_in_ig">Ορίζεται μέσα στο Instagram: μενού InstaEclipse &gt; Κλείδωμα. Πατήστε για άνοιγμα του Instagram.</string>
     <string name="theme_set_light">Θέματα φωτεινής λειτουργίας</string>

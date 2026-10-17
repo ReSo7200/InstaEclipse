@@ -196,6 +196,8 @@
     <string name="ig_dialog_open_links_externally">Links im externen Browser öffnen</string>
     <string name="theme_light_mode">Heller Modus</string>
     <string name="theme_dark_mode">Dunkler Modus</string>
+    <string name="ig_dialog_translate_messages">Übersetzen-Button in Chats</string>
+    <string name="ig_chat_translate_row">Mit App übersetzen</string>
     <string name="ig_downloader_folder_hint">Ordner in der InstaEclipse-App festlegen</string>
     <string name="lock_code_set_in_ig">Wird in Instagram festgelegt: InstaEclipse-Menü &gt; Sperre. Tippen, um Instagram zu öffnen.</string>
     <string name="theme_set_light">Themes für den hellen Modus</string>

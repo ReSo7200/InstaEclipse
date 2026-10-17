@@ -56,6 +56,10 @@ public class VoiceMessageDownloadHook {
     private static final String MEDIA = "com.instagram.feed.media.Media";
     // Row carrier: an action IG fully wires (click → dispatch) but never offers on voice messages.
     private static final String CARRIER = "COPY_TEXT";
+    // Translate row carrier: a staff-only action every menu renderer dispatches but that never
+    // appears for normal users, so the action alone identifies our tap (COPY_TEXT would be
+    // indistinguishable from IG's own Copy row on text messages).
+    private static final String TRANSLATE_CARRIER = "DEBUG";
 
     private static volatile Object lastMessage;
     private static volatile long lastMessageAt;
@@ -113,12 +117,14 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                        if (!FeatureFlags.enableVoiceDownload || ctor == null) return;
+                        if ((!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages) || ctor == null) return;
                         Object msg = recentMessage();
-                        String url = msg != null ? audioUrl(msg) : null;
-                        ModuleLog.line(TAG + "menu: message=" + (msg != null) + " voice=" + (url != null));
-                        if (url == null) {
-                            if (msg != null) dumpTypes(msg);
+                        String url = FeatureFlags.enableVoiceDownload && msg != null ? audioUrl(msg) : null;
+                        // Translate (like comments): hand a text message to the user's translator app.
+                        String text = FeatureFlags.translateMessages && url == null && msg != null ? messageText(msg) : null;
+                        ModuleLog.line(TAG + "menu: message=" + (msg != null) + " voice=" + (url != null) + " text=" + (text != null));
+                        if (url == null && text == null) {
+                            if (msg != null && FeatureFlags.enableVoiceDownload) dumpTypes(msg);
                             return;
                         }
                         for (int i = 0; i < param.args.length; i++) {
@@ -130,12 +136,20 @@ public class VoiceMessageDownloadHook {
                                 String an = actionName(r);
                                 if ("FORWARD".equals(an) || "REPLY".equals(an) || "PIN".equals(an) || "UNPIN".equals(an)) { template = r; break; }
                             }
-                            Object row = buildRow(ctor, template, param.args[0] instanceof Context c ? c : null);
+                            Context c = param.args[0] instanceof Context cc ? cc : null;
+                            Object row = url != null
+                                    ? buildRow(ctor, template, c, downloadLabel(), "instagram_download_outline_24", CARRIER)
+                                    : buildRow(ctor, template, c, translateLabel(), "instagram_translate_pano_outline_24", TRANSLATE_CARRIER);
                             if (row == null) return;
                             List<Object> copy = new ArrayList<>(list);
                             copy.add(row);
                             param.args[i] = copy;
-                            wireRowWhenShown(url);
+                            if (url != null) {
+                                wireRowWhenShown(downloadLabel(), act -> startDownload(act, url));
+                            } else {
+                                pendingText = text;
+                                wireRowWhenShown(translateLabel(), act -> translate(act));
+                            }
                             return;
                         }
                     }
@@ -151,6 +165,14 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                        if (FeatureFlags.translateMessages && hasAction(param.args, TRANSLATE_CARRIER)) {
+                            Context tctx = null;
+                            for (Object a : param.args) if (a instanceof Activity act) tctx = act;
+                            ModuleLog.line(TAG + "dispatch: translate");
+                            param.setResult(null);
+                            translate(tctx);
+                            return;
+                        }
                         if (!FeatureFlags.enableVoiceDownload) return;
                         Object action = null, msg = null;
                         Context ctx = null;
@@ -178,10 +200,17 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                        if (!FeatureFlags.enableVoiceDownload) return;
+                        if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages) return;
                         Object row = null;
                         for (Object a : param.args) if (data.isInstance(a)) row = a;
-                        if (row == null || !isSaveMedia(row)) return;
+                        if (row == null) return;
+                        if (isOurRow(row, translateLabel(), TRANSLATE_CARRIER)) {
+                            ModuleLog.line(TAG + "row tap: translate");
+                            param.setResult(null);
+                            translate(null);
+                            return;
+                        }
+                        if (!FeatureFlags.enableVoiceDownload || !isSaveMedia(row)) return;
                         Object msg = recentMessage();
                         String url = msg != null ? audioUrl(msg) : null;
                         ModuleLog.line(TAG + "row tap: voice=" + (url != null));
@@ -202,6 +231,12 @@ public class VoiceMessageDownloadHook {
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                            if (FeatureFlags.translateMessages && param.args[0] instanceof Enum<?> te && TRANSLATE_CARRIER.equals(te.name())) {
+                                ModuleLog.line(TAG + "action selected: translate");
+                                param.setResult(null);
+                                translate(null);
+                                return;
+                            }
                             if (!FeatureFlags.enableVoiceDownload) return;
                             if (!(param.args[0] instanceof Enum<?> e) || !CARRIER.equals(e.name())) return;
                             Object msg = recentMessage();
@@ -234,6 +269,7 @@ public class VoiceMessageDownloadHook {
                     }
                 }
                 if (labelField != null) {
+                    labelFieldRef = labelField;
                     final Field lf = labelField;
                     String desc = "L" + ACTION_DATA.replace('.', '/') + ";->" + lf.getName() + ":Ljava/lang/String;";
                     Class<?> fn1 = cl.loadClass("kotlin.jvm.functions.Function1");
@@ -248,13 +284,20 @@ public class VoiceMessageDownloadHook {
                         XposedBridge.hookMethod(m, new XC_MethodHook() {
                             @Override
                             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                                if (!FeatureFlags.enableVoiceDownload) return;
+                                if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages) return;
                                 for (int i = 0; i < param.args.length; i++) {
                                     Object orig = param.args[i];
                                     if (!fn1.isInstance(orig) || java.lang.reflect.Proxy.isProxyClass(orig.getClass())) continue;
                                     param.args[i] = java.lang.reflect.Proxy.newProxyInstance(cl, new Class<?>[]{fn1}, (proxy, method, margs) -> {
                                         if (method.getName().equals("invoke") && margs != null && margs.length == 1
-                                                && data.isInstance(margs[0]) && isOurRow(margs[0], lf)) {
+                                                && data.isInstance(margs[0]) && isOurRow(margs[0], translateLabel(), TRANSLATE_CARRIER)) {
+                                            ModuleLog.line(TAG + "compose row tap: translate");
+                                            dismissMenu();
+                                            translate(null);
+                                            return null;
+                                        }
+                                        if (method.getName().equals("invoke") && margs != null && margs.length == 1
+                                                && data.isInstance(margs[0]) && isOurRow(margs[0], downloadLabel(), CARRIER)) {
                                             Object msg = recentMessage();
                                             String url = msg != null ? audioUrl(msg) : null;
                                             ModuleLog.line(TAG + "compose row tap: voice=" + (url != null));
@@ -284,6 +327,7 @@ public class VoiceMessageDownloadHook {
             ModuleLog.line(TAG + "✅ lookups=" + lookups + " factories=" + factories + " dispatchers=" + dispatchers
                     + " mapper=" + (audioMapper != null) + " message=" + (messageClass != null ? messageClass.getName() : "?"));
             if (factories > 0 && dispatchers > 0) FeatureStatusTracker.setHooked("VoiceDownload");
+            if (factories > 0 && labelFieldRef != null) FeatureStatusTracker.setHooked("ChatTranslate");
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ " + t);
         }
@@ -293,10 +337,9 @@ public class VoiceMessageDownloadHook {
      * The menu renders our row but routes unknown actions to a dismiss-only branch, so attach our
      * own click handler to the row once it is on screen (found by its label), then close the menu.
      */
-    private static void wireRowWhenShown(String url) {
+    private static void wireRowWhenShown(String label, java.util.function.Consumer<Activity> onTap) {
         android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         if (act == null) return;
-        String label = I18n.t(act, R.string.ig_dl_title);
         android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
         final int[] tries = {0};
         h.post(new Runnable() {
@@ -308,7 +351,7 @@ public class VoiceMessageDownloadHook {
                     return;
                 }
                 row.setOnClickListener(v -> {
-                    startDownload(act, url);
+                    onTap.accept(act);
                     act.dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_BACK));
                     act.dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, android.view.KeyEvent.KEYCODE_BACK));
                 });
@@ -378,14 +421,100 @@ public class VoiceMessageDownloadHook {
         return "voice";
     }
 
-    private static boolean isOurRow(Object row, Field labelField) {
+    /** Our injected row with this label (carried by the CARRIER action, so IG's own rows with the
+     *  same text, e.g. its native "Translate", never match). */
+    private static boolean isOurRow(Object row, String label, String carrier) {
         try {
-            android.app.Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-            String label = act != null ? I18n.t(act, R.string.ig_dl_title) : "Download";
-            return label.equals(labelField.get(row)) && isSaveMedia(row);
+            Field lf = labelFieldRef;
+            return lf != null && label.equals(lf.get(row)) && carrier.equals(actionName(row));
         } catch (Throwable t) {
             return false;
         }
+    }
+
+    private static volatile Field labelFieldRef;
+    private static volatile String pendingText;
+
+    private static String downloadLabel() {
+        Context c = android.app.AndroidAppHelper.currentApplication();
+        return c != null ? I18n.t(c, R.string.ig_dl_title) : "Download";
+    }
+
+    private static String translateLabel() {
+        Context c = android.app.AndroidAppHelper.currentApplication();
+        return c != null ? I18n.t(c, R.string.ig_chat_translate_row) : "Translate with app";
+    }
+
+    private static volatile long lastTranslateAt;
+
+    /** Hands the long-pressed message's text to the user's translator app (same as comments). */
+    private static void translate(Context ctx) {
+        if (System.currentTimeMillis() - lastTranslateAt < 1500) return; // several tap paths fire
+        lastTranslateAt = System.currentTimeMillis();
+        String text = pendingText;
+        if (text == null) {
+            Object msg = recentMessage();
+            text = msg != null ? messageText(msg) : null;
+        }
+        if (text == null) return;
+        Context c = ctx != null ? ctx : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        if (c == null) c = android.app.AndroidAppHelper.currentApplication();
+        final Context host = c;
+        final String t = text;
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(
+                () -> ps.reso.instaeclipse.utils.core.TextTranslator.translate(host, t));
+    }
+
+    /**
+     * The message's own text, found by shape rather than by (obfuscated) name: a String field
+     * declared on the message object whose value is repeated inside its inner message model
+     * (wrapper + model both carry the text). Ids ("mid.…", digits) are skipped. Falls back to the
+     * single non-id String field when nothing repeats.
+     */
+    static String messageText(Object msg) {
+        try {
+            List<String> own = new ArrayList<>();
+            List<Object> children = new ArrayList<>();
+            boolean textType = false; // the message type enum (TEXT on 451); skips media/stickers
+            for (Class<?> k = msg.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
+                for (Field f : k.getDeclaredFields()) {
+                    if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+                    f.setAccessible(true);
+                    Object v = f.get(msg);
+                    if (v instanceof Enum<?> e && ("TEXT".equals(e.name()) || "LINK".equals(e.name()))) textType = true;
+                    if (v instanceof String s) { if (isTextLike(s)) own.add(s); }
+                    else if (v != null && (v.getClass().getName().startsWith("X.") || v.getClass().getName().startsWith("com.instagram."))) children.add(v);
+                }
+            }
+            if (own.isEmpty() || !textType) return null;
+            Set<String> nested = new java.util.HashSet<>();
+            for (Object c : children)
+                for (Class<?> k = c.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+                    for (Field f : k.getDeclaredFields()) {
+                        if (Modifier.isStatic(f.getModifiers()) || f.getType() != String.class) continue;
+                        try { f.setAccessible(true); Object v = f.get(c); if (v instanceof String s) nested.add(s); } catch (Throwable ignored) {}
+                    }
+            // The text is stored twice on 451 (a field of the message class and one of its base
+            // class); count both that and copies in a nested model.
+            java.util.Map<String, Integer> seenCount = new java.util.HashMap<>();
+            for (String s : own) seenCount.merge(s, 1, Integer::sum);
+            String best = null;
+            for (String s : own) {
+                boolean repeated = seenCount.get(s) > 1 || nested.contains(s);
+                if (repeated && (best == null || s.length() > best.length())) best = s;
+            }
+            if (best == null && own.size() == 1) best = own.get(0);
+            return best;
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ text: " + t);
+            return null;
+        }
+    }
+
+    private static boolean isTextLike(String s) {
+        if (s == null || s.trim().isEmpty()) return false;
+        if (s.startsWith("mid.") || s.matches("[0-9]+")) return false;
+        return true;
     }
 
     private static void dismissMenu() {
@@ -459,12 +588,17 @@ public class VoiceMessageDownloadHook {
         }
     }
 
+    private static boolean hasAction(Object[] args, String name) {
+        for (Object a : args) if (a instanceof Enum<?> e && name.equals(e.name())) return true;
+        return false;
+    }
+
     private static Object recentMessage() {
         return System.currentTimeMillis() - lastMessageAt < 15000 ? lastMessage : null;
     }
 
-    /** Our "Download" row, styled like the first existing row. */
-    private static Object buildRow(Constructor<?> ctor, Object template, Context ctx) {
+    /** Our injected row ("Download" / "Translate with app"), styled like an existing row. */
+    private static Object buildRow(Constructor<?> ctor, Object template, Context ctx, String label, String iconName, String carrier) {
         try {
             Class<?>[] p = ctor.getParameterTypes();
             if (saveMediaAction == null) {
@@ -482,12 +616,13 @@ public class VoiceMessageDownloadHook {
             Context c = ctx != null ? ctx : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
             if (c != null) {
                 @SuppressWarnings("DiscouragedApi")
-                int id = c.getResources().getIdentifier("instagram_download_outline_24", "drawable", c.getPackageName());
+                int id = c.getResources().getIdentifier(iconName, "drawable", c.getPackageName());
                 if (id != 0) icon = id;
             }
-            String label = c != null ? I18n.t(c, R.string.ig_dl_title) : "Download";
             ctor.setAccessible(true);
-            return ctor.newInstance(null, style, saveMediaAction, null, null, icon, null, label, null, null, null);
+            Object action = saveMediaAction;
+            for (Object v : p[2].getEnumConstants()) if (carrier.equals(((Enum<?>) v).name())) action = v;
+            return ctor.newInstance(null, style, action, null, null, icon, null, label, null, null, null);
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ row: " + t);
             return null;

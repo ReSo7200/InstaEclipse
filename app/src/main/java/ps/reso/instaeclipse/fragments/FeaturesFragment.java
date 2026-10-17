@@ -1106,6 +1106,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_keep_unsent), "keepUnsentMessages"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_edit_history), "keepEditHistory"),
                 createSwitch(R.drawable.ic_jump_first, "#5E5CE6", getString(R.string.ig_dialog_ghost_jump_first), "jumpToFirstMessage"),
+                createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_translate_messages), "translateMessages"),
                 createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_hide_dm_blend), "hideDmBlend"),

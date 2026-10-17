@@ -190,6 +190,8 @@
     <string name="ig_dialog_open_links_externally">在外部瀏覽器中開啟連結</string>
     <string name="theme_light_mode">淺色模式</string>
     <string name="theme_dark_mode">深色模式</string>
+    <string name="ig_dialog_translate_messages">聊天中的翻譯按鈕</string>
+    <string name="ig_chat_translate_row">用應用程式翻譯</string>
     <string name="ig_downloader_folder_hint">請在 InstaEclipse 應用程式中設定資料夾</string>
     <string name="lock_code_set_in_ig">請在 Instagram 內設定：InstaEclipse 選單 &gt; 鎖定。輕觸以開啟 Instagram。</string>
     <string name="theme_set_light">淺色模式主題</string>
