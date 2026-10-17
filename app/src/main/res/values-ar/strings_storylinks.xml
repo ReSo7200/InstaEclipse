@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">نسخ الرابط</string>
+    <string name="ig_story_links_title">روابط القصة</string>
+    <string name="ig_story_links_hint">اضغط للنسخ · اضغط مطولاً للفتح</string>
+    <string name="ig_toast_link_copied">تم نسخ الرابط</string>
+    <string name="ig_toast_links_copied">تم نسخ كل الروابط</string>
+    <string name="ig_dialog_misc_story_links">نسخ روابط القصص</string>
+    <string name="ig_feat_story_links">روابط القصص</string>
+</resources>

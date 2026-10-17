@@ -292,6 +292,7 @@ public class FeatureManager {
         reg(FeatureFlags.disableRepost,        "DisableRepost",        R.string.ig_dialog_misc_disable_repost);
         reg(FeatureFlags.commentSearch,        "CommentSearch",        R.string.ig_feat_comment_search);
         reg(FeatureFlags.storyViewerSearch,    "StoryViewerSearch",    R.string.ig_feat_viewer_search);
+        reg(FeatureFlags.storyLinks,           "StoryLinks",           R.string.ig_feat_story_links);
         reg(FeatureFlags.followListExport,     "FollowListExport",     R.string.ig_feat_follow_export);
         reg(FeatureFlags.savedOnProfile,       "SavedOnProfile",       R.string.ig_feat_saved_on_profile);
         reg(FeatureFlags.hideNotesTray,        "HideNotesTray",        R.string.ig_feat_hide_notes);

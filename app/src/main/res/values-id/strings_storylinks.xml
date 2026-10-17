@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">Salin tautan</string>
+    <string name="ig_story_links_title">Tautan cerita</string>
+    <string name="ig_story_links_hint">Ketuk untuk menyalin · tekan lama untuk membuka</string>
+    <string name="ig_toast_link_copied">Tautan disalin</string>
+    <string name="ig_toast_links_copied">Semua tautan disalin</string>
+    <string name="ig_dialog_misc_story_links">Salin tautan cerita</string>
+    <string name="ig_feat_story_links">Tautan cerita</string>
+</resources>

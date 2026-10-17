@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_btn_copy_story_link">העתק קישור</string>
+    <string name="ig_story_links_title">קישורי הסטורי</string>
+    <string name="ig_story_links_hint">הקש להעתקה · לחיצה ארוכה לפתיחה</string>
+    <string name="ig_toast_link_copied">הקישור הועתק</string>
+    <string name="ig_toast_links_copied">כל הקישורים הועתקו</string>
+    <string name="ig_dialog_misc_story_links">העתקת קישורי סטורי</string>
+    <string name="ig_feat_story_links">קישורי סטורי</string>
+</resources>

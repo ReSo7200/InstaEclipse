@@ -340,7 +340,7 @@ public class StoryMentionHook {
     // Checks runtime class name, not declared field type, so it works through Object fields.
     private static final int GRAPH_MAX_DEPTH = 6;
 
-    private static Object findMediaInGraph(Object obj, int depth, Set<Object> visited) {
+    static Object findMediaInGraph(Object obj, int depth, Set<Object> visited) {
         if (obj == null || depth > GRAPH_MAX_DEPTH) return null;
         if (!visited.add(obj)) return null;
 
@@ -426,7 +426,7 @@ public class StoryMentionHook {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static Context findContext(Object obj) {
+    static Context findContext(Object obj) {
         if (obj == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {

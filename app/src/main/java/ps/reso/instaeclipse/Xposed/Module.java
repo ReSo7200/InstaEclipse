@@ -558,6 +558,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Story Mentions
                     try {
                         if (!skip("StoryMentionHook")) new StoryMentionHook().install(dexKitBridge, lpparam.classLoader);
+                        if (!skip("StoryLinksHook")) new ps.reso.instaeclipse.mods.misc.StoryLinksHook().install(dexKitBridge, lpparam.classLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | StoryMentions): ❌ Failed to hook");
                     }
