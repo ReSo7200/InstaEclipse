@@ -167,7 +167,7 @@ public class DialogUtils {
         LinearLayout appearance = createGroupCard(context);
         appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
         appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_feed), A_APPEARANCE, () -> showFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "hidePlusUpsells", "followingOnlyFeed", "hideStoriesTray", "disableDiscoverPeople", "expandCaptions", "exactTimestamps", "highResolutionImages", "enablePhotoZoom", "disableVideoAutoPlay")));
-        appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), onCount(context, navExtras(), "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile", "disableSwipeToCamera")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), navCount(context)));
         appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels), A_APPEARANCE, () -> showReelsOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "disableRepost")));
         appearance.addView(createMenuRow(context, R.drawable.ic_story_ring, I18n.t(context, R.string.menu_stories), A_APPEARANCE, () -> showStoriesOptions(context), onCount(context, "disableStoryFlipping", "enableStoryMentions", "storyLinks", "storyInfo", "storyViewerSearch")));
         mainLayout.addView(appearance);
@@ -259,12 +259,12 @@ public class DialogUtils {
         return onCount(context, 0, flagNames);
     }
 
-    /** Navigation's non-switch settings: a changed tab order and a chosen startup tab count as on. */
-    private static int navExtras() {
-        int n = 0;
-        if (ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(FeatureFlags.navTabOrder)) n++;
-        if (FeatureFlags.startupTab != null && !FeatureFlags.startupTab.isEmpty()) n++;
-        return n;
+    /** Navigation: the switch count, plus "· Tab order changed" when the tab order isn't Instagram's. */
+    private static String navCount(Context context) {
+        String base = onCount(context, "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages",
+                "hideTabActivity", "hideTabProfile", "disableSwipeToCamera");
+        return ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(FeatureFlags.navTabOrder)
+                ? base + " · " + I18n.t(context, R.string.nav_tab_order_changed) : base;
     }
 
     private static String onCount(Context context, int extra, String... flagNames) {

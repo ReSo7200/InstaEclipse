@@ -15,4 +15,5 @@
     <string name="menu_nav_gestures">手势</string>
     <string name="menu_reels">Reels</string>
     <string name="menu_stories">快拍</string>
+    <string name="nav_tab_order_changed">标签顺序已更改</string>
 </resources>

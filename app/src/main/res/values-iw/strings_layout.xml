@@ -15,4 +15,5 @@
     <string name="menu_nav_gestures">מחוות</string>
     <string name="menu_reels">Reels</string>
     <string name="menu_stories">סטוריז</string>
+    <string name="nav_tab_order_changed">סדר הלשוניות שונה</string>
 </resources>

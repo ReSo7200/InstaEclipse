@@ -15,4 +15,5 @@
     <string name="menu_nav_gestures">Cử chỉ</string>
     <string name="menu_reels">Reels</string>
     <string name="menu_stories">Tin</string>
+    <string name="nav_tab_order_changed">Đã đổi thứ tự tab</string>
 </resources>

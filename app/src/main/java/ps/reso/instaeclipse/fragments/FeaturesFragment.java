@@ -939,17 +939,18 @@ public class FeaturesFragment extends Fragment {
             if (fi.type != FeatureItem.TYPE_SWITCH || fi.prefKey == null || !seen.add(fi.prefKey)) continue;
             if (getCurrentState(fi.prefKey)) on++;
         }
-        if ("navigation".equals(cat.key)) {
-            // Tab order / startup tab are choices, not switches: count them when they're changed.
-            if (ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(localCache.getString("navTabOrder", ""))) on++;
-            if (!localCache.getString("startupTab", "").isEmpty()) on++;
-        }
         if (seen.isEmpty()) {
             nav.subtitle = null;
             nav.subtitleActive = false;
         } else {
             nav.subtitle = on > 0 ? getString(R.string.feat_count_on, on) : getString(R.string.feat_count_off);
             nav.subtitleActive = on > 0;
+        }
+        // Navigation: a changed tab order is a choice, not a switch, so it is noted after the count.
+        if ("navigation".equals(cat.key) && nav.subtitle != null
+                && ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(localCache.getString("navTabOrder", ""))) {
+            nav.subtitle = nav.subtitle + " · " + getString(R.string.nav_tab_order_changed);
+            nav.subtitleActive = true;
         }
     }
 

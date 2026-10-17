@@ -15,4 +15,5 @@
     <string name="menu_nav_gestures">Gesty</string>
     <string name="menu_reels">Rolki</string>
     <string name="menu_stories">Relacje</string>
+    <string name="nav_tab_order_changed">Zmieniono kolejność kart</string>
 </resources>
