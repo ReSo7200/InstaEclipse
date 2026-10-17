@@ -495,6 +495,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Jump to the first message of a DM (#244)
                     try {
                         if (!skip("JumpToFirstMessageHook")) new ps.reso.instaeclipse.mods.ghost.JumpToFirstMessageHook().install();
+                        if (!skip("ReadReceiptChatHook")) new ps.reso.instaeclipse.mods.ghost.ReadReceiptChatHook().install(hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(IE|JumpFirst) ❌ Failed to hook");
                     }

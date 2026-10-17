@@ -136,6 +136,10 @@ public class KeepUnsentMessagesHook {
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                 try {
                     if (!threadId.equals(currentThreadId)) return; // user moved on
+                    // The header on screen belongs to the resumed thread fragment; an id reported
+                    // by a background sync must not take that chat's name.
+                    String open = ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.currentThreadId();
+                    if (open != null && !open.equals(threadId)) return;
                     android.app.Activity a = host != null ? host : UIHookManager.getCurrentActivity();
                     if (a == null) return;
                     View root = a.getWindow() != null ? a.getWindow().getDecorView() : null;
@@ -153,6 +157,12 @@ public class KeepUnsentMessagesHook {
      *  handle-token scan only if that view is absent. */
     @SuppressLint("DiscouragedApi")
     private static String findThreadName(android.app.Activity a, ViewGroup root) {
+        // Only ever read the DM thread header: a whole-window scan picked up message words
+        // ("New", "Finished") and other chats' names.
+        int headerId = a.getResources().getIdentifier("direct_thread_header", "id", a.getPackageName());
+        View header = headerId != 0 ? root.findViewById(headerId) : null;
+        if (!(header instanceof ViewGroup headerGroup)) return null;
+        root = headerGroup;
         try {
             int titleId = a.getResources().getIdentifier("header_title", "id", a.getPackageName());
             if (titleId != 0) {

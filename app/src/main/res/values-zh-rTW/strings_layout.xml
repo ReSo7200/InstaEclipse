@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">分頁</string>
     <string name="menu_nav_order">順序與啟動</string>
     <string name="menu_nav_gestures">手勢</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">限時動態</string>
 </resources>

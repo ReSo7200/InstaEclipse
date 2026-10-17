@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Kirim tanda baca ke chat tertentu</string>
+    <string name="ig_read_receipt_chat_on">Kirim tanda baca di chat ini</string>
+    <string name="ig_read_receipt_chat_off">Hentikan tanda baca di chat ini</string>
+    <string name="ig_toast_read_receipt_on">Tanda baca aktif untuk chat ini</string>
+    <string name="ig_toast_read_receipt_off">Tanda baca nonaktif untuk chat ini</string>
+    <string name="ig_feat_read_receipt_chats">Tanda baca per chat</string>
+</resources>

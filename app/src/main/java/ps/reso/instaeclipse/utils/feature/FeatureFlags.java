@@ -42,6 +42,7 @@ public class FeatureFlags {
     public static volatile boolean hideTabMessages = false;
     public static volatile boolean hideTabActivity = false;
     public static volatile boolean hideTabProfile = false;
+    public static volatile boolean readReceiptChats = false; // per-chat read receipts, chosen in the chat menu
     public static volatile boolean hideDmBlend = false; // hide the Blend button in DM thread headers
     public static volatile boolean hideThreadsButton = false; // hide the Threads button on profiles
     public static volatile boolean hideNotesTray = false; // hide the Notes tray in the DM inbox (#241)
@@ -71,7 +72,6 @@ public class FeatureFlags {
     public static volatile boolean followingOnlyFeed = false; // home feed shows only accounts you follow
     public static volatile boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static volatile boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
-    public static volatile boolean hideChatButtonStealth = false; // no eye icon; long-press the chat header to hide (#221)
 
     // Which ghost mode features the quick toggle will control
     public static volatile boolean quickToggleSeen = false;

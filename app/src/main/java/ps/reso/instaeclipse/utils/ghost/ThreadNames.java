@@ -50,6 +50,30 @@ public class ThreadNames {
         } catch (Throwable t) {
             ModuleLog.line("(IE|ThreadNames) load failed: " + t.getMessage());
         }
+        cleanupOnce();
+    }
+
+    /**
+     * Older builds labelled threads with whatever chat header (or even message word) was on screen,
+     * so one name ended up on several unrelated ids. Drop every name shared by more than one id,
+     * once; the real names are learned again the next time each chat is opened.
+     */
+    private static void cleanupOnce() {
+        try {
+            Context ctx = AndroidAppHelper.currentApplication();
+            if (ctx == null) return;
+            File marker = new File(ctx.getFilesDir(), "ie_thread_names.v2");
+            if (marker.exists()) return;
+            Map<String, Integer> counts = new HashMap<>();
+            for (String v : cache.values()) counts.merge(v, 1, Integer::sum);
+            int before = cache.size();
+            cache.values().removeIf(v -> counts.getOrDefault(v, 0) > 1);
+            if (cache.size() != before) persist();
+            marker.createNewFile();
+            ModuleLog.line("(IE|ThreadNames) cleanup dropped " + (before - cache.size()) + " ambiguous name(s)");
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|ThreadNames) cleanup failed: " + t.getMessage());
+        }
     }
 
     private static synchronized void persist() {

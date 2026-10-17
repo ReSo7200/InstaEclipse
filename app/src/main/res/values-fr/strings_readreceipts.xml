@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Envoyer les accusés de lecture à certaines discussions</string>
+    <string name="ig_read_receipt_chat_on">Envoyer les accusés de lecture dans cette discussion</string>
+    <string name="ig_read_receipt_chat_off">Arrêter les accusés de lecture dans cette discussion</string>
+    <string name="ig_toast_read_receipt_on">Accusés de lecture activés pour cette discussion</string>
+    <string name="ig_toast_read_receipt_off">Accusés de lecture désactivés pour cette discussion</string>
+    <string name="ig_feat_read_receipt_chats">Accusés de lecture par discussion</string>
+</resources>

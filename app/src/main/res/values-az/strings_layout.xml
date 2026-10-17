@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Tablar</string>
     <string name="menu_nav_order">Sıra və Başlanğıc</string>
     <string name="menu_nav_gestures">Jestlər</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Hekayələr</string>
 </resources>

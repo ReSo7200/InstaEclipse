@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Enviar confirmaciones de lectura a chats concretos</string>
+    <string name="ig_read_receipt_chat_on">Enviar confirmaciones de lectura en este chat</string>
+    <string name="ig_read_receipt_chat_off">Dejar de enviar confirmaciones en este chat</string>
+    <string name="ig_toast_read_receipt_on">Confirmaciones de lectura activadas para este chat</string>
+    <string name="ig_toast_read_receipt_off">Confirmaciones de lectura desactivadas para este chat</string>
+    <string name="ig_feat_read_receipt_chats">Confirmaciones de lectura por chat</string>
+</resources>

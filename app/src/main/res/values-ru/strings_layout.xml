@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Вкладки</string>
     <string name="menu_nav_order">Порядок и запуск</string>
     <string name="menu_nav_gestures">Жесты</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Истории</string>
 </resources>

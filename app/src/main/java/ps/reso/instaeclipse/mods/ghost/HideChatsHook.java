@@ -45,9 +45,6 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 public class HideChatsHook {
 
     private static final String TAG = "ie_hidechat_btn";
-    // View-tag key for the stealth long-press marker (any app-unique int works for setTag(int, …)).
-    private static final int STEALTH_KEY = 0x7E1DC4A7;
-    private static final String STEALTH_TAG = "ie_hidechat_stealth";
     private static final java.util.Set<View> pendingDecors =
             java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
     private static final String INBOX_ANCHOR = "DirectThreadStoreImpl.getSortedCopyOfThreadSummaries";
@@ -164,25 +161,6 @@ public class HideChatsHook {
             View header = threadHeaderId != 0 ? activity.findViewById(threadHeaderId) : null;
             if (header == null) return false;
 
-            // Stealth mode (#221): no visible eye icon — long-press the chat header instead.
-            if (FeatureFlags.hideChatButtonStealth) {
-                View existing = header.getRootView().findViewWithTag(TAG);
-                if (existing != null && existing.getParent() instanceof ViewGroup p) p.removeView(existing);
-                // The title is its own clickable view (it opens thread details) and would swallow the
-                // touch before the header container sees a long-press, so arm both.
-                View title = headerTitleId != 0 ? header.findViewById(headerTitleId) : null;
-                for (View target : new View[]{header, title}) {
-                    if (target == null || STEALTH_TAG.equals(target.getTag(STEALTH_KEY))) continue;
-                    target.setTag(STEALTH_KEY, STEALTH_TAG);
-                    target.setOnLongClickListener(v -> {
-                        if (!FeatureFlags.hideSpecificChats || !FeatureFlags.hideChatButtonStealth) return false;
-                        toggleCurrent(activity);
-                        return true;
-                    });
-                }
-                return true;
-            }
-
             View oldBtn = header.getRootView().findViewWithTag(TAG); // pre-menu builds' eye button
             if (oldBtn != null && oldBtn.getParent() instanceof ViewGroup p) p.removeView(oldBtn);
             if (ThreadHeaderMenu.has(activity, "hide")) return true;
@@ -239,7 +217,8 @@ public class HideChatsHook {
     }
 
     // ── thread-id resolution (mirrors UnsentThreadButtonHook.resolveFromActivity — proven) ──
-    private String resolveThreadId(Activity activity) {
+    /** The open DM thread's id for {@code activity} (shared with ReadReceiptChatHook). */
+    static String resolveThreadId(Activity activity) {
         try {
             // 0. The resumed thread fragment's DirectThreadKey (works for threads hosted in
             //    InstagramMainActivity as well as ModalActivity — issue #254).
@@ -262,7 +241,7 @@ public class HideChatsHook {
     }
 
     /** Find a DirectThreadKey in obj's field graph (depth-limited; descends IG/obfuscated + Bundles). */
-    private Object scan(Object obj, int depth, java.util.Set<Object> seen, int maxDepth) {
+    private static Object scan(Object obj, int depth, java.util.Set<Object> seen, int maxDepth) {
         if (obj == null || depth > maxDepth || !seen.add(obj)) return null;
         String cn = obj.getClass().getName();
         if (cn.contains("DirectThreadKey")) return obj;

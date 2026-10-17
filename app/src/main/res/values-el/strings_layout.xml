@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Καρτέλες</string>
     <string name="menu_nav_order">Σειρά &amp; Έναρξη</string>
     <string name="menu_nav_gestures">Χειρονομίες</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Ιστορίες</string>
 </resources>

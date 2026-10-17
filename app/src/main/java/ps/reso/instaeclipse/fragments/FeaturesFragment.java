@@ -844,7 +844,8 @@ public class FeaturesFragment extends Fragment {
         c.add(new Category("theme", GROUP_APPEARANCE, R.drawable.ic_palette, A_APPEARANCE, getString(R.string.ig_dialog_menu_theme), this::buildThemeDefs, this::loadThemeMenu));
         c.add(new Category("feed", GROUP_APPEARANCE, R.drawable.ic_sparkle, A_APPEARANCE, getString(R.string.menu_feed), this::buildFeedDefs, this::loadFeedMenu));
         c.add(new Category("navigation", GROUP_APPEARANCE, R.drawable.ic_tune, A_APPEARANCE, getString(R.string.menu_navigation), this::buildNavigationDefs, this::loadNavigationMenu));
-        c.add(new Category("reels", GROUP_APPEARANCE, R.drawable.ic_movie, A_APPEARANCE, getString(R.string.menu_reels_stories), this::buildReelsDefs, this::loadReelsMenu));
+        c.add(new Category("reels", GROUP_APPEARANCE, R.drawable.ic_movie, A_APPEARANCE, getString(R.string.menu_reels), this::buildReelsDefs, this::loadReelsMenu));
+        c.add(new Category("stories", GROUP_APPEARANCE, R.drawable.ic_story_ring, A_APPEARANCE, getString(R.string.menu_stories), this::buildStoriesDefs, this::loadStoriesMenu));
 
         c.add(new Category("ghost", GROUP_PRIVACY, R.drawable.ic_eye, A_PRIVACY, getString(R.string.ig_dialog_menu_ghost_settings), this::buildGhostDefs, this::loadGhostMenu));
         c.add(new Category("messages", GROUP_PRIVACY, R.drawable.ic_chat, A_PRIVACY, getString(R.string.menu_messages), this::buildMessagesDefs, this::loadMessagesMenu));
@@ -1062,6 +1063,7 @@ public class FeaturesFragment extends Fragment {
         // Outside the master switch
         defs.add(getString(R.string.feat_options));
         defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_ghost_read_receipt_chats), "readReceiptChats"),
                 createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_dialog_misc_spoof_last_seen), "spoofLastSeen"),
                 createExtrasSwitch("#5E5CE6", "airplaneMode")
         ));
@@ -1520,8 +1522,7 @@ public class FeaturesFragment extends Fragment {
 
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
-                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats"),
-                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_hide_chats_stealth), "hideChatButtonStealth")
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats")
         ));
 
         // Note: hiding/unhiding a specific chat is done from inside Instagram.
@@ -1652,8 +1653,13 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void loadReelsMenu() {
-        showMenu(getString(R.string.menu_reels_stories), buildReelsDefs());
+        showMenu(getString(R.string.menu_reels), buildReelsDefs());
         currentMenu = "reels";
+    }
+
+    private void loadStoriesMenu() {
+        showMenu(getString(R.string.menu_stories), buildStoriesDefs());
+        currentMenu = "stories";
     }
 
     private List<Object> buildReelsDefs() {
@@ -1668,17 +1674,21 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createExtrasSwitch("#32D74B", "reelsAutoScroll"),
                 createExtrasSwitch("#32D74B", "reelsLockScroll"),
-                createSwitch(R.drawable.ic_movie, "#32D74B", getString(R.string.ig_dialog_downloader_reel_scrubber), "forceReelScrubber")
+                createSwitch(R.drawable.ic_movie, "#32D74B", getString(R.string.ig_dialog_downloader_reel_scrubber), "forceReelScrubber"),
+                createSwitch(R.drawable.ic_block, "#32D74B", getString(R.string.ig_dialog_misc_disable_repost), "disableRepost")
         ));
 
-        defs.add(getString(R.string.story));
+        return defs;
+    }
+
+    private List<Object> buildStoriesDefs() {
+        List<Object> defs = new ArrayList<>();
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_story_ring, "#32D74B", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_at, "#32D74B", getString(R.string.ig_dialog_misc_view_story_mentions), "enableStoryMentions"),
                 createSwitch(R.drawable.ic_link, "#32D74B", getString(R.string.ig_dialog_misc_story_links), "storyLinks"),
                 createSwitch(R.drawable.ic_info, "#32D74B", getString(R.string.ig_dialog_misc_story_info), "storyInfo"),
-                createSwitch(R.drawable.ic_search, "#32D74B", getString(R.string.ig_dialog_misc_viewer_search), "storyViewerSearch"),
-                createSwitch(R.drawable.ic_block, "#32D74B", getString(R.string.ig_dialog_misc_disable_repost), "disableRepost")
+                createSwitch(R.drawable.ic_search, "#32D74B", getString(R.string.ig_dialog_misc_viewer_search), "storyViewerSearch")
         ));
 
         return defs;

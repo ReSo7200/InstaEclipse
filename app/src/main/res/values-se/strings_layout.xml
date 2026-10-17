@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Flikar</string>
     <string name="menu_nav_order">Ordning och start</string>
     <string name="menu_nav_gestures">Gester</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Stories</string>
 </resources>

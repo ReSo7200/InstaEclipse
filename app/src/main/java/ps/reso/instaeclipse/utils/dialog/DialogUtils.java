@@ -75,6 +75,7 @@ public class DialogUtils {
     @SuppressLint("UseCompatLoadingForDrawables")
     public static void showEclipseOptionsDialog(Context context) {
         SettingsManager.init(context);
+        clearSectionStack();
 
         LinearLayout outer = new LinearLayout(context);
         outer.setOrientation(LinearLayout.VERTICAL);
@@ -166,15 +167,16 @@ public class DialogUtils {
         appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
         appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_feed), A_APPEARANCE, () -> showFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "hidePlusUpsells", "followingOnlyFeed", "hideStoriesTray", "disableDiscoverPeople", "expandCaptions", "exactTimestamps", "highResolutionImages", "enablePhotoZoom", "disableVideoAutoPlay")));
         appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), onCount(context, "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile", "disableSwipeToCamera")));
-        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels_stories), A_APPEARANCE, () -> showReelsStoriesOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "disableStoryFlipping", "enableStoryMentions", "storyLinks", "storyInfo", "storyViewerSearch", "disableRepost")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels), A_APPEARANCE, () -> showReelsOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "disableRepost")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_story_ring, I18n.t(context, R.string.menu_stories), A_APPEARANCE, () -> showStoriesOptions(context), onCount(context, "disableStoryFlipping", "enableStoryMentions", "storyLinks", "storyInfo", "storyViewerSearch")));
         mainLayout.addView(appearance);
 
         // ---- PRIVACY ---- ghost, messages, hidden chats, lock, ads/tracking, location, distraction-free
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_privacy)));
         LinearLayout privacy = createGroupCard(context);
-        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "isGhostScreenshot", "allowScreenshots", "isGhostViewOnce", "permanentViewMode", "spoofLastSeen", "airplaneMode")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "isGhostScreenshot", "allowScreenshots", "isGhostViewOnce", "permanentViewMode", "readReceiptChats", "spoofLastSeen", "airplaneMode")));
         privacy.addView(createMenuRow(context, R.drawable.ic_chat, I18n.t(context, R.string.menu_messages), A_PRIVACY, () -> showMessagesOptions(context), onCount(context, "keepEphemeralMessages", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "chatExport", "hideNotesTray", "hideDmBlend", "hideShareCreateGroup")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context), onCount(context, "hideSpecificChats", "hideChatButtonStealth")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context), onCount(context, "hideSpecificChats")));
         privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
         privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.menu_ads_tracking), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally", "removeMetaAI", "hideOnboardingPrompts")));
         privacy.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_PRIVACY, () -> showLocationOptions(context), onCount(context, "spoofLocation")));
@@ -997,7 +999,6 @@ public class DialogUtils {
         LinearLayout layout = createSwitchLayout(context);
 
         layout.addView(createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_customize_quick_toggle), "#5E5CE6", v -> showGhostQuickToggleOptions(context)));
-        layout.addView(createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_read_receipts_title), "#5E5CE6", v -> showReadReceiptWhitelist(context)));
 
         // Each ghost toggle applies at once and refreshes the ghost emoji next to the inbox.
         Runnable refreshGhostEmoji = () -> {
@@ -1019,6 +1020,7 @@ public class DialogUtils {
         // Outside the master switch: last-seen spoofing and airplane mode.
         layout.addView(createDivider(context));
         layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_eye, "#5E5CE6", R.string.ig_dialog_ghost_read_receipt_chats, "readReceiptChats"),
                 flagSwitch(context, R.drawable.ic_timer, "#5E5CE6", R.string.ig_dialog_misc_spoof_last_seen, "spoofLastSeen"),
                 // Airplane mode takes effect at once: stop / restart the live MQTT connection.
                 extraSwitch(context, "#5E5CE6", "airplaneMode", ps.reso.instaeclipse.mods.extras.AirplaneModeHook::apply)));
@@ -1383,7 +1385,7 @@ public class DialogUtils {
     }
 
     /** Reels & Stories: forced reel quality, reel scrolling/scrubber, story behaviour. */
-    private static void showReelsStoriesOptions(Context context) {
+    private static void showReelsOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
         // Force Reels Quality — inline single choice (FeatureFlags.forceReelQuality, 0 = auto).
@@ -1417,18 +1419,22 @@ public class DialogUtils {
         layout.addView(cardOf(context,
                 extraSwitch(context, "#FF375F", "reelsAutoScroll"),
                 extraSwitch(context, "#FF375F", "reelsLockScroll"),
-                flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_downloader_reel_scrubber, "forceReelScrubber")));
+                flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_downloader_reel_scrubber, "forceReelScrubber"),
+                flagSwitch(context, R.drawable.ic_block, "#FF375F", R.string.ig_dialog_misc_disable_repost, "disableRepost")));
 
-        layout.addView(createDivider(context));
+        showSectionDialog(context, I18n.t(context, R.string.menu_reels), layout, () -> {});
+    }
+
+    private static void showStoriesOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_story_ring, "#FF375F", R.string.ig_dialog_misc_disable_story_autoswipe, "disableStoryFlipping"),
                 flagSwitch(context, R.drawable.ic_at, "#FF375F", R.string.ig_dialog_misc_view_story_mentions, "enableStoryMentions"),
                 flagSwitch(context, R.drawable.ic_link, "#FF375F", R.string.ig_dialog_misc_story_links, "storyLinks"),
                 flagSwitch(context, R.drawable.ic_info, "#FF375F", R.string.ig_dialog_misc_story_info, "storyInfo"),
-                flagSwitch(context, R.drawable.ic_search, "#FF375F", R.string.ig_dialog_misc_viewer_search, "storyViewerSearch"),
-                flagSwitch(context, R.drawable.ic_block, "#FF375F", R.string.ig_dialog_misc_disable_repost, "disableRepost")));
+                flagSwitch(context, R.drawable.ic_search, "#FF375F", R.string.ig_dialog_misc_viewer_search, "storyViewerSearch")));
 
-        showSectionDialog(context, I18n.t(context, R.string.menu_reels_stories), layout, () -> {});
+        showSectionDialog(context, I18n.t(context, R.string.menu_stories), layout, () -> {});
     }
 
 
@@ -1563,13 +1569,6 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         hideCard.addView(hideChats);
-        ToggleRow stealth = createSwitch(context, R.drawable.ic_eye_off, A_PRIVACY,
-                I18n.t(context, R.string.ig_hide_chats_stealth), FeatureFlags.hideChatButtonStealth);
-        stealth.setOnCheckedChangeListener((b, checked) -> {
-            FeatureFlags.hideChatButtonStealth = checked;
-            SettingsManager.saveAllFlags();
-        });
-        hideCard.addView(stealth);
         hideCard.addView(createActionRow(context, R.drawable.ic_eye,
                 I18n.t(context, R.string.ig_hide_chats_manage), A_PRIVACY, v -> showHiddenChats(context)));
         layout.addView(hideCard);
@@ -1587,38 +1586,6 @@ public class DialogUtils {
             c = ((android.content.ContextWrapper) c).getBaseContext();
         }
         return null;
-    }
-
-    /**
-     * Per-chat read-receipt whitelist (#227): chats listed here still get "Seen" while Hide DM Seen
-     * is on. Candidates are the chats opened while the module was active (ThreadNames); whitelisted
-     * ones are listed first.
-     */
-    private static void showReadReceiptWhitelist(Context context) {
-        LinearLayout layout = createSwitchLayout(context);
-        java.util.Map<String, String> allowed = ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist.all();
-        java.util.LinkedHashMap<String, String> rows = new java.util.LinkedHashMap<>(allowed);
-        for (java.util.Map.Entry<String, String> e : ps.reso.instaeclipse.utils.ghost.ThreadNames.all().entrySet()) {
-            if (!rows.containsKey(e.getKey())) rows.put(e.getKey(), e.getValue());
-        }
-        layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ig_read_receipts_hint)));
-        if (rows.isEmpty()) {
-            layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ig_read_receipts_empty)));
-        } else {
-            LinearLayout cardView = card(context);
-            for (java.util.Map.Entry<String, String> e : rows.entrySet()) {
-                final String id = e.getKey();
-                String known = ps.reso.instaeclipse.utils.ghost.ThreadNames.get(id);
-                final String label = !known.isEmpty() ? known
-                        : (e.getValue() == null || e.getValue().isEmpty() ? id : e.getValue());
-                ToggleRow row = createSwitch(context, R.drawable.ic_chat, "#5E5CE6", label, allowed.containsKey(id));
-                row.setOnCheckedChangeListener((b, checked) ->
-                        ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist.set(id, label, checked));
-                cardView.addView(row);
-            }
-            layout.addView(cardView);
-        }
-        showSectionDialog(context, I18n.t(context, R.string.ig_read_receipts_title), layout, () -> {});
     }
 
     /** Manager listing hidden chats with per-row unhide buttons. */
@@ -2406,8 +2373,29 @@ public class DialogUtils {
     // ==== HELPERS ====
 
     @SuppressLint("SetTextI18n")
+    /** Section pages opened from another section (e.g. Ghost Mode -> Send read receipts to): the
+     *  parent is hidden, not dismissed, so Back can bring it back as it was. {dialog, title} */
+    private static final java.util.ArrayDeque<Object[]> sectionStack = new java.util.ArrayDeque<>();
+    private static String currentSectionTitle; // null while the main menu (or nothing) is showing
+
+    private static void clearSectionStack() {
+        for (Object[] e : sectionStack) {
+            try { ((AlertDialog) e[0]).dismiss(); } catch (Exception ignored) {}
+        }
+        sectionStack.clear();
+        currentSectionTitle = null;
+    }
+
     private static void showSectionDialog(Context context, String title, LinearLayout contentLayout, Runnable onSave) {
-        if (currentDialog != null) { try { currentDialog.dismiss(); } catch (Exception ignored) {} currentDialog = null; }
+        if (currentDialog != null) {
+            if (currentSectionTitle != null && !currentSectionTitle.equals(title) && currentDialog.isShowing()) {
+                currentDialog.hide(); // opened from another section: keep it to come back to
+                sectionStack.push(new Object[]{currentDialog, currentSectionTitle});
+            } else {
+                try { currentDialog.dismiss(); } catch (Exception ignored) {}
+            }
+            currentDialog = null;
+        }
 
         LinearLayout container = new LinearLayout(context);
         container.setOrientation(LinearLayout.VERTICAL);
@@ -2445,7 +2433,15 @@ public class DialogUtils {
         backBtn.setOnClickListener(v -> {
             onSave.run();
             SettingsManager.saveAllFlags();
-            showEclipseOptionsDialog(context);
+            Object[] parent = sectionStack.poll();
+            if (parent != null) {
+                if (currentDialog != null) { try { currentDialog.dismiss(); } catch (Exception ignored) {} }
+                currentDialog = (AlertDialog) parent[0];
+                currentSectionTitle = (String) parent[1];
+                currentDialog.show();
+            } else {
+                showEclipseOptionsDialog(context);
+            }
         });
 
         TextView titleView = new TextView(context);
@@ -2477,6 +2473,9 @@ public class DialogUtils {
         ScrollView scrollView = createScrollableContainer(context, container);
 
         currentDialog = createBottomSheetDialog(context, scrollView);
+        currentSectionTitle = title;
+        // Tapping outside closes the whole chain, including hidden parents.
+        currentDialog.setOnCancelListener(d -> clearSectionStack());
         // System Back on a section goes back to the main menu (same as the ‹ arrow); only the
         // main menu closes on Back.
         currentDialog.setOnKeyListener((d, keyCode, event) -> {

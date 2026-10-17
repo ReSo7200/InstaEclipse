@@ -24,7 +24,7 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  */
 final class ThreadHeaderMenu {
     static final String TAG = "ie_thread_menu";
-    private static final String[] ORDER = {"unsent", "export", "jump", "hide"};
+    private static final String[] ORDER = {"unsent", "export", "jump", "read", "hide"};
 
     /** menu button -> key -> entry; weak so a closed thread's views can go */
     private static final Map<View, Map<String, Entry>> entries = new WeakHashMap<>();

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Lesebestätigungen an bestimmte Chats senden</string>
+    <string name="ig_read_receipt_chat_on">Lesebestätigungen in diesem Chat senden</string>
+    <string name="ig_read_receipt_chat_off">Lesebestätigungen in diesem Chat stoppen</string>
+    <string name="ig_toast_read_receipt_on">Lesebestätigungen für diesen Chat an</string>
+    <string name="ig_toast_read_receipt_off">Lesebestätigungen für diesen Chat aus</string>
+    <string name="ig_feat_read_receipt_chats">Lesebestätigungen pro Chat</string>
+</resources>

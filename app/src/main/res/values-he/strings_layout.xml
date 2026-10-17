@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">לשוניות</string>
     <string name="menu_nav_order">סדר והפעלה</string>
     <string name="menu_nav_gestures">מחוות</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">סטוריז</string>
 </resources>

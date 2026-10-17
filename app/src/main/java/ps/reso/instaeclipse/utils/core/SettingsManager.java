@@ -50,7 +50,6 @@ public class SettingsManager {
         editor.putBoolean("lockDirectAlways", FeatureFlags.lockDirectAlways);
         editor.putBoolean("lockWholeApp", FeatureFlags.lockWholeApp);
         editor.putBoolean("hideSpecificChats", FeatureFlags.hideSpecificChats);
-        editor.putBoolean("hideChatButtonStealth", FeatureFlags.hideChatButtonStealth);
         editor.putBoolean("lockUseFingerprint", FeatureFlags.lockUseFingerprint);
 
         // Quick Toggles
@@ -100,6 +99,7 @@ public class SettingsManager {
         editor.putBoolean("hideTabProfile", FeatureFlags.hideTabProfile);
         editor.putBoolean("hideNotesTray", FeatureFlags.hideNotesTray);
         editor.putBoolean("hideDmBlend", FeatureFlags.hideDmBlend);
+        editor.putBoolean("readReceiptChats", FeatureFlags.readReceiptChats);
         editor.putBoolean("hideThreadsButton", FeatureFlags.hideThreadsButton);
 
         // Ads
@@ -219,7 +219,6 @@ public class SettingsManager {
         FeatureFlags.lockDirectAlways = prefs.getBoolean("lockDirectAlways", false);
         FeatureFlags.lockWholeApp = prefs.getBoolean("lockWholeApp", false);
         FeatureFlags.hideSpecificChats = prefs.getBoolean("hideSpecificChats", false);
-        FeatureFlags.hideChatButtonStealth = prefs.getBoolean("hideChatButtonStealth", false);
         FeatureFlags.lockUseFingerprint = prefs.getBoolean("lockUseFingerprint", true);
 
         // Quick Toggles
@@ -269,6 +268,7 @@ public class SettingsManager {
         FeatureFlags.hideTabProfile = prefs.getBoolean("hideTabProfile", false);
         FeatureFlags.hideNotesTray = prefs.getBoolean("hideNotesTray", false);
         FeatureFlags.hideDmBlend = prefs.getBoolean("hideDmBlend", false);
+        FeatureFlags.readReceiptChats = prefs.getBoolean("readReceiptChats", false);
         FeatureFlags.hideThreadsButton = prefs.getBoolean("hideThreadsButton", false);
 
         // Ads

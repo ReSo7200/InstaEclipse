@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">التبويبات</string>
     <string name="menu_nav_order">الترتيب والبدء</string>
     <string name="menu_nav_gestures">الإيماءات</string>
+    <string name="menu_reels">ريلز</string>
+    <string name="menu_stories">القصص</string>
 </resources>

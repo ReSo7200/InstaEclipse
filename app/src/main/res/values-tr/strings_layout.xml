@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Sekmeler</string>
     <string name="menu_nav_order">Sıra ve Başlangıç</string>
     <string name="menu_nav_gestures">Hareketler</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Hikâyeler</string>
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Αποστολή επιβεβαιώσεων ανάγνωσης σε συγκεκριμένες συνομιλίες</string>
+    <string name="ig_read_receipt_chat_on">Αποστολή επιβεβαιώσεων ανάγνωσης σε αυτή τη συνομιλία</string>
+    <string name="ig_read_receipt_chat_off">Διακοπή επιβεβαιώσεων ανάγνωσης σε αυτή τη συνομιλία</string>
+    <string name="ig_toast_read_receipt_on">Επιβεβαιώσεις ανάγνωσης ενεργές για αυτή τη συνομιλία</string>
+    <string name="ig_toast_read_receipt_off">Επιβεβαιώσεις ανάγνωσης ανενεργές για αυτή τη συνομιλία</string>
+    <string name="ig_feat_read_receipt_chats">Επιβεβαιώσεις ανάγνωσης ανά συνομιλία</string>
+</resources>

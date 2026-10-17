@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Wysyłaj potwierdzenia odczytu do wybranych czatów</string>
+    <string name="ig_read_receipt_chat_on">Wysyłaj potwierdzenia odczytu w tym czacie</string>
+    <string name="ig_read_receipt_chat_off">Przestań wysyłać potwierdzenia w tym czacie</string>
+    <string name="ig_toast_read_receipt_on">Potwierdzenia odczytu włączone dla tego czatu</string>
+    <string name="ig_toast_read_receipt_off">Potwierdzenia odczytu wyłączone dla tego czatu</string>
+    <string name="ig_feat_read_receipt_chats">Potwierdzenia odczytu dla czatu</string>
+</resources>

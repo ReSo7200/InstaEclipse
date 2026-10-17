@@ -72,12 +72,17 @@ public class ReadReceiptWhitelist {
 
     /** True when Instagram should send read receipts for this thread despite ghost mode. */
     public static synchronized boolean isAllowed(String threadId) {
+        return ps.reso.instaeclipse.utils.feature.FeatureFlags.readReceiptChats && isHidden(threadId);
+    }
+
+    /** True when the chat is on the list (regardless of the feature switch), for the chat menu. */
+    public static synchronized boolean isListed(String threadId) {
         return isHidden(threadId);
     }
 
     /** True when the request path names a whitelisted thread (/direct_v2/threads/<id>/…). */
     public static synchronized boolean pathMentionsAllowed(String path) {
-        if (path == null) return false;
+        if (path == null || !ps.reso.instaeclipse.utils.feature.FeatureFlags.readReceiptChats) return false;
         ensureLoaded();
         for (String id : map.keySet()) if (path.contains("/" + id + "/")) return true;
         return false;

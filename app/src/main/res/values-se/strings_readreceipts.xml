@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Skicka läskvitton till vissa chattar</string>
+    <string name="ig_read_receipt_chat_on">Skicka läskvitton i den här chatten</string>
+    <string name="ig_read_receipt_chat_off">Sluta skicka läskvitton i den här chatten</string>
+    <string name="ig_toast_read_receipt_on">Läskvitton på för den här chatten</string>
+    <string name="ig_toast_read_receipt_off">Läskvitton av för den här chatten</string>
+    <string name="ig_feat_read_receipt_chats">Läskvitton per chatt</string>
+</resources>

@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Onglets</string>
     <string name="menu_nav_order">Ordre et démarrage</string>
     <string name="menu_nav_gestures">Gestes</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Stories</string>
 </resources>

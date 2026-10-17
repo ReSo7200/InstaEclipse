@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Thẻ</string>
     <string name="menu_nav_order">Thứ tự và khởi động</string>
     <string name="menu_nav_gestures">Cử chỉ</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Tin</string>
 </resources>

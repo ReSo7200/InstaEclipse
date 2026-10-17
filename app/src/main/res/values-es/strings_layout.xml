@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Pestañas</string>
     <string name="menu_nav_order">Orden e inicio</string>
     <string name="menu_nav_gestures">Gestos</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Historias</string>
 </resources>

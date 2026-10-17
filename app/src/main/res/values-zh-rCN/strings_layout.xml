@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">标签页</string>
     <string name="menu_nav_order">顺序与启动</string>
     <string name="menu_nav_gestures">手势</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">快拍</string>
 </resources>

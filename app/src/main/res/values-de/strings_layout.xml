@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Tabs</string>
     <string name="menu_nav_order">Reihenfolge &amp; Start</string>
     <string name="menu_nav_gestures">Gesten</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Storys</string>
 </resources>

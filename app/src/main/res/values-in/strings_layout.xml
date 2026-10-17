@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Tab</string>
     <string name="menu_nav_order">Urutan &amp; Mulai</string>
     <string name="menu_nav_gestures">Gestur</string>
+    <string name="menu_reels">Reels</string>
+    <string name="menu_stories">Cerita</string>
 </resources>

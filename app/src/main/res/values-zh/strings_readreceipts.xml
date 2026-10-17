@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">向特定聊天发送已读回执</string>
+    <string name="ig_read_receipt_chat_on">在此聊天中发送已读回执</string>
+    <string name="ig_read_receipt_chat_off">在此聊天中停止发送已读回执</string>
+    <string name="ig_toast_read_receipt_on">已为此聊天开启已读回执</string>
+    <string name="ig_toast_read_receipt_off">已为此聊天关闭已读回执</string>
+    <string name="ig_feat_read_receipt_chats">按聊天发送已读回执</string>
+</resources>

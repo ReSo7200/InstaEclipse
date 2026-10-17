@@ -81,7 +81,7 @@ public class HomeFragment extends Fragment {
             "hidePlusUpsells", "expandCaptions",
             // Distraction-free
             "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore",
-            "disableComments", "hideNotesTray", "hideDmBlend", "hideThreadsButton",
+            "disableComments", "hideNotesTray", "hideDmBlend", "hideThreadsButton", "readReceiptChats",
             // Navigation bar
             "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile",
             // Misc
@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
             "storyViewerSearch", "storyLinks", "storyInfo", "commentSearch", "followListExport",
             // Lock / hide chats
             "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint",
-            "hideSpecificChats", "hideChatButtonStealth",
+            "hideSpecificChats",
             // Location / theme
             "spoofLocation", "customThemeEnabled", "customFontEnabled", "customEmojiEnabled",
             // Downloader

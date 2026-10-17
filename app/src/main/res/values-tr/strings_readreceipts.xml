@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_dialog_ghost_read_receipt_chats">Belirli sohbetlere okundu bilgisi gönder</string>
+    <string name="ig_read_receipt_chat_on">Bu sohbette okundu bilgisi gönder</string>
+    <string name="ig_read_receipt_chat_off">Bu sohbette okundu bilgisini durdur</string>
+    <string name="ig_toast_read_receipt_on">Bu sohbet için okundu bilgisi açık</string>
+    <string name="ig_toast_read_receipt_off">Bu sohbet için okundu bilgisi kapalı</string>
+    <string name="ig_feat_read_receipt_chats">Sohbete özel okundu bilgisi</string>
+</resources>

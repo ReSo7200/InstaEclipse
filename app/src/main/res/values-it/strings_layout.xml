@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Schede</string>
     <string name="menu_nav_order">Ordine e avvio</string>
     <string name="menu_nav_gestures">Gesti</string>
+    <string name="menu_reels">Reel</string>
+    <string name="menu_stories">Storie</string>
 </resources>

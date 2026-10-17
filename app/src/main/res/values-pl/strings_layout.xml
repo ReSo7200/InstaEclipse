@@ -13,4 +13,6 @@
     <string name="menu_nav_tabs">Karty</string>
     <string name="menu_nav_order">Kolejność i start</string>
     <string name="menu_nav_gestures">Gesty</string>
+    <string name="menu_reels">Rolki</string>
+    <string name="menu_stories">Relacje</string>
 </resources>
