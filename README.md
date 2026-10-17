@@ -42,6 +42,8 @@ Under the hood, InstaEclipse uses [DexKit](https://github.com/LuckyPray/DexKit) 
 The biggest update so far. Highlights:
 
 - **Stories got smart.** Story Info shows exact posting and expiry times, the song with Spotify, YouTube Music and Apple Music buttons, location, hashtags, who it was reshared from, paid partnerships, Add Yours counts and more. Polls, sliders and quizzes show their results as bars.
+- **Song links on posts and reels too.** Media info shows the song with the same Spotify, YouTube Music and Apple Music buttons.
+- **Translate chat messages** with your own translator app (Google Translate, DeepL and others), right from the message menu.
 - **Copy links from story link stickers**, and hold a mention to open that profile.
 - **A reorganized menu**, grouped by what things do: Feed, Navigation, Reels, Stories, Ghost Mode, Messages, Downloads, Likes and Comments, Profiles, and more. Same layout in Instagram and in the companion app.
 - **Per chat tools** in one InstaEclipse button inside every chat: unsent messages, export, jump to the first message, read receipts for just that chat, and hide or unhide the chat.
@@ -49,7 +51,7 @@ The biggest update so far. Highlights:
 - **Clean up Instagram's own buttons:** hide the Threads button on profiles, the Blend button in chats, the Notes tray, "Create group" on the share sheet, Plus upsells, and community notes.
 - **Navigation:** hide tabs, reorder them, choose the tab Instagram opens on, and turn off swipe to camera.
 - **Extras:** airplane mode, following only feed, high resolution images, unlimited accounts, Reels auto scroll and scroll lock.
-- **A new look everywhere.** Modern dialogs and toasts, a home dashboard, searchable features, an animated About page, light and dark versions of every theme.
+- **A new look everywhere.** Modern dialogs and toasts, a home dashboard, searchable features, an animated About page, light and dark versions of every theme. InstaEclipse's own menus, toggles and dialogs follow your theme's colors, and its menu items get proper icons.
 - **Sturdier.** Safer settings sync with the companion app, crash fixes, security hardening, and every feature found at runtime with DexKit.
 - **New language:** Vietnamese joins the list.
 
@@ -90,11 +92,12 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Feature | What it does |
 |---|---|
 | Keep disappearing messages | Stop ephemeral messages from deleting themselves |
-| Log unsent messages | When someone unsends a message, keep a private copy, grouped per chat |
+| Log unsent messages | When someone unsends a message, keep a private copy, grouped per chat and named after it |
 | Edit history | See every earlier version of a message that was edited |
 | Chat export | Export a chat to a readable HTML page with replies, reactions, edit history and optional media |
 | Jump to first message | Scroll a chat all the way back to its first message |
 | Voice message downloads | Save voice messages, named by sender |
+| Translate messages | Send a message to your translator app from its long press menu (under More) |
 | Hide specific chats | Hide chats from your inbox and manage them later |
 | Hide the Notes tray | Remove Notes from the top of your inbox |
 | Hide Blend in chats | Remove the Blend button from the chat header |
@@ -112,7 +115,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Feature | What it does |
 |---|---|
 | Story Info | Exact posted, expiry and edit times, music, location, hashtags, reshared from, original post or reel, posting app, alt text, size, countdowns, questions, Add Yours (exact joined count and top people), paid partnership and collaborators. Tap any line to copy it |
-| Music links | Open the story's song in Spotify, YouTube Music or Apple Music |
+| Music links | Open the song in Spotify, YouTube Music or Apple Music, from Story Info, or from Media info on posts and reels |
 | Poll, slider and quiz results | Results drawn as bars, your own answer marked, and the correct quiz answer in green |
 | Copy story links | Copy the links from link stickers, or pick from a list when there are several |
 | View story mentions | See every @mention at once. Tap to copy, hold to open the profile |
@@ -150,7 +153,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Audio only | Save just the audio of a video or reel as .m4a, including a post's music |
 | Copy media link | Copy the direct link for a post, reel or a single carousel slide |
 | Copy image | Copy a photo straight to the clipboard |
-| Media info | Resolution, file size and more, with an option to open it in another app |
+| Media info | Resolution, file size, the song with streaming links, and an option to open the file in another app |
 | Download with InstaEclipse | Share a post or reel link from any app to download it |
 | Story cache | Keep stories you watched for 24 hours, so you can save ones that expired |
 | Save Instants | Long press an Instant to save it |
@@ -194,7 +197,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Undo a like | A few seconds to take a like back |
 | Comment search | Search a post's comments, load them all, and export them |
 | Copy comments and captions | Copy any comment, or a caption with or without hashtags |
-| Translate | Translate captions and comments |
+| Translate | Translate captions, comments and chat messages with your own translator app |
 | Save comment GIFs and images | Download the media in comments |
 | "Follows you" label | See on any profile whether they follow you back |
 | Follower toast | A quick message when you open a profile |
@@ -227,7 +230,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Feature | What it does |
 |---|---|
 | Lock the whole app | Passcode or fingerprint to open Instagram |
-| Lock DMs | Lock just the inbox |
+| Lock DMs | Lock just the inbox, and optionally lock it again every time you leave |
 | Block ads and analytics | Drop sponsored posts and tracking calls |
 | Disable tracking links | Strip only the tracking parts from links you share |
 | Open links externally | Use your own browser instead of Instagram's |
@@ -247,6 +250,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Custom theme | Presets or your own colors for every part of the app, applied live |
 | Light and dark themes | Every theme has both versions and follows your phone |
+| Themed menus | InstaEclipse's own menus, toggles and dialogs use your theme's accent color |
 | Custom font | Use any .ttf or .otf across the app |
 | Custom emoji | Swap in another emoji font |
 
