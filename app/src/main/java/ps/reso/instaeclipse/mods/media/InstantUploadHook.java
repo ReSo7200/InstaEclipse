@@ -541,7 +541,7 @@ public class InstantUploadHook {
                     I18n.t(act, R.string.ig_instant_upload_chip)), PICK_REQUEST);
         } catch (Throwable t) {
             pickerOpen = false;
-            Toast.makeText(act, I18n.t(act, R.string.ig_instant_upload_fail), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(act, I18n.t(act, R.string.ig_instant_upload_fail), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -583,14 +583,14 @@ public class InstantUploadHook {
                                 Bitmap bmp = decode(act, uri);
                                 if (bmp == null) {
                                     restoreChipAfterCancel(act);
-                                    Toast.makeText(act, I18n.t(act, R.string.ig_instant_upload_fail),
+                                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(act, I18n.t(act, R.string.ig_instant_upload_fail),
                                             Toast.LENGTH_SHORT).show();
                                     return;
                                 }
                                 pendingBitmap = bmp;
                                 pendingSetAt = System.currentTimeMillis();
                                 markChipReady(act, bmp);
-                                Toast.makeText(act, I18n.t(act, R.string.ig_instant_upload_ready),
+                                ps.reso.instaeclipse.utils.toast.IeToast.makeText(act, I18n.t(act, R.string.ig_instant_upload_ready),
                                         Toast.LENGTH_LONG).show();
                             } catch (Throwable t) {
                                 ModuleLog.line("(IE|InstantUpload) ❌ result: " + t);

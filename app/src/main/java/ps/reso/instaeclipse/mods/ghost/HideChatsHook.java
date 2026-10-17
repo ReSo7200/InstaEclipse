@@ -183,11 +183,11 @@ public class HideChatsHook {
     private void toggleCurrent(Activity activity) {
         String threadId = resolveThreadId(activity);
         if (threadId == null) {
-            Toast.makeText(activity, I18n(activity, R.string.ig_hide_chat_no_thread), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(activity, I18n(activity, R.string.ig_hide_chat_no_thread), Toast.LENGTH_SHORT).show();
             return;
         }
         boolean nowHidden = HiddenThreads.toggle(threadId, threadTitle(activity));
-        Toast.makeText(activity,
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(activity,
                 I18n(activity, nowHidden ? R.string.ig_hide_chat_hidden : R.string.ig_hide_chat_unhidden),
                 Toast.LENGTH_SHORT).show();
         ModuleLog.line("(IE|HideChats) toggled thread=" + threadId + " hidden=" + nowHidden);

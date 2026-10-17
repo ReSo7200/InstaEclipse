@@ -241,7 +241,7 @@ public class PlaybackSpeedHook {
                     boolean ok = applyToPlayers(speed);
                     ok |= p != null && apply(p, speed);
                     ModuleLog.line(TAG + "chosen " + speed + "x, applied now=" + ok);
-                    if (!ok) Toast.makeText(ctx, I18n.t(ctx, R.string.ig_playback_speed_next), Toast.LENGTH_SHORT).show();
+                    if (!ok) ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_playback_speed_next), Toast.LENGTH_SHORT).show();
                 })
                 .show();
     }

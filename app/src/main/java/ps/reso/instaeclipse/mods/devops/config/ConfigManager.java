@@ -28,14 +28,14 @@ public class ConfigManager {
                 if (json == null || json.isEmpty()) return;
                 writeConfigJson(context, json);
                 new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(context.getApplicationContext(),
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(context.getApplicationContext(),
                                 I18n.t(context, R.string.ig_toast_default_config_restored), Toast.LENGTH_SHORT).show()
                 );
                 ModuleLog.line("InstaEclipse | ✅ Default config restored.");
             } catch (Exception e) {
                 ModuleLog.line("InstaEclipse | ❌ Default config restore failed: " + e.getMessage());
                 new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(context.getApplicationContext(),
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(context.getApplicationContext(),
                                 I18n.t(context, R.string.ig_toast_config_import_failed), Toast.LENGTH_LONG).show()
                 );
             }
@@ -47,13 +47,13 @@ public class ConfigManager {
             try {
                 writeConfigJson(context, json);
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    Toast.makeText(context.getApplicationContext(), I18n.t(context, R.string.ig_toast_config_imported), Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context.getApplicationContext(), I18n.t(context, R.string.ig_toast_config_imported), Toast.LENGTH_LONG).show();
                     ModuleLog.line("InstaEclipse | ✅ JSON imported into mc_overrides.json");
                 });
             } catch (Exception e) {
                 ModuleLog.line("InstaEclipse | ❌ Import failed: " + e.getMessage());
                 new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(context.getApplicationContext(), I18n.t(context, R.string.ig_toast_config_import_failed), Toast.LENGTH_LONG).show()
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(context.getApplicationContext(), I18n.t(context, R.string.ig_toast_config_import_failed), Toast.LENGTH_LONG).show()
                 );
             }
         }).start();

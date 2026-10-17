@@ -770,7 +770,7 @@ public class StoryInfoHook {
         ClipboardManager cm = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
         if (cm == null) return;
         cm.setPrimaryClip(ClipData.newPlainText("story", text));
-        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_si_copied), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_si_copied), Toast.LENGTH_SHORT).show();
     }
 
     private static void open(Context ctx, String url) {

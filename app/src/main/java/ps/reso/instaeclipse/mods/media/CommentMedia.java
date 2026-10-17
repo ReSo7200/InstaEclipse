@@ -236,7 +236,7 @@ public final class CommentMedia {
                     + (postAuthor != null ? postAuthor : "unknown") + "_" + id + "_"
                     + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(new java.util.Date())
                     + (gif ? ".gif" : ".jpg"); // the saver corrects the extension from the real file type
-            android.widget.Toast.makeText(ctx, ps.reso.instaeclipse.utils.i18n.I18n.t(ctx, ps.reso.instaeclipse.R.string.ig_comment_gif_downloading),
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, ps.reso.instaeclipse.utils.i18n.I18n.t(ctx, ps.reso.instaeclipse.R.string.ig_comment_gif_downloading),
                     android.widget.Toast.LENGTH_SHORT).show();
             new Thread(() -> {
                 try { FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, false, "comment"); }

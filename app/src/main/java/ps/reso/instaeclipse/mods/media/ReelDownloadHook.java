@@ -567,17 +567,17 @@ public class ReelDownloadHook {
             final String fn        = FeedVideoDownloadHook.buildFilename(username, "reel", mediaId, true);
             final String finalUrl  = videoUrl;
             final String finalUser = username;
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_reel), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_reel), Toast.LENGTH_SHORT).show();
             FeedVideoDownloadHook.executor.submit(() -> {
                 try {
                     boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, finalUrl, fn, true, finalUser);
                     if (!delegated) {
                         FeedVideoDownloadHook.mainHandler.post(() ->
-                                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_saved), Toast.LENGTH_SHORT).show());
+                                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_saved), Toast.LENGTH_SHORT).show());
                     }
                 } catch (Throwable e) {
                     FeedVideoDownloadHook.mainHandler.post(() ->
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                 }
             });
             return;
@@ -586,7 +586,7 @@ public class ReelDownloadHook {
         // No direct video — may be a photo carousel reel
         List<String> allUrls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
         if (allUrls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_url_not_found), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_reel_url_not_found), Toast.LENGTH_SHORT).show();
             return;
         }
 

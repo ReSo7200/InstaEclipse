@@ -82,7 +82,7 @@ public class JumpToFirstMessageHook {
         if (running != null) {
             MAIN.removeCallbacks(running);
             running = null;
-            Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_stopped), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_jump_first_stopped), Toast.LENGTH_SHORT).show();
             return;
         }
         View list = findMessageList(a.getWindow().getDecorView());
@@ -91,7 +91,7 @@ public class JumpToFirstMessageHook {
             if (onDone != null) onDone.run();
             return;
         }
-        Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_loading), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_jump_first_loading), Toast.LENGTH_SHORT).show();
         final long started = System.currentTimeMillis();
         final long[] lastChange = {System.currentTimeMillis()};
         final int[] lastCount = {itemCount(list)};
@@ -114,7 +114,7 @@ public class JumpToFirstMessageHook {
                 } else if (System.currentTimeMillis() - lastChange[0] > 3000) {
                     // nothing moved and nothing new loaded for 3 s: this is the first message
                     running = null;
-                    Toast.makeText(a, I18n.t(a, R.string.ig_jump_first_done), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_jump_first_done), Toast.LENGTH_SHORT).show();
                     if (onDone != null) onDone.run();
                     return;
                 }

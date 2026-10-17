@@ -105,7 +105,7 @@ public class LikeUndoHook {
                 removeBar(bar);
                 if (undone[0]) {
                     ModuleLog.line(TAG + "like cancelled by UNDO");
-                    Toast.makeText(act, I18n.t(act, R.string.ig_like_undo_cancelled), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(act, I18n.t(act, R.string.ig_like_undo_cancelled), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 try {

@@ -670,12 +670,12 @@ public class DialogUtils {
                 context.startActivity(launchIntent);
                 Runtime.getRuntime().exit(0);
             } else {
-                Toast.makeText(context, I18n.t(context, R.string.ig_dialog_restart_not_found), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_restart_not_found), Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             String packageName = context.getPackageName();
             ModuleLog.line("InstaEclipse: Restart failed for " + packageName + " - " + e.getMessage());
-            Toast.makeText(context, I18n.t(context, R.string.ig_dialog_restart_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_restart_failed, e.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -820,7 +820,7 @@ public class DialogUtils {
         if (!entries.isEmpty()) {
             layout.addView(createActionRow(context, R.drawable.ic_upload, I18n.t(context, R.string.ig_dialog_unsent_export), "#0A84FF", v -> {
                 String path = exportUnsentJson(context, who, entries);
-                Toast.makeText(context, path != null
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, path != null
                         ? I18n.t(context, R.string.ig_dialog_unsent_exported, path)
                         : I18n.t(context, R.string.ig_toast_download_failed, "export"), Toast.LENGTH_LONG).show();
             }));
@@ -832,7 +832,7 @@ public class DialogUtils {
                     dlg.secondary(context.getString(android.R.string.cancel), null);
                     dlg.primary(I18n.t(context, R.string.ig_dialog_unsent_clear_yes), () -> {
                         ps.reso.instaeclipse.utils.ghost.UnsentLog.clearThread(threadId);
-                        Toast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
                         showThreadUnsent(context, threadId);
                     });
                     dlg.show();
@@ -985,7 +985,7 @@ public class DialogUtils {
                 dlg.secondary(context.getString(android.R.string.cancel), null);
                 dlg.primary(I18n.t(context, R.string.ig_dialog_unsent_clear_yes), () -> {
                     ps.reso.instaeclipse.utils.ghost.UnsentLog.clear();
-                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_unsent_cleared), Toast.LENGTH_SHORT).show();
                     showUnsentMessages(context); // refresh
                 });
                 dlg.show();
@@ -1605,7 +1605,7 @@ public class DialogUtils {
             cardView.addView(createActionRow(context, R.drawable.ic_eye, label + "  ·  "
                     + I18n.t(context, R.string.ig_hide_chats_unhide), "#BF5AF2", v -> {
                 ps.reso.instaeclipse.utils.ghost.HiddenThreads.unhide(id);
-                Toast.makeText(context, I18n.t(context, R.string.ig_hide_chat_unhidden), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_hide_chat_unhidden), Toast.LENGTH_SHORT).show();
                 ((View) v).setEnabled(false);
                 ((View) v).setAlpha(0.4f);
             }));
@@ -1627,7 +1627,7 @@ public class DialogUtils {
     }
 
     private static void toastWrongPass(Context context) {
-        Toast.makeText(context, ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.lockoutSecondsLeft() > 0
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.lockoutSecondsLeft() > 0
                 ? ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.failureText(context)
                 : I18n.t(context, R.string.ig_dialog_misc_lock_dms_wrong), Toast.LENGTH_SHORT).show();
     }
@@ -1714,7 +1714,7 @@ public class DialogUtils {
                 String raw = input.getText().toString();
                 String domain = ps.reso.instaeclipse.mods.ads.ShareDomain.normalize(raw);
                 if (domain == null) {
-                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_extras_share_domain_invalid), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_extras_share_domain_invalid), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 FeatureFlags.customShareDomain = domain;
@@ -1736,12 +1736,12 @@ public class DialogUtils {
                 if (pass.isEmpty()) {
                     FeatureFlags.lockDirectPasscode = "";
                     FeatureFlags.lockDirectSalt = "";
-                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_cleared), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_cleared), Toast.LENGTH_SHORT).show();
                 } else {
                     ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.newSalt(); // fresh salt per set
                     FeatureFlags.lockDirectPasscode =
                             ps.reso.instaeclipse.mods.ui.LockDirectMessagesHook.hashPass(pass);
-                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_saved), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_misc_lock_dms_saved), Toast.LENGTH_SHORT).show();
                 }
                 SettingsManager.saveAllFlags();
             });
@@ -1800,7 +1800,7 @@ public class DialogUtils {
                     FeatureFlags.spoofRecent = ps.reso.instaeclipse.mods.location.LocationPresets.serialize(
                             ps.reso.instaeclipse.mods.location.LocationPresets.remember(recent, p));
                     SettingsManager.saveAllFlags();
-                    Toast.makeText(context, I18n.t(context, R.string.ig_dialog_location_applied), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_location_applied), Toast.LENGTH_SHORT).show();
                     if (currentDialog != null) {
                         try { currentDialog.dismiss(); } catch (Exception ignored) {}
                         currentDialog = null;
@@ -1905,7 +1905,7 @@ public class DialogUtils {
                 I18n.t(context, R.string.ig_custom_font_pick), "#FF2D55", v -> {
                     Activity act = activityOf(context);
                     if (act != null) ps.reso.instaeclipse.mods.ui.CustomFontHook.launchPicker(act);
-                    else Toast.makeText(context, I18n.t(context, R.string.ig_dialog_downloader_cannot_open_picker),
+                    else ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_downloader_cannot_open_picker),
                             Toast.LENGTH_SHORT).show();
                 }));
 
@@ -1920,7 +1920,7 @@ public class DialogUtils {
                 I18n.t(context, R.string.ig_custom_emoji_pick), "#FF2D55", v -> {
                     Activity act = activityOf(context);
                     if (act != null) ps.reso.instaeclipse.mods.ui.CustomFontHook.launchEmojiPicker(act);
-                    else Toast.makeText(context, I18n.t(context, R.string.ig_dialog_downloader_cannot_open_picker),
+                    else ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_dialog_downloader_cannot_open_picker),
                             Toast.LENGTH_SHORT).show();
                 }));
         return fontCard;
@@ -2054,7 +2054,7 @@ public class DialogUtils {
                         dlg.secondary(context.getString(android.R.string.cancel), null);
                         dlg.primary(I18n.t(context, R.string.ig_story_cache_clear), () -> {
                             ps.reso.instaeclipse.utils.media.StoryCache.clearAll();
-                            Toast.makeText(context, I18n.t(context, R.string.ig_story_cache_cleared), Toast.LENGTH_SHORT).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_story_cache_cleared), Toast.LENGTH_SHORT).show();
                             showCachedStories(context); // refresh so the deleted rows disappear
                         });
                         dlg.show();
@@ -2166,13 +2166,13 @@ public class DialogUtils {
             dialog.setContentView(root);
             dialog.show();
         } catch (Throwable t) {
-            Toast.makeText(context, "Couldn't open story", Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, "Couldn't open story", Toast.LENGTH_SHORT).show();
         }
     }
 
     /** Copies a cached story's local file into the gallery/download folder (off the UI thread). */
     private static void saveCachedStoryToGallery(Context context, ps.reso.instaeclipse.utils.media.StoryCache.Entry e) {
-        Toast.makeText(context, I18n.t(context, R.string.ig_story_cache_saving), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_story_cache_saving), Toast.LENGTH_SHORT).show();
         ps.reso.instaeclipse.mods.media.FeedVideoDownloadHook.saveLocalFileToGallery(
                 context, e.path,
                 (e.author == null || e.author.isEmpty()) ? "story" : e.author, e.id, e.video,

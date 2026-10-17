@@ -78,7 +78,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     // for dev usage
     /*
     public static void showToast(final String text) {
-        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(AndroidAppHelper.currentApplication().getApplicationContext(), text, Toast.LENGTH_LONG).show());
+        new Handler(Looper.getMainLooper()).post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(AndroidAppHelper.currentApplication().getApplicationContext(), text, Toast.LENGTH_LONG).show());
     }
     */
 

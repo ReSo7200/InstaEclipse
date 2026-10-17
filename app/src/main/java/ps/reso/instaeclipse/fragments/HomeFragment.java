@@ -353,7 +353,7 @@ public class HomeFragment extends Fragment {
         if (launchIntent != null) {
             startActivity(launchIntent);
         } else {
-            Toast.makeText(getActivity(), getString(R.string.not_installed_instagram), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(getActivity(), getString(R.string.not_installed_instagram), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -417,7 +417,7 @@ public class HomeFragment extends Fragment {
     private void restartInstagram() {
         final String pkg = activePackage;
         if (pkg == null) {
-            Toast.makeText(requireContext(), getString(R.string.not_installed_instagram), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.not_installed_instagram), Toast.LENGTH_SHORT).show();
             return;
         }
         restartInstagramButton.setEnabled(false);
@@ -438,10 +438,10 @@ public class HomeFragment extends Fragment {
                 if (rooted) {
                     moduleConfirmed = false;
                     updateStatusPill();
-                    Toast.makeText(requireContext(), getString(R.string.home_restart_done), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.home_restart_done), Toast.LENGTH_SHORT).show();
                     mainHandler.postDelayed(() -> launchPackage(pkg), 400);
                 } else {
-                    Toast.makeText(requireContext(), getString(R.string.ig_toast_restart_manual), Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_restart_manual), Toast.LENGTH_LONG).show();
                     try {
                         Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                         intent.setData(Uri.parse("package:" + pkg));
@@ -600,7 +600,7 @@ public class HomeFragment extends Fragment {
                         if (count > MAX_PINNED) {
                             checked[which] = false;
                             ((AlertDialog) dialog).getListView().setItemChecked(which, false);
-                            Toast.makeText(requireContext(),
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(),
                                     getString(R.string.home_shortcuts_limit, MAX_PINNED), Toast.LENGTH_SHORT).show();
                         }
                     }

@@ -27,7 +27,7 @@ public class ShareDownloadActivity extends Activity {
         super.onCreate(savedInstanceState);
         String link = findLink(getIntent());
         if (link == null) {
-            Toast.makeText(this, R.string.share_dl_no_link, Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, R.string.share_dl_no_link, Toast.LENGTH_SHORT).show();
         } else {
             Intent ig = new Intent(Intent.ACTION_VIEW, Uri.parse(link))
                     .setPackage("com.instagram.android")
@@ -36,7 +36,7 @@ public class ShareDownloadActivity extends Activity {
             try {
                 startActivity(ig);
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, R.string.share_dl_no_instagram, Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, R.string.share_dl_no_instagram, Toast.LENGTH_SHORT).show();
             }
         }
         finish();

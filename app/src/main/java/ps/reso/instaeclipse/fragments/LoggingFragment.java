@@ -496,13 +496,13 @@ public class LoggingFragment extends Fragment {
         if (ctx == null) return;
         String text = exportText();
         if (text.isEmpty()) {
-            Toast.makeText(ctx, R.string.logs_nothing_to_copy, Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, R.string.logs_nothing_to_copy, Toast.LENGTH_SHORT).show();
             return;
         }
         ClipboardManager clipboard = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard == null) return;
         clipboard.setPrimaryClip(ClipData.newPlainText("InstaEclipse logs", text));
-        Toast.makeText(ctx, R.string.logs_copied, Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, R.string.logs_copied, Toast.LENGTH_SHORT).show();
     }
 
     private void shareLogs() {
@@ -510,7 +510,7 @@ public class LoggingFragment extends Fragment {
         if (ctx == null) return;
         String text = exportText();
         if (text.isEmpty()) {
-            Toast.makeText(ctx, R.string.logs_nothing_to_copy, Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, R.string.logs_nothing_to_copy, Toast.LENGTH_SHORT).show();
             return;
         }
         Intent send = new Intent(Intent.ACTION_SEND);
@@ -520,7 +520,7 @@ public class LoggingFragment extends Fragment {
         try {
             startActivity(Intent.createChooser(send, getString(R.string.logs_share_title)));
         } catch (Throwable t) {
-            Toast.makeText(ctx, String.valueOf(t.getMessage()), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, String.valueOf(t.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -549,7 +549,7 @@ public class LoggingFragment extends Fragment {
             });
         } catch (Throwable ignored) {}
         reload();
-        Toast.makeText(ctx, R.string.logs_cleared, Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, R.string.logs_cleared, Toast.LENGTH_SHORT).show();
     }
 
     // ---------------------------------------------------------------- adapter
@@ -593,7 +593,7 @@ public class LoggingFragment extends Fragment {
                 ClipboardManager cm = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 if (cm != null) {
                     cm.setPrimaryClip(ClipData.newPlainText("InstaEclipse log entry", e.full));
-                    Toast.makeText(v.getContext(), R.string.logs_entry_copied, Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(v.getContext(), R.string.logs_entry_copied, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             });

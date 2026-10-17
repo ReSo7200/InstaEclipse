@@ -90,24 +90,24 @@ public class ProfilePicDownloadHook {
 
                 String url = extractUrl(v);
                 if (url == null) {
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_profile_pic_url_not_found), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_profile_pic_url_not_found), Toast.LENGTH_SHORT).show();
                     ModuleLog.line("(IE|ProfileDL) ❌ URL extraction failed");
                     return true;
                 }
                 String username = activity != null ? extractUsername(activity) : null;
                 String filename  = FeedVideoDownloadHook.buildFilename(username, "profile", null, false);
 
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_profile_pic), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_profile_pic), Toast.LENGTH_SHORT).show();
                 new Thread(() -> {
                     try {
                         boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, filename, false, username);
                         if (!delegated) {
-                            mainHandler.post(() -> Toast.makeText(ctx,
+                            mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                     I18n.t(ctx, R.string.ig_toast_profile_pic_saved), Toast.LENGTH_SHORT).show());
                         }
                     } catch (Throwable e) {
                         ModuleLog.line("(IE|ProfileDL) ❌ download: " + e.getMessage());
-                        mainHandler.post(() -> Toast.makeText(ctx,
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                 I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                     }
                 }).start();

@@ -110,7 +110,7 @@ public class GhostDMMarkAsReadHook {
                 view.postDelayed(() -> {
                     group.scrollBy(0, 200);
                     FeatureFlags.isGhostSeen = true;
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_seen_sent), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_seen_sent), Toast.LENGTH_SHORT).show();
                 }, 300);
             }
         } catch (Exception e) {

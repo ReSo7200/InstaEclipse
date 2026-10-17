@@ -231,7 +231,7 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
         paletteIntent.putExtra("value", paletteJson);
         ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, paletteIntent);
 
-        Toast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
     }
 
     /** Light mode: only the enable switch and the light theme id; the dark theme is left as is. */
@@ -253,7 +253,7 @@ public class ThemeCustomizerActivity extends AppCompatActivity implements Advanc
             presetIntent.putExtra("value", selectedPresetId);
             ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(this, presetIntent);
         }
-        Toast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, R.string.theme_saved, Toast.LENGTH_SHORT).show();
     }
 
     private void makeCacheWorldReadable() {

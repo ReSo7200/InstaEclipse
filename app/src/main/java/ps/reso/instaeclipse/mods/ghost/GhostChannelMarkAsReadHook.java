@@ -105,7 +105,7 @@ public class GhostChannelMarkAsReadHook {
                 view.postDelayed(() -> {
                     group.scrollBy(0, 300);
                     FeatureFlags.isGhostSeen = true;
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_channel_seen_sent), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_channel_seen_sent), Toast.LENGTH_SHORT).show();
                 }, 400);
             }
         } catch (Exception e) {

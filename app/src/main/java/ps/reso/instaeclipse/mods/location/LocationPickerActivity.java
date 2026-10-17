@@ -241,7 +241,7 @@ public class LocationPickerActivity extends AppCompatActivity {
             } catch (Throwable t) {
                 main.post(() -> {
                     searchProgress.setVisibility(View.GONE);
-                    Toast.makeText(this, getString(R.string.loc_picker_search_error, String.valueOf(t.getMessage())),
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.loc_picker_search_error, String.valueOf(t.getMessage())),
                             Toast.LENGTH_SHORT).show();
                 });
             }
@@ -253,7 +253,7 @@ public class LocationPickerActivity extends AppCompatActivity {
         resultsList.removeAllViews();
         if (arr.length() == 0) {
             resultsCard.setVisibility(View.GONE);
-            Toast.makeText(this, R.string.loc_picker_search_failed, Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, R.string.loc_picker_search_failed, Toast.LENGTH_SHORT).show();
             return;
         }
         LayoutInflater inflater = LayoutInflater.from(this);

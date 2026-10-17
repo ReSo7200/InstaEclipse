@@ -399,7 +399,7 @@ public class StoryMentionHook {
                                 ctx.getSystemService(Context.CLIPBOARD_SERVICE);
                         if (cm != null) {
                             cm.setPrimaryClip(ClipData.newPlainText("username", username));
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_mention_copied, username), Toast.LENGTH_SHORT).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_mention_copied, username), Toast.LENGTH_SHORT).show();
                         }
                     });
                     // Hold opens the profile inside Instagram (its own deep-link handler).
@@ -426,7 +426,7 @@ public class StoryMentionHook {
                                 ctx.getSystemService(Context.CLIPBOARD_SERVICE);
                         if (cm != null) {
                             cm.setPrimaryClip(ClipData.newPlainText("mentions", sb.toString().trim()));
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_mentions_copied), Toast.LENGTH_SHORT).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_mentions_copied), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

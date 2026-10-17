@@ -552,7 +552,7 @@ public class CommentCopyHook {
             if (cm != null) {
                 cm.setPrimaryClip(ClipData.newPlainText("comment", text));
                 MAIN.post(() ->
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_comment_copied),
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_comment_copied),
                                 Toast.LENGTH_SHORT).show());
             }
         } catch (Throwable t) {

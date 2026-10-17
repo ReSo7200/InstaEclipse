@@ -159,11 +159,11 @@ public class ChatExportHook {
         Object store = findStore(threadId);
         ModuleLog.line(TAG + "export thread=" + threadId + " store=" + (store != null));
         if (store == null || messagesMethod == null) {
-            Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_none), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_chat_export_none), Toast.LENGTH_SHORT).show();
             return;
         }
         final boolean withMedia = downloadMedia;
-        Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_working), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_chat_export_working), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             try {
                 List<?> msgs = (List<?>) messagesMethod.invoke(store, true);
@@ -311,15 +311,15 @@ public class ChatExportHook {
                     ModuleLog.line(TAG + "exported locally " + count + " messages, " + fsaved + " media to " + folder);
                     new Handler(Looper.getMainLooper()).post(() -> {
                         if (fsaved > 0)
-                            Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done_media, count, fsaved, folder), Toast.LENGTH_LONG).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_chat_export_done_media, count, fsaved, folder), Toast.LENGTH_LONG).show();
                         else
-                            Toast.makeText(a, I18n.t(a, R.string.ig_chat_export_done, count, file), Toast.LENGTH_LONG).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_chat_export_done, count, file), Toast.LENGTH_LONG).show();
                     });
                 }
             } catch (Throwable t) {
                 ModuleLog.line(TAG + "❌ export: " + t);
                 new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(a, I18n.t(a, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }

@@ -304,7 +304,7 @@ public class StoryLinksHook {
         ClipboardManager cm = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
         if (cm == null) return;
         cm.setPrimaryClip(ClipData.newPlainText("link", text));
-        Toast.makeText(ctx, toast, Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, toast, Toast.LENGTH_SHORT).show();
     }
 
     private static void showLinks(Context ctx, List<String> links) {

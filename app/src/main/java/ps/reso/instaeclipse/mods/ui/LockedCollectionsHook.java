@@ -206,7 +206,7 @@ public class LockedCollectionsHook {
 
     private static void toggle(Activity a, String id, android.widget.ImageView btn) {
         if (!hasPasscode()) {
-            Toast.makeText(a, I18n.t(a, R.string.ig_locked_coll_need_passcode), Toast.LENGTH_LONG).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_locked_coll_need_passcode), Toast.LENGTH_LONG).show();
             return;
         }
         Runnable flip = () -> {
@@ -216,7 +216,7 @@ public class LockedCollectionsHook {
             FeatureFlags.lockedCollections = String.join(",", s);
             SettingsManager.saveAllFlags();
             showState(a, btn, nowLocked);
-            Toast.makeText(a, I18n.t(a, nowLocked ? R.string.ig_locked_coll_locked : R.string.ig_locked_coll_unlocked),
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, nowLocked ? R.string.ig_locked_coll_locked : R.string.ig_locked_coll_unlocked),
                     Toast.LENGTH_SHORT).show();
         };
         if (isLocked(id)) ask(a, flip, null); // removing a lock needs the passcode too

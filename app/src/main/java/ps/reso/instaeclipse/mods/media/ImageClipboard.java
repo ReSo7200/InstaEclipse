@@ -34,7 +34,7 @@ final class ImageClipboard {
     private ImageClipboard() {}
 
     static void copy(Context ctx, String imageUrl) {
-        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_copying_image), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_copying_image), Toast.LENGTH_SHORT).show();
         FeedVideoDownloadHook.executor.submit(() -> {
             try {
                 String auth = authority(ctx);
@@ -53,7 +53,7 @@ final class ImageClipboard {
                     try {
                         ClipboardManager cm = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
                         cm.setPrimaryClip(ClipData.newUri(ctx.getContentResolver(), "Image", uri));
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_image_copied), Toast.LENGTH_SHORT).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_image_copied), Toast.LENGTH_SHORT).show();
                     } catch (Throwable t) {
                         fail(ctx, t);
                     }
@@ -66,7 +66,7 @@ final class ImageClipboard {
 
     private static void fail(Context ctx, Throwable t) {
         ModuleLog.line("(IE|CopyImage) ❌ " + t);
-        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())),
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())),
                 Toast.LENGTH_SHORT).show();
     }
 

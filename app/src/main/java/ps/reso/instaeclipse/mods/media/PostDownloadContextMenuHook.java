@@ -565,7 +565,7 @@ public class PostDownloadContextMenuHook {
             if (media == null) media = findMedia(thisObj);
             if (media == null) {
                 ModuleLog.line("(IE|Post) ❌ Media not found in click handler");
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -638,14 +638,14 @@ public class PostDownloadContextMenuHook {
     private static void triggerCopyImage(Context ctx, Object media, Object clickHandler) {
         List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
         if (urls == null || urls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
             return;
         }
         int viewIdx = urls.size() > 1 ? ReelDownloadHook.findCarouselIndexFromView(ctx, urls.size()) : -1;
         int idx = viewIdx >= 0 ? viewIdx : findCarouselIndex(clickHandler, urls.size());
         String url = urls.get(idx >= 0 && idx < urls.size() ? idx : 0);
         if (FeedVideoDownloadHook.isVideoUrl(url)) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_copy_image_video), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_copy_image_video), Toast.LENGTH_SHORT).show();
             return;
         }
         ImageClipboard.copy(ctx, url);
@@ -660,7 +660,7 @@ public class PostDownloadContextMenuHook {
     private static void triggerCopyLink(Context ctx, Object media, Object clickHandler) {
         List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
         if (urls == null || urls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
             return;
         }
         // Single URL copies straight to clipboard; a carousel shows a per-slide chooser

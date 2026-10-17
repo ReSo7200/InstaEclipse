@@ -143,11 +143,11 @@ public class StoryDownloadHook {
 
     private static void downloadHighlightItems(Context ctx, List<?> items) {
         if (items == null || items.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
             return;
         }
         final List<Object> copy = new ArrayList<>(items);
-        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_downloading, copy.size()), Toast.LENGTH_LONG).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_downloading, copy.size()), Toast.LENGTH_LONG).show();
         ModuleLog.line("(IE|Highlight) downloading " + copy.size() + " items");
         new Thread(() -> {
             int ok = 0;
@@ -168,7 +168,7 @@ public class StoryDownloadHook {
                 }
             }
             final int done = ok;
-            mainHandler.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_done, done, copy.size()), Toast.LENGTH_LONG).show());
+            mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_done, done, copy.size()), Toast.LENGTH_LONG).show());
         }).start();
     }
 
@@ -347,7 +347,7 @@ public class StoryDownloadHook {
     private static void loadThenDownload(Context ctx, Object reel, Object session) {
         String id = highlightId(reel);
         if (id == null || session == null || loaderGetter == null || loaderRegister == null || loaderFetch == null) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
             return;
         }
         try {
@@ -373,7 +373,7 @@ public class StoryDownloadHook {
             });
             self[0] = cb;
             pendingLoads.add(cb);
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_loading), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_highlight_loading), Toast.LENGTH_SHORT).show();
             loaderRegister.invoke(loader, cb, id, "profile", false);
             if (!pendingLoads.contains(cb)) return; // was already loaded: callback ran
             Class<? extends Enum> reason = (Class<? extends Enum>) loaderFetch.getParameterTypes()[0];
@@ -382,7 +382,7 @@ public class StoryDownloadHook {
             loaderFetch.invoke(loader, why, id, "profile", null);
             ModuleLog.line("(IE|HighlightTray) fetching " + id);
             mainHandler.postDelayed(() -> { // give up after 20 s
-                if (pendingLoads.remove(cb)) Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+                if (pendingLoads.remove(cb)) ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
             }, 20000);
         } catch (Throwable t) {
             ModuleLog.line("(IE|HighlightTray) load: " + t);
@@ -640,7 +640,7 @@ public class StoryDownloadHook {
                     Context ctx = findContextAcrossParam(param, effective);
                     String id = extractMediaIdFromReelItemHolder(effective);
                     int n = ps.reso.instaeclipse.mods.ghost.GhostStorySeenHook.markSeen(id);
-                    if (ctx != null) Toast.makeText(ctx, I18n.t(ctx, n > 0
+                    if (ctx != null) ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, n > 0
                             ? R.string.ig_story_marked_seen : R.string.ig_story_mark_seen_none), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -668,7 +668,7 @@ public class StoryDownloadHook {
                 // 5. Extract story URL via ReelItem → media object field graph
                 StoryMediaOptions media = extractStoryMediaOptions(ctx, effectiveHolder);
                 if (media == null) {
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -1266,7 +1266,7 @@ public class StoryDownloadHook {
             case DOWNLOAD_PHOTO -> startDownload(ctx, media.imageUrl, false, username, mediaId);
             case DOWNLOAD_VIDEO -> startDownload(ctx, media.videoUrl, true, username, mediaId);
             case ASK -> showStoryFormatDialog(ctx, media, username, mediaId);
-            case NOT_FOUND -> Toast.makeText(ctx,
+            case NOT_FOUND -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                     I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
         }
     }
@@ -1302,7 +1302,7 @@ public class StoryDownloadHook {
             dlg.show();
         } catch (Throwable t) {
             ModuleLog.line("(IE|Story) format dialog failed: " + t);
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed,
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed,
                     t.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
@@ -1312,16 +1312,16 @@ public class StoryDownloadHook {
         String fn = FeedVideoDownloadHook.buildFilename(username, "story", mediaId, isVideo);
         ModuleLog.line("(IE|Story|DL) username=" + username + " mediaId=" + mediaId
                 + " file=" + fn);
-        Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_story_video) : I18n.t(ctx, R.string.ig_toast_downloading_story_photo), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_story_video) : I18n.t(ctx, R.string.ig_toast_downloading_story_photo), Toast.LENGTH_SHORT).show();
         mainHandler.post(() -> new Thread(() -> {
             try {
                 boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, isVideo, username);
                 if (!delegated) {
-                    mainHandler.post(() -> Toast.makeText(ctx,
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                             I18n.t(ctx, R.string.ig_toast_story_saved), Toast.LENGTH_SHORT).show());
                 }
             } catch (Throwable e) {
-                mainHandler.post(() -> Toast.makeText(ctx,
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                         I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
             }
         }).start());

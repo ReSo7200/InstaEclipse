@@ -92,7 +92,7 @@ public class ReadReceiptChatHook {
         return ThreadHeaderMenu.add(a, "read", label, () -> {
             boolean now = !ReadReceiptWhitelist.isListed(threadId);
             ReadReceiptWhitelist.set(threadId, titleOf(header), now);
-            Toast.makeText(a, I18n.t(a, now ? R.string.ig_toast_read_receipt_on : R.string.ig_toast_read_receipt_off),
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, now ? R.string.ig_toast_read_receipt_on : R.string.ig_toast_read_receipt_off),
                     Toast.LENGTH_SHORT).show();
             addEntry(a, threadId, header);
         });

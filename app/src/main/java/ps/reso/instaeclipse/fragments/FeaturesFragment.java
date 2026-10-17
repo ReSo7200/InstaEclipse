@@ -166,9 +166,9 @@ public class FeaturesFragment extends Fragment {
                 }
                 editor.apply();
                 refreshVisibleMenu();
-                Toast.makeText(requireContext(), getString(R.string.ig_toast_settings_restored), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_settings_restored), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -241,7 +241,7 @@ public class FeaturesFragment extends Fragment {
                 intentPath.putExtra("value", path);
                 ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intentPath);
 
-                Toast.makeText(requireContext(), getString(R.string.ig_toast_download_folder_updated), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_download_folder_updated), Toast.LENGTH_SHORT).show();
 
                 if ("downloader".equals(currentMenu)) {
                     loadDownloaderMenu();
@@ -1355,7 +1355,7 @@ public class FeaturesFragment extends Fragment {
                 .setPositiveButton(android.R.string.ok, (d, w) -> {
                     String domain = ps.reso.instaeclipse.mods.ads.ShareDomain.normalize(input.getText().toString());
                     if (domain == null) {
-                        android.widget.Toast.makeText(requireContext(), R.string.ig_dialog_extras_share_domain_invalid,
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), R.string.ig_dialog_extras_share_domain_invalid,
                                 android.widget.Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -1565,7 +1565,7 @@ public class FeaturesFragment extends Fragment {
             for (ps.reso.instaeclipse.mods.location.LocationPresets.Preset p : recent) {
                 rows.add(createNav(R.drawable.ic_timer, "#FFD60A", p.title(), () -> {
                     ps.reso.instaeclipse.mods.location.LocationPresets.applyFromCompanion(requireContext(), p);
-                    Toast.makeText(requireContext(), R.string.ig_dialog_location_applied, Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), R.string.ig_dialog_location_applied, Toast.LENGTH_SHORT).show();
                     loadLocationMenu();
                 }));
             }
@@ -1836,7 +1836,7 @@ public class FeaturesFragment extends Fragment {
         intentPath.putExtra("value", "");
         ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), intentPath);
 
-        Toast.makeText(requireContext(), getString(R.string.ig_toast_download_folder_reset), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_download_folder_reset), Toast.LENGTH_SHORT).show();
 
         if ("downloader".equals(currentMenu)) {
             loadDownloaderMenu();
@@ -1861,7 +1861,7 @@ public class FeaturesFragment extends Fragment {
             exportIntent.putExtra("file_name", "instaeclipse_settings.json");
             startActivity(exportIntent);
         } catch (JSONException e) {
-            Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1870,7 +1870,7 @@ public class FeaturesFragment extends Fragment {
     }
 
     private void restartInstagram() {
-        Toast.makeText(requireContext(), getString(R.string.ig_toast_restart_manual), Toast.LENGTH_LONG).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_restart_manual), Toast.LENGTH_LONG).show();
     }
 
     private void importDevConfig() {
@@ -1891,12 +1891,12 @@ public class FeaturesFragment extends Fragment {
                 if (activity == null || activity.isFinishing()) return;
                 String error = intent.getStringExtra("error");
                 if (error != null) {
-                    Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(activity, error, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 String json = intent.getStringExtra("json_content");
                 if (json == null || json.isEmpty()) {
-                    Toast.makeText(activity, getString(R.string.export_no_config_data), Toast.LENGTH_SHORT).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(activity, getString(R.string.export_no_config_data), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Intent exportIntent = new Intent();
@@ -1922,16 +1922,16 @@ public class FeaturesFragment extends Fragment {
                          Scanner scanner = new Scanner(is, "UTF-8").useDelimiter("\\A")) {
                         String json = scanner.hasNext() ? scanner.next() : "";
                         if (json.isEmpty()) {
-                            Toast.makeText(requireContext(), getString(R.string.ig_toast_config_import_failed), Toast.LENGTH_SHORT).show();
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_config_import_failed), Toast.LENGTH_SHORT).show();
                             return;
                         }
                         Intent broadcast = new Intent("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG");
                         broadcast.setPackage("com.instagram.android");
                         broadcast.putExtra("json_content", json);
                         ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), broadcast);
-                        Toast.makeText(requireContext(), getString(R.string.ig_toast_default_config_restored), Toast.LENGTH_SHORT).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_default_config_restored), Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
-                        Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton(getString(R.string.ig_dialog_cancel), null)
@@ -1991,7 +1991,7 @@ public class FeaturesFragment extends Fragment {
         editor.apply();
         stagedChanges.clear();
         fabSave.hide();
-        Toast.makeText(requireContext(), getString(R.string.ig_toast_settings_applied), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ig_toast_settings_applied), Toast.LENGTH_SHORT).show();
     }
 
     private boolean getCurrentState(String prefKey) {

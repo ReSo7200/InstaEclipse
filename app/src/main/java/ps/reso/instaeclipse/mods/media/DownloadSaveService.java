@@ -705,7 +705,7 @@ public class DownloadSaveService extends Service {
         // Use application context — service context is invalid after stopSelf() fires
         Context appCtx = getApplicationContext();
         new Handler(Looper.getMainLooper()).post(() ->
-                Toast.makeText(appCtx, msg, Toast.LENGTH_SHORT).show());
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(appCtx, msg, Toast.LENGTH_SHORT).show());
     }
 
     private void ensureChannel() {

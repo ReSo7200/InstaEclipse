@@ -909,7 +909,7 @@ public class CaptionCopyContextMenuHook {
 
             String caption = extractCaptionText(media);
             if (caption == null || caption.trim().isEmpty()) {
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_caption_copy_none), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_caption_copy_none), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -1103,7 +1103,7 @@ public class CaptionCopyContextMenuHook {
             if (cm != null) {
                 cm.setPrimaryClip(ClipData.newPlainText("caption", text));
                 MAIN.post(() ->
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_caption_copied),
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_caption_copied),
                                 Toast.LENGTH_SHORT).show());
             }
         } catch (Throwable t) {

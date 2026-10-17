@@ -144,7 +144,7 @@ public class FollowListExportHook {
             if (loading) { loading = false; return; } // second tap: stop loading, export now
             Object[] vis = visibleList();
             if (vis == null) {
-                Toast.makeText(v.getContext(), I18n.t(v.getContext(), R.string.ig_follow_export_none), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(v.getContext(), I18n.t(v.getContext(), R.string.ig_follow_export_none), Toast.LENGTH_SHORT).show();
                 return;
             }
             loadAllThenExport((View) vis[1], pill, vis[0]);
@@ -247,7 +247,7 @@ public class FollowListExportHook {
             }
             ModuleLog.line(TAG + "exported " + users.size() + " users to " + file);
             new Handler(Looper.getMainLooper()).post(() ->
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_follow_export_done, users.size(), file), Toast.LENGTH_LONG).show());
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_follow_export_done, users.size(), file), Toast.LENGTH_LONG).show());
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ export: " + t);
         }
@@ -288,7 +288,7 @@ public class FollowListExportHook {
         if (ad instanceof HeaderViewListAdapter h) ad = h.getWrappedAdapter();
         Map<String, String[]> users = ad != null ? collect(ad, true) : new LinkedHashMap<>();
         if (users.isEmpty()) {
-            Toast.makeText(root.getContext(), I18n.t(root.getContext(), R.string.ig_follow_export_none), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(root.getContext(), I18n.t(root.getContext(), R.string.ig_follow_export_none), Toast.LENGTH_SHORT).show();
             return;
         }
         Activity act = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();

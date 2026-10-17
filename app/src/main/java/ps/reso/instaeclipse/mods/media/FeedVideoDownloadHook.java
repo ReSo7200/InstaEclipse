@@ -280,7 +280,7 @@ public class FeedVideoDownloadHook {
                                     for (String u : all) { if (u.contains("/m86/") || u.contains("%2Fm86%2F")) m86.add(u); }
                                     List<String> pick = m86.isEmpty() ? all : m86;
                                     if (pick.isEmpty()) {
-                                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_reel_url_scroll), Toast.LENGTH_SHORT).show();
+                                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_reel_url_scroll), Toast.LENGTH_SHORT).show();
                                         return true;
                                     }
                                     ModuleLog.line("(IE|Reel) buffer fallback, m86=" + m86.size() + " total=" + all.size());
@@ -327,7 +327,7 @@ public class FeedVideoDownloadHook {
         btn.setOnClickListener(v -> {
             List<String> urls = resolveUrls(saveBtn, v);
             if (urls.isEmpty()) {
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
                 return;
             }
             onDownloadClicked(ctx, urls, saveBtn);
@@ -339,7 +339,7 @@ public class FeedVideoDownloadHook {
             if (!FeatureFlags.enablePostDownload) return false;
             List<String> urls = resolveUrls(saveBtn, btn);
             if (urls.isEmpty()) {
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media), Toast.LENGTH_SHORT).show();
                 return true;
             }
             onDownloadClicked(ctx, urls, saveBtn);
@@ -1621,7 +1621,7 @@ public class FeedVideoDownloadHook {
      */
     static void downloadAudio(Context ctx, String url, String filename, String username,
                               boolean extractFromVideo, long trimStartMs, long trimDurationMs) {
-        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
             try {
                 String uri = FeatureFlags.downloaderCustomUri.isEmpty()
@@ -1661,10 +1661,10 @@ public class FeedVideoDownloadHook {
                     //noinspection ResultOfMethodCallIgnored
                     if (video != null) video.delete();
                 }
-                mainHandler.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_audio_saved), Toast.LENGTH_SHORT).show());
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_audio_saved), Toast.LENGTH_SHORT).show());
             } catch (Throwable e) {
                 ModuleLog.line("(IE|DL|Audio) failed: " + e);
-                mainHandler.post(() -> Toast.makeText(ctx,
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                         I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
             }
         });
@@ -2252,9 +2252,9 @@ public class FeedVideoDownloadHook {
                 if (!src.exists()) return;
                 String fn = buildFilename(author, "story", id, video);
                 saveFileToDestination(ctx, src, fn, video, author);
-                mainHandler.post(() -> android.widget.Toast.makeText(ctx, okMsg, android.widget.Toast.LENGTH_SHORT).show());
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, okMsg, android.widget.Toast.LENGTH_SHORT).show());
             } catch (Throwable t) {
-                mainHandler.post(() -> android.widget.Toast.makeText(ctx, failMsg, android.widget.Toast.LENGTH_SHORT).show());
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, failMsg, android.widget.Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -2531,25 +2531,25 @@ public class FeedVideoDownloadHook {
                                        String username, String mediaId, int currentIndex,
                                        Object slideMedia, Object postMedia) {
         if (urls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_post_url_not_found), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_post_url_not_found), Toast.LENGTH_SHORT).show();
             return;
         }
         if (urls.size() == 1) {
             String url = urls.get(0);
             boolean isVid = isVideoUrl(url);
             String fn = buildFilename(username, "post", mediaId, isVid);
-            Toast.makeText(ctx, isVid ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, isVid ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
             executor.submit(() -> {
                 try {
                     boolean delegated = downloadAndSave(ctx, url, fn, isVid, username);
                     if (!delegated) {
-                        mainHandler.post(() -> Toast.makeText(ctx,
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                 isVid ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
                                 Toast.LENGTH_SHORT).show());
                     }
                 } catch (Throwable e) {
                     ModuleLog.line("(IE|Post|DL) single failed: " + e);
-                    mainHandler.post(() -> Toast.makeText(ctx,
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                             I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                 }
             });
@@ -2578,16 +2578,16 @@ public class FeedVideoDownloadHook {
                 String url = urls.get(safeIdx);
                 boolean isVid = isVideoUrl(url);
                 String fn = withSlide(buildFilename(username, "post", mediaId, isVid), safeIdx + 1, n);
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
                     try {
                         boolean delegated = downloadAndSave(ctx, url, fn, isVid, username);
                         if (!delegated) {
-                            mainHandler.post(() -> Toast.makeText(ctx,
+                            mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                     I18n.t(ctx, R.string.ig_toast_saved), Toast.LENGTH_SHORT).show());
                         }
                     } catch (Throwable e) {
-                        mainHandler.post(() -> Toast.makeText(ctx,
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                                 I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
                     }
                 });
@@ -2596,7 +2596,7 @@ public class FeedVideoDownloadHook {
             // Download all
             labels.add(I18n.t(ctx, R.string.ig_dl_carousel_all, n));
             actions.add(() -> {
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_all_n_items, n), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_all_n_items, n), Toast.LENGTH_SHORT).show();
                 executor.submit(() -> {
                     int failed = 0;
                     for (int i = 0; i < urls.size(); i++) {
@@ -2613,10 +2613,10 @@ public class FeedVideoDownloadHook {
                     final int finalFailed = failed;
                     mainHandler.post(() -> {
                         if (finalFailed == 0) {
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_items_saved, n),
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_all_items_saved, n),
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_items_partial_saved,
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_items_partial_saved,
                                     n - finalFailed, n, finalFailed), Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -2670,7 +2670,7 @@ public class FeedVideoDownloadHook {
             try {
                 ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
                 cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", url));
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
             } catch (Throwable t) {
                 ModuleLog.line("(IE|Post) ❌ copyLinkToClipboard: " + t);
             }
@@ -2680,7 +2680,7 @@ public class FeedVideoDownloadHook {
     @SuppressLint("DefaultLocale")
     static void showCopyLinkSheet(Context ctx, List<String> urls) {
         if (urls == null || urls.isEmpty()) {
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_none), Toast.LENGTH_SHORT).show();
             return;
         }
         if (urls.size() == 1) { copyLinkToClipboard(ctx, urls.get(0)); return; }
@@ -2704,7 +2704,7 @@ public class FeedVideoDownloadHook {
                     try {
                         ClipboardManager cb = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
                         cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", allText));
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
                     } catch (Throwable t) {
                         ModuleLog.line("(IE|Post) ❌ copy all links: " + t);
                     }
@@ -2868,7 +2868,7 @@ public class FeedVideoDownloadHook {
                     } else {
                         for (int i = 0; i < urls.size(); i++)
                             startDirectDownload(ctx, urls.get(i), isVideoUrl(urls.get(i)), i + 1, n);
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_n_items, n), Toast.LENGTH_SHORT).show();
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_n_items, n), Toast.LENGTH_SHORT).show();
                     }
                 }).show();
     }
@@ -2910,25 +2910,25 @@ public class FeedVideoDownloadHook {
         String fn = withSlide(buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, isVideo),
                 slide, total);
         ModuleLog.line("(IE|DL) startDirectDownload file=" + fn);
-        Toast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, isVideo ? I18n.t(ctx, R.string.ig_toast_downloading_video) : I18n.t(ctx, R.string.ig_toast_downloading_photo), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
             try {
                 boolean delegated = downloadAndSave(ctx, url, fn, isVideo, currentDownloadUsername);
                 if (!delegated) {
-                    mainHandler.post(() -> Toast.makeText(ctx,
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                             isVideo ? I18n.t(ctx, R.string.ig_toast_video_saved) : I18n.t(ctx, R.string.ig_toast_photo_saved),
                             Toast.LENGTH_SHORT).show());
                 }
             } catch (Throwable e) {
                 ModuleLog.line("(IE|DL) download failed: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-                mainHandler.post(() -> Toast.makeText(ctx,
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
                         I18n.t(ctx, R.string.ig_toast_download_failed, e.getMessage()), Toast.LENGTH_SHORT).show());
             }
         });
     }
 
     private void downloadAndMerge(Context ctx, String videoUrl, String audioUrl) {
-        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_merging_video_audio), Toast.LENGTH_SHORT).show();
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_merging_video_audio), Toast.LENGTH_SHORT).show();
         executor.submit(() -> {
             // Companion always holds the SAF permission — delegate whenever a URI is set.
             String uri = FeatureFlags.downloaderCustomUri.isEmpty()
@@ -2959,7 +2959,7 @@ public class FeedVideoDownloadHook {
                 String fn = buildFilename(currentDownloadUsername, "post", currentDownloadMediaId, true);
                 mergeVideoAudio(tv.getAbsolutePath(), ta.getAbsolutePath(), merged.getAbsolutePath());
                 saveFileToDestination(ctx, merged, fn, true, currentDownloadUsername);
-                mainHandler.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_video_saved),
+                mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_video_saved),
                         Toast.LENGTH_SHORT).show());
             } catch (Throwable e) {
                 mainHandler.post(() -> startDirectDownload(ctx, videoUrl, true));

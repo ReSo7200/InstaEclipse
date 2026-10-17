@@ -537,7 +537,7 @@ public class CommentSearchHook {
             exDlg.secondary(I18n.t(ctx, R.string.ig_dialog_cancel), null);
             exDlg.primary(I18n.t(ctx, R.string.ig_comment_export), () -> {
                 exportPostMedia = postBox.isChecked();
-                Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_working), Toast.LENGTH_SHORT).show();
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_working), Toast.LENGTH_SHORT).show();
                 exportComments(ctx, rows, exportPostMedia);
             });
             exDlg.show();
@@ -735,7 +735,7 @@ public class CommentSearchHook {
             }
             ClipboardManager cm = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
             cm.setPrimaryClip(ClipData.newPlainText("comment", r[1]));
-            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_comment_copied), Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_comment_copied), Toast.LENGTH_SHORT).show();
         });
         refresh.run();
 
@@ -958,11 +958,11 @@ public class CommentSearchHook {
                         out.write(html.getBytes(java.nio.charset.StandardCharsets.UTF_8));
                     }
                     ModuleLog.line(TAG + "exported " + cCount + " comments to " + file);
-                    MAIN.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_done, cCount, file), Toast.LENGTH_LONG).show());
+                    MAIN.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_comment_export_done, cCount, file), Toast.LENGTH_LONG).show());
                 }
             } catch (Throwable t) {
                 ModuleLog.line(TAG + "❌ export: " + t);
-                MAIN.post(() -> Toast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
+                MAIN.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }

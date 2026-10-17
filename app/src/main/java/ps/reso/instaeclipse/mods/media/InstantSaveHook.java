@@ -227,7 +227,7 @@ public class InstantSaveHook {
         if (ctx == null) return;
         if (media == null) {
             FeedVideoDownloadHook.mainHandler.post(() ->
-                    Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
             return;
         }
         FeedVideoDownloadHook.executor.submit(() -> {
@@ -235,7 +235,7 @@ public class InstantSaveHook {
                 List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
                 if (urls == null || urls.isEmpty()) {
                     FeedVideoDownloadHook.mainHandler.post(() ->
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_save_none), Toast.LENGTH_SHORT).show());
                     return;
                 }
                 String url = urls.get(0);
@@ -250,11 +250,11 @@ public class InstantSaveHook {
                 String fn = FeedVideoDownloadHook.buildFilename(username, "instant", mediaId, isVid);
                 final String fUser = username;
                 FeedVideoDownloadHook.mainHandler.post(() ->
-                        Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saving), Toast.LENGTH_SHORT).show());
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saving), Toast.LENGTH_SHORT).show());
                 boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, fn, isVid, fUser);
                 if (!delegated) {
                     FeedVideoDownloadHook.mainHandler.post(() ->
-                            Toast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saved), Toast.LENGTH_SHORT).show());
+                            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_instant_saved), Toast.LENGTH_SHORT).show());
                 }
             } catch (Throwable e) {
                 ModuleLog.line("(IE|InstantSave) ❌ save failed: " + e);

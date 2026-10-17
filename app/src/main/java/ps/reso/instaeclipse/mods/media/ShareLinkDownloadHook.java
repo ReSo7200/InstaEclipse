@@ -194,6 +194,6 @@ public class ShareLinkDownloadHook {
     }
 
     private static void toast(Context c, String msg) {
-        FeedVideoDownloadHook.mainHandler.post(() -> Toast.makeText(c, msg, Toast.LENGTH_SHORT).show());
+        FeedVideoDownloadHook.mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(c, msg, Toast.LENGTH_SHORT).show());
     }
 }

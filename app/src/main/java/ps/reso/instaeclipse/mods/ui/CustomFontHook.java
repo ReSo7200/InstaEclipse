@@ -195,10 +195,10 @@ public class CustomFontHook {
                                     if (saveEmoji(act, uri)) {
                                         FeatureFlags.customEmojiEnabled = true;
                                         SettingsManager.saveAllFlags();
-                                        android.widget.Toast.makeText(act,
+                                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(act,
                                                 "Emoji font saved — restart Instagram to apply", android.widget.Toast.LENGTH_LONG).show();
                                     } else {
-                                        android.widget.Toast.makeText(act,
+                                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(act,
                                                 "Couldn't load that font file", android.widget.Toast.LENGTH_SHORT).show();
                                     }
                                     return;
@@ -206,10 +206,10 @@ public class CustomFontHook {
                                 if (saveFont(act, uri)) {
                                     FeatureFlags.customFontEnabled = true;
                                     SettingsManager.saveAllFlags();
-                                    android.widget.Toast.makeText(act,
+                                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(act,
                                             "Font saved — restart Instagram to apply", android.widget.Toast.LENGTH_LONG).show();
                                 } else {
-                                    android.widget.Toast.makeText(act,
+                                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(act,
                                             "Couldn't load that font file", android.widget.Toast.LENGTH_SHORT).show();
                                 }
                             } catch (Throwable t) { ModuleLog.line("(IE|Font) result: " + t); }
@@ -338,7 +338,7 @@ public class CustomFontHook {
             i.addCategory(Intent.CATEGORY_OPENABLE);
             act.startActivityForResult(Intent.createChooser(i, title), req);
         } catch (Throwable t) {
-            android.widget.Toast.makeText(act, "Can't open file picker here", android.widget.Toast.LENGTH_SHORT).show();
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(act, "Can't open file picker here", android.widget.Toast.LENGTH_SHORT).show();
         }
     }
 
