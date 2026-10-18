@@ -673,4 +673,8 @@
     <string name="ig_story_ring_invalid">Cor inválida</string>
     <string name="ig_feed_corner_radius">Cantos arredondados nas publicações</string>
     <string name="ig_disable_search_history">Não salvar pesquisas</string>
+    <string name="ig_call_confirm">Perguntar antes de ligar</string>
+    <string name="ig_call_confirm_audio">Iniciar uma chamada de voz?</string>
+    <string name="ig_call_confirm_video">Iniciar uma chamada de vídeo?</string>
+    <string name="ig_call_confirm_call">Ligar</string>
 </resources>

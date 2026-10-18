@@ -706,4 +706,8 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_story_ring_invalid">Warna tidak valid</string>
     <string name="ig_feed_corner_radius">Sudut postingan membulat</string>
     <string name="ig_disable_search_history">Jangan simpan pencarian</string>
+    <string name="ig_call_confirm">Tanya sebelum menelepon</string>
+    <string name="ig_call_confirm_audio">Mulai panggilan suara?</string>
+    <string name="ig_call_confirm_video">Mulai panggilan video?</string>
+    <string name="ig_call_confirm_call">Telepon</string>
 </resources>

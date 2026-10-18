@@ -707,4 +707,8 @@
     <string name="ig_story_ring_invalid">Μη έγκυρο χρώμα</string>
     <string name="ig_feed_corner_radius">Στρογγυλεμένες γωνίες αναρτήσεων</string>
     <string name="ig_disable_search_history">Να μην αποθηκεύονται οι αναζητήσεις</string>
+    <string name="ig_call_confirm">Ερώτηση πριν την κλήση</string>
+    <string name="ig_call_confirm_audio">Έναρξη φωνητικής κλήσης;</string>
+    <string name="ig_call_confirm_video">Έναρξη βιντεοκλήσης;</string>
+    <string name="ig_call_confirm_call">Κλήση</string>
 </resources>

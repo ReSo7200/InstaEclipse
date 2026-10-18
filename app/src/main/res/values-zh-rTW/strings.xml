@@ -674,4 +674,8 @@
     <string name="ig_story_ring_invalid">無效的顏色</string>
     <string name="ig_feed_corner_radius">貼文圓角</string>
     <string name="ig_disable_search_history">不儲存搜尋紀錄</string>
+    <string name="ig_call_confirm">通話前確認</string>
+    <string name="ig_call_confirm_audio">要開始語音通話嗎？</string>
+    <string name="ig_call_confirm_video">要開始視訊通話嗎？</string>
+    <string name="ig_call_confirm_call">撥打</string>
 </resources>

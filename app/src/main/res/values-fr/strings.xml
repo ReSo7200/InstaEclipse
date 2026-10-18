@@ -709,4 +709,8 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="ig_story_ring_invalid">Couleur non valide</string>
     <string name="ig_feed_corner_radius">Coins arrondis des publications</string>
     <string name="ig_disable_search_history">Ne pas enregistrer les recherches</string>
+    <string name="ig_call_confirm">Demander avant d\'appeler</string>
+    <string name="ig_call_confirm_audio">Démarrer un appel audio ?</string>
+    <string name="ig_call_confirm_video">Démarrer un appel vidéo ?</string>
+    <string name="ig_call_confirm_call">Appeler</string>
 </resources>

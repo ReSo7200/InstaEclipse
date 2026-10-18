@@ -713,4 +713,8 @@
     <string name="ig_story_ring_invalid">Geçersiz renk</string>
     <string name="ig_feed_corner_radius">Gönderilerde yuvarlak köşeler</string>
     <string name="ig_disable_search_history">Aramaları kaydetme</string>
+    <string name="ig_call_confirm">Aramadan önce sor</string>
+    <string name="ig_call_confirm_audio">Sesli arama başlatılsın mı?</string>
+    <string name="ig_call_confirm_video">Görüntülü arama başlatılsın mı?</string>
+    <string name="ig_call_confirm_call">Ara</string>
 </resources>

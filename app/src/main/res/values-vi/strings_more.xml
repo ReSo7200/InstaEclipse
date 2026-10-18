@@ -275,4 +275,8 @@
     <string name="ig_story_ring_invalid">Màu không hợp lệ</string>
     <string name="ig_feed_corner_radius">Bo góc bài viết</string>
     <string name="ig_disable_search_history">Không lưu tìm kiếm</string>
+    <string name="ig_call_confirm">Hỏi trước khi gọi</string>
+    <string name="ig_call_confirm_audio">Bắt đầu cuộc gọi thoại?</string>
+    <string name="ig_call_confirm_video">Bắt đầu cuộc gọi video?</string>
+    <string name="ig_call_confirm_call">Gọi</string>
 </resources>

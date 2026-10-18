@@ -719,6 +719,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|ShareDL) ❌ Failed to hook");
                     }
 
+                    // Ask before calling (#277)
+                    try {
+                        if (!skip("CallConfirmHook")) ps.reso.instaeclipse.mods.ghost.CallConfirmHook.install();
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | CallConfirm): ❌ Failed to hook");
+                    }
+
                     // Don't save searches (#280)
                     try {
                         if (!skip("SearchHistoryHook")) ps.reso.instaeclipse.mods.ghost.SearchHistoryHook.install(dexKitBridge, hostClassLoader);

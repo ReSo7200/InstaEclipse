@@ -705,4 +705,8 @@
     <string name="ig_story_ring_invalid">צבע לא תקין</string>
     <string name="ig_feed_corner_radius">פינות מעוגלות לפוסטים</string>
     <string name="ig_disable_search_history">לא לשמור חיפושים</string>
+    <string name="ig_call_confirm">לשאול לפני שיחה</string>
+    <string name="ig_call_confirm_audio">להתחיל שיחה קולית?</string>
+    <string name="ig_call_confirm_video">להתחיל שיחת וידאו?</string>
+    <string name="ig_call_confirm_call">התקשר</string>
 </resources>

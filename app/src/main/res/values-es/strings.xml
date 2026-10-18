@@ -678,4 +678,8 @@
     <string name="ig_story_ring_invalid">Color no válido</string>
     <string name="ig_feed_corner_radius">Esquinas redondeadas en publicaciones</string>
     <string name="ig_disable_search_history">No guardar búsquedas</string>
+    <string name="ig_call_confirm">Preguntar antes de llamar</string>
+    <string name="ig_call_confirm_audio">¿Iniciar una llamada de voz?</string>
+    <string name="ig_call_confirm_video">¿Iniciar una videollamada?</string>
+    <string name="ig_call_confirm_call">Llamar</string>
 </resources>

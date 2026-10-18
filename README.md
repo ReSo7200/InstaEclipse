@@ -82,6 +82,7 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Edit history | See every earlier version of a message that was edited |
 | Chat export | Export a chat to a readable HTML page with replies, reactions, edit history and optional media |
 | Jump to first message | Scroll a chat all the way back to its first message |
+| Ask before calling | Tapping a chat's audio or video call button asks first, so calls never start by accident |
 | Voice message downloads | Save voice messages, named by sender |
 | Sticker and GIF downloads | Save stickers and GIFs from chats in their original format, named by sender |
 | Translate messages | Send a message to your translator app from its long press menu (under More) |

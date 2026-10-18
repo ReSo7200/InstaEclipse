@@ -706,4 +706,8 @@
     <string name="ig_story_ring_invalid">无效的颜色</string>
     <string name="ig_feed_corner_radius">帖子圆角</string>
     <string name="ig_disable_search_history">不保存搜索记录</string>
+    <string name="ig_call_confirm">通话前确认</string>
+    <string name="ig_call_confirm_audio">要开始语音通话吗？</string>
+    <string name="ig_call_confirm_video">要开始视频通话吗？</string>
+    <string name="ig_call_confirm_call">呼叫</string>
 </resources>

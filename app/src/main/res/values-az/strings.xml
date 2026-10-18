@@ -676,4 +676,8 @@
     <string name="ig_story_ring_invalid">Yanlış rəng</string>
     <string name="ig_feed_corner_radius">Paylaşımların yuvarlaq küncləri</string>
     <string name="ig_disable_search_history">Axtarışları saxlama</string>
+    <string name="ig_call_confirm">Zəngdən əvvəl soruş</string>
+    <string name="ig_call_confirm_audio">Səsli zəng başlasın?</string>
+    <string name="ig_call_confirm_video">Video zəng başlasın?</string>
+    <string name="ig_call_confirm_call">Zəng et</string>
 </resources>

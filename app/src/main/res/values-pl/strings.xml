@@ -723,4 +723,8 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_story_ring_invalid">Nieprawidłowy kolor</string>
     <string name="ig_feed_corner_radius">Zaokrąglone rogi postów</string>
     <string name="ig_disable_search_history">Nie zapisuj wyszukiwań</string>
+    <string name="ig_call_confirm">Pytaj przed połączeniem</string>
+    <string name="ig_call_confirm_audio">Rozpocząć połączenie głosowe?</string>
+    <string name="ig_call_confirm_video">Rozpocząć połączenie wideo?</string>
+    <string name="ig_call_confirm_call">Zadzwoń</string>
 </resources>

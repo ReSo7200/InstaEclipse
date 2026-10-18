@@ -672,4 +672,8 @@
     <string name="ig_story_ring_invalid">لون غير صالح</string>
     <string name="ig_feed_corner_radius">زوايا المنشورات المستديرة</string>
     <string name="ig_disable_search_history">عدم حفظ عمليات البحث</string>
+    <string name="ig_call_confirm">السؤال قبل الاتصال</string>
+    <string name="ig_call_confirm_audio">بدء مكالمة صوتية؟</string>
+    <string name="ig_call_confirm_video">بدء مكالمة فيديو؟</string>
+    <string name="ig_call_confirm_call">اتصال</string>
 </resources>

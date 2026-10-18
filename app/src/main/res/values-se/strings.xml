@@ -675,4 +675,8 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_story_ring_invalid">Ogiltig färg</string>
     <string name="ig_feed_corner_radius">Rundade hörn på inlägg</string>
     <string name="ig_disable_search_history">Spara inte sökningar</string>
+    <string name="ig_call_confirm">Fråga innan samtal</string>
+    <string name="ig_call_confirm_audio">Starta ett röstsamtal?</string>
+    <string name="ig_call_confirm_video">Starta ett videosamtal?</string>
+    <string name="ig_call_confirm_call">Ring</string>
 </resources>

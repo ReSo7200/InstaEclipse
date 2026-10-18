@@ -726,4 +726,8 @@ Stay on this screen until it finishes.</string>
     <string name="ig_story_ring_invalid">Not a valid color</string>
     <string name="ig_feed_corner_radius">Rounded post corners</string>
     <string name="ig_disable_search_history">Don\'t Save Searches</string>
+    <string name="ig_call_confirm">Ask Before Calling</string>
+    <string name="ig_call_confirm_audio">Start an audio call?</string>
+    <string name="ig_call_confirm_video">Start a video call?</string>
+    <string name="ig_call_confirm_call">Call</string>
 </resources>

@@ -684,4 +684,8 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="ig_story_ring_invalid">Keine gültige Farbe</string>
     <string name="ig_feed_corner_radius">Abgerundete Beitragsecken</string>
     <string name="ig_disable_search_history">Suchen nicht speichern</string>
+    <string name="ig_call_confirm">Vor Anrufen fragen</string>
+    <string name="ig_call_confirm_audio">Sprachanruf starten?</string>
+    <string name="ig_call_confirm_video">Videoanruf starten?</string>
+    <string name="ig_call_confirm_call">Anrufen</string>
 </resources>
