@@ -58,6 +58,7 @@ public class SettingsBackupManager {
         s.put("offerPlaybackSpeed",         FeatureFlags.offerPlaybackSpeed);
         s.put("maxUploadQuality",           FeatureFlags.maxUploadQuality);
         s.put("forceReelScrubber",          FeatureFlags.forceReelScrubber);
+        s.put("holdLeftSlowMotion",         FeatureFlags.holdLeftSlowMotion);
         s.put("keepEditHistory",            FeatureFlags.keepEditHistory);
         s.put("jumpToFirstMessage",         FeatureFlags.jumpToFirstMessage);
         s.put("translateMessages",          FeatureFlags.translateMessages);
@@ -109,6 +110,7 @@ public class SettingsBackupManager {
         s.put("storyInfo",               FeatureFlags.storyInfo);
         s.put("commentSearch",           FeatureFlags.commentSearch);
         s.put("followListExport",        FeatureFlags.followListExport);
+        s.put("followersHistory",        FeatureFlags.followersHistory);
         s.put("showFollowerToast",       FeatureFlags.showFollowerToast);
         s.put("showFeatureToasts",       FeatureFlags.showFeatureToasts);
         s.put("enableStoryMentions",     FeatureFlags.enableStoryMentions);
@@ -195,6 +197,7 @@ public class SettingsBackupManager {
         if (s.has("offerPlaybackSpeed"))        FeatureFlags.offerPlaybackSpeed        = s.getBoolean("offerPlaybackSpeed");
         if (s.has("maxUploadQuality"))          FeatureFlags.maxUploadQuality          = s.getBoolean("maxUploadQuality");
         if (s.has("forceReelScrubber"))         FeatureFlags.forceReelScrubber         = s.getBoolean("forceReelScrubber");
+        if (s.has("holdLeftSlowMotion"))        FeatureFlags.holdLeftSlowMotion        = s.getBoolean("holdLeftSlowMotion");
         if (s.has("keepEditHistory"))           FeatureFlags.keepEditHistory           = s.getBoolean("keepEditHistory");
         if (s.has("jumpToFirstMessage"))        FeatureFlags.jumpToFirstMessage        = s.getBoolean("jumpToFirstMessage");
         if (s.has("translateMessages"))         FeatureFlags.translateMessages         = s.getBoolean("translateMessages");
@@ -243,6 +246,7 @@ public class SettingsBackupManager {
         if (s.has("storyInfo"))              FeatureFlags.storyInfo              = s.getBoolean("storyInfo");
         if (s.has("commentSearch"))          FeatureFlags.commentSearch          = s.getBoolean("commentSearch");
         if (s.has("followListExport"))       FeatureFlags.followListExport       = s.getBoolean("followListExport");
+        if (s.has("followersHistory"))       FeatureFlags.followersHistory       = s.getBoolean("followersHistory");
         if (s.has("showFollowerToast"))      FeatureFlags.showFollowerToast      = s.getBoolean("showFollowerToast");
         if (s.has("showFeatureToasts"))      FeatureFlags.showFeatureToasts      = s.getBoolean("showFeatureToasts");
         if (s.has("enableStoryMentions"))    FeatureFlags.enableStoryMentions    = s.getBoolean("enableStoryMentions");

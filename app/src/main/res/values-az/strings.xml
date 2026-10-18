@@ -229,6 +229,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Paylaşım Menyusuna Media Məlumatı Əlavə Et</string>
     <string name="ig_dialog_downloader_offer_speed">Paylaşım Menyusuna Oynatma Sürəti Əlavə Et</string>
     <string name="ig_dialog_downloader_reel_scrubber">Reels İrəliləmə Zolağını Həmişə Göstər</string>
+    <string name="ig_dialog_reels_hold_left_slow">Yavaş hərəkət üçün sol tərəfi basılı saxla (0.5×)</string>
     <string name="ig_media_info_title">Media məlumatı</string>
     <string name="ig_playback_speed_title">Oynatma sürəti</string>
     <string name="ig_playback_speed_next">Sürət təyin edildi — başlayan növbəti videoya tətbiq olunur</string>
@@ -640,6 +641,18 @@
     <string name="ig_comment_export_post_media">Paylaşımın foto/videolarını da saxla</string>
     <string name="ig_comment_export_done">%1$d şərh %2$s ünvanına ixrac edildi</string>
     <string name="ig_dialog_misc_follow_export">İzləyiciləri/İzlənilənləri CSV olaraq ixrac et</string>
+    <string name="ig_feat_followers_history">İzləyici tarixçəsi (kim izləməni dayandırdı)</string>
+    <string name="ig_followers_history">İzləyici tarixçəsi</string>
+    <string name="ig_followers_history_first">İlk siyahınız saxlanıldı: %1$d izləyici. Kimin izləməni dayandırdığını və ya izlədiyini görmək üçün sonra yenidən yoxlayın.</string>
+    <string name="ig_followers_history_changes">%1$s tarixindən bəri: %2$d dayandırdı, %3$d yeni</string>
+    <string name="ig_followers_history_summary">%1$d izləyici · yoxlanıldı %2$s</string>
+    <string name="ig_followers_history_empty">Hələ dəyişiklik qeydə alınmayıb.</string>
+    <string name="ig_followers_history_unfollowed">Sizi izləməyi dayandırdı</string>
+    <string name="ig_followers_history_followed">Sizi izlədi</string>
+    <string name="ig_followers_history_partial">Siyahı tam yüklənmədi, ona görə müqayisə edilmədi. Yenidən cəhd edin.</string>
+    <string name="ig_followers_history_note">Dəyişikliklər yoxlayanda tapılır, ona görə tarix dəyişikliyin görüldüyü vaxtdır.</string>
+    <string name="ig_followers_history_clear">Tarixçəni təmizlə</string>
+    <string name="ig_followers_history_wrong_tab">Yoxlamaq üçün öz İzləyicilər bölmənizi açın.</string>
     <string name="ig_follow_export">CSV ixrac et</string>
     <string name="ig_follow_export_done">%1$d hesab %2$s ünvanına ixrac edildi</string>
     <string name="ig_follow_export_none">Hələ hesab yüklənməyib</string>

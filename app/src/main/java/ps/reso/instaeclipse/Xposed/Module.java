@@ -731,7 +731,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
                     // Profile Picture Download
                     try {
-                        if (!skip("ProfilePicDownloadHook")) ProfilePicDownloadHook.install();
+                        if (!skip("ProfilePicDownloadHook")) ProfilePicDownloadHook.install(dexKitBridge, hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | ProfileDownload): ❌ Failed to hook");
                     }

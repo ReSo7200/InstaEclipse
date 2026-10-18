@@ -298,12 +298,14 @@ public class FeatureManager {
         reg(FeatureFlags.storyLinks,           "StoryLinks",           R.string.ig_feat_story_links);
         reg(FeatureFlags.storyInfo,            "StoryInfo",            R.string.ig_feat_story_info);
         reg(FeatureFlags.followListExport,     "FollowListExport",     R.string.ig_feat_follow_export);
+        reg(FeatureFlags.followersHistory,     "FollowersHistory",     R.string.ig_feat_followers_history);
         reg(FeatureFlags.savedOnProfile,       "SavedOnProfile",       R.string.ig_feat_saved_on_profile);
         reg(FeatureFlags.hideNotesTray,        "HideNotesTray",        R.string.ig_feat_hide_notes);
         reg(FeatureFlags.hideDmBlend,          "HideDmBlend",          R.string.ig_feat_hide_blend);
         reg(FeatureFlags.readReceiptChats,     "ReadReceiptChats",     R.string.ig_feat_read_receipt_chats);
         reg(FeatureFlags.hideThreadsButton,    "HideThreadsButton",    R.string.ig_feat_hide_threads);
         reg(FeatureFlags.offerPlaybackSpeed,   "PlaybackSpeed",        R.string.ig_playback_speed_title);
+        reg(FeatureFlags.holdLeftSlowMotion,   "HoldSlowMotion",       R.string.ig_dialog_reels_hold_left_slow);
         reg(FeatureFlags.enableVoiceDownload,  "VoiceDownload",        R.string.ig_feat_voice_download);
         reg(FeatureFlags.enableDmMediaDownload, "DmMediaDownload",     R.string.ig_dialog_downloader_dm_media);
         reg(FeatureFlags.maxUploadQuality,     "MaxUploadQuality",     R.string.ig_feat_max_upload_quality);

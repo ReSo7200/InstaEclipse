@@ -227,6 +227,7 @@
     <string name="ig_dialog_downloader_offer_media_info">إضافة معلومات الوسائط إلى قائمة المنشور</string>
     <string name="ig_dialog_downloader_offer_speed">إضافة سرعة التشغيل إلى قائمة المنشور</string>
     <string name="ig_dialog_downloader_reel_scrubber">إظهار شريط التقديم في الريلز دائماً</string>
+    <string name="ig_dialog_reels_hold_left_slow">الضغط المطوّل على اليسار للتصوير البطيء (0.5×)</string>
     <string name="ig_media_info_title">معلومات الوسائط</string>
     <string name="ig_playback_speed_title">سرعة التشغيل</string>
     <string name="ig_playback_speed_next">تم ضبط السرعة — تُطبَّق على الفيديو التالي الذي يبدأ</string>
@@ -602,6 +603,18 @@
     <string name="ig_dialog_ghost_chat_export">زر تصدير المحادثة في الدردشات</string>
     <string name="ig_dialog_misc_comment_search">البحث في التعليقات</string>
     <string name="ig_dialog_misc_follow_export">تصدير المتابِعين/المتابَعين إلى CSV</string>
+    <string name="ig_feat_followers_history">سجل المتابعين (من ألغى متابعتك)</string>
+    <string name="ig_followers_history">سجل المتابعين</string>
+    <string name="ig_followers_history_first">تم حفظ قائمتك الأولى: %1$d متابع. تحقق لاحقًا لمعرفة من ألغى متابعتك أو تابعك.</string>
+    <string name="ig_followers_history_changes">منذ %1$s: ‏%2$d ألغوا المتابعة، %3$d جدد</string>
+    <string name="ig_followers_history_summary">%1$d متابع · آخر تحقق %2$s</string>
+    <string name="ig_followers_history_empty">لا توجد تغييرات مسجلة بعد.</string>
+    <string name="ig_followers_history_unfollowed">ألغى متابعتك</string>
+    <string name="ig_followers_history_followed">تابعك</string>
+    <string name="ig_followers_history_partial">لم يكتمل تحميل القائمة، لذلك لم تتم المقارنة. حاول مرة أخرى.</string>
+    <string name="ig_followers_history_note">تُكتشف التغييرات عند التحقق، لذا التاريخ هو وقت ملاحظة التغيير.</string>
+    <string name="ig_followers_history_clear">مسح السجل</string>
+    <string name="ig_followers_history_wrong_tab">افتح تبويب المتابعين في حسابك للتحقق.</string>
     <string name="ig_export_media_saved">تم حفظ التصدير — %1$d ملف وسائط في %2$s</string>
     <string name="ig_feat_comment_search">البحث في التعليقات</string>
     <string name="ig_feat_edit_history">سجل التعديلات</string>

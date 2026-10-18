@@ -99,6 +99,7 @@ public class SettingsManager {
         editor.putBoolean("offerPlaybackSpeed", FeatureFlags.offerPlaybackSpeed);
         editor.putBoolean("maxUploadQuality", FeatureFlags.maxUploadQuality);
         editor.putBoolean("forceReelScrubber", FeatureFlags.forceReelScrubber);
+        editor.putBoolean("holdLeftSlowMotion", FeatureFlags.holdLeftSlowMotion);
         editor.putBoolean("keepEditHistory", FeatureFlags.keepEditHistory);
         editor.putBoolean("jumpToFirstMessage", FeatureFlags.jumpToFirstMessage);
         editor.putBoolean("translateMessages", FeatureFlags.translateMessages);
@@ -146,6 +147,7 @@ public class SettingsManager {
         editor.putBoolean("storyInfo", FeatureFlags.storyInfo);
         editor.putBoolean("commentSearch", FeatureFlags.commentSearch);
         editor.putBoolean("followListExport", FeatureFlags.followListExport);
+        editor.putBoolean("followersHistory", FeatureFlags.followersHistory);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
         editor.putBoolean("showFeatureToasts", FeatureFlags.showFeatureToasts);
         editor.putBoolean("enableStoryMentions", FeatureFlags.enableStoryMentions);
@@ -287,6 +289,7 @@ public class SettingsManager {
         FeatureFlags.offerPlaybackSpeed = prefs.getBoolean("offerPlaybackSpeed", false);
         FeatureFlags.maxUploadQuality = prefs.getBoolean("maxUploadQuality", false);
         FeatureFlags.forceReelScrubber = prefs.getBoolean("forceReelScrubber", false);
+        FeatureFlags.holdLeftSlowMotion = prefs.getBoolean("holdLeftSlowMotion", false);
         FeatureFlags.keepEditHistory = prefs.getBoolean("keepEditHistory", false);
         FeatureFlags.jumpToFirstMessage = prefs.getBoolean("jumpToFirstMessage", false);
         FeatureFlags.translateMessages = prefs.getBoolean("translateMessages", false);
@@ -334,6 +337,7 @@ public class SettingsManager {
         FeatureFlags.storyInfo = prefs.getBoolean("storyInfo", false);
         FeatureFlags.commentSearch = prefs.getBoolean("commentSearch", false);
         FeatureFlags.followListExport = prefs.getBoolean("followListExport", false);
+        FeatureFlags.followersHistory = prefs.getBoolean("followersHistory", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);
         FeatureFlags.showFeatureToasts = prefs.getBoolean("showFeatureToasts", false);
         FeatureFlags.enableStoryMentions = prefs.getBoolean("enableStoryMentions", false);

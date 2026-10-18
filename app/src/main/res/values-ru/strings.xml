@@ -229,6 +229,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Добавить «Информация о медиа» в меню публикации</string>
     <string name="ig_dialog_downloader_offer_speed">Добавить «Скорость воспроизведения» в меню публикации</string>
     <string name="ig_dialog_downloader_reel_scrubber">Всегда показывать полосу перемотки Reels</string>
+    <string name="ig_dialog_reels_hold_left_slow">Удерживать левую сторону для замедления (0,5×)</string>
     <string name="ig_media_info_title">Информация о медиа</string>
     <string name="ig_playback_speed_title">Скорость воспроизведения</string>
     <string name="ig_playback_speed_next">Скорость задана — применится к следующему запущенному видео</string>
@@ -638,6 +639,18 @@
     <string name="ig_comment_export_post_media">Также сохранить фото/видео публикации</string>
     <string name="ig_comment_export_done">Экспортировано %1$d комментариев в %2$s</string>
     <string name="ig_dialog_misc_follow_export">Экспорт подписчиков/подписок в CSV</string>
+    <string name="ig_feat_followers_history">История подписчиков (кто отписался)</string>
+    <string name="ig_followers_history">История подписчиков</string>
+    <string name="ig_followers_history_first">Первый список сохранён: %1$d подписчиков. Проверьте позже, чтобы увидеть, кто отписался или подписался.</string>
+    <string name="ig_followers_history_changes">С %1$s: %2$d отписались, %3$d новых</string>
+    <string name="ig_followers_history_summary">%1$d подписчиков · проверено %2$s</string>
+    <string name="ig_followers_history_empty">Изменений пока нет.</string>
+    <string name="ig_followers_history_unfollowed">Отписался(ась)</string>
+    <string name="ig_followers_history_followed">Подписался(ась)</string>
+    <string name="ig_followers_history_partial">Список загрузился не полностью, поэтому сравнения не было. Попробуйте ещё раз.</string>
+    <string name="ig_followers_history_note">Изменения находятся при проверке, поэтому дата — это когда изменение заметили.</string>
+    <string name="ig_followers_history_clear">Очистить историю</string>
+    <string name="ig_followers_history_wrong_tab">Откройте свою вкладку «Подписчики», чтобы проверить.</string>
     <string name="ig_follow_export">Экспорт в CSV</string>
     <string name="ig_follow_export_done">Экспортировано %1$d аккаунтов в %2$s</string>
     <string name="ig_follow_export_none">Аккаунты ещё не загружены</string>

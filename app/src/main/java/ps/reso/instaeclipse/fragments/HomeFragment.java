@@ -89,7 +89,7 @@ public class HomeFragment extends Fragment {
             "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
             "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
             "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "fancyBioFont", "savedOnProfile",
-            "storyViewerSearch", "storyLinks", "storyInfo", "commentSearch", "followListExport",
+            "storyViewerSearch", "storyLinks", "storyInfo", "commentSearch", "followListExport", "followersHistory",
             // Lock / hide chats
             "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint",
             "hideSpecificChats",
@@ -99,7 +99,7 @@ public class HomeFragment extends Fragment {
             "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload",
             "downloaderUsernameFolder", "downloaderAddTimestamp", "copyMediaLink", "offerAudioDownload",
             "enableVoiceDownload", "enableDmMediaDownload", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed",
-            "forceReelScrubber", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories",
+            "forceReelScrubber", "holdLeftSlowMotion", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories",
             // Developer
             "isDevEnabled", "removeBuildExpiredPopup"
     };

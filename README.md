@@ -120,6 +120,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Force Reels quality | Pick a fixed quality (Auto, 360p to 1080p, or Max) |
 | Playback speed | 0.5x to 3x for reels, stories and feed videos |
+| Hold for slow motion | Hold the left side of a reel for 0.5x, the right side for 2x |
 | Always show the seek bar | Scrub through any reel |
 | Reels auto scroll | Move to the next reel when one ends |
 | Lock Reels scrolling | Stop accidental swipes |
@@ -135,7 +136,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Feature | What it does |
 |---|---|
 | Download posts, reels and stories | Single photos, full carousels, reels, and stories (your own included, with music) |
-| Download profile pictures | Full size, from a long press on the profile picture |
+| Download profile pictures | Long press a profile picture to see the full-size original, square, and save it |
 | Audio only | Save just the audio of a video or reel as .m4a, including a post's music |
 | Copy media link | Copy the direct link for a post, reel or a single carousel slide |
 | Copy image | Copy a photo straight to the clipboard |
@@ -188,6 +189,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | "Follows you" label | See on any profile whether they follow you back |
 | Follower toast | A quick message when you open a profile |
 | Export followers and following | Save the whole list as CSV |
+| Followers history | See who unfollowed you and who followed you since your last check |
 | Saved on your profile | A Saved button right on your profile |
 | Lock Saved collections | Put a passcode on a collection |
 | Hide the Threads button | Remove it from profiles |

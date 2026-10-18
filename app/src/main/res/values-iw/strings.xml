@@ -265,6 +265,7 @@
     <string name="ig_dialog_downloader_offer_media_info">הוסף מידע מדיה לתפריט הפוסט</string>
     <string name="ig_dialog_downloader_offer_speed">הוסף מהירות ניגון לתפריט הפוסט</string>
     <string name="ig_dialog_downloader_reel_scrubber">הצג תמיד את סרגל ההתקדמות בריילז</string>
+    <string name="ig_dialog_reels_hold_left_slow">החזקה בצד שמאל להילוך איטי (0.5×)</string>
     <string name="ig_media_info_title">מידע מדיה</string>
     <string name="ig_playback_speed_title">מהירות ניגון</string>
     <string name="ig_playback_speed_next">המהירות הוגדרה — תחול על הסרטון הבא שיתחיל</string>
@@ -635,6 +636,18 @@
     <string name="ig_dialog_ghost_chat_export">כפתור ייצוא צ\'אט בצ\'אטים</string>
     <string name="ig_dialog_misc_comment_search">חיפוש בתגובות</string>
     <string name="ig_dialog_misc_follow_export">ייצא עוקבים/נעקבים ל-CSV</string>
+    <string name="ig_feat_followers_history">היסטוריית עוקבים (מי הפסיק לעקוב)</string>
+    <string name="ig_followers_history">היסטוריית עוקבים</string>
+    <string name="ig_followers_history_first">הרשימה הראשונה נשמרה: %1$d עוקבים. בדוק שוב מאוחר יותר כדי לראות מי הפסיק לעקוב או התחיל.</string>
+    <string name="ig_followers_history_changes">מאז %1$s: ‏%2$d הפסיקו, %3$d חדשים</string>
+    <string name="ig_followers_history_summary">%1$d עוקבים · נבדק %2$s</string>
+    <string name="ig_followers_history_empty">עדיין לא נרשמו שינויים.</string>
+    <string name="ig_followers_history_unfollowed">הפסיק לעקוב אחריך</string>
+    <string name="ig_followers_history_followed">התחיל לעקוב אחריך</string>
+    <string name="ig_followers_history_partial">הרשימה לא נטענה עד הסוף, לכן לא בוצעה השוואה. נסה שוב.</string>
+    <string name="ig_followers_history_note">שינויים מתגלים כשבודקים, לכן התאריך הוא מתי השינוי זוהה.</string>
+    <string name="ig_followers_history_clear">נקה היסטוריה</string>
+    <string name="ig_followers_history_wrong_tab">פתח את לשונית העוקבים שלך כדי לבדוק.</string>
     <string name="ig_export_media_saved">הייצוא נשמר — %1$d קובצי מדיה ב-%2$s</string>
     <string name="ig_feat_comment_search">חיפוש בתגובות</string>
     <string name="ig_feat_edit_history">היסטוריית עריכה</string>

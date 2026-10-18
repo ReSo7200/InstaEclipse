@@ -1576,6 +1576,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_block, A_SOCIAL, getString(R.string.ig_dialog_hide_threads_button), "hideThreadsButton"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_show_follower_toast), "showFollowerToast"),
                 createSwitch(R.drawable.ic_download, A_SOCIAL, getString(R.string.ig_dialog_misc_follow_export), "followListExport"),
+                createSwitch(R.drawable.ic_eye, A_SOCIAL, getString(R.string.ig_feat_followers_history), "followersHistory"),
                 createSwitch(R.drawable.ic_save, A_SOCIAL, getString(R.string.ig_saved_on_profile), "savedOnProfile")
         ));
 
@@ -1886,6 +1887,7 @@ public class FeaturesFragment extends Fragment {
                 createExtrasSwitch("#32D74B", "reelsAutoScroll"),
                 createExtrasSwitch("#32D74B", "reelsLockScroll"),
                 createSwitch(R.drawable.ic_movie, "#32D74B", getString(R.string.ig_dialog_downloader_reel_scrubber), "forceReelScrubber"),
+                createSwitch(R.drawable.ic_movie, "#32D74B", getString(R.string.ig_dialog_reels_hold_left_slow), "holdLeftSlowMotion"),
                 createSwitch(R.drawable.ic_block, "#32D74B", getString(R.string.ig_dialog_misc_disable_repost), "disableRepost")
         ));
 

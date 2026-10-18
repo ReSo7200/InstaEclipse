@@ -367,6 +367,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Dodaj Informacje o multimediach do menu posta</string>
     <string name="ig_dialog_downloader_offer_speed">Dodaj Prędkość odtwarzania do menu posta</string>
     <string name="ig_dialog_downloader_reel_scrubber">Zawsze pokazuj pasek przewijania rolek</string>
+    <string name="ig_dialog_reels_hold_left_slow">Przytrzymaj lewą stronę, aby zwolnić (0,5×)</string>
     <string name="ig_media_info_title">Informacje o multimediach</string>
     <string name="ig_playback_speed_title">Prędkość odtwarzania</string>
     <string name="ig_playback_speed_next">Ustawiono prędkość — dotyczy następnego uruchomionego filmu</string>
@@ -686,6 +687,18 @@
     <string name="ig_comment_export_post_media">Zapisz też zdjęcia/filmy z posta</string>
     <string name="ig_comment_export_done">Wyeksportowano %1$d komentarzy do %2$s</string>
     <string name="ig_dialog_misc_follow_export">Eksport obserwujących/obserwowanych do CSV</string>
+    <string name="ig_feat_followers_history">Historia obserwujących (kto przestał obserwować)</string>
+    <string name="ig_followers_history">Historia obserwujących</string>
+    <string name="ig_followers_history_first">Zapisano pierwszą listę: %1$d obserwujących. Sprawdź ponownie później, aby zobaczyć, kto przestał lub zaczął obserwować.</string>
+    <string name="ig_followers_history_changes">Od %1$s: %2$d przestało, %3$d nowych</string>
+    <string name="ig_followers_history_summary">%1$d obserwujących · sprawdzono %2$s</string>
+    <string name="ig_followers_history_empty">Brak zapisanych zmian.</string>
+    <string name="ig_followers_history_unfollowed">Przestał(a) obserwować</string>
+    <string name="ig_followers_history_followed">Zaczął(ęła) obserwować</string>
+    <string name="ig_followers_history_partial">Lista nie wczytała się do końca, więc nic nie porównano. Spróbuj ponownie.</string>
+    <string name="ig_followers_history_note">Zmiany są wykrywane przy sprawdzaniu, więc data oznacza, kiedy je zauważono.</string>
+    <string name="ig_followers_history_clear">Wyczyść historię</string>
+    <string name="ig_followers_history_wrong_tab">Otwórz własną kartę Obserwujący, aby sprawdzić.</string>
     <string name="ig_follow_export">Eksportuj CSV</string>
     <string name="ig_follow_export_done">Wyeksportowano %1$d kont do %2$s</string>
     <string name="ig_follow_export_none">Nie wczytano jeszcze żadnych kont</string>

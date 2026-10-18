@@ -1,6 +1,6 @@
 # Remaining fork improvements on 0.8.1
 
-This contribution starts at upstream `6f70d5afc500183e2d8f1e7bc12152542b811fa4`. It ports selected behavior and tests onto 0.8.1 rather than merging the older fork's history. The application identity, icon and version remain upstream's.
+This contribution started at upstream `6f70d5afc500183e2d8f1e7bc12152542b811fa4` and incorporates 0.8.1 through `a3d48ab2034080a85fb7d6af23346eb58067794c`. It ports selected behavior and tests onto 0.8.1 rather than merging the older fork's history. The application identity, icon and version remain upstream's. The later upstream followers history, profile-picture viewer, Reel hold-speed controls and share-sheet cleanup are preserved.
 
 ## Decisions required before merging
 
@@ -48,7 +48,7 @@ Run with JDK 17 and the configured Android SDK:
 
 Optional media fixture tests use `-Dinstaeclipse.ffmpeg` and `-Dinstaeclipse.ffprobe` paths. Without them, those tests skip explicitly. Android fixture assets are synthetic; no private account content is included.
 
-Local verification of the final source tree completed with 343 JVM tests reported: 341 passed, two optional media-fixture tests skipped, and no failures or errors. Debug application and instrumentation APK assembly passed. Lint reported zero errors and 428 warnings. Instrumentation tests and live Instagram checks were not run. The latest logging failure/retry and audio-preference fixtures are instrumentation tests, so they were compiled but not executed.
+Local verification of the final source tree completed with 347 JVM tests reported: 345 passed, two optional media-fixture tests skipped, and no failures or errors. Debug application and instrumentation APK assembly passed. Lint reported zero errors and 433 warnings. Instrumentation tests and live Instagram checks were not run. The latest logging failure/retry and audio-preference fixtures are instrumentation tests, so they were compiled but not executed.
 
 New strings use an explicit, file-scoped English fallback where translations are unavailable. This does not suppress lint errors elsewhere. Review the final integrated tree: the commits are grouped by subsystem, and intermediate commits are not independently validated.
 

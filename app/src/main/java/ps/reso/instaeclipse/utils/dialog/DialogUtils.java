@@ -169,7 +169,7 @@ public class DialogUtils {
         appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
         appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_feed), A_APPEARANCE, () -> showFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "hidePlusUpsells", "followingOnlyFeed", "hideStoriesTray", "disableDiscoverPeople", "expandCaptions", "exactTimestamps", "highResolutionImages", "enablePhotoZoom", "disableVideoAutoPlay")));
         appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), navCount(context)));
-        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels), A_APPEARANCE, () -> showReelsOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "disableRepost")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels), A_APPEARANCE, () -> showReelsOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "holdLeftSlowMotion", "disableRepost")));
         appearance.addView(createMenuRow(context, R.drawable.ic_story_ring, I18n.t(context, R.string.menu_stories), A_APPEARANCE, () -> showStoriesOptions(context), onCount(context, "disableStoryFlipping", "enableStoryMentions", "storyLinks", "storyInfo", "storyViewerSearch")));
         mainLayout.addView(appearance);
 
@@ -196,7 +196,7 @@ public class DialogUtils {
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_social)));
         LinearLayout social = createGroupCard(context);
         social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "enableCopyComment", "commentSearch", "enableCaptionCopy")));
-        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "savedOnProfile", "hideThreadsButton")));
+        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
         mainLayout.addView(social);
 
         // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
@@ -1494,6 +1494,7 @@ public class DialogUtils {
                 extraSwitch(context, "#FF375F", "reelsAutoScroll"),
                 extraSwitch(context, "#FF375F", "reelsLockScroll"),
                 flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_downloader_reel_scrubber, "forceReelScrubber"),
+                flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_reels_hold_left_slow, "holdLeftSlowMotion"),
                 flagSwitch(context, R.drawable.ic_block, "#FF375F", R.string.ig_dialog_misc_disable_repost, "disableRepost")));
 
         showSectionDialog(context, I18n.t(context, R.string.menu_reels), layout, () -> {});
@@ -1610,6 +1611,7 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_block, A_SOCIAL, R.string.ig_dialog_hide_threads_button, "hideThreadsButton"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_misc_show_follower_toast, "showFollowerToast"),
                 flagSwitch(context, R.drawable.ic_download, A_SOCIAL, R.string.ig_dialog_misc_follow_export, "followListExport"),
+                flagSwitch(context, R.drawable.ic_eye, A_SOCIAL, R.string.ig_feat_followers_history, "followersHistory"),
                 flagSwitch(context, R.drawable.ic_save, A_SOCIAL, R.string.ig_saved_on_profile, "savedOnProfile")));
         showSectionDialog(context, I18n.t(context, R.string.menu_profiles), layout, () -> {});
     }

@@ -265,6 +265,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Tambahkan Info Media ke Menu Postingan</string>
     <string name="ig_dialog_downloader_offer_speed">Tambahkan Kecepatan Putar ke Menu Postingan</string>
     <string name="ig_dialog_downloader_reel_scrubber">Selalu Tampilkan Bilah Geser Reels</string>
+    <string name="ig_dialog_reels_hold_left_slow">Tahan sisi kiri untuk gerak lambat (0,5×)</string>
     <string name="ig_media_info_title">Info media</string>
     <string name="ig_playback_speed_title">Kecepatan putar</string>
     <string name="ig_playback_speed_next">Kecepatan diatur — berlaku untuk video berikutnya yang diputar</string>
@@ -669,6 +670,18 @@
     <string name="ig_comment_export_post_media">Simpan juga foto/video postingan</string>
     <string name="ig_comment_export_done">Mengekspor %1$d komentar ke %2$s</string>
     <string name="ig_dialog_misc_follow_export">Ekspor Pengikut/Mengikuti ke CSV</string>
+    <string name="ig_feat_followers_history">Riwayat Pengikut (siapa yang berhenti mengikuti)</string>
+    <string name="ig_followers_history">Riwayat pengikut</string>
+    <string name="ig_followers_history_first">Daftar pertama disimpan: %1$d pengikut. Periksa lagi nanti untuk melihat siapa yang berhenti mengikuti atau mulai mengikuti.</string>
+    <string name="ig_followers_history_changes">Sejak %1$s: %2$d berhenti, %3$d baru</string>
+    <string name="ig_followers_history_summary">%1$d pengikut · diperiksa %2$s</string>
+    <string name="ig_followers_history_empty">Belum ada perubahan tercatat.</string>
+    <string name="ig_followers_history_unfollowed">Berhenti mengikuti Anda</string>
+    <string name="ig_followers_history_followed">Mengikuti Anda</string>
+    <string name="ig_followers_history_partial">Daftar belum selesai dimuat, jadi tidak ada yang dibandingkan. Coba lagi.</string>
+    <string name="ig_followers_history_note">Perubahan ditemukan saat Anda memeriksa, jadi tanggal adalah saat perubahan terdeteksi.</string>
+    <string name="ig_followers_history_clear">Hapus riwayat</string>
+    <string name="ig_followers_history_wrong_tab">Buka tab Pengikut milik Anda untuk memeriksa.</string>
     <string name="ig_follow_export">Ekspor CSV</string>
     <string name="ig_follow_export_done">Mengekspor %1$d akun ke %2$s</string>
     <string name="ig_follow_export_none">Belum ada akun yang dimuat</string>

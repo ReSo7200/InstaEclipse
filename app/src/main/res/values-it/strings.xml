@@ -367,6 +367,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Aggiungi Info media al menu del post</string>
     <string name="ig_dialog_downloader_offer_speed">Aggiungi Velocità di riproduzione al menu del post</string>
     <string name="ig_dialog_downloader_reel_scrubber">Mostra sempre la barra di avanzamento dei Reel</string>
+    <string name="ig_dialog_reels_hold_left_slow">Tieni premuto il lato sinistro per il rallentatore (0,5×)</string>
     <string name="ig_media_info_title">Info media</string>
     <string name="ig_playback_speed_title">Velocità di riproduzione</string>
     <string name="ig_playback_speed_next">Velocità impostata — si applica al prossimo video che parte</string>
@@ -572,6 +573,18 @@
     <string name="ig_comment_export_post_media">Salva anche le foto/i video del post</string>
     <string name="ig_comment_export_done">%1$d commenti esportati in %2$s</string>
     <string name="ig_dialog_misc_follow_export">Esporta follower/seguiti in CSV</string>
+    <string name="ig_feat_followers_history">Cronologia follower (chi ha smesso di seguirti)</string>
+    <string name="ig_followers_history">Cronologia follower</string>
+    <string name="ig_followers_history_first">Prima lista salvata: %1$d follower. Controlla più tardi per vedere chi ha smesso di seguirti o ha iniziato.</string>
+    <string name="ig_followers_history_changes">Dal %1$s: %2$d hanno smesso, %3$d nuovi</string>
+    <string name="ig_followers_history_summary">%1$d follower · controllato %2$s</string>
+    <string name="ig_followers_history_empty">Nessuna modifica registrata finora.</string>
+    <string name="ig_followers_history_unfollowed">Ha smesso di seguirti</string>
+    <string name="ig_followers_history_followed">Ha iniziato a seguirti</string>
+    <string name="ig_followers_history_partial">La lista non è stata caricata del tutto, quindi non è stato confrontato nulla. Riprova.</string>
+    <string name="ig_followers_history_note">Le modifiche vengono rilevate quando controlli: la data è quando sono state notate.</string>
+    <string name="ig_followers_history_clear">Cancella cronologia</string>
+    <string name="ig_followers_history_wrong_tab">Apri la tua scheda Follower per controllare.</string>
     <string name="ig_follow_export">Esporta CSV</string>
     <string name="ig_follow_export_done">%1$d account esportati in %2$s</string>
     <string name="ig_follow_export_none">Nessun account ancora caricato</string>
