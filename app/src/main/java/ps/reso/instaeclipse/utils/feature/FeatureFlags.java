@@ -56,6 +56,7 @@ public class FeatureFlags {
     public static volatile boolean forceReelScrubber = false; // always show IG's reel seek bar (#247)
     public static volatile boolean holdLeftSlowMotion = false; // hold the left half of a reel: 0.5x instead of IG's 2x
     public static volatile boolean offerCopyImage = false; // offer "Copy image to clipboard" when downloading a photo (#228)
+    public static volatile boolean enableStickerDownload = false;
     public static volatile boolean enableVoiceDownload = false; // Download row for DM voice messages (#223)
     public static volatile boolean enableDmMediaDownload = false; // Download row for DM photos/videos (named + foldered like posts)
     public static volatile boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)

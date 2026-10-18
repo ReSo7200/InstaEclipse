@@ -30,6 +30,7 @@ public class PrefsSyncProvider extends ContentProvider {
     public static final String AUTHORITY = CommonUtils.MY_PACKAGE_NAME + ".prefsync";
     public static final Uri URI = Uri.parse("content://" + AUTHORITY);
     public static final String METHOD_PUSH = "push";
+    public static final String METHOD_PULL = "pull";
     public static final String RESULT_UPDATED = "updated";
     private static final int MAX_ENTRIES = 2000;
 
@@ -41,12 +42,26 @@ public class PrefsSyncProvider extends ContentProvider {
     @Nullable
     @Override
     public Bundle call(@NonNull String method, @Nullable String arg, @Nullable Bundle extras) {
-        if (!METHOD_PUSH.equals(method) || extras == null) return null;
+        if (!METHOD_PUSH.equals(method) && !METHOD_PULL.equals(method)) return null;
         Context ctx = getContext();
         if (IpcSecurity.supportedCallerPackage(ctx, Binder.getCallingUid()) == null) {
             throw new SecurityException("caller is not a supported Instagram package");
         }
-        if (extras.size() > MAX_ENTRIES) return null;
+        if (METHOD_PULL.equals(method)) {
+            Bundle snapshot = new Bundle();
+            synchronized (PrefsSyncProvider.class) {
+                for (Map.Entry<String, ?> entry : CommonUtils.companionCache(ctx).getAll().entrySet()) {
+                    String key = entry.getKey(); Object value = entry.getValue();
+                    if (key.startsWith("__ts_") && value instanceof Long) snapshot.putLong(key, (Long) value);
+                    else if (!PrefsMerge.isSharedSetting(key, value)) continue;
+                    else if (value instanceof Boolean) snapshot.putBoolean(key, (Boolean) value);
+                    else if (value instanceof Integer) snapshot.putInt(key, (Integer) value);
+                    else snapshot.putString(key, (String) value);
+                }
+            }
+            return snapshot;
+        }
+        if (extras == null || extras.size() > MAX_ENTRIES) return null;
 
         Map<String, Object> incoming = new HashMap<>();
         for (String key : extras.keySet()) {

@@ -158,6 +158,14 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("ExactTimestamps");
         }
 
+        if (FeatureFlags.enableStickerDownload) {
+            FeatureStatusTracker.setEnabled("DmStickerDownload", R.string.ig_sticker_download_dm);
+            FeatureStatusTracker.setEnabled("CommentStickerDownload", R.string.ig_sticker_download_comment);
+        } else {
+            FeatureStatusTracker.setDisabled("DmStickerDownload");
+            FeatureStatusTracker.setDisabled("CommentStickerDownload");
+        }
+
         if (FeatureFlags.hideShareCreateGroup) {
             FeatureStatusTracker.setEnabled("HideShareCreateGroup", R.string.ig_dialog_misc_hide_share_create_group);
         } else {

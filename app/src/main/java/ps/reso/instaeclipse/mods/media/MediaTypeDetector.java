@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Locale;
 
 /** Detects downloaded media from its response header and file signature. */
@@ -31,12 +32,13 @@ final class MediaTypeDetector {
 
     static Result resolve(File file, String responseContentType, String requestedMime,
                           String requestedFilename) throws IOException {
-        if (isGif(file)) { // animated comment GIFs etc.: keep the format, a .jpg name would show a still
-            String fn = withCorrectExtension(requestedFilename, Kind.IMAGE);
-            if (fn != null && fn.toLowerCase(Locale.US).endsWith(".jpg")) fn = fn.substring(0, fn.length() - 4) + ".gif";
-            return new Result(Kind.IMAGE, "image/gif", fn);
+        byte[] header = readHeader(file);
+        String imageType = imageType(header, header.length);
+        if (imageType != null) { // animated comment GIFs etc.: keep the format, a .jpg name would show a still
+            return new Result(Kind.IMAGE, imageType,
+                    withExtension(requestedFilename, "." + imageType.substring(6)));
         }
-        Kind kind = sniff(file);
+        Kind kind = sniff(header, header.length);
         if (kind == Kind.UNKNOWN) kind = fromContentType(responseContentType);
         if (kind == Kind.UNKNOWN) kind = fromContentType(requestedMime);
 
@@ -57,7 +59,11 @@ final class MediaTypeDetector {
 
     static String withCorrectExtension(String filename, Kind kind) {
         if (filename == null || filename.isEmpty() || kind == Kind.UNKNOWN) return filename;
-        String wanted = kind == Kind.VIDEO ? ".mp4" : ".jpg";
+        return withExtension(filename, kind == Kind.VIDEO ? ".mp4" : ".jpg");
+    }
+
+    private static String withExtension(String filename, String wanted) {
+        if (filename == null || filename.isEmpty()) return filename;
         String lower = filename.toLowerCase(Locale.US);
         if (lower.endsWith(wanted)) return filename;
 
@@ -67,14 +73,7 @@ final class MediaTypeDetector {
         return filename + wanted;
     }
 
-    static boolean isGif(File file) throws IOException {
-        try (InputStream in = new FileInputStream(file)) {
-            byte[] h = new byte[4];
-            return in.read(h) == 4 && h[0] == 'G' && h[1] == 'I' && h[2] == 'F' && h[3] == '8';
-        }
-    }
-
-    static Kind sniff(File file) throws IOException {
+    private static byte[] readHeader(File file) throws IOException {
         try (InputStream in = new FileInputStream(file)) {
             byte[] header = new byte[16];
             int read = 0;
@@ -83,8 +82,18 @@ final class MediaTypeDetector {
                 if (n < 0) break;
                 read += n;
             }
-            return sniff(header, read);
+            return Arrays.copyOf(header, read);
         }
+    }
+
+    private static String imageType(byte[] h, int n) {
+        if (n >= 6 && h[0] == 'G' && h[1] == 'I' && h[2] == 'F' && h[3] == '8'
+                && (h[4] == '7' || h[4] == '9') && h[5] == 'a') return "image/gif";
+        if (n >= 8 && u(h[0]) == 0x89 && h[1] == 'P' && h[2] == 'N' && h[3] == 'G'
+                && h[4] == 13 && h[5] == 10 && h[6] == 26 && h[7] == 10) return "image/png";
+        if (n >= 12 && h[0] == 'R' && h[1] == 'I' && h[2] == 'F' && h[3] == 'F'
+                && h[8] == 'W' && h[9] == 'E' && h[10] == 'B' && h[11] == 'P') return "image/webp";
+        return null;
     }
 
     static Kind sniff(byte[] header, int length) {
@@ -93,22 +102,7 @@ final class MediaTypeDetector {
         if (u(header[0]) == 0xff && u(header[1]) == 0xd8 && u(header[2]) == 0xff) {
             return Kind.IMAGE;
         }
-        if (length >= 8
-                && u(header[0]) == 0x89 && header[1] == 'P' && header[2] == 'N'
-                && header[3] == 'G' && u(header[4]) == 0x0d && u(header[5]) == 0x0a
-                && u(header[6]) == 0x1a && u(header[7]) == 0x0a) {
-            return Kind.IMAGE;
-        }
-        if (length >= 6 && header[0] == 'G' && header[1] == 'I' && header[2] == 'F'
-                && header[3] == '8' && (header[4] == '7' || header[4] == '9')
-                && header[5] == 'a') {
-            return Kind.IMAGE;
-        }
-        if (length >= 12 && header[0] == 'R' && header[1] == 'I' && header[2] == 'F'
-                && header[3] == 'F' && header[8] == 'W' && header[9] == 'E'
-                && header[10] == 'B' && header[11] == 'P') {
-            return Kind.IMAGE;
-        }
+        if (imageType(header, length) != null) return Kind.IMAGE;
 
         // MP4 and HEIF/AVIF share ISO-BMFF's ftyp box. Inspect the major brand so
         // still images are not mislabeled as video.

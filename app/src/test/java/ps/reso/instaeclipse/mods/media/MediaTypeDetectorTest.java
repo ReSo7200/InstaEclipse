@@ -53,6 +53,24 @@ public class MediaTypeDetectorTest {
     }
 
     @Test
+    public void preservesTransparentStickerFormatsEvenWithWrongResponseType() throws Exception {
+        byte[][] headers = {
+                {(byte) 0x89, 'P', 'N', 'G', 13, 10, 26, 10, 0, 0, 0, 0},
+                {'R', 'I', 'F', 'F', 0, 0, 0, 0, 'W', 'E', 'B', 'P'}
+        };
+        String[] formats = {"png", "webp"};
+        for (int i = 0; i < headers.length; i++) {
+            File file = File.createTempFile("ie_sticker", ".bin");
+            try {
+                try (FileOutputStream out = new FileOutputStream(file)) { out.write(headers[i]); }
+                MediaTypeDetector.Result result = MediaTypeDetector.resolve(file, "image/jpeg", "image/jpeg", "sticker.jpg");
+                assertEquals("image/" + formats[i], result.mimeType);
+                assertEquals("sticker." + formats[i], result.filename);
+            } finally { file.delete(); }
+        }
+    }
+
+    @Test
     public void keepsGifAsGifEvenWhenRequestedAsJpeg() throws Exception {
         File f = File.createTempFile("ie_gif", ".bin");
         try (FileOutputStream out = new FileOutputStream(f)) {

@@ -56,13 +56,23 @@ public final class CompanionSync {
         if (lastPull != 0 && now - lastPull < MIN_INTERVAL_MS) return false;
         lastPull = now;
         try {
-            // Small file, throttled, off the main thread: always re-read (hasFileChanged() missed
-            // same-size rewrites).
-            if (companion == null) {
-                companion = new XSharedPreferences(CommonUtils.MY_PACKAGE_NAME, "instaeclipse_cache");
+            Map<String, ?> all = null;
+            try {
+                android.os.Bundle snapshot = context.getContentResolver()
+                        .call(PrefsSyncProvider.URI, PrefsSyncProvider.METHOD_PULL, null, null);
+                if (snapshot != null) {
+                    Map<String, Object> values = new java.util.HashMap<>();
+                    for (String key : snapshot.keySet()) values.put(key, snapshot.get(key));
+                    all = values;
+                }
+            } catch (Throwable ignored) {}
+            if (all == null) {
+                // Small file, throttled, off the main thread: always re-read (hasFileChanged() missed
+                // same-size rewrites).
+                if (companion == null) companion = new XSharedPreferences(CommonUtils.MY_PACKAGE_NAME, "instaeclipse_cache");
+                companion.reload();
+                all = companion.getAll();
             }
-            companion.reload();
-            Map<String, ?> all = companion.getAll();
             if (all == null || all.isEmpty()) return false;
 
             SharedPreferences ig = context.getSharedPreferences("instaeclipse_prefs", Context.MODE_PRIVATE);

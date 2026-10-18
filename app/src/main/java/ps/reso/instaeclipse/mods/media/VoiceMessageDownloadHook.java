@@ -121,9 +121,14 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                        if ((!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) || ctor == null) return;
+                        if ((!FeatureFlags.enableVoiceDownload && !FeatureFlags.enableStickerDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) || ctor == null) return;
                         Object msg = recentMessage();
-                        String url = FeatureFlags.enableVoiceDownload && msg != null ? audioUrl(msg) : null;
+                        pendingDownloadUrl = null;
+                        List<String> stickers = FeatureFlags.enableStickerDownload ? StickerMedia.urls(msg) : Collections.emptyList();
+                        pendingSticker = !stickers.isEmpty();
+                        String url;
+                        if (pendingSticker) url = stickers.get(0);
+                        else url = FeatureFlags.enableVoiceDownload && msg != null ? audioUrl(msg) : null;
                         // Translate (like comments): hand a text message to the user's translator app.
                         String text = FeatureFlags.translateMessages && url == null && msg != null ? messageText(msg) : null;
                         ModuleLog.line(TAG + "menu: message=" + (msg != null) + " voice=" + (url != null) + " text=" + (text != null));
@@ -152,6 +157,8 @@ public class VoiceMessageDownloadHook {
                                 if (row != null) {
                                     copy.add(row);
                                     if (url != null) {
+                                        pendingDownloadUrl = url;
+                                        pendingDownloadAt = System.currentTimeMillis();
                                         wireRowWhenShown(downloadLabel(), act -> startDownload(act, url));
                                     } else {
                                         pendingText = text;
@@ -216,17 +223,15 @@ public class VoiceMessageDownloadHook {
                                 return;
                             }
                         }
-                        if (!FeatureFlags.enableVoiceDownload) return;
-                        Object action = null, msg = null;
+                        if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.enableStickerDownload) return;
+                        Object action = null;
                         Context ctx = null;
                         for (Object a : param.args) {
                             if (a instanceof Enum<?> e && CARRIER.equals(e.name())) action = a;
-                            else if (a != null && messageClass != null && messageClass.isInstance(a)) msg = a;
                             else if (a instanceof Activity act) ctx = act;
                         }
                         if (action == null) return;
-                        if (msg == null) msg = recentMessage();
-                        String url = msg != null ? audioUrl(msg) : null;
+                        String url = selectedDownloadUrl();
                         if (url == null) return;
                         param.setResult(null);
                         startDownload(ctx, url);
@@ -243,7 +248,7 @@ public class VoiceMessageDownloadHook {
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                        if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) return;
+                        if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.enableStickerDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) return;
                         Object row = null;
                         for (Object a : param.args) if (data.isInstance(a)) row = a;
                         if (row == null) return;
@@ -258,9 +263,8 @@ public class VoiceMessageDownloadHook {
                             translate(null);
                             return;
                         }
-                        if (!FeatureFlags.enableVoiceDownload || !isSaveMedia(row)) return;
-                        Object msg = recentMessage();
-                        String url = msg != null ? audioUrl(msg) : null;
+                        if ((!FeatureFlags.enableVoiceDownload && !FeatureFlags.enableStickerDownload) || !isSaveMedia(row)) return;
+                        String url = selectedDownloadUrl();
                         ModuleLog.line(TAG + "row tap: voice=" + (url != null));
                         if (url == null) return;
                         startDownload(null, url);
@@ -290,10 +294,9 @@ public class VoiceMessageDownloadHook {
                                 translate(null);
                                 return;
                             }
-                            if (!FeatureFlags.enableVoiceDownload) return;
+                            if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.enableStickerDownload) return;
                             if (!(param.args[0] instanceof Enum<?> e) || !CARRIER.equals(e.name())) return;
-                            Object msg = recentMessage();
-                            String url = msg != null ? audioUrl(msg) : null;
+                            String url = selectedDownloadUrl();
                             ModuleLog.line(TAG + "action selected via " + param.method.getDeclaringClass().getName() + ": voice=" + (url != null));
                             if (url == null) return;
                             param.setResult(null);
@@ -337,7 +340,7 @@ public class VoiceMessageDownloadHook {
                         XposedBridge.hookMethod(m, new XC_MethodHook() {
                             @Override
                             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                                if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) return;
+                                if (!FeatureFlags.enableVoiceDownload && !FeatureFlags.enableStickerDownload && !FeatureFlags.translateMessages && !FeatureFlags.bulkUnsend) return;
                                 for (int i = 0; i < param.args.length; i++) {
                                     Object orig = param.args[i];
                                     if (!fn1.isInstance(orig) || java.lang.reflect.Proxy.isProxyClass(orig.getClass())) continue;
@@ -357,8 +360,7 @@ public class VoiceMessageDownloadHook {
                                         }
                                         if (method.getName().equals("invoke") && margs != null && margs.length == 1
                                                 && data.isInstance(margs[0]) && isOurRow(margs[0], downloadLabel(), CARRIER)) {
-                                            Object msg = recentMessage();
-                                            String url = msg != null ? audioUrl(msg) : null;
+                                            String url = selectedDownloadUrl();
                                             ModuleLog.line(TAG + "compose row tap: voice=" + (url != null));
                                             if (url != null) {
                                                 startDownload(null, url);
@@ -387,6 +389,7 @@ public class VoiceMessageDownloadHook {
                     + " mapper=" + (audioMapper != null) + " message=" + (messageClass != null ? messageClass.getName() : "?"));
             if (factories > 0 && dispatchers > 0) {
                 FeatureStatusTracker.setHooked("VoiceDownload");
+                FeatureStatusTracker.setHooked("DmStickerDownload");
                 FeatureStatusTracker.setHooked("DmMediaDownload");
             }
             if (factories > 0 && labelFieldRef != null) FeatureStatusTracker.setHooked("ChatTranslate");
@@ -498,9 +501,18 @@ public class VoiceMessageDownloadHook {
     private static volatile Field labelFieldRef;
     private static volatile String pendingText;
 
+    private static volatile boolean pendingSticker;
+    private static volatile String pendingDownloadUrl;
+    private static volatile long pendingDownloadAt;
+
+    private static String selectedDownloadUrl() {
+        return System.currentTimeMillis() - pendingDownloadAt < 15000 ? pendingDownloadUrl : null;
+    }
+
     private static String downloadLabel() {
         Context c = android.app.AndroidAppHelper.currentApplication();
-        return c != null ? I18n.t(c, R.string.ig_dl_title) : "Download";
+        return c != null ? I18n.t(c, pendingSticker ? R.string.ig_sticker_download_action : R.string.ig_dl_title)
+                : pendingSticker ? "Download Sticker" : "Download";
     }
 
     private static String translateLabel() {
@@ -621,11 +633,37 @@ public class VoiceMessageDownloadHook {
         lastDownloadAt = System.currentTimeMillis();
         if (ctx == null) ctx = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
         if (ctx == null) return;
+        if (pendingSticker) {
+            if (!FeatureFlags.enableStickerDownload) return;
+            downloadSticker(ctx, url);
+            return;
+        }
+        if (!FeatureFlags.enableVoiceDownload) return;
         voiceMediaId = null;
         String user = voiceUsername(recentMessage());
         String id = voiceMediaId != null ? voiceMediaId : String.valueOf(System.currentTimeMillis());
         String name = FeedVideoDownloadHook.buildFilename(user, "voice", id, true).replace(".mp4", ".m4a");
         FeedVideoDownloadHook.downloadAudio(ctx, url, name, user);
+    }
+
+    private static void downloadSticker(Context ctx, String url) {
+        String user = voiceUsername(recentMessage());
+        String id = String.valueOf(System.currentTimeMillis());
+        boolean video = FeedVideoDownloadHook.isVideoUrl(url);
+        String filename = FeedVideoDownloadHook.buildFilename(user, "sticker", id, video);
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), android.widget.Toast.LENGTH_SHORT).show();
+        FeedVideoDownloadHook.executor.submit(() -> {
+            try {
+                boolean delegated = FeedVideoDownloadHook.downloadAndSave(ctx, url, filename, video, user);
+                if (!delegated) FeedVideoDownloadHook.mainHandler.post(() ->
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx,
+                                video ? R.string.ig_toast_video_saved : R.string.ig_toast_photo_saved), android.widget.Toast.LENGTH_SHORT).show());
+            } catch (Throwable t) {
+                ModuleLog.line(TAG + "sticker download failed: " + t);
+                FeedVideoDownloadHook.mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                        I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), android.widget.Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private static final java.util.regex.Pattern URL_SIZE = java.util.regex.Pattern.compile("[-.]w(\\d{2,5})h(\\d{2,5})");

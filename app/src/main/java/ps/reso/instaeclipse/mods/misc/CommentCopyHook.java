@@ -106,6 +106,7 @@ public class CommentCopyHook {
                 ModuleLog.line("(InstaEclipse | CopyComment): ✅ Hooked (cached, new) "
                         + cachedFmj.getDeclaringClass().getName() + "." + cachedFmj.getName());
                 FeatureStatusTracker.setHooked("CopyComment");
+                FeatureStatusTracker.setHooked("CommentStickerDownload");
                 return;
             }
 
@@ -118,6 +119,7 @@ public class CommentCopyHook {
                 ModuleLog.line("(InstaEclipse | CopyComment): ✅ Hooked (cached, legacy) – "
                         + cachedLongPress.size() + " method(s)");
                 FeatureStatusTracker.setHooked("CopyComment");
+                FeatureStatusTracker.setHooked("CommentStickerDownload");
                 return;
             }
         }
@@ -195,6 +197,7 @@ public class CommentCopyHook {
             DexKitCache.saveMethod(CACHE_KEY, fmj);
             DexKitCache.saveMethod(CACHE_RESOLVER_KEY, resolverMethod);
             FeatureStatusTracker.setHooked("CopyComment");
+            FeatureStatusTracker.setHooked("CommentStickerDownload");
             ModuleLog.line("(InstaEclipse | CopyComment): ✅ Hooked " + fmj.getDeclaringClass().getName()
                     + "." + fmj.getName() + " (resolver=" + resolverMethod.getDeclaringClass().getName()
                     + "." + resolverMethod.getName() + ")");
@@ -263,14 +266,23 @@ public class CommentCopyHook {
         if (!hooked.isEmpty()) {
             DexKitCache.saveMethods(CACHE_KEY_OLD, hooked);
             FeatureStatusTracker.setHooked("CopyComment");
+            FeatureStatusTracker.setHooked("CommentStickerDownload");
         }
     }
 
     private static final XC_MethodHook LONG_PRESS_HOOK = new XC_MethodHook() {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-            if (!FeatureFlags.enableCopyComment) return;
+            if (!FeatureFlags.enableCopyComment && !FeatureFlags.enableStickerDownload) return;
             try {
+                if (FeatureFlags.enableStickerDownload && currentActivity != null) {
+                    java.util.List<String> stickers = ps.reso.instaeclipse.mods.media.StickerMedia.urls(param.thisObject);
+                    if (!stickers.isEmpty()) {
+                        showCopyPopup(currentActivity, "", stickers, null, new String[2], true);
+                        return;
+                    }
+                }
+                if (!FeatureFlags.enableCopyComment) return;
                 String text = extractCommentTextLegacy(param.thisObject);
                 if (text == null || text.trim().isEmpty()) return;
 
@@ -434,7 +446,7 @@ public class CommentCopyHook {
     private static final XC_MethodHook SHOW_MENU_HOOK = new XC_MethodHook() {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-            if (!FeatureFlags.enableCopyComment) return;
+            if (!FeatureFlags.enableCopyComment && !FeatureFlags.enableStickerDownload) return;
             try {
                 Activity ctx = currentActivity;
                 if (ctx == null) return;
@@ -450,14 +462,19 @@ public class CommentCopyHook {
                 Object comment = resolverMethod.invoke(null, heldValue, commentId, mediaId);
                 if (comment == null) return;
 
-                String text = findLongestTextField(comment);
+                String text = FeatureFlags.enableCopyComment ? findLongestTextField(comment) : null;
                 // #242: image / GIF comments get a Download button (GIF-only comments have no text)
-                java.util.List<String> media = ps.reso.instaeclipse.mods.media.CommentMedia.urls(ctx, comment);
+                java.util.List<String> stickers = FeatureFlags.enableStickerDownload
+                        ? ps.reso.instaeclipse.mods.media.StickerMedia.urls(comment) : java.util.Collections.emptyList();
+                boolean sticker = !stickers.isEmpty();
+                java.util.List<String> media = stickers;
+                if (!sticker && FeatureFlags.enableCopyComment)
+                    media = ps.reso.instaeclipse.mods.media.CommentMedia.urls(ctx, comment);
                 if ((text == null || text.trim().isEmpty()) && media.isEmpty()) return;
 
                 String[] names = media.isEmpty() ? new String[2] // {commenter, post author} for the file name
                         : ps.reso.instaeclipse.mods.media.CommentMedia.names(comment, mediaId, heldValue, repo, param.thisObject);
-                showCopyPopup(ctx, text == null ? "" : text.trim(), media, commentId, names);
+                showCopyPopup(ctx, text == null ? "" : text.trim(), media, commentId, names, sticker);
             } catch (Throwable t) {
                 ModuleLog.line("(InstaEclipse | CopyComment): ❌ hook body – " + t);
             }
@@ -486,12 +503,12 @@ public class CommentCopyHook {
     // ── Copy popup ────────────────────────────────────────────────────────────
 
     private static void showCopyPopup(final Context ctx, final String text) {
-        showCopyPopup(ctx, text, java.util.Collections.emptyList(), null, new String[2]);
+        showCopyPopup(ctx, text, java.util.Collections.emptyList(), null, new String[2], false);
     }
 
     private static void showCopyPopup(final Context ctx, final String text,
                                       final java.util.List<String> media, final String commentId,
-                                      final String[] names) {
+                                      final String[] names, final boolean sticker) {
         MAIN.post(() -> {
             try {
                 IeDialog dlg = new IeDialog(ctx).title(I18n.t(ctx, R.string.ig_comment_copy_title));
@@ -500,7 +517,7 @@ public class CommentCopyHook {
                 java.util.List<CharSequence> labels = new java.util.ArrayList<>();
                 java.util.List<Runnable> actions = new java.util.ArrayList<>();
                 if (!media.isEmpty()) {
-                    labels.add(I18n.t(ctx, R.string.ig_dl_title));
+                    labels.add(I18n.t(ctx, sticker ? R.string.ig_sticker_download_action : R.string.ig_dl_title));
                     actions.add(() -> ps.reso.instaeclipse.mods.media.CommentMedia.download(ctx, media, commentId, names[0], names[1]));
                     // GIF / photo comments: copy the media link (Android can't put an animated GIF on the clipboard)
                     labels.add(I18n.t(ctx, R.string.ig_comment_copy_media_link));
