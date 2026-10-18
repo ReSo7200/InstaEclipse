@@ -4,7 +4,7 @@ This contribution started at upstream `6f70d5afc500183e2d8f1e7bc12152542b811fa4`
 
 ## Decisions required before merging
 
-- **License:** the custom downloader includes adapted GPL-3.0 HushGram code. Its notices and license are in [third-party/HushGram](../third-party/HushGram/NOTICE.md). The original Apache-2.0 license remains, but the combined APK must not be represented as Apache-only. Review the distribution obligations before accepting the downloader portion.
+- **License:** the custom downloader includes adapted GPL-3.0 HushGram code. Its notices and license are in [third-party/HushGram](../third-party/HushGram/NOTICE.md). InstaEclipse is now licensed under GPL-3.0 as a whole (it was Apache-2.0 before this merge).
 - **Trusted hosts:** companion IPC now requires the official Instagram package and approved signing identity/history, using the real Binder caller UID. Re-signed applications and clone package names are deliberately excluded. This narrows upstream clone support; supporting additional hosts needs an explicit trust policy, not a package-name-only exception.
 - **Runtime validation:** the rebased integration has not been installed or exercised in Instagram. Compiling instrumentation tests does not establish host compatibility, media synchronization, or UI behavior. Older fork device results do not count as validation of this tree.
 
