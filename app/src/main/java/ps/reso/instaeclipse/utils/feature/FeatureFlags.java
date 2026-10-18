@@ -122,6 +122,7 @@ public class FeatureFlags {
     public static volatile boolean disableStoryFlipping = false;
     public static volatile boolean disableVideoAutoPlay = false;
     public static volatile boolean spoofLastSeen = false;
+    public static volatile boolean disableSearchHistory = false; // keep searches out of Recent (#280)
     public static volatile boolean showFollowerToast = false;
     public static volatile boolean showFeatureToasts = false;
     public static volatile boolean disableRepost = false;

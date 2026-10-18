@@ -64,6 +64,7 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Hide view once opened | Open view once media without marking it as opened |
 | Unlock view once and view twice | Replay view once media instead of it disappearing |
 | Spoof last seen | Freeze your "active" status |
+| Don't save searches | Profiles, tags and places you open from Search stay out of Recent, on the phone and on Instagram's server |
 | Airplane mode | Appear offline: Instagram stops its live connection while you browse |
 | Quick toggle | Turn Ghost Mode on and off from a ghost icon next to your inbox |
 

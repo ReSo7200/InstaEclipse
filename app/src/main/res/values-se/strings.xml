@@ -674,4 +674,5 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_story_ring_custom_hint">En färg som #3897F0, eller två för en övertoning: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Ogiltig färg</string>
     <string name="ig_feed_corner_radius">Rundade hörn på inlägg</string>
+    <string name="ig_disable_search_history">Spara inte sökningar</string>
 </resources>

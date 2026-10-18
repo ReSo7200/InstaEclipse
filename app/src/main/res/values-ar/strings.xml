@@ -671,4 +671,5 @@
     <string name="ig_story_ring_custom_hint">لون مثل #3897F0، أو لونان للتدرج: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">لون غير صالح</string>
     <string name="ig_feed_corner_radius">زوايا المنشورات المستديرة</string>
+    <string name="ig_disable_search_history">عدم حفظ عمليات البحث</string>
 </resources>

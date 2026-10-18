@@ -129,6 +129,11 @@ public class IGNetworkInterceptor {
                                     boolean shouldDrop = false;
 
 
+                                    // Don't save searches (#280): the server keeps Recent from these
+                                    if (FeatureFlags.disableSearchHistory) {
+                                        shouldDrop |= uri.getPath().contains("/fbsearch/register_recent_search_click/");
+                                    }
+
                                     // Ghost Mode URIs
                                     if (FeatureFlags.isGhostSeen) {
                                         shouldDrop |= uri.getPath().contains("/threads/") && uri.getPath().contains("/opened")

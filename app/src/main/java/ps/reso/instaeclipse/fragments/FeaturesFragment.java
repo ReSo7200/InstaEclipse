@@ -1082,6 +1082,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_ghost_read_receipt_chats), "readReceiptChats"),
                 createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_dialog_misc_spoof_last_seen), "spoofLastSeen"),
+                createSwitch(R.drawable.ic_search, "#5E5CE6", getString(R.string.ig_disable_search_history), "disableSearchHistory"),
                 createExtrasSwitch("#5E5CE6", "airplaneMode")
         ));
 

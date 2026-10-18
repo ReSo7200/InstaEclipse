@@ -725,4 +725,5 @@ Stay on this screen until it finishes.</string>
     <string name="ig_story_ring_custom_hint">A color like #3897F0, or two for a gradient: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Not a valid color</string>
     <string name="ig_feed_corner_radius">Rounded post corners</string>
+    <string name="ig_disable_search_history">Don\'t Save Searches</string>
 </resources>

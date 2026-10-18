@@ -675,4 +675,5 @@
     <string name="ig_story_ring_custom_hint">#3897F0 kimi rəng və ya keçid üçün iki rəng: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Yanlış rəng</string>
     <string name="ig_feed_corner_radius">Paylaşımların yuvarlaq küncləri</string>
+    <string name="ig_disable_search_history">Axtarışları saxlama</string>
 </resources>

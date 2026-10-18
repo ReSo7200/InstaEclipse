@@ -708,4 +708,5 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="ig_story_ring_custom_hint">Une couleur comme #3897F0, ou deux pour un dégradé : #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Couleur non valide</string>
     <string name="ig_feed_corner_radius">Coins arrondis des publications</string>
+    <string name="ig_disable_search_history">Ne pas enregistrer les recherches</string>
 </resources>

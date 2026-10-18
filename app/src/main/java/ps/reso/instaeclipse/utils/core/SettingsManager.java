@@ -131,6 +131,7 @@ public class SettingsManager {
         editor.putBoolean("disableStoryFlipping", FeatureFlags.disableStoryFlipping);
         editor.putBoolean("disableVideoAutoPlay", FeatureFlags.disableVideoAutoPlay);
         editor.putBoolean("spoofLastSeen", FeatureFlags.spoofLastSeen);
+        editor.putBoolean("disableSearchHistory", FeatureFlags.disableSearchHistory);
         editor.putBoolean("spoofLocation", FeatureFlags.spoofLocation);
         editor.putString("spoofLat", String.valueOf(FeatureFlags.spoofLat));
         editor.putString("spoofLng", String.valueOf(FeatureFlags.spoofLng));
@@ -326,6 +327,7 @@ public class SettingsManager {
         FeatureFlags.disableStoryFlipping = prefs.getBoolean("disableStoryFlipping", false);
         FeatureFlags.disableVideoAutoPlay = prefs.getBoolean("disableVideoAutoPlay", false);
         FeatureFlags.spoofLastSeen = prefs.getBoolean("spoofLastSeen", false);
+        FeatureFlags.disableSearchHistory = prefs.getBoolean("disableSearchHistory", false);
         FeatureFlags.spoofLocation = prefs.getBoolean("spoofLocation", false);
         FeatureFlags.spoofLat = readDoublePref(prefs, "spoofLat", 0.0);
         FeatureFlags.spoofLng = readDoublePref(prefs, "spoofLng", 0.0);

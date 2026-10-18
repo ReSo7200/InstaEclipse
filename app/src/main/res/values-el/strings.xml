@@ -706,4 +706,5 @@
     <string name="ig_story_ring_custom_hint">Ένα χρώμα όπως #3897F0 ή δύο για διαβάθμιση: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Μη έγκυρο χρώμα</string>
     <string name="ig_feed_corner_radius">Στρογγυλεμένες γωνίες αναρτήσεων</string>
+    <string name="ig_disable_search_history">Να μην αποθηκεύονται οι αναζητήσεις</string>
 </resources>

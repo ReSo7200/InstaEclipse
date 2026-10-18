@@ -672,4 +672,5 @@
     <string name="ig_story_ring_custom_hint">Uma cor como #3897F0, ou duas para um degradê: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Cor inválida</string>
     <string name="ig_feed_corner_radius">Cantos arredondados nas publicações</string>
+    <string name="ig_disable_search_history">Não salvar pesquisas</string>
 </resources>

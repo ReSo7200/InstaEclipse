@@ -683,4 +683,5 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="ig_story_ring_custom_hint">Eine Farbe wie #3897F0 oder zwei für einen Verlauf: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Keine gültige Farbe</string>
     <string name="ig_feed_corner_radius">Abgerundete Beitragsecken</string>
+    <string name="ig_disable_search_history">Suchen nicht speichern</string>
 </resources>

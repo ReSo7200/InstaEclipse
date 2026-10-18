@@ -719,6 +719,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|ShareDL) ❌ Failed to hook");
                     }
 
+                    // Don't save searches (#280)
+                    try {
+                        if (!skip("SearchHistoryHook")) ps.reso.instaeclipse.mods.ghost.SearchHistoryHook.install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | SearchHistory): ❌ Failed to hook");
+                    }
+
                     // Rounded feed post corners (#276)
                     try {
                         if (!skip("RoundedFeedPostsHook")) ps.reso.instaeclipse.mods.feed.RoundedFeedPostsHook.install(hostClassLoader);
