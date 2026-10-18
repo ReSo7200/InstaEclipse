@@ -1476,6 +1476,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
+                createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_fancy_bio_font), "fancyBioFont"),
                 createSwitch(R.drawable.ic_block, A_SOCIAL, getString(R.string.ig_dialog_hide_threads_button), "hideThreadsButton"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_show_follower_toast), "showFollowerToast"),
                 createSwitch(R.drawable.ic_download, A_SOCIAL, getString(R.string.ig_dialog_misc_follow_export), "followListExport"),

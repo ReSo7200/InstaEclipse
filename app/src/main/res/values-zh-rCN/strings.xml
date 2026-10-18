@@ -257,6 +257,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">隐藏 Instagram Plus 推广</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">隐藏社区注释</string>
     <string name="ig_dialog_misc_profile_follows_label">在主页上显示“关注了你”</string>
+    <string name="ig_dialog_fancy_bio_font">简介花式字体</string>
+    <string name="ig_fancy_font_button">花式字体</string>
+    <string name="ig_fancy_font_title">简介字体</string>
+    <string name="ig_fancy_font_note">为英文、希腊字母和数字套用所有人都能看到的样式。删除线和下划线适用于任何语言。</string>
     <string name="ig_profile_follows_you">关注了你</string>
     <string name="ig_profile_not_following_you">未关注你</string>
     <string name="ig_dialog_downloader_offer_media_info">在帖子菜单中添加“媒体信息”</string>

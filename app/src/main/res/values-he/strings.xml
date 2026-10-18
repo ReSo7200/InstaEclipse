@@ -256,6 +256,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">הסתר פרסומות של Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">הסתר הערות קהילה</string>
     <string name="ig_dialog_misc_profile_follows_label">הצג \"עוקב/ת אחריך\" בפרופילים</string>
+    <string name="ig_dialog_fancy_bio_font">גופנים מעוצבים בביו</string>
+    <string name="ig_fancy_font_button">גופן מעוצב</string>
+    <string name="ig_fancy_font_title">גופן הביו</string>
+    <string name="ig_fancy_font_note">מעצב אותיות לטיניות ויווניות ומספרים כך שכולם יראו. קו חוצה וקו תחתון עובדים בכל שפה.</string>
     <string name="ig_profile_follows_you">עוקב/ת אחריך</string>
     <string name="ig_profile_not_following_you">לא עוקב/ת אחריך</string>
     <string name="ig_dialog_downloader_offer_media_info">הוסף מידע מדיה לתפריט הפוסט</string>

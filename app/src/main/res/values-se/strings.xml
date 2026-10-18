@@ -219,6 +219,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Dölj Instagram Plus-erbjudanden</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Dölj communityanteckningar</string>
     <string name="ig_dialog_misc_profile_follows_label">Visa \"Följer dig\" på profiler</string>
+    <string name="ig_dialog_fancy_bio_font">Snygga typsnitt i bion</string>
+    <string name="ig_fancy_font_button">Snyggt typsnitt</string>
+    <string name="ig_fancy_font_title">Typsnitt för bion</string>
+    <string name="ig_fancy_font_note">Stiliserar latinska och grekiska bokstäver och siffror så att alla ser dem. Genomstruken och understruken text fungerar på alla språk.</string>
     <string name="ig_profile_follows_you">Följer dig</string>
     <string name="ig_profile_not_following_you">Följer inte dig</string>
     <string name="ig_dialog_downloader_offer_media_info">Lägg till Mediainfo i inläggsmenyn</string>

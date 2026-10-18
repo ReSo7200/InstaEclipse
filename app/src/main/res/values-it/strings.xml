@@ -358,6 +358,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Nascondi le promozioni di Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Nascondi le note della community</string>
     <string name="ig_dialog_misc_profile_follows_label">Mostra \"Ti segue\" nei profili</string>
+    <string name="ig_dialog_fancy_bio_font">Caratteri decorativi nella bio</string>
+    <string name="ig_fancy_font_button">Carattere decorativo</string>
+    <string name="ig_fancy_font_title">Carattere della bio</string>
+    <string name="ig_fancy_font_note">Stilizza lettere latine e greche e numeri, visibili a tutti. Barrato e sottolineato funzionano in ogni lingua.</string>
     <string name="ig_profile_follows_you">Ti segue</string>
     <string name="ig_profile_not_following_you">Non ti segue</string>
     <string name="ig_dialog_downloader_offer_media_info">Aggiungi Info media al menu del post</string>

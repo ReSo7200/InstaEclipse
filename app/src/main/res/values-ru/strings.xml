@@ -220,6 +220,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Скрыть рекламу Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Скрыть заметки сообщества</string>
     <string name="ig_dialog_misc_profile_follows_label">Показывать «Подписан(а) на вас» в профилях</string>
+    <string name="ig_dialog_fancy_bio_font">Красивые шрифты в описании профиля</string>
+    <string name="ig_fancy_font_button">Красивый шрифт</string>
+    <string name="ig_fancy_font_title">Шрифт описания</string>
+    <string name="ig_fancy_font_note">Выберите стиль, и он применится к тому, что вы напечатаете дальше; уже написанный текст не меняется. Латиница, греческие буквы и цифры поддерживают все стили, зачёркивание и подчёркивание работают для любого языка.</string>
     <string name="ig_profile_follows_you">Подписан(а) на вас</string>
     <string name="ig_profile_not_following_you">Не подписан(а) на вас</string>
     <string name="ig_dialog_downloader_offer_media_info">Добавить «Информация о медиа» в меню публикации</string>

@@ -256,6 +256,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Masquer les promotions Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Masquer les notes de la communauté</string>
     <string name="ig_dialog_misc_profile_follows_label">Afficher « Vous suit » sur les profils</string>
+    <string name="ig_dialog_fancy_bio_font">Polices fantaisie dans la bio</string>
+    <string name="ig_fancy_font_button">Police fantaisie</string>
+    <string name="ig_fancy_font_title">Police de la bio</string>
+    <string name="ig_fancy_font_note">Stylise les lettres latines et grecques et les chiffres, visibles par tous. Le barré et le souligné fonctionnent dans toutes les langues.</string>
     <string name="ig_profile_follows_you">Vous suit</string>
     <string name="ig_profile_not_following_you">Ne vous suit pas</string>
     <string name="ig_dialog_downloader_offer_media_info">Ajouter Infos du média au menu de la publication</string>

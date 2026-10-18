@@ -118,6 +118,9 @@ public class UIHookManager {
         // alone leaves IG's cached stories/reels visible on IG 447.0.0.39+).
         ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.watchActivity(activity);
 
+        // Fancy bio fonts: the bio's "Change font" button opens the module's font picker.
+        ps.reso.instaeclipse.mods.ui.FancyBioFontHook.watchActivity(activity);
+
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
 

@@ -257,6 +257,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Απόκρυψη Προωθήσεων Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Απόκρυψη Σημειώσεων Κοινότητας</string>
     <string name="ig_dialog_misc_profile_follows_label">Εμφάνιση «Σας ακολουθεί» στα Προφίλ</string>
+    <string name="ig_dialog_fancy_bio_font">Διακοσμητικές γραμματοσειρές στο βιογραφικό</string>
+    <string name="ig_fancy_font_button">Διακοσμητική γραμματοσειρά</string>
+    <string name="ig_fancy_font_title">Γραμματοσειρά βιογραφικού</string>
+    <string name="ig_fancy_font_note">Μορφοποιεί λατινικά και ελληνικά γράμματα και αριθμούς ώστε να τα βλέπουν όλοι. Η διαγραφή και η υπογράμμιση λειτουργούν σε κάθε γλώσσα.</string>
     <string name="ig_profile_follows_you">Σας ακολουθεί</string>
     <string name="ig_profile_not_following_you">Δεν σας ακολουθεί</string>
     <string name="ig_dialog_downloader_offer_media_info">Προσθήκη Πληροφοριών Πολυμέσων στο Μενού Δημοσίευσης</string>

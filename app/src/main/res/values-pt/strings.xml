@@ -219,6 +219,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Ocultar Promoções do Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Ocultar Notas da Comunidade</string>
     <string name="ig_dialog_misc_profile_follows_label">Mostrar \"Segue-te\" nos Perfis</string>
+    <string name="ig_dialog_fancy_bio_font">Fontes decorativas na bio</string>
+    <string name="ig_fancy_font_button">Fonte decorativa</string>
+    <string name="ig_fancy_font_title">Fonte da bio</string>
+    <string name="ig_fancy_font_note">Estiliza letras latinas e gregas e números para todos verem. Riscado e sublinhado funcionam em qualquer idioma.</string>
     <string name="ig_profile_follows_you">Segue-te</string>
     <string name="ig_profile_not_following_you">Não te segue</string>
     <string name="ig_dialog_downloader_offer_media_info">Adicionar Informações do Conteúdo ao Menu da Publicação</string>

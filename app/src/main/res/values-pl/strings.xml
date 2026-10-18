@@ -358,6 +358,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Ukryj promocje Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Ukryj uwagi społeczności</string>
     <string name="ig_dialog_misc_profile_follows_label">Pokazuj „Obserwuje Cię” na profilach</string>
+    <string name="ig_dialog_fancy_bio_font">Ozdobne czcionki w bio</string>
+    <string name="ig_fancy_font_button">Ozdobna czcionka</string>
+    <string name="ig_fancy_font_title">Czcionka bio</string>
+    <string name="ig_fancy_font_note">Stylizuje litery łacińskie i greckie oraz cyfry tak, by każdy je widział. Przekreślenie i podkreślenie działają w każdym języku.</string>
     <string name="ig_profile_follows_you">Obserwuje Cię</string>
     <string name="ig_profile_not_following_you">Nie obserwuje Cię</string>
     <string name="ig_dialog_downloader_offer_media_info">Dodaj Informacje o multimediach do menu posta</string>

@@ -286,6 +286,7 @@ public class FeatureManager {
 
         // ── Newer features (concise labels for the load toast's dense grid) ───
         reg(FeatureFlags.chatExport,           "ChatExport",           R.string.ig_chat_export);
+        reg(FeatureFlags.fancyBioFont,         "FancyBioFont",         R.string.ig_dialog_fancy_bio_font);
         reg(FeatureFlags.keepEditHistory,      "EditHistory",          R.string.ig_feat_edit_history);
         reg(FeatureFlags.jumpToFirstMessage,   "JumpToFirstMessage",   R.string.ig_jump_first_message);
         reg(FeatureFlags.translateMessages,    "ChatTranslate",        R.string.ig_dialog_translate_messages);

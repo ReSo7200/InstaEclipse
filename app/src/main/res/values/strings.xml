@@ -484,6 +484,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Hide Instagram Plus Upsells</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Hide Community Notes</string>
     <string name="ig_dialog_misc_profile_follows_label">Show \"Follows You\" on Profiles</string>
+    <string name="ig_dialog_fancy_bio_font">Fancy Fonts in Bio</string>
+    <string name="ig_fancy_font_button">Fancy font</string>
+    <string name="ig_fancy_font_title">Bio font</string>
+    <string name="ig_fancy_font_note">Pick a style and what you type next uses it; text already there stays as it is. Latin and Greek letters and numbers get every style, strikethrough and underline work in every language.</string>
     <string name="ig_profile_follows_you">Follows you</string>
     <string name="ig_profile_not_following_you">Doesn\'t follow you</string>
     <string name="ig_dialog_downloader_offer_media_info">Add Media Info to the Post Menu</string>

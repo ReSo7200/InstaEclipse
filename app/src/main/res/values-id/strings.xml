@@ -256,6 +256,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">Sembunyikan Promosi Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">Sembunyikan Catatan Komunitas</string>
     <string name="ig_dialog_misc_profile_follows_label">Tampilkan \"Mengikuti Anda\" di Profil</string>
+    <string name="ig_dialog_fancy_bio_font">Font hias di bio</string>
+    <string name="ig_fancy_font_button">Font hias</string>
+    <string name="ig_fancy_font_title">Font bio</string>
+    <string name="ig_fancy_font_note">Memberi gaya pada huruf Latin, Yunani, dan angka yang dilihat semua orang. Coret dan garis bawah berfungsi di semua bahasa.</string>
     <string name="ig_profile_follows_you">Mengikuti Anda</string>
     <string name="ig_profile_not_following_you">Tidak mengikuti Anda</string>
     <string name="ig_dialog_downloader_offer_media_info">Tambahkan Info Media ke Menu Postingan</string>

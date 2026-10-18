@@ -219,6 +219,10 @@
     <string name="ig_dialog_clean_feed_hide_plus">隱藏 Instagram Plus 推廣</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">隱藏社群註解</string>
     <string name="ig_dialog_misc_profile_follows_label">在個人檔案顯示「追蹤你」</string>
+    <string name="ig_dialog_fancy_bio_font">簡介花式字體</string>
+    <string name="ig_fancy_font_button">花式字體</string>
+    <string name="ig_fancy_font_title">簡介字體</string>
+    <string name="ig_fancy_font_note">為英文、希臘字母和數字套用所有人都看得到的樣式。刪除線和底線適用於任何語言。</string>
     <string name="ig_profile_follows_you">追蹤你</string>
     <string name="ig_profile_not_following_you">沒有追蹤你</string>
     <string name="ig_dialog_downloader_offer_media_info">在貼文選單中加入「媒體資訊」</string>
