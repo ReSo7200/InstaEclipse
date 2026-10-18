@@ -99,7 +99,7 @@ public class HomeFragment extends Fragment {
             "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload",
             "downloaderUsernameFolder", "downloaderAddTimestamp", "copyMediaLink", "offerAudioDownload",
             "enableVoiceDownload", "enableDmMediaDownload", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed",
-            "forceReelScrubber", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories",
+            "forceReelScrubber", "holdLeftSlowMotion", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories",
             // Developer
             "isDevEnabled", "removeBuildExpiredPopup"
     };

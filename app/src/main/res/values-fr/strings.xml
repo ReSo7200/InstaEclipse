@@ -265,6 +265,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Ajouter Infos du média au menu de la publication</string>
     <string name="ig_dialog_downloader_offer_speed">Ajouter Vitesse de lecture au menu de la publication</string>
     <string name="ig_dialog_downloader_reel_scrubber">Toujours afficher la barre de progression des Reels</string>
+    <string name="ig_dialog_reels_hold_left_slow">Maintenir le côté gauche pour le ralenti (0,5×)</string>
     <string name="ig_media_info_title">Infos du média</string>
     <string name="ig_playback_speed_title">Vitesse de lecture</string>
     <string name="ig_playback_speed_next">Vitesse définie — s\'applique à la prochaine vidéo lancée</string>

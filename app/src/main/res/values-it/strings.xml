@@ -367,6 +367,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Aggiungi Info media al menu del post</string>
     <string name="ig_dialog_downloader_offer_speed">Aggiungi Velocità di riproduzione al menu del post</string>
     <string name="ig_dialog_downloader_reel_scrubber">Mostra sempre la barra di avanzamento dei Reel</string>
+    <string name="ig_dialog_reels_hold_left_slow">Tieni premuto il lato sinistro per il rallentatore (0,5×)</string>
     <string name="ig_media_info_title">Info media</string>
     <string name="ig_playback_speed_title">Velocità di riproduzione</string>
     <string name="ig_playback_speed_next">Velocità impostata — si applica al prossimo video che parte</string>

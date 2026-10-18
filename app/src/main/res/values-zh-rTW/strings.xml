@@ -228,6 +228,7 @@
     <string name="ig_dialog_downloader_offer_media_info">在貼文選單中加入「媒體資訊」</string>
     <string name="ig_dialog_downloader_offer_speed">在貼文選單中加入「播放速度」</string>
     <string name="ig_dialog_downloader_reel_scrubber">一律顯示 Reels 進度列</string>
+    <string name="ig_dialog_reels_hold_left_slow">按住左側慢放 (0.5×)</string>
     <string name="ig_media_info_title">媒體資訊</string>
     <string name="ig_playback_speed_title">播放速度</string>
     <string name="ig_playback_speed_next">已設定速度 — 將套用至下一部開始播放的影片</string>

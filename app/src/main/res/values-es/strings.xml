@@ -231,6 +231,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Añadir Información del contenido al menú de la publicación</string>
     <string name="ig_dialog_downloader_offer_speed">Añadir Velocidad de reproducción al menú de la publicación</string>
     <string name="ig_dialog_downloader_reel_scrubber">Mostrar siempre la barra de progreso de los reels</string>
+    <string name="ig_dialog_reels_hold_left_slow">Mantén pulsado el lado izquierdo para cámara lenta (0,5×)</string>
     <string name="ig_media_info_title">Información del contenido</string>
     <string name="ig_playback_speed_title">Velocidad de reproducción</string>
     <string name="ig_playback_speed_next">Velocidad establecida — se aplica al siguiente vídeo que empiece</string>

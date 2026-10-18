@@ -367,6 +367,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Dodaj Informacje o multimediach do menu posta</string>
     <string name="ig_dialog_downloader_offer_speed">Dodaj Prędkość odtwarzania do menu posta</string>
     <string name="ig_dialog_downloader_reel_scrubber">Zawsze pokazuj pasek przewijania rolek</string>
+    <string name="ig_dialog_reels_hold_left_slow">Przytrzymaj lewą stronę, aby zwolnić (0,5×)</string>
     <string name="ig_media_info_title">Informacje o multimediach</string>
     <string name="ig_playback_speed_title">Prędkość odtwarzania</string>
     <string name="ig_playback_speed_next">Ustawiono prędkość — dotyczy następnego uruchomionego filmu</string>

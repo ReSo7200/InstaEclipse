@@ -554,6 +554,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Gönderi Menüsüne Medya Bilgisi Ekle</string>
     <string name="ig_dialog_downloader_offer_speed">Gönderi Menüsüne Oynatma Hızı Ekle</string>
     <string name="ig_dialog_downloader_reel_scrubber">Reels İlerleme Çubuğunu Her Zaman Göster</string>
+    <string name="ig_dialog_reels_hold_left_slow">Ağır çekim için sol tarafı basılı tut (0,5×)</string>
     <string name="ig_media_info_title">Medya bilgisi</string>
     <string name="ig_playback_speed_title">Oynatma hızı</string>
     <string name="ig_playback_speed_next">Hız ayarlandı — başlayan bir sonraki videoya uygulanır</string>

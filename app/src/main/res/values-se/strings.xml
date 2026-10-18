@@ -228,6 +228,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Lägg till Mediainfo i inläggsmenyn</string>
     <string name="ig_dialog_downloader_offer_speed">Lägg till Uppspelningshastighet i inläggsmenyn</string>
     <string name="ig_dialog_downloader_reel_scrubber">Visa alltid förloppsfältet i Reels</string>
+    <string name="ig_dialog_reels_hold_left_slow">Håll vänster sida för slow motion (0,5×)</string>
     <string name="ig_media_info_title">Mediainfo</string>
     <string name="ig_playback_speed_title">Uppspelningshastighet</string>
     <string name="ig_playback_speed_next">Hastighet inställd — gäller nästa video som startar</string>

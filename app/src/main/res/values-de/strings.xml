@@ -234,6 +234,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Medieninfo zum Beitragsmenü hinzufügen</string>
     <string name="ig_dialog_downloader_offer_speed">Wiedergabegeschwindigkeit zum Beitragsmenü hinzufügen</string>
     <string name="ig_dialog_downloader_reel_scrubber">Reel-Fortschrittsleiste immer anzeigen</string>
+    <string name="ig_dialog_reels_hold_left_slow">Linke Seite halten für Zeitlupe (0,5×)</string>
     <string name="ig_media_info_title">Medieninfo</string>
     <string name="ig_playback_speed_title">Wiedergabegeschwindigkeit</string>
     <string name="ig_playback_speed_next">Geschwindigkeit gesetzt — gilt für das nächste Video, das startet</string>

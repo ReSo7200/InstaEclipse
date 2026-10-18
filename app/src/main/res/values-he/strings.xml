@@ -265,6 +265,7 @@
     <string name="ig_dialog_downloader_offer_media_info">הוסף מידע מדיה לתפריט הפוסט</string>
     <string name="ig_dialog_downloader_offer_speed">הוסף מהירות ניגון לתפריט הפוסט</string>
     <string name="ig_dialog_downloader_reel_scrubber">הצג תמיד את סרגל ההתקדמות בריילז</string>
+    <string name="ig_dialog_reels_hold_left_slow">החזקה בצד שמאל להילוך איטי (0.5×)</string>
     <string name="ig_media_info_title">מידע מדיה</string>
     <string name="ig_playback_speed_title">מהירות ניגון</string>
     <string name="ig_playback_speed_next">המהירות הוגדרה — תחול על הסרטון הבא שיתחיל</string>

@@ -1882,6 +1882,7 @@ public class FeaturesFragment extends Fragment {
                 createExtrasSwitch("#32D74B", "reelsAutoScroll"),
                 createExtrasSwitch("#32D74B", "reelsLockScroll"),
                 createSwitch(R.drawable.ic_movie, "#32D74B", getString(R.string.ig_dialog_downloader_reel_scrubber), "forceReelScrubber"),
+                createSwitch(R.drawable.ic_movie, "#32D74B", getString(R.string.ig_dialog_reels_hold_left_slow), "holdLeftSlowMotion"),
                 createSwitch(R.drawable.ic_block, "#32D74B", getString(R.string.ig_dialog_misc_disable_repost), "disableRepost")
         ));
 

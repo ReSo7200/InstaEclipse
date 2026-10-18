@@ -58,6 +58,7 @@ public class SettingsBackupManager {
         s.put("offerPlaybackSpeed",         FeatureFlags.offerPlaybackSpeed);
         s.put("maxUploadQuality",           FeatureFlags.maxUploadQuality);
         s.put("forceReelScrubber",          FeatureFlags.forceReelScrubber);
+        s.put("holdLeftSlowMotion",         FeatureFlags.holdLeftSlowMotion);
         s.put("keepEditHistory",            FeatureFlags.keepEditHistory);
         s.put("jumpToFirstMessage",         FeatureFlags.jumpToFirstMessage);
         s.put("translateMessages",          FeatureFlags.translateMessages);
@@ -195,6 +196,7 @@ public class SettingsBackupManager {
         if (s.has("offerPlaybackSpeed"))        FeatureFlags.offerPlaybackSpeed        = s.getBoolean("offerPlaybackSpeed");
         if (s.has("maxUploadQuality"))          FeatureFlags.maxUploadQuality          = s.getBoolean("maxUploadQuality");
         if (s.has("forceReelScrubber"))         FeatureFlags.forceReelScrubber         = s.getBoolean("forceReelScrubber");
+        if (s.has("holdLeftSlowMotion"))        FeatureFlags.holdLeftSlowMotion        = s.getBoolean("holdLeftSlowMotion");
         if (s.has("keepEditHistory"))           FeatureFlags.keepEditHistory           = s.getBoolean("keepEditHistory");
         if (s.has("jumpToFirstMessage"))        FeatureFlags.jumpToFirstMessage        = s.getBoolean("jumpToFirstMessage");
         if (s.has("translateMessages"))         FeatureFlags.translateMessages         = s.getBoolean("translateMessages");

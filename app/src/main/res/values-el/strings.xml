@@ -266,6 +266,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Προσθήκη Πληροφοριών Πολυμέσων στο Μενού Δημοσίευσης</string>
     <string name="ig_dialog_downloader_offer_speed">Προσθήκη Ταχύτητας Αναπαραγωγής στο Μενού Δημοσίευσης</string>
     <string name="ig_dialog_downloader_reel_scrubber">Πάντα Εμφάνιση της Μπάρας Προόδου στα Reels</string>
+    <string name="ig_dialog_reels_hold_left_slow">Κράτημα στα αριστερά για αργή κίνηση (0,5×)</string>
     <string name="ig_media_info_title">Πληροφορίες πολυμέσων</string>
     <string name="ig_playback_speed_title">Ταχύτητα αναπαραγωγής</string>
     <string name="ig_playback_speed_next">Η ταχύτητα ορίστηκε — ισχύει για το επόμενο βίντεο που ξεκινά</string>

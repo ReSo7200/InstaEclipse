@@ -229,6 +229,7 @@
     <string name="ig_dialog_downloader_offer_media_info">Добавить «Информация о медиа» в меню публикации</string>
     <string name="ig_dialog_downloader_offer_speed">Добавить «Скорость воспроизведения» в меню публикации</string>
     <string name="ig_dialog_downloader_reel_scrubber">Всегда показывать полосу перемотки Reels</string>
+    <string name="ig_dialog_reels_hold_left_slow">Удерживать левую сторону для замедления (0,5×)</string>
     <string name="ig_media_info_title">Информация о медиа</string>
     <string name="ig_playback_speed_title">Скорость воспроизведения</string>
     <string name="ig_playback_speed_next">Скорость задана — применится к следующему запущенному видео</string>
