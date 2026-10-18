@@ -42,6 +42,9 @@ public class DistractionFreeUIHook {
     private static final String[] PLUS_UPSELL_NAMES =
             {"aura_upsell_button", "aura_list_badge", "aura_list_badge_stub", "aura_badge_lock_icon", "aura_badge_chevron"};
     private static final int[] plusUpsellIds = new int[PLUS_UPSELL_NAMES.length];
+    // Disable Discover People: the profile's "Discover people" carousel (IG shows cached
+    // suggestions even when the network drop blocks new ones).
+    private static int discoverPeopleId = 0;
 
     private static boolean navTabHidden(int index) {
         switch (index) {
@@ -73,7 +76,7 @@ public class DistractionFreeUIHook {
 
     private static boolean anyFlag() {
         return FeatureFlags.disableStories || FeatureFlags.hideStoriesTray || FeatureFlags.disableReels || anyNavTabHidden() || FeatureFlags.hidePlusUpsells
-                || !FeatureFlags.navTabOrder.isEmpty();
+                || !FeatureFlags.navTabOrder.isEmpty() || FeatureFlags.disableDiscoverPeople;
     }
 
     @SuppressLint("DiscouragedApi")
@@ -89,6 +92,7 @@ public class DistractionFreeUIHook {
                 navTabIds[i] = res.getIdentifier(NAV_TAB_NAMES[i], "id", pkg);
             for (int i = 0; i < PLUS_UPSELL_NAMES.length; i++)
                 plusUpsellIds[i] = res.getIdentifier(PLUS_UPSELL_NAMES[i], "id", pkg);
+            discoverPeopleId = res.getIdentifier("similar_accounts_container", "id", pkg);
             idsResolved = true;
             ModuleLog.line("(IE|DistractUI) resolved: tray=" + trayId + " clipsTab=" + clipsTabId);
         } catch (Throwable ignored) {}
@@ -124,6 +128,7 @@ public class DistractionFreeUIHook {
                 if (navTabIds[i] != 0 && navTabHidden(i)) collapseAllById((ViewGroup) root, navTabIds[i]);
             if (FeatureFlags.hidePlusUpsells)
                 for (int id : plusUpsellIds) if (id != 0) collapseAllById((ViewGroup) root, id);
+            if (FeatureFlags.disableDiscoverPeople && discoverPeopleId != 0) collapseAllById((ViewGroup) root, discoverPeopleId);
             if (!FeatureFlags.navTabOrder.isEmpty()) reorderTabs(a, (ViewGroup) root);
         } catch (Throwable ignored) {}
     }
