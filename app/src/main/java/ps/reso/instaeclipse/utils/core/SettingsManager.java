@@ -10,10 +10,13 @@ import ps.reso.instaeclipse.utils.feature.FeatureManager;
 public class SettingsManager {
     private static final String PREF_NAME = "instaeclipse_prefs";
     private static SharedPreferences prefs;
+    private static Boolean appliedHideState;
+    private static boolean hostProcess;
     /** Application context, for pushing in-app changes to the companion (CompanionSync). */
     private static Context appContext;
 
     public static void init(Context context) {
+        hostProcess = context != null && CommonUtils.SUPPORTED_PACKAGES.contains(context.getPackageName());
         if (appContext == null && context != null) {
             appContext = context.getApplicationContext() != null ? context.getApplicationContext() : context;
         }
@@ -50,6 +53,13 @@ public class SettingsManager {
         editor.putBoolean("lockDirectAlways", FeatureFlags.lockDirectAlways);
         editor.putBoolean("lockWholeApp", FeatureFlags.lockWholeApp);
         editor.putBoolean("hideSpecificChats", FeatureFlags.hideSpecificChats);
+        editor.putBoolean("showHideChatButton", FeatureFlags.showHideChatButton);
+        editor.putBoolean("showDeletedMessagesButton", FeatureFlags.showDeletedMessagesButton);
+        editor.putBoolean("keepUnsentInChat", FeatureFlags.keepUnsentInChat);
+        editor.putBoolean("downloaderUseOriginal", FeatureFlags.downloaderUseOriginal);
+        editor.putInt("downloaderQualityMaxShortSide", FeatureFlags.downloaderQualityMaxShortSide);
+        editor.putBoolean("downloaderCompatibility", FeatureFlags.downloaderCompatibility);
+        editor.putBoolean("downloaderAllowFallback", FeatureFlags.downloaderAllowFallback);
         editor.putBoolean("lockUseFingerprint", FeatureFlags.lockUseFingerprint);
 
         // Quick Toggles
@@ -180,6 +190,13 @@ public class SettingsManager {
         CompanionSync.pushAsync(appContext);
 
         FeatureManager.refreshFeatureStatus();
+        if (hostProcess) {
+            ps.reso.instaeclipse.mods.ghost.KeepUnsentMessagesHook.onSettingsChanged();
+            ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.refreshAll();
+            if (appliedHideState != null && appliedHideState != FeatureFlags.hideSpecificChats)
+                ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshKnownAccounts();
+            appliedHideState = FeatureFlags.hideSpecificChats;
+        }
     }
 
     /** Marks keys whose value this save changed, so an older companion value never overrides them. */
@@ -224,6 +241,13 @@ public class SettingsManager {
         FeatureFlags.lockDirectAlways = prefs.getBoolean("lockDirectAlways", false);
         FeatureFlags.lockWholeApp = prefs.getBoolean("lockWholeApp", false);
         FeatureFlags.hideSpecificChats = prefs.getBoolean("hideSpecificChats", false);
+        FeatureFlags.showHideChatButton = prefs.getBoolean("showHideChatButton", false);
+        FeatureFlags.showDeletedMessagesButton = prefs.getBoolean("showDeletedMessagesButton", false);
+        FeatureFlags.keepUnsentInChat = prefs.getBoolean("keepUnsentInChat", false);
+        FeatureFlags.downloaderUseOriginal = prefs.getBoolean("downloaderUseOriginal", true);
+        FeatureFlags.downloaderQualityMaxShortSide = prefs.getInt("downloaderQualityMaxShortSide", 0);
+        FeatureFlags.downloaderCompatibility = prefs.getBoolean("downloaderCompatibility", false);
+        FeatureFlags.downloaderAllowFallback = prefs.getBoolean("downloaderAllowFallback", false);
         FeatureFlags.lockUseFingerprint = prefs.getBoolean("lockUseFingerprint", true);
 
         // Quick Toggles
@@ -360,6 +384,13 @@ public class SettingsManager {
         for (String flag : ExtrasFeatures.flags()) ExtrasFeatures.set(flag, prefs.getBoolean(flag, false));
 
         FeatureManager.refreshFeatureStatus();
+        if (hostProcess) {
+            ps.reso.instaeclipse.mods.ghost.KeepUnsentMessagesHook.onSettingsChanged();
+            ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.refreshAll();
+            if (appliedHideState != null && appliedHideState != FeatureFlags.hideSpecificChats)
+                ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshKnownAccounts();
+            appliedHideState = FeatureFlags.hideSpecificChats;
+        }
     }
 
     private static double readDoublePref(SharedPreferences p, String key, double fallback) {

@@ -274,7 +274,10 @@ public class ChatExportHook {
                             it.putExtra("mediaNames", mNames.toArray(new String[0]));
                             it.putExtra("mediaMimes", mMimes.toArray(new String[0]));
                         }
-                        a.startForegroundService(it);
+                        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(a, it, error -> {
+                            if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                    android.widget.Toast.makeText(a, error, android.widget.Toast.LENGTH_LONG).show());
+                        });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated export (" + count + " msgs, " + mUrls.size()
                                 + " media) to companion service: " + folder);

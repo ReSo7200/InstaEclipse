@@ -33,7 +33,7 @@ public class JsonImportActivity extends Activity {
             if (resultCode == RESULT_OK && data != null) {
                 Uri uri = data.getData();
                 try (InputStream inputStream = getContentResolver().openInputStream(uri)) {
-                    String json = readStream(inputStream).trim();
+                    String json = ps.reso.instaeclipse.utils.ipc.BrokerPayload.readConfig(inputStream);
                     if (json.startsWith("{") && json.endsWith("}")) {
                         String targetPackage = getIntent().getStringExtra("target_package");
                         if (targetPackage == null || targetPackage.isEmpty()) {
@@ -44,7 +44,7 @@ public class JsonImportActivity extends Activity {
                             // Exported activity: whoever starts it picks these extras, and the
                             // broadcast goes out with our signature permission. Allow only an
                             // Instagram variant and the two import actions.
-                            if (!ps.reso.instaeclipse.utils.core.CommonUtils.SUPPORTED_PACKAGES.contains(targetPackage)
+                            if (!ps.reso.instaeclipse.utils.ipc.CompanionBridge.isTrustedHost(this, targetPackage)
                                     || !(ACTION_IMPORT_CONFIG.equals(action)
                                     || "ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS".equals(action))) {
                                 ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_target_not_specified), Toast.LENGTH_LONG).show();
@@ -61,7 +61,7 @@ public class JsonImportActivity extends Activity {
                         ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_not_valid), Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
-                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_read_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_read_failed, "Cannot read this configuration (maximum 200,000 characters)"), Toast.LENGTH_LONG).show();
                 }
             } else {
                 ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(R.string.json_cancelled), Toast.LENGTH_SHORT).show();

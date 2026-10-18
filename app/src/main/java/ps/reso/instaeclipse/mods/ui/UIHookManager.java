@@ -307,6 +307,11 @@ public class UIHookManager {
             @Override
             public void onReceive(android.content.Context ctx, Intent intent) {
                 String json = intent.getStringExtra("json_content");
+                try { ps.reso.instaeclipse.utils.ipc.BrokerPayload.validateConfig(json); }
+                catch (IllegalArgumentException malformed) {
+                    ModuleLog.line("(IE|Config) Invalid or oversized configuration rejected");
+                    return;
+                }
                 if (json != null && !json.isEmpty()) {
                     ConfigManager.importConfigFromJson(ctx, json);
                 }
@@ -322,6 +327,11 @@ public class UIHookManager {
             @Override
             public void onReceive(android.content.Context ctx, Intent intent) {
                 String json = intent.getStringExtra("json_content");
+                try { ps.reso.instaeclipse.utils.ipc.BrokerPayload.validateConfig(json); }
+                catch (IllegalArgumentException malformed) {
+                    ModuleLog.line("(IE|Config) Invalid or oversized configuration rejected");
+                    return;
+                }
                 if (json == null || json.isEmpty()) return;
                 new Thread(() -> {
                     try {

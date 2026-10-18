@@ -92,6 +92,7 @@ public class FeaturesFragment extends Fragment {
 
     /** Nonce of the last ACTION_REQUEST_PREFS; replies without it are ignored (IpcSecurity). */
     private String prefsNonce;
+    private ps.reso.instaeclipse.utils.ipc.ModuleReplies.Pending prefsReply, configReply;
 
     private final BroadcastReceiver prefsReceiver = new BroadcastReceiver() {
         @Override
@@ -1104,6 +1105,8 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_dialog_ghost_keep_disappearing), "keepEphemeralMessages"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_keep_unsent), "keepUnsentMessages"),
+                createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ie_keep_unsent_in_chat), "keepUnsentInChat"),
+                createSwitch(R.drawable.ic_delete, "#5E5CE6", getString(R.string.ie_show_deleted_button), "showDeletedMessagesButton"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_edit_history), "keepEditHistory"),
                 createSwitch(R.drawable.ic_jump_first, "#5E5CE6", getString(R.string.ig_dialog_ghost_jump_first), "jumpToFirstMessage"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_translate_messages), "translateMessages"),
@@ -1686,7 +1689,8 @@ public class FeaturesFragment extends Fragment {
 
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
-                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats")
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats"),
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ie_show_hide_button), "showHideChatButton")
         ));
 
         // Note: hiding/unhiding a specific chat is done from inside Instagram.
@@ -1965,6 +1969,15 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_cache_stories), "cacheStories")
         ));
 
+        defs.add(getString(R.string.ie_downloader_mode_hint));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_downloader_use_original), "downloaderUseOriginal"),
+                createClickable(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_quality), this::chooseDownloadQuality),
+                createSwitch(R.drawable.ic_tune, "#FF9F0A", getString(R.string.ie_download_compatibility), "downloaderCompatibility"),
+                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_fallback), "downloaderAllowFallback")
+        ));
+        defs.add(getString(R.string.ie_download_quality_hint));
+
         String customPath = localCache.getString("downloaderCustomPath", "");
         String folderTitle = customPath.isEmpty()
                 ? getString(R.string.feat_downloader_set_folder)
@@ -1977,6 +1990,25 @@ public class FeaturesFragment extends Fragment {
         ));
 
         return defs;
+    }
+
+    private void chooseDownloadQuality() {
+        if (getCurrentState("downloaderUseOriginal")) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ie_downloader_mode_hint), Toast.LENGTH_LONG).show();
+            return;
+        }
+        int[] values = {0, 2160, 1440, 1080, 720, 480};
+        String[] labels = new String[values.length];
+        int current = localCache.getInt("downloaderQualityMaxShortSide", 0), selected = 0;
+        for (int i=0; i<values.length; i++) {
+            labels[i] = values[i] == 0 ? getString(R.string.ie_download_best) : getString(R.string.ie_download_ceiling, values[i]);
+            if (values[i] == current) selected = i;
+        }
+        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ie_download_quality)
+                .setSingleChoiceItems(labels, selected, (dialog, which) -> {
+                    putIntPref("downloaderQualityMaxShortSide", values[which]);
+                    dialog.dismiss(); loadDownloaderMenu();
+                }).setNegativeButton(android.R.string.cancel, null).show();
     }
 
     private void loadPostMenuMenu() {
@@ -2094,7 +2126,7 @@ public class FeaturesFragment extends Fragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (!ps.reso.instaeclipse.utils.core.IpcSecurity.nonceMatches(nonce, intent)) return;
-                context.unregisterReceiver(this);
+                if (configReply != null) { configReply.cancel(); configReply = null; }
                 Activity activity = getActivity();
                 if (activity == null || activity.isFinishing()) return;
                 String error = intent.getStringExtra("error");
@@ -2114,11 +2146,11 @@ public class FeaturesFragment extends Fragment {
             }
         };
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_CONFIG");
-        ps.reso.instaeclipse.utils.core.IpcSecurity.registerReplyReceiver(requireContext(), configReceiver, filter);
+        if (configReply != null) configReply.cancel();
         Intent request = new Intent("ps.reso.instaeclipse.ACTION_EXPORT_CONFIG");
         request.putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, nonce);
         request.setPackage("com.instagram.android");
-        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), request);
+        configReply = ps.reso.instaeclipse.utils.core.IpcSecurity.requestReply(requireContext(), request, "ps.reso.instaeclipse.ACTION_SEND_CONFIG", configReceiver);
     }
 
     private void restoreDefaultConfig() {
@@ -2308,7 +2340,7 @@ public class FeaturesFragment extends Fragment {
     // =========================================================
 
     private void stageChange(String prefKey, boolean isChecked) {
-        if (localCache.getBoolean(prefKey, false) == isChecked) {
+        if (localCache.getBoolean(prefKey, "downloaderUseOriginal".equals(prefKey)) == isChecked) {
             stagedChanges.remove(prefKey);
         } else {
             stagedChanges.put(prefKey, isChecked);
@@ -2345,7 +2377,7 @@ public class FeaturesFragment extends Fragment {
     private boolean getCurrentState(String prefKey) {
         if (prefKey == null) return false;
         if (stagedChanges.containsKey(prefKey)) return stagedChanges.get(prefKey);
-        return localCache.getBoolean(prefKey, false);
+        return localCache.getBoolean(prefKey, "downloaderUseOriginal".equals(prefKey));
     }
 
     // =========================================================
@@ -2356,11 +2388,12 @@ public class FeaturesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_PREFS");
-        ps.reso.instaeclipse.utils.core.IpcSecurity.registerReplyReceiver(requireContext(), prefsReceiver, filter);
+        if (prefsReply != null) prefsReply.cancel();
         prefsNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
-        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(),
+        prefsReply = ps.reso.instaeclipse.utils.core.IpcSecurity.requestReply(requireContext(),
                 new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS")
-                        .putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, prefsNonce));
+                        .putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, prefsNonce),
+                "ps.reso.instaeclipse.ACTION_SEND_PREFS", prefsReceiver);
         // Prefs may have changed while away (e.g. toggled from inside Instagram): refresh counts
         refreshVisibleMenu();
     }
@@ -2368,6 +2401,7 @@ public class FeaturesFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        requireContext().unregisterReceiver(prefsReceiver);
+        if (prefsReply != null) { prefsReply.cancel(); prefsReply = null; }
+        if (configReply != null) { configReply.cancel(); configReply = null; }
     }
 }

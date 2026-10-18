@@ -960,7 +960,10 @@ public class CommentSearchHook {
                             it.putExtra("mediaNames", ns);
                             it.putExtra("mediaMimes", ms);
                         }
-                        ctx.startForegroundService(it);
+                        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, it, error -> {
+                            if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                    android.widget.Toast.makeText(ctx, error, android.widget.Toast.LENGTH_LONG).show());
+                        });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated comment export (" + cCount + " comments, "
                                 + media.size() + " media) to companion service: " + folder);
