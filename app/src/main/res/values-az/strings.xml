@@ -680,4 +680,5 @@
     <string name="ig_call_confirm_audio">Səsli zəng başlasın?</string>
     <string name="ig_call_confirm_video">Video zəng başlasın?</string>
     <string name="ig_call_confirm_call">Zəng et</string>
+    <string name="ig_hide_ai_labeled">Süni intellekt etiketli paylaşımları gizlət</string>
 </resources>

@@ -711,4 +711,5 @@
     <string name="ig_call_confirm_audio">Έναρξη φωνητικής κλήσης;</string>
     <string name="ig_call_confirm_video">Έναρξη βιντεοκλήσης;</string>
     <string name="ig_call_confirm_call">Κλήση</string>
+    <string name="ig_hide_ai_labeled">Απόκρυψη αναρτήσεων με ετικέτα ΤΝ</string>
 </resources>

@@ -677,4 +677,5 @@
     <string name="ig_call_confirm_audio">Iniciar uma chamada de voz?</string>
     <string name="ig_call_confirm_video">Iniciar uma chamada de vídeo?</string>
     <string name="ig_call_confirm_call">Ligar</string>
+    <string name="ig_hide_ai_labeled">Ocultar publicações marcadas como IA</string>
 </resources>

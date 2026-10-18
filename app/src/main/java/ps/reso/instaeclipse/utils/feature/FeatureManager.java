@@ -126,6 +126,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("FollowingOnlyFeed");
         }
 
+        if (FeatureFlags.hideAiLabeledPosts) {
+            FeatureStatusTracker.setEnabled("HideAiLabeledPosts", R.string.ig_hide_ai_labeled);
+        } else {
+            FeatureStatusTracker.setDisabled("HideAiLabeledPosts");
+        }
+
         if (FeatureFlags.hideLikedPosts) {
             FeatureStatusTracker.setEnabled("HideLikedPosts", R.string.ig_dialog_clean_feed_hide_liked);
         } else {

@@ -709,4 +709,5 @@
     <string name="ig_call_confirm_audio">להתחיל שיחה קולית?</string>
     <string name="ig_call_confirm_video">להתחיל שיחת וידאו?</string>
     <string name="ig_call_confirm_call">התקשר</string>
+    <string name="ig_hide_ai_labeled">הסתרת פוסטים עם תווית AI</string>
 </resources>

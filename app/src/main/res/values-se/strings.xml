@@ -679,4 +679,5 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_call_confirm_audio">Starta ett röstsamtal?</string>
     <string name="ig_call_confirm_video">Starta ett videosamtal?</string>
     <string name="ig_call_confirm_call">Ring</string>
+    <string name="ig_hide_ai_labeled">Dölj AI-märkta inlägg</string>
 </resources>

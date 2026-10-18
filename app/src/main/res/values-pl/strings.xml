@@ -727,4 +727,5 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_call_confirm_audio">Rozpocząć połączenie głosowe?</string>
     <string name="ig_call_confirm_video">Rozpocząć połączenie wideo?</string>
     <string name="ig_call_confirm_call">Zadzwoń</string>
+    <string name="ig_hide_ai_labeled">Ukryj posty oznaczone jako AI</string>
 </resources>

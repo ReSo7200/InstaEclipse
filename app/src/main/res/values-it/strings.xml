@@ -613,4 +613,5 @@ Resta su questa schermata fino al termine.</string>
     <string name="ig_call_confirm_audio">Avviare una chiamata vocale?</string>
     <string name="ig_call_confirm_video">Avviare una videochiamata?</string>
     <string name="ig_call_confirm_call">Chiama</string>
+    <string name="ig_hide_ai_labeled">Nascondi i post etichettati come IA</string>
 </resources>

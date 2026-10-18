@@ -717,4 +717,5 @@
     <string name="ig_call_confirm_audio">Sesli arama başlatılsın mı?</string>
     <string name="ig_call_confirm_video">Görüntülü arama başlatılsın mı?</string>
     <string name="ig_call_confirm_call">Ara</string>
+    <string name="ig_hide_ai_labeled">Yapay zeka etiketli gönderileri gizle</string>
 </resources>

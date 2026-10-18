@@ -679,4 +679,5 @@
     <string name="ig_call_confirm_audio">Начать аудиозвонок?</string>
     <string name="ig_call_confirm_video">Начать видеозвонок?</string>
     <string name="ig_call_confirm_call">Позвонить</string>
+    <string name="ig_hide_ai_labeled">Скрывать публикации с меткой ИИ</string>
 </resources>
