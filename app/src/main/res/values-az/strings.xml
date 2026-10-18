@@ -241,6 +241,11 @@
     <string name="ig_like_undo_bar">❤ Bəyənildi · GERİ AL</string>
     <string name="ig_like_undo_cancelled">Bəyənmə ləğv edildi — ürəyi yeniləmək üçün səhifəni yeniləyin</string>
     <string name="ig_dialog_misc_exact_timestamps">\"2 saat əvvəl\" Əvəzinə Dəqiq Tarixləri Göstər</string>
+    <string name="ig_timestamp_format">Tarix formatı</string>
+    <string name="ig_timestamp_format_default">Cihaz standartı</string>
+    <string name="ig_timestamp_format_custom">Fərdi…</string>
+    <string name="ig_timestamp_format_custom_hint">Hərflər: yyyy il · MM ay · MMM ayın adı · dd gün · EEE həftənin günü · HH saat (24) · h saat (12) · mm dəqiqə · ss saniyə · a AM/PM. Başqa mətni \'tək dırnaqlara\' yazın.</string>
+    <string name="ig_timestamp_format_invalid">Format düzgün deyil</string>
     <string name="ig_dialog_misc_hide_share_create_group">Paylaşım Pəncərəsində \"Qrup yarat\" Düyməsini Gizlət</string>
     <string name="ig_dialog_misc_show_feature_toasts">Xüsusiyyət Bildirişlərini Göstər</string>
     <string name="ig_dialog_misc_show_follower_toast">İzləyici Bildirişini Göstər</string>

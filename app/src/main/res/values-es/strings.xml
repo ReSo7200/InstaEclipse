@@ -243,6 +243,11 @@
     <string name="ig_like_undo_bar">❤ Te gusta · DESHACER</string>
     <string name="ig_like_undo_cancelled">Me gusta cancelado — actualiza para refrescar el corazón</string>
     <string name="ig_dialog_misc_exact_timestamps">Mostrar fechas exactas en lugar de «hace 2 h»</string>
+    <string name="ig_timestamp_format">Formato de fecha</string>
+    <string name="ig_timestamp_format_default">Predeterminado del dispositivo</string>
+    <string name="ig_timestamp_format_custom">Personalizado…</string>
+    <string name="ig_timestamp_format_custom_hint">Letras: yyyy año · MM mes · MMM nombre del mes · dd día · EEE día de la semana · HH hora (24 h) · h hora (12 h) · mm minutos · ss segundos · a AM/PM. Pon otro texto entre \'comillas simples\'.</string>
+    <string name="ig_timestamp_format_invalid">Formato no válido</string>
     <string name="ig_dialog_misc_hide_share_create_group">Ocultar «Crear grupo» en el menú Compartir</string>
     <string name="ig_dialog_misc_show_feature_toasts">Mostrar notificaciones de funciones</string>
     <string name="ig_dialog_misc_show_follower_toast">Mostrar notificación de seguidor</string>

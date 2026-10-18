@@ -278,6 +278,11 @@
     <string name="ig_like_undo_bar">❤ Σας αρέσει · ΑΝΑΙΡΕΣΗ</string>
     <string name="ig_like_undo_cancelled">Το like ακυρώθηκε — ανανεώστε για να ενημερωθεί η καρδιά</string>
     <string name="ig_dialog_misc_exact_timestamps">Εμφάνιση Ακριβών Ημερομηνιών αντί για «πριν από 2 ώρες»</string>
+    <string name="ig_timestamp_format">Μορφή ημερομηνίας</string>
+    <string name="ig_timestamp_format_default">Προεπιλογή συσκευής</string>
+    <string name="ig_timestamp_format_custom">Προσαρμοσμένη…</string>
+    <string name="ig_timestamp_format_custom_hint">Γράμματα: yyyy έτος · MM μήνας · MMM όνομα μήνα · dd ημέρα · EEE ημέρα εβδομάδας · HH ώρα (24ωρο) · h ώρα (12ωρο) · mm λεπτά · ss δευτερόλεπτα · a ΠΜ/ΜΜ. Άλλο κείμενο μέσα σε \'μονά εισαγωγικά\'.</string>
+    <string name="ig_timestamp_format_invalid">Μη έγκυρη μορφή</string>
     <string name="ig_dialog_misc_hide_share_create_group">Απόκρυψη «Δημιουργία ομάδας» στο Μενού Κοινοποίησης</string>
     <string name="ig_dialog_misc_show_feature_toasts">Εμφάνιση Ειδοποιήσεων Λειτουργιών</string>
     <string name="ig_dialog_misc_show_follower_toast">Εμφάνιση Ειδοποίησης Ακόλουθου</string>

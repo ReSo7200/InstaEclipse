@@ -160,6 +160,7 @@ public class SettingsManager {
         editor.putString("navTabOrder", FeatureFlags.navTabOrder);
         editor.putString("startupTab", FeatureFlags.startupTab);
         editor.putString("customShareDomain", FeatureFlags.customShareDomain);
+        editor.putString("exactTimestampFormat", FeatureFlags.exactTimestampFormat);
         editor.putBoolean("customEmojiEnabled", FeatureFlags.customEmojiEnabled);
         editor.putString("customEmojiPath", FeatureFlags.customEmojiPath);
         editor.putString("downloaderCustomPath", FeatureFlags.downloaderCustomPath);
@@ -333,6 +334,7 @@ public class SettingsManager {
         FeatureFlags.navTabOrder              = prefs.getString("navTabOrder", "");
         FeatureFlags.startupTab               = prefs.getString("startupTab", "");
         FeatureFlags.customShareDomain        = prefs.getString("customShareDomain", "");
+        FeatureFlags.exactTimestampFormat     = prefs.getString("exactTimestampFormat", "");
         FeatureFlags.customEmojiEnabled       = prefs.getBoolean("customEmojiEnabled", false);
         FeatureFlags.customEmojiPath          = prefs.getString("customEmojiPath", "");
         FeatureFlags.downloaderCustomPath     = prefs.getString("downloaderCustomPath", "");

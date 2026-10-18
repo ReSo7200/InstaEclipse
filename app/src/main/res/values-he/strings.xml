@@ -277,6 +277,11 @@
     <string name="ig_like_undo_bar">❤ אהבת · בטל</string>
     <string name="ig_like_undo_cancelled">הלייק בוטל — רענן כדי לעדכן את הלב</string>
     <string name="ig_dialog_misc_exact_timestamps">הצג תאריכים מדויקים במקום \"לפני שעתיים\"</string>
+    <string name="ig_timestamp_format">תבנית תאריך</string>
+    <string name="ig_timestamp_format_default">ברירת המחדל של המכשיר</string>
+    <string name="ig_timestamp_format_custom">מותאם אישית…</string>
+    <string name="ig_timestamp_format_custom_hint">אותיות: yyyy שנה · MM חודש · MMM שם החודש · dd יום · EEE יום בשבוע · HH שעה (24) · h שעה (12) · mm דקות · ss שניות · a AM/PM. טקסט אחר יש לשים בין \'גרשיים בודדים\'.</string>
+    <string name="ig_timestamp_format_invalid">תבנית לא תקינה</string>
     <string name="ig_dialog_misc_hide_share_create_group">הסתר \"צור קבוצה\" בתפריט השיתוף</string>
     <string name="ig_dialog_misc_show_feature_toasts">הצג הודעות תכונות</string>
     <string name="ig_dialog_misc_show_follower_toast">הצג הודעת עוקב</string>

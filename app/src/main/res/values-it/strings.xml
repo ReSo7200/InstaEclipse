@@ -379,6 +379,11 @@
     <string name="ig_like_undo_bar">❤ Ti piace · ANNULLA</string>
     <string name="ig_like_undo_cancelled">Mi piace annullato — aggiorna per aggiornare il cuore</string>
     <string name="ig_dialog_misc_exact_timestamps">Mostra date esatte invece di \"2 ore fa\"</string>
+    <string name="ig_timestamp_format">Formato data</string>
+    <string name="ig_timestamp_format_default">Predefinito del dispositivo</string>
+    <string name="ig_timestamp_format_custom">Personalizzato…</string>
+    <string name="ig_timestamp_format_custom_hint">Lettere: yyyy anno · MM mese · MMM nome del mese · dd giorno · EEE giorno della settimana · HH ora (24 h) · h ora (12 h) · mm minuti · ss secondi · a AM/PM. Metti altro testo tra \'apici singoli\'.</string>
+    <string name="ig_timestamp_format_invalid">Formato non valido</string>
     <string name="ig_dialog_misc_hide_share_create_group">Nascondi \"Crea gruppo\" nel menu Condividi</string>
     <string name="ig_dialog_misc_show_feature_toasts">Mostra avvisi delle funzionalità</string>
     <string name="ig_dialog_misc_show_follower_toast">Mostra avviso follower</string>

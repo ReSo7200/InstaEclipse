@@ -210,6 +210,11 @@
     <string name="ig_like_undo_bar">❤ Đã thích · HOÀN TÁC</string>
     <string name="ig_like_undo_cancelled">Đã hủy lượt thích — làm mới để cập nhật trái tim</string>
     <string name="ig_dialog_misc_exact_timestamps">Hiện ngày chính xác thay vì \"2 giờ trước\"</string>
+    <string name="ig_timestamp_format">Định dạng ngày</string>
+    <string name="ig_timestamp_format_default">Mặc định của thiết bị</string>
+    <string name="ig_timestamp_format_custom">Tùy chỉnh…</string>
+    <string name="ig_timestamp_format_custom_hint">Ký tự: yyyy năm · MM tháng · MMM tên tháng · dd ngày · EEE thứ · HH giờ (24h) · h giờ (12h) · mm phút · ss giây · a SA/CH. Đặt chữ khác trong \'dấu nháy đơn\'.</string>
+    <string name="ig_timestamp_format_invalid">Định dạng không hợp lệ</string>
     <string name="ig_dialog_misc_hide_share_create_group">Ẩn \"Tạo nhóm\" trên bảng chia sẻ</string>
     <string name="ig_comment_gif_downloading">Đang tải phương tiện của bình luận…</string>
     <string name="ig_comment_copy_media_link">Sao chép liên kết GIF / ảnh</string>

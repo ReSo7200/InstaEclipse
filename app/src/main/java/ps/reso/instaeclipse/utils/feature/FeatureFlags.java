@@ -122,6 +122,7 @@ public class FeatureFlags {
     public static volatile boolean fancyBioFont = false; // Edit profile: fancy (Unicode) fonts for the bio
     public static volatile boolean likeUndo = false; // hold likes for a few seconds with an Undo bar (#235)
     public static volatile boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)
+    public static volatile String  exactTimestampFormat = ""; // its SimpleDateFormat pattern, "" = device default (#265)
     public static volatile boolean hideShareCreateGroup = false; // hide "Create group" on the DM share sheet (#240)
 
 

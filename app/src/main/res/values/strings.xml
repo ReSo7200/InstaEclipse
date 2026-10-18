@@ -530,6 +530,11 @@ Stay on this screen until it finishes.</string>
     <string name="ig_like_undo_bar">❤ Liked · UNDO</string>
     <string name="ig_like_undo_cancelled">Like cancelled — refresh to update the heart</string>
     <string name="ig_dialog_misc_exact_timestamps">Show Exact Dates Instead of \"2h ago\"</string>
+    <string name="ig_timestamp_format">Date format</string>
+    <string name="ig_timestamp_format_default">Device default</string>
+    <string name="ig_timestamp_format_custom">Custom…</string>
+    <string name="ig_timestamp_format_custom_hint">Letters: yyyy year · MM month · MMM month name · dd day · EEE weekday · HH hour (24h) · h hour (12h) · mm minutes · ss seconds · a AM/PM. Put other text in \'single quotes\'.</string>
+    <string name="ig_timestamp_format_invalid">Not a valid format</string>
     <string name="ig_dialog_misc_hide_share_create_group">Hide \"Create group\" on Share Sheet</string>
     <string name="ig_dialog_misc_show_feature_toasts">Show Feature Toasts</string>
     <string name="ig_dialog_misc_show_follower_toast">Show Follower Toast</string>

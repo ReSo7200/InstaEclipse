@@ -239,6 +239,11 @@
     <string name="ig_like_undo_bar">❤ أعجبك · تراجع</string>
     <string name="ig_like_undo_cancelled">تم إلغاء الإعجاب — حدّث الصفحة لتحديث القلب</string>
     <string name="ig_dialog_misc_exact_timestamps">عرض التواريخ الدقيقة بدلاً من \"منذ ساعتين\"</string>
+    <string name="ig_timestamp_format">تنسيق التاريخ</string>
+    <string name="ig_timestamp_format_default">افتراضي الجهاز</string>
+    <string name="ig_timestamp_format_custom">مخصص…</string>
+    <string name="ig_timestamp_format_custom_hint">الرموز: yyyy السنة · MM الشهر · MMM اسم الشهر · dd اليوم · EEE يوم الأسبوع · HH الساعة (24) · h الساعة (12) · mm الدقائق · ss الثواني · a ص/م. ضع أي نص آخر بين \'علامات اقتباس مفردة\'.</string>
+    <string name="ig_timestamp_format_invalid">تنسيق غير صالح</string>
     <string name="ig_dialog_misc_hide_share_create_group">إخفاء \"إنشاء مجموعة\" في قائمة المشاركة</string>
     <string name="ig_dialog_misc_show_feature_toasts">عرض إشعارات الميزات</string>
     <string name="ig_dialog_misc_show_follower_toast">عرض إشعار المتابعة</string>

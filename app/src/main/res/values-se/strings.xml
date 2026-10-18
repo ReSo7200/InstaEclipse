@@ -240,6 +240,11 @@
     <string name="ig_like_undo_bar">❤ Gillat · ÅNGRA</string>
     <string name="ig_like_undo_cancelled">Gillning avbruten — uppdatera för att uppdatera hjärtat</string>
     <string name="ig_dialog_misc_exact_timestamps">Visa exakta datum i stället för \"för 2 tim sedan\"</string>
+    <string name="ig_timestamp_format">Datumformat</string>
+    <string name="ig_timestamp_format_default">Enhetens standard</string>
+    <string name="ig_timestamp_format_custom">Eget…</string>
+    <string name="ig_timestamp_format_custom_hint">Bokstäver: yyyy år · MM månad · MMM månadens namn · dd dag · EEE veckodag · HH timme (24 h) · h timme (12 h) · mm minuter · ss sekunder · a FM/EM. Skriv annan text inom \'enkla citattecken\'.</string>
+    <string name="ig_timestamp_format_invalid">Ogiltigt format</string>
     <string name="ig_dialog_misc_hide_share_create_group">Dölj \"Skapa grupp\" i delningsmenyn</string>
     <string name="ig_dialog_misc_show_feature_toasts">Visa funktionsaviseringar</string>
     <string name="ig_dialog_misc_show_follower_toast">Visa följaravisering</string>

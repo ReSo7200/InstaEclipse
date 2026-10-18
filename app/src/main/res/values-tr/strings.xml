@@ -566,6 +566,11 @@
     <string name="ig_like_undo_bar">❤ Beğenildi · GERİ AL</string>
     <string name="ig_like_undo_cancelled">Beğeni iptal edildi — kalbi güncellemek için yenileyin</string>
     <string name="ig_dialog_misc_exact_timestamps">\"2 sa önce\" Yerine Tam Tarihleri Göster</string>
+    <string name="ig_timestamp_format">Tarih biçimi</string>
+    <string name="ig_timestamp_format_default">Cihaz varsayılanı</string>
+    <string name="ig_timestamp_format_custom">Özel…</string>
+    <string name="ig_timestamp_format_custom_hint">Harfler: yyyy yıl · MM ay · MMM ay adı · dd gün · EEE haftanın günü · HH saat (24) · h saat (12) · mm dakika · ss saniye · a ÖÖ/ÖS. Diğer metni \'tek tırnak\' içine yazın.</string>
+    <string name="ig_timestamp_format_invalid">Geçerli bir biçim değil</string>
     <string name="ig_dialog_misc_hide_share_create_group">Paylaşım Menüsünde \"Grup oluştur\" Seçeneğini Gizle</string>
     <string name="ig_story_mark_seen">Görüldü olarak işaretle</string>
     <string name="ig_story_marked_seen">Görüldü olarak işaretlendi</string>

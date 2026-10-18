@@ -278,6 +278,11 @@
     <string name="ig_like_undo_bar">❤ 已赞 · 撤销</string>
     <string name="ig_like_undo_cancelled">已取消赞 — 刷新以更新爱心</string>
     <string name="ig_dialog_misc_exact_timestamps">显示确切日期，而非“2小时前”</string>
+    <string name="ig_timestamp_format">日期格式</string>
+    <string name="ig_timestamp_format_default">设备默认</string>
+    <string name="ig_timestamp_format_custom">自定义…</string>
+    <string name="ig_timestamp_format_custom_hint">字母：yyyy 年 · MM 月 · MMM 月份名 · dd 日 · EEE 星期 · HH 小时（24 小时制）· h 小时（12 小时制）· mm 分 · ss 秒 · a 上午/下午。其他文字请放在\'单引号\'中。</string>
+    <string name="ig_timestamp_format_invalid">格式无效</string>
     <string name="ig_dialog_misc_hide_share_create_group">在分享面板中隐藏“创建群组”</string>
     <string name="ig_dialog_misc_show_feature_toasts">显示功能提示</string>
     <string name="ig_dialog_misc_show_follower_toast">显示关注者提示</string>

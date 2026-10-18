@@ -9,7 +9,6 @@ import org.luckypray.dexkit.result.ClassData;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -76,8 +75,8 @@ public class ExactTimestampHook {
                     if (param.args[0] instanceof Resources res) {
                         locale = res.getConfiguration().getLocales().get(0);
                     }
-                    DateFormat f = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, locale);
-                    param.setResult(f.format(new Date((long) (a * 1000))));
+                    param.setResult(ps.reso.instaeclipse.utils.text.TimestampFormat.format(
+                            FeatureFlags.exactTimestampFormat, new Date((long) (a * 1000)), locale));
                 } catch (Throwable ignored) {
                 }
             }

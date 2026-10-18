@@ -165,7 +165,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Hide the story tray | Keep the feed, lose the story row |
 | Disable Discover People | Remove the "people you may know" row |
 | Always show full captions | No more "... more" |
-| Exact dates | "17 Oct 2026 07:36" instead of "2h ago" |
+| Exact dates | "17 Oct 2026 07:36" instead of "2h ago", in the date format you pick (presets or your own pattern) |
 | High resolution images | Load the sharpest version of every photo |
 | Photo zoom | Long press a photo to zoom in |
 | Disable video autoplay | Videos wait for a tap |

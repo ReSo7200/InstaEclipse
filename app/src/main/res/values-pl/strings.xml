@@ -379,6 +379,11 @@
     <string name="ig_like_undo_bar">❤ Polubiono · COFNIJ</string>
     <string name="ig_like_undo_cancelled">Polubienie anulowane — odśwież, aby zaktualizować serce</string>
     <string name="ig_dialog_misc_exact_timestamps">Pokazuj dokładne daty zamiast „2 godz. temu”</string>
+    <string name="ig_timestamp_format">Format daty</string>
+    <string name="ig_timestamp_format_default">Domyślny urządzenia</string>
+    <string name="ig_timestamp_format_custom">Własny…</string>
+    <string name="ig_timestamp_format_custom_hint">Litery: yyyy rok · MM miesiąc · MMM nazwa miesiąca · dd dzień · EEE dzień tygodnia · HH godzina (24 h) · h godzina (12 h) · mm minuty · ss sekundy · a AM/PM. Inny tekst wpisz w \'pojedynczych cudzysłowach\'.</string>
+    <string name="ig_timestamp_format_invalid">Nieprawidłowy format</string>
     <string name="ig_dialog_misc_hide_share_create_group">Ukryj „Utwórz grupę” w menu udostępniania</string>
     <string name="ig_dialog_misc_show_feature_toasts">Komunikat o funkcjach</string>
     <string name="ig_dialog_misc_show_follower_toast">Komunikat o obserwowaniu</string>

@@ -1413,9 +1413,15 @@ public class DialogUtils {
 
         // feat_options reads "Options:" (written for the companion app), so drop the colon for a header.
         layout.addView(sectionHeader(context, I18n.t(context, R.string.feat_options).replaceAll("[:：]\\s*$", "")));
+        // Date format: only used (and tappable) while "Show exact dates" is on (#265).
+        View tsFormat = createActionRow(context, R.drawable.ic_timer, timestampFormatLabel(context), "#64D2FF",
+                v -> showTimestampFormatDialog(context, (TextView) findFirstText(v)));
+        setRowEnabled(tsFormat, FeatureFlags.exactTimestamps);
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_expand_captions, "expandCaptions"),
-                flagSwitch(context, R.drawable.ic_timer, "#64D2FF", R.string.ig_dialog_misc_exact_timestamps, "exactTimestamps"),
+                flagSwitch(context, R.drawable.ic_timer, "#64D2FF", R.string.ig_dialog_misc_exact_timestamps, "exactTimestamps",
+                        () -> setRowEnabled(tsFormat, FeatureFlags.exactTimestamps)),
+                tsFormat,
                 extraSwitch(context, "#64D2FF", "highResolutionImages"),
                 flagSwitch(context, R.drawable.ic_search, "#64D2FF", R.string.ig_dialog_misc_photo_zoom, "enablePhotoZoom"),
                 flagSwitch(context, R.drawable.ic_movie, "#64D2FF", R.string.ig_dialog_misc_disable_video_autoplay, "disableVideoAutoPlay")));
@@ -1718,6 +1724,84 @@ public class DialogUtils {
             });
             dlg.show();
         } catch (Throwable ignored) {}
+    }
+
+    private static void setRowEnabled(View row, boolean on) {
+        row.setEnabled(on);
+        row.setAlpha(on ? 1f : 0.4f);
+    }
+
+    /** The format, or "Device default", with a sample of the current time. */
+    private static String timestampFormatName(Context context, String pattern) {
+        String sample = ps.reso.instaeclipse.utils.text.TimestampFormat.format(pattern, new java.util.Date(), java.util.Locale.getDefault());
+        return pattern.isEmpty() ? I18n.t(context, R.string.ig_timestamp_format_default) + "  ·  " + sample : sample;
+    }
+
+    private static String timestampFormatLabel(Context context) {
+        return I18n.t(context, R.string.ig_timestamp_format) + "  ·  " + timestampFormatName(context, FeatureFlags.exactTimestampFormat);
+    }
+
+    /** Date format chooser: presets shown as today's date in that format, plus a custom pattern. */
+    private static void showTimestampFormatDialog(Context context, TextView label) {
+        try {
+            String[] presets = ps.reso.instaeclipse.utils.text.TimestampFormat.PRESETS;
+            String current = FeatureFlags.exactTimestampFormat;
+            CharSequence[] rows = new CharSequence[presets.length + 1];
+            int checked = presets.length; // custom
+            for (int i = 0; i < presets.length; i++) {
+                rows[i] = timestampFormatName(context, presets[i]);
+                if (presets[i].equals(current)) checked = i;
+            }
+            rows[presets.length] = checked == presets.length
+                    ? I18n.t(context, R.string.ig_timestamp_format_custom) + "  ·  " + timestampFormatName(context, current)
+                    : I18n.t(context, R.string.ig_timestamp_format_custom);
+            new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_timestamp_format))
+                    .choices(rows, checked, i -> {
+                        if (i == presets.length) { showCustomTimestampFormat(context, label); return; }
+                        saveTimestampFormat(context, presets[i], label);
+                    })
+                    .show();
+        } catch (Throwable ignored) {}
+    }
+
+    private static void showCustomTimestampFormat(Context context, TextView label) {
+        try {
+            IeDialog dlg = new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_timestamp_format_custom))
+                    .message(I18n.t(context, R.string.ig_timestamp_format_custom_hint));
+            final android.widget.EditText input = dlg.input("yyyy-MM-dd HH:mm:ss");
+            input.setText(FeatureFlags.exactTimestampFormat.isEmpty() ? "yyyy-MM-dd HH:mm:ss" : FeatureFlags.exactTimestampFormat);
+            final TextView preview = dlg.quote("", 2);
+            Runnable update = () -> {
+                String p = input.getText().toString();
+                preview.setText(ps.reso.instaeclipse.utils.text.TimestampFormat.isValid(p) && !p.isEmpty()
+                        ? ps.reso.instaeclipse.utils.text.TimestampFormat.format(p, new java.util.Date(), java.util.Locale.getDefault())
+                        : I18n.t(context, R.string.ig_timestamp_format_invalid));
+            };
+            input.addTextChangedListener(new android.text.TextWatcher() {
+                public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+                public void onTextChanged(CharSequence s, int a, int b, int c) {}
+                public void afterTextChanged(android.text.Editable s) { update.run(); }
+            });
+            update.run();
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(context.getString(android.R.string.ok), () -> {
+                String p = input.getText().toString().trim();
+                if (!ps.reso.instaeclipse.utils.text.TimestampFormat.isValid(p)) {
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_timestamp_format_invalid), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                saveTimestampFormat(context, p, label);
+            });
+            dlg.show();
+        } catch (Throwable ignored) {}
+    }
+
+    private static void saveTimestampFormat(Context context, String pattern, TextView label) {
+        FeatureFlags.exactTimestampFormat = pattern;
+        SettingsManager.saveAllFlags();
+        if (label != null) label.setText(timestampFormatLabel(context));
     }
 
     private static String shareDomainLabel(Context context) {

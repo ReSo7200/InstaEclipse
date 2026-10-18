@@ -277,6 +277,11 @@
     <string name="ig_like_undo_bar">❤ Disukai · URUNGKAN</string>
     <string name="ig_like_undo_cancelled">Suka dibatalkan — muat ulang untuk memperbarui ikon hati</string>
     <string name="ig_dialog_misc_exact_timestamps">Tampilkan Tanggal Pasti, Bukan \"2 jam lalu\"</string>
+    <string name="ig_timestamp_format">Format tanggal</string>
+    <string name="ig_timestamp_format_default">Bawaan perangkat</string>
+    <string name="ig_timestamp_format_custom">Kustom…</string>
+    <string name="ig_timestamp_format_custom_hint">Huruf: yyyy tahun · MM bulan · MMM nama bulan · dd hari · EEE nama hari · HH jam (24) · h jam (12) · mm menit · ss detik · a AM/PM. Tulis teks lain di antara \'tanda kutip tunggal\'.</string>
+    <string name="ig_timestamp_format_invalid">Format tidak valid</string>
     <string name="ig_dialog_misc_hide_share_create_group">Sembunyikan \"Buat grup\" di Menu Bagikan</string>
     <string name="ig_dialog_misc_show_feature_toasts">Tampilkan Toast Fitur</string>
     <string name="ig_dialog_misc_show_follower_toast">Tampilkan Toast Pengikut</string>

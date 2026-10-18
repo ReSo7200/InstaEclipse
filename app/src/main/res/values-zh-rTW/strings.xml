@@ -240,6 +240,11 @@
     <string name="ig_like_undo_bar">❤ 已按讚 · 復原</string>
     <string name="ig_like_undo_cancelled">已取消讚 — 重新整理以更新愛心</string>
     <string name="ig_dialog_misc_exact_timestamps">顯示確切日期，而非「2小時前」</string>
+    <string name="ig_timestamp_format">日期格式</string>
+    <string name="ig_timestamp_format_default">裝置預設</string>
+    <string name="ig_timestamp_format_custom">自訂…</string>
+    <string name="ig_timestamp_format_custom_hint">字母：yyyy 年 · MM 月 · MMM 月份名稱 · dd 日 · EEE 星期 · HH 小時（24 小時制）· h 小時（12 小時制）· mm 分 · ss 秒 · a 上午/下午。其他文字請放在\'單引號\'中。</string>
+    <string name="ig_timestamp_format_invalid">格式無效</string>
     <string name="ig_dialog_misc_hide_share_create_group">在分享面板中隱藏「建立群組」</string>
     <string name="ig_dialog_misc_show_feature_toasts">顯示功能提示</string>
     <string name="ig_dialog_misc_show_follower_toast">顯示追蹤者提示</string>

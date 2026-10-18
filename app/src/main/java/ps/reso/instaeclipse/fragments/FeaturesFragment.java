@@ -1199,6 +1199,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_sparkle, "#64D2FF", getString(R.string.ig_dialog_clean_feed_expand_captions), "expandCaptions"),
                 createSwitch(R.drawable.ic_timer, "#64D2FF", getString(R.string.ig_dialog_misc_exact_timestamps), "exactTimestamps"),
+                timestampFormatItem(),
                 createExtrasSwitch("#64D2FF", "highResolutionImages"),
                 createSwitch(R.drawable.ic_search, "#64D2FF", getString(R.string.ig_dialog_misc_photo_zoom), "enablePhotoZoom"),
                 createSwitch(R.drawable.ic_movie, "#64D2FF", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay")
@@ -1396,6 +1397,98 @@ public class FeaturesFragment extends Fragment {
                 getString(R.string.ig_nav_name_search),
                 getString(R.string.ig_nav_name_profile),
                 getString(R.string.ig_nav_name_activity)};
+    }
+
+    /** Date format row: greyed out until "Show exact dates" is on (#265). */
+    private FeatureItem timestampFormatItem() {
+        FeatureItem item = createClickable(R.drawable.ic_timer, "#64D2FF",
+                getString(R.string.ig_timestamp_format) + "  ·  " + timestampFormatName(localCache.getString("exactTimestampFormat", "")),
+                this::showTimestampFormatDialog);
+        item.requiresAnyOf = Arrays.asList("exactTimestamps");
+        return item;
+    }
+
+    private String timestampFormatName(String pattern) {
+        String sample = ps.reso.instaeclipse.utils.text.TimestampFormat.format(pattern, new java.util.Date(), java.util.Locale.getDefault());
+        return pattern.isEmpty() ? getString(R.string.ig_timestamp_format_default) + "  ·  " + sample : sample;
+    }
+
+    /** Presets shown as today's date in that format, plus a custom pattern with a live preview. */
+    private void showTimestampFormatDialog() {
+        String[] presets = ps.reso.instaeclipse.utils.text.TimestampFormat.PRESETS;
+        String current = localCache.getString("exactTimestampFormat", "");
+        String[] rows = new String[presets.length + 1];
+        int checked = presets.length;
+        for (int i = 0; i < presets.length; i++) {
+            rows[i] = timestampFormatName(presets[i]);
+            if (presets[i].equals(current)) checked = i;
+        }
+        rows[presets.length] = checked == presets.length
+                ? getString(R.string.ig_timestamp_format_custom) + "  ·  " + timestampFormatName(current)
+                : getString(R.string.ig_timestamp_format_custom);
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.ig_timestamp_format)
+                .setSingleChoiceItems(rows, checked, (d, which) -> {
+                    d.dismiss();
+                    if (which == presets.length) showCustomTimestampFormat();
+                    else saveTimestampFormat(presets[which]);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void showCustomTimestampFormat() {
+        android.content.Context c = requireContext();
+        int pad = (int) (20 * getResources().getDisplayMetrics().density);
+        android.widget.LinearLayout box = new android.widget.LinearLayout(c);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        box.setPadding(pad, pad / 2, pad, 0);
+        final android.widget.EditText input = new android.widget.EditText(c);
+        input.setSingleLine(true);
+        String current = localCache.getString("exactTimestampFormat", "");
+        input.setText(current.isEmpty() ? "yyyy-MM-dd HH:mm:ss" : current);
+        final android.widget.TextView preview = new android.widget.TextView(c);
+        preview.setPadding(0, pad / 2, 0, 0);
+        preview.setTextSize(16);
+        box.addView(input);
+        box.addView(preview);
+        Runnable update = () -> {
+            String p = input.getText().toString();
+            preview.setText(ps.reso.instaeclipse.utils.text.TimestampFormat.isValid(p) && !p.isEmpty()
+                    ? ps.reso.instaeclipse.utils.text.TimestampFormat.format(p, new java.util.Date(), java.util.Locale.getDefault())
+                    : getString(R.string.ig_timestamp_format_invalid));
+        };
+        input.addTextChangedListener(new android.text.TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int a, int b, int n) {}
+            public void onTextChanged(CharSequence s, int a, int b, int n) {}
+            public void afterTextChanged(android.text.Editable s) { update.run(); }
+        });
+        update.run();
+        new MaterialAlertDialogBuilder(c)
+                .setTitle(R.string.ig_timestamp_format_custom)
+                .setMessage(R.string.ig_timestamp_format_custom_hint)
+                .setView(box)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    String p = input.getText().toString().trim();
+                    if (!ps.reso.instaeclipse.utils.text.TimestampFormat.isValid(p)) {
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(c, R.string.ig_timestamp_format_invalid,
+                                android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    saveTimestampFormat(p);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void saveTimestampFormat(String pattern) {
+        localCache.edit().putString("exactTimestampFormat", pattern).commit();
+        makeLocalCacheWorldReadable();
+        Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
+        b.putExtra("key", "exactTimestampFormat");
+        b.putExtra("value", pattern);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
+        loadFeedMenu();
     }
 
     private String startupTabLabel() {

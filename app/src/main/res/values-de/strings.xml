@@ -246,6 +246,11 @@
     <string name="ig_like_undo_bar">❤ Gefällt dir · RÜCKGÄNGIG</string>
     <string name="ig_like_undo_cancelled">Like zurückgenommen — neu laden, um das Herz zu aktualisieren</string>
     <string name="ig_dialog_misc_exact_timestamps">Genaue Daten statt „vor 2 Std.“ anzeigen</string>
+    <string name="ig_timestamp_format">Datumsformat</string>
+    <string name="ig_timestamp_format_default">Gerätestandard</string>
+    <string name="ig_timestamp_format_custom">Eigenes…</string>
+    <string name="ig_timestamp_format_custom_hint">Buchstaben: yyyy Jahr · MM Monat · MMM Monatsname · dd Tag · EEE Wochentag · HH Stunde (24 h) · h Stunde (12 h) · mm Minuten · ss Sekunden · a AM/PM. Anderen Text in \'einfache Anführungszeichen\' setzen.</string>
+    <string name="ig_timestamp_format_invalid">Kein gültiges Format</string>
     <string name="ig_dialog_misc_hide_share_create_group">„Gruppe erstellen“ im Teilen-Menü verbergen</string>
     <string name="ig_dialog_misc_show_feature_toasts">Funktionsbenachrichtigungen anzeigen</string>
     <string name="ig_dialog_misc_show_follower_toast">Follower-Benachrichtigung anzeigen</string>

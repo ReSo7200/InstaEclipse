@@ -241,6 +241,11 @@
     <string name="ig_like_undo_bar">❤ Нравится · ОТМЕНИТЬ</string>
     <string name="ig_like_undo_cancelled">Лайк отменён — обновите, чтобы обновить сердечко</string>
     <string name="ig_dialog_misc_exact_timestamps">Показывать точные даты вместо «2 ч назад»</string>
+    <string name="ig_timestamp_format">Формат даты</string>
+    <string name="ig_timestamp_format_default">Как на устройстве</string>
+    <string name="ig_timestamp_format_custom">Свой…</string>
+    <string name="ig_timestamp_format_custom_hint">Буквы: yyyy год · MM месяц · MMM название месяца · dd день · EEE день недели · HH час (24) · h час (12) · mm минуты · ss секунды · a AM/PM. Другой текст пишите в \'одинарных кавычках\'.</string>
+    <string name="ig_timestamp_format_invalid">Неверный формат</string>
     <string name="ig_dialog_misc_hide_share_create_group">Скрыть «Создать группу» в меню «Поделиться»</string>
     <string name="ig_dialog_misc_show_feature_toasts">Показывать уведомления о функциях</string>
     <string name="ig_dialog_misc_show_follower_toast">Показывать уведомление о подписчике</string>
