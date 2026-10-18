@@ -2,7 +2,14 @@ package ps.reso.instaeclipse.utils.core;
 
 import ps.reso.instaeclipse.utils.feature.ExtrasFeatures;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureManager;
@@ -15,17 +22,36 @@ public class SettingsManager {
     /** Application context, for pushing in-app changes to the companion (CompanionSync). */
     private static Context appContext;
 
+    private static final ExecutorService syncExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "InstaEclipse-SettingsSync");
+        t.setDaemon(true);
+        return t;
+    });
+
     public static void init(Context context) {
         hostProcess = context != null && CommonUtils.SUPPORTED_PACKAGES.contains(context.getPackageName());
-        if (appContext == null && context != null) {
-            appContext = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        if (context != null) {
+            Context app = context.getApplicationContext();
+            if (app != null) {
+                appContext = app;
+            } else if (appContext == null) {
+                appContext = context;
+            }
         }
-        if (prefs == null) {
+        if (prefs == null && context != null) {
             prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         }
     }
 
+    public static void setPrefs(SharedPreferences customPrefs) {
+        prefs = customPrefs;
+    }
+
     public static void saveAllFlags() {
+        if (prefs == null && appContext != null) {
+            prefs = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        }
+        if (prefs == null) return;
         // Snapshot to stamp the keys this save changes (see CompanionSync).
         java.util.Map<String, ?> before = new java.util.HashMap<>(prefs.getAll());
         SharedPreferences.Editor editor = prefs.edit();
@@ -220,7 +246,8 @@ public class SettingsManager {
     }
 
     public static void loadAllFlags(Context context) {
-        if (prefs == null) {
+        init(context);
+        if (prefs == null && context != null) {
             prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         }
 
@@ -329,7 +356,7 @@ public class SettingsManager {
         FeatureFlags.spoofLng = readDoublePref(prefs, "spoofLng", 0.0);
         FeatureFlags.spoofLabel = prefs.getString("spoofLabel", "");
         FeatureFlags.spoofRecent = prefs.getString("spoofRecent", "");
-        FeatureFlags.forceReelQuality = prefs.getInt("forceReelQuality", 0);
+        FeatureFlags.forceReelQuality = readIntCompat(prefs, "forceReelQuality", 0);
         FeatureFlags.disableRepost = prefs.getBoolean("disableRepost", false);
         FeatureFlags.hideShareCreateGroup = prefs.getBoolean("hideShareCreateGroup", false);
         FeatureFlags.exactTimestamps = prefs.getBoolean("exactTimestamps", false);
@@ -410,6 +437,24 @@ public class SettingsManager {
             return Double.parseDouble(p.getString(key, String.valueOf(fallback)));
         } catch (Throwable ignored) {
             return fallback;
+        }
+    }
+
+    private static int readIntCompat(SharedPreferences p, String key, int fallback) {
+        try {
+            return p.getInt(key, fallback);
+        } catch (ClassCastException e) {
+            boolean legacy = false;
+            try {
+                legacy = p.getBoolean(key, false);
+            } catch (ClassCastException ignored) {
+            }
+            int migrated = legacy ? 1080 : fallback;
+            try {
+                p.edit().putInt(key, migrated).apply();
+            } catch (Throwable ignored) {
+            }
+            return migrated;
         }
     }
 }

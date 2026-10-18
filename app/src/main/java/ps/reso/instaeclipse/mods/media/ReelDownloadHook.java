@@ -56,7 +56,7 @@ public class ReelDownloadHook {
                         onOptionsBuilt(param);
                     }
                 });
-                ModuleLog.line("(IE|Reel) ✅ hooked: " + hookMethod.getDeclaringClass().getName() + "." + hookMethod.getName());
+                ModuleLog.line("(IE|Reel) hooked: " + hookMethod.getDeclaringClass().getName() + "." + hookMethod.getName());
                 return;
             }
         }
@@ -67,7 +67,7 @@ public class ReelDownloadHook {
                             .usingStrings("ClipsOrganicMediaItemViewMoreOptionsController")));
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(IE|Reel) ❌ ClipsOrganicMediaItemViewMoreOptionsController not found");
+                ModuleLog.line("(IE|Reel) ClipsOrganicMediaItemViewMoreOptionsController not found");
                 return;
             }
 
@@ -110,7 +110,7 @@ public class ReelDownloadHook {
             }
 
             if (target == null) {
-                ModuleLog.line("(IE|Reel) ❌ hook method (Media, ButtonAdder)V not found");
+                ModuleLog.line("(IE|Reel) hook method (Media, ButtonAdder)V not found");
                 return;
             }
 
@@ -126,10 +126,10 @@ public class ReelDownloadHook {
                     onOptionsBuilt(param);
                 }
             });
-            ModuleLog.line("(IE|Reel) ✅ hooked: " + hookMethod.getDeclaringClass().getName() + "." + hookMethod.getName());
+            ModuleLog.line("(IE|Reel) hooked: " + hookMethod.getDeclaringClass().getName() + "." + hookMethod.getName());
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Reel) ❌ install: " + t);
+            ModuleLog.line("(IE|Reel) install: " + t);
         }
     }
 
@@ -177,7 +177,7 @@ public class ReelDownloadHook {
                 else if (n.equals(PostDownloadContextMenuHook.SPEED_CARRIER)) speedOption = v;
             }
             if (downloadOption == null && copyLinkOption == null) {
-                ModuleLog.line("(IE|Reel) ❌ DOWNLOAD/COPY_LINK enum values not found");
+                ModuleLog.line("(IE|Reel) DOWNLOAD/COPY_LINK enum values not found");
                 return;
             }
             final Object download = downloadOption;
@@ -203,7 +203,7 @@ public class ReelDownloadHook {
                             if (wantSpeed && !mutable.contains(speedRow)) mutable.add(speedRow);
                         }
                     } catch (Throwable t) {
-                        ModuleLog.line("(IE|Reel) ❌ options-list patch failed: " + t);
+                        ModuleLog.line("(IE|Reel) options-list patch failed: " + t);
                     }
                 }
             };
@@ -225,7 +225,7 @@ public class ReelDownloadHook {
                             .addUsingField(optionDesc + "->UNSAVE:" + optionDesc)));
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(IE|Reel) ⚠️ Reduced options-list builder not found");
+                ModuleLog.line("(IE|Reel) Reduced options-list builder not found");
                 return;
             }
 
@@ -234,11 +234,11 @@ public class ReelDownloadHook {
             XposedBridge.hookMethod(target, hook);
             DexKitCache.saveMethod("ReelOptionsListBuilder", target);
             FeatureStatusTracker.setHooked("ReelDownload");
-            ModuleLog.line("(IE|Reel) ✅ Options-list patch hooked: " +
+            ModuleLog.line("(IE|Reel) Options-list patch hooked: " +
                     target.getDeclaringClass().getName() + "." + target.getName());
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Reel) ❌ installReduceOptionsListPatch: " + t);
+            ModuleLog.line("(IE|Reel) installReduceOptionsListPatch: " + t);
         }
     }
 
@@ -294,7 +294,7 @@ public class ReelDownloadHook {
                             .usingNumbers(configId)));
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(IE|Reel) ⚠️ Gate method not found for config " + configId);
+                ModuleLog.line("(IE|Reel) Gate method not found for config " + configId);
                 return;
             }
 
@@ -303,11 +303,11 @@ public class ReelDownloadHook {
             XposedBridge.hookMethod(target, hook);
             DexKitCache.saveMethod(cacheKey, target);
             FeatureStatusTracker.setHooked("ReelDownload");
-            ModuleLog.line("(IE|Reel) ✅ Gate unlocked: " +
+            ModuleLog.line("(IE|Reel) Gate unlocked: " +
                     target.getDeclaringClass().getName() + "." + target.getName() + " -> " + forcedResult);
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Reel) ❌ installGateHook(" + cacheKey + "): " + t);
+            ModuleLog.line("(IE|Reel) installGateHook(" + cacheKey + "): " + t);
         }
     }
 
@@ -500,7 +500,7 @@ public class ReelDownloadHook {
                 }
             }
             if (activityField == null) {
-                ModuleLog.line("(IE|Reel) ❌ no Activity field on controller");
+                ModuleLog.line("(IE|Reel) no Activity field on controller");
                 return;
             }
 
@@ -521,7 +521,7 @@ public class ReelDownloadHook {
                 }
             }
             if (buttonAdderMethod == null) {
-                ModuleLog.line("(IE|Reel) ❌ buttonAdderMethod not found");
+                ModuleLog.line("(IE|Reel) buttonAdderMethod not found");
                 return;
             }
 
@@ -535,7 +535,7 @@ public class ReelDownloadHook {
                     I18n.t(activity, R.string.ig_dl_title), icon);
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Reel) ❌ onOptionsBuilt: " + t);
+            ModuleLog.line("(IE|Reel) onOptionsBuilt: " + t);
         }
     }
 

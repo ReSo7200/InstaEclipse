@@ -8,15 +8,19 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import ps.reso.instaeclipse.R;
 
 /**
  * The module's in-Instagram dialog look (same as Search comments): rounded card that follows
@@ -54,7 +58,7 @@ public class IeDialog {
         text = dark ? 0xFFF5F5F5 : 0xFF111111;
         sub = dark ? 0xFF9A9AA0 : 0xFF6B6B70;
         line = dark ? 0x22FFFFFF : 0x14000000;
-        accent = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.accentOr(0xFF0095F6);
+        accent = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.accentOr(dark ? 0xFFFFFFFF : 0xFF111111);
         border = dark ? 0x33FFFFFF : 0x1F000000;
 
         dialog = new Dialog(ctx);
@@ -72,11 +76,13 @@ public class IeDialog {
         titleView.setTextSize(19);
         titleView.setTypeface(Typeface.DEFAULT_BOLD);
         header.addView(titleView, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        TextView close = new TextView(ctx);
-        close.setText("✕");
-        close.setTextSize(18);
-        close.setTextColor(sub);
-        close.setPadding(dp(10), dp(4), dp(4), dp(4));
+        ImageView close = new ImageView(ctx);
+        Drawable closeIcon = DialogUtils.moduleIcon(R.drawable.ic_close, sub);
+        if (closeIcon != null) close.setImageDrawable(closeIcon);
+        int closePad = dp(6);
+        close.setPadding(closePad, closePad, closePad, closePad);
+        close.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        close.setLayoutParams(new LinearLayout.LayoutParams(dp(26), dp(26)));
         close.setOnClickListener(v -> { dismiss(); if (onClose != null) onClose.run(); });
         header.addView(close);
         card.addView(header);
@@ -144,27 +150,48 @@ public class IeDialog {
     /** One tappable row per label; the row at {@code checked} (or -1) is marked. Tapping runs the
      *  listener with the index and closes the dialog. */
     public IeDialog choices(CharSequence[] labels, int checked, java.util.function.IntConsumer onPick) {
+        return choices(labels, null, checked, onPick);
+    }
+
+    public IeDialog choices(CharSequence[] labels, int[] icons, int checked, java.util.function.IntConsumer onPick) {
         for (int i = 0; i < labels.length; i++) {
             final int idx = i;
             boolean on = i == checked;
             LinearLayout row = new LinearLayout(ctx);
             row.setGravity(Gravity.CENTER_VERTICAL);
             row.setPadding(dp(16), dp(13), dp(14), dp(13));
+            boolean customTheme = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.themeEnabled();
+            int activeAccent = customTheme ? accent : (dark ? 0xFFFFFFFF : 0xFF111111);
             GradientDrawable g = cardBg();
-            if (on) g.setStroke(Math.max(1, dp(1.5f)), accent);
+            if (on) g.setStroke(Math.max(1, dp(1.5f)), activeAccent);
             row.setBackground(g);
+
+            if (icons != null && i < icons.length && icons[i] != 0) {
+                ImageView iconView = new ImageView(ctx);
+                Drawable ic = DialogUtils.moduleIcon(icons[i], on ? activeAccent : text);
+                if (ic != null) iconView.setImageDrawable(ic);
+                int s = dp(20);
+                LinearLayout.LayoutParams icLp = new LinearLayout.LayoutParams(s, s);
+                icLp.rightMargin = dp(12);
+                iconView.setLayoutParams(icLp);
+                iconView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                row.addView(iconView);
+            }
+
             TextView t = new TextView(ctx);
             t.setText(labels[i]);
-            t.setTextColor(on ? accent : text);
+            t.setTextColor(text);
             t.setTextSize(15);
             if (on) t.setTypeface(Typeface.DEFAULT_BOLD);
             row.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
             if (on) {
-                TextView tick = new TextView(ctx);
-                tick.setText("✓");
-                tick.setTextColor(accent);
-                tick.setTextSize(16);
-                tick.setTypeface(Typeface.DEFAULT_BOLD);
+                ImageView tick = new ImageView(ctx);
+                Drawable tickIcon = DialogUtils.moduleIcon(R.drawable.ic_check_circle, activeAccent);
+                if (tickIcon != null) tick.setImageDrawable(tickIcon);
+                int s = dp(20);
+                LinearLayout.LayoutParams tLp = new LinearLayout.LayoutParams(s, s);
+                tick.setLayoutParams(tLp);
+                tick.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                 row.addView(tick);
             }
             row.setOnClickListener(v -> { dismiss(); onPick.accept(idx); });
@@ -229,7 +256,9 @@ public class IeDialog {
         cb.setChecked(checked);
         cb.setTextColor(text);
         cb.setTextSize(15);
-        cb.setButtonTintList(ColorStateList.valueOf(accent));
+        boolean customTheme = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.themeEnabled();
+        int activeAccent = customTheme ? accent : (dark ? 0xFFFFFFFF : 0xFF111111);
+        cb.setButtonTintList(ColorStateList.valueOf(activeAccent));
         cb.setPadding(dp(6), dp(6), 0, dp(6));
         view(cb);
         return cb;
@@ -250,8 +279,11 @@ public class IeDialog {
         b.setTypeface(Typeface.DEFAULT_BOLD);
         b.setGravity(Gravity.CENTER);
         b.setPadding(dp(18), dp(10), dp(18), dp(10));
-        b.setTextColor(filled ? Color.WHITE : sub);
-        if (filled) b.setBackground(round(accent, 20));
+        boolean customTheme = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.themeEnabled();
+        int filledBg = customTheme ? accent : (dark ? 0xFFFFFFFF : 0xFF111111);
+        int filledTextColor = customTheme ? Color.WHITE : (dark ? 0xFF000000 : 0xFFFFFFFF);
+        b.setTextColor(filled ? filledTextColor : sub);
+        if (filled) b.setBackground(round(filledBg, 20));
         b.setOnClickListener(v -> {
             if (!keepOpen) dismiss();
             if (action != null) action.run();

@@ -54,11 +54,11 @@ public class LockDirectMessagesHook {
         try {
             XposedHelpers.findAndHookMethod("com.instagram.modal.ModalActivity",
                     classLoader, "onResume", start);
-        } catch (Throwable t) { ModuleLog.line("(IE|LockDMs) ⚠️ modal onResume: " + t.getMessage()); }
+        } catch (Throwable t) { ModuleLog.line("(IE|LockDMs) modal onResume: " + t.getMessage()); }
         // Reflect status at startup (the gate only runs when the inbox opens, so mark it hooked
         // now when armed — otherwise the load toast shows a ❌ even though it works).
         if (FeatureFlags.lockDirectMessages) FeatureStatusTracker.setHooked("LockDirectMessages");
-        ModuleLog.line("(IE|LockDMs) ✅ installed");
+        ModuleLog.line("(IE|LockDMs) installed");
     }
 
     /** Entry point usable from any activity hook (e.g. UIHookManager.setupHooks for the main tab). */
@@ -114,7 +114,7 @@ public class LockDirectMessagesHook {
             });
             gateIfInbox(a);
         } catch (Throwable t) {
-            ModuleLog.line("(IE|LockDMs) ⚠️ watch: " + t.getMessage());
+            ModuleLog.line("(IE|LockDMs) watch: " + t.getMessage());
         }
     }
 
@@ -220,11 +220,6 @@ public class LockDirectMessagesHook {
         clp.bottomMargin = dp(a, 40);
         col.setLayoutParams(clp);
 
-        TextView lock = new TextView(a);
-        lock.setText("🔒");
-        lock.setTextSize(34);
-        lock.setGravity(Gravity.CENTER);
-        lock.setPadding(0, 0, 0, dp(a, 8));
 
         TextView title = new TextView(a);
         title.setText(wholeApp ? "Enter passcode to open Instagram" : "Enter passcode to open DMs");
@@ -296,7 +291,6 @@ public class LockDirectMessagesHook {
             return false;
         });
 
-        col.addView(lock);
         col.addView(title);
         col.addView(code);
         col.addView(error);
@@ -364,7 +358,7 @@ public class LockDirectMessagesHook {
                         }
                     });
         } catch (Throwable t) {
-            ModuleLog.line("(IE|LockDMs) ⚠️ biometric: " + t.getMessage());
+            ModuleLog.line("(IE|LockDMs) biometric: " + t.getMessage());
         }
     }
 

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -303,9 +304,16 @@ public class CommentSearchHook {
         float d = ctx.getResources().getDisplayMetrics().density;
         TextView pill = new TextView(ctx);
         pill.setTag("ie_comment_search");
-        pill.setText("🔍 " + I18n.t(ctx, R.string.ig_comment_search));
+        pill.setText(I18n.t(ctx, R.string.ig_comment_search));
         pill.setTextColor(Color.WHITE);
         pill.setTextSize(13);
+        android.graphics.drawable.Drawable searchIcon = ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_search, Color.WHITE);
+        if (searchIcon != null) {
+            int s = (int) (14 * d);
+            searchIcon.setBounds(0, 0, s, s);
+            pill.setCompoundDrawables(searchIcon, null, null, null);
+            pill.setCompoundDrawablePadding((int) (6 * d));
+        }
         int ph = (int) (12 * d), pv = (int) (6 * d);
         pill.setPadding(ph, pv, ph, pv);
         GradientDrawable bg = new GradientDrawable();
@@ -352,7 +360,13 @@ public class CommentSearchHook {
                 ViewGroup.LayoutParams hl = headerParams(row, (int) (12 * d));
                 if (hl != null) {
                     // compact in the header (the full label would cover the centred title)
-                    pill.setText("🔍");
+                    pill.setText("");
+                    if (searchIcon != null) {
+                        int s = (int) (16 * d);
+                        searchIcon.setBounds(0, 0, s, s);
+                        pill.setCompoundDrawables(searchIcon, null, null, null);
+                        pill.setCompoundDrawablePadding(0);
+                    }
                     pill.setContentDescription(I18n.t(ctx, R.string.ig_comment_search));
                     row.addView(pill, hl);
                     if (!(row instanceof FrameLayout)) { // centred like the title: move it to the row start
@@ -466,11 +480,13 @@ public class CommentSearchHook {
         title.setTextSize(19);
         title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         header.addView(title, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        TextView close = new TextView(ctx);
-        close.setText("✕");
-        close.setTextSize(18);
-        close.setTextColor(cSub);
-        close.setPadding((int) (10 * d), (int) (4 * d), (int) (4 * d), (int) (4 * d));
+        ImageView close = new ImageView(ctx);
+        android.graphics.drawable.Drawable closeIcon = ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_close, cSub);
+        if (closeIcon != null) close.setImageDrawable(closeIcon);
+        int closePad = (int) (6 * d);
+        close.setPadding(closePad, closePad, closePad, closePad);
+        close.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        close.setLayoutParams(new LinearLayout.LayoutParams((int) (24 * d), (int) (24 * d)));
         close.setOnClickListener(v -> dlg.dismiss());
         header.addView(close);
         card.addView(header);
@@ -480,9 +496,11 @@ public class CommentSearchHook {
         field.setGravity(Gravity.CENTER_VERTICAL);
         field.setBackground(round(cField, 14 * d));
         field.setPadding((int) (12 * d), 0, (int) (6 * d), 0);
-        TextView glass = new TextView(ctx);
-        glass.setText("🔍");
-        glass.setTextSize(15);
+        ImageView glass = new ImageView(ctx);
+        android.graphics.drawable.Drawable glassIcon = ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_search, cSub);
+        if (glassIcon != null) glass.setImageDrawable(glassIcon);
+        glass.setLayoutParams(new LinearLayout.LayoutParams((int) (18 * d), (int) (18 * d)));
+        glass.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         field.addView(glass);
         EditText et = new EditText(ctx);
         et.setSingleLine(true);
@@ -493,11 +511,13 @@ public class CommentSearchHook {
         et.setHint(I18n.t(ctx, R.string.ig_comment_search_field_hint));
         et.setPadding((int) (8 * d), (int) (12 * d), (int) (8 * d), (int) (12 * d));
         field.addView(et, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        TextView clear = new TextView(ctx);
-        clear.setText("✕");
-        clear.setTextColor(cSub);
-        clear.setTextSize(14);
-        clear.setPadding((int) (10 * d), (int) (8 * d), (int) (10 * d), (int) (8 * d));
+        ImageView clear = new ImageView(ctx);
+        android.graphics.drawable.Drawable clearIcon = ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_close, cSub);
+        if (clearIcon != null) clear.setImageDrawable(clearIcon);
+        int clPad = (int) (6 * d);
+        clear.setPadding(clPad, clPad, clPad, clPad);
+        clear.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        clear.setLayoutParams(new LinearLayout.LayoutParams((int) (24 * d), (int) (24 * d)));
         clear.setVisibility(View.GONE);
         clear.setOnClickListener(v -> et.setText(""));
         field.addView(clear);

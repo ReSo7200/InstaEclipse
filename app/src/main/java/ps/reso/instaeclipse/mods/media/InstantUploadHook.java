@@ -476,13 +476,11 @@ public class InstantUploadHook {
                 int s = dp(act, 24);
                 iv.setLayoutParams(new FrameLayout.LayoutParams(s, s, Gravity.CENTER));
                 icon = iv;
-            } else {                                    // module resources unavailable: emoji glyph
-                TextView tv = new TextView(act);
-                tv.setText("🖼");
-                tv.setTextSize(18);
-                tv.setLayoutParams(new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-                icon = tv;
+            } else {
+                ImageView iv = new ImageView(act);
+                int s = dp(act, 24);
+                iv.setLayoutParams(new FrameLayout.LayoutParams(s, s, Gravity.CENTER));
+                icon = iv;
             }
             icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
             btn.addView(icon);

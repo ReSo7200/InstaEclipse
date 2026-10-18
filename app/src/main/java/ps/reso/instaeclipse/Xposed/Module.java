@@ -60,6 +60,7 @@ import ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine;
 import ps.reso.instaeclipse.mods.ui.theme.IgThemeHook;
 import ps.reso.instaeclipse.utils.core.CommonUtils;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
+import ps.reso.instaeclipse.utils.core.NativeLibLoader;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureManager;
@@ -100,8 +101,27 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
-        // Ensure preferences are loaded
+        if (CommonUtils.MY_PACKAGE_NAME.equals(lpparam.packageName)) {
+            try {
+                XposedHelpers.findAndHookMethod(
+                    "ps.reso.instaeclipse.core.ModuleStatus",
+                    lpparam.classLoader,
+                    "isModuleActiveInternal",
+                    de.robv.android.xposed.XC_MethodReplacement.returnConstant(true)
+                );
+            } catch (Throwable ignored) {}
 
+            try {
+                String framework = detectFrameworkName();
+                XposedHelpers.findAndHookMethod(
+                    "ps.reso.instaeclipse.core.ModuleStatus",
+                    lpparam.classLoader,
+                    "getFrameworkInternal",
+                    de.robv.android.xposed.XC_MethodReplacement.returnConstant(framework)
+                );
+            } catch (Throwable ignored) {}
+            return;
+        }
 
         // Hook into Instagram and its clones
         // Debug kill switch: `adb shell setprop debug.instaeclipse.off 1` loads the module but
@@ -118,13 +138,18 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             }
             try {
                 if (dexKitBridge == null) {
-                    // Load the .so file from your module (if not already loaded)
-                    System.load(moduleLibDir + "/libdexkit.so");
-                    // ModuleLog.line("libdexkit.so loaded successfully.");
-
-                    // Initialize DexKitBridge with the target app's APK
-                    dexKitBridge = DexKitBridge.create(lpparam.appInfo.sourceDir);
-                    // ModuleLog.line("DexKitBridge initialized with target APK: " + lpparam.appInfo.sourceDir);
+                    try {
+                        boolean loaded = NativeLibLoader.loadDexKit(
+                                null, moduleSourceDir, moduleLibDir,
+                                (lpparam.appInfo != null) ? lpparam.appInfo.nativeLibraryDir : null);
+                        if (loaded) {
+                            dexKitBridge = DexKitBridge.create(lpparam.appInfo.sourceDir);
+                        } else {
+                            ModuleLog.line("(InstaEclipse): libdexkit.so could not be resolved, continuing without DexKit.");
+                        }
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse): DexKit init failed for " + lpparam.packageName + ": " + t.getMessage());
+                    }
                 }
 
                 // Use the target app's ClassLoader
@@ -133,8 +158,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                 // Call the method to hook the target app
                 hookInstagram(lpparam);
 
-            } catch (Exception e) {
-                ModuleLog.line("(InstaEclipse): Failed to initialize DexKitBridge for " + lpparam.packageName + ": " + e.getMessage());
+            } catch (Throwable t) {
+                ModuleLog.line("(InstaEclipse): Failed to hook " + lpparam.packageName + ": " + t.getMessage());
             }
         }
     }
@@ -365,6 +390,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | HideSuggested): ❌ Failed to hook");
                     }
+
 
                     // Ads Blocker
                     try {
@@ -966,5 +992,48 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
         // Only the companion (holding the signature permission) can reach this receiver.
         ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver, filter);
+    }
+
+    private static String detectFrameworkName() {
+        try {
+            java.lang.reflect.Field tagField = de.robv.android.xposed.XposedBridge.class.getDeclaredField("TAG");
+            tagField.setAccessible(true);
+            Object tag = tagField.get(null);
+            if (tag != null) {
+                String tagStr = tag.toString().toLowerCase();
+                if (tagStr.contains("lspatch")) return "LSPatch";
+                if (tagStr.contains("lsposed")) return "LSPosed";
+                if (tagStr.contains("edxp")) return "EdXposed";
+            }
+        } catch (Throwable ignored) {}
+
+        try {
+            Class.forName("org.lsposed.lspatch.loader.XposedContext");
+            return "LSPatch";
+        } catch (Throwable ignored) {}
+        try {
+            Class.forName("org.lsposed.lspatch.metaloader.Metaloader");
+            return "LSPatch";
+        } catch (Throwable ignored) {}
+        try {
+            Class.forName("org.lsposed.lspd.service.ILSPManager");
+            return "LSPosed";
+        } catch (Throwable ignored) {}
+
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader("/proc/self/maps"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String lower = line.toLowerCase();
+                if (lower.contains("lspatch")) return "LSPatch";
+                if (lower.contains("lsposed")) return "LSPosed";
+                if (lower.contains("edxp") || lower.contains("edxposed")) return "EdXposed";
+                if (lower.contains("sandhook")) return "SandHook";
+                if (lower.contains("taichi")) return "TaiChi";
+            }
+        } catch (Throwable ignored) {}
+
+        if (System.getProperty("vxp") != null) return "VirtualXposed";
+
+        return "LSPosed";
     }
 }

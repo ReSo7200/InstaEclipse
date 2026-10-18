@@ -1,11 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace 'ps.reso.instaeclipse'
-    compileSdk 34
-    buildFeatures { buildConfig true }
+    compileSdk 37
 
     defaultConfig {
         applicationId "ps.reso.instaeclipse"
@@ -30,35 +30,62 @@ android {
     }
 
     testOptions {
+        unitTests.returnDefaultValues = true
         unitTests.all {
             ['instaeclipse.ffmpeg', 'instaeclipse.ffprobe', 'instaeclipse.fixtureOutput'].each { key ->
                 if (System.getProperty(key) != null) systemProperty key, System.getProperty(key)
             }
         }
     }
-    packagingOptions {
+    buildFeatures {
+        compose true
+        buildConfig true
+    }
+
+    packaging {
         jniLibs {
             useLegacyPackaging true
         }
+        resources {
+            excludes += [
+                '/META-INF/{AL2.0,LGPL2.1}',
+                '/META-INF/*.version',
+                'DebugProbesKt.bin',
+                '/META-INF/INDEX.LIST'
+            ]
+        }
     }
+
 }
 
 dependencies {
+    def composeBom = platform(libs.compose.bom)
+    implementation composeBom
+    implementation libs.compose.ui
+    implementation libs.compose.ui.graphics
+    implementation libs.compose.ui.tooling.preview
+    implementation libs.compose.material3
+    implementation libs.compose.material3.windowSizeClass
+    implementation libs.compose.material.icons.extended
+    implementation libs.compose.animation
+    implementation libs.activity.compose
+    implementation libs.lifecycle.compose
+    debugImplementation libs.compose.ui.tooling
+
     // Core Android dependencies
     implementation libs.appcompat
     implementation libs.material
-    implementation libs.constraintlayout
-    implementation libs.gson
     implementation libs.dexkit
-    implementation 'com.google.android.material:material:1.12.0'
-    implementation "androidx.documentfile:documentfile:1.1.0"
+    implementation libs.gson
+    implementation libs.documentfile
+    implementation libs.coroutines.android
     implementation libs.osmdroid
 
-    // External library for shared preferences
-    implementation libs.fileprefs
     // Testing dependencies
     testImplementation libs.junit
     testRuntimeOnly files('libs/api-82.jar')
+    testImplementation libs.coroutines.test
+    testImplementation libs.json
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core.v361
 

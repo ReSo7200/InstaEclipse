@@ -65,7 +65,7 @@ public class DisableVideoAutoPlayHook {
             );
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(InstaEclipse | AutoPlayDisable): ❌ No matching methods found.");
+                ModuleLog.line("(InstaEclipse | AutoPlayDisable): No matching methods found.");
                 return;
             }
 
@@ -80,9 +80,9 @@ public class DisableVideoAutoPlayHook {
                 }
             }
 
-            ModuleLog.line("(InstaEclipse | AutoPlayDisable): ❌ No matching methods with correct signature.");
+            ModuleLog.line("(InstaEclipse | AutoPlayDisable): No matching methods with correct signature.");
         } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse | AutoPlayDisable): ❌ Error during method discovery: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | AutoPlayDisable): Error during method discovery: " + e.getMessage());
         }
     }
 
@@ -91,10 +91,10 @@ public class DisableVideoAutoPlayHook {
             Method targetMethod = method.getMethodInstance(Module.hostClassLoader);
             DexKitCache.saveMethod("AutoPlayDisable", targetMethod);
             hookMethod(targetMethod);
-            ModuleLog.line("(InstaEclipse | AutoPlayDisable): ✅ Hooked (dynamic check): " +
+            ModuleLog.line("(InstaEclipse | AutoPlayDisable): Hooked (dynamic check): " +
                     method.getClassName() + "." + method.getName());
         } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse | AutoPlayDisable): ❌ Error hooking method: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | AutoPlayDisable): Error hooking method: " + e.getMessage());
         }
     }
 

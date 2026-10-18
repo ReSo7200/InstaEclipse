@@ -20,7 +20,7 @@
     <string name="module_status_enabled">Status do Módulo: Habilitado</string>
     <string name="module_active">O módulo está ativo e funcionando.</string>
     <string name="checking_instagram">Verificando o Instagram</string>
-    <string name="installed_instagram_version">Instagram Instalado - Versão: </string>
+    <string name="installed_instagram_version">Instagram Instalado - Versão:</string>
     <string name="not_installed_instagram">O Instagram não está instalado.</string>
     <string name="error_instagram">Erro ao verificar o status do Instagram.</string>
 
@@ -144,7 +144,7 @@
     <string name="ig_dialog_dev_export">Exportar configuração do desenvolvedor</string>
     <string name="ig_dialog_dev_restore_default_config">Restaurar configuração padrão</string>
     <string name="ig_dialog_dev_restore_default_config_confirm">Isso substituirá a Configuração de Desenvolvedor atual pelo padrão integrado. Continuar?</string>
-    <string name="ig_toast_default_config_restored">✅ Configuração padrão restaurada.</string>
+    <string name="ig_toast_default_config_restored">Configuração padrão restaurada.</string>
     <string name="ig_dialog_dev_remove_build_expired">Remover pop-up de build expirada</string>
     <string name="ig_dialog_unable_open_ui">Não foi possível abrir a interface do InstaEclipse.</string>
     <string name="ig_dialog_instagram_not_ready">Instagram não está aberto ou não está pronto.</string>
@@ -154,15 +154,15 @@
     <string name="export_config_success">Configuração exportada com sucesso.</string>
     <string name="export_config_failed">Falha ao salvar: %1$s</string>
     <string name="export_invalid_uri">URI inválida</string>
-    <string name="ig_toast_config_imported">✅ Configuração importada.</string>
-    <string name="ig_toast_config_import_failed">❌ Falha ao importar configuração.</string>
+    <string name="ig_toast_config_imported">Configuração importada.</string>
+    <string name="ig_toast_config_import_failed">Falha ao importar configuração.</string>
 
     <!-- JsonImportActivity -->
     <string name="json_select_config">Selecionar config JSON</string>
-    <string name="json_target_not_specified">❌ Pacote de destino não especificado.</string>
-    <string name="json_sent">✅ Enviado ao Instagram.</string>
-    <string name="json_not_valid">❌ Não é um ficheiro JSON válido.</string>
-    <string name="json_read_failed">❌ Falha ao ler ficheiro: %1$s</string>
+    <string name="json_target_not_specified">Pacote de destino não especificado.</string>
+    <string name="json_sent">Enviado ao Instagram.</string>
+    <string name="json_not_valid">Não é um ficheiro JSON válido.</string>
+    <string name="json_read_failed">Falha ao ler ficheiro: %1$s</string>
     <string name="json_cancelled">Cancelado ou nenhum ficheiro selecionado.</string>
     <string name="ig_dialog_ghost_hide_dm_seen">Ocultar leitura em mensagens diretas</string>
     <string name="ig_dialog_ghost_hide_typing">Ocultar indicador de digitação</string>
@@ -238,7 +238,7 @@
     <string name="ig_dialog_misc_viewer_search">Pesquisar Visualizadores da Sua Story</string>
     <string name="ig_viewer_search_hint">Pesquisar visualizadores</string>
     <string name="ig_dialog_misc_like_undo">Janela para Anular Gostos (4 s)</string>
-    <string name="ig_like_undo_bar">❤ Gostou · ANULAR</string>
+    <string name="ig_like_undo_bar">Gostou · ANULAR</string>
     <string name="ig_like_undo_cancelled">Gosto cancelado — atualize para atualizar o coração</string>
     <string name="ig_dialog_misc_exact_timestamps">Mostrar Datas Exatas em Vez de \"há 2 h\"</string>
     <string name="ig_timestamp_format">Formato da data</string>
@@ -260,7 +260,7 @@
     <string name="ig_comment_select_part">Selecionar parte para copiar</string>
     <string name="ig_comment_select_title">Selecionar para copiar</string>
     <string name="ig_comment_copy_selected">Copiar seleção</string>
-    <string name="ig_toast_comment_copied">✅ Copiado para a área de transferência!</string>
+    <string name="ig_toast_comment_copied">Copiado para a área de transferência!</string>
     <string name="ig_dialog_downloader_settings">Configurações do transferidor</string>
     <string name="ig_dialog_downloader_posts">Transferir publicações</string>
     <string name="ig_dialog_downloader_stories">Transferir stories</string>
@@ -275,10 +275,10 @@
     <string name="ig_dialog_backup_failed">Falha ao criar backup: %1$s</string>
     <string name="ig_dialog_about_github">GitHub</string>
     <string name="ig_dialog_about_telegram">Telegram</string>
-    <string name="ig_dialog_restart_message">⚠️ Limpar cache da aplicação e reiniciar?</string>
+    <string name="ig_dialog_restart_message">Limpar cache da aplicação e reiniciar?</string>
     <string name="ig_dialog_clear_cache">Limpar Cache de Hooks</string>
     <string name="ig_dialog_section_clear_cache">Limpar Cache de Hooks</string>
-    <string name="ig_dialog_clear_cache_message">⚠️ Isso forçará o InstaEclipse a re-escanear o Instagram na próxima inicialização. O app será reiniciado.</string>
+    <string name="ig_dialog_clear_cache_message">Isso forçará o InstaEclipse a re-escanear o Instagram na próxima inicialização. O app será reiniciado.</string>
     <string name="ig_dialog_clear_cache_now">Limpar Cache &amp; Reiniciar</string>
     <string name="ig_dialog_restart_now">Reiniciar agora</string>
     <string name="ig_dialog_restart_not_found">Não foi possível encontrar a aplicação para reiniciar.</string>
@@ -288,12 +288,12 @@
     <string name="ig_toast_ghost_no_options">Nenhuma opção do Modo Fantasma selecionada!</string>
     <string name="ig_toast_ghost_enabled">Modo Fantasma ativado</string>
     <string name="ig_toast_ghost_disabled">Modo Fantasma desativado</string>
-    <string name="ig_toast_seen_sent">✅ Lido enviado</string>
-    <string name="ig_toast_channel_seen_sent">✅ Canal lido enviado</string>
+    <string name="ig_toast_seen_sent">Lido enviado</string>
+    <string name="ig_toast_channel_seen_sent">Canal lido enviado</string>
 
     <!-- Toast: Follower status -->
-    <string name="ig_toast_follows_you">segue você ✅</string>
-    <string name="ig_toast_not_follows_you">não segue você ❌</string>
+    <string name="ig_toast_follows_you">segue você</string>
+    <string name="ig_toast_not_follows_you">não segue você</string>
 
     <!-- Toast: App settings -->
     <string name="ig_toast_settings_applied">Configurações aplicadas!</string>
@@ -362,7 +362,7 @@
     <string name="feat_downloader_reset_folder">Redefinir pasta de transferência</string>
 
     <!-- multiple versions -->
-    <string name="multiple_versions_detected">⚠️ Várias versões detetadas</string>
+    <string name="multiple_versions_detected">Várias versões detetadas</string>
 
     <!-- Story mentions dialog -->
     <string name="ig_mention_dialog_title">Menções de história</string>
@@ -373,7 +373,7 @@
     <!-- Toast: Downloader (service) -->
     <string name="ig_toast_no_download_folder">Nenhuma pasta de transferência definida</string>
     <string name="ig_toast_file_saved">Guardado: %1$s</string>
-    <string name="ig_toast_features_loaded">InstaEclipse carregado 🎯</string>
+    <string name="ig_toast_features_loaded">InstaEclipse carregado</string>
 
     <!-- Update check dialog -->
     <string name="ig_update_title">Atualização disponível</string>
@@ -394,7 +394,7 @@
     <string name="theme_saved">Tema salvo</string>
     <string name="theme_pick_color">Escolha uma cor</string>
     <string name="theme_apply_color">Aplicar</string>
-    <string name="theme_rgba_format">R %1$d  G %2$d  B %3$d  A %4$d</string>
+    <string name="theme_rgba_format">R %1$d G %2$d B %3$d A %4$d</string>
     <string name="theme_alpha_format">Opacidade: %1$d%%</string>
     <string name="theme_slot_background">Fundo</string>
     <string name="theme_slot_surface">Superfície</string>
@@ -551,7 +551,7 @@
     <string name="ig_caption_copy_title">Copiar Legenda</string>
     <string name="ig_caption_copy_full">Copiar Legenda Completa</string>
     <string name="ig_caption_copy_none">Esta publicação não tem legenda</string>
-    <string name="ig_caption_copied">✅ Legenda copiada para a área de transferência!</string>
+    <string name="ig_caption_copied">Legenda copiada para a área de transferência!</string>
     <string name="ig_dialog_downloader_copy_link">Copiar Ligação da Multimédia</string>
     <string name="ig_copy_link_title">Copiar Ligação da Multimédia</string>
     <string name="ig_copy_link_copied">Ligação da multimédia copiada para a área de transferência</string>
@@ -566,8 +566,8 @@
     <string name="ig_instant_save_none">Nenhuma multimédia Instant encontrada</string>
     <string name="ig_instant_upload_title">Carregar Instant da Galeria</string>
     <string name="ig_dialog_misc_upload_instants">Carregar Instant da Galeria</string>
-    <string name="ig_instant_upload_chip">🖼 Galeria</string>
-    <string name="ig_instant_upload_chip_ready">✓ Pronto — toque no obturador</string>
+    <string name="ig_instant_upload_chip">Galeria</string>
+    <string name="ig_instant_upload_chip_ready">Pronto — toque no obturador</string>
     <string name="ig_instant_upload_ready">Selecionado! Toque no obturador para o enviar como Instant</string>
     <string name="ig_instant_upload_fail">Não foi possível carregar essa imagem</string>
     <string name="ig_story_download_choice_title">Transferir story</string>
@@ -578,8 +578,8 @@
     <string name="ig_story_cache_cleared">Stories em cache eliminadas</string>
     <string name="ig_dialog_ghost_chat_export">Botão de exportar conversa nas conversas</string>
     <string name="ig_chat_export">Exportar conversa</string>
-    <string name="ig_locked_coll_setting">Coleções guardadas bloqueáveis (botão 🔒 numa coleção; usa o código definido no Instagram)</string>
-    <string name="ig_locked_coll_setting_short">Coleções guardadas bloqueáveis (🔒 numa coleção)</string>
+    <string name="ig_locked_coll_setting">Coleções guardadas bloqueáveis (botão numa coleção; usa o código definido no Instagram)</string>
+    <string name="ig_locked_coll_setting_short">Coleções guardadas bloqueáveis (numa coleção)</string>
     <string name="ig_locked_coll_title">Coleção bloqueada</string>
     <string name="ig_locked_coll_open">Abrir</string>
     <string name="ig_locked_coll_hint">Código</string>

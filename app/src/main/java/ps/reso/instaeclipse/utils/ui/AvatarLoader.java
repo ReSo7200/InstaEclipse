@@ -34,6 +34,22 @@ public final class AvatarLoader {
     private static final ExecutorService POOL = Executors.newFixedThreadPool(3);
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
+    public static Bitmap getCached(String url) {
+        if (url == null) return null;
+        return CACHE.get(url);
+    }
+
+    public static Bitmap fetchBitmap(String url) {
+        if (url == null || url.trim().isEmpty()) return null;
+        Bitmap cached = CACHE.get(url);
+        if (cached != null) return cached;
+        Bitmap bmp = fetch(url);
+        if (bmp != null) {
+            CACHE.put(url, bmp);
+        }
+        return bmp;
+    }
+
     /** Load {@code url} into {@code target} as a circle. The target is tagged with the URL so a
      *  late response for a reused view is ignored. */
     public static void loadCircular(final String url, final ImageView target) {
@@ -44,9 +60,8 @@ public final class AvatarLoader {
         if (cached != null) { apply(target, cached); return; }
 
         POOL.execute(() -> {
-            final Bitmap bmp = fetch(url);
+            final Bitmap bmp = fetchBitmap(url);
             if (bmp == null) return;
-            CACHE.put(url, bmp);
             MAIN.post(() -> {
                 if (url.equals(target.getTag())) apply(target, bmp);
             });
@@ -60,18 +75,32 @@ public final class AvatarLoader {
         iv.setVisibility(View.VISIBLE);
     }
 
-    private static Bitmap fetch(String url) {
+    private static Bitmap fetch(String urlString) {
         HttpURLConnection conn = null;
         try {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setInstanceFollowRedirects(true); // github.com/<user>.png 302s to the CDN
-            conn.setConnectTimeout(8000);
-            conn.setReadTimeout(8000);
-            conn.setRequestProperty("User-Agent", "InstaEclipse");
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) return null;
-            try (InputStream in = conn.getInputStream()) {
-                return BitmapFactory.decodeStream(in);
+            String currentUrl = urlString;
+            for (int redirects = 0; redirects < 5; redirects++) {
+                conn = (HttpURLConnection) new URL(currentUrl).openConnection();
+                conn.setInstanceFollowRedirects(true);
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
+                conn.setRequestProperty("User-Agent", "InstaEclipse");
+                int code = conn.getResponseCode();
+                if (code == HttpURLConnection.HTTP_MOVED_PERM ||
+                    code == HttpURLConnection.HTTP_MOVED_TEMP ||
+                    code == 307 || code == 308) {
+                    String newUrl = conn.getHeaderField("Location");
+                    if (newUrl == null) return null;
+                    conn.disconnect();
+                    currentUrl = newUrl;
+                    continue;
+                }
+                if (code != HttpURLConnection.HTTP_OK) return null;
+                try (InputStream in = conn.getInputStream()) {
+                    return BitmapFactory.decodeStream(in);
+                }
             }
+            return null;
         } catch (Throwable ignored) {
             return null;
         } finally {

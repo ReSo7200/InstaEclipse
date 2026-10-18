@@ -52,7 +52,7 @@ public class AdBlocker {
                 );
 
                 if (methods.isEmpty()) {
-                    ModuleLog.line("(InstaEclipse | AdBlocker): ⚠️ No methods found referencing '" + marker + "'");
+                    ModuleLog.line("(InstaEclipse | AdBlocker): No methods found referencing '" + marker + "'");
                     continue;
                 }
 
@@ -65,23 +65,23 @@ public class AdBlocker {
                         DexKitCache.saveMethod("AdBlocker", targetMethod);
                         XposedBridge.hookMethod(targetMethod, hook);
 
-                        ModuleLog.line("(InstaEclipse | AdBlocker): ✅ Hooked (dynamic check, marker='" + marker + "'): " +
+                        ModuleLog.line("(InstaEclipse | AdBlocker): Hooked (dynamic check, marker='" + marker + "'): " +
                                 method.getClassName() + "." + method.getName());
                         FeatureStatusTracker.setHooked("AdBlocker");
                         return; // Stop after first successful hook
 
                     } catch (Throwable hookEx) {
-                        ModuleLog.line("(InstaEclipse | AdBlocker): ❌ Failed to hook: " +
+                        ModuleLog.line("(InstaEclipse | AdBlocker): Failed to hook: " +
                                 method.getName() + " → " + hookEx.getMessage());
                     }
                 }
             }
 
-            ModuleLog.line("(InstaEclipse | AdBlocker): ❌ No valid methods hooked (all markers exhausted).");
+            ModuleLog.line("(InstaEclipse | AdBlocker): No valid methods hooked (all markers exhausted).");
             if (FeatureFlags.isAdBlockEnabled) FeatureStatusTracker.setBroken("AdBlocker");
 
         } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | AdBlocker): ❌ Exception: " + t.getMessage());
+            ModuleLog.line("(InstaEclipse | AdBlocker): Exception: " + t.getMessage());
         }
     }
 }

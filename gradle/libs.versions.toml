@@ -1,32 +1,49 @@
 [versions]
-agp = "8.7.0"
-dexkit = "2.0.3"
-espressoCoreVersion = "3.6.1"
-fileprefs = "1.0"
-gson = "2.10.1"
+agp = "9.3.2"
+kotlin = "2.4.10"
+dexkit = "2.2.0"
+appcompat = "1.8.0"
+material = "1.14.0"
+documentfile = "1.1.0"
+coroutines = "1.11.0"
+composeBom = "2026.08.00"
+activityCompose = "1.13.0"
+lifecycleCompose = "2.11.0"
+material3 = "1.4.0"
+windowSizeClass = "0.4.1"
+osmdroid = "6.1.20"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-espressoCore = "3.5.1"
-appcompat = "1.7.0"
-material = "1.12.0"
-activity = "1.8.0"
-constraintlayout = "2.2.0"
-osmdroid = "6.1.20"
+espressoCoreVersion = "3.6.1"
+json = "20240303"
+gson = "2.10.1"
 
 [libraries]
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+espresso-core-v361 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+json = { module = "org.json:json", version.ref = "json" }
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
 dexkit = { module = "org.luckypray:dexkit", version.ref = "dexkit" }
-espresso-core-v361 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
-fileprefs = { module = "com.github.chengxuncc:fileprefs", version.ref = "fileprefs" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+compose-material3-windowSizeClass = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+compose-animation = { module = "androidx.compose.animation:animation" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleCompose" }
+junit = { module = "junit:junit", version.ref = "junit" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

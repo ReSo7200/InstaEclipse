@@ -84,10 +84,10 @@ public class CacheAutoClear {
                 if (measured >= limit) {
                     long freed = 0;
                     for (File t : targets) { freed += dirSize(t); clearContents(t); }
-                    ModuleLog.line("(IE|CacheAutoClear) ✅ cleared ~" + (freed / (1024 * 1024)) + "MB");
+                    ModuleLog.line("(IE|CacheAutoClear) cleared ~" + (freed / (1024 * 1024)) + "MB");
                 }
             } catch (Throwable t) {
-                ModuleLog.line("(IE|CacheAutoClear) ❌ " + t);
+                ModuleLog.line("(IE|CacheAutoClear) " + t);
             }
         }, "ie-cacheclear").start();
     }

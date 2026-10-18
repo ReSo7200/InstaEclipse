@@ -10,12 +10,12 @@
     <!-- home -->
     <string name="back">חזרה</string>
     <string name="apply_changes">החל שינויים</string>
-    <string name="multiple_versions_detected">⚠️ זוהו מספר גרסאות</string>
+    <string name="multiple_versions_detected">זוהו מספר גרסאות</string>
     <string name="module_disabled">המודול אינו מופעל. נא להפעיל אותו.</string>
     <string name="module_status">סטטוס המודול:</string>
     <string name="module_status_disabled">סטטוס המודול: אינו מופעל</string>
     <string name="request_enable_module">נא להפעיל את המודול בXposed.</string>
-    <string name="module_status_enabled_no_root">סטטוס המודול: מופעל )בלי גישה לRoot)</string>
+    <string name="module_status_enabled_no_root">סטטוס המודול: מופעל)בלי גישה לRoot)</string>
     <string name="request_enable_root">גישה לRoot נדרש עבור תכונת הauto-restart. הפעלה מחדש ידנית נדרשת.</string>
     <string name="module_status_enabled">סטטוס המודול: תקין</string>
     <string name="module_active">המודול תקין ועובד.</string>
@@ -53,7 +53,7 @@
     <string name="faq_2"><b>2. מודול אינו מופעל?</b>\n- השבת את המודול ותפעילו אותו מחדש בLSPosed.</string>
     <string name="faq_3"><b>3. התכונות אינם עובדות?</b>\n- נא לעצור בכוח את אפליקציית אינסטגרם ותפעילו אותו מחדש.</string>
     <string name="faq_4"><b>4. הגדרות מפתחים גורמים לקריסות?</b>\n- נא לעקוב אחרי מדריך ההגרות מפתחים.</string>
-    <string name="faq_5"><b>5. להגרות מפתחים יש תגים מוזרים או מספרים?</b>\n- נא להשתמש בגרסת Beta או Alpha במקום, כי גרסאות יציבות )Stable) של האפליקציה עוברות אובפוסקציה.</string>
+    <string name="faq_5"><b>5. להגרות מפתחים יש תגים מוזרים או מספרים?</b>\n- נא להשתמש בגרסת Beta או Alpha במקום, כי גרסאות יציבות)Stable) של האפליקציה עוברות אובפוסקציה.</string>
     <string name="faq_6"><b>6. "ללא הסחות דעת" מופעל אך התוכן עדיין מופיע?</b>\n- לעצור בכוח את האפליקציה ולמחוק לו את הcache.</string>
 
     <!-- guide -->
@@ -131,7 +131,7 @@
     <!-- ================================================================ -->
 
     <!-- Common -->
-    <string name="ig_dialog_title" translatable="false">InstaEclipse 🌘</string>
+    <string name="ig_dialog_title" translatable="false">InstaEclipse</string>
     <string name="ig_dialog_close">סגור</string>
     <string name="ig_dialog_enable_disable_all">הפעלה/השבתת הכל</string>
     <string name="ig_dialog_error">שגיאה</string>
@@ -171,7 +171,7 @@
     <string name="ig_dialog_dev_export">ייצא הגדרות מפתחים</string>
     <string name="ig_dialog_dev_restore_default_config">שחזר להגדרות ברירת המחדל</string>
     <string name="ig_dialog_dev_restore_default_config_confirm">פעולה זו תחליף את הגדרות המפתחים הנוכחיות בהגדרות ברירת המחדל המובנות. להמשיך?</string>
-    <string name="ig_toast_default_config_restored">✅ הגדרות ברירת המחדל שוחזרו.</string>
+    <string name="ig_toast_default_config_restored">הגדרות ברירת המחדל שוחזרו.</string>
     <string name="ig_dialog_dev_remove_build_expired">הסר חלונית Build Expired</string>
     <string name="ig_dialog_unable_open_ui">לא ניתן לפתוח את ממשק InstaEclipse.</string>
     <string name="ig_dialog_instagram_not_ready">אינסטגרם אינו פתוח או מוכן.</string>
@@ -181,15 +181,15 @@
     <string name="export_config_success">ההגדרות יוצאו בהצלחה.</string>
     <string name="export_config_failed">נכשל בשמירה: %1$s</string>
     <string name="export_invalid_uri">URI לא תקין</string>
-    <string name="ig_toast_config_imported">✅ ההגדרות יובאו.</string>
-    <string name="ig_toast_config_import_failed">❌ נכשל בייבוא הגדרות.</string>
+    <string name="ig_toast_config_imported">ההגדרות יובאו.</string>
+    <string name="ig_toast_config_import_failed">נכשל בייבוא הגדרות.</string>
 
     <!-- JsonImportActivity -->
     <string name="json_select_config">בחר קובץ JSON</string>
-    <string name="json_target_not_specified">❌ חבילת יעד לא צוינה.</string>
-    <string name="json_sent">✅ נשלח לאינסטגרם.</string>
-    <string name="json_not_valid">❌ קובץ JSON לא תקין.</string>
-    <string name="json_read_failed">❌ נכשל בקריאת קובץ: %1$s</string>
+    <string name="json_target_not_specified">חבילת יעד לא צוינה.</string>
+    <string name="json_sent">נשלח לאינסטגרם.</string>
+    <string name="json_not_valid">קובץ JSON לא תקין.</string>
+    <string name="json_read_failed">נכשל בקריאת קובץ: %1$s</string>
     <string name="json_cancelled">בוטל או לא נבחר קובץ.</string>
 
     <!-- Ghost Mode options -->
@@ -275,7 +275,7 @@
     <string name="ig_dialog_misc_viewer_search">חפש בצופי הסטורי שלך</string>
     <string name="ig_viewer_search_hint">חפש צופים</string>
     <string name="ig_dialog_misc_like_undo">חלון ביטול ללייקים (4 שנ׳)</string>
-    <string name="ig_like_undo_bar">❤ אהבת · בטל</string>
+    <string name="ig_like_undo_bar">אהבת · בטל</string>
     <string name="ig_like_undo_cancelled">הלייק בוטל — רענן כדי לעדכן את הלב</string>
     <string name="ig_dialog_misc_exact_timestamps">הצג תאריכים מדויקים במקום \"לפני שעתיים\"</string>
     <string name="ig_timestamp_format">תבנית תאריך</string>
@@ -297,7 +297,7 @@
     <string name="ig_comment_select_part">בחר חלק להעתקה</string>
     <string name="ig_comment_select_title">בחר להעתקה</string>
     <string name="ig_comment_copy_selected">העתק נבחר</string>
-    <string name="ig_toast_comment_copied">✅ הועתק ללוח!</string>
+    <string name="ig_toast_comment_copied">הועתק ללוח!</string>
 
     <!-- Downloader options -->
     <string name="ig_dialog_downloader_settings">הגדרות הורדה</string>
@@ -321,10 +321,10 @@
     <string name="ig_dialog_about_telegram">Telegram</string>
 
     <!-- Restart -->
-    <string name="ig_dialog_restart_message">⚠️ נקה cache ואתחל?</string>
+    <string name="ig_dialog_restart_message">נקה cache ואתחל?</string>
     <string name="ig_dialog_clear_cache">נקה מטמון Hooks</string>
     <string name="ig_dialog_section_clear_cache">נקה מטמון Hooks</string>
-    <string name="ig_dialog_clear_cache_message">⚠️ פעולה זו תאלץ את InstaEclipse לסרוק מחדש את אינסטגרם בהפעלה הבאה. האפליקציה תופעל מחדש.</string>
+    <string name="ig_dialog_clear_cache_message">פעולה זו תאלץ את InstaEclipse לסרוק מחדש את אינסטגרם בהפעלה הבאה. האפליקציה תופעל מחדש.</string>
     <string name="ig_dialog_clear_cache_now">נקה מטמון &amp; הפעל מחדש</string>
     <string name="ig_dialog_restart_now">אתחל עכשיו</string>
     <string name="ig_dialog_restart_not_found">לא נמצאה האפליקציה לאתחול.</string>
@@ -334,12 +334,12 @@
     <string name="ig_toast_ghost_no_options">לא נבחרו אפשרויות מצב רפאים!</string>
     <string name="ig_toast_ghost_enabled">מצב רפאים הופעל</string>
     <string name="ig_toast_ghost_disabled">מצב רפאים הושבת</string>
-    <string name="ig_toast_seen_sent">✅ נקראה נשלחה</string>
-    <string name="ig_toast_channel_seen_sent">✅ נקראה ערוץ נשלחה</string>
+    <string name="ig_toast_seen_sent">נקראה נשלחה</string>
+    <string name="ig_toast_channel_seen_sent">נקראה ערוץ נשלחה</string>
 
     <!-- Toast: Follower status -->
-    <string name="ig_toast_follows_you">עוקב אחריך ✅</string>
-    <string name="ig_toast_not_follows_you">לא עוקב אחריך ❌</string>
+    <string name="ig_toast_follows_you">עוקב אחריך</string>
+    <string name="ig_toast_not_follows_you">לא עוקב אחריך</string>
 
     <!-- Toast: App settings -->
     <string name="ig_toast_settings_applied">ההגדרות הוחלו!</string>
@@ -404,7 +404,7 @@
     <!-- Toast: Downloader (service) -->
     <string name="ig_toast_no_download_folder">לא הוגדרה תיקיית הורדות</string>
     <string name="ig_toast_file_saved">נשמר: %1$s</string>
-    <string name="ig_toast_features_loaded">InstaEclipse נטען 🎯</string>
+    <string name="ig_toast_features_loaded">InstaEclipse נטען</string>
 
 
     <!-- Update check dialog -->
@@ -426,7 +426,7 @@
     <string name="theme_saved">ערכת הנושא נשמרה</string>
     <string name="theme_pick_color">בחר צבע</string>
     <string name="theme_apply_color">החל</string>
-    <string name="theme_rgba_format">R %1$d  G %2$d  B %3$d  A %4$d</string>
+    <string name="theme_rgba_format">R %1$d G %2$d B %3$d A %4$d</string>
     <string name="theme_alpha_format">שקיפות: %1$d%%</string>
     <string name="theme_slot_background">רקע</string>
     <string name="theme_slot_surface">משטח</string>
@@ -583,7 +583,7 @@
     <string name="ig_caption_copy_title">העתק כיתוב</string>
     <string name="ig_caption_copy_full">העתק כיתוב מלא</string>
     <string name="ig_caption_copy_none">אין כיתוב בפוסט הזה</string>
-    <string name="ig_caption_copied">✅ הכיתוב הועתק ללוח!</string>
+    <string name="ig_caption_copied">הכיתוב הועתק ללוח!</string>
     <string name="ig_dialog_downloader_copy_link">העתק קישור מדיה</string>
     <string name="ig_copy_link_title">העתק קישור מדיה</string>
     <string name="ig_copy_link_copied">קישור המדיה הועתק ללוח</string>
@@ -598,8 +598,8 @@
     <string name="ig_instant_save_none">לא נמצאה מדיית Instant</string>
     <string name="ig_instant_upload_title">העלה Instant מהגלריה</string>
     <string name="ig_dialog_misc_upload_instants">העלה Instant מהגלריה</string>
-    <string name="ig_instant_upload_chip">🖼 גלריה</string>
-    <string name="ig_instant_upload_chip_ready">✓ מוכן — הקש על כפתור הצילום</string>
+    <string name="ig_instant_upload_chip">גלריה</string>
+    <string name="ig_instant_upload_chip_ready">מוכן — הקש על כפתור הצילום</string>
     <string name="ig_instant_upload_ready">נבחר! הקש על כפתור הצילום כדי לשלוח כ-Instant</string>
     <string name="ig_instant_upload_fail">לא ניתן לטעון את התמונה</string>
     <string name="ig_story_download_choice_title">הורד סטורי</string>
@@ -673,8 +673,8 @@
     <string name="ig_locked_coll_locked">האוסף ננעל: הוא יבקש את קוד הגישה שלך</string>
     <string name="ig_locked_coll_need_passcode">הגדר קודם קוד גישה: הגדרות InstaEclipse באינסטגרם, נעילה</string>
     <string name="ig_locked_coll_open">פתח</string>
-    <string name="ig_locked_coll_setting">אוספים שמורים ניתנים לנעילה (כפתור 🔒 באוסף; משתמש בקוד הגישה שהוגדר באינסטגרם)</string>
-    <string name="ig_locked_coll_setting_short">אוספים שמורים ניתנים לנעילה (🔒 באוסף)</string>
+    <string name="ig_locked_coll_setting">אוספים שמורים ניתנים לנעילה (כפתור באוסף; משתמש בקוד הגישה שהוגדר באינסטגרם)</string>
+    <string name="ig_locked_coll_setting_short">אוספים שמורים ניתנים לנעילה (באוסף)</string>
     <string name="ig_locked_coll_title">אוסף נעול</string>
     <string name="ig_locked_coll_unlock">בטל נעילה של האוסף הזה</string>
     <string name="ig_locked_coll_unlocked">נעילת האוסף בוטלה</string>
