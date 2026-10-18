@@ -1336,13 +1336,15 @@ public class StoryDownloadHook {
 
         try {
             CharSequence[] rows = new CharSequence[choices.size()];
-            // One tappable row per available format (📷 photo / 🎬 video with music).
-            for (int i = 0; i < choices.size(); i++)
-                rows[i] = (choices.get(i).video ? "🎬  " : "📷  ") + labels.get(i);
+            int[] icons = new int[choices.size()];
+            for (int i = 0; i < choices.size(); i++) {
+                rows[i] = labels.get(i);
+                icons[i] = choices.get(i).video ? R.drawable.ic_movie : R.drawable.ic_camera;
+            }
             IeDialog dlg = new IeDialog(ctx)
                     .title(I18n.t(ctx, R.string.ig_story_download_choice_title))
                     .message(I18n.t(ctx, R.string.ig_story_download_choice_subtitle))
-                    .choices(rows, -1, which -> {
+                    .choices(rows, icons, -1, which -> {
                         StoryMedia choice = choices.get(which);
                         startDownload(ctx, choice.url, choice.video, username, mediaId);
                     });

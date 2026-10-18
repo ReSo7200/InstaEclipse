@@ -2,9 +2,9 @@
 <resources>
     <!-- Logs tab (0.8) -->
     <string name="logs_filter_all">Semua</string>
-    <string name="logs_filter_hooked">Berhasil ✅</string>
-    <string name="logs_filter_errors">Kesalahan ❌</string>
-    <string name="logs_filter_warnings">Peringatan ⚠️</string>
+    <string name="logs_filter_hooked">Berhasil</string>
+    <string name="logs_filter_errors">Kesalahan</string>
+    <string name="logs_filter_warnings">Peringatan </string>
     <string name="logs_filter_count">%1$s · %2$d</string>
     <string name="logs_refresh">Muat ulang</string>
     <string name="logs_copy">Salin</string>

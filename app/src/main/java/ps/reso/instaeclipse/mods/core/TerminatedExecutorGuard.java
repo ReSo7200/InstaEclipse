@@ -50,9 +50,9 @@ public class TerminatedExecutorGuard {
                         }
                     }
             );
-            ModuleLog.line("(IE|ExecGuard) ✅ installed");
+            ModuleLog.line("(IE|ExecGuard) installed");
         } catch (Throwable t) {
-            ModuleLog.line("(IE|ExecGuard) ⚠️ install failed: " + t.getMessage());
+            ModuleLog.line("(IE|ExecGuard) install failed: " + t.getMessage());
         }
     }
 }

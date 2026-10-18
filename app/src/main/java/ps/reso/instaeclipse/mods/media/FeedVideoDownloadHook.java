@@ -219,7 +219,7 @@ public class FeedVideoDownloadHook {
                     });
             FeatureStatusTracker.setHooked("PostDownload");
         } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | MediaDownload): ❌ Uri.parse hook: " + t);
+            ModuleLog.line("(InstaEclipse | MediaDownload): Uri.parse hook: " + t);
         }
     }
 
@@ -293,7 +293,7 @@ public class FeedVideoDownloadHook {
                         }
                     });
         } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | MediaDownload): ❌ View hook: " + t);
+            ModuleLog.line("(InstaEclipse | MediaDownload): View hook: " + t);
         }
     }
 
@@ -1189,22 +1189,22 @@ public class FeedVideoDownloadHook {
                         try {
                             Method m = methodData.getMethodInstance(classLoader);
                             XposedBridge.hookMethod(m, urlHook);
-                            ModuleLog.line("(IE|DL|DexKit) ✅ Hooked getUrl() on "
+                            ModuleLog.line("(IE|DL|DexKit) Hooked getUrl() on "
                                     + classData.getName());
                             hooked.add(m);
                         } catch (Throwable e) {
-                            ModuleLog.line("(IE|DL|DexKit) ❌ Hook failed for "
+                            ModuleLog.line("(IE|DL|DexKit) Hook failed for "
                                     + classData.getName() + ": " + e.getMessage());
                         }
                     }
                 } catch (Throwable e) {
-                    ModuleLog.line("(IE|DL|DexKit) ❌ findMethod failed for "
+                    ModuleLog.line("(IE|DL|DexKit) findMethod failed for "
                             + classData.getName() + ": " + e.getMessage());
                 }
             }
             if (!hooked.isEmpty()) DexKitCache.saveMethods("VideoUrlCapture", hooked);
         } catch (Throwable e) {
-            ModuleLog.line("(IE|DL|DexKit) ❌ installVideoUrlCaptureHook: " + e.getMessage());
+            ModuleLog.line("(IE|DL|DexKit) installVideoUrlCaptureHook: " + e.getMessage());
         }
 
         resolveUsernameGetter(bridge, classLoader);
@@ -1783,7 +1783,7 @@ public class FeedVideoDownloadHook {
                             .usingStrings("username_missing_during_update")));
 
             if (userMethods.isEmpty()) {
-                ModuleLog.line("(IE|DL|Username) ❌ username_missing_during_update not found");
+                ModuleLog.line("(IE|DL|Username) username_missing_during_update not found");
                 return;
             }
 
@@ -1833,17 +1833,17 @@ public class FeedVideoDownloadHook {
                     ModuleLog.line("(IE|DL|Username) userUsernameGetter=" + UserUtils.userUsernameGetter.getName()
                             + " (excluded " + readsFullName.size() + " full_name getter(s))");
                 } else {
-                    ModuleLog.line("(IE|DL|Username) ❌ userUsernameGetter not found via -265713450");
+                    ModuleLog.line("(IE|DL|Username) userUsernameGetter not found via -265713450");
                 }
             } catch (Throwable t) {
-                ModuleLog.line("(IE|DL|Username) ❌ userUsernameGetter resolution: " + t);
+                ModuleLog.line("(IE|DL|Username) userUsernameGetter resolution: " + t);
             }
 
             resolveDictUserGetter(bridge, classLoader);
             resolveMediaAuthorGetter(bridge, classLoader);
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|DL|Username) ❌ resolveUsernameGetter: " + t);
+            ModuleLog.line("(IE|DL|Username) resolveUsernameGetter: " + t);
         }
     }
 
@@ -1875,12 +1875,12 @@ public class FeedVideoDownloadHook {
                 m.setAccessible(true);
                 mediaAuthorGetter = m;
                 DexKitCache.saveMethod("MediaAuthorGetter", m);
-                ModuleLog.line("(IE|DL|Username) ✅ mediaAuthorGetter (Media.\"user\"): " + m.getName());
+                ModuleLog.line("(IE|DL|Username) mediaAuthorGetter (Media.\"user\"): " + m.getName());
             } else {
                 ModuleLog.line("(IE|DL|Username) mediaAuthorGetter: no Media \"user\" getter (older build)");
             }
         } catch (Throwable t) {
-            ModuleLog.line("(IE|DL|Username) ❌ mediaAuthorGetter: " + t);
+            ModuleLog.line("(IE|DL|Username) mediaAuthorGetter: " + t);
         }
     }
 
@@ -1913,7 +1913,7 @@ public class FeedVideoDownloadHook {
                     m.setAccessible(true);
                     dictUserGetter = m;
                     DexKitCache.saveMethod("DictUserGetter", m);
-                    ModuleLog.line("(IE|DL|Username) ✅ Resolved dictUserGetter: " + m.getName());
+                    ModuleLog.line("(IE|DL|Username) Resolved dictUserGetter: " + m.getName());
                     return;
                 }
             }
@@ -1944,15 +1944,15 @@ public class FeedVideoDownloadHook {
                     m.setAccessible(true);
                     dictUserGetter = m;
                     DexKitCache.saveMethod("DictUserGetter", m);
-                    ModuleLog.line("(IE|DL|Username) ✅ Resolved dictUserGetter (concrete class): " + m.getName());
+                    ModuleLog.line("(IE|DL|Username) Resolved dictUserGetter (concrete class): " + m.getName());
                     return;
                 }
             } catch (Throwable t) {
-                ModuleLog.line("(IE|DL|Username) ❌ dictUserGetter DexKit lookup: " + t);
+                ModuleLog.line("(IE|DL|Username) dictUserGetter DexKit lookup: " + t);
             }
         }
 
-        ModuleLog.line("(IE|DL|Username) ❌ Failed to resolve dictUserGetter in hierarchy");
+        ModuleLog.line("(IE|DL|Username) Failed to resolve dictUserGetter in hierarchy");
     }
 
     // ── Download dispatch ─────────────────────────────────────────────────────
@@ -2341,10 +2341,14 @@ public class FeedVideoDownloadHook {
                 : FeatureFlags.downloaderCustomUri;
 
         String[] dash = isVideo ? DASH_UPGRADE.get(url) : null;
-        if (!uri.isEmpty()) {
-            if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username);
-            else delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
-            return true;
+        if (!uri.isEmpty() && ps.reso.instaeclipse.utils.core.CommonUtils.isCompanionAppInstalled(ctx)) {
+            try {
+                if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username);
+                else delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
+                return true;
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|DL) Companion delegation failed, falling back to MediaStore: " + t.getMessage());
+            }
         }
         if (dash != null) {
             File tv = File.createTempFile("ie_dv_", ".mp4", ctx.getCacheDir());
@@ -2733,7 +2737,7 @@ public class FeedVideoDownloadHook {
                     .show();
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Post) ❌ showCarouselBottomSheet: " + t);
+            ModuleLog.line("(IE|Post) showCarouselBottomSheet: " + t);
         }
     }
 
@@ -2758,7 +2762,7 @@ public class FeedVideoDownloadHook {
                 cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", url));
                 ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied), Toast.LENGTH_SHORT).show();
             } catch (Throwable t) {
-                ModuleLog.line("(IE|Post) ❌ copyLinkToClipboard: " + t);
+                ModuleLog.line("(IE|Post) copyLinkToClipboard: " + t);
             }
         }, 350);
     }
@@ -2792,14 +2796,14 @@ public class FeedVideoDownloadHook {
                         cb.setPrimaryClip(ClipData.newPlainText("InstaEclipse", allText));
                         ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_copy_link_copied_all, n), Toast.LENGTH_SHORT).show();
                     } catch (Throwable t) {
-                        ModuleLog.line("(IE|Post) ❌ copy all links: " + t);
+                        ModuleLog.line("(IE|Post) copy all links: " + t);
                     }
                 }, 350);
             });
             dlg.show();
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Post) ❌ showCopyLinkSheet: " + t);
+            ModuleLog.line("(IE|Post) showCopyLinkSheet: " + t);
         }
     }
 

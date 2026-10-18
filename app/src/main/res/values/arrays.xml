@@ -5,6 +5,7 @@
     </string-array>
 
     <string-array name="theme_preset_names">
+        <item>Default</item>
         <item>Midnight Eclipse</item>
         <item>Pure OLED</item>
         <item>Arctic Frost</item>

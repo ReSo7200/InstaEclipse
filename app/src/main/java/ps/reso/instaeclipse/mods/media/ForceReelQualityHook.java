@@ -90,7 +90,7 @@ public class ForceReelQualityHook {
                 heightGetterName = resolveHeightGetterName(bridge, classLoader);
 
                 if (videoVersionsGetter == null || heightGetterName == null) {
-                    ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ discovery failed");
+                    ModuleLog.line("(InstaEclipse | ForceReelQuality): discovery failed");
                     return;
                 }
 
@@ -117,7 +117,7 @@ public class ForceReelQualityHook {
                             param.setResult(Collections.singletonList(chosen));
                         }
                     } catch (Throwable t) {
-                        ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ hook body – " + t);
+                        ModuleLog.line("(InstaEclipse | ForceReelQuality): hook body – " + t);
                     }
                 }
             });
@@ -126,12 +126,12 @@ public class ForceReelQualityHook {
             // with multiple qualities is actually intercepted — the status toast is built
             // ~1.5s after launch, before any video is guaranteed to have loaded yet.
             FeatureStatusTracker.setHooked("ForceReelQuality");
-            ModuleLog.line("(InstaEclipse | ForceReelQuality): ✅ Hooked "
+            ModuleLog.line("(InstaEclipse | ForceReelQuality): Hooked "
                     + videoVersionsGetter.getDeclaringClass().getName()
                     + "#" + videoVersionsGetter.getName()
                     + " (height=" + heightGetterName + ")");
         } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ install – " + t);
+            ModuleLog.line("(InstaEclipse | ForceReelQuality): install – " + t);
         }
     }
 
@@ -152,7 +152,7 @@ public class ForceReelQualityHook {
                     } catch (Throwable ignored) {}
                 }
             } catch (Throwable t) {
-                ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ resolveVideoVersionsGetter[" + dictClass + "] – " + t);
+                ModuleLog.line("(InstaEclipse | ForceReelQuality): resolveVideoVersionsGetter[" + dictClass + "] – " + t);
             }
         }
         return null;
@@ -170,7 +170,7 @@ public class ForceReelQualityHook {
 
                 if (!results.isEmpty()) return results.get(0).getName();
             } catch (Throwable t) {
-                ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ resolveHeightGetterName[" + versionClass + "] – " + t);
+                ModuleLog.line("(InstaEclipse | ForceReelQuality): resolveHeightGetterName[" + versionClass + "] – " + t);
             }
         }
         return null;

@@ -13,8 +13,8 @@
     <string name="ig_dialog_ghost_keep_unsent">Ghi lại tin nhắn đã thu hồi</string>
     <string name="ig_dialog_ghost_chat_export">Nút xuất đoạn chat trong cuộc trò chuyện</string>
     <string name="ig_chat_export">Xuất đoạn chat</string>
-    <string name="ig_locked_coll_setting">Khóa bộ sưu tập đã lưu (nút 🔒 trong bộ sưu tập; dùng mã khóa đặt trong Instagram)</string>
-    <string name="ig_locked_coll_setting_short">Khóa bộ sưu tập đã lưu (🔒 trong bộ sưu tập)</string>
+    <string name="ig_locked_coll_setting">Khóa bộ sưu tập đã lưu (nút trong bộ sưu tập; dùng mã khóa đặt trong Instagram)</string>
+    <string name="ig_locked_coll_setting_short">Khóa bộ sưu tập đã lưu (trong bộ sưu tập)</string>
     <string name="ig_locked_coll_title">Bộ sưu tập bị khóa</string>
     <string name="ig_locked_coll_open">Mở</string>
     <string name="ig_locked_coll_hint">Mã khóa</string>
@@ -220,7 +220,7 @@
     <string name="ig_follow_export_loading">Đang tải tài khoản… đã có %1$d.\nHãy ở lại màn hình này cho đến khi xong.</string>
     <string name="ig_follow_export_stop">Dừng &amp; lưu</string>
     <string name="ig_dialog_misc_like_undo">Thời gian hoàn tác lượt thích (4 giây)</string>
-    <string name="ig_like_undo_bar">❤ Đã thích · HOÀN TÁC</string>
+    <string name="ig_like_undo_bar">Đã thích · HOÀN TÁC</string>
     <string name="ig_like_undo_cancelled">Đã hủy lượt thích — làm mới để cập nhật trái tim</string>
     <string name="ig_dialog_misc_exact_timestamps">Hiện ngày chính xác thay vì \"2 giờ trước\"</string>
     <string name="ig_timestamp_format">Định dạng ngày</string>
@@ -248,8 +248,8 @@
     <string name="ig_instant_save_none">Không tìm thấy phương tiện Instant</string>
     <string name="ig_instant_upload_title">Đăng Instant từ thư viện</string>
     <string name="ig_dialog_misc_upload_instants">Đăng Instant từ thư viện</string>
-    <string name="ig_instant_upload_chip">🖼 Thư viện</string>
-    <string name="ig_instant_upload_chip_ready">✓ Sẵn sàng — chạm nút chụp</string>
+    <string name="ig_instant_upload_chip">Thư viện</string>
+    <string name="ig_instant_upload_chip_ready">Sẵn sàng — chạm nút chụp</string>
     <string name="ig_instant_upload_ready">Đã chọn! Chạm nút chụp để gửi dưới dạng Instant</string>
     <string name="ig_instant_upload_fail">Không thể tải ảnh đó</string>
     <string name="ig_highlight_download_all">Tải toàn bộ tin nổi bật</string>

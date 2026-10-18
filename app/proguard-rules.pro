@@ -1,36 +1,30 @@
-# Keep everything — no obfuscation, no shrinking
--dontobfuscate
--dontoptimize
--keepattributes *Annotation*, SourceFile, LineNumberTable
+-keepattributes *Annotation*, SourceFile, LineNumberTable, InnerClasses, EnclosingMethod, Signature
 
-# Keep ALL classes & members (methods, fields)
--keep class ps.reso.instaeclipse.** { *; }
-
-# Keep everything related to Xposed API
+-dontwarn de.robv.android.xposed.**
 -keep class de.robv.android.xposed.** { *; }
 
-# Keep reflection / DexKit-accessed symbols
--keep class * {
-    public protected *;
+-keep class ps.reso.instaeclipse.** { *; }
+-keepclassmembers class ps.reso.instaeclipse.** { *; }
+
+-keepclasseswithmembernames class * {
+    native <methods>;
 }
 
-# Keep any dynamically called methods (like URI matchers)
+-keep class org.luckypray.dexkit.** { *; }
+-dontwarn org.luckypray.dexkit.**
+
+-keep class org.osmdroid.** { *; }
+-dontwarn org.osmdroid.**
+
 -keepclassmembers class * {
     *** get*();
     void set*(***);
 }
 
-# Avoid warnings from missing Android APIs
 -dontwarn android.support.**
 -dontwarn androidx.**
 -dontwarn com.android.**
 -dontwarn org.lsposed.**
-# Suppress missing javax.lang.model warnings
 -dontwarn javax.lang.model.**
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn org.checkerframework.**
-
-
-# keep GSON serialized classes
--keep class * implements com.google.gson.JsonDeserializer { *; }
--keep class * implements com.google.gson.JsonSerializer { *; }

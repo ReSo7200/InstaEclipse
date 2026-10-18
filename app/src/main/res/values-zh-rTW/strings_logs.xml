@@ -2,9 +2,9 @@
 <resources>
     <!-- Logs tab (0.8) -->
     <string name="logs_filter_all">全部</string>
-    <string name="logs_filter_hooked">成功 ✅</string>
-    <string name="logs_filter_errors">錯誤 ❌</string>
-    <string name="logs_filter_warnings">警告 ⚠️</string>
+    <string name="logs_filter_hooked">成功</string>
+    <string name="logs_filter_errors">錯誤</string>
+    <string name="logs_filter_warnings">警告 </string>
     <string name="logs_filter_count">%1$s · %2$d</string>
     <string name="logs_refresh">重新整理</string>
     <string name="logs_copy">複製</string>

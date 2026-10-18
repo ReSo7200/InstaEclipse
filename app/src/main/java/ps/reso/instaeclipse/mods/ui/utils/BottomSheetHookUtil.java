@@ -61,7 +61,7 @@ public class BottomSheetHookUtil {
             }
 
         } catch (Throwable e) {
-            ModuleLog.line("(InstaEclipse | BottomSheet): ❌ DexKit exception: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | BottomSheet): DexKit exception: " + e.getMessage());
         }
     }
 
@@ -72,7 +72,7 @@ public class BottomSheetHookUtil {
         // updates. This hook exists only to locate the method; its body is intentionally
         // empty to avoid any per-call overhead.
         XposedBridge.hookMethod(reflectMethod, new XC_MethodHook() { });
-        ModuleLog.line("(InstaEclipse | BottomSheet): ✅ Hooked: " + reflectMethod.getDeclaringClass().getName() + "." + reflectMethod.getName());
+        ModuleLog.line("(InstaEclipse | BottomSheet): Hooked: " + reflectMethod.getDeclaringClass().getName() + "." + reflectMethod.getName());
     }
 }
 
