@@ -676,4 +676,10 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="ig_spoof_device_note">Instagram sieht dieses Telefon als das gewählte Gerät. Das schaltet HDR-Video und andere Funktionen frei, die Instagram auf diese Telefone beschränkt, und fügt die passenden Entwickleroptionen hinzu. Starte Instagram neu, um es anzuwenden. Instagram fragt eventuell einmal nach einer Bestätigung deines Kontos.</string>
     <string name="ig_dialog_downloader_stickers">Sticker und GIFs in DMs herunterladen (lange drücken)</string>
     <string name="ig_feat_sticker_download">Sticker-Download</string>
+    <string name="ig_story_tray_size">Größe der Story-Leiste</string>
+    <string name="ig_story_ring_color">Ringfarbe ungesehener Storys</string>
+    <string name="ig_story_ring_default">Instagram-Standard</string>
+    <string name="ig_story_ring_custom">Eigene Farbe</string>
+    <string name="ig_story_ring_custom_hint">Eine Farbe wie #3897F0 oder zwei für einen Verlauf: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Keine gültige Farbe</string>
 </resources>

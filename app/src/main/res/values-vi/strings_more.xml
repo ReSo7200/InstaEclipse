@@ -267,4 +267,10 @@
     <string name="ig_spoof_device_note">Instagram nhận diện điện thoại này là thiết bị đã chọn. Điều này mở khóa video HDR và các tính năng khác mà Instagram giới hạn cho những điện thoại đó, đồng thời thêm các tùy chọn nhà phát triển tương ứng. Khởi động lại Instagram để áp dụng. Instagram có thể yêu cầu bạn xác nhận tài khoản một lần.</string>
     <string name="ig_dialog_downloader_stickers">Tải nhãn dán và GIF trong tin nhắn (nhấn giữ)</string>
     <string name="ig_feat_sticker_download">Tải nhãn dán</string>
+    <string name="ig_story_tray_size">Kích thước khay tin</string>
+    <string name="ig_story_ring_color">Màu vòng tin chưa xem</string>
+    <string name="ig_story_ring_default">Mặc định của Instagram</string>
+    <string name="ig_story_ring_custom">Màu tùy chỉnh</string>
+    <string name="ig_story_ring_custom_hint">Một màu như #3897F0, hoặc hai màu cho dải chuyển: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Màu không hợp lệ</string>
 </resources>

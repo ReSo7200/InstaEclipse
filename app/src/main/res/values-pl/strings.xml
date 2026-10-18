@@ -715,4 +715,10 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_spoof_device_note">Instagram widzi ten telefon jako wybrane urządzenie. Odblokowuje to wideo HDR i inne funkcje, które Instagram ogranicza do tych telefonów, oraz dodaje pasujące opcje programisty. Uruchom ponownie Instagram, aby zastosować. Instagram może raz poprosić o potwierdzenie konta.</string>
     <string name="ig_dialog_downloader_stickers">Pobieraj naklejki i GIF-y w wiadomościach (przytrzymaj)</string>
     <string name="ig_feat_sticker_download">Pobieranie naklejek</string>
+    <string name="ig_story_tray_size">Rozmiar paska relacji</string>
+    <string name="ig_story_ring_color">Kolor obwódki nieobejrzanych relacji</string>
+    <string name="ig_story_ring_default">Domyślny Instagrama</string>
+    <string name="ig_story_ring_custom">Własny kolor</string>
+    <string name="ig_story_ring_custom_hint">Kolor jak #3897F0 lub dwa dla gradientu: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Nieprawidłowy kolor</string>
 </resources>

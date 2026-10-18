@@ -665,4 +665,10 @@
     <string name="ig_spoof_device_note">O Instagram vê este telefone como o dispositivo escolhido. Isso desbloqueia vídeo HDR e outros recursos que o Instagram limita a esses telefones, e adiciona as opções de desenvolvedor correspondentes. Reinicie o Instagram para aplicar. O Instagram pode pedir que você confirme sua conta uma vez.</string>
     <string name="ig_dialog_downloader_stickers">Baixar figurinhas e GIFs nas mensagens (toque longo)</string>
     <string name="ig_feat_sticker_download">Download de figurinhas</string>
+    <string name="ig_story_tray_size">Tamanho da bandeja de stories</string>
+    <string name="ig_story_ring_color">Cor do anel de stories não vistos</string>
+    <string name="ig_story_ring_default">Padrão do Instagram</string>
+    <string name="ig_story_ring_custom">Cor personalizada</string>
+    <string name="ig_story_ring_custom_hint">Uma cor como #3897F0, ou duas para um degradê: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Cor inválida</string>
 </resources>

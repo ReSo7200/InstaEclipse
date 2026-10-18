@@ -1941,8 +1941,84 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_info, "#32D74B", getString(R.string.ig_dialog_misc_story_info), "storyInfo"),
                 createSwitch(R.drawable.ic_search, "#32D74B", getString(R.string.ig_dialog_misc_viewer_search), "storyViewerSearch")
         ));
+        defs.add(Arrays.asList(
+                createClickable(R.drawable.ic_story_ring, "#32D74B",
+                        getString(R.string.ig_story_tray_size) + "  ·  " + localCache.getInt("storyTrayScale", 100) + "%",
+                        this::chooseStoryTraySize),
+                createClickable(R.drawable.ic_palette, "#32D74B", storyRingColorText(), this::chooseStoryRingColor)
+        ));
 
         return defs;
+    }
+
+    private void chooseStoryTraySize() {
+        int[] sizes = ps.reso.instaeclipse.utils.dialog.DialogUtils.STORY_TRAY_SIZES;
+        String[] labels = new String[sizes.length];
+        int current = localCache.getInt("storyTrayScale", 100), selected = 0;
+        for (int i = 0; i < sizes.length; i++) {
+            labels[i] = sizes[i] + "%";
+            if (sizes[i] == current) selected = i;
+        }
+        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_story_tray_size)
+                .setSingleChoiceItems(labels, selected, (dialog, which) -> {
+                    putIntPref("storyTrayScale", sizes[which]);
+                    dialog.dismiss(); loadStoriesMenu();
+                }).setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    private String storyRingColorText() {
+        String v = localCache.getString("storyRingColor", "");
+        return getString(R.string.ig_story_ring_color) + "  ·  " + (v.isEmpty() ? getString(R.string.ig_story_ring_default) : v);
+    }
+
+    private void chooseStoryRingColor() {
+        String[] presets = ps.reso.instaeclipse.utils.dialog.DialogUtils.STORY_RING_PRESETS;
+        CharSequence[] rows = new CharSequence[presets.length + 2];
+        String current = localCache.getString("storyRingColor", "");
+        rows[0] = getString(R.string.ig_story_ring_default);
+        int selected = current.isEmpty() ? 0 : rows.length - 1;
+        for (int i = 0; i < presets.length; i++) {
+            rows[i + 1] = ps.reso.instaeclipse.utils.dialog.DialogUtils.storyRingSwatch(presets[i]);
+            if (presets[i].equalsIgnoreCase(current)) selected = i + 1;
+        }
+        rows[rows.length - 1] = getString(R.string.ig_story_ring_custom);
+        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_story_ring_color)
+                .setSingleChoiceItems(rows, selected, (dialog, which) -> {
+                    dialog.dismiss();
+                    if (which == rows.length - 1) { customStoryRingColor(current); return; }
+                    putStringPref("storyRingColor", which == 0 ? "" : presets[which - 1]);
+                    loadStoriesMenu();
+                }).setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    private void customStoryRingColor(String current) {
+        android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setHint("#3897F0");
+        input.setText(current);
+        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_story_ring_custom)
+                .setMessage(R.string.ig_story_ring_custom_hint)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    String v = input.getText().toString().trim().replace(" ", "");
+                    if (ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(v) == null) {
+                        Toast.makeText(requireContext(), R.string.ig_story_ring_invalid, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    StringBuilder norm = new StringBuilder();
+                    for (String p : v.split(",")) norm.append(norm.length() > 0 ? "," : "").append(p.startsWith("#") ? p : "#" + p);
+                    putStringPref("storyRingColor", norm.toString().toUpperCase(java.util.Locale.ROOT));
+                    loadStoriesMenu();
+                })
+                .setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    private void putStringPref(String key, String value) {
+        localCache.edit().putString(key, value).commit();
+        makeLocalCacheWorldReadable();
+        Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
+        b.putExtra("key", key);
+        b.putExtra("value", value);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
     }
 
     private void pickQuality(int current) {

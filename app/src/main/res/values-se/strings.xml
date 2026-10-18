@@ -667,4 +667,10 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_spoof_device_note">Instagram ser den här telefonen som den valda enheten. Det låser upp HDR-video och andra funktioner som Instagram begränsar till de telefonerna, och lägger till motsvarande utvecklaralternativ. Starta om Instagram för att tillämpa. Instagram kan be dig bekräfta ditt konto en gång.</string>
     <string name="ig_dialog_downloader_stickers">Ladda ner klistermärken och GIF:ar i DM (långt tryck)</string>
     <string name="ig_feat_sticker_download">Nedladdning av klistermärken</string>
+    <string name="ig_story_tray_size">Storlek på berättelsefältet</string>
+    <string name="ig_story_ring_color">Färg på ringen för osedda berättelser</string>
+    <string name="ig_story_ring_default">Instagrams standard</string>
+    <string name="ig_story_ring_custom">Egen färg</string>
+    <string name="ig_story_ring_custom_hint">En färg som #3897F0, eller två för en övertoning: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Ogiltig färg</string>
 </resources>

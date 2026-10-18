@@ -664,4 +664,10 @@
     <string name="ig_spoof_device_note">يرى Instagram هذا الهاتف كالجهاز المختار. يفتح هذا فيديو HDR وميزات أخرى يقصرها Instagram على تلك الهواتف، ويضيف خيارات المطور المطابقة. أعد تشغيل Instagram للتطبيق. قد يطلب Instagram تأكيد حسابك مرة واحدة.</string>
     <string name="ig_dialog_downloader_stickers">تنزيل الملصقات وصور GIF في الرسائل (ضغط مطوّل)</string>
     <string name="ig_feat_sticker_download">تنزيل الملصقات</string>
+    <string name="ig_story_tray_size">حجم شريط القصص</string>
+    <string name="ig_story_ring_color">لون حلقة القصص غير المشاهدة</string>
+    <string name="ig_story_ring_default">افتراضي Instagram</string>
+    <string name="ig_story_ring_custom">لون مخصص</string>
+    <string name="ig_story_ring_custom_hint">لون مثل #3897F0، أو لونان للتدرج: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">لون غير صالح</string>
 </resources>

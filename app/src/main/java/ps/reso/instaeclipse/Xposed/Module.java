@@ -719,6 +719,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|ShareDL) ❌ Failed to hook");
                     }
 
+                    // Story tray size and ring color (#283)
+                    try {
+                        if (!skip("StoryTrayHook")) ps.reso.instaeclipse.mods.ui.StoryTrayHook.install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | StoryTray): ❌ Failed to hook");
+                    }
+
                     // Story Download
                     try {
                         if (!skip("StoryDownloadHook")) new StoryDownloadHook().install(dexKitBridge, lpparam.classLoader);

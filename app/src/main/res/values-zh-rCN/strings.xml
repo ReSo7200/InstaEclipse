@@ -698,4 +698,10 @@
     <string name="ig_spoof_device_note">Instagram 会将此手机识别为所选设备。这会解锁 HDR 视频以及 Instagram 仅限这些手机的其他功能，并添加相应的开发者选项。重启 Instagram 后生效。Instagram 可能会要求你确认一次帐户。</string>
     <string name="ig_dialog_downloader_stickers">下载私信中的贴纸和 GIF（长按）</string>
     <string name="ig_feat_sticker_download">贴纸下载</string>
+    <string name="ig_story_tray_size">快拍栏大小</string>
+    <string name="ig_story_ring_color">未看快拍圆环颜色</string>
+    <string name="ig_story_ring_default">Instagram 默认</string>
+    <string name="ig_story_ring_custom">自定义颜色</string>
+    <string name="ig_story_ring_custom_hint">颜色如 #3897F0，或两种颜色组成渐变：#FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">无效的颜色</string>
 </resources>

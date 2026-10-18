@@ -117,6 +117,7 @@ public class UIHookManager {
         // Distraction Free: collapse the story tray / Reels tab at the view level (the network drop
         // alone leaves IG's cached stories/reels visible on IG 447.0.0.39+).
         ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.watchActivity(activity);
+        ps.reso.instaeclipse.mods.ui.StoryTrayHook.watchActivity(activity);
 
         // Fancy bio fonts: the bio's "Change font" button opens the module's font picker.
         ps.reso.instaeclipse.mods.ui.FancyBioFontHook.watchActivity(activity);

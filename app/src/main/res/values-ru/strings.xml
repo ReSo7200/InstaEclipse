@@ -667,4 +667,10 @@
     <string name="ig_spoof_device_note">Instagram видит этот телефон как выбранное устройство. Это открывает HDR-видео и другие функции, которые Instagram ограничивает этими телефонами, и добавляет соответствующие параметры разработчика. Перезапустите Instagram, чтобы применить. Instagram может один раз попросить подтвердить аккаунт.</string>
     <string name="ig_dialog_downloader_stickers">Скачивать стикеры и GIF в директе (долгое нажатие)</string>
     <string name="ig_feat_sticker_download">Загрузка стикеров</string>
+    <string name="ig_story_tray_size">Размер ленты историй</string>
+    <string name="ig_story_ring_color">Цвет кольца непросмотренных историй</string>
+    <string name="ig_story_ring_default">Стандарт Instagram</string>
+    <string name="ig_story_ring_custom">Свой цвет</string>
+    <string name="ig_story_ring_custom_hint">Цвет вида #3897F0 или два для градиента: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Неверный цвет</string>
 </resources>

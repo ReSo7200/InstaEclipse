@@ -699,4 +699,10 @@
     <string name="ig_spoof_device_note">Το Instagram βλέπει αυτό το τηλέφωνο ως την επιλεγμένη συσκευή. Αυτό ξεκλειδώνει βίντεο HDR και άλλες λειτουργίες που το Instagram περιορίζει σε αυτά τα τηλέφωνα και προσθέτει τις αντίστοιχες επιλογές προγραμματιστή. Επανεκκινήστε το Instagram για εφαρμογή. Το Instagram ίσως ζητήσει μία φορά επιβεβαίωση του λογαριασμού σας.</string>
     <string name="ig_dialog_downloader_stickers">Λήψη αυτοκόλλητων και GIF στα μηνύματα (παρατεταμένο πάτημα)</string>
     <string name="ig_feat_sticker_download">Λήψη αυτοκόλλητων</string>
+    <string name="ig_story_tray_size">Μέγεθος γραμμής ιστοριών</string>
+    <string name="ig_story_ring_color">Χρώμα δακτυλίου μη προβεβλημένων ιστοριών</string>
+    <string name="ig_story_ring_default">Προεπιλογή Instagram</string>
+    <string name="ig_story_ring_custom">Προσαρμοσμένο χρώμα</string>
+    <string name="ig_story_ring_custom_hint">Ένα χρώμα όπως #3897F0 ή δύο για διαβάθμιση: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Μη έγκυρο χρώμα</string>
 </resources>

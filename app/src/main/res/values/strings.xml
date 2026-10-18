@@ -718,4 +718,10 @@ Stay on this screen until it finishes.</string>
     <string name="ig_spoof_device_note">Instagram sees this phone as the chosen device. This unlocks HDR video and other features Instagram limits to those phones, and adds the matching developer options. Restart Instagram to apply. Instagram may ask you to confirm your account once.</string>
     <string name="ig_dialog_downloader_stickers">Download Stickers and GIFs in DMs (long-press)</string>
     <string name="ig_feat_sticker_download">Sticker download</string>
+    <string name="ig_story_tray_size">Story tray size</string>
+    <string name="ig_story_ring_color">Unseen story ring color</string>
+    <string name="ig_story_ring_default">Instagram default</string>
+    <string name="ig_story_ring_custom">Custom color</string>
+    <string name="ig_story_ring_custom_hint">A color like #3897F0, or two for a gradient: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Not a valid color</string>
 </resources>

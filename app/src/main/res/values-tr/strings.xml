@@ -705,4 +705,10 @@
     <string name="ig_spoof_device_note">Instagram bu telefonu seçilen cihaz olarak görür. Bu, HDR videoyu ve Instagram\'ın bu telefonlarla sınırladığı diğer özellikleri açar ve ilgili geliştirici seçeneklerini ekler. Uygulamak için Instagram\'ı yeniden başlatın. Instagram hesabınızı bir kez onaylamanızı isteyebilir.</string>
     <string name="ig_dialog_downloader_stickers">DM\'lerde çıkartma ve GIF indir (uzun bas)</string>
     <string name="ig_feat_sticker_download">Çıkartma indirme</string>
+    <string name="ig_story_tray_size">Hikaye çubuğu boyutu</string>
+    <string name="ig_story_ring_color">Görülmemiş hikaye halkası rengi</string>
+    <string name="ig_story_ring_default">Instagram varsayılanı</string>
+    <string name="ig_story_ring_custom">Özel renk</string>
+    <string name="ig_story_ring_custom_hint">#3897F0 gibi bir renk ya da geçiş için iki renk: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Geçersiz renk</string>
 </resources>

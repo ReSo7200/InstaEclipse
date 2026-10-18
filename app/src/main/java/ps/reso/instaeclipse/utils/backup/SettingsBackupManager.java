@@ -53,6 +53,8 @@ public class SettingsBackupManager {
         s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
         s.put("enableVoiceDownload",        FeatureFlags.enableVoiceDownload);
         s.put("enableStickerDownload",      FeatureFlags.enableStickerDownload);
+        s.put("storyTrayScale",             FeatureFlags.storyTrayScale);
+        s.put("storyRingColor",             FeatureFlags.storyRingColor);
         s.put("enableDmMediaDownload",      FeatureFlags.enableDmMediaDownload);
         s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
         s.put("offerMediaInfo",             FeatureFlags.offerMediaInfo);
@@ -196,6 +198,10 @@ public class SettingsBackupManager {
         if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
         if (s.has("enableVoiceDownload"))       FeatureFlags.enableVoiceDownload       = s.getBoolean("enableVoiceDownload");
         if (s.has("enableStickerDownload"))     FeatureFlags.enableStickerDownload     = s.getBoolean("enableStickerDownload");
+        if (s.has("storyTrayScale"))            FeatureFlags.storyTrayScale            = Math.max(30, Math.min(100, s.getInt("storyTrayScale")));
+        if (s.has("storyRingColor") && (s.getString("storyRingColor").isEmpty()
+                || ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(s.getString("storyRingColor")) != null))
+            FeatureFlags.storyRingColor = s.getString("storyRingColor");
         if (s.has("enableDmMediaDownload"))     FeatureFlags.enableDmMediaDownload     = s.getBoolean("enableDmMediaDownload");
         if (s.has("offerCopyImage"))            FeatureFlags.offerCopyImage            = s.getBoolean("offerCopyImage");
         if (s.has("offerMediaInfo"))            FeatureFlags.offerMediaInfo            = s.getBoolean("offerMediaInfo");

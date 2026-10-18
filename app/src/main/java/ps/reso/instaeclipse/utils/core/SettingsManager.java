@@ -58,6 +58,8 @@ public class SettingsManager {
         editor.putBoolean("keepUnsentInChat", FeatureFlags.keepUnsentInChat);
         editor.putBoolean("downloaderUseOriginal", FeatureFlags.downloaderUseOriginal);
         editor.putInt("downloaderQualityMaxShortSide", FeatureFlags.downloaderQualityMaxShortSide);
+        editor.putInt("storyTrayScale", FeatureFlags.storyTrayScale);
+        editor.putString("storyRingColor", FeatureFlags.storyRingColor);
         editor.putBoolean("downloaderCompatibility", FeatureFlags.downloaderCompatibility);
         editor.putBoolean("downloaderAllowFallback", FeatureFlags.downloaderAllowFallback);
         editor.putBoolean("lockUseFingerprint", FeatureFlags.lockUseFingerprint);
@@ -250,6 +252,8 @@ public class SettingsManager {
         FeatureFlags.keepUnsentInChat = prefs.getBoolean("keepUnsentInChat", false);
         FeatureFlags.downloaderUseOriginal = prefs.getBoolean("downloaderUseOriginal", true);
         FeatureFlags.downloaderQualityMaxShortSide = prefs.getInt("downloaderQualityMaxShortSide", 0);
+        FeatureFlags.storyTrayScale = prefs.getInt("storyTrayScale", 100);
+        FeatureFlags.storyRingColor = prefs.getString("storyRingColor", "");
         FeatureFlags.downloaderCompatibility = prefs.getBoolean("downloaderCompatibility", false);
         FeatureFlags.downloaderAllowFallback = prefs.getBoolean("downloaderAllowFallback", false);
         FeatureFlags.lockUseFingerprint = prefs.getBoolean("lockUseFingerprint", true);

@@ -1542,8 +1542,114 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_link, "#FF375F", R.string.ig_dialog_misc_story_links, "storyLinks"),
                 flagSwitch(context, R.drawable.ic_info, "#FF375F", R.string.ig_dialog_misc_story_info, "storyInfo"),
                 flagSwitch(context, R.drawable.ic_search, "#FF375F", R.string.ig_dialog_misc_viewer_search, "storyViewerSearch")));
+        View ringRow = createActionRow(context, R.drawable.ic_palette, storyRingColorLabel(context).toString(), "#FF375F",
+                v -> showStoryRingColorDialog(context, (TextView) findFirstText(v)));
+        View ringText = findFirstText(ringRow);
+        if (ringText instanceof TextView tv) tv.setText(storyRingColorLabel(context)); // with the color swatch
+        layout.addView(cardOf(context,
+                createActionRow(context, R.drawable.ic_story_ring, storyTraySizeLabel(context), "#FF375F",
+                        v -> showStoryTraySizeDialog(context, (TextView) findFirstText(v))),
+                ringRow));
 
         showSectionDialog(context, I18n.t(context, R.string.menu_stories), layout, () -> {});
+    }
+
+    public static final int[] STORY_TRAY_SIZES = {100, 90, 80, 70, 60, 50};
+    public static final String[] STORY_RING_PRESETS = {"#3897F0", "#A855F7", "#FF3B30", "#FFD60A", "#FFFFFF",
+            "#FF0066,#7638FA", "#00C6FF,#0072FF"};
+
+    private static String storyTraySizeLabel(Context context) {
+        return I18n.t(context, R.string.ig_story_tray_size) + "  ·  " + FeatureFlags.storyTrayScale + "%";
+    }
+
+    /** Story tray size (#283): applies at once, the tray resizes on its next layout. */
+    private static void showStoryTraySizeDialog(Context context, TextView label) {
+        CharSequence[] rows = new CharSequence[STORY_TRAY_SIZES.length];
+        int checked = 0;
+        for (int i = 0; i < rows.length; i++) {
+            rows[i] = STORY_TRAY_SIZES[i] + "%";
+            if (STORY_TRAY_SIZES[i] == FeatureFlags.storyTrayScale) checked = i;
+        }
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.ig_story_tray_size))
+                .choices(rows, checked, which -> {
+                    FeatureFlags.storyTrayScale = STORY_TRAY_SIZES[which];
+                    SettingsManager.saveAllFlags();
+                    if (label != null) label.setText(storyTraySizeLabel(context));
+                })
+                .show();
+    }
+
+    /** A color value shown as swatch(es) and its hex. */
+    public static CharSequence storyRingSwatch(String value) {
+        int[] colors = ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(value);
+        android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder();
+        if (colors != null) for (int c : colors) {
+            int start = sb.length();
+            sb.append("\u25CF");
+            sb.setSpan(new android.text.style.ForegroundColorSpan(c), start, sb.length(), 0);
+        }
+        return sb.append("  ").append(value.replace(",", " \u2192 "));
+    }
+
+    private static CharSequence storyRingColorLabel(Context context) {
+        android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder(
+                I18n.t(context, R.string.ig_story_ring_color) + "  ·  ");
+        return FeatureFlags.storyRingColor.isEmpty()
+                ? sb.append(I18n.t(context, R.string.ig_story_ring_default))
+                : sb.append(storyRingSwatch(FeatureFlags.storyRingColor));
+    }
+
+    /** Unseen story ring color (#283): Instagram's, a preset, or a custom one / two-color gradient. */
+    private static void showStoryRingColorDialog(Context context, TextView label) {
+        CharSequence[] rows = new CharSequence[STORY_RING_PRESETS.length + 2];
+        rows[0] = I18n.t(context, R.string.ig_story_ring_default);
+        int checked = FeatureFlags.storyRingColor.isEmpty() ? 0 : rows.length - 1;
+        for (int i = 0; i < STORY_RING_PRESETS.length; i++) {
+            rows[i + 1] = storyRingSwatch(STORY_RING_PRESETS[i]);
+            if (STORY_RING_PRESETS[i].equalsIgnoreCase(FeatureFlags.storyRingColor)) checked = i + 1;
+        }
+        rows[rows.length - 1] = checked == rows.length - 1
+                ? new android.text.SpannableStringBuilder(I18n.t(context, R.string.ig_story_ring_custom) + "  ").append(storyRingSwatch(FeatureFlags.storyRingColor))
+                : I18n.t(context, R.string.ig_story_ring_custom);
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.ig_story_ring_color))
+                .choices(rows, checked, which -> {
+                    if (which == rows.length - 1) { showCustomStoryRingColor(context, label); return; }
+                    saveStoryRingColor(context, which == 0 ? "" : STORY_RING_PRESETS[which - 1], label);
+                })
+                .show();
+    }
+
+    private static void showCustomStoryRingColor(Context context, TextView label) {
+        try {
+            IeDialog dlg = new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_story_ring_custom))
+                    .message(I18n.t(context, R.string.ig_story_ring_custom_hint));
+            final android.widget.EditText input = dlg.input("#3897F0");
+            input.setText(FeatureFlags.storyRingColor);
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(context.getString(android.R.string.ok), () -> {
+                String v = input.getText().toString().trim().replace(" ", "");
+                if (ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(v) == null) {
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_story_ring_invalid), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String[] parts = v.split(",");
+                StringBuilder norm = new StringBuilder();
+                for (String p : parts) norm.append(norm.length() > 0 ? "," : "").append(p.startsWith("#") ? p : "#" + p);
+                saveStoryRingColor(context, norm.toString().toUpperCase(java.util.Locale.ROOT), label);
+            });
+            dlg.show();
+        } catch (Throwable ignored) {}
+    }
+
+    private static void saveStoryRingColor(Context context, String value, TextView label) {
+        FeatureFlags.storyRingColor = value;
+        SettingsManager.saveAllFlags();
+        if (label != null) label.setText(storyRingColorLabel(context));
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(context,
+                I18n.t(context, R.string.ig_toast_restart_manual), Toast.LENGTH_SHORT).show();
     }
 
 

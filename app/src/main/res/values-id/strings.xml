@@ -698,4 +698,10 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_spoof_device_note">Instagram melihat ponsel ini sebagai perangkat yang dipilih. Ini membuka video HDR dan fitur lain yang dibatasi Instagram untuk ponsel tersebut, serta menambahkan opsi pengembang yang sesuai. Mulai ulang Instagram untuk menerapkan. Instagram mungkin meminta Anda mengonfirmasi akun sekali.</string>
     <string name="ig_dialog_downloader_stickers">Unduh stiker dan GIF di DM (tekan lama)</string>
     <string name="ig_feat_sticker_download">Unduh stiker</string>
+    <string name="ig_story_tray_size">Ukuran baki cerita</string>
+    <string name="ig_story_ring_color">Warna cincin cerita yang belum dilihat</string>
+    <string name="ig_story_ring_default">Bawaan Instagram</string>
+    <string name="ig_story_ring_custom">Warna kustom</string>
+    <string name="ig_story_ring_custom_hint">Warna seperti #3897F0, atau dua untuk gradasi: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">Warna tidak valid</string>
 </resources>

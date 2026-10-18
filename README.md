@@ -105,6 +105,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Music links | Open the song in Spotify, YouTube Music or Apple Music, from Story Info, or from Media info on posts and reels |
 | Poll, slider and quiz results | Results drawn as bars, your own answer marked, and the correct quiz answer in green |
 | Copy story links | Copy the links from link stickers, or pick from a list when there are several |
+| Story tray | Make the story tray smaller so more stories fit in a row, and pick the color of the ring around unseen stories (a preset, your own color or a two-color gradient) |
 | View story mentions | See every @mention at once. Tap to copy, hold to open the profile |
 | Search your story viewers | A search box over your viewer list |
 | Disable story auto swipe | Stories stop advancing on their own |
