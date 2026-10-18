@@ -63,14 +63,14 @@ public class DevOptionsUnlockHook {
         try {
             findAndHookDynamicMethod(bridge);
         } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Error handling Dev Options: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Error handling Dev Options: " + e.getMessage());
         }
     }
 
     private void findAndHookDynamicMethod(DexKitBridge bridge) {
         try {
             // Tier 1: Existing String-based search
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): 🔍 Discovery Tier 1 (String)...");
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Discovery Tier 1 (String)...");
             List<ClassData> classes = bridge.findClass(FindClass.create()
                     .matcher(ClassMatcher.create().usingStrings("is_employee"))
             );
@@ -102,25 +102,25 @@ public class DevOptionsUnlockHook {
             // MobileConfig directly and is reused from many unrelated classes. Survives
             // both string stripping and per-build MobileConfig ID churn.
             if (!found) {
-                ModuleLog.line("(InstaEclipse | DevOptionsEnable): ⚠️ Tier 1 failed. Discovery Tier 2 (Structural)...");
+                ModuleLog.line("(InstaEclipse | DevOptionsEnable): Tier 1 failed. Discovery Tier 2 (Structural)...");
                 MethodData structural = resolveEmployeeGateStructurally(bridge);
                 if (structural != null) {
                     try {
                         Method targetMethod = structural.getMethodInstance(Module.hostClassLoader);
                         DexKitCache.saveMethod("DevOptionsMethod", targetMethod);
                         hookExactMethod(targetMethod);
-                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): 🎯 Found via structural match: "
+                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): Found via structural match: "
                                 + structural.getClassName() + "." + structural.getName());
                         found = true;
                     } catch (Throwable e) {
-                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Structural match failed to bind: " + e.getMessage());
+                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): Structural match failed to bind: " + e.getMessage());
                     }
                 }
             }
 
             // Tier 3: Failover to hardcoded MobileConfig IDs (legacy, last resort)
             if (!found) {
-                ModuleLog.line("(InstaEclipse | DevOptionsEnable): ⚠️ Tier 2 failed. Discovery Tier 3 (Config ID)...");
+                ModuleLog.line("(InstaEclipse | DevOptionsEnable): Tier 2 failed. Discovery Tier 3 (Config ID)...");
                 for (long configId : IS_EMPLOYEE_CONFIG_IDS) {
                     List<MethodData> idMethods = bridge.findMethod(FindMethod.create()
                             .matcher(MethodMatcher.create()
@@ -131,7 +131,7 @@ public class DevOptionsUnlockHook {
 
                     if (!idMethods.isEmpty()) {
                         String targetClass = idMethods.get(0).getClassName();
-                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): 🎯 Found via Config ID " + configId + " in: " + targetClass);
+                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): Found via Config ID " + configId + " in: " + targetClass);
                         DexKitCache.saveString("DevOptionsClass", targetClass);
                         hookAllBooleanMethodsInClass(bridge, targetClass);
                         found = true;
@@ -142,7 +142,7 @@ public class DevOptionsUnlockHook {
 
             // Final Debug Trace: If all tiers fail, log where the string is used ANYWHERE
             if (!found) {
-                ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Tier 3 failed. Debugging global references...");
+                ModuleLog.line("(InstaEclipse | DevOptionsEnable): Tier 3 failed. Debugging global references...");
                 List<MethodData> debugMethods = bridge.findMethod(FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings("is_employee")));
                 for (MethodData m : debugMethods) {
@@ -151,7 +151,7 @@ public class DevOptionsUnlockHook {
             }
 
         } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Error during discovery: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Error during discovery: " + e.getMessage());
         }
     }
 
@@ -204,7 +204,7 @@ public class DevOptionsUnlockHook {
             }
             return bestFanIn >= MIN_CALLER_FAN_IN ? best : null;
         } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Structural discovery error: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Structural discovery error: " + e.getMessage());
             return null;
         }
     }
@@ -221,9 +221,9 @@ public class DevOptionsUnlockHook {
                     }
                 }
             });
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ✅ Hooked: " + m.getDeclaringClass().getName() + "." + m.getName());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Hooked: " + m.getDeclaringClass().getName() + "." + m.getName());
         } catch (Throwable e) {
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Failed to hook resolved method: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Failed to hook resolved method: " + e.getMessage());
         }
     }
 
@@ -243,14 +243,14 @@ public class DevOptionsUnlockHook {
 
                 if (paramTypes.size() == 1 && paramTypes.get(0).contains("com.instagram.common.session.UserSession")) {
                     String targetClass = invokedMethod.getClassName();
-                    ModuleLog.line("(InstaEclipse | DevOptionsEnable): 📦 Hooking via String detection: " + targetClass);
+                    ModuleLog.line("(InstaEclipse | DevOptionsEnable): Hooking via String detection: " + targetClass);
                     DexKitCache.saveString("DevOptionsClass", targetClass);
                     hookAllBooleanMethodsInClass(bridge, targetClass);
                     return true;
                 }
             }
         } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Error inspecting invoked methods: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Error inspecting invoked methods: " + e.getMessage());
         }
         return false;
     }
@@ -274,10 +274,10 @@ public class DevOptionsUnlockHook {
                 if (!params[0].getName().equals("com.instagram.common.session.UserSession")) continue;
                 m.setAccessible(true);
                 XposedBridge.hookMethod(m, hook);
-                ModuleLog.line("(InstaEclipse | DevOptionsEnable): ✅ Hooked (cache): " + className + "." + m.getName());
+                ModuleLog.line("(InstaEclipse | DevOptionsEnable): Hooked (cache): " + className + "." + m.getName());
             }
         } catch (Throwable e) {
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Reflection fallback failed: " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Reflection fallback failed: " + e.getMessage());
         }
     }
 
@@ -306,14 +306,14 @@ public class DevOptionsUnlockHook {
                                 }
                             }
                         });
-                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): ✅ Hooked: " + method.getClassName() + "." + method.getName());
+                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): Hooked: " + method.getClassName() + "." + method.getName());
                     } catch (Throwable e) {
-                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Failed to hook " + method.getName() + ": " + e.getMessage());
+                        ModuleLog.line("(InstaEclipse | DevOptionsEnable): Failed to hook " + method.getName() + ": " + e.getMessage());
                     }
                 }
             }
         } catch (Exception e) {
-            ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Error while hooking class: " + className + " → " + e.getMessage());
+            ModuleLog.line("(InstaEclipse | DevOptionsEnable): Error while hooking class: " + className + " → " + e.getMessage());
         }
     }
 }

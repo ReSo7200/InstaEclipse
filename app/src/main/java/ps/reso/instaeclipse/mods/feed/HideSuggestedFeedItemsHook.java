@@ -88,7 +88,7 @@ public class HideSuggestedFeedItemsHook {
                     markHookedForEnabledFlags();
                     return;
                 } catch (Throwable t) {
-                    ModuleLog.line("(InstaEclipse | HideSuggested): ⚠️ Cache hook failed: " + t.getMessage());
+                    ModuleLog.line("(InstaEclipse | HideSuggested): Cache hook failed: " + t.getMessage());
                 }
             }
         }
@@ -119,7 +119,7 @@ public class HideSuggestedFeedItemsHook {
             }
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(InstaEclipse | HideSuggested): ❌ FeedItem parser not found.");
+                ModuleLog.line("(InstaEclipse | HideSuggested): FeedItem parser not found.");
                 return;
             }
 
@@ -127,10 +127,10 @@ public class HideSuggestedFeedItemsHook {
             DexKitCache.saveString(CACHE_KEY_PARSER, targetClass);
             hookBridgeMethod(targetClass, classLoader, filterHook);
             markHookedForEnabledFlags();
-            ModuleLog.line("(InstaEclipse | HideSuggested): ✅ Hooked: " + targetClass);
+            ModuleLog.line("(InstaEclipse | HideSuggested): Hooked: " + targetClass);
 
         } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | HideSuggested): ❌ Exception: " + t.getMessage());
+            ModuleLog.line("(InstaEclipse | HideSuggested): Exception: " + t.getMessage());
         }
     }
 

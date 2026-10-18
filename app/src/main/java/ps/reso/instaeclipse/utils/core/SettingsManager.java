@@ -2,7 +2,14 @@ package ps.reso.instaeclipse.utils.core;
 
 import ps.reso.instaeclipse.utils.feature.ExtrasFeatures;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureManager;
@@ -13,16 +20,35 @@ public class SettingsManager {
     /** Application context, for pushing in-app changes to the companion (CompanionSync). */
     private static Context appContext;
 
+    private static final ExecutorService syncExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "InstaEclipse-SettingsSync");
+        t.setDaemon(true);
+        return t;
+    });
+
     public static void init(Context context) {
-        if (appContext == null && context != null) {
-            appContext = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        if (context != null) {
+            Context app = context.getApplicationContext();
+            if (app != null) {
+                appContext = app;
+            } else if (appContext == null) {
+                appContext = context;
+            }
         }
-        if (prefs == null) {
+        if (prefs == null && context != null) {
             prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         }
     }
 
+    public static void setPrefs(SharedPreferences customPrefs) {
+        prefs = customPrefs;
+    }
+
     public static void saveAllFlags() {
+        if (prefs == null && appContext != null) {
+            prefs = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        }
+        if (prefs == null) return;
         // Snapshot to stamp the keys this save changes (see CompanionSync).
         java.util.Map<String, ?> before = new java.util.HashMap<>(prefs.getAll());
         SharedPreferences.Editor editor = prefs.edit();
@@ -182,6 +208,10 @@ public class SettingsManager {
         CompanionSync.pushAsync(appContext);
 
         FeatureManager.refreshFeatureStatus();
+
+        if (CommonUtils.isCompanionAppInstalled(appContext)) {
+            syncToCompanionApp();
+        }
     }
 
     /** Marks keys whose value this save changed, so an older companion value never overrides them. */
@@ -199,7 +229,8 @@ public class SettingsManager {
     }
 
     public static void loadAllFlags(Context context) {
-        if (prefs == null) {
+        init(context);
+        if (prefs == null && context != null) {
             prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         }
 
@@ -298,7 +329,7 @@ public class SettingsManager {
         FeatureFlags.spoofLng = readDoublePref(prefs, "spoofLng", 0.0);
         FeatureFlags.spoofLabel = prefs.getString("spoofLabel", "");
         FeatureFlags.spoofRecent = prefs.getString("spoofRecent", "");
-        FeatureFlags.forceReelQuality = prefs.getInt("forceReelQuality", 0);
+        FeatureFlags.forceReelQuality = readIntCompat(prefs, "forceReelQuality", 0);
         FeatureFlags.disableRepost = prefs.getBoolean("disableRepost", false);
         FeatureFlags.hideShareCreateGroup = prefs.getBoolean("hideShareCreateGroup", false);
         FeatureFlags.exactTimestamps = prefs.getBoolean("exactTimestamps", false);
@@ -372,5 +403,113 @@ public class SettingsManager {
         } catch (Throwable ignored) {
             return fallback;
         }
+    }
+
+    private static int readIntCompat(SharedPreferences p, String key, int fallback) {
+        try {
+            return p.getInt(key, fallback);
+        } catch (ClassCastException e) {
+            boolean legacy = false;
+            try {
+                legacy = p.getBoolean(key, false);
+            } catch (ClassCastException ignored) {
+            }
+            int migrated = legacy ? 1080 : fallback;
+            try {
+                p.edit().putInt(key, migrated).apply();
+            } catch (Throwable ignored) {
+            }
+            return migrated;
+        }
+    }
+
+    public static void syncToCompanionApp() {
+        if (prefs == null) {
+            android.util.Log.w("InstaEclipse.Sync", "(SettingsManager) syncToCompanionApp aborted: prefs is null");
+            return;
+        }
+        if (appContext == null) {
+            android.util.Log.w("InstaEclipse.Sync", "(SettingsManager) syncToCompanionApp aborted: appContext is null");
+            return;
+        }
+        if (!CommonUtils.isCompanionAppInstalled(appContext)) {
+            return;
+        }
+        final Bundle bundle = new Bundle();
+        for (Map.Entry<String, ?> entry : prefs.getAll().entrySet()) {
+            Object val = entry.getValue();
+            if (val instanceof Boolean) {
+                bundle.putBoolean(entry.getKey(), (Boolean) val);
+            } else if (val instanceof Integer) {
+                bundle.putInt(entry.getKey(), (Integer) val);
+            } else if (val instanceof Long) {
+                bundle.putLong(entry.getKey(), (Long) val);
+            } else if (val instanceof Float) {
+                bundle.putFloat(entry.getKey(), (Float) val);
+            } else if (val instanceof String) {
+                bundle.putString(entry.getKey(), (String) val);
+            }
+        }
+        android.util.Log.d("InstaEclipse.Sync", "(SettingsManager) syncToCompanionApp: sending " + bundle.size() + " entries");
+
+        syncExecutor.execute(() -> {
+            try {
+                Uri uri = Uri.parse("content://ps.reso.instaeclipse.preferences");
+                Bundle res = appContext.getContentResolver().call(uri, "saveAll", null, bundle);
+                android.util.Log.d("InstaEclipse.Sync", "(SettingsManager) ContentProvider saveAll success: " + res);
+            } catch (Throwable t) {
+                android.util.Log.e("InstaEclipse.Sync", "(SettingsManager) ContentProvider saveAll failed: " + t.getMessage(), t);
+            }
+            try {
+                Intent reply = new Intent("ps.reso.instaeclipse.ACTION_SEND_PREFS");
+                reply.setPackage(CommonUtils.MY_PACKAGE_NAME);
+                reply.putExtras(bundle);
+                appContext.sendBroadcast(reply);
+                android.util.Log.d("InstaEclipse.Sync", "(SettingsManager) Broadcast ACTION_SEND_PREFS sent");
+            } catch (Throwable t) {
+                android.util.Log.e("InstaEclipse.Sync", "(SettingsManager) Broadcast ACTION_SEND_PREFS failed: " + t.getMessage(), t);
+            }
+        });
+    }
+
+    public static void syncFromCompanionProvider(Context context) {
+        init(context);
+        if (appContext == null || prefs == null) return;
+        if (!CommonUtils.isCompanionAppInstalled(appContext)) return;
+        syncExecutor.execute(() -> {
+            try {
+                Uri uri = Uri.parse("content://ps.reso.instaeclipse.preferences");
+                Bundle bundle = appContext.getContentResolver().call(uri, "getAll", null, null);
+                if (bundle != null && !bundle.isEmpty()) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    boolean hasChanges = false;
+                    for (String key : bundle.keySet()) {
+                        Object val = bundle.get(key);
+                        if (val instanceof Boolean) {
+                            editor.putBoolean(key, (Boolean) val);
+                            hasChanges = true;
+                        } else if (val instanceof Integer) {
+                            editor.putInt(key, (Integer) val);
+                            hasChanges = true;
+                        } else if (val instanceof Long) {
+                            editor.putLong(key, (Long) val);
+                            hasChanges = true;
+                        } else if (val instanceof Float) {
+                            editor.putFloat(key, (Float) val);
+                            hasChanges = true;
+                        } else if (val instanceof String) {
+                            editor.putString(key, (String) val);
+                            hasChanges = true;
+                        }
+                    }
+                    if (hasChanges) {
+                        editor.apply();
+                        loadAllFlags(appContext);
+                        FeatureManager.refreshFeatureStatus();
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+        });
     }
 }

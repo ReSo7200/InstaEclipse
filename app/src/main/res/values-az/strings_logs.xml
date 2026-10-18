@@ -2,9 +2,9 @@
 <resources>
     <!-- Logs tab (0.8) -->
     <string name="logs_filter_all">Hamısı</string>
-    <string name="logs_filter_hooked">Uğurlu ✅</string>
-    <string name="logs_filter_errors">Xətalar ❌</string>
-    <string name="logs_filter_warnings">Xəbərdarlıqlar ⚠️</string>
+    <string name="logs_filter_hooked">Uğurlu</string>
+    <string name="logs_filter_errors">Xətalar</string>
+    <string name="logs_filter_warnings">Xəbərdarlıqlar </string>
     <string name="logs_filter_count">%1$s · %2$d</string>
     <string name="logs_refresh">Yenilə</string>
     <string name="logs_copy">Kopyala</string>

@@ -10,7 +10,7 @@
     <!-- home -->
     <string name="back">Quay lại</string>
     <string name="apply_changes">Áp dụng thay đổi</string>
-    <string name="multiple_versions_detected">⚠️ Phát hiện nhiều phiên bản Instagram</string>
+    <string name="multiple_versions_detected"> Phát hiện nhiều phiên bản Instagram</string>
     <string name="module_disabled">Module chưa được kích hoạt. Vui lòng bật module trong LSPosed.</string>
 
     <string name="module_status">Trạng thái Module:</string>
@@ -182,7 +182,7 @@
     <string name="theme_saved">Đã lưu giao diện</string>
     <string name="theme_pick_color">Chọn màu sắc</string>
     <string name="theme_apply_color">Áp dụng</string>
-    <string name="theme_rgba_format">R %1$d  G %2$d  B %3$d  A %4$d</string>
+    <string name="theme_rgba_format">R %1$d G %2$d B %3$d A %4$d</string>
     <string name="theme_alpha_format">Độ trong suốt: %1$d%%</string>
     <string name="theme_slot_background">Màu nền</string>
     <string name="theme_slot_surface">Màu bề mặt (Surface)</string>
@@ -224,11 +224,11 @@
     <string name="ig_dialog_dev_export">Xuất tệp cấu hình Dev</string>
     <string name="ig_dialog_dev_restore_default_config">Khôi phục cấu hình mặc định</string>
     <string name="ig_dialog_dev_restore_default_config_confirm">Thao tác này sẽ ghi đè cấu hình Dev hiện tại bằng cấu hình mặc định. Tiếp tục?</string>
-    <string name="ig_toast_default_config_restored">✅ Đã khôi phục cấu hình mặc định.</string>
+    <string name="ig_toast_default_config_restored">Đã khôi phục cấu hình mặc định.</string>
     <string name="ig_dialog_dev_remove_build_expired">Chặn thông báo hết hạn bản Build</string>
     <string name="ig_dialog_clear_cache">Xóa bộ nhớ đệm Hooks</string>
     <string name="ig_dialog_section_clear_cache">Xóa bộ nhớ đệm Hooks</string>
-    <string name="ig_dialog_clear_cache_message">⚠️ Thao tác này sẽ buộc InstaEclipse quét lại Instagram ở lần mở tiếp theo. Ứng dụng sẽ tự khởi động lại.</string>
+    <string name="ig_dialog_clear_cache_message"> Thao tác này sẽ buộc InstaEclipse quét lại Instagram ở lần mở tiếp theo. Ứng dụng sẽ tự khởi động lại.</string>
     <string name="ig_dialog_clear_cache_now">Xóa bộ nhớ đệm &amp; Khởi động lại</string>
     <string name="ig_dialog_unable_open_ui">Không thể mở giao diện InstaEclipse.</string>
     <string name="ig_dialog_instagram_not_ready">Instagram chưa được mở hoặc chưa sẵn sàng.</string>
@@ -238,15 +238,15 @@
     <string name="export_config_success">Đã xuất cấu hình thành công.</string>
     <string name="export_config_failed">Lưu tệp thất bại: %1$s</string>
     <string name="export_invalid_uri">Đường dẫn URI không hợp lệ</string>
-    <string name="ig_toast_config_imported">✅ Đã nhập cấu hình thành công.</string>
-    <string name="ig_toast_config_import_failed">❌ Nhập cấu hình thất bại.</string>
+    <string name="ig_toast_config_imported">Đã nhập cấu hình thành công.</string>
+    <string name="ig_toast_config_import_failed">Nhập cấu hình thất bại.</string>
 
     <!-- JsonImportActivity -->
     <string name="json_select_config">Chọn tệp JSON cấu hình</string>
-    <string name="json_target_not_specified">❌ Chưa xác định ứng dụng mục tiêu.</string>
-    <string name="json_sent">✅ Đã gửi tới Instagram.</string>
-    <string name="json_not_valid">❌ Tệp JSON không hợp lệ.</string>
-    <string name="json_read_failed">❌ Không thể đọc tệp: %1$s</string>
+    <string name="json_target_not_specified">Chưa xác định ứng dụng mục tiêu.</string>
+    <string name="json_sent">Đã gửi tới Instagram.</string>
+    <string name="json_not_valid">Tệp JSON không hợp lệ.</string>
+    <string name="json_read_failed">Không thể đọc tệp: %1$s</string>
     <string name="json_cancelled">Đã hủy hoặc không có tệp nào được chọn.</string>
 
     <!-- Ghost Mode options -->
@@ -312,14 +312,14 @@
     <string name="ig_comment_select_part">Chọn đoạn văn bản để sao chép</string>
     <string name="ig_comment_select_title">Chọn nội dung sao chép</string>
     <string name="ig_comment_copy_selected">Sao chép đoạn đã chọn</string>
-    <string name="ig_toast_comment_copied">✅ Đã sao chép vào bộ nhớ tạm!</string>
+    <string name="ig_toast_comment_copied">Đã sao chép vào bộ nhớ tạm!</string>
 
     <!-- Caption Copy menu + dialog (runs in IG process) -->
     <string name="ig_caption_copy_menu_item">Sao chép chú thích</string>
     <string name="ig_caption_copy_title">Sao chép chú thích</string>
     <string name="ig_caption_copy_full">Sao chép toàn bộ chú thích</string>
     <string name="ig_caption_copy_none">Bài viết này không có chú thích</string>
-    <string name="ig_caption_copied">✅ Đã sao chép chú thích vào bộ nhớ tạm!</string>
+    <string name="ig_caption_copied">Đã sao chép chú thích vào bộ nhớ tạm!</string>
 
     <!-- Downloader options -->
     <string name="ig_dialog_downloader_settings">Cài đặt Trình tải xuống</string>
@@ -342,7 +342,7 @@
     <string name="ig_dialog_about_telegram">Telegram</string>
 
     <!-- Restart -->
-    <string name="ig_dialog_restart_message">⚠️ Xóa bộ nhớ đệm và khởi động lại ứng dụng Instagram?</string>
+    <string name="ig_dialog_restart_message"> Xóa bộ nhớ đệm và khởi động lại ứng dụng Instagram?</string>
     <string name="ig_dialog_restart_now">Khởi động lại ngay</string>
     <string name="ig_dialog_restart_not_found">Không tìm thấy ứng dụng Instagram để khởi động lại.</string>
     <string name="ig_dialog_restart_failed">Khởi động lại thất bại: %1$s</string>
@@ -351,12 +351,12 @@
     <string name="ig_toast_ghost_no_options">Chưa chọn tùy chọn Chế độ Ẩn danh nào!</string>
     <string name="ig_toast_ghost_enabled">Đã bật Chế độ Ẩn danh</string>
     <string name="ig_toast_ghost_disabled">Đã tắt Chế độ Ẩn danh</string>
-    <string name="ig_toast_seen_sent">✅ Đã gửi trạng thái Đã xem</string>
-    <string name="ig_toast_channel_seen_sent">✅ Đã gửi trạng thái Đã xem kênh</string>
+    <string name="ig_toast_seen_sent">Đã gửi trạng thái Đã xem</string>
+    <string name="ig_toast_channel_seen_sent">Đã gửi trạng thái Đã xem kênh</string>
 
     <!-- Toast: Follower status -->
-    <string name="ig_toast_follows_you">đang theo dõi bạn ✅</string>
-    <string name="ig_toast_not_follows_you">không theo dõi bạn ❌</string>
+    <string name="ig_toast_follows_you">đang theo dõi bạn</string>
+    <string name="ig_toast_not_follows_you">không theo dõi bạn</string>
 
     <!-- Toast: App settings -->
     <string name="ig_toast_settings_applied">Đã áp dụng cài đặt thành công!</string>
@@ -399,7 +399,7 @@
     <string name="ig_toast_no_reel_url_scroll">Không tìm thấy liên kết Reel — hãy vuốt xem Reel trước</string>
     <string name="ig_toast_no_download_folder">Chưa chọn thư mục tải xuống</string>
     <string name="ig_toast_file_saved">Đã lưu: %1$s</string>
-    <string name="ig_toast_features_loaded">InstaEclipse đã sẵn sàng 🎯</string>
+    <string name="ig_toast_features_loaded">InstaEclipse đã sẵn sàng</string>
 
     <!-- Downloader carousel UI -->
     <string name="ig_dl_title">Tải xuống</string>

@@ -27,13 +27,19 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 public final class IeToast {
 
     private final Context ctx;
+    private final int iconRes;
     private final CharSequence text;
     private final int duration;
 
-    private IeToast(Context ctx, CharSequence text, int duration) {
+    private IeToast(Context ctx, int iconRes, CharSequence text, int duration) {
         this.ctx = ctx;
+        this.iconRes = iconRes != 0 ? iconRes : R.drawable.ic_logo;
         this.text = text;
         this.duration = duration;
+    }
+
+    private IeToast(Context ctx, CharSequence text, int duration) {
+        this(ctx, R.drawable.ic_logo, text, duration);
     }
 
     public static IeToast makeText(Context ctx, CharSequence text, int duration) {
@@ -44,6 +50,16 @@ public final class IeToast {
         CharSequence t;
         try { t = ctx.getText(resId); } catch (Throwable e) { t = ""; }
         return new IeToast(ctx, t, duration);
+    }
+
+    public static IeToast makeText(Context ctx, int iconRes, CharSequence text, int duration) {
+        return new IeToast(ctx, iconRes, text, duration);
+    }
+
+    public static IeToast makeText(Context ctx, int iconRes, int resId, int duration) {
+        CharSequence t;
+        try { t = ctx.getText(resId); } catch (Throwable e) { t = ""; }
+        return new IeToast(ctx, iconRes, t, duration);
     }
 
     public void show() {
@@ -68,7 +84,6 @@ public final class IeToast {
         int bg = dark ? 0xF21C1C1E : 0xF7FFFFFF;
         int fg = dark ? 0xFFF5F5F5 : 0xFF111111;
         int stroke = dark ? 0x1FFFFFFF : 0x1A000000;
-        int accent = ps.reso.instaeclipse.mods.ui.theme.IgThemeEngine.accentOr(0xFF0095F6);
 
         LinearLayout card = new LinearLayout(app);
         card.setOrientation(LinearLayout.HORIZONTAL);
@@ -81,17 +96,14 @@ public final class IeToast {
         card.setBackground(shape);
         card.setElevation(6 * d);
 
-        // Accent badge with the InstaEclipse mark.
         ImageView mark = new ImageView(app);
-        GradientDrawable badge = new GradientDrawable();
-        badge.setShape(GradientDrawable.OVAL);
-        badge.setColor(accent);
-        mark.setBackground(badge);
-        Drawable logo = moduleDrawable(app, R.drawable.ic_logo);
-        if (logo != null) mark.setImageDrawable(logo);
-        int pad = (int) (5 * d);
-        mark.setPadding(pad, pad, pad, pad);
-        int size = (int) (28 * d);
+        Drawable logo = moduleDrawable(app, iconRes != 0 ? iconRes : R.drawable.ic_logo);
+        if (logo != null) {
+            logo = logo.mutate();
+            logo.setColorFilter(new android.graphics.PorterDuffColorFilter(fg, android.graphics.PorterDuff.Mode.SRC_IN));
+            mark.setImageDrawable(logo);
+        }
+        int size = (int) (22 * d);
         LinearLayout.LayoutParams mlp = new LinearLayout.LayoutParams(size, size);
         mlp.setMarginEnd((int) (10 * d));
         card.addView(mark, mlp);

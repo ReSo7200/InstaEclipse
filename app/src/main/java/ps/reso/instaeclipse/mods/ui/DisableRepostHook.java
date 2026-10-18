@@ -70,7 +70,7 @@ public class DisableRepostHook {
         total += installFeedCommit(classLoader);
 
         if (total > 0) FeatureStatusTracker.setHooked("DisableRepost");
-        ModuleLog.line("(IE|Repost) ✅ installed: " + total + " method(s)");
+        ModuleLog.line("(IE|Repost) installed: " + total + " method(s)");
     }
 
     // Reels + profile path — swallow the shared handler's void entry points entirely.
@@ -99,7 +99,7 @@ public class DisableRepostHook {
                     } catch (Throwable ignored) {}
                 }
             } catch (Throwable t) {
-                ModuleLog.line("(IE|Repost) ⚠️ anchor " + anchor + ": " + t.getMessage());
+                ModuleLog.line("(IE|Repost) anchor " + anchor + ": " + t.getMessage());
             }
         }
         return total;
@@ -136,7 +136,7 @@ public class DisableRepostHook {
             }
 
             if (owner == null) {
-                ModuleLog.line("(IE|Repost) ⚠️ RepostsRepository owner not resolved");
+                ModuleLog.line("(IE|Repost) RepostsRepository owner not resolved");
                 return 0;
             }
 
@@ -148,10 +148,10 @@ public class DisableRepostHook {
                     total++;
                 } catch (Throwable ignored) {}
             }
-            if (total == 0) ModuleLog.line("(IE|Repost) ⚠️ postRepost launcher not found on "
+            if (total == 0) ModuleLog.line("(IE|Repost) postRepost launcher not found on "
                     + owner.getName());
         } catch (Throwable t) {
-            ModuleLog.line("(IE|Repost) ⚠️ feed postRepost hook: " + t.getMessage());
+            ModuleLog.line("(IE|Repost) feed postRepost hook: " + t.getMessage());
         }
         ModuleLog.line("(IE|Repost) feed postRepost launcher: " + total + " method(s)");
         return total;

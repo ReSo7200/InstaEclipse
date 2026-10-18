@@ -67,7 +67,7 @@ public class GhostPermanentViewHook {
                             .paramCount(1)));
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(IE|ViewOnceMedia) ❌ unsafeParseFromJson not found");
+                ModuleLog.line("(IE|ViewOnceMedia) unsafeParseFromJson not found");
                 return;
             }
 
@@ -88,22 +88,22 @@ public class GhostPermanentViewHook {
                 try {
                     target = methods.get(0).getMethodInstance(classLoader);
                 } catch (Throwable t) {
-                    ModuleLog.line("(IE|ViewOnceMedia) ❌ Could not resolve method: " + t);
+                    ModuleLog.line("(IE|ViewOnceMedia) Could not resolve method: " + t);
                     return;
                 }
             }
 
-            ModuleLog.line("(IE|ViewOnceMedia) ✅ hooking "
+            ModuleLog.line("(IE|ViewOnceMedia) hooking "
                     + target.getDeclaringClass().getName() + "." + target.getName());
 
             DexKitCache.saveMethod("ViewOnceMedia", target);
             XposedBridge.hookMethod(target, buildHook());
 
             FeatureStatusTracker.setHooked("PermanentViewMode");
-            ModuleLog.line("(IE|ViewOnceMedia) ✅ hooked");
+            ModuleLog.line("(IE|ViewOnceMedia) hooked");
 
         } catch (Throwable t) {
-            ModuleLog.line("(IE|ViewOnceMedia) ❌ " + t);
+            ModuleLog.line("(IE|ViewOnceMedia) " + t);
         }
     }
 

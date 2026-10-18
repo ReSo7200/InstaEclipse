@@ -2,9 +2,9 @@
 <resources>
     <!-- Logs tab (0.8) -->
     <string name="logs_filter_all">All</string>
-    <string name="logs_filter_hooked">Hooked ✅</string>
-    <string name="logs_filter_errors">Errors ❌</string>
-    <string name="logs_filter_warnings">Warnings ⚠️</string>
+    <string name="logs_filter_hooked">Hooked</string>
+    <string name="logs_filter_errors">Errors</string>
+    <string name="logs_filter_warnings">Warnings </string>
     <string name="logs_filter_count">%1$s · %2$d</string>
     <string name="logs_refresh">Refresh</string>
     <string name="logs_copy">Copy</string>

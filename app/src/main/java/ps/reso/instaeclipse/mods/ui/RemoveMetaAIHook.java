@@ -114,16 +114,16 @@ public class RemoveMetaAIHook {
             XposedHelpers.findAndHookMethod(LayoutInflater.class, "inflate",
                     int.class, ViewGroup.class, boolean.class, inflateHook);
         } catch (Throwable t) {
-            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ inflate(3) hook: " + t.getMessage());
+            ModuleLog.line("(IE|RemoveMetaAI) inflate(3) hook: " + t.getMessage());
         }
         try {
             XposedHelpers.findAndHookMethod(LayoutInflater.class, "inflate",
                     int.class, ViewGroup.class, inflateHook);
         } catch (Throwable t) {
-            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ inflate(2) hook: " + t.getMessage());
+            ModuleLog.line("(IE|RemoveMetaAI) inflate(2) hook: " + t.getMessage());
         }
         FeatureStatusTracker.setHooked("RemoveMetaAI");
-        ModuleLog.line("(IE|RemoveMetaAI) ✅ installed");
+        ModuleLog.line("(IE|RemoveMetaAI) installed");
     }
 
     /**
@@ -223,7 +223,7 @@ public class RemoveMetaAIHook {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), hook); n++; } catch (Throwable ignored) {}
             }
         } catch (Throwable t) {
-            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ " + label + ": " + t.getMessage());
+            ModuleLog.line("(IE|RemoveMetaAI) " + label + ": " + t.getMessage());
         }
         ModuleLog.line("(IE|RemoveMetaAI) " + label + ": " + n + " method(s)");
     }
@@ -256,7 +256,7 @@ public class RemoveMetaAIHook {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), neuter); n++; } catch (Throwable ignored) {}
             }
         } catch (Throwable t) {
-            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ search-serp-hcm: " + t.getMessage());
+            ModuleLog.line("(IE|RemoveMetaAI) search-serp-hcm: " + t.getMessage());
         }
         ModuleLog.line("(IE|RemoveMetaAI) search-serp-hcm: " + n + " method(s)");
     }
@@ -291,7 +291,7 @@ public class RemoveMetaAIHook {
                     catch (Throwable ignored) {}
                 }
             } catch (Throwable t) {
-                ModuleLog.line("(IE|RemoveMetaAI) ⚠️ reels-card anchor " + a + ": " + t.getMessage());
+                ModuleLog.line("(IE|RemoveMetaAI) reels-card anchor " + a + ": " + t.getMessage());
             }
         }
         ModuleLog.line("(IE|RemoveMetaAI) reels-card eligibility: " + n + " method(s)");
@@ -328,7 +328,7 @@ public class RemoveMetaAIHook {
                 catch (Throwable ignored) {}
             }
         } catch (Throwable t) {
-            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ video-attribution: " + t.getMessage());
+            ModuleLog.line("(IE|RemoveMetaAI) video-attribution: " + t.getMessage());
         }
         ModuleLog.line("(IE|RemoveMetaAI) video-attribution: " + n + " method(s)");
     }
@@ -375,7 +375,7 @@ public class RemoveMetaAIHook {
                 catch (Throwable ignored) {}
             }
         } catch (Throwable t) {
-            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ overflow gate: " + t.getMessage());
+            ModuleLog.line("(IE|RemoveMetaAI) overflow gate: " + t.getMessage());
         }
         return n;
     }
@@ -445,7 +445,7 @@ public class RemoveMetaAIHook {
             }
             ModuleLog.line("(IE|RemoveMetaAI) " + label + " filter: " + n + " method(s)");
         } catch (Throwable t) {
-            ModuleLog.line("(IE|RemoveMetaAI) ⚠️ " + label + ": " + t.getMessage());
+            ModuleLog.line("(IE|RemoveMetaAI) " + label + ": " + t.getMessage());
         }
     }
 

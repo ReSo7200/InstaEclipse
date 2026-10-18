@@ -130,6 +130,13 @@ public class LikeUndoHook {
             tv.setTextColor(Color.WHITE);
             tv.setTextSize(15);
             tv.setGravity(Gravity.CENTER);
+            android.graphics.drawable.Drawable heart = ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(R.drawable.ic_heart, Color.parseColor("#ED4956"));
+            if (heart != null) {
+                int iconSize = (int) (18 * d);
+                heart.setBounds(0, 0, iconSize, iconSize);
+                tv.setCompoundDrawables(heart, null, null, null);
+                tv.setCompoundDrawablePadding((int) (8 * d));
+            }
             int ph = (int) (16 * d), pv = (int) (12 * d);
             tv.setPadding(ph, pv, ph, pv);
             GradientDrawable bg = new GradientDrawable();

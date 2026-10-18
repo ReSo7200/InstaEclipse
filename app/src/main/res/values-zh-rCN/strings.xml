@@ -11,7 +11,7 @@
     <!--  home  -->
     <string name="back">返回</string>
     <string name="apply_changes">应用更改</string>
-    <string name="multiple_versions_detected">⚠️ 检测到多个版本</string>
+    <string name="multiple_versions_detected">检测到多个版本</string>
     <string name="module_disabled">模块未启用。请启用它。</string>
     <string name="module_status">模块状态：</string>
     <string name="module_status_disabled">模块状态：已禁用</string>
@@ -132,7 +132,7 @@
     <!-- ================================================================ -->
 
     <!-- Common -->
-    <string name="ig_dialog_title" translatable="false">InstaEclipse 🌘</string>
+    <string name="ig_dialog_title" translatable="false">InstaEclipse</string>
     <string name="ig_dialog_close">关闭</string>
     <string name="ig_dialog_enable_disable_all">启用/禁用所有</string>
     <string name="ig_dialog_error">错误</string>
@@ -172,7 +172,7 @@
     <string name="ig_dialog_dev_export">导出开发者配置</string>
     <string name="ig_dialog_dev_restore_default_config">恢复默认配置</string>
     <string name="ig_dialog_dev_restore_default_config_confirm">这将用内置默认配置覆盖当前的开发者配置。是否继续？</string>
-    <string name="ig_toast_default_config_restored">✅ 默认配置已恢复。</string>
+    <string name="ig_toast_default_config_restored">默认配置已恢复。</string>
     <string name="ig_dialog_dev_remove_build_expired">移除版本过期弹窗</string>
     <string name="ig_dialog_unable_open_ui">无法打开 InstaEclipse 界面。</string>
     <string name="ig_dialog_instagram_not_ready">Instagram 未打开或未就绪。</string>
@@ -182,15 +182,15 @@
     <string name="export_config_success">配置导出成功。</string>
     <string name="export_config_failed">保存失败：%1$s</string>
     <string name="export_invalid_uri">无效的 URI</string>
-    <string name="ig_toast_config_imported">✅ 配置已导入。</string>
-    <string name="ig_toast_config_import_failed">❌ 导入配置失败。</string>
+    <string name="ig_toast_config_imported">配置已导入。</string>
+    <string name="ig_toast_config_import_failed">导入配置失败。</string>
 
     <!-- JsonImportActivity -->
     <string name="json_select_config">选择 JSON 配置文件</string>
-    <string name="json_target_not_specified">❌ 未指定目标包。</string>
-    <string name="json_sent">✅ 已发送至 Instagram。</string>
-    <string name="json_not_valid">❌ 非有效 JSON 文件。</string>
-    <string name="json_read_failed">❌ 读取文件失败：%1$s</string>
+    <string name="json_target_not_specified">未指定目标包。</string>
+    <string name="json_sent">已发送至 Instagram。</string>
+    <string name="json_not_valid">非有效 JSON 文件。</string>
+    <string name="json_read_failed">读取文件失败：%1$s</string>
     <string name="json_cancelled">已取消或未选择文件。</string>
 
     <!-- Ghost Mode options -->
@@ -276,7 +276,7 @@
     <string name="ig_dialog_misc_viewer_search">搜索你的限时动态观看者</string>
     <string name="ig_viewer_search_hint">搜索观看者</string>
     <string name="ig_dialog_misc_like_undo">赞的撤销时间窗口（4 秒）</string>
-    <string name="ig_like_undo_bar">❤ 已赞 · 撤销</string>
+    <string name="ig_like_undo_bar">已赞 · 撤销</string>
     <string name="ig_like_undo_cancelled">已取消赞 — 刷新以更新爱心</string>
     <string name="ig_dialog_misc_exact_timestamps">显示确切日期，而非“2小时前”</string>
     <string name="ig_timestamp_format">日期格式</string>
@@ -298,7 +298,7 @@
     <string name="ig_comment_select_part">选择要复制的部分</string>
     <string name="ig_comment_select_title">选择要复制的内容</string>
     <string name="ig_comment_copy_selected">复制所选内容</string>
-    <string name="ig_toast_comment_copied">✅ 已复制到剪贴板！</string>
+    <string name="ig_toast_comment_copied">已复制到剪贴板！</string>
 
     <!-- Downloader options -->
     <string name="ig_dialog_downloader_settings">下载器设置</string>
@@ -322,10 +322,10 @@
     <string name="ig_dialog_about_telegram">Telegram</string>
 
     <!-- Restart -->
-    <string name="ig_dialog_restart_message">⚠️ 清除应用缓存并重启？</string>
+    <string name="ig_dialog_restart_message">清除应用缓存并重启？</string>
     <string name="ig_dialog_clear_cache">清除 Hooks 缓存</string>
     <string name="ig_dialog_section_clear_cache">清除 Hooks 缓存</string>
-    <string name="ig_dialog_clear_cache_message">⚠️ 这将强制 InstaEclipse 在下次启动时重新扫描 Instagram。应用将重新启动。</string>
+    <string name="ig_dialog_clear_cache_message">这将强制 InstaEclipse 在下次启动时重新扫描 Instagram。应用将重新启动。</string>
     <string name="ig_dialog_clear_cache_now">清除缓存并重启</string>
     <string name="ig_dialog_restart_now">立即重启</string>
     <string name="ig_dialog_restart_not_found">找不到要重启的应用。</string>
@@ -335,12 +335,12 @@
     <string name="ig_toast_ghost_no_options">未选择幽灵模式选项！</string>
     <string name="ig_toast_ghost_enabled">幽灵模式已启用</string>
     <string name="ig_toast_ghost_disabled">幽灵模式已禁用</string>
-    <string name="ig_toast_seen_sent">✅ 已读已发送</string>
-    <string name="ig_toast_channel_seen_sent">✅ 频道已读已发送</string>
+    <string name="ig_toast_seen_sent">已读已发送</string>
+    <string name="ig_toast_channel_seen_sent">频道已读已发送</string>
 
     <!-- Toast: Follower status -->
-    <string name="ig_toast_follows_you">正在关注您 ✅</string>
-    <string name="ig_toast_not_follows_you">未关注您 ❌</string>
+    <string name="ig_toast_follows_you">正在关注您</string>
+    <string name="ig_toast_not_follows_you">未关注您</string>
 
     <!-- Toast: App settings -->
     <string name="ig_toast_settings_applied">设置已应用！</string>
@@ -405,7 +405,7 @@
     <!-- Toast: Downloader (service) -->
     <string name="ig_toast_no_download_folder">未设置下载文件夹</string>
     <string name="ig_toast_file_saved">已保存：%1$s</string>
-    <string name="ig_toast_features_loaded">InstaEclipse 已加载 🎯</string>
+    <string name="ig_toast_features_loaded">InstaEclipse 已加载</string>
 
 
     <!-- Update check dialog -->
@@ -427,7 +427,7 @@
     <string name="theme_saved">主题已保存</string>
     <string name="theme_pick_color">选择颜色</string>
     <string name="theme_apply_color">应用</string>
-    <string name="theme_rgba_format">R %1$d  G %2$d  B %3$d  A %4$d</string>
+    <string name="theme_rgba_format">R %1$d G %2$d B %3$d A %4$d</string>
     <string name="theme_alpha_format">不透明度：%1$d%%</string>
     <string name="theme_slot_background">背景</string>
     <string name="theme_slot_surface">表面</string>
@@ -584,7 +584,7 @@
     <string name="ig_caption_copy_title">复制标题</string>
     <string name="ig_caption_copy_full">复制完整标题</string>
     <string name="ig_caption_copy_none">此帖子没有标题</string>
-    <string name="ig_caption_copied">✅ 标题已复制到剪贴板！</string>
+    <string name="ig_caption_copied">标题已复制到剪贴板！</string>
     <string name="ig_dialog_downloader_copy_link">复制媒体链接</string>
     <string name="ig_copy_link_title">复制媒体链接</string>
     <string name="ig_copy_link_copied">媒体链接已复制到剪贴板</string>
@@ -599,8 +599,8 @@
     <string name="ig_instant_save_none">未找到 Instant 媒体</string>
     <string name="ig_instant_upload_title">从相册上传 Instant</string>
     <string name="ig_dialog_misc_upload_instants">从相册上传 Instant</string>
-    <string name="ig_instant_upload_chip">🖼 相册</string>
-    <string name="ig_instant_upload_chip_ready">✓ 就绪 —— 点击快门</string>
+    <string name="ig_instant_upload_chip">相册</string>
+    <string name="ig_instant_upload_chip_ready">就绪 —— 点击快门</string>
     <string name="ig_instant_upload_ready">已选择！点击快门以将其作为 Instant 发送</string>
     <string name="ig_instant_upload_fail">无法加载该图片</string>
     <string name="ig_story_download_choice_title">下载限时动态</string>
@@ -611,8 +611,8 @@
     <string name="ig_story_cache_cleared">已清除缓存的限时动态</string>
     <string name="ig_dialog_ghost_chat_export">聊天中的“导出聊天”按钮</string>
     <string name="ig_chat_export">导出聊天</string>
-    <string name="ig_locked_coll_setting">可锁定的收藏夹（收藏夹内的 🔒 按钮；使用在 Instagram 中设置的密码）</string>
-    <string name="ig_locked_coll_setting_short">可锁定的收藏夹（收藏夹内的 🔒）</string>
+    <string name="ig_locked_coll_setting">可锁定的收藏夹（收藏夹内的 按钮；使用在 Instagram 中设置的密码）</string>
+    <string name="ig_locked_coll_setting_short">可锁定的收藏夹（收藏夹内的）</string>
     <string name="ig_locked_coll_title">已锁定的收藏夹</string>
     <string name="ig_locked_coll_open">打开</string>
     <string name="ig_locked_coll_hint">密码</string>

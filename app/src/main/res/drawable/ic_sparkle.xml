@@ -2,9 +2,19 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:tint="@android:color/white">
-  <path
-      android:fillColor="@android:color/white"
-      android:pathData="M19,9l1.25,-2.75L23,5l-2.75,-1.25L19,1l-1.25,2.75L15,5l2.75,1.25L19,9z M11.5,9.5L9,4 6.5,9.5 1,12l5.5,2.5L9,20l2.5,-5.5L17,12l-5.5,-2.5z M19,15l-1.25,2.75L15,19l2.75,1.25L19,23l1.25,-2.75L23,19l-2.75,-1.25L19,15z"/>
+    android:viewportHeight="24">
+    <path
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M12,3c0,4.5 -3.5,8 -8,8c4.5,0 8,3.5 8,8c0,-4.5 3.5,-8 8,-8c-4.5,0 -8,-3.5 -8,-8z" />
+    <path
+        android:strokeColor="@android:color/white"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M19,3c0,1.5 -1,2.5 -2.5,2.5c1.5,0 2.5,1 2.5,2.5c0,-1.5 1,-2.5 2.5,-2.5c-1.5,0 -2.5,-1 -2.5,-2.5z" />
 </vector>

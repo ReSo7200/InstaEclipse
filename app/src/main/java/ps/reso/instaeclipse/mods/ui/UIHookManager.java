@@ -330,11 +330,11 @@ public class UIHookManager {
                         ps.reso.instaeclipse.utils.feature.FeatureManager.refreshFeatureStatus();
                         Handler mainHandler = new Handler(Looper.getMainLooper());
                         mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx.getApplicationContext(),
-                                "✅ " + I18n.t(ctx, R.string.ig_toast_settings_restored), Toast.LENGTH_SHORT).show());
+                                R.drawable.ic_check_circle, I18n.t(ctx, R.string.ig_toast_settings_restored), Toast.LENGTH_SHORT).show());
                     } catch (Exception e) {
                         Handler mainHandler = new Handler(Looper.getMainLooper());
                         mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx.getApplicationContext(),
-                                "❌ " + I18n.t(ctx, R.string.ig_toast_restore_failed, e.getMessage()), Toast.LENGTH_LONG).show());
+                                R.drawable.ic_block, I18n.t(ctx, R.string.ig_toast_restore_failed, e.getMessage()), Toast.LENGTH_LONG).show());
                     }
                 }).start();
             }

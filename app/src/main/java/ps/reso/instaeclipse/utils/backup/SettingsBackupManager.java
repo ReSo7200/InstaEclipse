@@ -19,6 +19,7 @@ public class SettingsBackupManager {
         s.put("removeBuildExpiredPopup", FeatureFlags.removeBuildExpiredPopup);
 
         // Ghost Mode
+        s.put("isGhostModeEnabled",      FeatureFlags.isGhostModeEnabled);
         s.put("isGhostSeen",             FeatureFlags.isGhostSeen);
         s.put("isGhostTyping",           FeatureFlags.isGhostTyping);
         s.put("isGhostScreenshot",       FeatureFlags.isGhostScreenshot);
@@ -126,6 +127,32 @@ public class SettingsBackupManager {
         s.put("saveInstants",            FeatureFlags.saveInstants);
         s.put("uploadInstants",          FeatureFlags.uploadInstants);
 
+        s.put("isDistractionFree",       FeatureFlags.isDistractionFree);
+        s.put("isMiscEnabled",           FeatureFlags.isMiscEnabled);
+        s.put("enableCopyComment",       FeatureFlags.enableCopyComment);
+        s.put("enableCaptionCopy",       FeatureFlags.enableCaptionCopy);
+        s.put("disableDoubleTapLike",    FeatureFlags.disableDoubleTapLike);
+        s.put("enablePhotoZoom",         FeatureFlags.enablePhotoZoom);
+        s.put("cacheStories",            FeatureFlags.cacheStories);
+        s.put("removeMetaAI",            FeatureFlags.removeMetaAI);
+        s.put("autoClearCache",          FeatureFlags.autoClearCache);
+        s.put("autoClearCacheSizeMb",    FeatureFlags.autoClearCacheSizeMb);
+        s.put("customThemeEnabled",      FeatureFlags.customThemeEnabled);
+        s.put("themePresetId",           FeatureFlags.themePresetId);
+        s.put("themePaletteJson",        FeatureFlags.themePaletteJson);
+        s.put("customFontEnabled",       FeatureFlags.customFontEnabled);
+        s.put("customFontPath",          FeatureFlags.customFontPath);
+        s.put("customEmojiEnabled",      FeatureFlags.customEmojiEnabled);
+        s.put("customEmojiPath",         FeatureFlags.customEmojiPath);
+        s.put("downloaderCustomPath",    FeatureFlags.downloaderCustomPath);
+        s.put("downloaderCustomUri",     FeatureFlags.downloaderCustomUri);
+
+        s.put("lockDirectMessages",      FeatureFlags.lockDirectMessages);
+        s.put("lockDirectAlways",        FeatureFlags.lockDirectAlways);
+        s.put("lockWholeApp",            FeatureFlags.lockWholeApp);
+        s.put("lockUseFingerprint",      FeatureFlags.lockUseFingerprint);
+        s.put("hideSpecificChats",       FeatureFlags.hideSpecificChats);
+
         JSONObject root = new JSONObject();
         root.put("version",  VERSION);
         for (String flag : ps.reso.instaeclipse.utils.feature.ExtrasFeatures.flags())
@@ -161,6 +188,7 @@ public class SettingsBackupManager {
         if (s.has("isDevEnabled"))            FeatureFlags.isDevEnabled            = s.getBoolean("isDevEnabled");
         if (s.has("removeBuildExpiredPopup")) FeatureFlags.removeBuildExpiredPopup = s.getBoolean("removeBuildExpiredPopup");
 
+        if (s.has("isGhostModeEnabled"))     FeatureFlags.isGhostModeEnabled     = s.getBoolean("isGhostModeEnabled");
         if (s.has("isGhostSeen"))            FeatureFlags.isGhostSeen            = s.getBoolean("isGhostSeen");
         if (s.has("isGhostTyping"))          FeatureFlags.isGhostTyping          = s.getBoolean("isGhostTyping");
         if (s.has("isGhostScreenshot"))      FeatureFlags.isGhostScreenshot      = s.getBoolean("isGhostScreenshot");
@@ -234,7 +262,7 @@ public class SettingsBackupManager {
         if (s.has("spoofLocation"))          FeatureFlags.spoofLocation          = s.getBoolean("spoofLocation");
         if (s.has("spoofLat"))               FeatureFlags.spoofLat               = parseDouble(s.get("spoofLat"), 0.0);
         if (s.has("spoofLng"))               FeatureFlags.spoofLng               = parseDouble(s.get("spoofLng"), 0.0);
-        if (s.has("forceReelQuality"))        FeatureFlags.forceReelQuality       = s.getInt("forceReelQuality");
+        if (s.has("forceReelQuality"))       FeatureFlags.forceReelQuality       = parseQuality(s.get("forceReelQuality"), 0);
         if (s.has("disableRepost"))          FeatureFlags.disableRepost          = s.getBoolean("disableRepost");
         if (s.has("hideShareCreateGroup"))   FeatureFlags.hideShareCreateGroup   = s.getBoolean("hideShareCreateGroup");
         if (s.has("exactTimestamps"))        FeatureFlags.exactTimestamps        = s.getBoolean("exactTimestamps");
@@ -260,6 +288,47 @@ public class SettingsBackupManager {
         if (s.has("copyMediaLink"))          FeatureFlags.copyMediaLink          = s.getBoolean("copyMediaLink");
         if (s.has("saveInstants"))           FeatureFlags.saveInstants           = s.getBoolean("saveInstants");
         if (s.has("uploadInstants"))         FeatureFlags.uploadInstants         = s.getBoolean("uploadInstants");
+
+        if (s.has("isDistractionFree"))       FeatureFlags.isDistractionFree       = s.getBoolean("isDistractionFree");
+        if (s.has("isMiscEnabled"))          FeatureFlags.isMiscEnabled          = s.getBoolean("isMiscEnabled");
+        if (s.has("enableCopyComment"))      FeatureFlags.enableCopyComment      = s.getBoolean("enableCopyComment");
+        if (s.has("enableCaptionCopy"))      FeatureFlags.enableCaptionCopy      = s.getBoolean("enableCaptionCopy");
+        if (s.has("disableDoubleTapLike"))   FeatureFlags.disableDoubleTapLike   = s.getBoolean("disableDoubleTapLike");
+        if (s.has("enablePhotoZoom"))        FeatureFlags.enablePhotoZoom        = s.getBoolean("enablePhotoZoom");
+        if (s.has("cacheStories"))           FeatureFlags.cacheStories           = s.getBoolean("cacheStories");
+        if (s.has("removeMetaAI"))           FeatureFlags.removeMetaAI           = s.getBoolean("removeMetaAI");
+        if (s.has("autoClearCache"))         FeatureFlags.autoClearCache         = s.getBoolean("autoClearCache");
+        if (s.has("autoClearCacheSizeMb"))   FeatureFlags.autoClearCacheSizeMb   = parseInt(s.get("autoClearCacheSizeMb"), 100);
+        if (s.has("customThemeEnabled"))     FeatureFlags.customThemeEnabled     = s.getBoolean("customThemeEnabled");
+        if (s.has("themePresetId"))          FeatureFlags.themePresetId          = parseInt(s.get("themePresetId"), 1);
+        if (s.has("themePaletteJson"))       FeatureFlags.themePaletteJson       = s.getString("themePaletteJson");
+        if (s.has("customFontEnabled"))      FeatureFlags.customFontEnabled      = s.getBoolean("customFontEnabled");
+        if (s.has("customFontPath"))         FeatureFlags.customFontPath         = s.getString("customFontPath");
+        if (s.has("customEmojiEnabled"))     FeatureFlags.customEmojiEnabled     = s.getBoolean("customEmojiEnabled");
+        if (s.has("customEmojiPath"))        FeatureFlags.customEmojiPath        = s.getString("customEmojiPath");
+        if (s.has("downloaderCustomPath"))   FeatureFlags.downloaderCustomPath   = s.getString("downloaderCustomPath");
+        if (s.has("downloaderCustomUri"))    FeatureFlags.downloaderCustomUri    = s.getString("downloaderCustomUri");
+
+        if (s.has("lockDirectMessages"))     FeatureFlags.lockDirectMessages     = s.getBoolean("lockDirectMessages");
+        if (s.has("lockDirectAlways"))       FeatureFlags.lockDirectAlways       = s.getBoolean("lockDirectAlways");
+        if (s.has("lockWholeApp"))           FeatureFlags.lockWholeApp           = s.getBoolean("lockWholeApp");
+        if (s.has("lockUseFingerprint"))     FeatureFlags.lockUseFingerprint     = s.getBoolean("lockUseFingerprint");
+        if (s.has("hideSpecificChats"))      FeatureFlags.hideSpecificChats      = s.getBoolean("hideSpecificChats");
+    }
+
+    private static int parseQuality(Object raw, int fallback) {
+        if (raw instanceof Boolean) return ((Boolean) raw) ? 1080 : 0;
+        return parseInt(raw, fallback);
+    }
+
+    private static int parseInt(Object raw, int fallback) {
+        if (raw instanceof Number) return ((Number) raw).intValue();
+        if (raw instanceof String) {
+            try {
+                return Integer.parseInt((String) raw);
+            } catch (Throwable ignored) {}
+        }
+        return fallback;
     }
 
     private static double parseDouble(Object raw, double fallback) {
