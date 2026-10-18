@@ -265,4 +265,6 @@
     <string name="ig_story_download_video_music">Tải video kèm nhạc</string>
     <string name="ig_spoof_device">Giả lập thiết bị (video HDR)</string>
     <string name="ig_spoof_device_note">Instagram nhận diện điện thoại này là thiết bị đã chọn. Điều này mở khóa video HDR và các tính năng khác mà Instagram giới hạn cho những điện thoại đó, đồng thời thêm các tùy chọn nhà phát triển tương ứng. Khởi động lại Instagram để áp dụng. Instagram có thể yêu cầu bạn xác nhận tài khoản một lần.</string>
+    <string name="ig_dialog_downloader_stickers">Tải nhãn dán và GIF trong tin nhắn (nhấn giữ)</string>
+    <string name="ig_feat_sticker_download">Tải nhãn dán</string>
 </resources>

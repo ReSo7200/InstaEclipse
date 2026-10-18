@@ -52,6 +52,7 @@ public class SettingsBackupManager {
         s.put("expandCaptions",             FeatureFlags.expandCaptions);
         s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
         s.put("enableVoiceDownload",        FeatureFlags.enableVoiceDownload);
+        s.put("enableStickerDownload",      FeatureFlags.enableStickerDownload);
         s.put("enableDmMediaDownload",      FeatureFlags.enableDmMediaDownload);
         s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
         s.put("offerMediaInfo",             FeatureFlags.offerMediaInfo);
@@ -194,6 +195,7 @@ public class SettingsBackupManager {
         if (s.has("expandCaptions"))            FeatureFlags.expandCaptions            = s.getBoolean("expandCaptions");
         if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
         if (s.has("enableVoiceDownload"))       FeatureFlags.enableVoiceDownload       = s.getBoolean("enableVoiceDownload");
+        if (s.has("enableStickerDownload"))     FeatureFlags.enableStickerDownload     = s.getBoolean("enableStickerDownload");
         if (s.has("enableDmMediaDownload"))     FeatureFlags.enableDmMediaDownload     = s.getBoolean("enableDmMediaDownload");
         if (s.has("offerCopyImage"))            FeatureFlags.offerCopyImage            = s.getBoolean("offerCopyImage");
         if (s.has("offerMediaInfo"))            FeatureFlags.offerMediaInfo            = s.getBoolean("offerMediaInfo");

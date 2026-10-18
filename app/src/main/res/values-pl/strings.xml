@@ -713,4 +713,6 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_highlight_done">Zapisano wyróżnione: %1$d z %2$d elementów</string>
     <string name="ig_spoof_device">Podszywanie urządzenia (wideo HDR)</string>
     <string name="ig_spoof_device_note">Instagram widzi ten telefon jako wybrane urządzenie. Odblokowuje to wideo HDR i inne funkcje, które Instagram ogranicza do tych telefonów, oraz dodaje pasujące opcje programisty. Uruchom ponownie Instagram, aby zastosować. Instagram może raz poprosić o potwierdzenie konta.</string>
+    <string name="ig_dialog_downloader_stickers">Pobieraj naklejki i GIF-y w wiadomościach (przytrzymaj)</string>
+    <string name="ig_feat_sticker_download">Pobieranie naklejek</string>
 </resources>

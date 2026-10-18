@@ -695,4 +695,6 @@
     <string name="share_dl_no_link">לא נמצא קישור לפוסט או לריל של אינסטגרם</string>
     <string name="ig_spoof_device">זיוף מכשיר (וידאו HDR)</string>
     <string name="ig_spoof_device_note">Instagram רואה את הטלפון הזה כמכשיר שנבחר. זה פותח וידאו HDR ותכונות אחרות ש-Instagram מגביל לטלפונים האלה, ומוסיף את אפשרויות המפתח המתאימות. הפעל מחדש את Instagram כדי להחיל. Instagram עשוי לבקש לאשר את החשבון פעם אחת.</string>
+    <string name="ig_dialog_downloader_stickers">הורדת מדבקות ו-GIF בהודעות (לחיצה ארוכה)</string>
+    <string name="ig_feat_sticker_download">הורדת מדבקות</string>
 </resources>

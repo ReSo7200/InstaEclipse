@@ -662,4 +662,6 @@
     <string name="share_dl_no_link">لم يتم العثور على رابط منشور أو ريل من إنستغرام</string>
     <string name="ig_spoof_device">انتحال الجهاز (فيديو HDR)</string>
     <string name="ig_spoof_device_note">يرى Instagram هذا الهاتف كالجهاز المختار. يفتح هذا فيديو HDR وميزات أخرى يقصرها Instagram على تلك الهواتف، ويضيف خيارات المطور المطابقة. أعد تشغيل Instagram للتطبيق. قد يطلب Instagram تأكيد حسابك مرة واحدة.</string>
+    <string name="ig_dialog_downloader_stickers">تنزيل الملصقات وصور GIF في الرسائل (ضغط مطوّل)</string>
+    <string name="ig_feat_sticker_download">تنزيل الملصقات</string>
 </resources>

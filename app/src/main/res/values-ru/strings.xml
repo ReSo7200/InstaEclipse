@@ -665,4 +665,6 @@
     <string name="ig_highlight_done">«Актуальное» сохранено: %1$d из %2$d элементов</string>
     <string name="ig_spoof_device">Подмена устройства (HDR-видео)</string>
     <string name="ig_spoof_device_note">Instagram видит этот телефон как выбранное устройство. Это открывает HDR-видео и другие функции, которые Instagram ограничивает этими телефонами, и добавляет соответствующие параметры разработчика. Перезапустите Instagram, чтобы применить. Instagram может один раз попросить подтвердить аккаунт.</string>
+    <string name="ig_dialog_downloader_stickers">Скачивать стикеры и GIF в директе (долгое нажатие)</string>
+    <string name="ig_feat_sticker_download">Загрузка стикеров</string>
 </resources>

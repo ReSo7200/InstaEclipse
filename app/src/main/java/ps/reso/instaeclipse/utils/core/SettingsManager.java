@@ -93,6 +93,7 @@ public class SettingsManager {
         editor.putBoolean("expandCaptions", FeatureFlags.expandCaptions);
         editor.putBoolean("offerAudioDownload", FeatureFlags.offerAudioDownload);
         editor.putBoolean("enableVoiceDownload", FeatureFlags.enableVoiceDownload);
+        editor.putBoolean("enableStickerDownload", FeatureFlags.enableStickerDownload);
         editor.putBoolean("enableDmMediaDownload", FeatureFlags.enableDmMediaDownload);
         editor.putBoolean("offerCopyImage", FeatureFlags.offerCopyImage);
         editor.putBoolean("offerMediaInfo", FeatureFlags.offerMediaInfo);
@@ -284,6 +285,7 @@ public class SettingsManager {
         FeatureFlags.expandCaptions = prefs.getBoolean("expandCaptions", false);
         FeatureFlags.offerAudioDownload = prefs.getBoolean("offerAudioDownload", false);
         FeatureFlags.enableVoiceDownload = prefs.getBoolean("enableVoiceDownload", false);
+        FeatureFlags.enableStickerDownload = prefs.getBoolean("enableStickerDownload", false);
         FeatureFlags.enableDmMediaDownload = prefs.getBoolean("enableDmMediaDownload", false);
         FeatureFlags.offerCopyImage = prefs.getBoolean("offerCopyImage", false);
         FeatureFlags.offerMediaInfo = prefs.getBoolean("offerMediaInfo", false);

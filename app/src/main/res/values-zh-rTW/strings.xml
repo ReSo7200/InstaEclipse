@@ -664,4 +664,6 @@
     <string name="ig_highlight_done">精選已儲存：%1$d / %2$d 個項目</string>
     <string name="ig_spoof_device">偽裝裝置（HDR 影片）</string>
     <string name="ig_spoof_device_note">Instagram 會將此手機識別為所選裝置。這會解鎖 HDR 影片以及 Instagram 僅限這些手機的其他功能，並加入對應的開發者選項。重新啟動 Instagram 後生效。Instagram 可能會要求你確認一次帳號。</string>
+    <string name="ig_dialog_downloader_stickers">下載私訊中的貼圖和 GIF（長按）</string>
+    <string name="ig_feat_sticker_download">貼圖下載</string>
 </resources>

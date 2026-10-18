@@ -53,7 +53,7 @@ public class CustomToast {
             case "PostDownload": case "ReelDownload": case "StoryDownload": case "ProfileDownload":
             case "CopyMediaLink": case "SaveInstants": case "UploadInstants": case "CacheStories":
             case "SpoofLocation": case "StoryMentions": case "CaptionCopy": case "CopyComment":
-            case "PhotoZoom": case "PlaybackSpeed": case "VoiceDownload": case "MaxUploadQuality":
+            case "PhotoZoom": case "PlaybackSpeed": case "VoiceDownload": case "StickerDownload": case "MaxUploadQuality":
                 return "Media";
             default:
                 return "Tools"; // DevOptions, RemoveBuildExpiredPopup, FollowerToast, DisableDoubleTapLike…

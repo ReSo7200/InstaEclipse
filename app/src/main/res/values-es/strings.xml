@@ -668,4 +668,6 @@
     <string name="ig_highlight_done">Historia destacada guardada: %1$d de %2$d elementos</string>
     <string name="ig_spoof_device">Simular dispositivo (vídeo HDR)</string>
     <string name="ig_spoof_device_note">Instagram ve este teléfono como el dispositivo elegido. Esto desbloquea el vídeo HDR y otras funciones que Instagram limita a esos teléfonos, y añade las opciones de desarrollador correspondientes. Reinicia Instagram para aplicarlo. Instagram puede pedirte que confirmes tu cuenta una vez.</string>
+    <string name="ig_dialog_downloader_stickers">Descargar stickers y GIF en mensajes directos (mantener pulsado)</string>
+    <string name="ig_feat_sticker_download">Descarga de stickers</string>
 </resources>
