@@ -16,6 +16,21 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Two APKs from the same code (docs/xposed-api-102): "legacy" has only assets/xposed_init and
+    // loads on every framework (LSPatch, LSPosed <= 1.11, Vector); "modern" also ships
+    // META-INF/xposed (libxposed API 102) for Vector 2.2+. LSPosed 1.11 (API 100) picks
+    // META-INF/xposed whenever it exists and then fails, so it must not be in the legacy APK.
+    flavorDimensions = ['xposedApi']
+    productFlavors {
+        legacy {
+            dimension 'xposedApi'
+        }
+        modern {
+            dimension 'xposedApi'
+            versionNameSuffix '-api102'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -53,6 +68,8 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core.v361
 
-    // Compile-only dependency
+    // Xposed APIs, provided by the framework at runtime: legacy (LSPatch, older LSPosed) and
+    // libxposed API 102 (Vector 2.2+). See docs/xposed-api-102.
     compileOnly files('libs/api-82.jar')
+    compileOnly 'io.github.libxposed:api:102.0.0'
 }

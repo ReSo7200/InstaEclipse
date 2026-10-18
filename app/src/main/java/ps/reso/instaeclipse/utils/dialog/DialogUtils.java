@@ -31,7 +31,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.mods.devops.config.ConfigManager;
@@ -2500,7 +2500,7 @@ public class DialogUtils {
     /** A drawable from the module's own APK, in its own colours. */
     private static Drawable loadModuleDrawable(int res) {
         try {
-            return android.content.res.XModuleResources.createInstance(ps.reso.instaeclipse.Xposed.Module.moduleSourceDir, null)
+            return ps.reso.instaeclipse.xposedcompat.ModuleResources.get()
                     .getDrawable(res, null);
         } catch (Throwable t) {
             return null;
@@ -2894,7 +2894,7 @@ public class DialogUtils {
 
     private static Drawable loadModuleIcon(int iconRes, int tintColor) {
         try {
-            Drawable icon = android.content.res.XModuleResources.createInstance(Module.moduleSourceDir, null)
+            Drawable icon = ps.reso.instaeclipse.xposedcompat.ModuleResources.get()
                     .getDrawable(iconRes, null);
             icon = icon.mutate();
             icon.setColorFilter(new android.graphics.PorterDuffColorFilter(tintColor, android.graphics.PorterDuff.Mode.SRC_IN));

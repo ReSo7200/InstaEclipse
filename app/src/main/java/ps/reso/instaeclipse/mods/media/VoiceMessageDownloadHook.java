@@ -23,8 +23,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -499,12 +499,12 @@ public class VoiceMessageDownloadHook {
     private static volatile String pendingText;
 
     private static String downloadLabel() {
-        Context c = android.app.AndroidAppHelper.currentApplication();
+        Context c = ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
         return c != null ? I18n.t(c, R.string.ig_dl_title) : "Download";
     }
 
     private static String translateLabel() {
-        Context c = android.app.AndroidAppHelper.currentApplication();
+        Context c = ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
         return c != null ? I18n.t(c, R.string.ig_chat_translate_row) : "Translate with app";
     }
 
@@ -513,7 +513,7 @@ public class VoiceMessageDownloadHook {
     private static volatile Object pendingBulk;
 
     private static String bulkLabel() {
-        Context c = android.app.AndroidAppHelper.currentApplication();
+        Context c = ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
         return c != null ? I18n.t(c, R.string.ig_bulk_unsend_row) : "Unsend multiple";
     }
 
@@ -546,7 +546,7 @@ public class VoiceMessageDownloadHook {
         }
         if (text == null) return;
         Context c = ctx != null ? ctx : ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-        if (c == null) c = android.app.AndroidAppHelper.currentApplication();
+        if (c == null) c = ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
         final Context host = c;
         final String t = text;
         new android.os.Handler(android.os.Looper.getMainLooper()).post(

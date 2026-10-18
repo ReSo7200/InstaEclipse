@@ -64,9 +64,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
@@ -2312,11 +2312,7 @@ public class FeedVideoDownloadHook {
      */
     private static String readCompanionUri() {
         try {
-            de.robv.android.xposed.XSharedPreferences cp =
-                    new de.robv.android.xposed.XSharedPreferences(
-                            "ps.reso.instaeclipse", "instaeclipse_cache");
-            cp.reload();
-            return cp.getString("downloaderCustomUri", "");
+            return ps.reso.instaeclipse.xposedcompat.CompanionPrefs.getString("downloaderCustomUri", "");
         } catch (Throwable t) {
             return "";
         }

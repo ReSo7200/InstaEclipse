@@ -1,6 +1,6 @@
 package ps.reso.instaeclipse.mods.ui;
 
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;

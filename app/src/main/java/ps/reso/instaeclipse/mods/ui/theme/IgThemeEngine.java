@@ -62,7 +62,7 @@ public final class IgThemeEngine {
     public static boolean isNightNow() {
         try {
             android.content.Context c = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
-            if (c == null) c = android.app.AndroidAppHelper.currentApplication();
+            if (c == null) c = ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
             android.content.res.Configuration cfg = c != null
                     ? c.getResources().getConfiguration()
                     : Resources.getSystem().getConfiguration();
