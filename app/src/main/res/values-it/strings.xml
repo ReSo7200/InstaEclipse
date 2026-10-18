@@ -607,4 +607,5 @@ Resta su questa schermata fino al termine.</string>
     <string name="ig_story_ring_custom">Colore personalizzato</string>
     <string name="ig_story_ring_custom_hint">Un colore come #3897F0, o due per una sfumatura: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Colore non valido</string>
+    <string name="ig_feed_corner_radius">Angoli dei post arrotondati</string>
 </resources>

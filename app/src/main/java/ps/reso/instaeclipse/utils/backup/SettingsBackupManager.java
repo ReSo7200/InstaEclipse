@@ -54,6 +54,7 @@ public class SettingsBackupManager {
         s.put("enableVoiceDownload",        FeatureFlags.enableVoiceDownload);
         s.put("enableStickerDownload",      FeatureFlags.enableStickerDownload);
         s.put("storyTrayScale",             FeatureFlags.storyTrayScale);
+        s.put("feedCornerRadius",           FeatureFlags.feedCornerRadius);
         s.put("storyRingColor",             FeatureFlags.storyRingColor);
         s.put("enableDmMediaDownload",      FeatureFlags.enableDmMediaDownload);
         s.put("offerCopyImage",             FeatureFlags.offerCopyImage);
@@ -199,6 +200,7 @@ public class SettingsBackupManager {
         if (s.has("enableVoiceDownload"))       FeatureFlags.enableVoiceDownload       = s.getBoolean("enableVoiceDownload");
         if (s.has("enableStickerDownload"))     FeatureFlags.enableStickerDownload     = s.getBoolean("enableStickerDownload");
         if (s.has("storyTrayScale"))            FeatureFlags.storyTrayScale            = Math.max(30, Math.min(100, s.getInt("storyTrayScale")));
+        if (s.has("feedCornerRadius"))          FeatureFlags.feedCornerRadius          = Math.max(0, Math.min(48, s.getInt("feedCornerRadius")));
         if (s.has("storyRingColor") && (s.getString("storyRingColor").isEmpty()
                 || ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(s.getString("storyRingColor")) != null))
             FeatureFlags.storyRingColor = s.getString("storyRingColor");

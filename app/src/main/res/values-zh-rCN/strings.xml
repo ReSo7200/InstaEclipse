@@ -704,4 +704,5 @@
     <string name="ig_story_ring_custom">自定义颜色</string>
     <string name="ig_story_ring_custom_hint">颜色如 #3897F0，或两种颜色组成渐变：#FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">无效的颜色</string>
+    <string name="ig_feed_corner_radius">帖子圆角</string>
 </resources>

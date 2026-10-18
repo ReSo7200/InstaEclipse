@@ -703,4 +703,5 @@
     <string name="ig_story_ring_custom">צבע מותאם</string>
     <string name="ig_story_ring_custom_hint">צבע כמו #3897F0, או שניים למעבר צבע: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">צבע לא תקין</string>
+    <string name="ig_feed_corner_radius">פינות מעוגלות לפוסטים</string>
 </resources>

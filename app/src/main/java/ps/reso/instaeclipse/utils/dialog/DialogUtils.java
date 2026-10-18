@@ -1487,9 +1487,39 @@ public class DialogUtils {
                 tsFormat,
                 extraSwitch(context, "#64D2FF", "highResolutionImages"),
                 flagSwitch(context, R.drawable.ic_search, "#64D2FF", R.string.ig_dialog_misc_photo_zoom, "enablePhotoZoom"),
-                flagSwitch(context, R.drawable.ic_movie, "#64D2FF", R.string.ig_dialog_misc_disable_video_autoplay, "disableVideoAutoPlay")));
+                flagSwitch(context, R.drawable.ic_movie, "#64D2FF", R.string.ig_dialog_misc_disable_video_autoplay, "disableVideoAutoPlay"),
+                createActionRow(context, R.drawable.ic_sparkle, feedCornerLabel(context), "#64D2FF",
+                        v -> showFeedCornerDialog(context, (TextView) findFirstText(v)))));
 
         showSectionDialog(context, I18n.t(context, R.string.menu_feed), layout, () -> {});
+    }
+
+    public static final int[] FEED_CORNER_RADII = {0, 8, 12, 16, 20, 24};
+
+    static String feedCornerName(Context context, int dp) {
+        return dp <= 0 ? I18n.t(context, R.string.ig_dialog_extras_share_domain_off) : dp + " dp";
+    }
+
+    private static String feedCornerLabel(Context context) {
+        return I18n.t(context, R.string.ig_feed_corner_radius) + "  ·  " + feedCornerName(context, FeatureFlags.feedCornerRadius);
+    }
+
+    /** Rounded feed post corners (#276): applies to posts as they are laid out. */
+    private static void showFeedCornerDialog(Context context, TextView label) {
+        CharSequence[] rows = new CharSequence[FEED_CORNER_RADII.length];
+        int checked = 0;
+        for (int i = 0; i < rows.length; i++) {
+            rows[i] = feedCornerName(context, FEED_CORNER_RADII[i]);
+            if (FEED_CORNER_RADII[i] == FeatureFlags.feedCornerRadius) checked = i;
+        }
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.ig_feed_corner_radius))
+                .choices(rows, checked, which -> {
+                    FeatureFlags.feedCornerRadius = FEED_CORNER_RADII[which];
+                    SettingsManager.saveAllFlags();
+                    if (label != null) label.setText(feedCornerLabel(context));
+                })
+                .show();
     }
 
     /** Reels & Stories: forced reel quality, reel scrolling/scrubber, story behaviour. */

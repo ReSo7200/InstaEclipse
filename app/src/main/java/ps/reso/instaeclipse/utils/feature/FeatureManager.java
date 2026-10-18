@@ -309,6 +309,7 @@ public class FeatureManager {
         reg(FeatureFlags.enableVoiceDownload,  "VoiceDownload",        R.string.ig_feat_voice_download);
         reg(FeatureFlags.enableStickerDownload, "StickerDownload",     R.string.ig_feat_sticker_download);
         reg(!FeatureFlags.storyRingColor.isEmpty(), "StoryRingColor",  R.string.ig_story_ring_color);
+        reg(FeatureFlags.feedCornerRadius > 0, "RoundedFeedPosts",     R.string.ig_feed_corner_radius);
         reg(FeatureFlags.enableDmMediaDownload, "DmMediaDownload",     R.string.ig_dialog_downloader_dm_media);
         reg(FeatureFlags.maxUploadQuality,     "MaxUploadQuality",     R.string.ig_feat_max_upload_quality);
         reg(FeatureFlags.enableCaptionCopy,    "CaptionCopy",          R.string.ig_caption_copy_title);

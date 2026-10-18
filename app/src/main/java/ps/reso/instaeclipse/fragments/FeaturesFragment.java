@@ -1207,10 +1207,32 @@ public class FeaturesFragment extends Fragment {
                 timestampFormatItem(),
                 createExtrasSwitch("#64D2FF", "highResolutionImages"),
                 createSwitch(R.drawable.ic_search, "#64D2FF", getString(R.string.ig_dialog_misc_photo_zoom), "enablePhotoZoom"),
-                createSwitch(R.drawable.ic_movie, "#64D2FF", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay")
+                createSwitch(R.drawable.ic_movie, "#64D2FF", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
+                createClickable(R.drawable.ic_sparkle, "#64D2FF", feedCornerText(), this::chooseFeedCorner)
         ));
 
         return defs;
+    }
+
+    private String feedCornerText() {
+        int dp = localCache.getInt("feedCornerRadius", 0);
+        return getString(R.string.ig_feed_corner_radius) + "  ·  "
+                + (dp <= 0 ? getString(R.string.ig_dialog_extras_share_domain_off) : dp + " dp");
+    }
+
+    private void chooseFeedCorner() {
+        int[] radii = ps.reso.instaeclipse.utils.dialog.DialogUtils.FEED_CORNER_RADII;
+        String[] labels = new String[radii.length];
+        int current = localCache.getInt("feedCornerRadius", 0), selected = 0;
+        for (int i = 0; i < radii.length; i++) {
+            labels[i] = radii[i] <= 0 ? getString(R.string.ig_dialog_extras_share_domain_off) : radii[i] + " dp";
+            if (radii[i] == current) selected = i;
+        }
+        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_feed_corner_radius)
+                .setSingleChoiceItems(labels, selected, (dialog, which) -> {
+                    putIntPref("feedCornerRadius", radii[which]);
+                    dialog.dismiss(); loadFeedMenu();
+                }).setNegativeButton(android.R.string.cancel, null).show();
     }
 
     private void loadDistractionMenu() {

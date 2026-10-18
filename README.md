@@ -171,6 +171,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Exact dates | "17 Oct 2026 07:36" instead of "2h ago", in the date format you pick (presets or your own pattern) |
 | High resolution images | Load the sharpest version of every photo |
 | Photo zoom | Long press a photo to zoom in |
+| Rounded posts | Round the corners of photos and videos in the feed (8 to 24 dp) |
 | Disable video autoplay | Videos wait for a tap |
 
 </details>

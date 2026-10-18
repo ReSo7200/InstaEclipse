@@ -711,4 +711,5 @@
     <string name="ig_story_ring_custom">Özel renk</string>
     <string name="ig_story_ring_custom_hint">#3897F0 gibi bir renk ya da geçiş için iki renk: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Geçersiz renk</string>
+    <string name="ig_feed_corner_radius">Gönderilerde yuvarlak köşeler</string>
 </resources>

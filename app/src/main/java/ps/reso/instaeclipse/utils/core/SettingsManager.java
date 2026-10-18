@@ -59,6 +59,7 @@ public class SettingsManager {
         editor.putBoolean("downloaderUseOriginal", FeatureFlags.downloaderUseOriginal);
         editor.putInt("downloaderQualityMaxShortSide", FeatureFlags.downloaderQualityMaxShortSide);
         editor.putInt("storyTrayScale", FeatureFlags.storyTrayScale);
+        editor.putInt("feedCornerRadius", FeatureFlags.feedCornerRadius);
         editor.putString("storyRingColor", FeatureFlags.storyRingColor);
         editor.putBoolean("downloaderCompatibility", FeatureFlags.downloaderCompatibility);
         editor.putBoolean("downloaderAllowFallback", FeatureFlags.downloaderAllowFallback);
@@ -253,6 +254,7 @@ public class SettingsManager {
         FeatureFlags.downloaderUseOriginal = prefs.getBoolean("downloaderUseOriginal", true);
         FeatureFlags.downloaderQualityMaxShortSide = prefs.getInt("downloaderQualityMaxShortSide", 0);
         FeatureFlags.storyTrayScale = prefs.getInt("storyTrayScale", 100);
+        FeatureFlags.feedCornerRadius = prefs.getInt("feedCornerRadius", 0);
         FeatureFlags.storyRingColor = prefs.getString("storyRingColor", "");
         FeatureFlags.downloaderCompatibility = prefs.getBoolean("downloaderCompatibility", false);
         FeatureFlags.downloaderAllowFallback = prefs.getBoolean("downloaderAllowFallback", false);

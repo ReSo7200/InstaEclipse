@@ -273,4 +273,5 @@
     <string name="ig_story_ring_custom">Màu tùy chỉnh</string>
     <string name="ig_story_ring_custom_hint">Một màu như #3897F0, hoặc hai màu cho dải chuyển: #FF0066,#7638FA</string>
     <string name="ig_story_ring_invalid">Màu không hợp lệ</string>
+    <string name="ig_feed_corner_radius">Bo góc bài viết</string>
 </resources>

@@ -719,6 +719,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(IE|ShareDL) ❌ Failed to hook");
                     }
 
+                    // Rounded feed post corners (#276)
+                    try {
+                        if (!skip("RoundedFeedPostsHook")) ps.reso.instaeclipse.mods.feed.RoundedFeedPostsHook.install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | RoundedPosts): ❌ Failed to hook");
+                    }
+
                     // Story tray size and ring color (#283)
                     try {
                         if (!skip("StoryTrayHook")) ps.reso.instaeclipse.mods.ui.StoryTrayHook.install(hostClassLoader);
