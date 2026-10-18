@@ -56,6 +56,7 @@ public class FeatureFlags {
     public static volatile boolean forceReelScrubber = false; // always show IG's reel seek bar (#247)
     public static volatile boolean offerCopyImage = false; // offer "Copy image to clipboard" when downloading a photo (#228)
     public static volatile boolean enableVoiceDownload = false; // Download row for DM voice messages (#223)
+    public static volatile boolean enableDmMediaDownload = false; // Download row for DM photos/videos (named + foldered like posts)
     public static volatile boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)
     public static volatile boolean maxUploadQuality = false; // force IG's "Upload at highest quality" switch always on
     public static volatile boolean expandCaptions = false; // feed captions without "… more" (#246)

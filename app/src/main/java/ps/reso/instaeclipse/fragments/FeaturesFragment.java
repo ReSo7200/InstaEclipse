@@ -1866,6 +1866,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_folder, "#FF9F0A", getString(R.string.ig_dialog_downloader_username_subfolder), "downloaderUsernameFolder"),
                 createSwitch(R.drawable.ic_timer, "#FF9F0A", getString(R.string.ig_dialog_downloader_add_timestamp), "downloaderAddTimestamp"),
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_downloader_voice), "enableVoiceDownload"),
+                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_downloader_dm_media), "enableDmMediaDownload"),
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_downloader_offer_audio), "offerAudioDownload"),
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_save_instants), "saveInstants"),
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_cache_stories), "cacheStories")

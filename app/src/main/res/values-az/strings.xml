@@ -234,6 +234,7 @@
     <string name="ig_playback_speed_next">Sürət təyin edildi — başlayan növbəti videoya tətbiq olunur</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Mesajlarda Qeydləri Gizlət</string>
     <string name="ig_dialog_downloader_voice">Səsli Mesajları Yüklə (uzun basma)</string>
+    <string name="ig_dialog_downloader_dm_media">Mesajlardakı şəkil və videoları yüklə (uzun basma)</string>
     <string name="ig_dialog_misc_viewer_search">Hekayə Baxanlarınızda Axtar</string>
     <string name="ig_viewer_search_hint">Baxanlarda axtar</string>
     <string name="ig_dialog_misc_like_undo">Bəyənmələr üçün Geri Alma Pəncərəsi (4 san)</string>

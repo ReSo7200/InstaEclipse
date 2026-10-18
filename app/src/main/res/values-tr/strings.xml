@@ -559,6 +559,7 @@
     <string name="ig_playback_speed_next">Hız ayarlandı — başlayan bir sonraki videoya uygulanır</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Mesajlardaki Notları Gizle</string>
     <string name="ig_dialog_downloader_voice">Sesli Mesajları İndir (uzun basma)</string>
+    <string name="ig_dialog_downloader_dm_media">Mesajlardaki fotoğraf ve videoları indir (uzun bas)</string>
     <string name="ig_dialog_misc_viewer_search">Hikaye İzleyicilerinde Ara</string>
     <string name="ig_viewer_search_hint">İzleyicilerde ara</string>
     <string name="ig_dialog_misc_like_undo">Beğeniler İçin Geri Alma Süresi (4 sn)</string>

@@ -270,6 +270,7 @@
     <string name="ig_playback_speed_next">Vitesse définie — s\'applique à la prochaine vidéo lancée</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Masquer les notes dans les messages</string>
     <string name="ig_dialog_downloader_voice">Télécharger les messages vocaux (appui long)</string>
+    <string name="ig_dialog_downloader_dm_media">Télécharger photos et vidéos des messages (appui long)</string>
     <string name="ig_dialog_misc_viewer_search">Rechercher parmi les spectateurs de votre story</string>
     <string name="ig_viewer_search_hint">Rechercher des spectateurs</string>
     <string name="ig_dialog_misc_like_undo">Délai d\'annulation des J\'aime (4 s)</string>

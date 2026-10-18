@@ -201,6 +201,21 @@ public class VoiceMessageDownloadHook {
                             translate(tctx);
                             return;
                         }
+                        // DM photos/videos: IG's own "Save" goes through our downloader instead (its
+                        // save lands in Pictures/Instagram as IMG_<date>, no username or folder).
+                        if (FeatureFlags.enableDmMediaDownload && hasAction(param.args, "SAVE_MEDIA")) {
+                            Object media = null;
+                            Context sctx = null;
+                            for (Object a : param.args) {
+                                if (a != null && messageClass != null && messageClass.isInstance(a)) media = mediaOf(a);
+                                else if (a instanceof Activity act) sctx = act;
+                            }
+                            if (media != null && sctx != null) {
+                                param.setResult(null);
+                                downloadDmMedia(sctx, media);
+                                return;
+                            }
+                        }
                         if (!FeatureFlags.enableVoiceDownload) return;
                         Object action = null, msg = null;
                         Context ctx = null;
@@ -370,7 +385,10 @@ public class VoiceMessageDownloadHook {
             ModuleLog.line(TAG + "compose row hooks=" + composeRows + " (label field " + (composeRows >= 0 ? "ok" : "") + ")");
             ModuleLog.line(TAG + "✅ lookups=" + lookups + " factories=" + factories + " dispatchers=" + dispatchers
                     + " mapper=" + (audioMapper != null) + " message=" + (messageClass != null ? messageClass.getName() : "?"));
-            if (factories > 0 && dispatchers > 0) FeatureStatusTracker.setHooked("VoiceDownload");
+            if (factories > 0 && dispatchers > 0) {
+                FeatureStatusTracker.setHooked("VoiceDownload");
+                FeatureStatusTracker.setHooked("DmMediaDownload");
+            }
             if (factories > 0 && labelFieldRef != null) FeatureStatusTracker.setHooked("ChatTranslate");
             ps.reso.instaeclipse.mods.ghost.BulkUnsend.install(bridge, cl, messageClass);
         } catch (Throwable t) {
@@ -608,6 +626,83 @@ public class VoiceMessageDownloadHook {
         String id = voiceMediaId != null ? voiceMediaId : String.valueOf(System.currentTimeMillis());
         String name = FeedVideoDownloadHook.buildFilename(user, "voice", id, true).replace(".mp4", ".m4a");
         FeedVideoDownloadHook.downloadAudio(ctx, url, name, user);
+    }
+
+    private static final java.util.regex.Pattern URL_SIZE = java.util.regex.Pattern.compile("[-.]w(\\d{2,5})h(\\d{2,5})");
+
+    /** Pixel area named in a CDN URL's cache key ("...-w1080h1920..."), or 0 when it has none. */
+    private static long urlArea(String url) {
+        java.util.regex.Matcher m = URL_SIZE.matcher(url);
+        long best = 0;
+        while (m.find()) best = Math.max(best, Long.parseLong(m.group(1)) * Long.parseLong(m.group(2)));
+        return best;
+    }
+
+    /** The message's Media (its photo or video), found by its stable class name. */
+    private static Object mediaOf(Object message) {
+        Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        ArrayDeque<Object[]> q = new ArrayDeque<>();
+        q.add(new Object[]{message, 0});
+        while (!q.isEmpty() && seen.size() < 300) {
+            Object[] e = q.poll();
+            Object o = e[0];
+            int d = (int) e[1];
+            if (o == null || !seen.add(o)) continue;
+            if (o.getClass().getName().equals(MEDIA)) return o;
+            if (d >= 3) continue;
+            String n = o.getClass().getName();
+            if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
+            for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
+                for (Field f : k.getDeclaredFields()) {
+                    if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
+                    try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
+                }
+        }
+        return null;
+    }
+
+    /** Saves a DM photo/video (every item of a carousel) like posts: username in the name and
+     *  the username subfolder, at the best quality the downloader finds. */
+    private static void downloadDmMedia(Context ctx, Object media) {
+        String user = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
+        if (user == null || user.isEmpty()) user = voiceUsername(null);
+        String id = null;
+        try {
+            Object v = media.getClass().getMethod("getId").invoke(media);
+            if (v instanceof String sid && !sid.isEmpty()) id = sid.split("_")[0];
+        } catch (Throwable ignored) {}
+        final String fUser = user, fId = id != null ? id : String.valueOf(System.currentTimeMillis());
+        ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading), android.widget.Toast.LENGTH_SHORT).show();
+        FeedVideoDownloadHook.executor.submit(() -> {
+            try {
+                List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
+                // a single photo: IG's own URL is sized for the screen; take the largest version
+                if (urls.size() == 1 && !FeedVideoDownloadHook.isVideoUrl(urls.get(0))) {
+                    Object[] big = StoryDownloadHook.largestImage(media);
+                    long igArea = urlArea(urls.get(0));
+                    ModuleLog.line(TAG + "DM photo: largest=" + (big != null ? big[1] : null) + " ig=" + igArea);
+                    if (big != null && igArea > 0 && (int) big[1] > igArea) urls.set(0, (String) big[0]);
+                }
+                ModuleLog.line(TAG + "DM media: " + urls.size() + " item(s), user=" + fUser);
+                if (urls.isEmpty()) throw new IllegalStateException("no media URL");
+                boolean delegated = false, anyVideo = false;
+                for (int i = 0; i < urls.size(); i++) {
+                    String u = urls.get(i);
+                    boolean video = FeedVideoDownloadHook.isVideoUrl(u);
+                    anyVideo |= video;
+                    String itemId = urls.size() > 1 ? fId + "_" + (i + 1) : fId;
+                    delegated |= FeedVideoDownloadHook.downloadAndSave(ctx, u,
+                            FeedVideoDownloadHook.buildFilename(fUser, "dm", itemId, video), video, fUser);
+                }
+                int saved = anyVideo ? R.string.ig_toast_video_saved : R.string.ig_toast_photo_saved;
+                if (!delegated) FeedVideoDownloadHook.mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                        I18n.t(ctx, saved), android.widget.Toast.LENGTH_SHORT).show());
+            } catch (Throwable t) {
+                ModuleLog.line(TAG + "DM media download failed: " + t);
+                FeedVideoDownloadHook.mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                        I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(t.getMessage())), android.widget.Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private static String actionName(Object row) {

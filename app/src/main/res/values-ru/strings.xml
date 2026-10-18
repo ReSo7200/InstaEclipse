@@ -234,6 +234,7 @@
     <string name="ig_playback_speed_next">Скорость задана — применится к следующему запущенному видео</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Скрыть заметки в сообщениях</string>
     <string name="ig_dialog_downloader_voice">Скачивать голосовые сообщения (долгое нажатие)</string>
+    <string name="ig_dialog_downloader_dm_media">Скачивать фото и видео из сообщений (долгое нажатие)</string>
     <string name="ig_dialog_misc_viewer_search">Поиск по зрителям вашей истории</string>
     <string name="ig_viewer_search_hint">Поиск зрителей</string>
     <string name="ig_dialog_misc_like_undo">Окно отмены лайков (4 с)</string>

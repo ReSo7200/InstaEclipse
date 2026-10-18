@@ -188,7 +188,7 @@ public class DialogUtils {
         // ---- MEDIA ---- downloading, post-menu extras and uploads
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_media)));
         LinearLayout media = createGroupCard(context);
-        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "offerAudioDownload", "saveInstants", "cacheStories", "downloaderUsernameFolder", "downloaderAddTimestamp")));
+        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "enableDmMediaDownload", "offerAudioDownload", "saveInstants", "cacheStories", "downloaderUsernameFolder", "downloaderAddTimestamp")));
         media.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.menu_post_menu), A_MEDIA, () -> showPostMenuOptions(context), onCount(context, "copyMediaLink", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed", "maxUploadQuality", "uploadInstants")));
         mainLayout.addView(media);
 
@@ -2062,6 +2062,7 @@ public class DialogUtils {
         layout.addView(createDivider(context));
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_voice, "enableVoiceDownload"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_dm_media, "enableDmMediaDownload"),
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_offer_audio, "offerAudioDownload"),
                 // Save Instants (#184) — long-press a received Instant to save its media.
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_save_instants, "saveInstants"),

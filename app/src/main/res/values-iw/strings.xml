@@ -270,6 +270,7 @@
     <string name="ig_playback_speed_next">המהירות הוגדרה — תחול על הסרטון הבא שיתחיל</string>
     <string name="ig_dialog_distraction_hide_notes_tray">הסתר פתקים בהודעות</string>
     <string name="ig_dialog_downloader_voice">הורד הודעות קוליות (לחיצה ארוכה)</string>
+    <string name="ig_dialog_downloader_dm_media">הורדת תמונות וסרטונים מהודעות (לחיצה ארוכה)</string>
     <string name="ig_dialog_misc_viewer_search">חפש בצופי הסטורי שלך</string>
     <string name="ig_viewer_search_hint">חפש צופים</string>
     <string name="ig_dialog_misc_like_undo">חלון ביטול ללייקים (4 שנ׳)</string>

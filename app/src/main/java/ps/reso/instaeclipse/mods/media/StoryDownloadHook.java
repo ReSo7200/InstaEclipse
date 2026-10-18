@@ -1024,6 +1024,15 @@ public class StoryDownloadHook {
      * data is not exposed as Java fields (fixes lower-quality photos on some story types).
      * The two largest plausible-dimension ints are multiplied to estimate the area.
      */
+    /** {url, area} of the largest image candidate reachable from {@code media}, or null. */
+    static Object[] largestImage(Object media) {
+        List<CandidateInfo> candidates = new ArrayList<>();
+        collectImageCandidates(media, candidates, Collections.newSetFromMap(new IdentityHashMap<>()), 0);
+        CandidateInfo best = null;
+        for (CandidateInfo c : candidates) if (best == null || c.area > best.area) best = c;
+        return best == null ? null : new Object[]{best.url, best.area};
+    }
+
     private static void collectImageCandidates(Object obj, List<CandidateInfo> out,
                                                Set<Object> visited, int depth) {
         if (obj == null || depth > 7 || out.size() >= 40) return;
