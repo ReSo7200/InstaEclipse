@@ -122,7 +122,7 @@ public final class DeviceSpoofHook {
 
             XC_MethodHook props = new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     String v = prop(p, (String) param.args[0]);
                     if (v != null) param.setResult(v);
                 }
@@ -134,7 +134,7 @@ public final class DeviceSpoofHook {
             if (!p.features.isEmpty()) {
                 XC_MethodHook feature = new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam param) {
+                    protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (p.features.contains(param.args[0])) param.setResult(true);
                     }
                 };
