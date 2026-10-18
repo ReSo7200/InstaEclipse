@@ -64,9 +64,9 @@ public class CommonUtils {
      */
     /**
      * The companion's instaeclipse_cache prefs, opened MODE_WORLD_READABLE so Instagram can read
-     * it through XSharedPreferences. LSPosed (xposedsharedprefs) allows that mode and keeps the
+     * it through XSharedPreferences. Vector (xposedsharedprefs) allows that mode and keeps the
      * file under /data/misc/<id>/prefs; MODE_PRIVATE made it 0660 there, unreadable from
-     * Instagram. Without LSPosed the platform rejects the mode, so fall back to MODE_PRIVATE.
+     * Instagram. Without Vector the platform rejects the mode, so fall back to MODE_PRIVATE.
      * Every companion-side open must go through here: a process keeps the first mode it used.
      */
     @SuppressWarnings("deprecation")

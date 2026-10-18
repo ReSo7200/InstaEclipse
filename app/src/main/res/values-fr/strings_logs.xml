@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Journal enregistré · Instagram n\'est pas lancé</string>
     <string name="logs_status_none">Aucune application Instagram compatible installée</string>
     <string name="logs_empty_title">Aucun journal pour l\'instant</string>
-    <string name="logs_empty_body">Ouvrez Instagram une fois avec InstaEclipse activé dans LSPosed, puis revenez ici et appuyez sur Actualiser. Le journal d\'Instagram est enregistré ici automatiquement, même après la fermeture d\'Instagram.</string>
+    <string name="logs_empty_body">Ouvrez Instagram une fois avec InstaEclipse activé dans Vector, puis revenez ici et appuyez sur Actualiser. Le journal d\'Instagram est enregistré ici automatiquement, même après la fermeture d\'Instagram.</string>
     <string name="logs_empty_filter_title">Aucun résultat pour ce filtre</string>
     <string name="logs_empty_filter_body">Revenez à Tous pour voir toutes les entrées.</string>
     <string name="logs_nothing_to_copy">Aucun journal à copier</string>

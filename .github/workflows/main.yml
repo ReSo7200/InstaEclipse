@@ -43,7 +43,7 @@ jobs:
 
       # Step 5: Run unit tests before building
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew testLegacyDebugUnitTest testModernDebugUnitTest
 
       # Step 6: Build the debug APK
       - name: Build Debug APK

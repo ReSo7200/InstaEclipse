@@ -72,4 +72,10 @@ dependencies {
     // libxposed API 102 (Vector 2.2+). See docs/xposed-api-102.
     compileOnly files('libs/api-82.jar')
     compileOnly 'io.github.libxposed:api:102.0.0'
+    // modern flavor only: lets the companion write remote preferences that the hooked app reads
+    // (older frameworks speak an incompatible service protocol, so the legacy APK leaves it out).
+    // The classes of io.github.libxposed:service/interface 102.0.0 (Apache-2.0), used as jars: the
+    // AARs declare minCompileSdk 37, which this project's AGP/compileSdk 34 doesn't meet; their
+    // XposedProvider is declared in src/modern/AndroidManifest.xml.
+    modernImplementation files('libs/modern/libxposed-service-102.0.0.jar', 'libs/modern/libxposed-interface-102.0.0.jar')
 }

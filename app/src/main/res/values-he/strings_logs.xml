@@ -18,7 +18,7 @@
     <string name="logs_status_saved">יומן שמור · Instagram לא פועל</string>
     <string name="logs_status_none">לא מותקנת אפליקציית Instagram נתמכת</string>
     <string name="logs_empty_title">אין עדיין יומנים</string>
-    <string name="logs_empty_body">פתח את Instagram פעם אחת כש-InstaEclipse מופעל ב-LSPosed, ואז חזור לכאן והקש על רענן. היומן של Instagram נשמר כאן אוטומטית, גם אחרי ש-Instagram נסגר.</string>
+    <string name="logs_empty_body">פתח את Instagram פעם אחת כש-InstaEclipse מופעל ב-Vector, ואז חזור לכאן והקש על רענן. היומן של Instagram נשמר כאן אוטומטית, גם אחרי ש-Instagram נסגר.</string>
     <string name="logs_empty_filter_title">אין תוצאות למסנן הזה</string>
     <string name="logs_empty_filter_body">חזור אל הכל כדי לראות את כל הרשומות.</string>
     <string name="logs_nothing_to_copy">אין יומנים להעתקה</string>

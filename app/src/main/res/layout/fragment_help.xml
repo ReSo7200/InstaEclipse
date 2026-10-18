@@ -47,7 +47,7 @@
                 android:paddingBottom="4dp" />
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===== Troubleshooting (LSPosed / LSPatch links) ===== -->
+        <!-- ===== Troubleshooting (Vector / LSPatch links) ===== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,9 +73,9 @@
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp">
 
-                <!-- Rooted: JingMatrix's LSPosed (now Vector) -->
+                <!-- Rooted: JingMatrix's Vector (formerly LSPosed) -->
                 <LinearLayout
-                    android:id="@+id/lsposed_row"
+                    android:id="@+id/vector_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
@@ -89,11 +89,11 @@
                     android:paddingBottom="12dp">
 
                     <ImageView
-                        android:id="@+id/lsposed_logo"
+                        android:id="@+id/vector_logo"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:importantForAccessibility="no"
-                        android:background="@drawable/ic_logo_lsposed"
+                        android:background="@drawable/ic_logo_vector_tile"
                         android:padding="5dp"
                         android:src="@drawable/ic_vector_statue" />
 
@@ -107,14 +107,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/help_lsposed_title"
+                            android:text="@string/help_vector_title"
                             android:textAppearance="?attr/textAppearanceTitleMedium"
                             android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/help_lsposed_sub"
+                            android:text="@string/help_vector_sub"
                             android:textAppearance="?attr/textAppearanceBodyMedium"
                             android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>

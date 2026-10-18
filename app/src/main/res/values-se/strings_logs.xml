@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Sparad logg · Instagram körs inte</string>
     <string name="logs_status_none">Ingen Instagram-app som stöds är installerad</string>
     <string name="logs_empty_title">Inga loggar än</string>
-    <string name="logs_empty_body">Öppna Instagram en gång med InstaEclipse aktiverat i LSPosed, gå sedan tillbaka hit och tryck på Uppdatera. Instagrams logg sparas här automatiskt, även efter att Instagram har stängts.</string>
+    <string name="logs_empty_body">Öppna Instagram en gång med InstaEclipse aktiverat i Vector, gå sedan tillbaka hit och tryck på Uppdatera. Instagrams logg sparas här automatiskt, även efter att Instagram har stängts.</string>
     <string name="logs_empty_filter_title">Inget matchar det här filtret</string>
     <string name="logs_empty_filter_body">Gå tillbaka till Alla för att se alla poster.</string>
     <string name="logs_nothing_to_copy">Inga loggar att kopiera</string>

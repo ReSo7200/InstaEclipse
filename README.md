@@ -2,7 +2,7 @@
   <img src="assets/logo.png" alt="InstaEclipse" width="120" />
   <h1>InstaEclipse</h1>
   <p><b>Instagram, the way you want it.</b><br/>
-  An LSPosed module for privacy, downloads, a cleaner feed, smarter stories and DMs, and your own look. Everything is a switch inside Instagram.</p>
+  A Vector (Xposed) module for privacy, downloads, a cleaner feed, smarter stories and DMs, and your own look. Everything is a switch inside Instagram.</p>
 
   <p>
     <a href="https://github.com/ReSo7200/InstaEclipse/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/ReSo7200/InstaEclipse?style=for-the-badge&logo=github&color=1a1a2e&labelColor=0d0d0d"/></a>
@@ -32,7 +32,7 @@
 
 ## What is it
 
-InstaEclipse is a module for [LSPosed](https://github.com/JingMatrix/LSPosed) (rooted phones) and [LSPatch](https://github.com/JingMatrix/LSPatch) (no root). Long press the Explore (search) tab inside Instagram and the InstaEclipse menu slides up. Flip what you want, and most things apply right away.
+InstaEclipse is a module for [Vector](https://github.com/JingMatrix/Vector), the Xposed framework formerly known as LSPosed (rooted phones), and [LSPatch](https://github.com/JingMatrix/LSPatch) (no root). Long press the Explore (search) tab inside Instagram and the InstaEclipse menu slides up. Flip what you want, and most things apply right away.
 
 It comes with a companion app too. That is where you see whether the module is running, read its logs, back up your settings, edit themes, and get help.
 
@@ -82,6 +82,7 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Chat export | Export a chat to a readable HTML page with replies, reactions, edit history and optional media |
 | Jump to first message | Scroll a chat all the way back to its first message |
 | Voice message downloads | Save voice messages, named by sender |
+| DM photos and videos | Instagram's Save on a photo or video in a chat goes through InstaEclipse: named after the sender, in their folder, at the best quality |
 | Translate messages | Send a message to your translator app from its long press menu (under More) |
 | Unsend multiple messages | Long press one of your messages, then More, Unsend multiple: check your messages right in the chat and unsend them all at once |
 | Hide specific chats | Hide chats from your inbox and manage them later |
@@ -134,7 +135,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 
 | Feature | What it does |
 |---|---|
-| Download posts, reels and stories | Single photos, full carousels, reels, and stories (your own included, with music) |
+| Download posts, reels and stories | Single photos, full carousels, reels, and stories (your own included, with music), always at the best quality available |
 | Download profile pictures | Full size, from a long press on the profile picture |
 | Audio only | Save just the audio of a video or reel as .m4a, including a post's music |
 | Copy media link | Copy the direct link for a post, reel or a single carousel slide |
@@ -186,6 +187,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Translate | Translate captions, comments and chat messages with your own translator app |
 | Save comment GIFs and images | Download the media in comments |
 | "Follows you" label | See on any profile whether they follow you back |
+| Fancy bio fonts | The bio's "Change font" button picks a style for what you type next: bold, italic, script, monospace and more; strikethrough and underline work in any language |
 | Follower toast | A quick message when you open a profile |
 | Export followers and following | Save the whole list as CSV |
 | Saved on your profile | A Saved button right on your profile |
@@ -280,7 +282,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Home dashboard | Module status, Instagram version, quick launch and restart, and your pinned shortcuts |
 | Feature search | Find any switch by name |
 | Live logs | Hook status from Instagram and the app, no adb needed |
-| Help | Frequently asked questions, setup links for LSPosed and LSPatch, and the community |
+| Help | Frequently asked questions, setup links for Vector and LSPatch, and the community |
 | 18 languages | English, Arabic, Azerbaijani, Chinese (Simplified and Traditional), French, German, Greek, Hebrew, Indonesian, Italian, Polish, Portuguese, Russian, Spanish, Swedish, Turkish and Vietnamese |
 
 </details>
@@ -306,12 +308,12 @@ A big Instagram update can still knock a feature out until it is patched. The me
 
 Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone.
 
-### Rooted, with LSPosed
+### Rooted, with Vector
 
-> Needs [JingMatrix's LSPosed](https://github.com/JingMatrix/LSPosed/releases/latest).
+> Needs [Vector](https://github.com/JingMatrix/Vector/releases/latest), JingMatrix's Xposed framework.
 
 1. **Install InstaEclipse** from the APK you downloaded.
-2. **Enable the module.** In LSPosed Manager, open Modules, enable InstaEclipse and tick Instagram.
+2. **Enable the module.** In the Vector manager, open Modules, enable InstaEclipse and tick Instagram.
 3. **Restart Instagram.** Force stop it and open it again.
 4. **Open the menu.** Long press the Explore (search) tab.
 
@@ -351,7 +353,7 @@ Updates and tips:
 ## FAQ
 
 **A feature is not doing anything.**
-Disable and enable the module again in LSPosed or LSPatch, then force stop and reopen Instagram.
+Disable and enable the module again in Vector or LSPatch, then force stop and reopen Instagram.
 
 **The text in the InstaEclipse menus is missing.**
 Turn off Hide My Applist (HMA) for Instagram. InstaEclipse reads its text from its own app, and HMA hides it.
@@ -404,7 +406,7 @@ Ask in the [Telegram group](https://t.me/instaEclipse_discussion). Someone will 
 
 ## Built with
 
-- [JingMatrix/LSPosed](https://github.com/JingMatrix/LSPosed), the Xposed framework it runs on
+- [JingMatrix/Vector](https://github.com/JingMatrix/Vector), the Xposed framework it runs on
 - [JingMatrix/LSPatch](https://github.com/JingMatrix/LSPatch), for phones without root
 - [LuckyPray/DexKit](https://github.com/LuckyPray/DexKit), which finds Instagram's code at runtime
 

@@ -9,8 +9,8 @@
     <string name="help_source_code">Kod źródłowy na GitHubie</string>
     <string name="help_faq_expand">Rozwiń odpowiedź</string>
     <string name="help_faq_collapse">Zwiń odpowiedź</string>
-    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
-    <string name="help_lsposed_sub">Masz roota? Użyj tej wersji</string>
+    <string name="help_vector_title">Vector (JingMatrix)</string>
+    <string name="help_vector_sub">Masz roota? Użyj tej wersji</string>
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Bez roota? Zainstaluj to</string>
     <string name="help_lspatch_guide">Zobacz poradnik instalacji</string>

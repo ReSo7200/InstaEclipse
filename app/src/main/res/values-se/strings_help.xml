@@ -9,8 +9,8 @@
     <string name="help_source_code">Källkod på GitHub</string>
     <string name="help_faq_expand">Visa svar</string>
     <string name="help_faq_collapse">Dölj svar</string>
-    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
-    <string name="help_lsposed_sub">Rootad? Använd den här versionen</string>
+    <string name="help_vector_title">Vector (JingMatrix)</string>
+    <string name="help_vector_sub">Rootad? Använd den här versionen</string>
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Inte rootad? Installera den här</string>
     <string name="help_lspatch_guide">Följ installationsguiden</string>

@@ -57,7 +57,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">Frequently Asked Questions</string>
     <string name="faq_1"><b>1. Not working/crashes when using Google Play Version?</b>\n- Use APKMirror APKs</string>
-    <string name="faq_2"><b>2. Module not enabled?</b>\n- Disable and re-enable the module in LSPosed.</string>
+    <string name="faq_2"><b>2. Module not enabled?</b>\n- Disable and re-enable the module in Vector.</string>
     <string name="faq_3"><b>3. Features not working?</b>\n- Force stop and restart Instagram.</string>
     <string name="faq_4"><b>4. Developer options cause crashes?</b>\n- Follow the developer options guide.</string>
     <string name="faq_5"><b>5. Developer options have weird labels or numbers?</b>\n- Use Beta or Alpha versions as Stable versions have obfuscation.</string>

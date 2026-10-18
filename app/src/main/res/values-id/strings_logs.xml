@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Log tersimpan · Instagram tidak berjalan</string>
     <string name="logs_status_none">Tidak ada aplikasi Instagram yang didukung terpasang</string>
     <string name="logs_empty_title">Belum ada log</string>
-    <string name="logs_empty_body">Buka Instagram sekali dengan InstaEclipse diaktifkan di LSPosed, lalu kembali ke sini dan ketuk Muat ulang. Log Instagram disimpan di sini secara otomatis, bahkan setelah Instagram ditutup.</string>
+    <string name="logs_empty_body">Buka Instagram sekali dengan InstaEclipse diaktifkan di Vector, lalu kembali ke sini dan ketuk Muat ulang. Log Instagram disimpan di sini secara otomatis, bahkan setelah Instagram ditutup.</string>
     <string name="logs_empty_filter_title">Tidak ada yang cocok dengan filter ini</string>
     <string name="logs_empty_filter_body">Kembali ke Semua untuk melihat semua entri.</string>
     <string name="logs_nothing_to_copy">Tidak ada log untuk disalin</string>

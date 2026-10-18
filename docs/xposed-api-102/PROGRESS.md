@@ -41,8 +41,9 @@ a legacy module on LSPatch / older LSPosed.
 - [ ] Vector 2.2 with the `modern` APK: loads `ModernEntry`, all hooks install, features work?
 - [ ] Vector 2.2 with the `legacy` APK: still loads (it supports legacy modules)? Expected yes.
 - [ ] LSPatch: legacy APK works (should, nothing changed for it); modern APK fails like LSPosed 1.11?
-- [ ] Remote preferences on modern: the companion app must write `instaeclipse_cache` through the
-      libxposed **service** library, or cold-start settings sync falls back to broadcasts only.
+- [ ] Remote preferences on modern: does `RemotePrefsMirror` connect on Vector 2.2 (logcat tag
+      `IE|RemotePrefs`: "connected to Vector ..., mirrored N values") and does Instagram read them
+      on a cold start (`CompanionSync` applies them)?
 - [ ] Release plan: ship both APKs (`-legacy`, `-api102`)? Or legacy only until Vector 2.2 is common?
 
 ## Steps
@@ -59,7 +60,16 @@ a legacy module on LSPatch / older LSPosed.
 - [x] **Legacy APK on the phone (LSPosed 1.11.0)**: loads via `LegacyEntry`; same 80+ hook ✅ lines
       and the same warnings as the run before the migration (diffed from the module log); thread
       menu buttons inject on opening a chat; theme/tab order/exact-date format all active.
-- [ ] Companion: write remote preferences (libxposed service) for the modern path
+- [x] Companion: `RemotePrefsMirror` (modern flavor) copies `instaeclipse_cache` into remote
+      preferences on connect and on every change; `InstaEclipseApp` starts it; legacy flavor has a
+      no-op version. libxposed `service`/`interface` 102 classes are bundled as jars in
+      `app/libs/modern/` (their AARs need compileSdk 37; this project is on AGP 8.7 / compileSdk 34)
+      and `XposedProvider` is declared in `app/src/modern/AndroidManifest.xml`.
+- [x] Legacy APK checked again on the phone: companion starts (new Application class), "Module
+      active", Help shows the Vector row
+- [x] "LSPosed" -> "Vector" in the README, app strings (all languages), Help screen, issue
+      template; README lists the 0.8.1 additions (DM photos/videos, best quality, fancy bio fonts)
+- [x] CI: tests per flavor (`testLegacyDebugUnitTest testModernDebugUnitTest`, 60/60 each)
 - [ ] Modern APK on Vector 2.2 (needs the phone's LSPosed replaced: user's call)
 - [ ] README/FAQ: which APK to install; reply on #264
 
@@ -69,3 +79,6 @@ a legacy module on LSPatch / older LSPosed.
   Vector 2.2 (2026-08-04) brings API 102. JingMatrix/LSPosed is now JingMatrix/Vector.
 - 2026-10-18: compat layer + both backends + entries built; found the LSPosed 1.11 java_init.list
   behaviour (above) -> split into legacy/modern flavors; legacy flavor verified on the phone.
+- 2026-10-18: companion remote-preferences mirror (modern), Vector naming everywhere, README 0.8.1.
+  **Next: user flashes Vector 2.2 and restarts the phone; then install `app-modern-debug.apk`**,
+  enable it in Vector (scope Instagram), and work through "Open questions".

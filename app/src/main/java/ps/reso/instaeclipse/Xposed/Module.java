@@ -247,7 +247,7 @@ public class Module {
 
                     FeatureManager.refreshFeatureStatus(); // Update internal feature states
 
-                    // Activate the LSPosed Sync Bridge to listen to FeaturesFragment updates
+                    // Activate the sync bridge to listen to FeaturesFragment updates
                     registerSyncReceiver(context);
 
                     try {

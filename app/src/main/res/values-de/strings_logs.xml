@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Gespeichertes Protokoll · Instagram läuft nicht</string>
     <string name="logs_status_none">Keine unterstützte Instagram-App installiert</string>
     <string name="logs_empty_title">Noch keine Protokolle</string>
-    <string name="logs_empty_body">Öffne Instagram einmal mit in LSPosed aktiviertem InstaEclipse, komm dann hierher zurück und tippe auf Aktualisieren. Das Instagram-Protokoll wird hier automatisch gespeichert – auch nachdem Instagram geschlossen wurde.</string>
+    <string name="logs_empty_body">Öffne Instagram einmal mit in Vector aktiviertem InstaEclipse, komm dann hierher zurück und tippe auf Aktualisieren. Das Instagram-Protokoll wird hier automatisch gespeichert – auch nachdem Instagram geschlossen wurde.</string>
     <string name="logs_empty_filter_title">Nichts passt zu diesem Filter</string>
     <string name="logs_empty_filter_body">Wechsle zurück zu „Alle“, um alle Einträge zu sehen.</string>
     <string name="logs_nothing_to_copy">Keine Protokolle zum Kopieren</string>
