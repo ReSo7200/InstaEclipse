@@ -666,4 +666,6 @@
     <string name="ig_highlight_loading">Cargando historia destacada…</string>
     <string name="ig_highlight_downloading">Descargando %1$d elementos de la historia destacada…</string>
     <string name="ig_highlight_done">Historia destacada guardada: %1$d de %2$d elementos</string>
+    <string name="ig_spoof_device">Simular dispositivo (vídeo HDR)</string>
+    <string name="ig_spoof_device_note">Instagram ve este teléfono como el dispositivo elegido. Esto desbloquea el vídeo HDR y otras funciones que Instagram limita a esos teléfonos, y añade las opciones de desarrollador correspondientes. Reinicia Instagram para aplicarlo. Instagram puede pedirte que confirmes tu cuenta una vez.</string>
 </resources>

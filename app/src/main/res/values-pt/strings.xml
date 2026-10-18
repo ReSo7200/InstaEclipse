@@ -661,4 +661,6 @@
     <string name="ig_highlight_loading">A carregar destaque…</string>
     <string name="ig_highlight_downloading">A transferir %1$d itens do destaque…</string>
     <string name="ig_highlight_done">Destaque guardado: %1$d de %2$d itens</string>
+    <string name="ig_spoof_device">Simular dispositivo (vídeo HDR)</string>
+    <string name="ig_spoof_device_note">O Instagram vê este telefone como o dispositivo escolhido. Isso desbloqueia vídeo HDR e outros recursos que o Instagram limita a esses telefones, e adiciona as opções de desenvolvedor correspondentes. Reinicie o Instagram para aplicar. O Instagram pode pedir que você confirme sua conta uma vez.</string>
 </resources>

@@ -1042,7 +1042,9 @@ public class FeaturesFragment extends Fragment {
         ));
 
         defs.add(getString(R.string.feat_options));
-        defs.add(Arrays.asList(createSwitch(R.drawable.ic_block, "#FF453A", getString(R.string.ig_dialog_dev_remove_build_expired), "removeBuildExpiredPopup")));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_block, "#FF453A", getString(R.string.ig_dialog_dev_remove_build_expired), "removeBuildExpiredPopup"),
+                createClickable(R.drawable.ic_movie, "#0A84FF", spoofDeviceLabel(), this::showSpoofDeviceDialog)));
 
         return defs;
     }
@@ -1489,6 +1491,42 @@ public class FeaturesFragment extends Fragment {
         b.putExtra("value", pattern);
         ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
         loadFeedMenu();
+    }
+
+    private String[] spoofDeviceNames() {
+        String[] ids = ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.DEVICES;
+        String[] names = new String[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            String n = ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.deviceName(ids[i]);
+            names[i] = n != null ? n : getString(R.string.ig_dialog_extras_share_domain_off);
+        }
+        return names;
+    }
+
+    private String spoofDeviceLabel() {
+        int i = Arrays.asList(ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.DEVICES).indexOf(localCache.getString("spoofDevice", ""));
+        return getString(R.string.ig_spoof_device) + "  ·  " + spoofDeviceNames()[Math.max(i, 0)];
+    }
+
+    /** Which device Instagram sees (saved as the "spoofDevice" string pref). */
+    private void showSpoofDeviceDialog() {
+        String[] ids = ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.DEVICES;
+        int current = Math.max(Arrays.asList(ids).indexOf(localCache.getString("spoofDevice", "")), 0);
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.ig_spoof_device)
+                .setSingleChoiceItems(spoofDeviceNames(), current, (d, which) -> {
+                    localCache.edit().putString("spoofDevice", ids[which]).commit();
+                    makeLocalCacheWorldReadable();
+                    Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
+                    b.putExtra("key", "spoofDevice");
+                    b.putExtra("value", ids[which]);
+                    ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
+                    d.dismiss();
+                    Toast.makeText(requireContext(), R.string.ig_spoof_device_note, Toast.LENGTH_LONG).show();
+                    loadDevMenu();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private String startupTabLabel() {

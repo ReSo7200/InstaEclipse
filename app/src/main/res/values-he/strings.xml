@@ -693,4 +693,6 @@
     <string name="share_dl_label">הורד עם InstaEclipse</string>
     <string name="share_dl_no_instagram">אינסטגרם לא מותקן</string>
     <string name="share_dl_no_link">לא נמצא קישור לפוסט או לריל של אינסטגרם</string>
+    <string name="ig_spoof_device">זיוף מכשיר (וידאו HDR)</string>
+    <string name="ig_spoof_device_note">Instagram רואה את הטלפון הזה כמכשיר שנבחר. זה פותח וידאו HDR ותכונות אחרות ש-Instagram מגביל לטלפונים האלה, ומוסיף את אפשרויות המפתח המתאימות. הפעל מחדש את Instagram כדי להחיל. Instagram עשוי לבקש לאשר את החשבון פעם אחת.</string>
 </resources>

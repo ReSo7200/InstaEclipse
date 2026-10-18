@@ -672,4 +672,6 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="ig_highlight_loading">Highlight wird geladen…</string>
     <string name="ig_highlight_downloading">%1$d Highlight-Elemente werden heruntergeladen…</string>
     <string name="ig_highlight_done">Highlight gespeichert: %1$d von %2$d Elementen</string>
+    <string name="ig_spoof_device">Gerät vortäuschen (HDR-Video)</string>
+    <string name="ig_spoof_device_note">Instagram sieht dieses Telefon als das gewählte Gerät. Das schaltet HDR-Video und andere Funktionen frei, die Instagram auf diese Telefone beschränkt, und fügt die passenden Entwickleroptionen hinzu. Starte Instagram neu, um es anzuwenden. Instagram fragt eventuell einmal nach einer Bestätigung deines Kontos.</string>
 </resources>

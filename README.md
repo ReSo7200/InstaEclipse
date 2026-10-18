@@ -264,6 +264,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Feature | What it does |
 |---|---|
 | Developer Options | Instagram's hidden internal panel, with config import, export and a known good default |
+| Spoof device | Instagram sees a Pixel 11 Pro XL or Galaxy S26 Ultra, which unlocks HDR video downloads and other features it limits to those phones. Adds the matching developer options |
 | Unlimited accounts | Add more accounts than Instagram allows |
 | Notification fix | Repair notifications that stopped arriving |
 | Auto clear cache | Clear Instagram's media cache once it gets too big |

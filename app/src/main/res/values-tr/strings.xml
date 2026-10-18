@@ -701,4 +701,6 @@
     <string name="ig_highlight_loading">Öne çıkan yükleniyor…</string>
     <string name="ig_highlight_downloading">%1$d öne çıkan öğe indiriliyor…</string>
     <string name="ig_highlight_done">Öne çıkan kaydedildi: %2$d öğeden %1$d tanesi</string>
+    <string name="ig_spoof_device">Cihazı taklit et (HDR video)</string>
+    <string name="ig_spoof_device_note">Instagram bu telefonu seçilen cihaz olarak görür. Bu, HDR videoyu ve Instagram\'ın bu telefonlarla sınırladığı diğer özellikleri açar ve ilgili geliştirici seçeneklerini ekler. Uygulamak için Instagram\'ı yeniden başlatın. Instagram hesabınızı bir kez onaylamanızı isteyebilir.</string>
 </resources>

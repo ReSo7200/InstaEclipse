@@ -694,4 +694,6 @@
     <string name="ig_highlight_loading">正在加载精选…</string>
     <string name="ig_highlight_downloading">正在下载 %1$d 个精选项目…</string>
     <string name="ig_highlight_done">精选已保存：%1$d / %2$d 个项目</string>
+    <string name="ig_spoof_device">伪装设备（HDR 视频）</string>
+    <string name="ig_spoof_device_note">Instagram 会将此手机识别为所选设备。这会解锁 HDR 视频以及 Instagram 仅限这些手机的其他功能，并添加相应的开发者选项。重启 Instagram 后生效。Instagram 可能会要求你确认一次帐户。</string>
 </resources>

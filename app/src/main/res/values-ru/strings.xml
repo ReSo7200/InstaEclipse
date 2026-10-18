@@ -663,4 +663,6 @@
     <string name="ig_highlight_loading">Загрузка «Актуального»…</string>
     <string name="ig_highlight_downloading">Загрузка %1$d элементов «Актуального»…</string>
     <string name="ig_highlight_done">«Актуальное» сохранено: %1$d из %2$d элементов</string>
+    <string name="ig_spoof_device">Подмена устройства (HDR-видео)</string>
+    <string name="ig_spoof_device_note">Instagram видит этот телефон как выбранное устройство. Это открывает HDR-видео и другие функции, которые Instagram ограничивает этими телефонами, и добавляет соответствующие параметры разработчика. Перезапустите Instagram, чтобы применить. Instagram может один раз попросить подтвердить аккаунт.</string>
 </resources>

@@ -697,4 +697,6 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="ig_highlight_loading">Chargement de la story à la une…</string>
     <string name="ig_highlight_downloading">Téléchargement de %1$d éléments de la story à la une…</string>
     <string name="ig_highlight_done">Story à la une enregistrée : %1$d éléments sur %2$d</string>
+    <string name="ig_spoof_device">Simuler l\'appareil (vidéo HDR)</string>
+    <string name="ig_spoof_device_note">Instagram voit ce téléphone comme l\'appareil choisi. Cela débloque la vidéo HDR et d\'autres fonctions qu\'Instagram réserve à ces téléphones, et ajoute les options développeur correspondantes. Redémarrez Instagram pour appliquer. Instagram peut vous demander une fois de confirmer votre compte.</string>
 </resources>

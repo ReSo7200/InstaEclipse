@@ -694,4 +694,6 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_highlight_loading">Memuat Sorotan…</string>
     <string name="ig_highlight_downloading">Mengunduh %1$d item Sorotan…</string>
     <string name="ig_highlight_done">Sorotan disimpan: %1$d dari %2$d item</string>
+    <string name="ig_spoof_device">Samarkan perangkat (video HDR)</string>
+    <string name="ig_spoof_device_note">Instagram melihat ponsel ini sebagai perangkat yang dipilih. Ini membuka video HDR dan fitur lain yang dibatasi Instagram untuk ponsel tersebut, serta menambahkan opsi pengembang yang sesuai. Mulai ulang Instagram untuk menerapkan. Instagram mungkin meminta Anda mengonfirmasi akun sekali.</string>
 </resources>

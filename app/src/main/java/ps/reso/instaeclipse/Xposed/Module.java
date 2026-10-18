@@ -179,6 +179,10 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     SettingsManager.init(context);
                     SettingsManager.loadAllFlags(context);
 
+                    // Before Instagram reads anything about the device; a change applies on the next start.
+                    ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.apply(lpparam.classLoader);
+                    ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.syncOverrides(context);
+
                     // Init DexKit cache — checks IG version to decide if saved descriptors are valid.
                     // Must run before any hook that calls DexKitCache.isCacheValid().
                     try {

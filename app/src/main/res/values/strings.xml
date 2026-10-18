@@ -714,4 +714,6 @@ Stay on this screen until it finishes.</string>
     <string name="ig_update_later">Later</string>
     <string name="ig_update_error_message">Failed to check for updates. Please try again later.</string>
 
+    <string name="ig_spoof_device">Spoof device (HDR video)</string>
+    <string name="ig_spoof_device_note">Instagram sees this phone as the chosen device. This unlocks HDR video and other features Instagram limits to those phones, and adds the matching developer options. Restart Instagram to apply. Instagram may ask you to confirm your account once.</string>
 </resources>

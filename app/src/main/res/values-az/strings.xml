@@ -664,4 +664,6 @@
     <string name="ig_highlight_loading">Seçilmiş yüklənir…</string>
     <string name="ig_highlight_downloading">%1$d seçilmiş element yüklənir…</string>
     <string name="ig_highlight_done">Seçilmiş saxlanıldı: %2$d elementdən %1$d tanesi</string>
+    <string name="ig_spoof_device">Cihazı saxtalaşdır (HDR video)</string>
+    <string name="ig_spoof_device_note">Instagram bu telefonu seçilmiş cihaz kimi görür. Bu, HDR videonu və Instagram-ın həmin telefonlarla məhdudlaşdırdığı digər funksiyaları açır və uyğun tərtibatçı seçimlərini əlavə edir. Tətbiq etmək üçün Instagram-ı yenidən başladın. Instagram hesabınızı bir dəfə təsdiqləməyi istəyə bilər.</string>
 </resources>

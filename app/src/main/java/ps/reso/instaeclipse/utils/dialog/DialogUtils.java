@@ -811,9 +811,43 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         layout.addView(buildExpiredSwitch);
+        layout.addView(createActionRow(context, R.drawable.ic_movie, spoofDeviceLabel(context), "#0A84FF",
+                v -> showSpoofDeviceDialog(context, (TextView) findFirstText(v))));
 
         // Save current dev mode flag when dialog is closed
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_dev_options), layout, SettingsManager::saveAllFlags);
+    }
+
+    static String[] spoofDeviceNames(Context context) {
+        String[] ids = ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.DEVICES;
+        String[] names = new String[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            String n = ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.deviceName(ids[i]);
+            names[i] = n != null ? n : I18n.t(context, R.string.ig_dialog_extras_share_domain_off);
+        }
+        return names;
+    }
+
+    private static String spoofDeviceLabel(Context context) {
+        int i = java.util.Arrays.asList(ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.DEVICES).indexOf(FeatureFlags.spoofDevice);
+        return I18n.t(context, R.string.ig_spoof_device) + "  ·  " + spoofDeviceNames(context)[Math.max(i, 0)];
+    }
+
+    /** Which device Instagram sees (FeatureFlags.spoofDevice); applies on the next start. */
+    private static void showSpoofDeviceDialog(Context context, TextView label) {
+        String[] ids = ps.reso.instaeclipse.mods.misc.DeviceSpoofHook.DEVICES;
+        int current = Math.max(java.util.Arrays.asList(ids).indexOf(FeatureFlags.spoofDevice), 0);
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.ig_spoof_device))
+                .message(I18n.t(context, R.string.ig_spoof_device_note))
+                .choices(spoofDeviceNames(context), current, which -> {
+                    FeatureFlags.spoofDevice = ids[which];
+                    SettingsManager.saveAllFlags();
+                    if (label != null) label.setText(spoofDeviceLabel(context));
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context,
+                            I18n.t(context, R.string.ig_toast_restart_manual), Toast.LENGTH_LONG).show();
+                })
+                .show();
     }
 
     /** Viewer for the persistent Unsent Messages log (captured by KeepUnsentMessagesHook). */

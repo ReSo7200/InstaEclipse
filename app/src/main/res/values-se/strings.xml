@@ -663,4 +663,6 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_highlight_loading">Laddar höjdpunkt…</string>
     <string name="ig_highlight_downloading">Laddar ned %1$d objekt från höjdpunkten…</string>
     <string name="ig_highlight_done">Höjdpunkt sparad: %1$d av %2$d objekt</string>
+    <string name="ig_spoof_device">Förfalska enhet (HDR-video)</string>
+    <string name="ig_spoof_device_note">Instagram ser den här telefonen som den valda enheten. Det låser upp HDR-video och andra funktioner som Instagram begränsar till de telefonerna, och lägger till motsvarande utvecklaralternativ. Starta om Instagram för att tillämpa. Instagram kan be dig bekräfta ditt konto en gång.</string>
 </resources>
