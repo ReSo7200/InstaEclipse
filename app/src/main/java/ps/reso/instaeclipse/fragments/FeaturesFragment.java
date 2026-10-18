@@ -1573,6 +1573,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_block, A_SOCIAL, getString(R.string.ig_dialog_hide_threads_button), "hideThreadsButton"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_show_follower_toast), "showFollowerToast"),
                 createSwitch(R.drawable.ic_download, A_SOCIAL, getString(R.string.ig_dialog_misc_follow_export), "followListExport"),
+                createSwitch(R.drawable.ic_eye, A_SOCIAL, getString(R.string.ig_feat_followers_history), "followersHistory"),
                 createSwitch(R.drawable.ic_save, A_SOCIAL, getString(R.string.ig_saved_on_profile), "savedOnProfile")
         ));
 

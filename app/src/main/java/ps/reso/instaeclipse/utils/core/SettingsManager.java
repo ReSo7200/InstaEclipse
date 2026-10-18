@@ -137,6 +137,7 @@ public class SettingsManager {
         editor.putBoolean("storyInfo", FeatureFlags.storyInfo);
         editor.putBoolean("commentSearch", FeatureFlags.commentSearch);
         editor.putBoolean("followListExport", FeatureFlags.followListExport);
+        editor.putBoolean("followersHistory", FeatureFlags.followersHistory);
         editor.putBoolean("showFollowerToast", FeatureFlags.showFollowerToast);
         editor.putBoolean("showFeatureToasts", FeatureFlags.showFeatureToasts);
         editor.putBoolean("enableStoryMentions", FeatureFlags.enableStoryMentions);
@@ -312,6 +313,7 @@ public class SettingsManager {
         FeatureFlags.storyInfo = prefs.getBoolean("storyInfo", false);
         FeatureFlags.commentSearch = prefs.getBoolean("commentSearch", false);
         FeatureFlags.followListExport = prefs.getBoolean("followListExport", false);
+        FeatureFlags.followersHistory = prefs.getBoolean("followersHistory", false);
         FeatureFlags.showFollowerToast = prefs.getBoolean("showFollowerToast", false);
         FeatureFlags.showFeatureToasts = prefs.getBoolean("showFeatureToasts", false);
         FeatureFlags.enableStoryMentions = prefs.getBoolean("enableStoryMentions", false);

@@ -114,6 +114,7 @@ public class FeatureFlags {
     public static volatile boolean showFeatureToasts = false;
     public static volatile boolean disableRepost = false;
     public static volatile boolean followListExport = false; // Export CSV pill on followers/following lists (#224)
+    public static volatile boolean followersHistory = false; // who unfollowed / followed you, checked on your Followers tab
     public static volatile boolean commentSearch = false; // search the loaded comments of a post (#230)
     public static volatile boolean storyInfo = false; // Story Info / Quiz Answer / Poll Results in the story menu
     public static volatile boolean storyLinks = false; // copy link-sticker urls from the story menu

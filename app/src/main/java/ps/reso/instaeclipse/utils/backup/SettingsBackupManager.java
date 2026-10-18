@@ -110,6 +110,7 @@ public class SettingsBackupManager {
         s.put("storyInfo",               FeatureFlags.storyInfo);
         s.put("commentSearch",           FeatureFlags.commentSearch);
         s.put("followListExport",        FeatureFlags.followListExport);
+        s.put("followersHistory",        FeatureFlags.followersHistory);
         s.put("showFollowerToast",       FeatureFlags.showFollowerToast);
         s.put("showFeatureToasts",       FeatureFlags.showFeatureToasts);
         s.put("enableStoryMentions",     FeatureFlags.enableStoryMentions);
@@ -245,6 +246,7 @@ public class SettingsBackupManager {
         if (s.has("storyInfo"))              FeatureFlags.storyInfo              = s.getBoolean("storyInfo");
         if (s.has("commentSearch"))          FeatureFlags.commentSearch          = s.getBoolean("commentSearch");
         if (s.has("followListExport"))       FeatureFlags.followListExport       = s.getBoolean("followListExport");
+        if (s.has("followersHistory"))       FeatureFlags.followersHistory       = s.getBoolean("followersHistory");
         if (s.has("showFollowerToast"))      FeatureFlags.showFollowerToast      = s.getBoolean("showFollowerToast");
         if (s.has("showFeatureToasts"))      FeatureFlags.showFeatureToasts      = s.getBoolean("showFeatureToasts");
         if (s.has("enableStoryMentions"))    FeatureFlags.enableStoryMentions    = s.getBoolean("enableStoryMentions");
