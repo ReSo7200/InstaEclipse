@@ -118,6 +118,7 @@ public class LoggingFragment extends Fragment {
 
     /** Nonce of the last ACTION_REQUEST_LOGS; replies without it are ignored (IpcSecurity). */
     private String logsNonce;
+    private final java.util.List<ps.reso.instaeclipse.utils.ipc.ModuleReplies.Pending> logReplies = new java.util.ArrayList<>();
 
     private final BroadcastReceiver logReplyReceiver = new BroadcastReceiver() {
         @Override
@@ -186,12 +187,7 @@ public class LoggingFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        IntentFilter filter = new IntentFilter(CommonUtils.ACTION_LOGS_REPLY);
-        if (Build.VERSION.SDK_INT >= 33) {
-            requireContext().registerReceiver(logReplyReceiver, filter, Context.RECEIVER_EXPORTED);
-        } else {
-            ContextCompat.registerReceiver(requireContext(), logReplyReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
-        }
+
     }
 
     @Override
@@ -205,9 +201,7 @@ public class LoggingFragment extends Fragment {
         super.onStop();
         cancelInstagramTimeout();
         waitingForInstagram = false;
-        try {
-            requireContext().unregisterReceiver(logReplyReceiver);
-        } catch (Throwable ignored) {}
+        cancelLogReplies();
     }
 
     @Override
@@ -239,12 +233,15 @@ public class LoggingFragment extends Fragment {
         List<String> targets = findInstalledTargets(ctx);
         noTargetInstalled = targets.isEmpty();
         if (noTargetInstalled) return;
+        cancelLogReplies();
         logsNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
         for (String pkg : targets) {
             Intent request = new Intent(CommonUtils.ACTION_REQUEST_LOGS);
             request.setPackage(pkg);
             request.putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, logsNonce);
-            ctx.sendBroadcast(request);
+            ps.reso.instaeclipse.utils.ipc.ModuleReplies.Pending pending =
+                    ps.reso.instaeclipse.utils.core.IpcSecurity.requestReply(ctx, request, CommonUtils.ACTION_LOGS_REPLY, logReplyReceiver);
+            if (pending != null) logReplies.add(pending);
         }
         waitingForInstagram = true;
         setProgress(true);
@@ -256,6 +253,11 @@ public class LoggingFragment extends Fragment {
             updateStatus();
         };
         mainHandler.postDelayed(pendingTimeout, INSTAGRAM_REPLY_TIMEOUT_MS);
+    }
+
+    private void cancelLogReplies() {
+        for (ps.reso.instaeclipse.utils.ipc.ModuleReplies.Pending reply : logReplies) reply.cancel();
+        logReplies.clear();
     }
 
     private void reload() {

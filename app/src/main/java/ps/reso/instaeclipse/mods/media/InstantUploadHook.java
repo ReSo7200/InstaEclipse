@@ -79,45 +79,31 @@ public class InstantUploadHook {
     private void hookSwap(ClassLoader cl) {
         try {
             Class<?> vm = XposedHelpers.findClass(VM_CLASS, cl);
-            java.util.List<Method> targets = new java.util.ArrayList<>();
-            // Legacy (<= 447): static (Context, Bitmap, Bitmap, VM, ...) capture handler.
-            for (Method m : vm.getDeclaredMethods()) {
-                if (!Modifier.isStatic(m.getModifiers())) continue;
-                int bmp = 0;
-                for (Class<?> t : m.getParameterTypes()) if (t == Bitmap.class) bmp++;
-                if (bmp >= 2) { targets.add(m); break; }
+            SwapBinding binding = SwapBinding.resolve(vm, android.content.Context.class, Bitmap.class);
+            if (binding == null) {
+                ModuleLog.line("(IE|InstantUpload) photo handoff unresolved or ambiguous");
+                if (FeatureFlags.uploadInstants) FeatureStatusTracker.setBroken("UploadInstants");
+                return;
             }
-            // IG 451: the second Bitmap became a holder object; the capture handlers are static
-            // (Context, Bitmap, ..., QuickSnapCameraViewModel, ...) -> Object (suspend), called from
-            // QuickSnapCameraViewModel$onCaptured$*. Hook every such handler; the first one to
-            // run consumes pendingBitmap, so a capture is swapped exactly once.
-            if (targets.isEmpty()) {
-                for (Method m : vm.getDeclaredMethods()) {
-                    if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != Object.class) continue;
-                    Class<?>[] pt = m.getParameterTypes();
-                    if (pt.length < 4 || pt[0] != android.content.Context.class || pt[1] != Bitmap.class) continue;
-                    boolean hasVm = false;
-                    for (Class<?> t : pt) if (t == vm) hasVm = true;
-                    if (hasVm) targets.add(m);
-                }
-            }
-            if (targets.isEmpty()) { ModuleLog.line("(IE|InstantUpload) ⚠️ A02 not found"); return; }
             XC_MethodHook swap = new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     try {
-                        if (!(p.args[1] instanceof Bitmap)) return; // suspend re-entry passes nulls
+                        if (!binding.accepts(p.args)) return; // suspend re-entry passes nulls
                         // Drop a stale pick so it can't hijack a much-later real capture.
                         if (pendingBitmap != null
                                 && System.currentTimeMillis() - pendingSetAt > PENDING_TTL_MS) {
                             pendingBitmap = null;
                         }
-                        if (FeatureFlags.uploadInstants && pendingBitmap != null) {
-                            p.args[1] = pendingBitmap;
-                            // Only on builds where arg2 is the second capture Bitmap (<= 447);
-                            // on 451 it is a non-Bitmap holder and must be left untouched.
-                            if (p.args.length > 2 && p.args[2] instanceof Bitmap)
-                                p.args[2] = pendingBitmap.copy(pendingBitmap.getConfig(), false);
-                            pendingBitmap = null;
+                        Bitmap selected = pendingBitmap;
+                        if (FeatureFlags.uploadInstants && selected != null) {
+                            Bitmap secondary = null;
+                            if (binding.needsSecondary(p.args)) {
+                                Bitmap.Config config = selected.getConfig();
+                                secondary = selected.copy(config != null ? config : Bitmap.Config.ARGB_8888, false);
+                            }
+                            // Validate both replacements before touching either argument.
+                            if (!binding.replace(p.args, selected, secondary)) return;
+                            if (pendingBitmap == selected) pendingBitmap = null;
                             FeedVideoDownloadHook.mainHandler.post(InstantUploadHook::removeChip);
                             ModuleLog.line("(IE|InstantUpload) ✅ swapped in gallery bitmap");
                         }
@@ -126,11 +112,83 @@ public class InstantUploadHook {
                     }
                 }
             };
-            for (Method m : targets) XposedBridge.hookMethod(m, swap);
+            binding.method.setAccessible(true);
+            XposedBridge.hookMethod(binding.method, swap);
             FeatureStatusTracker.setHooked("UploadInstants");
-            ModuleLog.line("(IE|InstantUpload) ✅ capture handler hooked: " + targets.size());
+            ModuleLog.line("(IE|InstantUpload) ✅ capture handler hooked");
         } catch (Throwable t) {
             ModuleLog.line("(IE|InstantUpload) ⚠️ swap install: " + t.getMessage());
+            if (FeatureFlags.uploadInstants) FeatureStatusTracker.setBroken("UploadInstants");
+        }
+    }
+
+    /** A unique photo handoff, with declared argument slots checked before mutation. */
+    static final class SwapBinding {
+        final Method method;
+        final int secondaryBitmapIndex;
+        private final Class<?> bitmapType;
+        private final Class<?> vmType;
+        private final int vmIndex;
+
+        private SwapBinding(Method method, Class<?> bitmapType, int secondaryBitmapIndex, int vmIndex) {
+            this.method = method;
+            this.bitmapType = bitmapType;
+            this.vmType = method.getDeclaringClass();
+            this.vmIndex = vmIndex;
+            this.secondaryBitmapIndex = secondaryBitmapIndex;
+        }
+
+        static SwapBinding resolve(Class<?> vm, Class<?> contextType, Class<?> bitmapType) {
+            SwapBinding found = null;
+            for (Method method : vm.getDeclaredMethods()) {
+                if (!Modifier.isStatic(method.getModifiers()) || method.getReturnType() != Object.class) continue;
+                Class<?>[] p = method.getParameterTypes();
+                if (p.length < 4 || p[0] != contextType || p[1] != bitmapType) continue;
+                boolean legacy = p.length == 9 && p[2] == bitmapType && p[3] == vm
+                        && modelType(p[4], bitmapType) && p[5] == String.class && p[6] == String.class
+                        && modelType(p[7], bitmapType) && p[8] == long.class;
+                // Preserve 451+'s single-Bitmap capture family without selecting an arbitrary
+                // overload. Video/File handoffs and archive/void helpers are never photo targets.
+                boolean modern = modelType(p[2], bitmapType) && p[2] != vm;
+                int bitmaps = 0, owners = 0, ownerIndex = -1;
+                for (int i = 0; i < p.length; i++) {
+                    Class<?> type = p[i];
+                    if (type == bitmapType) bitmaps++;
+                    if (type == vm) { owners++; ownerIndex = i; }
+                    if (type == java.io.File.class) modern = false;
+                }
+                legacy &= bitmaps == 2 && owners == 1;
+                modern &= bitmaps == 1 && owners == 1;
+                if (!legacy && !modern) continue;
+                if (found != null) return null;
+                found = new SwapBinding(method, bitmapType, legacy ? 2 : -1, legacy ? 3 : ownerIndex);
+            }
+            return found;
+        }
+
+        private static boolean modelType(Class<?> type, Class<?> bitmapType) {
+            return !type.isPrimitive() && type != bitmapType && type != String.class
+                    && type != Object.class && type != java.io.File.class;
+        }
+
+        boolean accepts(Object[] args) {
+            return args != null && args.length == method.getParameterCount()
+                    && bitmapType.isInstance(args[1]) && vmType.isInstance(args[vmIndex])
+                    && (secondaryBitmapIndex < 0 || args[secondaryBitmapIndex] == null
+                    || bitmapType.isInstance(args[secondaryBitmapIndex]));
+        }
+
+        boolean needsSecondary(Object[] args) {
+            return accepts(args) && secondaryBitmapIndex >= 0 && args[secondaryBitmapIndex] != null;
+        }
+
+        boolean replace(Object[] args, Object selected, Object secondary) {
+            if (!accepts(args) || !bitmapType.isInstance(selected)
+                    || (needsSecondary(args) && !bitmapType.isInstance(secondary))) return false;
+            boolean replaceSecondary = needsSecondary(args);
+            args[1] = selected;
+            if (replaceSecondary) args[secondaryBitmapIndex] = secondary;
+            return true;
         }
     }
 

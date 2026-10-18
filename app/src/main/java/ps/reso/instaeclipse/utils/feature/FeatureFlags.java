@@ -2,6 +2,14 @@ package ps.reso.instaeclipse.utils.feature;
 
 // Written from the settings receiver / menus, read from hook threads: volatile for visibility.
 public class FeatureFlags {
+    // Upstream selection stays the default; Custom opts into the verified downloader.
+    public static volatile boolean showHideChatButton = false;
+    public static volatile boolean showDeletedMessagesButton = false;
+    public static volatile boolean keepUnsentInChat = false;
+    public static volatile boolean downloaderUseOriginal = true;
+    public static volatile int downloaderQualityMaxShortSide = 0;
+    public static volatile boolean downloaderCompatibility = false;
+    public static volatile boolean downloaderAllowFallback = false;
 
     // Dev Options
     public static volatile boolean isDevEnabled = false;

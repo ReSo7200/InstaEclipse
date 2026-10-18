@@ -9,6 +9,22 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class MediaTypeDetectorTest {
+    @Test public void verifiedFormatsKeepTheirOwnExtensionsWithoutChangingBytes() {
+        String[][] formats = {{"image/png", ".png"}, {"image/webp", ".webp"},
+                {"image/avif", ".avif"}, {"image/heic", ".heic"}, {"image/gif", ".gif"},
+                {"audio/webm", ".webm"}, {"audio/mpeg", ".mp3"}, {"audio/mp4", ".m4a"}};
+        for (String[] format : formats) {
+            MediaTypeDetector.Result result = MediaTypeDetector.verified(format[0], "captured_custom.jpg");
+            assertEquals(format[0], result.mimeType);
+            assertEquals("captured_custom" + format[1], result.filename);
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void verifiedPublicationRejectsNonMediaMime() {
+        MediaTypeDetector.verified("text/html", "error.jpg");
+    }
+
 
     @Test
     public void detectsMp4ByFtypEvenWhenUrlAndNameLookLikeImage() {

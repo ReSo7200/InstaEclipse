@@ -755,7 +755,7 @@ public class DialogUtils {
                 importIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 importIntent.putExtra("target_package", context.getPackageName());
                 try {
-                    instagramActivity.startActivity(importIntent);
+                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.launchActivity(instagramActivity, importIntent);
                 } catch (Exception e) {
                     ModuleLog.line("InstaEclipse | ❌ Failed to start JsonImportActivity: " + e.getMessage());
                     showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_unable_open_ui));
@@ -774,17 +774,15 @@ public class DialogUtils {
                         showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_mc_overrides_not_found));
                         return;
                     }
-                    StringBuilder sb = new StringBuilder();
-                    try (BufferedReader reader = new BufferedReader(new FileReader(source))) {
-                        String line;
-                        while ((line = reader.readLine()) != null) sb.append(line).append("\n");
+                    String json;
+                    try (java.io.InputStream input = new java.io.FileInputStream(source)) {
+                        json = ps.reso.instaeclipse.utils.ipc.BrokerPayload.readConfig(input);
                     }
-                    String json = sb.toString().trim();
                     Intent exportIntent = new Intent();
                     exportIntent.setComponent(new ComponentName("ps.reso.instaeclipse", "ps.reso.instaeclipse.mods.devops.config.JsonExportActivity"));
                     exportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     exportIntent.putExtra("json_content", json);
-                    instagramActivity.startActivity(exportIntent);
+                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.launchActivity(instagramActivity, exportIntent);
                 } catch (Exception e) {
                     showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_failed_read_config, e.getMessage()));
                 }
@@ -933,6 +931,27 @@ public class DialogUtils {
                 body.setTextIsSelectable(true);
                 row.addView(meta);
                 row.addView(body);
+
+                row.addView(createActionRow(context, R.drawable.ic_delete,
+                        I18n.t(context, R.string.ie_unsent_remove_copy), "#FF453A", v -> {
+                    IeDialog confirmation = new IeDialog(context)
+                            .title(I18n.t(context, R.string.ie_unsent_remove_copy))
+                            .message(I18n.t(context, R.string.ie_unsent_remove_copy_confirm));
+                    confirmation.secondary(context.getString(android.R.string.cancel), null);
+                    confirmation.primary(I18n.t(context, R.string.ie_unsent_remove_copy), () -> {
+                                ps.reso.instaeclipse.utils.ghost.UnsentLog.RemovalResult result =
+                                        ps.reso.instaeclipse.utils.ghost.UnsentLog.removeEntry(e);
+                                int notice = result == ps.reso.instaeclipse.utils.ghost.UnsentLog.RemovalResult.REMOVED
+                                        ? R.string.ie_unsent_copy_removed
+                                        : result == ps.reso.instaeclipse.utils.ghost.UnsentLog.RemovalResult.STALE
+                                        ? R.string.ie_unsent_copy_stale : R.string.ie_unsent_copy_remove_failed;
+                                if (result != ps.reso.instaeclipse.utils.ghost.UnsentLog.RemovalResult.FAILED)
+                                    layout.removeView(row);
+                                ps.reso.instaeclipse.utils.toast.IeToast.makeText(context,
+                                        I18n.t(context, notice), Toast.LENGTH_SHORT).show();
+                            });
+                    confirmation.show();
+                }));
 
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1104,7 +1123,16 @@ public class DialogUtils {
         LinearLayout layout = createSwitchLayout(context);
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_timer, "#5E5CE6", R.string.ig_dialog_ghost_keep_disappearing, "keepEphemeralMessages"),
-                flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_ghost_keep_unsent, "keepUnsentMessages"),
+                flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_ghost_keep_unsent, "keepUnsentMessages", () -> {
+                    ps.reso.instaeclipse.mods.ghost.KeepUnsentMessagesHook.onSettingsChanged();
+                    ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.refreshAll();
+                }),
+                flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ie_keep_unsent_in_chat, "keepUnsentInChat",
+                        ps.reso.instaeclipse.mods.ghost.KeepUnsentMessagesHook::onSettingsChanged),
+                flagSwitch(context, R.drawable.ic_delete, "#5E5CE6", R.string.ie_show_deleted_button, "showDeletedMessagesButton",
+                        ps.reso.instaeclipse.mods.ghost.ConversationMenuHook::refreshAll),
+                createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ie_chat_actions), "#5E5CE6",
+                        v -> ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.show(activityOf(context))),
                 createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ig_dialog_unsent_title), "#5E5CE6", v -> showUnsentMessages(context)),
                 flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_ghost_edit_history, "keepEditHistory"),
                 flagSwitch(context, R.drawable.ic_jump_first, "#5E5CE6", R.string.ig_dialog_ghost_jump_first, "jumpToFirstMessage"),
@@ -1114,6 +1142,7 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_distraction_hide_notes_tray, "hideNotesTray"),
                 flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_hide_dm_blend, "hideDmBlend"),
                 flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_misc_hide_share_create_group, "hideShareCreateGroup")));
+        layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_keep_unsent_in_chat_hint)));
         showSectionDialog(context, I18n.t(context, R.string.menu_messages), layout, () -> {});
     }
 
@@ -1638,8 +1667,7 @@ public class DialogUtils {
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_misc_lock_section), layout, () -> {});
     }
 
-    /** Top-level "Hide Specific Chats" section (Privacy group) — enable toggle + unhide manager.
-     *  Hiding itself is done from inside a chat (the eye-off button in the thread header). */
+    /** Hide Specific Chats: account-scoped manager and an independent optional header shortcut. */
     private static void showHideChatsOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
@@ -1649,8 +1677,16 @@ public class DialogUtils {
         hideChats.setOnCheckedChangeListener((b, checked) -> {
             FeatureFlags.hideSpecificChats = checked;
             SettingsManager.saveAllFlags();
+            ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.refreshAll();
+            ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshKnownAccounts();
         });
         hideCard.addView(hideChats);
+        hideCard.addView(flagSwitch(context, R.drawable.ic_eye_off, A_PRIVACY,
+                R.string.ie_show_hide_button, "showHideChatButton",
+                ps.reso.instaeclipse.mods.ghost.ConversationMenuHook::refreshAll));
+        hideCard.addView(createActionRow(context, R.drawable.ic_chat,
+                I18n.t(context, R.string.ie_chat_actions), A_PRIVACY,
+                v -> ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.show(activityOf(context))));
         hideCard.addView(createActionRow(context, R.drawable.ic_eye,
                 I18n.t(context, R.string.ig_hide_chats_manage), A_PRIVACY, v -> showHiddenChats(context)));
         layout.addView(hideCard);
@@ -1673,7 +1709,20 @@ public class DialogUtils {
     /** Manager listing hidden chats with per-row unhide buttons. */
     private static void showHiddenChats(Context context) {
         LinearLayout layout = createSwitchLayout(context);
-        java.util.Map<String, String> hidden = ps.reso.instaeclipse.utils.ghost.HiddenThreads.all();
+        Activity activity = activityOf(context);
+        String account = ps.reso.instaeclipse.utils.ghost.CurrentConversation.accountId(activity);
+        if (account == null) {
+            layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_chat_account_unresolved)));
+            showSectionDialog(context, I18n.t(context, R.string.ig_hide_chats_manage), layout, () -> {});
+            return;
+        }
+        java.util.Map<String, String> hidden = ps.reso.instaeclipse.utils.ghost.HiddenThreads.all(account);
+        if (ps.reso.instaeclipse.utils.ghost.HiddenThreads.lastError() != null) {
+            layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_hidden_state_unavailable)));
+        }
+        if (!ps.reso.instaeclipse.utils.ghost.HiddenThreads.legacyEntries().isEmpty()) {
+            layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_hidden_legacy)));
+        }
         if (hidden.isEmpty()) {
             layout.addView(createInfoSection(context, I18n.t(context, R.string.ig_hide_chats_title),
                     I18n.t(context, R.string.ig_hide_chats_empty)));
@@ -1686,7 +1735,17 @@ public class DialogUtils {
             String label = (e.getValue() == null || e.getValue().isEmpty()) ? id : e.getValue();
             cardView.addView(createActionRow(context, R.drawable.ic_eye, label + "  ·  "
                     + I18n.t(context, R.string.ig_hide_chats_unhide), "#BF5AF2", v -> {
-                ps.reso.instaeclipse.utils.ghost.HiddenThreads.unhide(id);
+                if (!account.equals(ps.reso.instaeclipse.utils.ghost.CurrentConversation.accountId(activity))) {
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context,
+                            I18n.t(context, R.string.ie_chat_changed), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!ps.reso.instaeclipse.utils.ghost.HiddenThreads.unhide(account, id).success) {
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context,
+                            I18n.t(context, R.string.ie_hidden_save_failed), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshAccount(account);
                 ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_hide_chat_unhidden), Toast.LENGTH_SHORT).show();
                 ((View) v).setEnabled(false);
                 ((View) v).setAlpha(0.4f);
@@ -2170,8 +2229,72 @@ public class DialogUtils {
         }
     }
 
+    private static String downloadQualityLabel(Context context, int ceiling) {
+        return ceiling <= 0 ? I18n.t(context, R.string.ie_download_best)
+                : I18n.t(context, R.string.ie_download_ceiling, ceiling);
+    }
+
+    private static void showDownloadQuality(Context context) {
+        if (FeatureFlags.downloaderUseOriginal) return;
+        int[] ceilings = {0, 2160, 1440, 1080, 720, 480};
+        String[] labels = new String[ceilings.length];
+        int selected = 0;
+        for (int i = 0; i < ceilings.length; i++) {
+            labels[i] = downloadQualityLabel(context, ceilings[i]);
+            if (ceilings[i] == FeatureFlags.downloaderQualityMaxShortSide) selected = i;
+        }
+        new android.app.AlertDialog.Builder(context)
+                .setTitle(I18n.t(context, R.string.ie_download_quality))
+                .setSingleChoiceItems(labels, selected, (dialog, which) -> {
+                    if (!FeatureFlags.downloaderUseOriginal) {
+                        FeatureFlags.downloaderQualityMaxShortSide = ceilings[which];
+                        SettingsManager.saveAllFlags();
+                    }
+                    dialog.dismiss();
+                }).setNegativeButton(android.R.string.cancel, null).show();
+    }
+
     private static void showDownloaderOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
+
+        ToggleRow original = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
+                I18n.t(context, R.string.ie_downloader_use_original), FeatureFlags.downloaderUseOriginal);
+        layout.addView(original);
+        layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_downloader_mode_hint)));
+        View quality = createActionRow(context, R.drawable.ic_download,
+                I18n.t(context, R.string.ie_download_quality) + " · "
+                        + downloadQualityLabel(context, FeatureFlags.downloaderQualityMaxShortSide),
+                "#FF9F0A", v -> showDownloadQuality(context));
+        layout.addView(quality);
+        ToggleRow compatibility = createSwitch(context, R.drawable.ic_tune, "#FF9F0A",
+                I18n.t(context, R.string.ie_download_compatibility), FeatureFlags.downloaderCompatibility);
+        compatibility.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.downloaderCompatibility = checked;
+            SettingsManager.saveAllFlags();
+        });
+        ToggleRow lowerFallback = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
+                I18n.t(context, R.string.ie_download_fallback), FeatureFlags.downloaderAllowFallback);
+        lowerFallback.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.downloaderAllowFallback = checked;
+            SettingsManager.saveAllFlags();
+        });
+        layout.addView(compatibility);
+        layout.addView(lowerFallback);
+        Runnable updateCustomControls = () -> {
+            boolean custom = !FeatureFlags.downloaderUseOriginal;
+            quality.setEnabled(custom);
+            quality.setAlpha(custom ? 1f : 0.38f);
+            compatibility.setEnabled(custom);
+            lowerFallback.setEnabled(custom);
+        };
+        original.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.downloaderUseOriginal = checked;
+            updateCustomControls.run();
+            SettingsManager.saveAllFlags();
+        });
+        updateCustomControls.run();
+        layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_download_quality_hint)));
+
 
         addMasterGroup(context, layout,
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_posts, "enablePostDownload"),
@@ -2417,7 +2540,7 @@ public class DialogUtils {
                     exportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     exportIntent.putExtra("json_content", json);
                     exportIntent.putExtra("file_name", "instaeclipse_settings.json");
-                    instagramActivity.startActivity(exportIntent);
+                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.launchActivity(instagramActivity, exportIntent);
                 }
             } catch (Exception e) {
                 showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_backup_failed, e.getMessage()));
@@ -2433,7 +2556,7 @@ public class DialogUtils {
                 importIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 importIntent.putExtra("target_package", context.getPackageName());
                 importIntent.putExtra("broadcast_action", "ps.reso.instaeclipse.ACTION_RESTORE_SETTINGS");
-                instagramActivity.startActivity(importIntent);
+                ps.reso.instaeclipse.utils.ipc.CompanionBridge.launchActivity(instagramActivity, importIntent);
             } else {
                 showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_instagram_not_ready));
             }

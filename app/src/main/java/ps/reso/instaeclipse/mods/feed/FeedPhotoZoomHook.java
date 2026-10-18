@@ -14,9 +14,11 @@ import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
@@ -48,22 +50,16 @@ public class FeedPhotoZoomHook {
 
     public void install(ClassLoader classLoader) {
         try {
-            Class<?> viewClass = null;
-            for (String name : VIEW_CLASSES) {
-                try {
-                    viewClass = classLoader.loadClass(name);
-                    break;
-                } catch (ClassNotFoundException ignored) {
-                }
-            }
-            if (viewClass == null) {
-                ModuleLog.line("(IE|PhotoZoom) ❌ IgProgressImageView not found");
+            ViewBinding binding = ViewBinding.resolve(classLoader, VIEW_CLASSES);
+            if (binding == null) {
+                ModuleLog.line("(IE|PhotoZoom) compatible image wrapper not found");
+                if (FeatureFlags.enablePhotoZoom) FeatureStatusTracker.setBroken("PhotoZoom");
                 return;
             }
 
             // Hooked at onAttachedToWindow, not the constructor: the view has no parent yet
             // at construction time, so the feed-row ancestor check below would always fail.
-            XposedHelpers.findAndHookMethod(viewClass, "onAttachedToWindow", new XC_MethodHook() {
+            XposedBridge.hookMethod(binding.attach, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     // setOnLongClickListener() has a side effect beyond registering the
@@ -81,9 +77,9 @@ public class FeedPhotoZoomHook {
                         View view = (View) param.thisObject;
                         if (!isInsideFeedRow(view)) return;
                         view.setOnLongClickListener(v -> {
-                            if (!FeatureFlags.enablePhotoZoom) return false;
+                            if (!FeatureFlags.enablePhotoZoom || !isInsideFeedRow(v)) return false;
                             try {
-                                Object imgViewObj = XposedHelpers.callMethod(param.thisObject, "getIgImageView");
+                                Object imgViewObj = binding.image.invoke(v);
                                 if (!(imgViewObj instanceof ImageView)) return false;
                                 Bitmap snapshot = viewToBitmap((ImageView) imgViewObj);
                                 if (snapshot == null) return false;
@@ -101,9 +97,42 @@ public class FeedPhotoZoomHook {
             });
 
             FeatureStatusTracker.setHooked("PhotoZoom");
-            ModuleLog.line("(IE|PhotoZoom) ✅ hook installed on " + viewClass.getName());
+            ModuleLog.line("(IE|PhotoZoom) ✅ hook installed on " + binding.attach.getDeclaringClass().getName());
         } catch (Throwable t) {
             ModuleLog.line("(IE|PhotoZoom) ❌ install: " + t);
+            if (FeatureFlags.enablePhotoZoom) FeatureStatusTracker.setBroken("PhotoZoom");
+        }
+    }
+
+    /** Resolve a typed child and an owned lifecycle before changing any host listener. */
+    static final class ViewBinding {
+        final Method attach;
+        final Method image;
+
+        private ViewBinding(Method attach, Method image) {
+            this.attach = attach;
+            this.image = image;
+        }
+
+        static ViewBinding resolve(ClassLoader loader, String... names) {
+            for (String name : names) {
+                try {
+                    Class<?> type = loader.loadClass(name);
+                    if (!ViewGroup.class.isAssignableFrom(type)) continue;
+                    Method attach = type.getDeclaredMethod("onAttachedToWindow");
+                    Method image = type.getMethod("getIgImageView");
+                    if (attach.getReturnType() != void.class
+                            || Modifier.isStatic(attach.getModifiers())
+                            || Modifier.isAbstract(attach.getModifiers())
+                            || Modifier.isStatic(image.getModifiers())
+                            || !ImageView.class.isAssignableFrom(image.getReturnType())) continue;
+                    attach.setAccessible(true);
+                    image.setAccessible(true);
+                    return new ViewBinding(attach, image);
+                } catch (ReflectiveOperationException | LinkageError ignored) {
+                }
+            }
+            return null;
         }
     }
 

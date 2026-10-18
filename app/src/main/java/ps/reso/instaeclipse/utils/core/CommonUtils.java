@@ -95,12 +95,14 @@ public class CommonUtils {
         } catch (Throwable ignored) {}
     }
 
-    /** Sends a broadcast to every supported Instagram variant currently installed. */
+    /** Sends commands only to an explicitly trusted installed host signing identity. */
     public static void broadcastToInstagram(Context context, Intent intent) {
         stampSetting(context, intent);
         PackageManager pm = context.getPackageManager();
         for (String pkg : SUPPORTED_PACKAGES) {
             try {
+                if (intent.getPackage() != null && !pkg.equals(intent.getPackage())) continue;
+                if (!ps.reso.instaeclipse.utils.ipc.CompanionBridge.isTrustedHost(context, pkg)) continue;
                 pm.getPackageInfo(pkg, 0);
                 Intent targeted = new Intent(intent);
                 targeted.setPackage(pkg);

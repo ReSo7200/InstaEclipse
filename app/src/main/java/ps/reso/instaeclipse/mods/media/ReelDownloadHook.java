@@ -540,15 +540,7 @@ public class ReelDownloadHook {
     }
 
     private static void startReelDownload(Context ctx, Object media, Object controller) {
-        String user = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
-        String id = "0";
-        try {
-            Object v = media.getClass().getMethod("getId").invoke(media);
-            if (v instanceof String s && !s.isEmpty()) id = s;
-        } catch (Throwable ignored) {}
-        // Audio-only option (#234) — only asks when enabled and the reel has an audio track.
-        FeedVideoDownloadHook.offerAudioOrRun(ctx, media, null, user != null ? user : "reel", id, "reel",
-                () -> startReelVideoDownload(ctx, media, controller));
+        SelectedMediaDownloads.captureAndShowPost(ctx, media, "reel");
     }
 
     private static void startReelVideoDownload(Context ctx, Object media, Object controller) {

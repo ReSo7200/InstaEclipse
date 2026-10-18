@@ -209,6 +209,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     ps.reso.instaeclipse.utils.core.CompanionSync.pushAsync(context);
                     // ...and while it sat frozen in the background: check again on every resume.
                     if (param.thisObject instanceof android.app.Application) {
+                        ps.reso.instaeclipse.utils.ghost.CurrentConversation.registerApplication((android.app.Application) param.thisObject);
                         ((android.app.Application) param.thisObject).registerActivityLifecycleCallbacks(
                                 new android.app.Application.ActivityLifecycleCallbacks() {
                                     @Override public void onActivityResumed(android.app.Activity a) {
@@ -312,6 +313,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
 
                     try {
+                        ps.reso.instaeclipse.utils.ghost.CurrentConversation.install(dexKitBridge, lpparam.classLoader);
+                        ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.install();
                         if (!skip("KeepUnsentMessagesHook")) new KeepUnsentMessagesHook().install(dexKitBridge, lpparam.classLoader); // Keep Unsent
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | KeepUnsent): ❌ Failed to hook");
@@ -794,7 +797,11 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
+                if (intent == null) return;
                 String action = intent.getAction();
+                if (action != null && action.startsWith("ps.reso.instaeclipse.ACTION_UPDATE_PREF")
+                        && !ps.reso.instaeclipse.utils.ipc.ModuleReplies.isPreferenceUpdate(action,
+                            intent.getStringExtra("key"), intent.getExtras() == null ? null : intent.getExtras().get("value"))) return;
                 if ("ps.reso.instaeclipse.ACTION_UPDATE_PREF".equals(action)) {
                     String key = intent.getStringExtra("key");
                     ps.reso.instaeclipse.utils.core.CompanionSync.markApplied(ctx, key, intent.getLongExtra("ts", 0));
@@ -852,14 +859,14 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             reply.putExtra(CommonUtils.EXTRA_LOG_TEXT, Logging.isMirrorActive() ? "" : Logging.getSnapshotForIpc());
                             reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
                             ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
-                            ctx.sendBroadcast(reply);
+                            ps.reso.instaeclipse.utils.ipc.ModuleReplies.reply(intent, reply.getExtras());
                         } catch (Throwable t) {
                             Intent reply = new Intent(CommonUtils.ACTION_LOGS_REPLY);
                             reply.setPackage(CommonUtils.MY_PACKAGE_NAME);
-                            reply.putExtra(CommonUtils.EXTRA_LOG_ERROR, String.valueOf(t.getMessage()));
+                            reply.putExtra(CommonUtils.EXTRA_LOG_ERROR, "Logs are unavailable");
                             reply.putExtra(CommonUtils.EXTRA_LOG_SOURCE, ctx.getPackageName());
                             ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
-                            ctx.sendBroadcast(reply);
+                            ps.reso.instaeclipse.utils.ipc.ModuleReplies.reply(intent, reply.getExtras());
                         }
                     });
 
@@ -890,7 +897,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
                     reply.putExtras(bundle);
                     ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
-                            ctx.sendBroadcast(reply);
+                            ps.reso.instaeclipse.utils.ipc.ModuleReplies.reply(intent, reply.getExtras());
 
                 } else if ("ps.reso.instaeclipse.ACTION_EXPORT_CONFIG".equals(action)) {
                     ModuleLog.line("(InstaEclipse) Sync: Companion app requested Dev Config export.");
@@ -902,22 +909,25 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                             reply.setPackage("ps.reso.instaeclipse");
                             reply.putExtra("error", "mc_overrides.json not found.");
                             ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
-                            ctx.sendBroadcast(reply);
+                            ps.reso.instaeclipse.utils.ipc.ModuleReplies.reply(intent, reply.getExtras());
                             return;
                         }
-                        StringBuilder sb = new StringBuilder();
-                        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(source))) {
-                            String line;
-                            while ((line = reader.readLine()) != null) sb.append(line).append("\n");
+                        String json;
+                        try (java.io.InputStream input = new java.io.FileInputStream(source)) {
+                            json = ps.reso.instaeclipse.utils.ipc.BrokerPayload.readConfig(input);
                         }
                         Intent reply = new Intent("ps.reso.instaeclipse.ACTION_SEND_CONFIG");
                         reply.setPackage("ps.reso.instaeclipse");
-                        reply.putExtra("json_content", sb.toString().trim());
+                        reply.putExtra("json_content", json);
                         ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
-                            ctx.sendBroadcast(reply);
+                            ps.reso.instaeclipse.utils.ipc.ModuleReplies.reply(intent, reply.getExtras());
                         ModuleLog.line("(InstaEclipse) Export: config reply sent to companion.");
                     } catch (Exception e) {
-                        ModuleLog.line("(InstaEclipse) Export: failed: " + e.getMessage());
+                        Intent reply = new Intent("ps.reso.instaeclipse.ACTION_SEND_CONFIG");
+                        reply.putExtra("error", "Configuration could not be read or exceeds the supported size");
+                        ps.reso.instaeclipse.utils.core.IpcSecurity.echoNonce(intent, reply);
+                        ps.reso.instaeclipse.utils.ipc.ModuleReplies.reply(intent, reply.getExtras());
+                        ModuleLog.line("(IE|Config) Configuration export failed");
                     }
 
                 } else if ("ps.reso.instaeclipse.ACTION_BACKUP_SETTINGS".equals(action)) {
@@ -929,7 +939,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         exportIntent.putExtra("json_content", json);
                         exportIntent.putExtra("file_name", "instaeclipse_settings.json");
                         exportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        ctx.startActivity(exportIntent);
+                        ps.reso.instaeclipse.utils.ipc.CompanionBridge.launchActivity(ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity(), exportIntent);
                     } catch (Exception e) {
                         ModuleLog.line("(InstaEclipse) Failed to create backup: " + e.getMessage());
                     }

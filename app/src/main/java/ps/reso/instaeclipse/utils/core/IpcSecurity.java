@@ -19,9 +19,8 @@ import java.security.SecureRandom;
  *   {@link #PERMISSION}, a signature-level permission only the companion APK holds. Other
  *   installed apps can no longer flip settings, overwrite mc_overrides.json or restore
  *   arbitrary backups by broadcasting to Instagram.</li>
- *   <li><b>Instagram → companion</b>: Instagram cannot hold our signature permission, so the
- *   companion attaches a random nonce to each request and only accepts replies echoing it.
- *   Requests are package-targeted, so no other app can observe the nonce.</li>
+ *   <li><b>Instagram → companion</b>: Instagram receives a private, expiring Binder reply capability.
+ *   No exported reply receiver or public broadcast carries logs or preferences.</li>
  * </ul>
  */
 public final class IpcSecurity {
@@ -41,27 +40,20 @@ public final class IpcSecurity {
                 ContextCompat.RECEIVER_EXPORTED);
     }
 
-    /**
-     * Registers a receiver in the companion for replies from the hooked app. It must be exported
-     * (the reply comes from another uid); authenticity is enforced with {@link #nonceMatches}.
-     */
-    public static void registerReplyReceiver(Context context, BroadcastReceiver receiver,
-                                             IntentFilter filter) {
-        ContextCompat.registerReceiver(context, receiver, filter, ContextCompat.RECEIVER_EXPORTED);
+    /** Replies are private expiring Binder capabilities, never exported broadcast receivers. */
+    public static ps.reso.instaeclipse.utils.ipc.ModuleReplies.Pending requestReply(
+            Context context, Intent request, String replyAction, BroadcastReceiver receiver) {
+        Intent addressed = new Intent(request);
+        if (addressed.getPackage() == null) addressed.setPackage(CommonUtils.IG_PACKAGE_NAME);
+        return ps.reso.instaeclipse.utils.ipc.ModuleReplies.request(context, addressed,
+                data -> receiver.onReceive(context, new Intent(replyAction).putExtras(data)));
     }
 
-    /**
-     * Companion side, inside a ContentProvider call: the supported Instagram package the calling
-     * uid belongs to, or null. The uid comes from the binder, so the caller can't fake it.
-     */
+    /** Authoritative UID and pinned signing history are required for provider access too. */
     public static String supportedCallerPackage(Context context, int callingUid) {
         if (context == null || callingUid == android.os.Process.myUid()) return null;
-        String[] pkgs = context.getPackageManager().getPackagesForUid(callingUid);
-        if (pkgs == null) return null;
-        for (String p : pkgs) {
-            if (CommonUtils.SUPPORTED_PACKAGES.contains(p)) return p;
-        }
-        return null;
+        return ps.reso.instaeclipse.utils.ipc.CompanionBridge.isTrustedCaller(context, callingUid)
+                ? CommonUtils.IG_PACKAGE_NAME : null;
     }
 
     public static String newNonce() {

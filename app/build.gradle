@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'ps.reso.instaeclipse'
     compileSdk 34
+    buildFeatures { buildConfig true }
 
     defaultConfig {
         applicationId "ps.reso.instaeclipse"
@@ -28,6 +29,13 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests.all {
+            ['instaeclipse.ffmpeg', 'instaeclipse.ffprobe', 'instaeclipse.fixtureOutput'].each { key ->
+                if (System.getProperty(key) != null) systemProperty key, System.getProperty(key)
+            }
+        }
+    }
     packagingOptions {
         jniLibs {
             useLegacyPackaging true
@@ -50,6 +58,7 @@ dependencies {
     implementation libs.fileprefs
     // Testing dependencies
     testImplementation libs.junit
+    testRuntimeOnly files('libs/api-82.jar')
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core.v361
 
