@@ -107,6 +107,7 @@ public class DownloadSaveService extends Service {
 
         String url       = intent.getStringExtra("url");
         String audioUrl  = intent.getStringExtra("audioUrl"); // null → single-stream
+        String fallbackUrl = intent.getStringExtra("fallbackUrl"); // saved if the merge fails
         String filename  = intent.getStringExtra("filename");
         String mimeType  = intent.getStringExtra("mimeType");
         String username  = intent.getStringExtra("username");
@@ -143,7 +144,7 @@ public class DownloadSaveService extends Service {
         }
 
         final int    sid    = startId;
-        final String fUrl   = url, fAudio = audioUrl, fFile = filename;
+        final String fUrl   = url, fAudio = audioUrl, fFile = filename, fFallback = fallbackUrl;
         final String fMime  = mimeType, fUser = username, fSave = saveUri;
         final boolean fUF   = usernameFolder;
         final boolean fExtract = extractAudio;
@@ -151,11 +152,24 @@ public class DownloadSaveService extends Service {
 
         new Thread(() -> {
             try {
-                SavedMedia saved = fExtract
-                        ? downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF, fTrimStart, fTrimDur)
-                        : fAudio != null
-                        ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
-                        : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
+                SavedMedia saved;
+                if (fExtract) {
+                    saved = downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF, fTrimStart, fTrimDur);
+                } else if (fFallback != null) {
+                    // best-quality DASH stream first; the progressive file if that fails
+                    try {
+                        saved = fAudio != null
+                                ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
+                                : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(IE|DL) DASH download failed, saving the progressive file: " + t);
+                        saved = downloadAndSave(fFallback, fFile, fMime, fSave, fUser, fUF);
+                    }
+                } else {
+                    saved = fAudio != null
+                            ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
+                            : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
+                }
                 postDoneNotification(sid, "Saved: " + saved.filename, saved.mimeType, saved.uri);
                 showToast(getString(R.string.ig_toast_file_saved, saved.filename));
             } catch (Throwable e) {

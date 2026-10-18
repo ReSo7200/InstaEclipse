@@ -735,6 +735,8 @@ public class FeedVideoDownloadHook {
     private static void addVideoVersionUrl(Object item, List<String> out) {
         String url = videoUrlFromVersionObject(item);
         if (url == null) return;
+        int h = ForceReelQualityHook.heightOf(item);
+        if (h > 0) VIDEO_HEIGHT.put(url, h);
         rememberVideoUrl(url);
         if (!out.contains(url)) out.add(url);
     }
@@ -753,9 +755,49 @@ public class FeedVideoDownloadHook {
             collectAllVideoUrls(media, all, visited, 0);
         }
         if (all.isEmpty()) return null;
-        for (String u : all) { if (u.contains("/m86/") || u.contains("%2Fm86%2F")) return u; }
-        return all.get(0); // fallback: first found
+        // the tallest version (IG's list order and its m86 stream aren't always the best quality);
+        // m86 (combined stream) wins a tie, then the first found
+        String best = null;
+        int bestH = -1;
+        for (String u : all) {
+            Integer h = VIDEO_HEIGHT.get(u);
+            int hh = h != null ? h : -1;
+            boolean m86 = u.contains("/m86/") || u.contains("%2Fm86%2F");
+            if (best == null || hh > bestH || (hh == bestH && m86
+                    && !(best.contains("/m86/") || best.contains("%2Fm86%2F")))) {
+                best = u;
+                bestH = hh;
+            }
+        }
+        if (bestH <= 0) {
+            for (String u : all) { if (u.contains("/m86/") || u.contains("%2Fm86%2F")) return u; }
+            return all.get(0); // fallback: first found
+        }
+        // The player streams DASH; its tallest stream is often above every progressive file
+        // (e.g. 1080p DASH vs a 720p video_versions MP4). Remember it so the download fetches
+        // that stream + the audio and merges them, keeping the progressive file as the fallback.
+        String[] dash = DashAudio.bestVideo(dashManifest(media),
+                android.os.Build.VERSION.SDK_INT < 34);
+        int dashH = dash != null ? Integer.parseInt(dash[1]) : -1;
+        if (dashH > bestH) DASH_UPGRADE.put(best, new String[]{dash[0], extractAudioUrl(media)});
+        ModuleLog.line("(IE|DL) video " + bestH + "p of " + all.size() + " version(s)"
+                + (dashH > bestH ? ", DASH " + dashH + "p" : ""));
+        return best;
     }
+
+    /** progressive URL -> {taller DASH video URL, DASH audio URL or null} */
+    private static final Map<String, String[]> DASH_UPGRADE = Collections.synchronizedMap(
+            new java.util.LinkedHashMap<>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, String[]> e) { return size() > 50; }
+            });
+
+    /** video version URL -> its height, filled whenever a video_versions list is read */
+    private static final Map<String, Integer> VIDEO_HEIGHT = Collections.synchronizedMap(
+            new java.util.LinkedHashMap<>(64, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Integer> e) { return size() > 300; }
+            });
 
     static boolean isMediaVideo(Object media) {
         if (media == null || resolvedIsVideoMethod == null) return false;
@@ -810,13 +852,18 @@ public class FeedVideoDownloadHook {
                                                             List<String> out,
                                                             boolean trustedVideoList) {
         try {
-            Object result = getter.invoke(dict);
+            Object result;
+            // read every quality, not the one "Force reel quality" leaves for the player
+            ForceReelQualityHook.RAW.set(Boolean.TRUE);
+            try { result = getter.invoke(dict); } finally { ForceReelQualityHook.RAW.remove(); }
             if (!(result instanceof List<?> items) || items.isEmpty()) return;
 
             List<String> found = new ArrayList<>();
             for (Object item : items) {
                 String url = videoUrlFromVersionObject(item);
                 if (url == null) continue;
+                int h = ForceReelQualityHook.heightOf(item);
+                if (h > 0) VIDEO_HEIGHT.put(url, h);
                 if (trustedVideoList || isVideoUrl(url)) found.add(url);
             }
             if (!trustedVideoList && (found.isEmpty() || found.size() != items.size())) return;
@@ -2293,9 +2340,37 @@ public class FeedVideoDownloadHook {
                 ? readCompanionUri()
                 : FeatureFlags.downloaderCustomUri;
 
+        String[] dash = isVideo ? DASH_UPGRADE.get(url) : null;
         if (!uri.isEmpty()) {
-            delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
+            if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username);
+            else delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
             return true;
+        }
+        if (dash != null) {
+            File tv = File.createTempFile("ie_dv_", ".mp4", ctx.getCacheDir());
+            File ta = dash[1] != null ? File.createTempFile("ie_da_", ".mp4", ctx.getCacheDir()) : null;
+            File merged = File.createTempFile("ie_dm_", ".mp4", ctx.getCacheDir());
+            try {
+                downloadToFile(dash[0], tv);
+                File out = tv;
+                if (ta != null) {
+                    downloadToFile(dash[1], ta);
+                    mergeVideoAudio(tv.getAbsolutePath(), ta.getAbsolutePath(), merged.getAbsolutePath());
+                    out = merged;
+                }
+                saveFileToDestination(ctx, out, MediaTypeDetector.withCorrectExtension(
+                        filename, MediaTypeDetector.Kind.VIDEO), true, username);
+                return false;
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|DL) DASH download failed, saving the progressive file: " + t);
+            } finally {
+                //noinspection ResultOfMethodCallIgnored
+                tv.delete();
+                if (ta != null) //noinspection ResultOfMethodCallIgnored
+                    ta.delete();
+                //noinspection ResultOfMethodCallIgnored
+                merged.delete();
+            }
         }
 
         // No custom folder configured → download to a neutral temporary file first.
@@ -2329,7 +2404,18 @@ public class FeedVideoDownloadHook {
                                                    String audioUrl,
                                                    String filename, boolean isVideo,
                                                    String username) throws Exception {
+        delegateUrlToCompanionApp(ctx, url, audioUrl, null, filename, isVideo, username);
+    }
+
+    /** @param fallbackUrl saved instead when the merge fails (e.g. a codec the muxer can't write) */
+    private static void delegateUrlToCompanionApp(Context ctx,
+                                                   String url,
+                                                   String audioUrl,
+                                                   String fallbackUrl,
+                                                   String filename, boolean isVideo,
+                                                   String username) throws Exception {
         android.content.Intent intent = new android.content.Intent();
+        if (fallbackUrl != null) intent.putExtra("fallbackUrl", fallbackUrl);
         intent.setClassName("ps.reso.instaeclipse",
                             "ps.reso.instaeclipse.mods.media.DownloadSaveService");
         intent.putExtra("url",      url);
