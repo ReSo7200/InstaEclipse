@@ -43,6 +43,7 @@ public class UnsentThreadButtonHook {
     private static int threadHeaderId, actionBarEndId, tagKeyId, backButtonId, leftContainerId, threadTitleId, threadSubtitleId;
 
     public void install(ClassLoader classLoader) {
+        ConversationMenuHook.install();
         // IG 448+ moved onResume off InstagramMainActivity into IgFragmentActivity, so a plain
         // findAndHookMethod throws there; LifecycleHookUtil hooks the declaring class instead.
         for (String act : new String[]{"com.instagram.modal.ModalActivity",
@@ -147,12 +148,6 @@ public class UnsentThreadButtonHook {
             View header = threadHeaderId != 0 ? activity.findViewById(threadHeaderId) : null;
             if (header == null) return false;
 
-            if (ThreadHeaderMenu.has(activity, "unsent")) { // already injected
-                if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
-                ChatExportHook.inject(activity);
-                return true;
-            }
-
             final View headerRoot = header;
             // Capture the thread id AT INJECTION (thread just opened, before any refresh churn),
             // bound to THIS button — a stable per-thread fallback if the live read fails.
@@ -170,14 +165,9 @@ public class UnsentThreadButtonHook {
                 if (threadId == null) threadId = resolveFromIntent(activity);
                 return threadId;
             };
-            // Lives in the shared module menu button (one header button for all thread actions).
-            if (!ThreadHeaderMenu.add(activity, "unsent",
-                    ps.reso.instaeclipse.utils.i18n.I18n.t(activity, ps.reso.instaeclipse.R.string.ig_unsent_messages), () -> {
-                String threadId = openThread.get();
-                ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
-                ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
-            })) return false;
-            ModuleLog.line("(IE|UnsentBtn) ✅ added to the thread menu");
+            // History owns a title gesture and an independently optional shortcut. Keep upstream
+            // export/jump/read entries in ThreadHeaderMenu; they must not depend on a history icon.
+            ConversationMenuHook.refreshAll();
             if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
             ChatExportHook.inject(activity);
             return true;
