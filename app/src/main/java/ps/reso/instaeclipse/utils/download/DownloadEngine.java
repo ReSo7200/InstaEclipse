@@ -326,6 +326,7 @@ public final class DownloadEngine {
             String videoCodec = "", audioCodec = "";
             for (int i = 0; i < ex.getTrackCount(); i++) {
                 checkCancelled(cancellation);
+                if (isDolbyVisionAlias(ex, i)) continue;
                 MediaFormat format = ex.getTrackFormat(i);
                 String mime = format.getString(MediaFormat.KEY_MIME);
                 if (mime == null || (!mime.startsWith("video/") && !mime.startsWith("audio/"))) continue;
@@ -414,9 +415,31 @@ public final class DownloadEngine {
         if (size < 0 || size > 32 * 1024 * 1024) throw new IOException("Sample buffer exceeds limit");
         return Math.max(size, 1024 * 1024);
     }
+    /**
+     * Whether track {@code i} is the Dolby Vision view of another track. For backward-compatible
+     * Dolby Vision (an AV1 or HEVC picture with a {@code dvvC}/{@code dvcC} box, as Instagram's
+     * HDR streams are) Android 13 lists the one MP4 track twice under the same track id: as
+     * video/dolby-vision and as its base codec. Only the base codec's entry is a separate picture.
+     */
+    static boolean isDolbyVisionAlias(MediaExtractor ex, int i) {
+        MediaFormat f = ex.getTrackFormat(i);
+        if (!MediaFormat.MIMETYPE_VIDEO_DOLBY_VISION.equals(f.getString(MediaFormat.KEY_MIME))
+                || !f.containsKey(MediaFormat.KEY_TRACK_ID)) return false;
+        int id = f.getInteger(MediaFormat.KEY_TRACK_ID);
+        for (int j = 0; j < ex.getTrackCount(); j++) {
+            if (j == i) continue;
+            MediaFormat g = ex.getTrackFormat(j);
+            String mime = g.getString(MediaFormat.KEY_MIME);
+            if (mime != null && mime.startsWith("video/") && !MediaFormat.MIMETYPE_VIDEO_DOLBY_VISION.equals(mime)
+                    && g.containsKey(MediaFormat.KEY_TRACK_ID) && g.getInteger(MediaFormat.KEY_TRACK_ID) == id) return true;
+        }
+        return false;
+    }
+
     private static int select(MediaExtractor ex, String prefix) throws IOException {
         int found = -1;
         for (int i = 0; i < ex.getTrackCount(); i++) {
+            if (isDolbyVisionAlias(ex, i)) continue;
             String mime = ex.getTrackFormat(i).getString(MediaFormat.KEY_MIME);
             if (mime != null && mime.startsWith(prefix)) {
                 if (found >= 0) throw new IOException("Ambiguous source tracks"); found = i;
