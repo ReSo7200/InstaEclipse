@@ -1137,6 +1137,7 @@ public class FeedVideoDownloadHook {
      * Used as a supplement to the Uri.parse buffer (Tier 3) when Tiers 1 and 2 fail.
      */
     public static void installVideoUrlCaptureHook(DexKitBridge bridge, ClassLoader classLoader) {
+        SelectedMediaAdapter.install(bridge, classLoader);
         discoverDynamicMediaModel(bridge, classLoader);
         resolveVideoVersionsGetters(bridge, classLoader);
         resolveCarouselGetter(bridge, classLoader);
@@ -1684,7 +1685,10 @@ public class FeedVideoDownloadHook {
                     intent.putExtra("extractAudio", extractFromVideo);
                     intent.putExtra("trimStartMs", trimStartMs);
                     intent.putExtra("trimDurationMs", trimDurationMs);
-                    ctx.startForegroundService(intent);
+                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> {
+                        if (error != null) mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
+                    });
                     return;
                 }
                 File temp = File.createTempFile("ie_dl_", ".m4a", ctx.getCacheDir());
@@ -2341,6 +2345,12 @@ public class FeedVideoDownloadHook {
                 : FeatureFlags.downloaderCustomUri;
 
         String[] dash = isVideo ? DASH_UPGRADE.get(url) : null;
+        return downloadCapturedOriginal(ctx, url, filename, isVideo, username, dash);
+    }
+
+    static boolean downloadCapturedOriginal(Context ctx, String url, String filename, boolean isVideo,
+            String username, String[] dash) throws Exception {
+        String uri = FeatureFlags.downloaderCustomUri.isEmpty() ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
         if (!uri.isEmpty()) {
             if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username);
             else delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
@@ -2423,8 +2433,11 @@ public class FeedVideoDownloadHook {
         intent.putExtra("filename", filename);
         intent.putExtra("mimeType", isVideo ? "video/mp4" : "image/jpeg");
         intent.putExtra("username", username);
-        ctx.startForegroundService(intent);
-        ModuleLog.line("(IE|DL) Delegated to DownloadSaveService: " + filename);
+        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> {
+                        if (error != null) mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
+                    });
+        ModuleLog.line("(IE|DL) Submitted companion download request");
     }
 
     /**
@@ -2463,6 +2476,34 @@ public class FeedVideoDownloadHook {
      * Returns a single-entry list for plain photo/video posts, multi-entry for carousels.
      * Steps: (A) video, (B) carousel via MutableMediaDictIntf, (C) single photo, (D) CDN scan.
      */
+    /** Upstream photo discovery order, scoped to the selected item. The caller verifies ownership. */
+    static String originalImageFromSelected(Context ctx, Object media, boolean carouselChild) {
+        String image = imageUrlFromMedia(ctx, media);
+        if (image != null) return image;
+        if (carouselChild) {
+            // Original MutableMediaDict carousel fallback, after its native image helper.
+            String probed = probeCdnUrlViaStringMethods(media);
+            if (probed != null) return probed;
+        }
+        List<String> scanned = collectCdnUrls(media);
+        if (scanned.isEmpty()) return null;
+        return carouselChild ? pickBestImageUrl(scanned) : scanned.get(0);
+    }
+
+    static boolean hasCompanionDestination() {
+        return !FeatureFlags.downloaderCustomUri.isEmpty() || !readCompanionUri().isEmpty();
+    }
+    /** Detach upstream's chosen DASH upgrade before any chooser is shown. */
+    static OriginalMediaSelection.Plan originalPlan(Object media, String progressive) {
+        if (progressive == null) return null;
+        Integer height = VIDEO_HEIGHT.get(progressive);
+        String[] dash = height != null && height > 0 ? DashAudio.bestVideo(dashManifest(media),
+                android.os.Build.VERSION.SDK_INT < 34) : null;
+        return dash != null && Integer.parseInt(dash[1]) > height
+                ? new OriginalMediaSelection.Plan(dash[0], extractAudioUrl(media), progressive)
+                : new OriginalMediaSelection.Plan(progressive, null, null);
+    }
+
     public static List<String> extractAllUrlsFromMedia(Context ctx, Object media) {
         if (media == null) return new ArrayList<>();
 

@@ -29,6 +29,31 @@ final class MediaTypeDetector {
 
     private MediaTypeDetector() {}
 
+    /** Only for a MIME returned by DownloadEngine.fetch after signature/track verification. */
+    static Result verified(String mime, String filename) {
+        String extension = switch (mime) {
+            case "image/jpeg" -> ".jpg";
+            case "image/png" -> ".png";
+            case "image/webp" -> ".webp";
+            case "image/gif" -> ".gif";
+            case "image/avif" -> ".avif";
+            case "image/heic" -> ".heic";
+            case "image/heif" -> ".heif";
+            case "video/mp4" -> ".mp4";
+            case "video/webm", "audio/webm" -> ".webm";
+            case "video/quicktime" -> ".mov";
+            case "video/3gpp" -> ".3gp";
+            case "audio/mp4" -> ".m4a";
+            case "audio/mpeg" -> ".mp3";
+            default -> throw new IllegalArgumentException("Unsupported verified media type");
+        };
+        int dot = filename.lastIndexOf('.');
+        String name = (dot > 0 ? filename.substring(0, dot) : filename) + extension;
+        Kind kind = mime.startsWith("image/") ? Kind.IMAGE
+                : mime.startsWith("video/") ? Kind.VIDEO : Kind.UNKNOWN;
+        return new Result(kind, mime, name);
+    }
+
     static Result resolve(File file, String responseContentType, String requestedMime,
                           String requestedFilename) throws IOException {
         if (isGif(file)) { // animated comment GIFs etc.: keep the format, a .jpg name would show a still
