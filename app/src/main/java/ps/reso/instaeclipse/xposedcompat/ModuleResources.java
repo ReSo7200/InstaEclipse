@@ -48,7 +48,15 @@ public final class ModuleResources {
             cached = r;
             return r;
         } catch (Throwable t) {
-            return null;
+            try {
+                android.content.res.AssetManager am = android.content.res.AssetManager.class.getDeclaredConstructor().newInstance();
+                android.content.res.AssetManager.class.getMethod("addAssetPath", String.class).invoke(am, path);
+                r = new Resources(am, ctx.getResources().getDisplayMetrics(), ctx.getResources().getConfiguration());
+                cached = r;
+                return r;
+            } catch (Throwable ignored) {
+                return null;
+            }
         }
     }
 }

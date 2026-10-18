@@ -71,6 +71,7 @@ public final class ModernBackend implements HookBackend {
         }
 
         if (param.getThrowable() != null) throw param.getThrowable();
+        if (member instanceof Constructor<?>) return null;
         return param.getResult();
     }
 
@@ -78,15 +79,16 @@ public final class ModernBackend implements HookBackend {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Object invokeOriginal(Member member, Object thisObject, Object[] args) throws Throwable {
         try {
+            Object[] safeArgs = args != null ? args : new Object[0];
             if (member instanceof Method m) {
                 XposedInterface.Invoker invoker = xposed.getInvoker(m);
                 invoker.setType(XposedInterface.Invoker.Type.ORIGIN);
-                return invoker.invoke(thisObject, args);
+                return invoker.invoke(thisObject, safeArgs);
             }
             XposedInterface.CtorInvoker<?> invoker = xposed.getInvoker((Constructor<?>) member);
             invoker.setType(XposedInterface.Invoker.Type.ORIGIN);
             // calling an original constructor on an existing object = invokeSpecial
-            return thisObject != null ? invoker.invokeSpecial(thisObject, args) : invoker.newInstance(args);
+            return thisObject != null ? invoker.invokeSpecial(thisObject, safeArgs) : invoker.newInstance(safeArgs);
         } catch (InvocationTargetException e) {
             throw e.getCause() != null ? e.getCause() : e;
         }
