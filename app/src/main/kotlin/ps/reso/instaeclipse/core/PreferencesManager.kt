@@ -542,6 +542,7 @@ object PreferencesManager {
             "offerMediaInfo" -> FeatureFlags.offerMediaInfo = value
             "offerPlaybackSpeed" -> FeatureFlags.offerPlaybackSpeed = value
             "forceReelScrubber" -> FeatureFlags.forceReelScrubber = value
+            "holdLeftSlowMotion" -> FeatureFlags.holdLeftSlowMotion = value
             "reelsLockScroll" -> FeatureFlags.reelsLockScroll = value
             "reelsAutoScroll" -> FeatureFlags.reelsAutoScroll = value
             "maxUploadQuality" -> FeatureFlags.maxUploadQuality = value
@@ -587,6 +588,7 @@ object PreferencesManager {
             "fancyBioFont" -> FeatureFlags.fancyBioFont = value
             "savedOnProfile" -> FeatureFlags.savedOnProfile = value
             "followListExport" -> FeatureFlags.followListExport = value
+            "followersHistory" -> FeatureFlags.followersHistory = value
             "commentSearch" -> FeatureFlags.commentSearch = value
             "storyViewerSearch" -> FeatureFlags.storyViewerSearch = value
             "storyInfo" -> FeatureFlags.storyInfo = value

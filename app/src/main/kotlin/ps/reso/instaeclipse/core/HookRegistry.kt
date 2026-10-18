@@ -74,6 +74,13 @@ object HookRegistry {
             defaultEnabled = false
         ),
         Hook(
+            id = "holdLeftSlowMotion",
+            name = "Hold Left Side for Slow Motion",
+            description = "Hold the left half of a reel to play at 0.5× instead of 2×, right half for 2×",
+            category = HookCategory.REELS,
+            defaultEnabled = false
+        ),
+        Hook(
             id = "reelsLockScroll",
             name = "Lock Reels Scrolling",
             description = "Prevent accidental vertical swipes between reels",
@@ -583,6 +590,13 @@ object HookRegistry {
             id = "followListExport",
             name = "Export Followers/Following to CSV",
             description = "Export followers or following lists to a CSV file",
+            category = HookCategory.PROFILES,
+            defaultEnabled = false
+        ),
+        Hook(
+            id = "followersHistory",
+            name = "Followers History",
+            description = "Track who unfollowed or followed you, checked on your Followers tab",
             category = HookCategory.PROFILES,
             defaultEnabled = false
         ),
