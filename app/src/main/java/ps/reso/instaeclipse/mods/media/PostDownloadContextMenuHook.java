@@ -617,7 +617,11 @@ public class PostDownloadContextMenuHook {
     // ── Download dispatch ─────────────────────────────────────────────────────
 
     private static void triggerDownload(Context ctx, Object media, Object clickHandler) {
-        SelectedMediaDownloads.captureAndShowPost(ctx, media, "post");
+        // The visible slide, found the same way as Copy image (#289)
+        SelectedMediaDownloads.captureAndShowPost(ctx, media, "post", n -> {
+            int viewIdx = ReelDownloadHook.findCarouselIndexFromView(ctx, n);
+            return viewIdx >= 0 ? viewIdx : findCarouselIndex(clickHandler, n);
+        });
     }
 
     // ── Copy image (#228) ─────────────────────────────────────────────────────
