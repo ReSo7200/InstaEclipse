@@ -35,6 +35,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.users.UserUtils;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class StoryMentionHook {
 
@@ -88,7 +89,7 @@ public class StoryMentionHook {
             for (String cls : mediaClasses) {
                 List<MethodData> getters;
                 try {
-                    getters = bridge.findMethod(FindMethod.create()
+                    getters = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create()
                                     .declaredClass(cls)
                                     .paramCount(0)
@@ -114,7 +115,7 @@ public class StoryMentionHook {
         }
 
         try {
-            List<MethodData> converters = bridge.findMethod(FindMethod.create()
+            List<MethodData> converters = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .paramCount(1)
                             .usingEqStrings(List.of("MentionTappableObject.user is null; dropping mention sticker"))));
@@ -175,7 +176,7 @@ public class StoryMentionHook {
 
         if (builders == null || builders.isEmpty()) {
             try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .usingStrings("[INTERNAL] Pause Playback")));
                 builders = new java.util.ArrayList<>(

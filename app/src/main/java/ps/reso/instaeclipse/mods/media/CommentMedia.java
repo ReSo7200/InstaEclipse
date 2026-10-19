@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Media attached to a comment (#242): photo comments carry a com.instagram.feed.media.Media
@@ -134,7 +135,7 @@ public final class CommentMedia {
      *  452); after onViewCreated its Media is remembered so comment downloads know the post's author. */
     public static void trackCommentSheet(org.luckypray.dexkit.DexKitBridge bridge, ClassLoader cl) {
         try {
-            for (org.luckypray.dexkit.result.MethodData md : bridge.findMethod(org.luckypray.dexkit.query.FindMethod.create()
+            for (org.luckypray.dexkit.result.MethodData md : DexKitQueryCache.findMethod(bridge, org.luckypray.dexkit.query.FindMethod.create()
                     .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create().usingStrings("Failed to ingest comments close signal")))) {
                 Class<?> frag = cl.loadClass(md.getClassName());
                 Method ovc = frag.getDeclaredMethod("onViewCreated", android.view.View.class, android.os.Bundle.class);

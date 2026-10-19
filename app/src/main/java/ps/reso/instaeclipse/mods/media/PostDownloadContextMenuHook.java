@@ -30,6 +30,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Injects a "Download" entry into the feed-post three-dots (⋮) menu.
@@ -186,7 +187,7 @@ public class PostDownloadContextMenuHook {
         }
 
         try {
-            List<ClassData> pass1 = bridge.findClass(FindClass.create()
+            List<ClassData> pass1 = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create()
                             .usingStrings("MediaOptionsOverflowMenuCreator")));
 
@@ -198,7 +199,7 @@ public class PostDownloadContextMenuHook {
             String creatorClassName = pass1.get(0).getName();
             menuCreatorClass = classLoader.loadClass(creatorClassName);
 
-            List<MethodData> pass2 = bridge.findMethod(FindMethod.create()
+            List<MethodData> pass2 = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .declaredClass(creatorClassName)
                             .returnType("void")));
@@ -368,7 +369,7 @@ public class PostDownloadContextMenuHook {
     private static void resolveReelClickDispatcher(DexKitBridge bridge, ClassLoader loader) {
         reelClickDispatcher = null;
         try {
-            List<MethodData> matches = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            List<MethodData> matches = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType("void")
                     .paramTypes("com.instagram.feed.media.mediaoption.MediaOption$Option")
                     .usingStrings(List.of("ClipsOrganicMoreOptionsHelper_handleOptionSelected"),
@@ -409,7 +410,7 @@ public class PostDownloadContextMenuHook {
         try {
             String optionClassName = "com.instagram.feed.media.mediaoption.MediaOption$Option";
 
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
+            List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("void")
                             .paramTypes(optionClassName)));
@@ -517,7 +518,7 @@ public class PostDownloadContextMenuHook {
             String typeDesc = "L" + optionClassName.replace('.', '/') + ";";
             String prefix = typeDesc + "->";
 
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
+            List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .paramTypes("boolean")
                             .returnType("java.util.List")

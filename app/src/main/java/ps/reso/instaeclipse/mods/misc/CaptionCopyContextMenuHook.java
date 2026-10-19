@@ -39,6 +39,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Injects a "Copy Caption" entry into the feed-post three-dots (⋮) menu, reusing the same
@@ -200,7 +201,7 @@ public class CaptionCopyContextMenuHook {
             for (String declClass : declClassCandidates) {
                 List<MethodData> results;
                 try {
-                    results = bridge.findMethod(FindMethod.create()
+                    results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create()
                                     .declaredClass(declClass)
                                     .paramCount(0)
@@ -322,7 +323,7 @@ public class CaptionCopyContextMenuHook {
         }
 
         try {
-            List<ClassData> pass1 = bridge.findClass(FindClass.create()
+            List<ClassData> pass1 = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create()
                             .usingStrings("MediaOptionsOverflowMenuCreator")));
 
@@ -334,7 +335,7 @@ public class CaptionCopyContextMenuHook {
             String creatorClassName = pass1.get(0).getName();
             menuCreatorClass = classLoader.loadClass(creatorClassName);
 
-            List<MethodData> pass2 = bridge.findMethod(FindMethod.create()
+            List<MethodData> pass2 = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .declaredClass(creatorClassName)
                             .returnType("void")));
@@ -509,7 +510,7 @@ public class CaptionCopyContextMenuHook {
         try {
             String optionClassName = "com.instagram.feed.media.mediaoption.MediaOption$Option";
 
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
+            List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("void")
                             .paramTypes(optionClassName)));
@@ -586,7 +587,7 @@ public class CaptionCopyContextMenuHook {
             String typeDesc = "L" + optionClassName.replace('.', '/') + ";";
             String prefix = typeDesc + "->";
 
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
+            List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .paramTypes("boolean")
                             .returnType("java.util.List")
@@ -644,7 +645,7 @@ public class CaptionCopyContextMenuHook {
 
         try {
             String optionDesc = "Lcom/instagram/feed/media/mediaoption/MediaOption$Option;";
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("java.util.ArrayList")
                             .addUsingField(optionDesc + "->PLAYBACK_CONTROLS:" + optionDesc)
@@ -705,7 +706,7 @@ public class CaptionCopyContextMenuHook {
 
         try {
             // 1) Label resolver (X.0AOs.A02) — anchored on its unique string.
-            List<MethodData> resolverResults = bridge.findMethod(FindMethod.create()
+            List<MethodData> resolverResults = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingEqStrings(List.of(
                                     "Unsupported text row for Clips Viewer Overflow menu."))));
@@ -716,7 +717,7 @@ public class CaptionCopyContextMenuHook {
             Method labelResolver = resolverResults.get(0).getMethodInstance(classLoader);
 
             // 2) Row-adder methods (X.0AOr.A0P) — invoke the resolver AND take a MediaOption$Option.
-            List<MethodData> adderResults = bridge.findMethod(FindMethod.create()
+            List<MethodData> adderResults = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("void")
                             .addInvoke(MethodMatcher.create(labelResolver))));
@@ -736,7 +737,7 @@ public class CaptionCopyContextMenuHook {
                 // 3) Row builders (LX/0458.A00 / .A01) — the void methods this adder CALLS.
                 List<MethodData> builderResults;
                 try {
-                    builderResults = bridge.findMethod(FindMethod.create()
+                    builderResults = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create()
                                     .returnType("void")
                                     .addCaller(MethodMatcher.create(rowAdder))));
@@ -773,7 +774,7 @@ public class CaptionCopyContextMenuHook {
         try {
             Method resolver = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("ReelLabelResolver", classLoader) : null;
             if (resolver == null) {
-                List<MethodData> r = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> r = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingEqStrings(List.of("Unsupported text row for Clips Viewer Overflow menu."))));
                 if (r.isEmpty()) return;
                 resolver = r.get(0).getMethodInstance(classLoader);

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /** Resolved against the loaded APK, rebuilt every process start, with no persisted symbol cache. */
 final class SelectedMediaAdapter implements SelectedMediaSnapshot.Access {
@@ -218,7 +219,7 @@ final class SelectedMediaAdapter implements SelectedMediaSnapshot.Access {
         try {
             String type = "com.instagram.model.reels.ReelItem";
             Set<Method> matches = new LinkedHashSet<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(type).paramCount(0).returnType(MEDIA)
                     .usingEqStrings(List.of("Required value was null."))))) {
                 Method method = data.getMethodInstance(loader);
@@ -311,7 +312,7 @@ final class SelectedMediaAdapter implements SelectedMediaSnapshot.Access {
             MethodMatcher matcher = MethodMatcher.create().declaredClass(type).paramCount(0);
             if (numeric) matcher.usingNumbers(key.hashCode());
             else matcher.usingEqStrings(List.of(key));
-            List<MethodData> candidates = bridge.findMethod(FindMethod.create().matcher(matcher));
+            List<MethodData> candidates = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(matcher));
             for (MethodData data : candidates) {
                 try {
                     Method method = getterCandidate(key, data.getName(), data.getReturnTypeName(),

@@ -16,6 +16,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Limits the home feed to accounts the user follows by forcing the feed/timeline request's
@@ -132,7 +133,7 @@ public class FollowingOnlyFeedHook {
 
     private static Method findBuildMethod(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("homecoming_all", "X-IG-PRIMED-FEED-REQUEST")))) {
                 if (md.isConstructor() || md.isStaticInitializer()) continue;
                 Method m = md.getMethodInstance(classLoader);

@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Disable Repost (feed + reels/clips + profile grid).
@@ -89,7 +90,7 @@ public class DisableRepostHook {
         Set<String> hooked = new HashSet<>();
         for (String anchor : NEUTRALIZE_ANCHORS) {
             try {
-                for (MethodData md : bridge.findMethod(FindMethod.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings(anchor)))) {
                     String key = md.getDescriptor();
                     if (!hooked.add(key)) continue; // avoid double-hooking a shared method

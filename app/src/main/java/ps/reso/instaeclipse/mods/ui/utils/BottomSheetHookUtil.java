@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class BottomSheetHookUtil {
 
@@ -31,7 +32,7 @@ public class BottomSheetHookUtil {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, 
                     FindMethod.create()
                             .matcher(MethodMatcher.create().usingStrings("BottomSheetConstants"))
             );

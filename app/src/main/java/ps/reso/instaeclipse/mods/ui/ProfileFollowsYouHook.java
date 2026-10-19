@@ -25,6 +25,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * "Follows you" label on profiles (#239), instead of only the follower toast.
@@ -51,9 +52,9 @@ public class ProfileFollowsYouHook {
             Method updated = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("FollowsYou_onUserUpdated", cl) : null;
             followedByGetter = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("FollowsYou_followedBy", cl) : null;
             if (updated == null || followedByGetter == null) {
-                List<MethodData> u = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> u = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(FRAGMENT).usingStrings("UserDetailFragment.onUserUpdated")));
-                List<MethodData> f = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> f = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(USER).paramCount(0).returnType("java.lang.Boolean")
                         .usingEqStrings(java.util.List.of("followed_by"))));
                 if (u.isEmpty() || f.size() != 1) {

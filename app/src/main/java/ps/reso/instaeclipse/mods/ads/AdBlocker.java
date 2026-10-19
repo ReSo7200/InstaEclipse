@@ -14,6 +14,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class AdBlocker {
 
@@ -45,7 +46,7 @@ public class AdBlocker {
 
         try {
             for (String marker : INSERT_ITEM_MARKERS) {
-                List<MethodData> methods = bridge.findMethod(
+                List<MethodData> methods = DexKitQueryCache.findMethod(bridge, 
                         FindMethod.create().matcher(
                                 MethodMatcher.create().usingStrings(marker)
                         )

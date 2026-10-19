@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class HideSuggestedFeedItemsHook {
 
@@ -102,7 +103,7 @@ public class HideSuggestedFeedItemsHook {
                     {"clips_netego", "media_or_ad"},
                     {"clips_netego", "stories_netego", "bloks_netego"}};
             for (String[] strings : queries) {
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(
                         MethodMatcher.create().usingStrings(strings)))) {
                     if (isFeedItemParser(md.getClassName(), classLoader)) { targetClass = md.getClassName(); break; }
                 }
@@ -155,7 +156,7 @@ public class HideSuggestedFeedItemsHook {
                     "com.instagram.feed.media.LiveTreeMediaDict"}) {
                 List<MethodData> found;
                 try {
-                    found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .declaredClass(owner)
                             .usingEqStrings(java.util.List.of("has_liked"))
                             .returnType("java.lang.Boolean")

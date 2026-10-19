@@ -23,6 +23,7 @@ import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
 import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /** Shared foreground binding, independent of retention and never sourced from a last-thread ID. */
 public final class CurrentConversation {
@@ -82,7 +83,7 @@ public final class CurrentConversation {
         // igThreadIgid is also an ephemeral-removal path in this build. It is telemetry only:
         // neither a true boolean nor a background store callback proves a foreground conversation.
         try {
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("igThreadIgid").paramTypes(KEY, "boolean").returnType("void")))) {
                 XposedBridge.hookMethod(data.getMethodInstance(loader), new XC_MethodHook() {
                     private boolean logged;
@@ -124,7 +125,7 @@ public final class CurrentConversation {
         if (validFormatter(cached)) { keyFormatter = cached; return; }
         try {
             List<Method> found = new ArrayList<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(KEY).usingStrings("thread:", "recipients:").returnType("java.lang.String")))) {
                 Method method = data.getMethodInstance(loader);
                 if (validFormatter(method)) found.add(method);

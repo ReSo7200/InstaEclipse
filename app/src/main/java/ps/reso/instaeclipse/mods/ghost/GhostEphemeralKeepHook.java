@@ -16,6 +16,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Prevents disappearing/vanish-mode messages from being deleted locally.
@@ -71,7 +72,7 @@ public class GhostEphemeralKeepHook {
         }
         try {
             List<Method> found = new java.util.ArrayList<>();
-            for (MethodData md : bridge.findMethod(FindMethod.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("Unexpected null timestamp for disappearing message, removed message")
                             .paramTypes("boolean")
@@ -113,7 +114,7 @@ public class GhostEphemeralKeepHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("igThreadIgid")
                             .paramTypes("com.instagram.model.direct.DirectThreadKey", "boolean")
@@ -151,7 +152,7 @@ public class GhostEphemeralKeepHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("mark_ephemeral_item_ranges_viewed")));
 
@@ -204,7 +205,7 @@ public class GhostEphemeralKeepHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("message_expiration_timestamp_ms")));
 

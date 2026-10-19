@@ -32,6 +32,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Like undo window (#235): a like is held for {@link #DELAY_MS} behind a small "Liked · UNDO" bar
@@ -56,7 +57,7 @@ public class LikeUndoHook {
         Method target = DexKitCache.isCacheValid() ? DexKitCache.loadMethod(CACHE_KEY, Module.hostClassLoader) : null;
         if (target == null) {
             try {
-                List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("source_of_like", "fetchLikeCount")
                         .returnType("void")));
                 for (MethodData md : found) {

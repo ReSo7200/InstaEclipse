@@ -22,6 +22,7 @@ import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Removes Meta AI entry points (GitHub #179) by collapsing the Meta AI XML layouts as they inflate.
@@ -219,7 +220,7 @@ public class RemoveMetaAIHook {
         try {
             MethodMatcher mm = MethodMatcher.create().usingStrings(marker);
             if (returnTypeFilter != null) mm = mm.returnType(returnTypeFilter);
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(mm))) {
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(mm))) {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), hook); n++; } catch (Throwable ignored) {}
             }
         } catch (Throwable t) {
@@ -251,7 +252,7 @@ public class RemoveMetaAIHook {
         };
         int n = 0;
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("android_purge_26_q2_ClipsTopSerpDataSource_createDefaultMetaAIHcmFetchResults")))) {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), neuter); n++; } catch (Throwable ignored) {}
             }
@@ -283,7 +284,7 @@ public class RemoveMetaAIHook {
         java.util.Set<String> hooked = new HashSet<>();
         for (String a : anchors) {
             try {
-                for (MethodData md : bridge.findMethod(FindMethod.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings(a)))) {
                     String key = md.getDescriptor();
                     if (!hooked.add(key)) continue; // both markers live on the same method
@@ -321,7 +322,7 @@ public class RemoveMetaAIHook {
         };
         int n = 0;
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("android_purge_26_q3_MetaAIVideoAttributionSubtitleUseCase_getUiState")))) {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), blank); n++; }
@@ -370,7 +371,7 @@ public class RemoveMetaAIHook {
                     .returnType("boolean")
                     .paramTypes("com.instagram.common.session.UserSession")
                     .usingNumbers(ids);
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(m))) {
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(m))) {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), hook); n++; }
                 catch (Throwable ignored) {}
             }
@@ -440,7 +441,7 @@ public class RemoveMetaAIHook {
     private void hookBuilder(DexKitBridge bridge, ClassLoader cl, XC_MethodHook hook, FindMethod q, String label) {
         try {
             int n = 0;
-            for (MethodData md : bridge.findMethod(q)) {
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, q)) {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), hook); n++; } catch (Throwable ignored) {}
             }
             ModuleLog.line("(IE|RemoveMetaAI) " + label + " filter: " + n + " method(s)");

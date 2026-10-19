@@ -45,6 +45,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 import ps.reso.instaeclipse.utils.users.UserUtils;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Search inside the comments sheet (#230).
@@ -87,7 +88,7 @@ public class CommentSearchHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> vm = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("select_comment_screen_pin_comment_tap")))) {
                 vm = cl.loadClass(md.getClassName());
                 break;
@@ -111,14 +112,14 @@ public class CommentSearchHook {
                 builders++;
             }
             try {
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("parent_comment_id", "child_comment_count").returnType("void").paramCount(2)))) {
                     Method m = md.getMethodInstance(cl);
                     if (Modifier.isStatic(m.getModifiers())) { commentSerializer = m; break; }
                 }
                 if (commentSerializer != null) {
                     Class<?> gen = commentSerializer.getParameterTypes()[0];
-                    for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .paramTypes("java.io.Writer").returnType(gen.getName())))) {
                         Method m = md.getMethodInstance(cl);
                         if (Modifier.isStatic(m.getModifiers())) continue;
@@ -132,7 +133,7 @@ public class CommentSearchHook {
                 ModuleLog.line(TAG + "⚠️ comment json: " + t);
             }
             int frags = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("Failed to ingest comments close signal")))) {
                 Class<?> frag = cl.loadClass(md.getClassName());
                 try {

@@ -20,6 +20,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Exact timestamps (#232): "3 hours ago" / "92 weeks ago" / "3w" → "20/09/2026 16:32".
@@ -44,7 +45,7 @@ public class ExactTimestampHook {
 
         if (target == null) {
             try {
-                List<ClassData> classes = bridge.findClass(FindClass.create()
+                List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                         .matcher(ClassMatcher.create().usingStrings("%d:%02d:%02d", "MMMM d", "MMM d")));
                 for (ClassData cd : classes) {
                     target = findFormatter(cd.getInstance(Module.hostClassLoader));

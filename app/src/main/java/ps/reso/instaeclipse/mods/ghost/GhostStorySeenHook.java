@@ -17,6 +17,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Hide Story / Reel Views.
@@ -73,7 +74,7 @@ public class GhostStorySeenHook {
     /** IG 442+/447: block the reel-seen store's inserts + immediate sender. */
     private boolean tryModernBatchBlock(DexKitBridge bridge) {
         try {
-            List<MethodData> seenMethods = bridge.findMethod(FindMethod.create()
+            List<MethodData> seenMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings("media/seen/")));
             if (seenMethods.isEmpty()) return false;
 
@@ -89,7 +90,7 @@ public class GhostStorySeenHook {
 
             String itemClassName = builder.getClassName();
             String storeClassName = null;
-            for (MethodData caller : builder.getCallers()) {
+            for (MethodData caller : DexKitQueryCache.callers(bridge, builder)) {
                 String cn = caller.getClassName();
                 if (cn != null && !cn.equals(itemClassName)) { storeClassName = cn; break; }
             }
@@ -183,7 +184,7 @@ public class GhostStorySeenHook {
     /** IG <=441 (436): the sender is a single {@code final void ()} method referencing "media/seen/". */
     private boolean tryLegacyBlock(DexKitBridge bridge) {
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings("media/seen/")));
             for (MethodData method : methods) {
                 Method m;

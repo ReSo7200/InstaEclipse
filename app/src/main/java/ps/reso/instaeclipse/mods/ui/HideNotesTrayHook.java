@@ -16,6 +16,7 @@ import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Hide the Notes tray at the top of the DM inbox (#241).
@@ -35,7 +36,7 @@ public class HideNotesTrayHook {
         // Skipping its body renders an empty item; takes effect after an Instagram restart.
         try {
             int n = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("NotesTrayComposeItem.<init>.<anonymous> (NotesTrayComposeItem.kt")))) {
                 if (md.isConstructor() || md.isStaticInitializer()) continue;
                 java.lang.reflect.Method m = md.getMethodInstance(ps.reso.instaeclipse.Xposed.Module.hostClassLoader);
@@ -54,7 +55,7 @@ public class HideNotesTrayHook {
         }
         try {
             Member ctor = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("NotesTrayAdapter")))) {
                 if (!md.isConstructor()) continue;
                 Constructor<?> c = md.getConstructorInstance(ps.reso.instaeclipse.Xposed.Module.hostClassLoader);

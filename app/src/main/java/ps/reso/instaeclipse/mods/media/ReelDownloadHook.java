@@ -23,6 +23,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class ReelDownloadHook {
 
@@ -62,7 +63,7 @@ public class ReelDownloadHook {
         }
 
         try {
-            var methods = bridge.findMethod(FindMethod.create()
+            var methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("ClipsOrganicMediaItemViewMoreOptionsController")));
 
@@ -218,7 +219,7 @@ public class ReelDownloadHook {
             }
 
             String optionDesc = "Lcom/instagram/feed/media/mediaoption/MediaOption$Option;";
-            var methods = bridge.findMethod(FindMethod.create()
+            var methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("java.util.ArrayList")
                             .addUsingField(optionDesc + "->PLAYBACK_CONTROLS:" + optionDesc)
@@ -287,7 +288,7 @@ public class ReelDownloadHook {
         }
 
         try {
-            var methods = bridge.findMethod(FindMethod.create()
+            var methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .paramTypes(param1Type, param2Type)
                             .returnType("boolean")

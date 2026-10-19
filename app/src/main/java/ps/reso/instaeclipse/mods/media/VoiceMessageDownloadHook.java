@@ -30,6 +30,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Download voice messages from the DM long-press menu (#223).
@@ -98,7 +99,7 @@ public class VoiceMessageDownloadHook {
             } catch (Throwable t) {
                 ModuleLog.line(TAG + "sticker classes: " + t);
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("audio_src_expiration_timestamp_us", "waveform_sampling_frequency_hz")
                     .returnType("java.util.Map")))) {
                 Method m = md.getMethodInstance(cl);
@@ -108,7 +109,7 @@ public class VoiceMessageDownloadHook {
 
             // message lookup → remember the long-pressed message
             int lookups = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings(": null_direct_message")))) {
                 Class<?> owner = md.getMethodInstance(cl).getDeclaringClass();
                 messageClass = md.getMethodInstance(cl).getReturnType();
@@ -206,7 +207,7 @@ public class VoiceMessageDownloadHook {
 
             // tap dispatcher
             int dispatchers = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("DirectReportDailyPromptInteractor.reportDailyPrompt")))) {
                 Method m = md.getMethodInstance(cl);
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
@@ -262,7 +263,7 @@ public class VoiceMessageDownloadHook {
             }
             // Row taps of the long-press menu go through the static method of the menu controller
             // that takes a LongPressActionData (MessageActionsController.A02 on 452).
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .paramTypes(ACTION_DATA, null, "java.lang.String")))) {
                 Method m = md.getMethodInstance(cl);
                 if (!Modifier.isStatic(m.getModifiers())) continue;
@@ -297,7 +298,7 @@ public class VoiceMessageDownloadHook {
             // "Action selected" listeners: (ActionEnum, String) -> void, e.g. X.0lMj.E5t on 452.
             if (ctor != null) {
                 String actionEnum = ctor.getParameterTypes()[2].getName();
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .paramTypes(actionEnum, "java.lang.String").returnType("void")))) {
                     Method m;
                     try { m = md.getMethodInstance(cl); } catch (Throwable t) { continue; }
@@ -352,7 +353,7 @@ public class VoiceMessageDownloadHook {
                     final Field lf = labelField;
                     String desc = "L" + ACTION_DATA.replace('.', '/') + ";->" + lf.getName() + ":Ljava/lang/String;";
                     Class<?> fn1 = cl.loadClass("kotlin.jvm.functions.Function1");
-                    for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .addUsingField(desc)))) {
                         if (!md.isMethod()) continue;
                         Method m;

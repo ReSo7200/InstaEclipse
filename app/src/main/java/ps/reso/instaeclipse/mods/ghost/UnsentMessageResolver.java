@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /** Resolves only the native removing store's message and account; never reads message text. */
 final class UnsentMessageResolver {
@@ -71,7 +72,7 @@ final class UnsentMessageResolver {
     static UnsentMessageResolver resolve(DexKitBridge bridge, ClassLoader loader) {
         String stage = "anchors";
         try {
-            List<MethodData> anchors = bridge.findMethod(FindMethod.create()
+            List<MethodData> anchors = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings(REMOVE)));
             diagnostic("anchors", anchors.size(), anchors.size());
             List<UnsentMessageResolver> resolved = new ArrayList<>();
@@ -102,7 +103,7 @@ final class UnsentMessageResolver {
                 // Invoked-method metadata can be a cross-dex reference without a method body.
                 // Requery the exact reflected method before inspecting the sender field it reads.
                 stage = "ownership-definition";
-                MethodData ownDefinition = unique(methods(bridge.findMethod(FindMethod.create().matcher(
+                MethodData ownDefinition = unique(methods(DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(
                         MethodMatcher.create().declaredClass(messageType.getName()).name(own.getName()))), loader),
                         stage, own::equals);
                 if (ownDefinition == null) continue;
@@ -114,7 +115,7 @@ final class UnsentMessageResolver {
                 Method client = anchoredGetter(bridge, loader, messageType, CLIENT, stage);
                 if (sender == null || id == null || client == null) continue;
                 stage = "entry-methods";
-                Map<Method, MethodData> getters = methods(bridge.findMethod(FindMethod.create().matcher(
+                Map<Method, MethodData> getters = methods(DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(
                         MethodMatcher.create().declaredClass(entryType.getName()))), loader);
                 stage = "id-lookup";
                 MethodData idLookup = unique(getters, stage, m -> parameters(m, String.class)
@@ -303,7 +304,7 @@ final class UnsentMessageResolver {
         return false;
     }
     private static Method anchoredGetter(DexKitBridge bridge, ClassLoader loader, Class<?> type, String anchor, String stage) {
-        MethodData data = unique(methods(bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+        MethodData data = unique(methods(DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                 .declaredClass(type.getName()).usingStrings(anchor))), loader), stage, m -> m.getReturnType() == String.class
                 && m.getParameterCount() == 0 && !Modifier.isStatic(m.getModifiers()));
         return data == null ? null : method(data, loader);
