@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_chat_actions">פעולות בשיחה הנוכחית</string>
+    <string name="ie_hide_this_chat">הסתר שיחה זו</string>
+    <string name="ie_unhide_this_chat">בטל הסתרת שיחה זו</string>
+    <string name="ie_view_deleted_for_chat">הצג הודעות שנמחקו בשיחה זו</string>
+    <string name="ie_show_hide_button">הצג כפתור להסתרת שיחה</string>
+    <string name="ie_show_deleted_button">הצג כפתור להודעות שנמחקו</string>
+    <string name="ie_chat_gesture_hint">לחץ לחיצה ארוכה על כותרת השיחה ובחר הסתר שיחה זו. אם המחווה אינה זמינה, הפעל את האפשרות הצג כפתור להסתרת שיחה וחזור לשיחה. האפשרות פעולות בשיחה הנוכחית זמינה רק כשהשיחה נשארת פתוחה מאחורי ההגדרות האלה. שני הכפתורים בכותרת כבויים כברירת מחדל ונשלטים בנפרד. ההסתרה חלה רק על רשימות נתמכות בתיבת ההודעות; חיפוש, התראות, הצעות לשיתוף וכניסה ישירה עדיין עשויים לחשוף שיחות.</string>
+    <string name="ie_downloader_original">רגיל</string>
+    <string name="ie_downloader_mode">איכות: %1$s</string>
+    <string name="ie_downloader_original_unavailable">רגיל לא הצליח לשמור את זה. עבור להטובה ביותר כדי להוריד.</string>
+    <string name="ie_unsent_remove_copy">הסר עותק שמור</string>
+    <string name="ie_unsent_remove_copy_confirm">להסיר רק את הרשומה הזו מהיסטוריית ההודעות השמורה במכשיר? הפעולה אינה מוחקת הודעה מהשיחה ב-Instagram או מהשרתים שלו ואינה מבטלת את שליחתה. שאר הרשומות השמורות לא ישתנו.</string>
+    <string name="ie_unsent_copy_removed">העותק השמור במכשיר הוסר.</string>
+    <string name="ie_unsent_copy_stale">הרשומה השמורה הזו כבר אינה זמינה. ההיסטוריה רועננה.</string>
+    <string name="ie_unsent_copy_remove_failed">לא ניתן היה לשמור את ההסרה. העותק השמור עדיין מוצג; נסה שוב.</string>
+
+    <string name="ie_download_quality">איכות הורדה</string>
+    <string name="ie_download_best">הטובה ביותר</string>
+    <string name="ie_download_ceiling">הטובה ביותר, עד %1$dp</string>
+    <string name="ie_download_compatibility">העדף סרטונים שמתנגנים בכל מקום</string>
+    <string name="ie_download_fallback">השתמש באיכות נמוכה יותר אם הטובה ביותר נכשלת</string>
+    <string name="ie_download_quality_hint">רגיל הוא המוריד הקלאסי. הטובה ביותר בודקת כל גרסה של הסרטון, כולל HDR, ושומרת את החדה ביותר, או את החדה ביותר עד הרזולוציה שבחרת.</string>
+    <string name="ie_download_fallback_prompt">הטובה ביותר לא הצליחה לשמור את זה. לנסות איכות נמוכה יותר?</string>
+</resources>

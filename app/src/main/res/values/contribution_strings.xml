@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- New contribution strings use English fallback until upstream translations are supplied. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="module_display_name" translatable="false">InstaEclipse</string>
+    <string name="module_download_channel_name">InstaEclipse Downloads</string>
+    <string name="ie_keep_unsent_in_chat">Keep received unsent messages in chat</string>
+    <string name="ie_keep_unsent_in_chat_hint">Optional, session-only retention of verified received messages. History-only is the default. Your own messages and messages with unresolved ownership are removed normally. Retained messages are not restored after restarting Instagram.</string>
+    <string name="ie_chat_account_unresolved">The current account could not be verified. Return to the inbox and try again.</string>
+    <string name="ie_chat_actions">Current chat actions</string>
+    <string name="ie_hide_this_chat">Hide this chat</string>
+    <string name="ie_unhide_this_chat">Unhide this chat</string>
+    <string name="ie_view_deleted_for_chat">View deleted messages for this chat</string>
+    <string name="ie_show_hide_button">Show Hide Chat button</string>
+    <string name="ie_show_deleted_button">Show Deleted Messages button</string>
+    <string name="ie_chat_changed">The conversation changed. Open the menu again.</string>
+    <string name="ie_hidden_save_failed">Could not save hidden-chat state. Nothing was changed.</string>
+    <string name="ie_chat_features_disabled">Enable Hide Specific Chats or Keep Unsent Messages to use these actions.</string>
+    <string name="ie_hidden_legacy">Unassigned legacy entries are preserved. They are not applied to any account. Open each intended conversation and hide it again to associate it safely.</string>
+    <string name="ie_account_unresolved">Could not identify the current account. No hidden-chat state was changed.</string>
+    <string name="ie_download_quality">Download quality</string>
+    <string name="ie_download_best">Best</string>
+    <string name="ie_download_compatibility">Prefer videos that play everywhere</string>
+    <string name="ie_download_fallback">Use lower quality if Best fails</string>
+    <string name="ie_download_quality_hint">Standard is the classic downloader. Best checks every version of the video, HDR included, and saves the sharpest one, or the sharpest up to the resolution you pick.</string>
+    <string name="ie_download_unavailable">Selected media could not be resolved for this Instagram version.</string>
+    <string name="ie_download_retry_lower">Retry lower quality</string>
+    <string name="ie_download_fallback_prompt">Best couldn\'t save this one. Try a lower quality instead?</string>
+    <string name="ie_download_verified">Saved and verified: %1$s</string>
+    <string name="ie_download_fallback_used">Saved lower quality: %1$s</string>
+    <string name="ie_download_cancelled">Download cancelled</string>
+    <string name="ie_download_select_item">Choose carousel item</string>
+    <string name="ie_download_item">Item %1$d</string>
+    <string name="ie_download_ceiling">Best, up to %1$dp</string>
+    <string name="ie_hidden_state_unavailable">Hidden-chat state could not be read. The saved file is preserved; no new changes will be made.</string>
+    <string name="ie_chat_gesture_hint">Long-press the conversation title, then choose Hide this chat. If unavailable, enable Show Hide Chat button and return to the chat. Current chat actions works only while that chat stays open behind these settings. Both header buttons are off by default and controlled independently. Hiding only filters supported inbox lists; search, notifications, sharing suggestions and direct entry may still expose chats.</string>
+    <string name="ie_save_video_frame">Save video frame</string>
+    <string name="ie_download_video">Download video</string>
+    <string name="ie_frame_help">Choose a frame with the slider. Only the full-resolution PNG is saved; the temporary video is removed when you save or close.</string>
+    <string name="ie_frame_preparing">Preparing highest-quality video…</string>
+    <string name="ie_frame_preparing_progress">Preparing highest-quality video… %1$d%%</string>
+    <string name="ie_frame_loading">Loading preview…</string>
+    <string name="ie_frame_preview">Selected video frame preview</string>
+    <string name="ie_frame_position">Frame position</string>
+    <string name="ie_frame_time">%1$s / %2$s</string>
+    <string name="ie_frame_ready">PNG · %1$d × %2$d · Full resolution</string>
+    <string name="ie_frame_save">Save PNG</string>
+    <string name="ie_frame_saving">Saving full-resolution frame…</string>
+    <string name="ie_frame_saved">Saved PNG: %1$d × %2$d. Temporary video removed.</string>
+    <string name="ie_frame_failed">Could not prepare or save this frame. No lower-quality version was substituted.</string>
+    <string name="ie_frame_cleanup_pending">Temporary cleanup is incomplete. Reopen the companion app to retry cleanup.</string>
+    <string name="ie_frame_reopen">Open Download again in Instagram to choose a frame.</string>
+    <string name="ie_downloader_original">Standard</string>
+    <string name="ie_downloader_mode">Quality: %1$s</string>
+    <string name="ie_downloader_original_unavailable">Standard couldn\'t save this one. Switch to Best to download it.</string>
+    <string name="ie_unsent_remove_copy">Remove saved copy</string>
+    <string name="ie_unsent_remove_copy_confirm">Remove only this entry from the local saved-message history? This does not delete or unsend any message in the Instagram chat or on its servers. Other saved entries stay unchanged.</string>
+    <string name="ie_unsent_copy_removed">Local saved copy removed.</string>
+    <string name="ie_unsent_copy_stale">This saved entry is no longer available. The history was refreshed.</string>
+    <string name="ie_unsent_copy_remove_failed">Could not save the removal. The saved copy is still shown; try again.</string>
+</resources>

@@ -27,6 +27,24 @@ public class TrackingParamStripperTest {
     }
 
     @Test
+    public void removesFourLetterPolymorphicTrackingParams() {
+        assertNull(TrackingParamStripper.strip("https://www.instagram.com/reel/XYZ/?abc=abc"));
+        assertEquals("https://www.instagram.com/reel/XYZ/",
+                TrackingParamStripper.strip("https://www.instagram.com/reel/XYZ/?abcd=abc"));
+        assertEquals("https://www.instagram.com/reel/XYZ/",
+                TrackingParamStripper.strip("https://www.instagram.com/reel/XYZ/?xtok=abc"));
+        assertNull(TrackingParamStripper.strip("https://www.instagram.com/reel/XYZ/?abcde=abcde"));
+    }
+
+    @Test
+    public void removesFourLetterPolymorphicTrackingParamsKeepingCarouselIndex() {
+        assertEquals("https://www.instagram.com/reel/XYZ/?img_index=2",
+                TrackingParamStripper.strip("https://www.instagram.com/reel/XYZ/?img_index=2&xtok=abc"));
+        assertEquals("https://www.instagram.com/reel/XYZ/?img_index=2",
+                TrackingParamStripper.strip("https://www.instagram.com/reel/XYZ/?xtok=abc&img_index=2"));
+    }
+
+    @Test
     public void keepsOrderOfRemainingParamsAndFragment() {
         assertEquals("https://instagram.com/p/A/?a=1&b=2#c",
                 TrackingParamStripper.strip("https://instagram.com/p/A/?igshid=1&a=1&utm_medium=x&b=2#c"));

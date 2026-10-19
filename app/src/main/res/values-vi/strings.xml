@@ -11,12 +11,12 @@
     <string name="back">Quay lại</string>
     <string name="apply_changes">Áp dụng thay đổi</string>
     <string name="multiple_versions_detected">⚠️ Phát hiện nhiều phiên bản Instagram</string>
-    <string name="module_disabled">Module chưa được kích hoạt. Vui lòng bật module trong LSPosed.</string>
+    <string name="module_disabled">Module chưa được kích hoạt. Vui lòng bật module trong Vector.</string>
 
     <string name="module_status">Trạng thái Module:</string>
 
     <string name="module_status_disabled">Trạng thái Module: Đã tắt</string>
-    <string name="request_enable_module">Vui lòng kích hoạt module trong trình quản lý Xposed/LSPosed.</string>
+    <string name="request_enable_module">Vui lòng kích hoạt module trong trình quản lý Xposed/Vector.</string>
 
     <string name="module_status_enabled_no_root">Trạng thái Module: Đã bật (Không có quyền Root)</string>
     <string name="request_enable_root">Cần quyền Root để ứng dụng tự khởi động lại. Hiện tại cần khởi động lại thủ công.</string>
@@ -46,7 +46,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">Câu hỏi thường gặp (FAQ)</string>
     <string name="faq_1"><b>1. Không hoạt động hoặc văng app khi dùng bản Google Play?</b>\n- Hãy tải và cài đặt bản APK từ APKMirror</string>
-    <string name="faq_2"><b>2. Module báo chưa bật?</b>\n- Hãy tắt rồi bật lại module trong LSPosed, sau đó khởi động lại thiết bị.</string>
+    <string name="faq_2"><b>2. Module báo chưa bật?</b>\n- Hãy tắt rồi bật lại module trong Vector, sau đó khởi động lại thiết bị.</string>
     <string name="faq_3"><b>3. Tính năng không có hiệu lực?</b>\n- Buộc dừng (Force Stop) và mở lại ứng dụng Instagram.</string>
     <string name="faq_4"><b>4. Tùy chọn nhà phát triển gây văng ứng dụng?</b>\n- Hãy làm theo đúng các bước trong hướng dẫn Tùy chọn nhà phát triển.</string>
     <string name="faq_5"><b>5. Tùy chọn nhà phát triển hiển thị ký tự hoặc số lạ?</b>\n- Hãy sử dụng bản Instagram Beta hoặc Alpha (bản Stable đã bị mã hóa ký danh).</string>

@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         // (see Theme.InstaEclipse); adopting the wallpaper palette here would override the brand.
         super.onCreate(savedInstanceState);
         Logging.init(this, "instaeclipse_companion.log");
+        ps.reso.instaeclipse.mods.media.FrameSessionCache.cleanupOrphans(getCacheDir());
         VersionCheckUtility.checkForUpdates(this);
 
         setContentView(R.layout.activity_main);

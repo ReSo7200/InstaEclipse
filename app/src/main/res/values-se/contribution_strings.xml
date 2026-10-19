@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_download_quality">Nedladdningskvalitet</string>
+    <string name="ie_downloader_original">Standard</string>
+    <string name="ie_download_best">Bästa</string>
+    <string name="ie_download_ceiling">Bästa, upp till %1$dp</string>
+    <string name="ie_downloader_mode">Kvalitet: %1$s</string>
+    <string name="ie_download_compatibility">Föredra videor som spelas överallt</string>
+    <string name="ie_download_fallback">Använd lägre kvalitet om Bästa misslyckas</string>
+    <string name="ie_download_quality_hint">Standard är den klassiska nedladdningen. Bästa går igenom alla versioner av videon, även HDR, och sparar den skarpaste, eller den skarpaste upp till upplösningen du väljer.</string>
+    <string name="ie_downloader_original_unavailable">Standard kunde inte spara den. Byt till Bästa för att ladda ner den.</string>
+    <string name="ie_download_fallback_prompt">Bästa kunde inte spara den. Försöka med lägre kvalitet?</string>
+</resources>

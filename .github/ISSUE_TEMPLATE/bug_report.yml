@@ -18,7 +18,7 @@ body:
           required: true
         - label: I am using Instagram from **APKMirror**, not the Google Play Store.
           required: true
-        - label: I have tried **disabling and re-enabling** the module in LSPosed/LSPatch and force-stopping Instagram.
+        - label: I have tried **disabling and re-enabling** the module in Vector/LSPatch and force-stopping Instagram.
           required: true
         - label: I have read the [FAQ](https://github.com/ReSo7200/InstaEclipse#-faq) and my issue is not covered there.
           required: true
@@ -46,10 +46,10 @@ body:
     attributes:
       label: Setup Method
       options:
-        - Root — LSPosed (JingMatrix fork)
-        - Root — LSPosed (other fork)
-        - No Root — LSPatch (JingMatrix fork)
-        - No Root — LSPatch (other)
+        - "Root: Vector (JingMatrix)"
+        - "Root: other Xposed framework"
+        - "No Root: LSPatch (JingMatrix fork)"
+        - "No Root: LSPatch (other)"
     validations:
       required: true
 
@@ -57,7 +57,7 @@ body:
     id: device
     attributes:
       label: Device & Android Version
-      placeholder: e.g. Pixel 8 — Android 15
+      placeholder: e.g. Pixel 8, Android 15
     validations:
       required: true
 
@@ -86,5 +86,5 @@ body:
     id: logs
     attributes:
       label: Logs (if available)
-      description: Paste any relevant LSPosed logs here.
+      description: Paste any relevant Vector or LSPatch logs here.
       render: text

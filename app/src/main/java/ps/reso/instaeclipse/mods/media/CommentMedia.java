@@ -138,7 +138,7 @@ public final class CommentMedia {
                     .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create().usingStrings("Failed to ingest comments close signal")))) {
                 Class<?> frag = cl.loadClass(md.getClassName());
                 Method ovc = frag.getDeclaredMethod("onViewCreated", android.view.View.class, android.os.Bundle.class);
-                de.robv.android.xposed.XposedBridge.hookMethod(ovc, new de.robv.android.xposed.XC_MethodHook() {
+                ps.reso.instaeclipse.xposedcompat.XposedBridge.hookMethod(ovc, new ps.reso.instaeclipse.xposedcompat.XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         Object m = firstOfType(p.thisObject, MEDIA, 3, null);
                         sheetMedia = new java.lang.ref.WeakReference<>(m);

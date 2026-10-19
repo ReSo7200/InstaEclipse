@@ -14,8 +14,8 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 /**
@@ -141,7 +141,36 @@ public final class CurrentThreadTracker {
                     if (id != null) return id;
                 }
             }
+            // A chat opened from the inbox carries its key inside the fragment's thread target
+            // (DIRECT_FRAGMENT_ARGUMENT_THREAD_TARGET: a ThreadTargetParcelable wrapping an
+            // obfuscated key class on 451), not as a bare DirectThreadKey. Take the numeric id
+            // from inside that target, from THIS fragment's own arguments only.
+            for (String k : b.keySet()) {
+                Object v = b.get(k);
+                if (v == null || !v.getClass().getName().contains("ThreadTarget")) continue;
+                String id = numericId(v, 0, java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()));
+                if (id != null) return id;
+            }
         } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
+    /** The first all-digit id (a thread id) in {@code o}'s fields, IG classes only, depth-limited. */
+    private static String numericId(Object o, int depth, java.util.Set<Object> seen) {
+        if (o == null || depth > 2 || !seen.add(o)) return null;
+        if (o instanceof String str) return str.length() >= 10 && str.chars().allMatch(Character::isDigit) ? str : null;
+        String cn = o.getClass().getName();
+        if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return null;
+        for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+                if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
+                try {
+                    f.setAccessible(true);
+                    String r = numericId(f.get(o), depth + 1, seen);
+                    if (r != null) return r;
+                } catch (Throwable ignored) {}
+            }
         }
         return null;
     }

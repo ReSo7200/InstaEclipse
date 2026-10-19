@@ -25,9 +25,9 @@ import android.widget.Toast;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
@@ -79,45 +79,31 @@ public class InstantUploadHook {
     private void hookSwap(ClassLoader cl) {
         try {
             Class<?> vm = XposedHelpers.findClass(VM_CLASS, cl);
-            java.util.List<Method> targets = new java.util.ArrayList<>();
-            // Legacy (<= 447): static (Context, Bitmap, Bitmap, VM, ...) capture handler.
-            for (Method m : vm.getDeclaredMethods()) {
-                if (!Modifier.isStatic(m.getModifiers())) continue;
-                int bmp = 0;
-                for (Class<?> t : m.getParameterTypes()) if (t == Bitmap.class) bmp++;
-                if (bmp >= 2) { targets.add(m); break; }
+            SwapBinding binding = SwapBinding.resolve(vm, android.content.Context.class, Bitmap.class);
+            if (binding == null) {
+                ModuleLog.line("(IE|InstantUpload) photo handoff unresolved or ambiguous");
+                if (FeatureFlags.uploadInstants) FeatureStatusTracker.setBroken("UploadInstants");
+                return;
             }
-            // IG 451: the second Bitmap became a holder object; the capture handlers are static
-            // (Context, Bitmap, ..., QuickSnapCameraViewModel, ...) -> Object (suspend), called from
-            // QuickSnapCameraViewModel$onCaptured$*. Hook every such handler; the first one to
-            // run consumes pendingBitmap, so a capture is swapped exactly once.
-            if (targets.isEmpty()) {
-                for (Method m : vm.getDeclaredMethods()) {
-                    if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != Object.class) continue;
-                    Class<?>[] pt = m.getParameterTypes();
-                    if (pt.length < 4 || pt[0] != android.content.Context.class || pt[1] != Bitmap.class) continue;
-                    boolean hasVm = false;
-                    for (Class<?> t : pt) if (t == vm) hasVm = true;
-                    if (hasVm) targets.add(m);
-                }
-            }
-            if (targets.isEmpty()) { ModuleLog.line("(IE|InstantUpload) ⚠️ A02 not found"); return; }
             XC_MethodHook swap = new XC_MethodHook() {
                 @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                     try {
-                        if (!(p.args[1] instanceof Bitmap)) return; // suspend re-entry passes nulls
+                        if (!binding.accepts(p.args)) return; // suspend re-entry passes nulls
                         // Drop a stale pick so it can't hijack a much-later real capture.
                         if (pendingBitmap != null
                                 && System.currentTimeMillis() - pendingSetAt > PENDING_TTL_MS) {
                             pendingBitmap = null;
                         }
-                        if (FeatureFlags.uploadInstants && pendingBitmap != null) {
-                            p.args[1] = pendingBitmap;
-                            // Only on builds where arg2 is the second capture Bitmap (<= 447);
-                            // on 451 it is a non-Bitmap holder and must be left untouched.
-                            if (p.args.length > 2 && p.args[2] instanceof Bitmap)
-                                p.args[2] = pendingBitmap.copy(pendingBitmap.getConfig(), false);
-                            pendingBitmap = null;
+                        Bitmap selected = pendingBitmap;
+                        if (FeatureFlags.uploadInstants && selected != null) {
+                            Bitmap secondary = null;
+                            if (binding.needsSecondary(p.args)) {
+                                Bitmap.Config config = selected.getConfig();
+                                secondary = selected.copy(config != null ? config : Bitmap.Config.ARGB_8888, false);
+                            }
+                            // Validate both replacements before touching either argument.
+                            if (!binding.replace(p.args, selected, secondary)) return;
+                            if (pendingBitmap == selected) pendingBitmap = null;
                             FeedVideoDownloadHook.mainHandler.post(InstantUploadHook::removeChip);
                             ModuleLog.line("(IE|InstantUpload) ✅ swapped in gallery bitmap");
                         }
@@ -126,11 +112,83 @@ public class InstantUploadHook {
                     }
                 }
             };
-            for (Method m : targets) XposedBridge.hookMethod(m, swap);
+            binding.method.setAccessible(true);
+            XposedBridge.hookMethod(binding.method, swap);
             FeatureStatusTracker.setHooked("UploadInstants");
-            ModuleLog.line("(IE|InstantUpload) ✅ capture handler hooked: " + targets.size());
+            ModuleLog.line("(IE|InstantUpload) ✅ capture handler hooked");
         } catch (Throwable t) {
             ModuleLog.line("(IE|InstantUpload) ⚠️ swap install: " + t.getMessage());
+            if (FeatureFlags.uploadInstants) FeatureStatusTracker.setBroken("UploadInstants");
+        }
+    }
+
+    /** A unique photo handoff, with declared argument slots checked before mutation. */
+    static final class SwapBinding {
+        final Method method;
+        final int secondaryBitmapIndex;
+        private final Class<?> bitmapType;
+        private final Class<?> vmType;
+        private final int vmIndex;
+
+        private SwapBinding(Method method, Class<?> bitmapType, int secondaryBitmapIndex, int vmIndex) {
+            this.method = method;
+            this.bitmapType = bitmapType;
+            this.vmType = method.getDeclaringClass();
+            this.vmIndex = vmIndex;
+            this.secondaryBitmapIndex = secondaryBitmapIndex;
+        }
+
+        static SwapBinding resolve(Class<?> vm, Class<?> contextType, Class<?> bitmapType) {
+            SwapBinding found = null;
+            for (Method method : vm.getDeclaredMethods()) {
+                if (!Modifier.isStatic(method.getModifiers()) || method.getReturnType() != Object.class) continue;
+                Class<?>[] p = method.getParameterTypes();
+                if (p.length < 4 || p[0] != contextType || p[1] != bitmapType) continue;
+                boolean legacy = p.length == 9 && p[2] == bitmapType && p[3] == vm
+                        && modelType(p[4], bitmapType) && p[5] == String.class && p[6] == String.class
+                        && modelType(p[7], bitmapType) && p[8] == long.class;
+                // Preserve 451+'s single-Bitmap capture family without selecting an arbitrary
+                // overload. Video/File handoffs and archive/void helpers are never photo targets.
+                boolean modern = modelType(p[2], bitmapType) && p[2] != vm;
+                int bitmaps = 0, owners = 0, ownerIndex = -1;
+                for (int i = 0; i < p.length; i++) {
+                    Class<?> type = p[i];
+                    if (type == bitmapType) bitmaps++;
+                    if (type == vm) { owners++; ownerIndex = i; }
+                    if (type == java.io.File.class) modern = false;
+                }
+                legacy &= bitmaps == 2 && owners == 1;
+                modern &= bitmaps == 1 && owners == 1;
+                if (!legacy && !modern) continue;
+                if (found != null) return null;
+                found = new SwapBinding(method, bitmapType, legacy ? 2 : -1, legacy ? 3 : ownerIndex);
+            }
+            return found;
+        }
+
+        private static boolean modelType(Class<?> type, Class<?> bitmapType) {
+            return !type.isPrimitive() && type != bitmapType && type != String.class
+                    && type != Object.class && type != java.io.File.class;
+        }
+
+        boolean accepts(Object[] args) {
+            return args != null && args.length == method.getParameterCount()
+                    && bitmapType.isInstance(args[1]) && vmType.isInstance(args[vmIndex])
+                    && (secondaryBitmapIndex < 0 || args[secondaryBitmapIndex] == null
+                    || bitmapType.isInstance(args[secondaryBitmapIndex]));
+        }
+
+        boolean needsSecondary(Object[] args) {
+            return accepts(args) && secondaryBitmapIndex >= 0 && args[secondaryBitmapIndex] != null;
+        }
+
+        boolean replace(Object[] args, Object selected, Object secondary) {
+            if (!accepts(args) || !bitmapType.isInstance(selected)
+                    || (needsSecondary(args) && !bitmapType.isInstance(secondary))) return false;
+            boolean replaceSecondary = needsSecondary(args);
+            args[1] = selected;
+            if (replaceSecondary) args[secondaryBitmapIndex] = secondary;
+            return true;
         }
     }
 
@@ -144,6 +202,7 @@ public class InstantUploadHook {
             // on screen. Injection is idempotent + gated to the modal, so hooking several is safe.
             XC_MethodHook onActive = new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
+                    quickSnapActiveAt = android.os.SystemClock.uptimeMillis();
                     if (!FeatureFlags.uploadInstants) return;
                     Activity act = currentActivity();
                     if (act != null) FeedVideoDownloadHook.mainHandler.post(() -> injectChip(act));
@@ -176,7 +235,7 @@ public class InstantUploadHook {
         if (lifecycleRegistered) return;
         try {
             android.app.Application app = (android.app.Application)
-                    android.app.AndroidAppHelper.currentApplication();
+                    ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
             if (app == null) {
                 if (attempt < 30) FeedVideoDownloadHook.mainHandler.postDelayed(() -> registerLifecycle(attempt + 1), 1000);
                 else ModuleLog.line("(IE|InstantUpload) ⚠️ no Application; chip lifecycle not registered");
@@ -474,12 +533,18 @@ public class InstantUploadHook {
     private static final long WATCH_MS = 300;
     private static int cameraViewId;
     private static Activity watchHost;          // the resumed modal being watched (main thread only)
+    // The camera in a chat (and other cameras) also has a camera_view inside a ModalActivity; only
+    // the Instants (quicksnap) camera drives QuickSnapCameraViewModel. Show the chip only when that
+    // view model has been active since the watched modal came up.
+    private static volatile long quickSnapActiveAt;
+    private static volatile long watchStartedAt;
     private static final Runnable WATCH = new Runnable() {
         @Override public void run() {
             Activity host = watchHost;
             if (host == null || !FeatureFlags.uploadInstants) return;
             boolean hasCam = hasCameraView(host);
-            boolean on = hasCam && cameraOnScreen(host);
+            // 2 s margin: the quicksnap view model can start just before its modal reports resumed.
+            boolean on = hasCam && quickSnapActiveAt >= watchStartedAt - 2000 && cameraOnScreen(host);
             if (on && (chip == null || chipHost != host)) injectChip(host);
             if (chip != null && chipHost == host) {
                 int vis = on || pickerOpen ? View.VISIBLE : View.GONE;
@@ -493,6 +558,7 @@ public class InstantUploadHook {
 
     private static void startWatch(Activity act) {
         watchHost = act;
+        watchStartedAt = android.os.SystemClock.uptimeMillis();
         FeedVideoDownloadHook.mainHandler.removeCallbacks(WATCH);
         FeedVideoDownloadHook.mainHandler.post(WATCH);
     }

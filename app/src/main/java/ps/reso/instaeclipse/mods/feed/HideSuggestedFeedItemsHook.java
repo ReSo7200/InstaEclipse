@@ -9,8 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -82,7 +82,7 @@ public class HideSuggestedFeedItemsHook {
 
         if (DexKitCache.isCacheValid()) {
             String cached = DexKitCache.loadString(CACHE_KEY_PARSER);
-            if (cached != null) {
+            if (cached != null && isFeedItemParser(cached, classLoader)) {
                 try {
                     hookBridgeMethod(cached, classLoader, filterHook);
                     markHookedForEnabledFlags();
@@ -94,36 +94,26 @@ public class HideSuggestedFeedItemsHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(
-                    FindMethod.create().matcher(
-                            MethodMatcher.create().usingStrings(
-                                    "clips_netego", "suggested_users", "Unknown FeedItem Type"
-                            )
-                    )
-            );
-
-            if (methods.isEmpty()) {
-                methods = bridge.findMethod(
-                        FindMethod.create().matcher(
-                                MethodMatcher.create().usingStrings("clips_netego", "media_or_ad")
-                        )
-                );
+            // Other classes use the same strings (on 451 a large string table, X.0000, matches
+            // first), so every match is checked to really be the FeedItem parser.
+            String targetClass = null;
+            String[][] queries = {
+                    {"clips_netego", "suggested_users", "Unknown FeedItem Type"},
+                    {"clips_netego", "media_or_ad"},
+                    {"clips_netego", "stories_netego", "bloks_netego"}};
+            for (String[] strings : queries) {
+                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(
+                        MethodMatcher.create().usingStrings(strings)))) {
+                    if (isFeedItemParser(md.getClassName(), classLoader)) { targetClass = md.getClassName(); break; }
+                }
+                if (targetClass != null) break;
             }
 
-            if (methods.isEmpty()) {
-                methods = bridge.findMethod(
-                        FindMethod.create().matcher(
-                                MethodMatcher.create().usingStrings("clips_netego", "stories_netego", "bloks_netego")
-                        )
-                );
-            }
-
-            if (methods.isEmpty()) {
+            if (targetClass == null) {
                 ModuleLog.line("(InstaEclipse | HideSuggested): ❌ FeedItem parser not found.");
                 return;
             }
 
-            String targetClass = methods.get(0).getClassName();
             DexKitCache.saveString(CACHE_KEY_PARSER, targetClass);
             hookBridgeMethod(targetClass, classLoader, filterHook);
             markHookedForEnabledFlags();
@@ -131,6 +121,27 @@ public class HideSuggestedFeedItemsHook {
 
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse | HideSuggested): ❌ Exception: " + t.getMessage());
+        }
+    }
+
+    /**
+     * The FeedItem JSON parser: has bridge parse methods and a static serializer
+     * (writer, FeedItem) whose FeedItem declares a Media field.
+     */
+    private static boolean isFeedItemParser(String className, ClassLoader classLoader) {
+        try {
+            Class<?> c = Class.forName(className, false, classLoader);
+            boolean bridges = false, serializer = false;
+            for (Method m : c.getDeclaredMethods()) {
+                if (m.isBridge()) bridges = true;
+                if (java.lang.reflect.Modifier.isStatic(m.getModifiers()) && m.getParameterCount() == 2) {
+                    for (Field f : m.getParameterTypes()[1].getDeclaredFields())
+                        if (f.getType().getName().equals("com.instagram.feed.media.Media")) { serializer = true; break; }
+                }
+            }
+            return bridges && serializer;
+        } catch (Throwable t) {
+            return false;
         }
     }
 

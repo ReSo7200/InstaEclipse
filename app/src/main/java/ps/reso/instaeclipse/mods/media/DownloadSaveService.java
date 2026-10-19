@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,19 +20,27 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.widget.Toast;
 
-import androidx.documentfile.provider.DocumentFile;
-
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.BuildConfig;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.log.Logging;
+import ps.reso.instaeclipse.utils.download.DownloadEngine;
+import ps.reso.instaeclipse.utils.download.DownloadRequest;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import androidx.documentfile.provider.DocumentFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Foreground service that runs in the companion-app process and saves downloaded media
@@ -48,6 +57,14 @@ import java.nio.ByteBuffer;
  */
 public class DownloadSaveService extends Service {
 
+    static final String EXTRA_REQUEST = "selectedDownloadRequest";
+    private static final String ACTION_CANCEL = BuildConfig.APPLICATION_ID + ".CANCEL_DOWNLOAD";
+    private final ExecutorService jobs = Executors.newSingleThreadExecutor();
+    private final Map<Integer, DownloadEngine.Cancellation> cancellations = new ConcurrentHashMap<>();
+    private final Map<Integer, String> jobTokens = new ConcurrentHashMap<>();
+    private volatile int activeJobId;
+    private int latestStartId;
+
     private static final String CHANNEL_ID  = "ie_dl_save";
     private static final int    NOTIF_ID    = 0x49455344; // "IESD" — ongoing progress
     private static final int    DONE_NOTIF_BASE = 0x49455345; // per-startId completion notifs
@@ -59,14 +76,8 @@ public class DownloadSaveService extends Service {
     private static final long NOTIF_INTERVAL_MS = 250;
 
     private NotificationManager nm;
-    // Written from every download thread; volatile is enough for the throttle heuristic.
-    private volatile long lastNotifMs  = 0;
-    private volatile int  lastNotifPct = -1;
-
-    private static final int CONNECT_TIMEOUT_MS = 15_000;
-    private static final int READ_TIMEOUT_MS    = 30_000;
-    /** Hard cap on a single download so a hostile or broken stream can't fill the disk. */
-    private static final long MAX_DOWNLOAD_BYTES = 2L * 1024 * 1024 * 1024;
+    private long lastNotifMs  = 0;
+    private int  lastNotifPct = -1;
 
     private static final class SavedMedia {
         final Uri uri;
@@ -83,25 +94,39 @@ public class DownloadSaveService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Logging.init(this, "instaeclipse_companion.log");
+        if (!FrameSessionCache.cleanupOrphans(getCacheDir()))
+            ModuleLog.line("(IE|Frame) Startup cache cleanup incomplete");
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         ensureChannel();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        android.app.Notification starting = buildProgressNotification("Starting…", 0, 0, true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(NOTIF_ID, starting, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
-        } else {
-            startForeground(NOTIF_ID, starting);
+        latestStartId = startId;
+        if (intent != null && ACTION_CANCEL.equals(intent.getAction())) {
+            int jobId = intent.getIntExtra("jobId", -1);
+            DownloadEngine.Cancellation token = cancellations.get(jobId);
+            String expectedToken = jobTokens.get(jobId);
+            if (token != null && expectedToken != null
+                    && expectedToken.equals(intent.getStringExtra("jobToken"))) token.cancel();
+            if (cancellations.isEmpty()) stopSelfResult(latestStartId);
+            return START_NOT_STICKY;
         }
+        startForeground(NOTIF_ID, buildProgressNotification("Starting…", 0, 0, true));
 
-        if (intent == null) { stopSelf(startId); return START_NOT_STICKY; }
+        if (intent == null) { if (cancellations.isEmpty()) stopSelfResult(latestStartId); return START_NOT_STICKY; }
 
-        // Chat export (ChatExportHook): write a generated HTML + download its media into a
-        // nested subfolder, so the whole export lands in the user's SAF folder and is visible.
         if (intent.getStringExtra("chatExportSubdir") != null) {
             handleChatExport(intent, startId);
+            return START_NOT_STICKY;
+        }
+        DownloadRequest request = null;
+        try {
+            if (intent.hasExtra(EXTRA_REQUEST)) request = DownloadRequest.fromJson(intent.getStringExtra(EXTRA_REQUEST));
+        } catch (RuntimeException invalid) {
+            showToast(getString(R.string.ig_toast_download_failed, "Invalid selected media request"));
+            if (cancellations.isEmpty()) stopSelfResult(latestStartId);
             return START_NOT_STICKY;
         }
 
@@ -110,26 +135,14 @@ public class DownloadSaveService extends Service {
         String filename  = intent.getStringExtra("filename");
         String mimeType  = intent.getStringExtra("mimeType");
         String username  = intent.getStringExtra("username");
-        // Audio-only from a plain MP4 (no separate DASH audio track): pull the audio out locally.
-        boolean extractAudio = intent.getBooleanExtra("extractAudio", false);
-        // Only part of the source (a post's music clip): start and length in ms; -1 = all of it.
-        long trimStartMs    = intent.getLongExtra("trimStartMs", 0);
-        long trimDurationMs = intent.getLongExtra("trimDurationMs", -1);
+        final String fallbackUrl = intent.getStringExtra("fallbackUrl");
+        final boolean extractAudio = intent.getBooleanExtra("extractAudio", false);
+        final long trimStartMs = intent.getLongExtra("trimStartMs", 0);
+        final long trimDurationMs = intent.getLongExtra("trimDurationMs", -1);
 
-        if (url == null || filename == null) { stopSelf(startId); return START_NOT_STICKY; }
-        // This service is exported so Instagram's process can reach it, which means any app can
-        // start it. Only accept Instagram CDN URLs and single-segment file names.
-        if (!DownloadRequestValidator.isAllowedMediaUrl(url)
-                || (audioUrl != null && !DownloadRequestValidator.isAllowedMediaUrl(audioUrl))) {
-            ModuleLog.line("(IE|DL) Rejected download request: URL is not an Instagram CDN https URL");
-            stopSelf(startId);
+        if (request == null && (url == null || filename == null)) {
+            if (cancellations.isEmpty()) stopSelfResult(latestStartId);
             return START_NOT_STICKY;
-        }
-        filename = DownloadRequestValidator.sanitizeFileName(filename, "instaeclipse_" + System.currentTimeMillis());
-        if (username != null) username = DownloadRequestValidator.sanitizeFileName(username, null);
-        if (mimeType != null && !mimeType.startsWith("image/") && !mimeType.startsWith("video/")
-                && !mimeType.startsWith("audio/")) {
-            mimeType = null;
         }
 
         SharedPreferences cache = ps.reso.instaeclipse.utils.core.CommonUtils.companionCache(this);
@@ -138,7 +151,7 @@ public class DownloadSaveService extends Service {
 
         if (saveUri.isEmpty()) {
             showToast(getString(R.string.ig_toast_no_download_folder));
-            stopSelf(startId);
+            if (cancellations.isEmpty()) stopSelfResult(latestStartId);
             return START_NOT_STICKY;
         }
 
@@ -146,26 +159,73 @@ public class DownloadSaveService extends Service {
         final String fUrl   = url, fAudio = audioUrl, fFile = filename;
         final String fMime  = mimeType, fUser = username, fSave = saveUri;
         final boolean fUF   = usernameFolder;
-        final boolean fExtract = extractAudio;
-        final long fTrimStart = trimStartMs, fTrimDur = trimDurationMs;
+        final DownloadRequest captured = request;
+        final DownloadEngine.Cancellation cancellation = new DownloadEngine.Cancellation();
+        final String jobToken = UUID.randomUUID().toString();
+        final int notificationId = jobToken.hashCode();
+        cancellations.put(sid, cancellation);
+        jobTokens.put(sid, jobToken);
 
-        new Thread(() -> {
+        jobs.submit(() -> {
+            activeJobId = sid;
             try {
-                SavedMedia saved = fExtract
-                        ? downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF, fTrimStart, fTrimDur)
-                        : fAudio != null
-                        ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
-                        : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
-                postDoneNotification(sid, "Saved: " + saved.filename, saved.mimeType, saved.uri);
+                DownloadFiles.check(cancellation);
+                if (captured != null) {
+                    try (DownloadEngine.Result result = DownloadEngine.execute(this, captured, cancellation,
+                            (phase, done, total) -> maybeUpdateProgress(phase,
+                                    total > 0 ? (int) Math.min(100, done * 100 / total) : 0, 100, total <= 0))) {
+                        pushProgress("Saving…", 99, 100, false);
+                        Uri saved = writeViaSaf(result.file, captured.filename, result.mime,
+                                fSave, captured.owner, fUF, cancellation);
+                        String verified = getString(result.lowerFallback ? R.string.ie_download_fallback_used
+                                : R.string.ie_download_verified, result.summary);
+                        postDoneNotification(notificationId, verified, result.mime, saved);
+                        showToast(verified);
+                        ModuleLog.line("(IE|Download) SAF published " + result.summary);
+                    }
+                    return;
+                }
+                SavedMedia saved;
+                if (extractAudio) {
+                    saved = downloadExtractAudioAndSave(fUrl, fFile, fSave, fUser, fUF, trimStartMs, trimDurationMs);
+                } else if (fallbackUrl != null) {
+                    try {
+                        saved = fAudio != null ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
+                                : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
+                    } catch (Exception failedUpgrade) {
+                        DownloadFiles.check(cancellation);
+                        ModuleLog.line("(IE|DL) Original DASH failed; using captured progressive fallback");
+                        saved = downloadAndSave(fallbackUrl, fFile, fMime, fSave, fUser, fUF);
+                    }
+                } else {
+                    saved = fAudio != null ? downloadMergeAndSave(fUrl, fAudio, fFile, fMime, fSave, fUser, fUF)
+                            : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
+                }
+                postDoneNotification(notificationId, "Saved: " + saved.filename, saved.mimeType, saved.uri);
                 showToast(getString(R.string.ig_toast_file_saved, saved.filename));
+                ModuleLog.line("(IE|Download) SAF published type=" + saved.mimeType);
             } catch (Throwable e) {
-                String reason = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-                postDoneNotification(sid, "Download failed: " + reason, null, null, false);
+                String reason = cancellation.isCancelled() ? getString(R.string.ie_download_cancelled)
+                        : e instanceof DownloadEngine.Failure failure ? failure.getMessage() : "Could not save download";
+                DownloadRequest retry = captured != null && !captured.options.allowFallback
+                        && e instanceof DownloadEngine.Failure failure && failure.canOfferFallback
+                        && !cancellation.isCancelled() ? new DownloadRequest(captured.mediaId, captured.owner, captured.filename, captured.manifest, captured.direct, new DownloadRequest.Options(captured.options.maxShortSide, captured.options.compatibility, true, captured.options.originalSelection), captured.audio) : null;
+                postFailureNotification(notificationId, reason, retry);
                 showToast(getString(R.string.ig_toast_download_failed, reason));
+                String diagnostic = e instanceof DownloadEngine.Failure failure
+                        && !failure.diagnostic.isEmpty() ? " " + failure.diagnostic : "";
+                ModuleLog.line("(IE|Download) " + (cancellation.isCancelled() ? "cancelled" : "failed")
+                        + " fallbackAvailable=" + (retry != null) + diagnostic);
             } finally {
-                stopSelf(sid);
+                Logging.flush();
+                cancellations.remove(sid);
+                jobTokens.remove(sid);
+                activeJobId = 0;
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (cancellations.isEmpty()) stopSelfResult(latestStartId);
+                });
             }
-        }, "ie-saf-" + startId).start();
+        });
 
         return START_NOT_STICKY;
     }
@@ -178,7 +238,7 @@ public class DownloadSaveService extends Service {
         File tmp = File.createTempFile("ie_dl_", ".bin", getCacheDir());
         try {
             pushProgress("Downloading…", 0, 100, false);
-            String responseType = downloadToFile(url, tmp, (done, total) -> {
+            String responseType = downloadToFile(url, tmp, mimeType, (done, total) -> {
                 if (total > 0) {
                     int pct = (int) (done * 95 / total);
                     maybeUpdateProgress("Downloading…", pct, 100);
@@ -186,12 +246,8 @@ public class DownloadSaveService extends Service {
                     maybeUpdateProgress("Downloading…", 0, 0, true);
                 }
             });
-            // Audio-only (#234): an .m4a is an MP4 container and would be sniffed as video — keep it.
-            MediaTypeDetector.Result detected = mimeType != null && mimeType.startsWith("audio/")
-                    ? new MediaTypeDetector.Result(MediaTypeDetector.Kind.UNKNOWN, mimeType, filename)
-                    : MediaTypeDetector.resolve(tmp, responseType, mimeType, filename);
-            ModuleLog.line("(IE|DL|Type) requested=" + mimeType + " response=" + responseType
-                    + " detected=" + detected.kind + " file=" + detected.filename);
+            MediaTypeDetector.Result detected = MediaTypeDetector.verified(responseType, filename);
+            ModuleLog.line("(IE|DL|Type) detected=" + detected.kind);
             pushProgress("Saving…", 97, 100, false);
             Uri uri = writeViaSaf(tmp, detected.filename, detected.mimeType,
                     saveUri, username, usernameFolder);
@@ -214,7 +270,7 @@ public class DownloadSaveService extends Service {
         try {
             // Video download: 0–60 %
             pushProgress("Downloading video…", 0, 100, false);
-            downloadToFile(videoUrl, tv, (done, total) -> {
+            downloadToFile(videoUrl, tv, "video/mp4", (done, total) -> {
                 if (total > 0) {
                     int pct = (int) (done * 60 / total);
                     maybeUpdateProgress("Downloading video…", pct, 100);
@@ -223,7 +279,7 @@ public class DownloadSaveService extends Service {
 
             // Audio download: 60–80 %
             pushProgress("Downloading audio…", 60, 100, false);
-            downloadToFile(audioUrl, ta, (done, total) -> {
+            downloadToFile(audioUrl, ta, "audio/mp4", (done, total) -> {
                 if (total > 0) {
                     int pct = 60 + (int) (done * 20 / total);
                     maybeUpdateProgress("Downloading audio…", pct, 100);
@@ -261,7 +317,7 @@ public class DownloadSaveService extends Service {
         File out = new File(cacheDir, "ie_xa_" + ts + ".m4a");
         try {
             pushProgress("Downloading audio…", 0, 100, false);
-            downloadToFile(videoUrl, tv, (done, total) -> {
+            DownloadEngine.fetchAudioSource(this, videoUrl, tv, cancellations.get(activeJobId), (phase, done, total) -> {
                 if (total > 0) maybeUpdateProgress("Downloading audio…", (int) (done * 85 / total), 100);
             });
             pushProgress("Extracting audio…", 90, 100, true);
@@ -334,28 +390,15 @@ public class DownloadSaveService extends Service {
     private Uri writeViaSaf(File src, String filename, String mimeType,
                              String saveUri, String username, boolean usernameFolder)
             throws Exception {
-        DocumentFile dir = DocumentFile.fromTreeUri(this, Uri.parse(saveUri));
-        if (dir == null || !dir.canWrite()) {
-            throw new Exception("SAF folder not writable — was the permission revoked?");
-        }
+        return writeViaSaf(src, filename, mimeType, saveUri, username, usernameFolder,
+                cancellations.get(activeJobId));
+    }
 
-        if (usernameFolder && username != null && !username.isEmpty()) {
-            DocumentFile sub = dir.findFile(username);
-            if (sub == null || !sub.isDirectory()) sub = dir.createDirectory(username);
-            if (sub == null) throw new Exception("Cannot create username sub-folder");
-            dir = sub;
-        }
-
-        DocumentFile file = dir.createFile(mimeType, filename);
-        if (file == null) throw new Exception("SAF createFile returned null");
-
-        try (FileInputStream in  = new FileInputStream(src);
-             OutputStream    os  = getContentResolver().openOutputStream(file.getUri())) {
-            if (os == null) throw new Exception("SAF openOutputStream returned null");
-            byte[] buf = new byte[32768]; int n;
-            while ((n = in.read(buf)) != -1) os.write(buf, 0, n);
-        }
-        return file.getUri();
+    private Uri writeViaSaf(File src, String filename, String mimeType,
+            String saveUri, String username, boolean usernameFolder,
+            DownloadEngine.Cancellation cancellation) throws Exception {
+        return DownloadPublisher.saveToSaf(this, src, filename, mimeType, saveUri,
+                username, usernameFolder, cancellation);
     }
 
     // ── Chat export (HTML + media batch into a nested subfolder) ───────────────
@@ -380,11 +423,17 @@ public class DownloadSaveService extends Service {
         final String fSave = saveUri;
         if (fSave == null || fSave.isEmpty()) {
             showToast(getString(R.string.ig_toast_no_download_folder));
-            stopSelf(startId);
+            if (cancellations.isEmpty()) stopSelfResult(latestStartId);
             return;
         }
 
-        new Thread(() -> {
+        final DownloadEngine.Cancellation cancellation = new DownloadEngine.Cancellation();
+        cancellations.put(startId, cancellation);
+        String jobToken = UUID.randomUUID().toString();
+        jobTokens.put(startId, jobToken);
+        final int notificationId = jobToken.hashCode();
+        jobs.submit(() -> {
+            activeJobId = startId;
             int saved = 0;
             int total = urls != null ? urls.length : 0;
             try {
@@ -403,11 +452,12 @@ public class DownloadSaveService extends Service {
                 final long INLINE_EACH_MAX  = 16L * 1024 * 1024; // skip inlining a single file over 16 MB
                 final long INLINE_TOTAL_MAX = 48L * 1024 * 1024; // keep the whole HTML openable
                 for (int i = 0; i < total; i++) {
+                    DownloadFiles.check(cancellation);
                     maybeUpdateProgress("Saving media " + (i + 1) + "/" + total,
                             (int) ((i + 1) * 100L / Math.max(1, total)), 100);
                     File tmp = File.createTempFile("ie_cm_", ".bin", getCacheDir());
                     try {
-                        downloadToFile(urls[i], tmp, null);
+                        downloadToFile(urls[i], tmp, mimes[i], null);
                         long len = tmp.length();
                         if (len > 0) {
                             writeFileToDir(dir, tmp, names[i], mimes[i]);
@@ -440,17 +490,24 @@ public class DownloadSaveService extends Service {
                         htmp.delete(); }
                 }
                 final int fSaved = saved;
-                ModuleLog.line("(IE|Export|Service) saved html + " + fSaved + "/" + total + " media to " + subdir);
-                postDoneNotification(startId, getString(R.string.ig_export_media_saved, fSaved, subdir), "text/html", htmlUri, true);
+                DownloadFiles.check(cancellation);
+                ModuleLog.line("(IE|Export|Service) saved media=" + fSaved + "/" + total);
+                postDoneNotification(notificationId, getString(R.string.ig_export_media_saved, fSaved, subdir), "text/html", htmlUri, true);
                 showToast(getString(R.string.ig_export_media_saved, fSaved, subdir));
             } catch (Throwable e) {
-                ModuleLog.line("(IE|ChatExport|Service) failed: " + e);
-                postDoneNotification(startId, "Export failed: " + e.getMessage(), null, null, false);
-                showToast(getString(R.string.ig_toast_download_failed, String.valueOf(e.getMessage())));
+                ModuleLog.line("(IE|ChatExport|Service) failed type=" + e.getClass().getSimpleName());
+                postDoneNotification(notificationId, "Export failed", null, null);
+                showToast(getString(R.string.ig_toast_download_failed, "Export failed"));
             } finally {
-                stopSelf(startId);
+                Logging.flush();
+                cancellations.remove(startId);
+                jobTokens.remove(startId);
+                activeJobId = 0;
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (cancellations.isEmpty()) stopSelfResult(latestStartId);
+                });
             }
-        }, "ie-chatexport-" + startId).start();
+        });
     }
 
     /** Reads a (small) file fully into memory — used to base64-inline media into the export HTML. */
@@ -489,13 +546,18 @@ public class DownloadSaveService extends Service {
             existing.delete();
         DocumentFile file = dir.createFile(mimeType != null ? mimeType : "application/octet-stream", filename);
         if (file == null) throw new Exception("SAF createFile returned null: " + filename);
-        try (FileInputStream in = new FileInputStream(src);
-             OutputStream os = getContentResolver().openOutputStream(file.getUri())) {
-            if (os == null) throw new Exception("SAF openOutputStream returned null");
-            byte[] buf = new byte[32768]; int n;
-            while ((n = in.read(buf)) != -1) os.write(buf, 0, n);
+        boolean complete = false;
+        try {
+            try (OutputStream os = getContentResolver().openOutputStream(file.getUri())) {
+                if (os == null) throw new Exception("SAF openOutputStream returned null");
+                DownloadFiles.copy(src, os, cancellations.get(activeJobId));
+            }
+            DownloadFiles.check(cancellations.get(activeJobId));
+            complete = true;
+            return file.getUri();
+        } finally {
+            if (!complete) file.delete();
         }
-        return file.getUri();
     }
 
     // ── Network / merge utilities ─────────────────────────────────────────────
@@ -506,57 +568,11 @@ public class DownloadSaveService extends Service {
         void onProgress(long bytesRead, long totalBytes);
     }
 
-    private static String downloadToFile(String url, File dest, ProgressCallback cb)
+    private String downloadToFile(String url, File dest, String mime, ProgressCallback cb)
             throws Exception {
-        HttpURLConnection conn = openValidatedConnection(url);
-        String contentType = conn.getContentType();
-        long total = conn.getContentLengthLong(); // -1 if server doesn't send Content-Length
-        if (total > MAX_DOWNLOAD_BYTES) {
-            conn.disconnect();
-            throw new java.io.IOException("File too large");
-        }
-        try (InputStream in = conn.getInputStream();
-             FileOutputStream fos = new FileOutputStream(dest)) {
-            byte[] buf = new byte[32768];
-            long downloaded = 0;
-            int n;
-            while ((n = in.read(buf)) != -1) {
-                fos.write(buf, 0, n);
-                downloaded += n;
-                if (downloaded > MAX_DOWNLOAD_BYTES) throw new java.io.IOException("File too large");
-                if (cb != null) cb.onProgress(downloaded, total);
-            }
-        } finally {
-            conn.disconnect();
-        }
-        return contentType;
+        return DownloadEngine.fetch(this, url, dest, mime, cancellations.get(activeJobId),
+                (phase, done, total) -> { if (cb != null) cb.onProgress(done, total); });
     }
-
-    /**
-     * Opens {@code url}, following up to 5 redirects manually so that every hop is checked
-     * against the CDN allowlist. Returns a connection with a 200 response.
-     */
-    private static HttpURLConnection openValidatedConnection(String url) throws Exception {
-        String current = url;
-        for (int hop = 0; hop < 5; hop++) {
-            if (!DownloadRequestValidator.isAllowedMediaUrl(current)) {
-                throw new java.io.IOException("Not an Instagram CDN link");
-            }
-            HttpURLConnection conn = (HttpURLConnection) new URL(current).openConnection();
-            conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
-            conn.setReadTimeout(READ_TIMEOUT_MS);
-            conn.setInstanceFollowRedirects(false);
-            conn.setRequestProperty("User-Agent", UA);
-            int code = conn.getResponseCode();
-            if (code == HttpURLConnection.HTTP_OK) return conn;
-            String location = conn.getHeaderField("Location");
-            conn.disconnect();
-            if (code / 100 != 3 || location == null) throw new java.io.IOException("HTTP " + code);
-            current = new URL(new URL(current), location).toString();
-        }
-        throw new java.io.IOException("Too many redirects");
-    }
-
     private static void mergeVideoAudio(String vp, String ap, String op) throws Exception {
         MediaExtractor vEx = new MediaExtractor(), aEx = new MediaExtractor();
         MediaMuxer mux = new MediaMuxer(op, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
@@ -632,23 +648,44 @@ public class DownloadSaveService extends Service {
 
     private Notification buildProgressNotification(String text, int progress, int max,
                                                     boolean indeterminate) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return new Notification.Builder(this, CHANNEL_ID)
-                    .setContentTitle("InstaEclipse")
-                    .setContentText(text)
-                    .setSmallIcon(android.R.drawable.stat_sys_download)
-                    .setProgress(max, progress, indeterminate)
-                    .setOngoing(true)
-                    .build();
-        }
-        //noinspection deprecation
-        return new Notification.Builder(this)
-                .setContentTitle("InstaEclipse")
+        Notification.Builder builder = Build.VERSION.SDK_INT >= 26
+                ? new Notification.Builder(this, CHANNEL_ID) : new Notification.Builder(this);
+        builder
+                .setContentTitle(getString(R.string.module_display_name))
                 .setContentText(text)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setProgress(max, progress, indeterminate)
-                .setOngoing(true)
-                .build();
+                .setOngoing(true);
+        int jobId = activeJobId;
+        if (jobId != 0) {
+            String token = jobTokens.get(jobId);
+            Intent cancel = new Intent(this, DownloadSaveService.class).setAction(ACTION_CANCEL)
+                    .setData(Uri.parse("instaeclipse-download://cancel/" + token))
+                    .putExtra("jobId", jobId).putExtra("jobToken", token);
+            PendingIntent action = PendingIntent.getService(this, jobId, cancel,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            builder.addAction(new Notification.Action.Builder(null, getString(android.R.string.cancel), action).build());
+        }
+        return builder.build();
+    }
+
+    private void postFailureNotification(int startId, String reason, DownloadRequest retry) {
+        Notification.Builder builder = Build.VERSION.SDK_INT >= 26
+                ? new Notification.Builder(this, CHANNEL_ID) : new Notification.Builder(this);
+        builder.setContentTitle(getString(R.string.module_display_name)).setContentText(reason)
+                .setSmallIcon(android.R.drawable.stat_notify_error).setAutoCancel(true)
+                .setStyle(new Notification.BigTextStyle().bigText(reason + (retry == null ? ""
+                        : "\n" + getString(R.string.ie_download_fallback_prompt))));
+        if (retry != null) {
+            Intent intent = new Intent(this, DownloadSaveService.class)
+                    .setData(Uri.parse("instaeclipse-download://retry/" + UUID.randomUUID()))
+                    .putExtra(EXTRA_REQUEST, retry.toJson());
+            PendingIntent action = PendingIntent.getForegroundService(this, DONE_NOTIF_BASE + startId,
+                    intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+            builder.addAction(new Notification.Action.Builder(null,
+                    getString(R.string.ie_download_retry_lower), action).build());
+        }
+        nm.notify(startId, builder.build());
     }
 
     /**
@@ -661,13 +698,11 @@ public class DownloadSaveService extends Service {
      * in the device's default viewer (gallery, video player, etc.).
      */
     private void postDoneNotification(int startId, String text, String mimeType, Uri fileUri) {
-        postDoneNotification(startId, text, mimeType, fileUri, true);
+        postDoneNotification(startId, text, mimeType, fileUri, fileUri != null);
     }
 
-    /** @param ok false only for a real failure (uses the error icon); success uses the download-done
-     *  check icon even when there is no file to open, so a finished export never looks like a warning. */
-    private void postDoneNotification(int startId, String text, String mimeType, Uri fileUri, boolean ok) {
-        int icon = ok
+    private void postDoneNotification(int startId, String text, String mimeType, Uri fileUri, boolean success) {
+        int icon = success
                 ? android.R.drawable.stat_sys_download_done
                 : android.R.drawable.stat_notify_error;
 
@@ -693,28 +728,35 @@ public class DownloadSaveService extends Service {
             //noinspection deprecation
             builder = new Notification.Builder(this);
         }
-        builder.setContentTitle("InstaEclipse")
+        builder.setContentTitle(getString(R.string.module_display_name))
                .setContentText(text)
+               .setStyle(new Notification.BigTextStyle().bigText(text))
                .setSmallIcon(icon)
                .setAutoCancel(true);
         if (contentIntent != null) builder.setContentIntent(contentIntent);
-        nm.notify(DONE_NOTIF_BASE + startId, builder.build());
+        nm.notify(startId, builder.build());
     }
 
     private void showToast(String msg) {
         // Use application context — service context is invalid after stopSelf() fires
         Context appCtx = getApplicationContext();
         new Handler(Looper.getMainLooper()).post(() ->
-                ps.reso.instaeclipse.utils.toast.IeToast.makeText(appCtx, msg, Toast.LENGTH_SHORT).show());
+                Toast.makeText(appCtx, msg, Toast.LENGTH_SHORT).show());
     }
 
     private void ensureChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel ch = new NotificationChannel(
-                    CHANNEL_ID, "InstaEclipse Downloads", NotificationManager.IMPORTANCE_LOW);
+                    CHANNEL_ID, getString(R.string.module_download_channel_name), NotificationManager.IMPORTANCE_LOW);
             ch.setSound(null, null);
             nm.createNotificationChannel(ch);
         }
+    }
+
+    @Override public void onDestroy() {
+        for (DownloadEngine.Cancellation cancellation : cancellations.values()) cancellation.cancel();
+        jobs.shutdownNow();
+        super.onDestroy();
     }
 
     @Override public IBinder onBind(Intent intent) { return null; }

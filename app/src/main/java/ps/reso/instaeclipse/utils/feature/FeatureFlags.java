@@ -2,6 +2,17 @@ package ps.reso.instaeclipse.utils.feature;
 
 // Written from the settings receiver / menus, read from hook threads: volatile for visibility.
 public class FeatureFlags {
+    // Upstream selection stays the default; Custom opts into the verified downloader.
+    public static volatile boolean showHideChatButton = false;
+    public static volatile boolean showDeletedMessagesButton = false;
+    public static volatile boolean keepUnsentInChat = false;
+    public static volatile boolean downloaderUseOriginal = true;
+    public static volatile int downloaderQualityMaxShortSide = 0;
+    public static volatile int feedCornerRadius = 0;       // rounded feed post corners in dp (#276), 0 = square
+    public static volatile int storyTrayScale = 100;       // story tray size in percent (#283), 100 = Instagram's
+    public static volatile String storyRingColor = "";     // unseen story ring: "#RRGGBB" or "#RRGGBB,#RRGGBB", "" = Instagram's (#283)
+    public static volatile boolean downloaderCompatibility = false;
+    public static volatile boolean downloaderAllowFallback = false;
 
     // Dev Options
     public static volatile boolean isDevEnabled = false;
@@ -49,12 +60,16 @@ public class FeatureFlags {
     public static volatile boolean chatExport = false; // header button: export the open chat to HTML (#225)
     public static volatile boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
     public static volatile boolean translateMessages = false; // "Translate" in the DM message long-press menu
+    public static volatile boolean bulkUnsend = false; // "Unsend multiple" in the DM message long-press menu (#245)
     public static volatile boolean keepEditHistory = false; // show previous text of edited DMs (#243)
     public static volatile boolean offerMediaInfo = false; // "Media info" row in the post menu (#231)
     public static volatile boolean offerPlaybackSpeed = false; // "Playback speed" row for feed videos (#247)
     public static volatile boolean forceReelScrubber = false; // always show IG's reel seek bar (#247)
+    public static volatile boolean holdLeftSlowMotion = false; // hold the left half of a reel: 0.5x instead of IG's 2x
     public static volatile boolean offerCopyImage = false; // offer "Copy image to clipboard" when downloading a photo (#228)
     public static volatile boolean enableVoiceDownload = false; // Download row for DM voice messages (#223)
+    public static volatile boolean enableStickerDownload = false; // Download row for DM stickers and GIFs
+    public static volatile boolean enableDmMediaDownload = false; // Download row for DM photos/videos (named + foldered like posts)
     public static volatile boolean offerAudioDownload = false; // ask Video / Audio only when downloading a video (#234)
     public static volatile boolean maxUploadQuality = false; // force IG's "Upload at highest quality" switch always on
     public static volatile boolean expandCaptions = false; // feed captions without "… more" (#246)
@@ -71,6 +86,7 @@ public class FeatureFlags {
     public static volatile boolean reelsAutoScroll = false; // unlock Instagram's own Reels auto-scroll option
     public static volatile boolean disableSwipeToCamera = false; // sideways swipe on the feed no longer opens the camera
     public static volatile boolean followingOnlyFeed = false; // home feed shows only accounts you follow
+    public static volatile boolean confirmFeedRefresh = false; // ask before pull-to-refresh reloads the home feed (#278)
     public static volatile boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static volatile boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
 
@@ -107,18 +123,24 @@ public class FeatureFlags {
     public static volatile boolean disableStoryFlipping = false;
     public static volatile boolean disableVideoAutoPlay = false;
     public static volatile boolean spoofLastSeen = false;
+    public static volatile boolean disableSearchHistory = false; // keep searches out of Recent (#280)
+    public static volatile boolean confirmCalls = false;       // ask before a chat call starts (#277)
     public static volatile boolean showFollowerToast = false;
     public static volatile boolean showFeatureToasts = false;
     public static volatile boolean disableRepost = false;
     public static volatile boolean followListExport = false; // Export CSV pill on followers/following lists (#224)
+    public static volatile boolean followersHistory = false; // who unfollowed / followed you, checked on your Followers tab
     public static volatile boolean commentSearch = false; // search the loaded comments of a post (#230)
     public static volatile boolean storyInfo = false; // Story Info / Quiz Answer / Poll Results in the story menu
     public static volatile boolean storyLinks = false; // copy link-sticker urls from the story menu
     public static volatile boolean storyViewerSearch = false; // search box over your story viewers list
     public static volatile boolean savedOnProfile = false;        // #237: Saved button on your own profile
     public static volatile boolean profileFollowsYouLabel = false; // "Follows you" label on profiles (#239)
+    public static volatile boolean fancyBioFont = false; // Edit profile: fancy (Unicode) fonts for the bio
     public static volatile boolean likeUndo = false; // hold likes for a few seconds with an Undo bar (#235)
     public static volatile boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)
+    public static volatile String  exactTimestampFormat = ""; // its SimpleDateFormat pattern, "" = device default (#265)
+    public static volatile String  spoofDevice = "";          // device Instagram sees: "" = real, "pixel", "s26" (DeviceSpoofHook)
     public static volatile boolean hideShareCreateGroup = false; // hide "Create group" on the DM share sheet (#240)
 
 

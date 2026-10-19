@@ -73,11 +73,11 @@ public class HomeFragment extends Fragment {
             // Ghost mode
             "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "allowScreenshots",
             "isGhostScreenshot", "isGhostViewOnce", "permanentViewMode", "keepEphemeralMessages",
-            "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "translateMessages", "chatExport",
+            "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "translateMessages", "bulkUnsend", "chatExport",
             // Ads & analytics
             "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally",
             // Clean feed
-            "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideCommunityNotes", "followingOnlyFeed",
+            "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "confirmFeedRefresh", "hideCommunityNotes", "followingOnlyFeed",
             "hidePlusUpsells", "expandCaptions",
             // Distraction-free
             "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore",
@@ -85,11 +85,11 @@ public class HomeFragment extends Fragment {
             // Navigation bar
             "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile",
             // Misc
-            "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
+            "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableSearchHistory", "confirmCalls", "disableRepost", "showFollowerToast",
             "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
             "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
-            "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "savedOnProfile",
-            "storyViewerSearch", "storyLinks", "storyInfo", "commentSearch", "followListExport",
+            "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "fancyBioFont", "savedOnProfile",
+            "storyViewerSearch", "storyLinks", "storyInfo", "commentSearch", "followListExport", "followersHistory",
             // Lock / hide chats
             "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint",
             "hideSpecificChats",
@@ -98,8 +98,8 @@ public class HomeFragment extends Fragment {
             // Downloader
             "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload",
             "downloaderUsernameFolder", "downloaderAddTimestamp", "copyMediaLink", "offerAudioDownload",
-            "enableVoiceDownload", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed",
-            "forceReelScrubber", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories",
+            "enableVoiceDownload", "enableStickerDownload", "enableDmMediaDownload", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed",
+            "forceReelScrubber", "holdLeftSlowMotion", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories",
             // Developer
             "isDevEnabled", "removeBuildExpiredPopup"
     };
@@ -178,6 +178,7 @@ public class HomeFragment extends Fragment {
      * as a signal — FeaturesFragment remains the one that syncs its contents into the cache.
      */
     private String pingNonce;
+    private ps.reso.instaeclipse.utils.ipc.ModuleReplies.Pending pingReply;
 
     private final BroadcastReceiver pingReceiver = new BroadcastReceiver() {
         @Override
@@ -259,7 +260,7 @@ public class HomeFragment extends Fragment {
         if (contributorsScroller != null) contributorsScroller.stop();
         if (specialThanksScroller != null) specialThanksScroller.stop();
         if (pingReceiverRegistered) {
-            try { requireContext().unregisterReceiver(pingReceiver); } catch (Throwable ignored) { }
+            if (pingReply != null) { pingReply.cancel(); pingReply = null; }
             pingReceiverRegistered = false;
         }
     }
@@ -396,12 +397,13 @@ public class HomeFragment extends Fragment {
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_PREFS");
         try {
             // Same registration as FeaturesFragment: the reply comes from the Instagram process.
-            ps.reso.instaeclipse.utils.core.IpcSecurity.registerReplyReceiver(requireContext(), pingReceiver, filter);
+            if (pingReply != null) pingReply.cancel();
             pingReceiverRegistered = true;
             pingNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
-            ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(),
-                    new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS")
-                            .putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, pingNonce));
+            pingReply = ps.reso.instaeclipse.utils.core.IpcSecurity.requestReply(requireContext(),
+                    new Intent("ps.reso.instaeclipse.ACTION_REQUEST_PREFS").setPackage(activePackage)
+                            .putExtra(ps.reso.instaeclipse.utils.core.IpcSecurity.EXTRA_NONCE, pingNonce),
+                    "ps.reso.instaeclipse.ACTION_SEND_PREFS", pingReceiver);
         } catch (Throwable ignored) { }
     }
 

@@ -5,11 +5,13 @@
 
 
     <application
+        android:name=".InstaEclipseApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:description="@string/module_description"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.InstaEclipse"
@@ -26,23 +28,23 @@
 
         <activity
             android:name=".mods.devops.config.JsonImportActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.InstaEclipse">
         </activity>
 
         <activity
             android:name=".mods.devops.config.JsonExportActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.InstaEclipse" />
 
         <activity
             android:name=".mods.location.LocationPickerActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.InstaEclipse" />
 
         <activity
             android:name=".ui.theme.ThemeCustomizerActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.InstaEclipse" />
 
         <!-- "Download with InstaEclipse" share target for Instagram post/reel links (#236). -->
@@ -66,7 +68,7 @@
              whose permission belongs to the companion app. -->
         <service
             android:name=".mods.media.DownloadSaveService"
-            android:exported="true"
+            android:exported="false"
             android:foregroundServiceType="dataSync" />
 
         <!-- Logs tab: hands Instagram's hooked process an append-only FD on a file in the
@@ -85,13 +87,16 @@
             android:authorities="ps.reso.instaeclipse.prefsync"
             android:exported="true" />
 
+        <activity android:name=".mods.media.VideoFramePickerActivity" android:exported="false" android:theme="@style/Theme.InstaEclipse" />
+        <service android:name=".mods.media.DownloadBrokerService" android:exported="true" />
+
         <!-- Xposed Meta-data -->
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Enhance your Instagram experience" />
+            android:value="@string/module_description" />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />
@@ -101,6 +106,14 @@
         <meta-data
             android:name="xposedscope"
             android:resource="@array/target_app" />
+
+        <!-- libxposed service (API 102): the framework hands the module app its XposedService
+             binder through this provider (see RemotePrefsMirror). -->
+        <provider
+            android:name="io.github.libxposed.service.XposedProvider"
+            android:authorities="${applicationId}.XposedService"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
     </application>
 
     <!-- Permissions -->

@@ -5,13 +5,14 @@ plugins {
 android {
     namespace 'ps.reso.instaeclipse'
     compileSdk 34
+    buildFeatures { buildConfig true }
 
     defaultConfig {
         applicationId "ps.reso.instaeclipse"
         minSdkVersion 28
         targetSdk 36
-        versionCode 18
-        versionName '0.8.0'
+        versionCode 19
+        versionName '0.8.1'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,7 +29,17 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests.all {
+            ['instaeclipse.ffmpeg', 'instaeclipse.ffprobe', 'instaeclipse.fixtureOutput'].each { key ->
+                if (System.getProperty(key) != null) systemProperty key, System.getProperty(key)
+            }
+        }
+    }
     packagingOptions {
+        resources {
+            merges += 'META-INF/xposed/*'
+        }
         jniLibs {
             useLegacyPackaging true
         }
@@ -50,9 +61,17 @@ dependencies {
     implementation libs.fileprefs
     // Testing dependencies
     testImplementation libs.junit
+    testRuntimeOnly files('libs/api-82.jar')
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core.v361
 
-    // Compile-only dependency
+    // Xposed APIs, provided by the framework at runtime. The module loads through libxposed API 102
+    // (META-INF/xposed: Vector 2.2+, LSPatch 1.0+); the legacy API stays behind the compat layer.
+    // See docs/xposed-api-102.
     compileOnly files('libs/api-82.jar')
+    compileOnly 'io.github.libxposed:api:102.0.0'
+    // Lets the companion write remote preferences that the hooked app reads. The classes of io.github.libxposed:service/interface 102.0.0 (Apache-2.0), used as jars: the
+    // AARs declare minCompileSdk 37, which this project's AGP/compileSdk 34 doesn't meet; their
+    // XposedProvider is declared in AndroidManifest.xml.
+    implementation files('libs/modern/libxposed-service-102.0.0.jar', 'libs/modern/libxposed-interface-102.0.0.jar')
 }

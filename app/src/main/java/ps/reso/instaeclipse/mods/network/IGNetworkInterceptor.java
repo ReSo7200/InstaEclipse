@@ -4,10 +4,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_LoadPackage;
 import ps.reso.instaeclipse.mods.misc.FollowStatusHook;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -128,6 +128,11 @@ public class IGNetworkInterceptor {
                                     final String host = uri.getHost(); // null for opaque/relative URIs — guard before use
                                     boolean shouldDrop = false;
 
+
+                                    // Don't save searches (#280): the server keeps Recent from these
+                                    if (FeatureFlags.disableSearchHistory) {
+                                        shouldDrop |= uri.getPath().contains("/fbsearch/register_recent_search_click/");
+                                    }
 
                                     // Ghost Mode URIs
                                     if (FeatureFlags.isGhostSeen) {
@@ -263,6 +268,10 @@ public class IGNetworkInterceptor {
                 XposedHelpers.findAndHookMethod("com.instagram.api.tigon.TigonServiceLayer", classLoader, "startRequest",
                         random_param_1, random_param_2, random_param_3, dropHook);
                 hookChainEntry(classLoader, random_param_1, random_param_2, random_param_3, dropHook);
+                // These act on every matching request, so they are in place once the hook is.
+                for (String key : new String[]{"BlockAnalytics", "DisableStoriesSection", "DisableFeedSection",
+                        "DisableReelsSection", "DisableExploreSection", "DisableCommentsSection"})
+                    FeatureStatusTracker.setHooked(key);
             } else {
                 ModuleLog.line("(InstaEclipse | Interceptor): Could not resolve required classes or fields.");
             }

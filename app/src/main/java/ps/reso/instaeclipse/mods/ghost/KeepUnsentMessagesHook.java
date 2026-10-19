@@ -18,12 +18,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.ghost.ThreadNames;
+import ps.reso.instaeclipse.utils.ghost.CurrentConversation;
+import ps.reso.instaeclipse.utils.ghost.UnsentRetentionState;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -36,8 +38,9 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  * saved to {@link ps.reso.instaeclipse.utils.ghost.UnsentLog}, read back by the "Unsent messages"
  * viewer and the in-thread button. Instagram then removes the message as usual.
  *
- * <p>Keeping the message in the chat itself was dropped: Instagram's thread syncs remove it again
- * (and from its local database) through paths that could not be covered reliably.
+ * <p>History-only remains the default. Optional in-chat retention requires a verified different
+ * sender in the removing store's account and a compatible reconcile binding. It is session-only;
+ * own or unresolved deletions always keep Instagram's normal removal behavior.
  *
  * <p>Robustness: no obfuscated X.* names are hardcoded. The store is anchored by its "Posted
  * RemoveThreadEvent..." string; the thread entry class by its reconcile's "...deleted locally or
@@ -54,6 +57,13 @@ public class KeepUnsentMessagesHook {
             " is not in cache, may need to double check if this message is deleted locally or not";
     private static final String DTK = "com.instagram.model.direct.DirectThreadKey";
     private static final String CACHE_KEY = "KeepUnsent_remove";
+    private static final UnsentRetentionState retained = new UnsentRetentionState();
+    private UnsentMessageResolver ownership;
+    private boolean retentionReady;
+
+    public static void onSettingsChanged() {
+        if (!FeatureFlags.keepUnsentMessages || !FeatureFlags.keepUnsentInChat) retained.clear();
+    }
 
     /** Extract the thread id string from a DirectThreadKey (first non-empty String field). */
     private static String threadIdOf(Object dtk) {
@@ -76,6 +86,11 @@ public class KeepUnsentMessagesHook {
     public static volatile String currentThreadId = null;
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        CurrentConversation.install(bridge, classLoader);
+        ownership = UnsentMessageResolver.resolve(bridge, classLoader);
+        if (ownership != null) retentionReady = hookReconcile(bridge, classLoader);
+        ModuleLog.line("(IE|KeepUnsent) sender binding=" + (ownership != null)
+                + "; optional in-chat binding=" + retentionReady);
         resolveEntryClass(bridge, classLoader);
         hookRemovePrimitive(bridge, classLoader);
         hookCurrentThread(bridge, classLoader);
@@ -102,7 +117,6 @@ public class KeepUnsentMessagesHook {
                     if (param.args.length > 0) {
                         String id = threadIdOf(param.args[0]);
                         Object flag = param.args.length > 1 ? param.args[1] : null;
-                        ModuleLog.line("(IE|KeepUnsent|PROBE) igThreadIgid id=" + id + " flag=" + flag);
                         // Only treat flag==true as "thread entered/visible" to avoid background sync
                         // overwriting the current thread with other threads' ids.
                         if (id != null && Boolean.TRUE.equals(flag)) {
@@ -209,7 +223,34 @@ public class KeepUnsentMessagesHook {
         XC_MethodHook hook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                onSettingsChanged();
                 if (!FeatureFlags.keepUnsentMessages || param.args.length == 0) return;
+                // Bulk actions are excluded regardless of optional native sender discovery.
+                for (Object arg : param.args) if (arg instanceof String id && BulkUnsend.isOwnUnsend(id)) {
+                    retained.clearStore(param.thisObject);
+                    return;
+                }
+                UnsentMessageResolver.Selection selected = ownership == null || param.args.length < 3 ? null
+                        : ownership.lookup(param.thisObject, param.args[0],
+                        param.args[1] instanceof String ? (String) param.args[1] : null,
+                        param.args[2] instanceof String ? (String) param.args[2] : null);
+                if (selected != null && selected.own) {
+                    retained.forget(selected.threadEntry, selected.identity());
+                    return; // Do not save our own message; native deletion still runs.
+                }
+                if (selected != null) {
+                    String thread = CurrentConversation.threadIdOfKey(param.args[0]);
+                    logMessage(selected.message, thread, selected.accountId + ":" + thread + ":" + selected.identity());
+                    if (FeatureFlags.keepUnsentInChat && retentionReady
+                            && retained.protect(selected.threadEntry, param.thisObject, selected.accountId,
+                            thread, selected.identity(), selected.senderId, selected.message)) {
+                        param.setResult(null);
+                    }
+                    return;
+                }
+                // Unknown ownership is history-only, preserving the upstream logger fallback.
+                // Do not let a previously retained object reappear after this unresolved removal.
+                retained.clearStore(param.thisObject);
                 String threadId = threadIdOf(param.args[0]);
                 for (Object a : param.args) {
                     if (a instanceof String && ((String) a).length() >= 6) logRemoved(param.thisObject, param.args[0], threadId, (String) a);
@@ -261,6 +302,82 @@ public class KeepUnsentMessagesHook {
         }
     }
 
+    /** Optional, session-only reconcile protection; refuse ambiguous or unrelated entry classes. */
+    private boolean hookReconcile(DexKitBridge bridge, ClassLoader loader) {
+        try {
+            Set<Method> candidates = new LinkedHashSet<>();
+            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(
+                    MethodMatcher.create().usingStrings(RECONCILE_ANCHOR)))) {
+                Class<?> owner = data.getMethodInstance(loader).getDeclaringClass();
+                if (owner != ownership.entryType()) continue;
+                for (Method method : owner.getDeclaredMethods()) {
+                    Class<?>[] parameters = method.getParameterTypes();
+                    if (!Modifier.isStatic(method.getModifiers()) || method.getReturnType() != void.class
+                            || parameters.length != 6 || parameters[0] != owner) continue;
+                    boolean lists = true;
+                    for (int i = 1; i < parameters.length; i++)
+                        if (!List.class.isAssignableFrom(parameters[i])) lists = false;
+                    if (lists) candidates.add(method);
+                }
+            }
+            if (candidates.size() != 1) return false;
+            Method method = candidates.iterator().next();
+            method.setAccessible(true);
+            XposedBridge.hookMethod(method, new XC_MethodHook() {
+                @Override @SuppressWarnings("unchecked")
+                protected void afterHookedMethod(MethodHookParam param) {
+                    onSettingsChanged();
+                    if (!FeatureFlags.keepUnsentMessages || !FeatureFlags.keepUnsentInChat || param.hasThrowable()) return;
+                    Object[] args = param.args;
+                    if (args == null || args.length != 6 || args[0] == null) return;
+                    try {
+                        synchronized (args[0]) {
+                            List<Object> live = findLiveList(args);
+                            if (live == null) return;
+                            java.util.List<List<Object>> deltas = new java.util.ArrayList<>();
+                            for (int i = 1; i < args.length; i++)
+                                if (args[i] instanceof List && args[i] != live) deltas.add((List<Object>) args[i]);
+                            retained.reconcile(args[0], live, deltas, new UnsentRetentionState.Validator() {
+                                public String identity(Object message) { return ownership.identityOf(message); }
+                                public int insertionIndex(UnsentRetentionState.Record record, List<Object> messages) {
+                                    return ownership.insertionIndex(messages, record.message);
+                                }
+                                public boolean received(UnsentRetentionState.Record record, Object candidate) {
+                                    return ownership.stillReceived(record.store, args[0], candidate,
+                                            record.accountId, record.messageId, record.senderId);
+                                }
+                            });
+                        }
+                    } catch (Throwable failure) {
+                        ModuleLog.line("(IE|KeepUnsent) optional reconcile declined incompatible data");
+                    }
+                }
+            });
+            return true;
+        } catch (Throwable failure) {
+            ModuleLog.line("(IE|KeepUnsent) optional reconcile binding unavailable");
+            return false;
+        }
+    }
+
+    /** The live list must be the unique list argument also owned by this native thread entry. */
+    @SuppressWarnings("unchecked")
+    static List<Object> findLiveList(Object[] args) throws IllegalAccessException {
+        if (args == null || args.length < 2 || args[0] == null) return null;
+        Set<Object> fields = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Class<?> type = args[0].getClass(); type != null && type != Object.class; type = type.getSuperclass()) {
+            for (Field field : type.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers()) || !List.class.isAssignableFrom(field.getType())) continue;
+                field.setAccessible(true);
+                Object value = field.get(args[0]);
+                if (value != null) fields.add(value);
+            }
+        }
+        Set<Object> matches = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (int i = 1; i < args.length; i++) if (args[i] instanceof List && fields.contains(args[i])) matches.add(args[i]);
+        return matches.size() == 1 ? (List<Object>) matches.iterator().next() : null;
+    }
+
     // ── Thread entry lookup ──────────────────────────────────────────────────────
     /** The per-thread entry class (01eV on 452), which holds the thread's loaded messages. */
     private static Class<?> entryClass;
@@ -291,7 +408,9 @@ public class KeepUnsentMessagesHook {
     /** Finds message {@code id} in the store's entry for {@code threadKey} and logs its text. */
     @SuppressWarnings("unchecked")
     private static void logRemoved(Object store, Object threadKey, String threadId, String id) {
-        if (entryClass == null || store == null || threadKey == null || loggedIds.contains(id)) return;
+        if (entryClass == null || store == null || threadKey == null
+                || loggedIds.contains("unresolved:" + threadId + ":" + id)) return;
+        if (BulkUnsend.isOwnUnsend(id)) return; // our own bulk unsend, not the other side's
         try {
             Object entry = null;
             for (Method m : store.getClass().getDeclaredMethods()) {
@@ -311,20 +430,23 @@ public class KeepUnsentMessagesHook {
                 synchronized (v) {
                     for (Object msg : (List<Object>) v) {
                         if (!carriesId(msg, id, 0, Collections.newSetFromMap(new IdentityHashMap<>()))) continue;
-                        String body = bodyOf(msg);
-                        if (body == null) return;
-                        loggedIds.add(id);
-                        String who = ThreadNames.resolve(threadId);
-                        ps.reso.instaeclipse.utils.ghost.UnsentLog.add(threadId, who, body);
-                        ModuleLog.line("(IE|KeepUnsent) ✅ logged (thread=" + threadId + " who=" + who + "): "
-                                + (body.length() > 24 ? body.substring(0, 24) + "…" : body));
+                        logMessage(msg, threadId, "unresolved:" + threadId + ":" + id);
                         return;
                     }
                 }
             }
         } catch (Throwable t) {
-            ModuleLog.line("(IE|KeepUnsent) ⚠️ log failed: " + t);
+            ModuleLog.line("(IE|KeepUnsent) local history lookup unavailable");
         }
+    }
+
+    private static void logMessage(Object message, String threadId, String identity) {
+        if (loggedIds.contains(identity)) return;
+        String body = bodyOf(message);
+        if (body == null) return;
+        loggedIds.add(identity);
+        ps.reso.instaeclipse.utils.ghost.UnsentLog.add(threadId, ThreadNames.resolve(threadId), body);
+        ModuleLog.line("(IE|KeepUnsent) saved local history entry; thread resolved=" + (threadId != null));
     }
 
     /** The longest human-looking String in the message's object graph (its text). */

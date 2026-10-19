@@ -36,8 +36,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
@@ -708,6 +708,7 @@ public class CommentSearchHook {
             refresh.run();
         };
         Runnable idle = () -> {
+            focusable(dlg, true);
             bar.setVisibility(View.INVISIBLE);
             loadBtn.setText(I18n.t(ctx, R.string.ig_comment_search_load_all));
             pull.run();
@@ -720,6 +721,8 @@ public class CommentSearchHook {
         loadBtn.setOnClickListener(v -> {
             if (loading != null) { stopLoading(); idle.run(); return; }
             bar.setVisibility(View.VISIBLE);
+            // IG only fetches the next page while its own window has focus
+            focusable(dlg, false);
             loadAll(n -> {
                 loadBtn.setText(I18n.t(ctx, R.string.ig_comment_search_stop));
                 if (n != all.size()) pull.run();
@@ -748,6 +751,23 @@ public class CommentSearchHook {
             w.setLayout((int) (ctx.getResources().getDisplayMetrics().widthPixels * 0.92f), ViewGroup.LayoutParams.WRAP_CONTENT);
             w.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
+    }
+
+    /** Gives focus back to IG's window (or takes it again) while the dialog stays shown and tappable. */
+    private static void focusable(android.app.Dialog dlg, boolean on) {
+        android.view.Window w = dlg.getWindow();
+        if (w == null) return;
+        if (on) {
+            w.clearFlags(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+            return;
+        }
+        View f = w.getCurrentFocus();
+        if (f != null) {
+            ((android.view.inputmethod.InputMethodManager) dlg.getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(f.getWindowToken(), 0);
+            f.clearFocus();
+        }
+        w.addFlags(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
     private static boolean hit(String[] r, String q) {
@@ -940,7 +960,10 @@ public class CommentSearchHook {
                             it.putExtra("mediaNames", ns);
                             it.putExtra("mediaMimes", ms);
                         }
-                        ctx.startForegroundService(it);
+                        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, it, error -> {
+                            if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                    android.widget.Toast.makeText(ctx, error, android.widget.Toast.LENGTH_LONG).show());
+                        });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated comment export (" + cCount + " comments, "
                                 + media.size() + " media) to companion service: " + folder);

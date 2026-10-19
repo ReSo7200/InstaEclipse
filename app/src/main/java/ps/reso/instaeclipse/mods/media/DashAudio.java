@@ -45,6 +45,38 @@ public final class DashAudio {
         return null;
     }
 
+    private static final Pattern HEIGHT = Pattern.compile("\\bheight\\s*=\\s*\"(\\d+)\"");
+    private static final Pattern CODECS = Pattern.compile("\\bcodecs\\s*=\\s*\"([^\"]+)\"");
+
+    /**
+     * The tallest video Representation as {BaseURL, height}, or null. Ties go to the higher bitrate;
+     * {@code skipAv1} leaves AV1 streams out (MediaMuxer can not write AV1 before Android 14).
+     */
+    public static String[] bestVideo(String manifest, boolean skipAv1) {
+        if (manifest == null || manifest.isEmpty()) return null;
+        String best = null;
+        long bestH = -1, bestBw = -1;
+        Matcher sets = ADAPTATION.matcher(manifest);
+        while (sets.find()) {
+            String attrs = sets.group(1), body = sets.group(2);
+            if (isAudio(attrs) || isAudio(firstRepresentationAttrs(body))) continue;
+            Matcher reps = REPRESENTATION.matcher(body);
+            while (reps.find()) {
+                String ra = reps.group(1);
+                Matcher u = BASE_URL.matcher(reps.group(2));
+                Matcher h = HEIGHT.matcher(ra);
+                if (!u.find() || !h.find()) continue;
+                long height = Long.parseLong(h.group(1)), bw = bandwidth(ra);
+                Matcher c = CODECS.matcher(ra);
+                if (skipAv1 && c.find() && c.group(1).toLowerCase(java.util.Locale.ROOT).startsWith("av01")) continue;
+                if (height > bestH || (height == bestH && bw > bestBw)) {
+                    best = u.group(1); bestH = height; bestBw = bw;
+                }
+            }
+        }
+        return best == null ? null : new String[]{unescape(best.trim()), String.valueOf(bestH)};
+    }
+
     private static boolean isAudio(String attrs) {
         if (attrs == null) return false;
         String a = attrs.toLowerCase(java.util.Locale.ROOT);

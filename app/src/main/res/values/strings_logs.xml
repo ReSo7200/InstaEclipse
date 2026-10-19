@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Saved log · Instagram not running</string>
     <string name="logs_status_none">No supported Instagram app installed</string>
     <string name="logs_empty_title">No logs yet</string>
-    <string name="logs_empty_body">Open Instagram once with InstaEclipse enabled in LSPosed, then come back here and tap Refresh. Instagram\'s log is saved here automatically, even after Instagram is closed.</string>
+    <string name="logs_empty_body">Open Instagram once with InstaEclipse enabled in Vector, then come back here and tap Refresh. Instagram\'s log is saved here automatically, even after Instagram is closed.</string>
     <string name="logs_empty_filter_title">Nothing matches this filter</string>
     <string name="logs_empty_filter_body">Switch back to All to see every entry.</string>
     <string name="logs_nothing_to_copy">No logs to copy</string>

@@ -14,13 +14,18 @@ import org.luckypray.dexkit.result.MethodData;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -38,6 +43,7 @@ public class DisableDoubleTapLikeHook {
     // Reel double-taps reach it from the clips GestureDetector listener's onDoubleTap, so the
     // stack-gated HOOK blocks only double-tap likes; the like button (no onDoubleTap frame) works.
     private static final String CACHE_REELS_LIKE = "DoubleTapLikeReelsLike";
+    private static final String CACHE_BOUND_ACTION = "DoubleTapLikeBoundAction";
 
     private static final XC_MethodHook HOOK = new XC_MethodHook() {
         @Override
@@ -65,7 +71,9 @@ public class DisableDoubleTapLikeHook {
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         boolean cachedFeedHooked = false;
-        boolean cachedReelsHooked = false;
+        // Prefer the proven action boundary: suppressing the gesture callback itself can
+        // also swallow native skip/forward actions and gesture bookkeeping.
+        boolean cachedReelsHooked = installReelsLikeAction(bridge, classLoader);
         if (DexKitCache.isCacheValid()) {
             Method feedCached = DexKitCache.loadMethod("DoubleTapLike", classLoader);
             Method reelsCached = DexKitCache.loadMethod("DoubleTapLikeReels", classLoader);
@@ -73,12 +81,13 @@ public class DisableDoubleTapLikeHook {
 
             cachedFeedHooked = hookMethod(feedCached, HOOK)
                     | hookMethods(DexKitCache.loadMethods(CACHE_FEED_SPLIT, classLoader), HOOK) > 0;
-            boolean cachedLegacyReelsHooked = hookMethod(reelsCached, HOOK);
-            boolean cachedGestureReelsHooked = hookMethods(reelsGestureCached, REELS_GESTURE_HOOK) > 0;
-            boolean cachedReelsLikeHooked = hookMethods(DexKitCache.loadMethods(CACHE_REELS_LIKE, classLoader), HOOK) > 0;
-            cachedReelsHooked = cachedLegacyReelsHooked || cachedGestureReelsHooked || cachedReelsLikeHooked;
+            if (!cachedReelsHooked)
+                cachedReelsHooked = hookMethods(DexKitCache.loadMethods(CACHE_REELS_LIKE, classLoader), HOOK) > 0;
+            if (!cachedReelsHooked) cachedReelsHooked = hookMethod(reelsCached, HOOK);
+            if (!cachedReelsHooked)
+                cachedReelsHooked = hookMethods(reelsGestureCached, REELS_GESTURE_HOOK) > 0;
 
-            if (cachedFeedHooked && (cachedGestureReelsHooked || cachedReelsLikeHooked)) {
+            if (cachedFeedHooked && cachedReelsHooked) {
                 ModuleLog.line("(InstaEclipse | DoubleTapLike): Hooked (cached)");
                 FeatureStatusTracker.setHooked("DisableDoubleTapLike");
                 return;
@@ -88,6 +97,7 @@ public class DisableDoubleTapLikeHook {
             findAndHook(bridge, classLoader, cachedFeedHooked, cachedReelsHooked);
         } catch (Exception e) {
             ModuleLog.line("(InstaEclipse | DoubleTapLike): " + e.getMessage());
+            if (FeatureFlags.disableDoubleTapLike) FeatureStatusTracker.setBroken("DisableDoubleTapLike");
         }
     }
 
@@ -160,43 +170,192 @@ public class DisableDoubleTapLikeHook {
             }
         }
 
-        List<Method> reelsGestureMethods = findReelsGestureMethods(bridge, classLoader);
-        if (hookMethods(reelsGestureMethods, REELS_GESTURE_HOOK) > 0) {
-            DexKitCache.saveMethods("DoubleTapLikeReelsGestures", reelsGestureMethods);
-            reelsHooked = true;
-            ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels gesture callbacks hooked: " + reelsGestureMethods.size());
+        if (!reelsHooked) {
+            List<Method> reelsGestureMethods = findReelsGestureMethods(bridge, classLoader);
+            if (hookMethods(reelsGestureMethods, REELS_GESTURE_HOOK) > 0) {
+                DexKitCache.saveMethods("DoubleTapLikeReelsGestures", reelsGestureMethods);
+                reelsHooked = true;
+                ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels gesture callbacks hooked: " + reelsGestureMethods.size());
+            }
         }
 
-        List<ClassData> reelsClasses = bridge.findClass(FindClass.create()
-                .matcher(ClassMatcher.create()
-                        .usingStrings("clips_doubletap", "LIKE_FIRED")
-                )
-        );
-        for (ClassData cd : reelsClasses) {
-            List<MethodData> ecgMethods = bridge.findMethod(FindMethod.create()
-                    .matcher(MethodMatcher.create()
-                            .declaredClass(cd.getName())
-                            .usingStrings("clips_doubletap")
+        if (!reelsHooked) {
+            List<ClassData> reelsClasses = bridge.findClass(FindClass.create()
+                    .matcher(ClassMatcher.create()
+                            .usingStrings("clips_doubletap", "LIKE_FIRED")
                     )
             );
-            for (MethodData md : ecgMethods) {
-                try {
-                    Method method = md.getMethodInstance(classLoader);
-                    if (hookMethod(method, HOOK)) {
-                        DexKitCache.saveMethod("DoubleTapLikeReels", method);
-                        reelsHooked = true;
-                        ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels legacy hooked on " + cd.getName() + "." + md.getMethodName());
+            for (ClassData cd : reelsClasses) {
+                List<MethodData> ecgMethods = bridge.findMethod(FindMethod.create()
+                        .matcher(MethodMatcher.create()
+                                .declaredClass(cd.getName())
+                                .usingStrings("clips_doubletap")
+                        )
+                );
+                for (MethodData md : ecgMethods) {
+                    try {
+                        Method method = md.getMethodInstance(classLoader);
+                        if (hookMethod(method, HOOK)) {
+                            DexKitCache.saveMethod("DoubleTapLikeReels", method);
+                            reelsHooked = true;
+                            ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels legacy hooked on " + cd.getName() + "." + md.getMethodName());
+                        }
+                    } catch (Exception e) {
+                        ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels: " + e.getMessage());
                 }
             }
         }
         if (!reelsHooked) {
             ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels entry not found");
         }
-        if (feedHooked || reelsHooked) {
+        if (feedHooked && reelsHooked) {
             FeatureStatusTracker.setHooked("DisableDoubleTapLike");
+        } else if (FeatureFlags.disableDoubleTapLike) {
+            FeatureStatusTracker.setBroken("DisableDoubleTapLike");
+        }
+    }
+
+    private boolean installReelsLikeAction(DexKitBridge bridge, ClassLoader loader) {
+        try {
+            List<Method> proof = DexKitCache.isCacheValid()
+                    ? DexKitCache.loadMethods(CACHE_BOUND_ACTION, loader) : null;
+            if (proof == null || proof.size() != 4 || LikeActionBinding.create(proof.get(0),
+                    proof.get(1), proof.get(2), proof.subList(3, 4)) == null) {
+                // A negative result is version-scoped by DexKitCache, just like method entries.
+                if (DexKitCache.isCacheValid() && "absent".equals(DexKitCache.loadString(CACHE_BOUND_ACTION)))
+                    return false;
+                List<MethodData> setters = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                        .usingStrings("android_purge_26_q3_GestureActionHandler_setOnLikeMediaAction")));
+                List<MethodData> dispatchers = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                        .usingStrings("android_purge_26_q3_GestureActionHandler_handleDoubleTapMedia")));
+                List<MethodData> actions = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                        .name("invoke").usingStrings("android_purge_26_q3_LikeNavigator_onLikeMedia",
+                                "DOUBLE_TAP_MEDIA", "LIKE_FIRED")));
+                if (setters.size() != 1 || dispatchers.size() != 1 || actions.size() != 1) {
+                    DexKitCache.saveString(CACHE_BOUND_ACTION, "absent");
+                    return false;
+                }
+                Method setter = setters.get(0).getMethodInstance(loader);
+                Method dispatcher = dispatchers.get(0).getMethodInstance(loader);
+                Method action = actions.get(0).getMethodInstance(loader);
+                List<Method> invoked = new ArrayList<>();
+                for (MethodData data : dispatchers.get(0).getInvokes()) {
+                    try { invoked.add(data.getMethodInstance(loader)); }
+                    catch (ReflectiveOperationException | LinkageError ignored) { }
+                }
+                if (LikeActionBinding.create(setter, dispatcher, action, invoked) == null) return false;
+                Method contract = setter.getParameterTypes()[0].getMethod("invoke",
+                        Object.class, Object.class, Object.class, Object.class);
+                proof = Arrays.asList(setter, dispatcher, action, contract);
+                DexKitCache.saveMethods(CACHE_BOUND_ACTION, proof);
+            }
+            Method setter = proof.get(0), dispatcher = proof.get(1), action = proof.get(2);
+            if (hookedMethods.contains(signature(setter)) && hookedMethods.contains(signature(action))) return true;
+            if (hookedMethods.contains(signature(action))) return false;
+            BoundLikeCallbacks callbacks = new BoundLikeCallbacks(dispatcher);
+            setter.setAccessible(true);
+            action.setAccessible(true);
+            XC_MethodHook.Unhook setterHook = XposedBridge.hookMethod(setter, new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) {
+                    ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (!param.hasThrowable() && param.args.length == 1
+                            && action.getDeclaringClass().isInstance(param.args[0])) callbacks.bind(param.args[0]);
+                }
+            });
+            try {
+                XposedBridge.hookMethod(action, new XC_MethodHook() {
+                    @Override protected void beforeHookedMethod(MethodHookParam param) {
+                        ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                        if (callbacks.shouldBlock(FeatureFlags.disableDoubleTapLike, param.thisObject,
+                                param.args, () -> Thread.currentThread().getStackTrace())) {
+                            // The proven void dispatcher discards the result. Other cases of
+                            // this merged lambda and native gesture side effects stay intact.
+                            param.setResult(null);
+                        }
+                    }
+                });
+            } catch (Throwable failure) {
+                setterHook.unhook();
+                throw failure;
+            }
+            hookedMethods.add(signature(setter));
+            hookedMethods.add(signature(action));
+            ModuleLog.line("(InstaEclipse | DoubleTapLike): Reels like action bound");
+            return true;
+        } catch (Throwable ignored) {
+            ModuleLog.line("(InstaEclipse | DoubleTapLike): Scoped Reels action unavailable");
+            return false;
+        }
+    }
+
+    /** Pure reflection checks, shared by discovery and regression fixtures. */
+    static final class LikeActionBinding {
+        static LikeActionBinding create(Method setter, Method dispatcher, Method action, List<Method> invokes) {
+            if (setter == null || dispatcher == null || action == null || invokes == null) return null;
+            if (setter.getDeclaringClass() != dispatcher.getDeclaringClass()
+                    || setter.getReturnType() != void.class || dispatcher.getReturnType() != void.class
+                    || setter.getParameterTypes().length != 1 || action.getReturnType() != Object.class
+                    || !"invoke".equals(action.getName()) || !instanceMethod(setter)
+                    || !instanceMethod(dispatcher) || !instanceMethod(action)) return null;
+            Class<?> contract = setter.getParameterTypes()[0];
+            Class<?>[] dispatchTypes = dispatcher.getParameterTypes();
+            if (!contract.isInterface() || !contract.isAssignableFrom(action.getDeclaringClass())
+                    || dispatchTypes.length != 6 || dispatchTypes[0] != View.class
+                    || dispatchTypes[4] != boolean.class || dispatchTypes[5] != boolean.class) return null;
+            Class<?>[] types = action.getParameterTypes();
+            if (types.length != 4) return null;
+            for (Class<?> type : types) if (type != Object.class) return null;
+            try {
+                Method invoke = contract.getMethod("invoke", Object.class, Object.class, Object.class, Object.class);
+                if (invoke.getReturnType() != Object.class || !invokes.contains(invoke)) return null;
+            } catch (NoSuchMethodException e) { return null; }
+            return new LikeActionBinding();
+        }
+
+        private static boolean instanceMethod(Method method) {
+            return !Modifier.isStatic(method.getModifiers()) && !Modifier.isAbstract(method.getModifiers());
+        }
+    }
+
+    /** Identity-scoped because one merged lambda class implements many unrelated actions. */
+    static final class BoundLikeCallbacks {
+        private final List<WeakReference<Object>> bound = new ArrayList<>();
+        private final String dispatcherClass;
+        private final String dispatcherName;
+
+        BoundLikeCallbacks(Method dispatcher) {
+            dispatcherClass = dispatcher.getDeclaringClass().getName();
+            dispatcherName = dispatcher.getName();
+        }
+
+        synchronized void bind(Object callback) {
+            if (callback == null || contains(callback)) return;
+            if (bound.size() >= 128) bound.remove(0);
+            bound.add(new WeakReference<>(callback));
+        }
+
+        synchronized boolean shouldBlock(boolean enabled, Object callback, Object[] args,
+                Supplier<StackTraceElement[]> stackSource) {
+            if (!enabled || callback == null || args == null || args.length != 4
+                    || !Boolean.TRUE.equals(args[3]) || stackSource == null || !contains(callback)) return false;
+            StackTraceElement[] stack = stackSource.get();
+            if (stack == null) return false;
+            for (StackTraceElement frame : stack) {
+                if (dispatcherClass.equals(frame.getClassName()) && dispatcherName.equals(frame.getMethodName())) return true;
+            }
+            return false;
+        }
+
+        private boolean contains(Object callback) {
+            boolean found = false;
+            Iterator<WeakReference<Object>> iterator = bound.iterator();
+            while (iterator.hasNext()) {
+                Object existing = iterator.next().get();
+                if (existing == null) iterator.remove();
+                else if (existing == callback) found = true;
+            }
+            return found;
         }
     }
 
@@ -230,9 +389,10 @@ public class DisableDoubleTapLikeHook {
         if (method == null) return false;
         try {
             String key = signature(method);
-            if (!hookedMethods.add(key)) return true;
+            if (hookedMethods.contains(key)) return true;
             method.setAccessible(true);
             XposedBridge.hookMethod(method, hook);
+            hookedMethods.add(key);
             return true;
         } catch (Throwable e) {
             ModuleLog.line("(InstaEclipse | DoubleTapLike): Hook failed: " + e.getMessage());

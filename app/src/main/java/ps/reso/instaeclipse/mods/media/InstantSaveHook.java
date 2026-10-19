@@ -1,15 +1,15 @@
 package ps.reso.instaeclipse.mods.media;
 
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.content.Context;
 import android.widget.Toast;
 
 import java.lang.reflect.Proxy;
 import java.util.List;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;

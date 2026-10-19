@@ -127,7 +127,7 @@ public final class IeToast {
         try {
             if ("ps.reso.instaeclipse".equals(c.getPackageName())) return c.getDrawable(res);
             if (Module.moduleSourceDir == null) return null;
-            return android.content.res.XModuleResources.createInstance(Module.moduleSourceDir, null)
+            return ps.reso.instaeclipse.xposedcompat.ModuleResources.get()
                     .getDrawable(res, null);
         } catch (Throwable t) {
             return null;

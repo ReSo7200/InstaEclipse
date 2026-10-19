@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Kayıtlı günlük · Instagram çalışmıyor</string>
     <string name="logs_status_none">Desteklenen bir Instagram uygulaması yüklü değil</string>
     <string name="logs_empty_title">Henüz günlük yok</string>
-    <string name="logs_empty_body">InstaEclipse LSPosed\'de etkinken Instagram\'ı bir kez açın, ardından buraya dönüp Yenile\'ye dokunun. Instagram\'ın günlüğü, Instagram kapatıldıktan sonra bile burada otomatik olarak kaydedilir.</string>
+    <string name="logs_empty_body">InstaEclipse Vector\'de etkinken Instagram\'ı bir kez açın, ardından buraya dönüp Yenile\'ye dokunun. Instagram\'ın günlüğü, Instagram kapatıldıktan sonra bile burada otomatik olarak kaydedilir.</string>
     <string name="logs_empty_filter_title">Bu filtreyle eşleşen bir şey yok</string>
     <string name="logs_empty_filter_body">Tüm kayıtları görmek için Tümü\'ne geri dönün.</string>
     <string name="logs_nothing_to_copy">Kopyalanacak günlük yok</string>

@@ -8,6 +8,8 @@ public final class TrackingParamStripper {
     // Instagram links inside arbitrary share text ("Check this out https://www.instagram.com/p/…").
     private static final java.util.regex.Pattern IG_URL = java.util.regex.Pattern.compile(
             "(?i)(?:https?://)?(?:[a-z0-9-]+\\.)*instagram\\.com/[^\\s]*");
+    private static final java.util.regex.Pattern FOUR_LETTERS = java.util.regex.Pattern.compile(
+            "^[a-z]{4}$");
 
     /** True for query keys that only track the sharer/session (never change what the link opens). */
     private static boolean isTrackingParam(String key) {
@@ -15,7 +17,8 @@ public final class TrackingParamStripper {
         return k.equals("igshid") || k.equals("igsh") || k.equals("ig_rid") || k.equals("ig_mid")
                 || k.equals("stkn") || k.startsWith("utm_") || k.equals("story_media_id")
                 || k.equals("saved_by") || k.equals("saved-by")
-                || k.equals("psln"); // per-share id on "Copy link" (IG 452)
+                || k.equals("psln") // per-share id on "Copy link" (IG 452)
+                || FOUR_LETTERS.matcher(k).matches();
     }
 
     /**

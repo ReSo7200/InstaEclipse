@@ -1,6 +1,6 @@
 package ps.reso.instaeclipse.mods.misc;
 
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.dialog.IeDialog;
 import ps.reso.instaeclipse.utils.core.DexKitCache;

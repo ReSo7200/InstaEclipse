@@ -1,6 +1,6 @@
 package ps.reso.instaeclipse.mods.media;
 
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,10 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.dialog.IeDialog;
@@ -173,6 +174,7 @@ public class StoryDownloadHook {
     }
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        SelectedMediaAdapter.install(bridge, classLoader);
         try {
             for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("Reel with pending media should have an owner.")))) {
@@ -189,6 +191,7 @@ public class StoryDownloadHook {
         } catch (Throwable ignored) {}
 
         installButtonInjectorHook(bridge, classLoader);
+        installHighlightButtonInjectorHook(bridge, classLoader);
         installClickHandlerHook(bridge, classLoader);
         installHighlightTrayHook(bridge, classLoader);
         resolveExpiringGetter(bridge, classLoader);
@@ -600,6 +603,63 @@ public class StoryDownloadHook {
     // equals "Download", triggers the download. Context and ReelItem are resolved
     // from fields on 'this' or same-class params.
 
+    private static XC_MethodHook menuButtonInjector() {
+        return new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.enableStoryDownload || param.hasThrowable()) return;
+                Object original = param.getResult();
+                String label = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
+                Object extended = StoryMenuOptions.appendDownload(original, label);
+                if (extended != original) param.setResult(extended);
+            }
+        };
+    }
+
+    private void installHighlightButtonInjectorHook(DexKitBridge bridge, ClassLoader loader) {
+        // The native Highlight sheet iterates two alternative ArrayList builders. Only one
+        // carries the semantic anchor; discover its paired builder through that sheet's
+        // call graph. Both must belong to the same exact ReelItem owner as the dispatcher.
+        try {
+            Class<?> itemType = loader.loadClass("com.instagram.model.reels.ReelItem");
+            List<MethodData> anchors = new ArrayList<>();
+            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType("java.util.ArrayList").usingStrings("story_highlight_action_sheet")))) {
+                if (StoryMenuOptions.isOwnedListBuilder(data.getMethodInstance(loader), itemType)) {
+                    anchors.add(data);
+                }
+            }
+            if (anchors.size() != 1) {
+                ModuleLog.line("(IE|Story) Highlight menu anchor unavailable or ambiguous");
+                return;
+            }
+            MethodData anchor = anchors.get(0);
+            String ownerName = anchor.getDeclaredClassName();
+            Set<Method> builders = new LinkedHashSet<>();
+            for (MethodData caller : anchor.getCallers()) {
+                if (!ownerName.equals(caller.getDeclaredClassName())
+                        || !"void".equals(caller.getReturnTypeName())) continue;
+                for (MethodData invoked : caller.getInvokes()) {
+                    if (!ownerName.equals(invoked.getDeclaredClassName())
+                            || !"java.util.ArrayList".equals(invoked.getReturnTypeName())) continue;
+                    Method method = invoked.getMethodInstance(loader);
+                    if (StoryMenuOptions.isOwnedListBuilder(method, itemType)) builders.add(method);
+                }
+            }
+            // No independent/global menu injection when the native sheet cannot be identified.
+            if (!builders.contains(anchor.getMethodInstance(loader))) return;
+            XC_MethodHook injector = menuButtonInjector();
+            int hooked = 0;
+            for (Method builder : builders) {
+                XposedBridge.hookMethod(builder, injector);
+                hooked++;
+            }
+            ModuleLog.line("(IE|Story) Highlight injector hooked " + hooked + " builder(s)");
+        } catch (Throwable error) {
+            ModuleLog.line("(IE|Story) Highlight menu binding failed: " + error.getClass().getSimpleName());
+        }
+    }
+
+
     private void installClickHandlerHook(DexKitBridge bridge, ClassLoader classLoader) {
         // Anchor ONLY on the common "[INTERNAL] Pause Playback" string and hook EVERY void
         // dispatcher behind it. The old matcher also required "explore_viewer" +
@@ -661,7 +721,7 @@ public class StoryDownloadHook {
                         try {
                             for (int i = 0; i < args.length; i++)
                                 if (args[i] instanceof CharSequence) { args[i] = "[INTERNAL] Resume Playback"; break; }
-                            de.robv.android.xposed.XposedBridge.invokeOriginalMethod(method, self, args);
+                            ps.reso.instaeclipse.xposedcompat.XposedBridge.invokeOriginalMethod(method, self, args);
                         } catch (Throwable t) {
                             ModuleLog.line("(IE|Story) resume after speed: " + t);
                         }
@@ -704,16 +764,13 @@ public class StoryDownloadHook {
                     return;
                 }
 
-                // 5. Extract story URL via ReelItem → media object field graph
-                StoryMediaOptions media = extractStoryMediaOptions(ctx, effectiveHolder);
-                if (media == null) {
-                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_story_url_not_found), Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                try {
+                    Object selected = SelectedMediaAdapter.findStoryMedia((Method) param.method,
+                            param.thisObject, param.args);
+                    SelectedMediaDownloads.Captured captured = SelectedMediaDownloads.capture(ctx, selected, "story");
+                    SelectedMediaDownloads.showPost(ctx, captured);
+                } catch (Throwable unavailable) { SelectedMediaDownloads.unavailable(ctx, unavailable); }
 
-                String username = extractUsernameFromReelItemHolder(effectiveHolder);
-                String mediaId = extractMediaIdFromReelItemHolder(effectiveHolder);
-                handleStoryMedia(ctx, media, username, mediaId);
             }
         };
 
@@ -749,6 +806,34 @@ public class StoryDownloadHook {
             if (c != null) return c;
         }
         return null;
+    }
+
+    /** The original Story selectors, restricted to the already resolved selected Media. */
+    static String originalVideoFromSelected(Object media) {
+        String video = FeedVideoDownloadHook.bestVideoUrlFromMedia(media);
+        if (video == null) video = findVideoUrl(media,
+                Collections.newSetFromMap(new IdentityHashMap<>()), 0);
+        if (video != null) return video;
+        List<String> urls = new ArrayList<>();
+        scanCdnUrls(media, urls, 0, Collections.newSetFromMap(new IdentityHashMap<>()));
+        for (String url : urls) if (FeedVideoDownloadHook.isVideoUrl(url)) return url;
+        return null;
+    }
+
+    static String originalImageFromSelected(Context context, Object media) {
+        String image = FeedVideoDownloadHook.imageUrlFromMedia(context, media);
+        if (image != null && FeedVideoDownloadHook.isVideoUrl(image)) image = null;
+        if (image != null) return image;
+        List<CandidateInfo> candidates = new ArrayList<>();
+        collectImageCandidates(media, candidates, Collections.newSetFromMap(new IdentityHashMap<>()), 0);
+        if (!candidates.isEmpty()) {
+            candidates.sort((a, b) -> Integer.compare(b.area, a.area));
+            return candidates.get(0).url;
+        }
+        List<String> urls = new ArrayList<>();
+        scanCdnUrls(media, urls, 0, Collections.newSetFromMap(new IdentityHashMap<>()));
+        urls.removeIf(FeedVideoDownloadHook::isVideoUrl);
+        return urls.isEmpty() ? null : pickBestUrl(urls);
     }
 
     // ── URL extraction ────────────────────────────────────────────────────────
@@ -1024,6 +1109,15 @@ public class StoryDownloadHook {
      * data is not exposed as Java fields (fixes lower-quality photos on some story types).
      * The two largest plausible-dimension ints are multiplied to estimate the area.
      */
+    /** {url, area} of the largest image candidate reachable from {@code media}, or null. */
+    static Object[] largestImage(Object media) {
+        List<CandidateInfo> candidates = new ArrayList<>();
+        collectImageCandidates(media, candidates, Collections.newSetFromMap(new IdentityHashMap<>()), 0);
+        CandidateInfo best = null;
+        for (CandidateInfo c : candidates) if (best == null || c.area > best.area) best = c;
+        return best == null ? null : new Object[]{best.url, best.area};
+    }
+
     private static void collectImageCandidates(Object obj, List<CandidateInfo> out,
                                                Set<Object> visited, int depth) {
         if (obj == null || depth > 7 || out.size() >= 40) return;

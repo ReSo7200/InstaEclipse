@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import de.robv.android.xposed.XSharedPreferences;
 import ps.reso.instaeclipse.utils.feature.FeatureManager;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -39,7 +38,6 @@ public final class CompanionSync {
         return t;
     });
 
-    private static XSharedPreferences companion;
     private static long lastPull;
 
     private CompanionSync() {}
@@ -58,11 +56,7 @@ public final class CompanionSync {
         try {
             // Small file, throttled, off the main thread: always re-read (hasFileChanged() missed
             // same-size rewrites).
-            if (companion == null) {
-                companion = new XSharedPreferences(CommonUtils.MY_PACKAGE_NAME, "instaeclipse_cache");
-            }
-            companion.reload();
-            Map<String, ?> all = companion.getAll();
+            Map<String, ?> all = ps.reso.instaeclipse.xposedcompat.CompanionPrefs.all();
             if (all == null || all.isEmpty()) return false;
 
             SharedPreferences ig = context.getSharedPreferences("instaeclipse_prefs", Context.MODE_PRIVATE);

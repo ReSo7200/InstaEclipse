@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_download_quality">Download-Qualität</string>
+    <string name="ie_downloader_original">Standard</string>
+    <string name="ie_download_best">Beste</string>
+    <string name="ie_download_ceiling">Beste, bis %1$dp</string>
+    <string name="ie_downloader_mode">Qualität: %1$s</string>
+    <string name="ie_download_compatibility">Videos bevorzugen, die überall abspielbar sind</string>
+    <string name="ie_download_fallback">Niedrigere Qualität nutzen, wenn Beste fehlschlägt</string>
+    <string name="ie_download_quality_hint">Standard ist der klassische Downloader. Beste prüft jede Version des Videos, auch HDR, und speichert die schärfste, oder die schärfste bis zur gewählten Auflösung.</string>
+    <string name="ie_downloader_original_unavailable">Standard konnte das nicht speichern. Wechsle zu Beste, um es zu laden.</string>
+    <string name="ie_download_fallback_prompt">Beste konnte das nicht speichern. Stattdessen eine niedrigere Qualität versuchen?</string>
+</resources>

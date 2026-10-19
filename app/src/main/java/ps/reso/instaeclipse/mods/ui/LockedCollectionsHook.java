@@ -15,8 +15,8 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.core.JitGuard;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
@@ -187,7 +187,10 @@ public class LockedCollectionsHook {
             View options = null;
             for (int i = g.getChildCount() - 1; i >= 0 && options == null; i--)
                 if (g.getChildAt(i).isClickable() && g.getChildAt(i).getVisibility() == View.VISIBLE) options = g.getChildAt(i);
-            if (options == null) return;
+            // While the collection loads (and while leaving it) there is no Options button yet and
+            // the right-most clickable is the back arrow + title block; going before it would push
+            // them aside. Wait for Options: the bar's layout listener calls this again.
+            if (options == null || options.getWidth() == 0 || options.getLeft() < g.getWidth() / 2) return;
             android.widget.ImageView btn = new android.widget.ImageView(a);
             btn.setTag(BTN_TAG);
             btn.setScaleType(android.widget.ImageView.ScaleType.CENTER);

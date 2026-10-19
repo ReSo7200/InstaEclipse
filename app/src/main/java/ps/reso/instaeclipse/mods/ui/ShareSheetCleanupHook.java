@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
@@ -28,6 +28,9 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  *    selection changes) via a coalesced global-layout check scoped to the sheet's view.
  *  - the multi-recipient "create group" facepile variants, inflated from layouts
  *    {@code direct_private_share_create_group_facepile_button/_view}: collapsed as they inflate.
+ *  - "Send to new group chat (N)" under "Send separately" once two or more chats are selected
+ *    (IG 452), view ids {@code direct_send_to_group_button_vertical/_horizontal} inside
+ *    {@code direct_multi_select_message_composer}: built in code, so the same layout sweep hides it.
  * Gated on FeatureFlags.hideShareCreateGroup; nothing changes when it is off.
  */
 public class ShareSheetCleanupHook {
@@ -38,10 +41,15 @@ public class ShareSheetCleanupHook {
             "direct_private_share_create_group_facepile_button",
             "direct_private_share_create_group_facepile_view",
     };
+    private static final String[] BUTTONS = {
+            "direct_private_share_create_group_button",
+            "direct_send_to_group_button_vertical",
+            "direct_send_to_group_button_horizontal",
+    };
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
     private static volatile boolean idsResolved;
-    private static int buttonId;
+    private static int[] buttonIds = new int[0];
     private static final Set<Integer> layoutIds = new HashSet<>();
 
     public void install(ClassLoader classLoader) {
@@ -95,7 +103,7 @@ public class ShareSheetCleanupHook {
         if (!FeatureFlags.hideShareCreateGroup) return;
         try {
             ensureIds(root.getResources(), root.getContext().getPackageName());
-            if (buttonId == 0) return;
+            if (buttonIds.length == 0) return;
             sweep(root);
             final boolean[] pending = {false};
             final android.view.ViewTreeObserver.OnGlobalLayoutListener listener = () -> {
@@ -122,15 +130,23 @@ public class ShareSheetCleanupHook {
     }
 
     private static void sweep(View root) {
-        View b = root.findViewById(buttonId);
-        // ConstraintLayout child: GONE only (width/height 0 would mean "match constraints").
-        if (b != null && b.getVisibility() != View.GONE) b.setVisibility(View.GONE);
+        for (int id : buttonIds) {
+            View b = root.findViewById(id);
+            // ConstraintLayout child: GONE only (width/height 0 would mean "match constraints").
+            if (b != null && b.getVisibility() != View.GONE) b.setVisibility(View.GONE);
+        }
     }
 
     @SuppressLint("DiscouragedApi")
     private static void ensureIds(Resources res, String pkg) {
         if (idsResolved) return;
-        buttonId = res.getIdentifier("direct_private_share_create_group_button", "id", pkg);
+        int[] ids = new int[BUTTONS.length];
+        int n = 0;
+        for (String name : BUTTONS) {
+            int id = res.getIdentifier(name, "id", pkg);
+            if (id != 0) ids[n++] = id;
+        }
+        buttonIds = java.util.Arrays.copyOf(ids, n);
         for (String name : LAYOUTS) {
             int id = res.getIdentifier(name, "layout", pkg);
             if (id != 0) layoutIds.add(id);

@@ -1,6 +1,6 @@
 package ps.reso.instaeclipse.mods.misc;
 
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -36,8 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.dialog.IeDialog;
@@ -563,9 +563,7 @@ public class StoryInfoHook {
     /** A drawable from the module's own resources, in its own colours (no tint). */
     private static android.graphics.drawable.Drawable moduleDrawable(int res) {
         try {
-            return android.content.res.XModuleResources
-                    .createInstance(ps.reso.instaeclipse.Xposed.Module.moduleSourceDir, null)
-                    .getDrawable(res, null);
+            return ps.reso.instaeclipse.xposedcompat.ModuleResources.get().getDrawable(res, null);
         } catch (Throwable t) {
             return null;
         }

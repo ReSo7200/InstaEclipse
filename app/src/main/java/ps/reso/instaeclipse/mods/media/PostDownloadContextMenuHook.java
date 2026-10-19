@@ -1,10 +1,11 @@
 package ps.reso.instaeclipse.mods.media;
 
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.content.Context;
 import android.widget.Toast;
 
 import org.luckypray.dexkit.DexKitBridge;
+import org.luckypray.dexkit.query.enums.StringMatchType;
 import org.luckypray.dexkit.query.FindClass;
 import org.luckypray.dexkit.query.FindMethod;
 import org.luckypray.dexkit.query.matchers.ClassMatcher;
@@ -21,8 +22,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
@@ -334,6 +335,8 @@ public class PostDownloadContextMenuHook {
 
         if (downloadOptionValue != null) FeatureStatusTracker.setHooked("PostDownload");
         if (copyLinkOptionValue != null) FeatureStatusTracker.setHooked("CopyMediaLink");
+        if (copyImageOptionValue != null) FeatureStatusTracker.setHooked("CopyImage");
+        if (mediaInfoOptionValue != null) FeatureStatusTracker.setHooked("MediaInfo");
         ModuleLog.line("(IE|Post) ✅ Post menu inject hook installed");
     }
 
@@ -360,7 +363,28 @@ public class PostDownloadContextMenuHook {
     // DexKit finds void methods with sole param MediaOption$Option — a stable unobfuscated type.
     // No string constants used, so obfuscation of surrounding code doesn't matter.
 
+    private static Method reelClickDispatcher;
+
+    private static void resolveReelClickDispatcher(DexKitBridge bridge, ClassLoader loader) {
+        reelClickDispatcher = null;
+        try {
+            List<MethodData> matches = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    .returnType("void")
+                    .paramTypes("com.instagram.feed.media.mediaoption.MediaOption$Option")
+                    .usingStrings(List.of("ClipsOrganicMoreOptionsHelper_handleOptionSelected"),
+                            StringMatchType.Contains, false)));
+            Set<Method> methods = new java.util.LinkedHashSet<>();
+            for (MethodData data : matches) {
+                Method method = data.getMethodInstance(loader);
+                if (!Modifier.isStatic(method.getModifiers())) methods.add(method);
+            }
+            if (methods.size() == 1) reelClickDispatcher = methods.iterator().next();
+        } catch (Throwable ignored) { }
+        ModuleLog.line("(IE|Post) selected Reel dispatcher bound=" + (reelClickDispatcher != null));
+    }
+
     private static void installClickHandlerHook(DexKitBridge bridge, ClassLoader classLoader) {
+        resolveReelClickDispatcher(bridge, classLoader);
         XC_MethodHook clickHook = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
@@ -375,7 +399,7 @@ public class PostDownloadContextMenuHook {
         // (cache key bumped to _v2 — the old key could hold private analytics-only
         // lookalikes hooked before the public-only filter below was added)
         if (DexKitCache.isCacheValid()) {
-            List<Method> cached = DexKitCache.loadMethods("PostDownload_click_v2", classLoader);
+            List<Method> cached = DexKitCache.loadMethods("PostDownload_click_v3", classLoader);
             if (cached != null && !cached.isEmpty()) {
                 for (Method m : cached) XposedBridge.hookMethod(m, clickHook);
                 return;
@@ -416,6 +440,8 @@ public class PostDownloadContextMenuHook {
             for (Method m : candidates) {
                 try {
                     if (hasPublicCandidate && Modifier.isPrivate(m.getModifiers())) continue;
+                    if (reelClickDispatcher != null && m.getDeclaringClass() == reelClickDispatcher.getDeclaringClass()
+                            && !m.equals(reelClickDispatcher)) continue;
                     m.setAccessible(true);
                     XposedBridge.hookMethod(m, clickHook);
                     hooked.add(m);
@@ -427,7 +453,7 @@ public class PostDownloadContextMenuHook {
             if (hooked.isEmpty()) {
                 ModuleLog.line("(IE|Post) ❌ No click handler methods could be hooked");
             } else {
-                DexKitCache.saveMethods("PostDownload_click_v2", hooked);
+                DexKitCache.saveMethods("PostDownload_click_v3", hooked);
             }
 
         } catch (Throwable t) {
@@ -544,8 +570,9 @@ public class PostDownloadContextMenuHook {
             // REEL download is on. If we only consumed the tap for POST download, a reel tap with
             // only Reel download enabled fell through to Instagram's own save flow, which burns in
             // a watermark (#256). Route it to the module's clean downloader for either toggle.
+            boolean reelMenu = reelClickDispatcher != null && param.method.equals(reelClickDispatcher);
             boolean isDownload = option.equals("DOWNLOAD")
-                    && (FeatureFlags.enablePostDownload || FeatureFlags.enableReelDownload);
+                    && (reelMenu ? FeatureFlags.enableReelDownload : FeatureFlags.enablePostDownload);
             boolean isCopyLink = option.equals("COPY_LINK") && FeatureFlags.copyMediaLink;
             boolean isCopyImage = option.equals(COPY_IMAGE_CARRIER) && FeatureFlags.offerCopyImage;
             boolean isInfo = option.equals(MEDIA_INFO_CARRIER) && FeatureFlags.offerMediaInfo;
@@ -563,8 +590,15 @@ public class PostDownloadContextMenuHook {
             }
 
             if (isSpeed) { PlaybackSpeedHook.showChooser(ctx); return; }
-            Object media = findMediaViaMenuCreator(thisObj);
-            if (media == null) media = findMedia(thisObj);
+            Object media;
+            if (isDownload) {
+                media = SelectedMediaAdapter.findPostMenuMedia(thisObj, menuCreatorClass);
+                if (media == null && reelClickDispatcher != null && param.method.equals(reelClickDispatcher))
+                    media = SelectedMediaAdapter.findReelMenuMedia(thisObj, reelClickDispatcher.getDeclaringClass());
+            } else {
+                media = findMediaViaMenuCreator(thisObj);
+                if (media == null) media = findMedia(thisObj);
+            }
             if (media == null) {
                 ModuleLog.line("(IE|Post) ❌ Media not found in click handler");
                 ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_no_media_for_post), Toast.LENGTH_SHORT).show();
@@ -583,53 +617,7 @@ public class PostDownloadContextMenuHook {
     // ── Download dispatch ─────────────────────────────────────────────────────
 
     private static void triggerDownload(Context ctx, Object media, Object clickHandler) {
-        String username = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
-        if (username == null) username = "post";
-
-        String mediaId = "0";
-        try {
-            Object id = media.getClass().getMethod("getId").invoke(media);
-            if (id instanceof String s && !s.isEmpty()) mediaId = s;
-        } catch (Throwable ignored) {}
-
-        List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
-
-        // Carousel index: live view scan is primary (reads the actual visible slide, and
-        // now only trusts itself when exactly one on-screen carousel matches the target
-        // size — see ReelDownloadHook.findCarouselIndexFromView). Field-guessing on
-        // clickHandler is the fallback for when the scan is ambiguous or finds nothing;
-        // it's unreliable specifically for reels whose DOWNLOAD row was patched into the
-        // shared post-style option list (see ReelDownloadHook.installReduceOptionsListPatch),
-        // where clickHandler carries no real position field.
-        int viewIdx = urls.size() > 1
-                ? ReelDownloadHook.findCarouselIndexFromView(ctx, urls.size())
-                : -1;
-        final int carouselIdx = viewIdx >= 0 ? viewIdx : findCarouselIndex(clickHandler, urls.size());
-
-        final String finalUser = username;
-        final String finalId   = mediaId;
-        // Audio-only option (#234) — only asks when enabled and the media has an audio track.
-        // Copy-image (#228) acts on the slide being viewed.
-        String shownUrl = urls.isEmpty() ? null : urls.get(carouselIdx >= 0 && carouselIdx < urls.size() ? carouselIdx : 0);
-        // For a carousel, offer audio for the slide being viewed (its own video item), not the
-        // album container — the container has no video_dash_manifest of its own.
-        Object audioMedia = media;
-        try {
-            java.util.List<?> kids = FeedVideoDownloadHook.carouselChildren(media);
-            if (kids != null && carouselIdx >= 0 && carouselIdx < kids.size() && kids.get(carouselIdx) != null)
-                audioMedia = kids.get(carouselIdx);
-        } catch (Throwable ignored) {}
-        // Carousel: one sheet with every choice (current / all / audio of this slide). A separate
-        // "Video or audio" step first would hide which item gets downloaded.
-        if (urls.size() > 1) {
-            final Object slide = audioMedia;
-            FeedVideoDownloadHook.mainHandler.post(() ->
-                    FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx, slide, media));
-            return;
-        }
-        FeedVideoDownloadHook.offerAudioOrRun(ctx, audioMedia, shownUrl, finalUser, finalId, "post", () ->
-                FeedVideoDownloadHook.mainHandler.post(() ->
-                        FeedVideoDownloadHook.showPostDownloadDialog(ctx, urls, finalUser, finalId, carouselIdx)));
+        SelectedMediaDownloads.captureAndShowPost(ctx, media, "post");
     }
 
     // ── Copy image (#228) ─────────────────────────────────────────────────────

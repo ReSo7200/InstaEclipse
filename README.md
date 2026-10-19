@@ -2,7 +2,7 @@
   <img src="assets/logo.png" alt="InstaEclipse" width="120" />
   <h1>InstaEclipse</h1>
   <p><b>Instagram, the way you want it.</b><br/>
-  An LSPosed module for privacy, downloads, a cleaner feed, smarter stories and DMs, and your own look. Everything is a switch inside Instagram.</p>
+  A Vector (Xposed) module for privacy, downloads, a cleaner feed, smarter stories and DMs, and your own look. Everything is a switch inside Instagram.</p>
 
   <p>
     <a href="https://github.com/ReSo7200/InstaEclipse/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/ReSo7200/InstaEclipse?style=for-the-badge&logo=github&color=1a1a2e&labelColor=0d0d0d"/></a>
@@ -13,7 +13,6 @@
   </p>
 
   <p>
-    <a href="#whats-new-in-080">What's new</a> •
     <a href="#features">Features</a> •
     <a href="#compatibility">Compatibility</a> •
     <a href="#installation">Installation</a> •
@@ -33,33 +32,13 @@
 
 ## What is it
 
-InstaEclipse is a module for [LSPosed](https://github.com/JingMatrix/LSPosed) (rooted phones) and [LSPatch](https://github.com/JingMatrix/LSPatch) (no root). Long press the Explore (search) tab inside Instagram and the InstaEclipse menu slides up. Flip what you want, and most things apply right away.
+InstaEclipse is a module for [Vector](https://github.com/JingMatrix/Vector), the Xposed framework formerly known as LSPosed (rooted phones), and [LSPatch](https://github.com/JingMatrix/LSPatch) (no root). Long press the Explore (search) tab inside Instagram and the InstaEclipse menu slides up. Flip what you want, and most things apply right away.
 
 It comes with a companion app too. That is where you see whether the module is running, read its logs, back up your settings, edit themes, and get help.
 
 Under the hood, InstaEclipse uses [DexKit](https://github.com/LuckyPray/DexKit) to find what it needs inside Instagram every time Instagram updates, instead of relying on names that change with each build. So when Instagram ships a new version, most features keep working without waiting for a module update.
 
 > InstaEclipse is a personal, educational project. It is not affiliated with Meta or Instagram. See the [Disclaimer](DISCLAIMER.md).
-
----
-
-## What's new in 0.8.0
-
-The biggest update so far. Highlights:
-
-- **Stories got smart.** Story Info shows exact posting and expiry times, the song with Spotify, YouTube Music and Apple Music buttons, location, hashtags, who it was reshared from, paid partnerships, Add Yours counts and more. Polls, sliders and quizzes show their results as bars.
-- **Song links on posts and reels too.** Media info shows the song with the same Spotify, YouTube Music and Apple Music buttons.
-- **Translate chat messages** with your own translator app (Google Translate, DeepL and others), right from the message menu.
-- **Copy links from story link stickers**, and hold a mention to open that profile.
-- **A reorganized menu**, grouped by what things do: Feed, Navigation, Reels, Stories, Ghost Mode, Messages, Downloads, Likes and Comments, Profiles, and more. Same layout in Instagram and in the companion app.
-- **Per chat tools** in one InstaEclipse button inside every chat: unsent messages, export, jump to the first message, read receipts for just that chat, and hide or unhide the chat.
-- **Edit history, unsent message log, chat export, voice message downloads, comment search, follower export.**
-- **Clean up Instagram's own buttons:** hide the Threads button on profiles, the Blend button in chats, the Notes tray, "Create group" on the share sheet, Plus upsells, and community notes.
-- **Navigation:** hide tabs, reorder them, choose the tab Instagram opens on, and turn off swipe to camera.
-- **Extras:** airplane mode, following only feed, high resolution images, unlimited accounts, Reels auto scroll and scroll lock.
-- **A new look everywhere.** Modern dialogs and toasts, a home dashboard, searchable features, an animated About page, light and dark versions of every theme. InstaEclipse's own menus, toggles and dialogs follow your theme's colors, and its menu items get proper icons.
-- **Sturdier.** Safer settings sync with the companion app, crash fixes, security hardening, and every feature found at runtime with DexKit.
-- **New language:** Vietnamese joins the list.
 
 ---
 
@@ -81,9 +60,7 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Mark a story as seen | Send the view for one story on purpose, from the story menu |
 | Hide live presence | Join lives without being counted |
 | Bypass screenshot detection | Screenshot disappearing media without the other person being told |
-| Allow screenshots in DMs | Take screenshots where Instagram blocks them |
 | Hide view once opened | Open view once media without marking it as opened |
-| Unlock view once and view twice | Replay view once media instead of it disappearing |
 | Spoof last seen | Freeze your "active" status |
 | Airplane mode | Appear offline: Instagram stops its live connection while you browse |
 | Quick toggle | Turn Ghost Mode on and off from a ghost icon next to your inbox |
@@ -102,8 +79,14 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Edit history | See every earlier version of a message that was edited |
 | Chat export | Export a chat to a readable HTML page with replies, reactions, edit history and optional media |
 | Jump to first message | Scroll a chat all the way back to its first message |
+| Ask before calling | Tapping a chat's audio or video call button asks first, so calls never start by accident |
+| Allow screenshots in DMs | Take screenshots where Instagram blocks them |
+| Unlock view once and view twice | Replay view once media instead of it disappearing |
 | Voice message downloads | Save voice messages, named by sender |
+| Sticker and GIF downloads | Save stickers and GIFs from chats in their original format, named by sender |
+| DM photos and videos | Instagram's Save on a photo or video in a chat goes through InstaEclipse: named after the sender, in their folder, at the best quality |
 | Translate messages | Send a message to your translator app from its long press menu (under More) |
+| Unsend multiple messages | Long press one of your messages, then More, Unsend multiple: check your messages right in the chat and unsend them all at once |
 | Hide specific chats | Hide chats from your inbox and manage them later |
 | Hide the Notes tray | Remove Notes from the top of your inbox |
 | Hide Blend in chats | Remove the Blend button from the chat header |
@@ -124,6 +107,8 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Music links | Open the song in Spotify, YouTube Music or Apple Music, from Story Info, or from Media info on posts and reels |
 | Poll, slider and quiz results | Results drawn as bars, your own answer marked, and the correct quiz answer in green |
 | Copy story links | Copy the links from link stickers, or pick from a list when there are several |
+| Story tray | Make the story tray smaller so more stories fit in a row, and pick the color of the ring around unseen stories (a preset, your own color or a two-color gradient) |
+| Hide the story tray | Keep the feed, lose the story row |
 | View story mentions | See every @mention at once. Tap to copy, hold to open the profile |
 | Search your story viewers | A search box over your viewer list |
 | Disable story auto swipe | Stories stop advancing on their own |
@@ -138,12 +123,11 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 
 | Feature | What it does |
 |---|---|
-| Force Reels quality | Pick a fixed quality (Auto, 360p to 1080p, or Max) |
 | Playback speed | 0.5x to 3x for reels, stories and feed videos |
+| Hold for slow motion | Hold the left side of a reel for 0.5x, the right side for 2x |
 | Always show the seek bar | Scrub through any reel |
 | Reels auto scroll | Move to the next reel when one ends |
 | Lock Reels scrolling | Stop accidental swipes |
-| Disable repost | Keep the repost button from reposting |
 
 </details>
 
@@ -154,8 +138,8 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 
 | Feature | What it does |
 |---|---|
-| Download posts, reels and stories | Single photos, full carousels, reels, and stories (your own included, with music) |
-| Download profile pictures | Full size, from a long press on the profile picture |
+| Download posts, reels and stories | Single photos, full carousels, reels, and stories (your own included, with music), always at the best quality available |
+| Download profile pictures | Long press a profile picture to see the full-size original, square, and save it |
 | Audio only | Save just the audio of a video or reel as .m4a, including a post's music |
 | Copy media link | Copy the direct link for a post, reel or a single carousel slide |
 | Copy image | Copy a photo straight to the clipboard |
@@ -164,8 +148,21 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Story cache | Keep stories you watched for 24 hours, so you can save ones that expired |
 | Save Instants | Long press an Instant to save it |
 | Upload Instant from gallery | Send a picture from your gallery as an Instant |
-| Max upload quality | Always upload at the highest quality |
 | Download folder | Choose the folder, sort into a folder per account, and add the date to file names |
+
+</details>
+
+<details>
+<summary><b>🎞️ Quality</b>: the best Instagram has</summary>
+
+<br/>
+
+| Feature | What it does |
+|---|---|
+| Force Reels quality | Pick a fixed quality (Auto, 360p to 1080p, or Max) |
+| High resolution images | Load the sharpest version of every photo |
+| Max upload quality | Always upload at the highest quality |
+| Spoof device | Instagram sees a Pixel 11 Pro XL or Galaxy S26 Ultra, which unlocks HDR video downloads and other features it limits to those phones. Adds the matching developer options |
 
 </details>
 
@@ -181,13 +178,12 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Hide Threads suggestions | Drop the Threads promos |
 | Hide posts you already liked | Skip what you have seen |
 | Hide community notes | Remove notes added under posts and reels |
-| Hide Instagram Plus upsells | No more Plus prompts |
-| Hide the story tray | Keep the feed, lose the story row |
 | Disable Discover People | Remove the "people you may know" row |
 | Always show full captions | No more "... more" |
-| Exact dates | "17 Oct 2026 07:36" instead of "2h ago" |
-| High resolution images | Load the sharpest version of every photo |
+| Exact dates | "17 Oct 2026 07:36" instead of "2h ago", in the date format you pick (presets or your own pattern) |
 | Photo zoom | Long press a photo to zoom in |
+| Rounded posts | Round the corners of photos and videos in the feed (8 to 24 dp) |
+| Ask before refreshing | Pulling the home feed down asks before it reloads, so an accidental pull doesn't lose your place |
 | Disable video autoplay | Videos wait for a tap |
 
 </details>
@@ -201,13 +197,16 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Disable double tap to like | No accidental likes, in posts, comments and DMs |
 | Undo a like | A few seconds to take a like back |
+| Disable repost | Keep the repost button from reposting |
 | Comment search | Search a post's comments, load them all, and export them |
 | Copy comments and captions | Copy any comment, or a caption with or without hashtags |
 | Translate | Translate captions, comments and chat messages with your own translator app |
 | Save comment GIFs and images | Download the media in comments |
 | "Follows you" label | See on any profile whether they follow you back |
+| Fancy bio fonts | The bio's "Change font" button picks a style for what you type next: bold, italic, script, monospace and more; strikethrough and underline work in any language |
 | Follower toast | A quick message when you open a profile |
 | Export followers and following | Save the whole list as CSV |
+| Followers history | See who unfollowed you and who followed you since your last check |
 | Saved on your profile | A Saved button right on your profile |
 | Lock Saved collections | Put a passcode on a collection |
 | Hide the Threads button | Remove it from profiles |
@@ -239,10 +238,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Lock DMs | Lock just the inbox, and optionally lock it again every time you leave |
 | Block ads and analytics | Drop sponsored posts and tracking calls |
 | Disable tracking links | Strip only the tracking parts from links you share |
-| Open links externally | Use your own browser instead of Instagram's |
-| Custom share domain | Share links with a different domain |
-| Remove Meta AI | Take Meta AI out of search, chats and reels |
-| Hide onboarding prompts | Skip the nag screens |
+| Don't save searches | Profiles, tags and places you open from Search stay out of Recent, on the phone and on Instagram's server |
 | Location spoofing | Pick any place on a map; Instagram sees that location everywhere |
 
 </details>
@@ -271,11 +267,14 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Turn off sections | Stories, Feed, Reels (or all Reels except in DMs), Explore and Comments, one by one |
 | Extreme mode | Lock those choices in until you reinstall |
+| Remove Meta AI | Take Meta AI out of search, chats and reels |
+| Hide onboarding prompts | Skip the nag screens |
+| Hide Instagram Plus upsells | No more Plus prompts |
 
 </details>
 
 <details>
-<summary><b>🛠️ Tools and developer options</b></summary>
+<summary><b>🛠️ App, accounts and tools</b></summary>
 
 <br/>
 
@@ -283,6 +282,8 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Developer Options | Instagram's hidden internal panel, with config import, export and a known good default |
 | Unlimited accounts | Add more accounts than Instagram allows |
+| Open links externally | Use your own browser instead of Instagram's |
+| Custom share domain | Share links with a different domain |
 | Notification fix | Repair notifications that stopped arriving |
 | Auto clear cache | Clear Instagram's media cache once it gets too big |
 | Backup and restore | All settings to a file and back |
@@ -300,7 +301,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Home dashboard | Module status, Instagram version, quick launch and restart, and your pinned shortcuts |
 | Feature search | Find any switch by name |
 | Live logs | Hook status from Instagram and the app, no adb needed |
-| Help | Frequently asked questions, setup links for LSPosed and LSPatch, and the community |
+| Help | Frequently asked questions, setup links for Vector and LSPatch, and the community |
 | 18 languages | English, Arabic, Azerbaijani, Chinese (Simplified and Traditional), French, German, Greek, Hebrew, Indonesian, Italian, Polish, Portuguese, Russian, Spanish, Swedish, Turkish and Vietnamese |
 
 </details>
@@ -315,6 +316,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | **Get this version** | [Instagram 451.0.0.20.80 on APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) |
 | **Survives updates** | Yes, DexKit finds what it needs at runtime |
 | **Android** | 9 and newer |
+| **Frameworks** | Vector 2.2 or newer (root), LSPatch 1.0 or newer (no root) |
 
 A big Instagram update can still knock a feature out until it is patched. The menu inside Instagram shows how many features are active (for example "62/62 active"); tap it to see which ones could not attach. If something breaks right after an update, check the [Telegram channel](https://t.me/InstaEclipse) first.
 
@@ -324,14 +326,14 @@ A big Instagram update can still knock a feature out until it is patched. The me
 
 > Get Instagram [451.0.0.20.80 from APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) rather than the Play Store. The Play build is not always fully supported.
 
-Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone.
+Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone. InstaEclipse uses the new Xposed API (102), so it needs Vector 2.2 or LSPatch 1.0 or newer.
 
-### Rooted, with LSPosed
+### Rooted, with Vector
 
-> Needs [JingMatrix's LSPosed](https://github.com/JingMatrix/LSPosed/releases/latest).
+> Needs [Vector](https://github.com/JingMatrix/Vector/releases/latest) 2.2 or newer, JingMatrix's Xposed framework.
 
 1. **Install InstaEclipse** from the APK you downloaded.
-2. **Enable the module.** In LSPosed Manager, open Modules, enable InstaEclipse and tick Instagram.
+2. **Enable the module.** In the Vector manager, open Modules, enable InstaEclipse and tick Instagram.
 3. **Restart Instagram.** Force stop it and open it again.
 4. **Open the menu.** Long press the Explore (search) tab.
 
@@ -340,7 +342,7 @@ Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo
 
 ### No root, with LSPatch
 
-> Needs [JingMatrix's LSPatch](https://github.com/JingMatrix/LSPatch/releases/latest).
+> Needs [JingMatrix's LSPatch](https://github.com/JingMatrix/LSPatch/releases/latest) 1.0 or newer.
 
 1. **Install InstaEclipse** from the APK.
 2. **Install LSPatch** (the JingMatrix fork).
@@ -371,7 +373,7 @@ Updates and tips:
 ## FAQ
 
 **A feature is not doing anything.**
-Disable and enable the module again in LSPosed or LSPatch, then force stop and reopen Instagram.
+Disable and enable the module again in Vector or LSPatch, then force stop and reopen Instagram.
 
 **The text in the InstaEclipse menus is missing.**
 Turn off Hide My Applist (HMA) for Instagram. InstaEclipse reads its text from its own app, and HMA hides it.
@@ -424,7 +426,7 @@ Ask in the [Telegram group](https://t.me/instaEclipse_discussion). Someone will 
 
 ## Built with
 
-- [JingMatrix/LSPosed](https://github.com/JingMatrix/LSPosed), the Xposed framework it runs on
+- [JingMatrix/Vector](https://github.com/JingMatrix/Vector), the Xposed framework it runs on
 - [JingMatrix/LSPatch](https://github.com/JingMatrix/LSPatch), for phones without root
 - [LuckyPray/DexKit](https://github.com/LuckyPray/DexKit), which finds Instagram's code at runtime
 

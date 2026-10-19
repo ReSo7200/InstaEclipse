@@ -15,7 +15,7 @@ import android.widget.ImageView;
  * ScaleGestureDetector/Matrix pattern; no Instagram internals involved.
  */
 @android.annotation.SuppressLint("AppCompatCustomView") // runs inside Instagram
-class ZoomableImageView extends ImageView {
+public class ZoomableImageView extends ImageView {
 
     private static final float MIN_SCALE = 1f;
     private static final float MAX_SCALE = 5f;
@@ -29,7 +29,7 @@ class ZoomableImageView extends ImageView {
     private final GestureDetector gestureDetector;
     private Runnable onDismissRequest;
 
-    ZoomableImageView(Context ctx) {
+    public ZoomableImageView(Context ctx) {
         super(ctx);
         setScaleType(ScaleType.MATRIX);
         setClickable(true);
@@ -70,8 +70,15 @@ class ZoomableImageView extends ImageView {
         });
     }
 
-    void setOnDismissRequest(Runnable r) {
+    public void setOnDismissRequest(Runnable r) {
         this.onDismissRequest = r;
+    }
+
+    /** Also fits an image that arrives after layout (loaded in the background). */
+    @Override
+    public void setImageBitmap(android.graphics.Bitmap bm) {
+        super.setImageBitmap(bm);
+        post(this::resetZoom);
     }
 
     private static float clamp(float s) {

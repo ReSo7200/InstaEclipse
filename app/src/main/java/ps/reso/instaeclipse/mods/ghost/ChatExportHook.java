@@ -46,8 +46,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -75,6 +75,9 @@ public class ChatExportHook {
     private static final String TAG = "(IE|ChatExport) ";
     private static final String BTN_TAG = "ie_chat_export_btn";
     private static final String USER = "com.instagram.user.model.User";
+    private static final String SESSION = "com.instagram.common.session.UserSession";
+    /** the viewer's user id, found next to the participants (set by {@link #participants}) */
+    private static volatile String selfId;
     private static final Map<Object, Boolean> STORES = Collections.synchronizedMap(new WeakHashMap<>());
     private static Method messagesMethod, serializer, factoryWriterMethod;
     private static Class<?> factoryClass;
@@ -170,6 +173,7 @@ public class ChatExportHook {
                 Map<String, String> names = participants(store);
                 String title = threadId != null ? ThreadNames.resolve(threadId) : null;
                 if (title == null || title.isEmpty()) title = "chat";
+                String user = chatUsername(msgs, names);
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                 // first pass: JSON per message + item id -> message (for reply quotes)
                 List<Object[]> rows = new ArrayList<>();
@@ -183,7 +187,7 @@ public class ChatExportHook {
                 }
 
                 String stamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-                String safe = title.replaceAll("[^A-Za-z0-9._-]", "_");
+                String safe = (user != null ? user : title).replaceAll("[^A-Za-z0-9._-]", "_");
                 String folder = "chat_" + safe + "_" + stamp;   // the export's own folder
                 String file = folder + ".html";
 
@@ -209,8 +213,8 @@ public class ChatExportHook {
                 // sender → their messages align right (self-coloured bubbles).
                 java.util.LinkedHashSet<String> senders = new java.util.LinkedHashSet<>();
                 for (Object[] r : rows) senders.add(names.getOrDefault(((JSONObject) r[1]).optString("user_id", ""), ""));
-                String selfName = null;
-                if (senders.size() == 2) for (String s : senders) if (!s.isEmpty() && !s.equalsIgnoreCase(title)) selfName = s;
+                String selfName = selfId != null ? names.get(selfId) : null;
+                if (selfName == null && senders.size() == 2) for (String s : senders) if (!s.isEmpty() && !s.equalsIgnoreCase(title)) selfName = s;
                 SimpleDateFormat daySep = new SimpleDateFormat("EEEE, d MMM yyyy", Locale.getDefault());
 
                 StringBuilder body = new StringBuilder();
@@ -238,7 +242,8 @@ public class ChatExportHook {
                 html.append("<!doctype html><html><head><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><title>")
                         .append(esc(title)).append("</title><style>").append(CHAT_CSS).append("</style></head><body><div class=wrap>")
                         .append(ps.reso.instaeclipse.utils.core.ExportBrand.htmlBanner("Chat export"))
-                        .append("<div class=head><h1>").append(esc(title)).append("</h1><div class=sub>").append(n).append(" messages");
+                        .append("<div class=head><h1>").append(esc(title))
+                        .append(user != null && !user.equalsIgnoreCase(title) ? " <span class=sub>@" + esc(user) + "</span>" : "").append("</h1><div class=sub>").append(n).append(" messages");
                 if (first > 0) html.append(" · ").append(fmt.format(new Date(first))).append(" – ").append(fmt.format(new Date(last)));
                 html.append("</div><div class=chips>");
                 for (Map.Entry<String, Integer> e : perUser.entrySet())
@@ -269,7 +274,10 @@ public class ChatExportHook {
                             it.putExtra("mediaNames", mNames.toArray(new String[0]));
                             it.putExtra("mediaMimes", mMimes.toArray(new String[0]));
                         }
-                        a.startForegroundService(it);
+                        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(a, it, error -> {
+                            if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
+                                    android.widget.Toast.makeText(a, error, android.widget.Toast.LENGTH_LONG).show());
+                        });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated export (" + count + " msgs, " + mUrls.size()
                                 + " media) to companion service: " + folder);
@@ -875,9 +883,28 @@ public class ChatExportHook {
         return false;
     }
 
-    /** user id → username for every User reachable from the store. */
+    /** The username the export is named after: the other person in a 1:1 chat, yourself in a chat
+     *  with yourself, null in a group (the thread title is used then). */
+    private static String chatUsername(List<?> msgs, Map<String, String> names) {
+        String me = selfId;
+        java.util.LinkedHashSet<String> others = new java.util.LinkedHashSet<>();
+        for (String id : names.keySet()) if (!id.equals(me)) others.add(id);
+        if (others.size() == 1) return names.get(others.iterator().next());
+        if (others.isEmpty()) return me != null ? names.get(me) : null;
+        // more users reachable than the thread's members (e.g. authors of shared posts): go by senders
+        java.util.LinkedHashSet<String> senders = new java.util.LinkedHashSet<>();
+        for (Object m : msgs) {
+            JSONObject j = toJson(m);
+            String id = j != null ? j.optString("user_id", "") : "";
+            if (!id.isEmpty() && !id.equals(me) && names.containsKey(id)) senders.add(id);
+        }
+        return senders.size() == 1 && me != null ? names.get(senders.iterator().next()) : null;
+    }
+
+    /** user id → username for every User reachable from the store (also finds {@link #selfId}). */
     private static Map<String, String> participants(Object store) {
         Map<String, String> out = new HashMap<>();
+        selfId = null;
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         ArrayDeque<Object[]> q = new ArrayDeque<>();
         q.add(new Object[]{store, 0});
@@ -887,6 +914,10 @@ public class ChatExportHook {
             int d = (int) e[1];
             if (o == null || !seen.add(o)) continue;
             if (o instanceof List<?> l) { if (d < 4) for (Object it : l) q.add(new Object[]{it, d + 1}); continue; }
+            if (selfId == null && o.getClass().getName().equals(SESSION)) {
+                try { selfId = (String) o.getClass().getMethod("getUserId").invoke(o); } catch (Throwable ignored) {}
+                continue;
+            }
             if (o.getClass().getName().equals(USER)) {
                 String u = UserUtils.callUsernameGetter(o);
                 String id = userId(o);

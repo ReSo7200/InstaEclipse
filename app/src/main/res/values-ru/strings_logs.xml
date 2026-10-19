@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Сохранённый лог · Instagram не запущен</string>
     <string name="logs_status_none">Поддерживаемое приложение Instagram не установлено</string>
     <string name="logs_empty_title">Логов пока нет</string>
-    <string name="logs_empty_body">Откройте Instagram один раз с включённым в LSPosed InstaEclipse, затем вернитесь сюда и нажмите «Обновить». Лог Instagram сохраняется здесь автоматически — даже после закрытия Instagram.</string>
+    <string name="logs_empty_body">Откройте Instagram один раз с включённым в Vector InstaEclipse, затем вернитесь сюда и нажмите «Обновить». Лог Instagram сохраняется здесь автоматически — даже после закрытия Instagram.</string>
     <string name="logs_empty_filter_title">Нет записей для этого фильтра</string>
     <string name="logs_empty_filter_body">Выберите «Все», чтобы увидеть все записи.</string>
     <string name="logs_nothing_to_copy">Нет логов для копирования</string>

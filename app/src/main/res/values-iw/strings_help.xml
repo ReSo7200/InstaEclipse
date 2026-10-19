@@ -9,8 +9,8 @@
     <string name="help_source_code">קוד המקור ב-GitHub</string>
     <string name="help_faq_expand">הרחב תשובה</string>
     <string name="help_faq_collapse">כווץ תשובה</string>
-    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
-    <string name="help_lsposed_sub">יש רוט? השתמשו בגרסה הזו</string>
+    <string name="help_vector_title">Vector (JingMatrix)</string>
+    <string name="help_vector_sub">יש רוט? השתמשו בגרסה הזו</string>
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">אין רוט? התקינו את זה</string>
     <string name="help_lspatch_guide">למדריך ההתקנה</string>

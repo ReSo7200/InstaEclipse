@@ -64,9 +64,9 @@ public class CommonUtils {
      */
     /**
      * The companion's instaeclipse_cache prefs, opened MODE_WORLD_READABLE so Instagram can read
-     * it through XSharedPreferences. LSPosed (xposedsharedprefs) allows that mode and keeps the
+     * it through XSharedPreferences. Vector (xposedsharedprefs) allows that mode and keeps the
      * file under /data/misc/<id>/prefs; MODE_PRIVATE made it 0660 there, unreadable from
-     * Instagram. Without LSPosed the platform rejects the mode, so fall back to MODE_PRIVATE.
+     * Instagram. Without Vector the platform rejects the mode, so fall back to MODE_PRIVATE.
      * Every companion-side open must go through here: a process keeps the first mode it used.
      */
     @SuppressWarnings("deprecation")
@@ -95,12 +95,14 @@ public class CommonUtils {
         } catch (Throwable ignored) {}
     }
 
-    /** Sends a broadcast to every supported Instagram variant currently installed. */
+    /** Sends commands only to an explicitly trusted installed host signing identity. */
     public static void broadcastToInstagram(Context context, Intent intent) {
         stampSetting(context, intent);
         PackageManager pm = context.getPackageManager();
         for (String pkg : SUPPORTED_PACKAGES) {
             try {
+                if (intent.getPackage() != null && !pkg.equals(intent.getPackage())) continue;
+                if (!ps.reso.instaeclipse.utils.ipc.CompanionBridge.isTrustedHost(context, pkg)) continue;
                 pm.getPackageInfo(pkg, 0);
                 Intent targeted = new Intent(intent);
                 targeted.setPackage(pkg);

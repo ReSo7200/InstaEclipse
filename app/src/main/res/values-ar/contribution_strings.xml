@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_chat_actions">إجراءات المحادثة الحالية</string>
+    <string name="ie_hide_this_chat">إخفاء هذه المحادثة</string>
+    <string name="ie_unhide_this_chat">إظهار هذه المحادثة</string>
+    <string name="ie_view_deleted_for_chat">عرض الرسائل المحذوفة لهذه المحادثة</string>
+    <string name="ie_show_hide_button">إظهار زر إخفاء المحادثة</string>
+    <string name="ie_show_deleted_button">إظهار زر الرسائل المحذوفة</string>
+    <string name="ie_chat_gesture_hint">اضغط مطولًا على عنوان المحادثة، ثم اختر إخفاء هذه المحادثة. إذا لم تتوفر هذه الإيماءة، فعّل خيار إظهار زر إخفاء المحادثة وارجع إلى المحادثة. يعمل خيار إجراءات المحادثة الحالية فقط عندما تبقى المحادثة مفتوحة خلف هذه الإعدادات. الزران في رأس المحادثة معطّلان افتراضيًا ويمكن التحكم في كل منهما بشكل مستقل. يقتصر الإخفاء على قوائم صندوق الوارد المدعومة؛ قد تظل المحادثات ظاهرة في البحث والإشعارات واقتراحات المشاركة وعند فتحها مباشرة.</string>
+    <string name="ie_downloader_original">قياسي</string>
+    <string name="ie_downloader_mode">الجودة: %1$s</string>
+    <string name="ie_downloader_original_unavailable">تعذّر على القياسي حفظ هذا العنصر. انتقل إلى الأفضل لتنزيله.</string>
+    <string name="ie_unsent_remove_copy">إزالة النسخة المحفوظة</string>
+    <string name="ie_unsent_remove_copy_confirm">هل تريد إزالة هذا الإدخال فقط من سجل الرسائل المحفوظ محليًا؟ لا يؤدي ذلك إلى حذف أي رسالة أو إلغاء إرسالها في محادثة Instagram أو على خوادمه. تبقى الإدخالات المحفوظة الأخرى دون تغيير.</string>
+    <string name="ie_unsent_copy_removed">تمت إزالة النسخة المحفوظة محليًا.</string>
+    <string name="ie_unsent_copy_stale">لم يعد هذا الإدخال المحفوظ متاحًا. تم تحديث السجل.</string>
+    <string name="ie_unsent_copy_remove_failed">تعذّر حفظ الإزالة. لا تزال النسخة المحفوظة معروضة؛ حاول مجددًا.</string>
+
+    <string name="ie_download_quality">جودة التنزيل</string>
+    <string name="ie_download_best">الأفضل</string>
+    <string name="ie_download_ceiling">الأفضل، حتى %1$dp</string>
+    <string name="ie_download_compatibility">تفضيل مقاطع تعمل على كل الأجهزة</string>
+    <string name="ie_download_fallback">استخدام جودة أقل إذا فشل الأفضل</string>
+    <string name="ie_download_quality_hint">القياسي هو أداة التنزيل المعتادة. الأفضل يفحص كل نسخ الفيديو، بما فيها HDR، ويحفظ الأوضح، أو الأوضح حتى الدقة التي تختارها.</string>
+    <string name="ie_download_fallback_prompt">تعذّر على الأفضل حفظ هذا العنصر. هل تريد تجربة جودة أقل؟</string>
+</resources>

@@ -18,7 +18,7 @@
     <string name="logs_status_saved">سجل محفوظ · Instagram لا يعمل</string>
     <string name="logs_status_none">لا يوجد تطبيق Instagram مدعوم مثبّت</string>
     <string name="logs_empty_title">لا توجد سجلات بعد</string>
-    <string name="logs_empty_body">افتح Instagram مرة واحدة مع تفعيل InstaEclipse في LSPosed، ثم عُد إلى هنا واضغط على «تحديث». يُحفظ سجل Instagram هنا تلقائيًا، حتى بعد إغلاق Instagram.</string>
+    <string name="logs_empty_body">افتح Instagram مرة واحدة مع تفعيل InstaEclipse في Vector، ثم عُد إلى هنا واضغط على «تحديث». يُحفظ سجل Instagram هنا تلقائيًا، حتى بعد إغلاق Instagram.</string>
     <string name="logs_empty_filter_title">لا شيء يطابق هذا الفلتر</string>
     <string name="logs_empty_filter_body">عُد إلى «الكل» لعرض جميع الإدخالات.</string>
     <string name="logs_nothing_to_copy">لا توجد سجلات لنسخها</string>

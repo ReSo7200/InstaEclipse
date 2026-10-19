@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Log salvato · Instagram non in esecuzione</string>
     <string name="logs_status_none">Nessuna app Instagram supportata installata</string>
     <string name="logs_empty_title">Ancora nessun log</string>
-    <string name="logs_empty_body">Apri Instagram una volta con InstaEclipse abilitato in LSPosed, poi torna qui e tocca Aggiorna. Il log di Instagram viene salvato qui automaticamente, anche dopo la chiusura di Instagram.</string>
+    <string name="logs_empty_body">Apri Instagram una volta con InstaEclipse abilitato in Vector, poi torna qui e tocca Aggiorna. Il log di Instagram viene salvato qui automaticamente, anche dopo la chiusura di Instagram.</string>
     <string name="logs_empty_filter_title">Nessun risultato per questo filtro</string>
     <string name="logs_empty_filter_body">Torna a Tutti per vedere ogni voce.</string>
     <string name="logs_nothing_to_copy">Nessun log da copiare</string>

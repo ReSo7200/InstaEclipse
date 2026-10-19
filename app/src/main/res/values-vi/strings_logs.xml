@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Nhật ký đã lưu · Instagram không chạy</string>
     <string name="logs_status_none">Chưa cài ứng dụng Instagram được hỗ trợ</string>
     <string name="logs_empty_title">Chưa có nhật ký</string>
-    <string name="logs_empty_body">Hãy mở Instagram một lần khi InstaEclipse đã được bật trong LSPosed, rồi quay lại đây và nhấn Làm mới. Nhật ký của Instagram được tự động lưu tại đây, kể cả sau khi Instagram đã đóng.</string>
+    <string name="logs_empty_body">Hãy mở Instagram một lần khi InstaEclipse đã được bật trong Vector, rồi quay lại đây và nhấn Làm mới. Nhật ký của Instagram được tự động lưu tại đây, kể cả sau khi Instagram đã đóng.</string>
     <string name="logs_empty_filter_title">Không có mục nào khớp với bộ lọc này</string>
     <string name="logs_empty_filter_body">Chuyển về Tất cả để xem mọi mục.</string>
     <string name="logs_nothing_to_copy">Không có nhật ký để sao chép</string>

@@ -9,8 +9,8 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
@@ -56,6 +56,22 @@ public class ForceReelQualityHook {
     private static final String CACHE_GETTER_KEY = "ForceReelQuality_VideoVersionsGetter";
     private static final String CACHE_HEIGHT_KEY = "ForceReelQuality_HeightGetterName";
 
+    /** Set while a download reads the qualities: it gets the full list, not the forced one. */
+    static final ThreadLocal<Boolean> RAW = new ThreadLocal<>();
+    private static volatile String heightGetter;
+
+    /** A video version's height in pixels, or -1 when unknown. */
+    static int heightOf(Object item) {
+        String name = heightGetter;
+        if (item == null || name == null) return -1;
+        try {
+            Object h = item.getClass().getMethod(name).invoke(item);
+            return h instanceof Integer i ? i : -1;
+        } catch (Throwable t) {
+            return -1;
+        }
+    }
+
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         try {
             Method videoVersionsGetter;
@@ -84,11 +100,12 @@ public class ForceReelQualityHook {
 
             videoVersionsGetter.setAccessible(true);
             String finalHeightGetterName = heightGetterName;
+            heightGetter = heightGetterName;
 
             XposedBridge.hookMethod(videoVersionsGetter, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                    if (FeatureFlags.forceReelQuality <= 0) return;
+                    if (FeatureFlags.forceReelQuality <= 0 || RAW.get() != null) return;
                     try {
                         Object result = param.getResult();
                         if (!(result instanceof List)) return;

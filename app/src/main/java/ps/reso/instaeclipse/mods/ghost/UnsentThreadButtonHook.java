@@ -43,6 +43,7 @@ public class UnsentThreadButtonHook {
     private static int threadHeaderId, actionBarEndId, tagKeyId, backButtonId, leftContainerId, threadTitleId, threadSubtitleId;
 
     public void install(ClassLoader classLoader) {
+        ConversationMenuHook.install();
         // IG 448+ moved onResume off InstagramMainActivity into IgFragmentActivity, so a plain
         // findAndHookMethod throws there; LifecycleHookUtil hooks the declaring class instead.
         for (String act : new String[]{"com.instagram.modal.ModalActivity",
@@ -147,36 +148,26 @@ public class UnsentThreadButtonHook {
             View header = threadHeaderId != 0 ? activity.findViewById(threadHeaderId) : null;
             if (header == null) return false;
 
-            if (ThreadHeaderMenu.has(activity, "unsent")) { // already injected
-                if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
-                ChatExportHook.inject(activity);
-                return true;
-            }
-
             final View headerRoot = header;
             // Capture the thread id AT INJECTION (thread just opened, before any refresh churn),
             // bound to THIS button — a stable per-thread fallback if the live read fails.
-            final String[] bound = { CurrentThreadTracker.currentThreadId() != null
-                    ? CurrentThreadTracker.currentThreadId() : KeepUnsentMessagesHook.currentThreadId };
-            // PRIMARY: read the actually-open thread from the foreground fragment (immune to
-            // background igThreadIgid churn). Fallbacks: id bound at open, then tracked, then tags.
+            final String[] bound = { CurrentThreadTracker.currentThreadId() };
+            // Only sources tied to THIS open chat: the resumed thread fragment, this header's own
+            // tags, the id bound when this button was added, and the launching intent. No scan of
+            // the whole activity graph and no "last opened thread" global: in the main activity
+            // those return another chat (inbox rows, the previous chat) and leaked its unsent
+            // messages and exports into this one. Unknown stays null; callers never widen it.
             // Shared with the other header buttons (chat export) so they act on the same thread.
             openThread = () -> {
                 String threadId = CurrentThreadTracker.currentThreadId();
-                if (threadId == null) threadId = resolveFromActivity(activity);
-                if (threadId == null) threadId = bound[0];
-                if (threadId == null) threadId = KeepUnsentMessagesHook.currentThreadId;
                 if (threadId == null) threadId = resolveThreadId(headerRoot);
+                if (threadId == null) threadId = bound[0];
+                if (threadId == null) threadId = resolveFromIntent(activity);
                 return threadId;
             };
-            // Lives in the shared module menu button (one header button for all thread actions).
-            if (!ThreadHeaderMenu.add(activity, "unsent",
-                    ps.reso.instaeclipse.utils.i18n.I18n.t(activity, ps.reso.instaeclipse.R.string.ig_unsent_messages), () -> {
-                String threadId = openThread.get();
-                ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
-                ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
-            })) return false;
-            ModuleLog.line("(IE|UnsentBtn) ✅ added to the thread menu");
+            // History owns a title gesture and an independently optional shortcut. Keep upstream
+            // export/jump/read entries in ThreadHeaderMenu; they must not depend on a history icon.
+            ConversationMenuHook.refreshAll();
             if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
             ChatExportHook.inject(activity);
             return true;
@@ -194,21 +185,18 @@ public class UnsentThreadButtonHook {
      * background igThreadIgid churn and header rebuilds during a refresh. Name-agnostic (matched by
      * class name containing "DirectThreadKey"), so obfuscation doesn't matter.
      */
-    private String resolveFromActivity(Activity activity) {
+    /** The thread key the chat's own activity was launched with (a chat opened in ModalActivity,
+     *  e.g. from a notification or link). The main activity's intent never carries one. */
+    private String resolveFromIntent(Activity activity) {
         try {
-            // 1. Intent extras (fastest, cleanest — the thread key is usually passed here).
             android.os.Bundle ex = activity.getIntent() != null ? activity.getIntent().getExtras() : null;
-            if (ex != null) {
-                for (String k : ex.keySet()) {
-                    Object dtk = scanForDirectThreadKey(ex.get(k), 0,
-                            java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()), 4);
-                    if (dtk != null) { String id = firstStringField(dtk); if (id != null) return id; }
-                }
+            if (ex == null) return null;
+            for (String k : ex.keySet()) {
+                Object dtk = scanForDirectThreadKey(ex.get(k), 0,
+                        java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()), 4);
+                if (dtk != null) { String id = firstStringField(dtk); if (id != null) return id; }
             }
-            // 2. The activity object graph (its hosted thread fragment holds the key).
-            Object dtk = scanForDirectThreadKey(activity, 0,
-                    java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>()), 6);
-            return dtk != null ? firstStringField(dtk) : null;
+            return null;
         } catch (Throwable t) { return null; }
     }
 

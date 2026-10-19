@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.utils.core.JitGuard;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -141,7 +141,7 @@ final class IgThemeColorSourceHooks {
      */
     private static int hookCachedColorDrawables() {
         try {
-            de.robv.android.xposed.XposedBridge.hookAllConstructors(ColorDrawable.class, new XC_MethodHook() {
+            ps.reso.instaeclipse.xposedcompat.XposedBridge.hookAllConstructors(ColorDrawable.class, new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam p) {
                     JitGuard.tick(p.method);
                     if (p.args.length != 2 || !active()) return;

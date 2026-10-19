@@ -18,7 +18,7 @@
     <string name="logs_status_saved">已儲存的日誌 · Instagram 未執行</string>
     <string name="logs_status_none">未安裝支援的 Instagram 應用程式</string>
     <string name="logs_empty_title">尚無日誌</string>
-    <string name="logs_empty_body">請在 LSPosed 中啟用 InstaEclipse 後開啟一次 Instagram，再回到這裡輕觸「重新整理」。即使 Instagram 已關閉，其日誌也會自動儲存在這裡。</string>
+    <string name="logs_empty_body">請在 Vector 中啟用 InstaEclipse 後開啟一次 Instagram，再回到這裡輕觸「重新整理」。即使 Instagram 已關閉，其日誌也會自動儲存在這裡。</string>
     <string name="logs_empty_filter_title">沒有符合此篩選條件的項目</string>
     <string name="logs_empty_filter_body">切換回「全部」即可查看所有項目。</string>
     <string name="logs_nothing_to_copy">沒有可複製的日誌</string>

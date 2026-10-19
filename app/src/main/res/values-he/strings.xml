@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
-    <string name="version" translatable="false">v0.8.0</string>
+    <string name="version" translatable="false">v0.8.1</string>
     <string name="home">דף הבית</string>
     <string name="features">תכונות</string>
     <string name="help">עזרה</string>
@@ -50,7 +50,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">שאלות נפוצות</string>
     <string name="faq_1"><b>1. אינו עובד/קורס אצל שימוש בגרסת האפליקציה מהGoogle Play?</b>\n- נא להשתמש בקובץ APK מאתר APKMirror.</string>
-    <string name="faq_2"><b>2. מודול אינו מופעל?</b>\n- השבת את המודול ותפעילו אותו מחדש בLSPosed.</string>
+    <string name="faq_2"><b>2. מודול אינו מופעל?</b>\n- השבת את המודול ותפעילו אותו מחדש בVector.</string>
     <string name="faq_3"><b>3. התכונות אינם עובדות?</b>\n- נא לעצור בכוח את אפליקציית אינסטגרם ותפעילו אותו מחדש.</string>
     <string name="faq_4"><b>4. הגדרות מפתחים גורמים לקריסות?</b>\n- נא לעקוב אחרי מדריך ההגרות מפתחים.</string>
     <string name="faq_5"><b>5. להגרות מפתחים יש תגים מוזרים או מספרים?</b>\n- נא להשתמש בגרסת Beta או Alpha במקום, כי גרסאות יציבות )Stable) של האפליקציה עוברות אובפוסקציה.</string>
@@ -225,6 +225,11 @@
     <string name="theme_dark_mode">מצב כהה</string>
     <string name="ig_dialog_translate_messages">כפתור תרגום בצ׳אטים</string>
     <string name="ig_chat_translate_row">תרגום באפליקציה</string>
+    <string name="ig_dialog_bulk_unsend">ביטול שליחה של כמה הודעות</string>
+    <string name="ig_bulk_unsend_row">ביטול שליחה מרובה</string>
+    <string name="ig_bulk_unsend_go">בטל שליחה</string>
+    <string name="ig_bulk_unsend_done">בוטלה שליחה של %1$d הודעות</string>
+    <string name="ig_bulk_unsend_unavailable">ביטול שליחה מרובה לא זמין בגרסה זו של אינסטגרם</string>
     <string name="ig_downloader_folder_hint">בוחרים את התיקייה מתוך אפליקציית InstaEclipse</string>
     <string name="lock_code_set_in_ig">מגדירים אותו בתוך Instagram: תפריט InstaEclipse &gt; נעילה. הקישו כדי לפתוח את Instagram.</string>
     <string name="theme_set_light">ערכות נושא למצב בהיר</string>
@@ -251,22 +256,33 @@
     <string name="ig_dialog_clean_feed_hide_plus">הסתר פרסומות של Instagram Plus</string>
     <string name="ig_dialog_clean_feed_hide_community_notes">הסתר הערות קהילה</string>
     <string name="ig_dialog_misc_profile_follows_label">הצג \"עוקב/ת אחריך\" בפרופילים</string>
+    <string name="ig_dialog_fancy_bio_font">גופנים מעוצבים בביו</string>
+    <string name="ig_fancy_font_button">גופן מעוצב</string>
+    <string name="ig_fancy_font_title">גופן הביו</string>
+    <string name="ig_fancy_font_note">מעצב אותיות לטיניות ויווניות ומספרים כך שכולם יראו. קו חוצה וקו תחתון עובדים בכל שפה.</string>
     <string name="ig_profile_follows_you">עוקב/ת אחריך</string>
     <string name="ig_profile_not_following_you">לא עוקב/ת אחריך</string>
     <string name="ig_dialog_downloader_offer_media_info">הוסף מידע מדיה לתפריט הפוסט</string>
     <string name="ig_dialog_downloader_offer_speed">הוסף מהירות ניגון לתפריט הפוסט</string>
     <string name="ig_dialog_downloader_reel_scrubber">הצג תמיד את סרגל ההתקדמות בריילז</string>
+    <string name="ig_dialog_reels_hold_left_slow">החזקה בצד שמאל להילוך איטי (0.5×)</string>
     <string name="ig_media_info_title">מידע מדיה</string>
     <string name="ig_playback_speed_title">מהירות ניגון</string>
     <string name="ig_playback_speed_next">המהירות הוגדרה — תחול על הסרטון הבא שיתחיל</string>
     <string name="ig_dialog_distraction_hide_notes_tray">הסתר פתקים בהודעות</string>
     <string name="ig_dialog_downloader_voice">הורד הודעות קוליות (לחיצה ארוכה)</string>
+    <string name="ig_dialog_downloader_dm_media">הורדת תמונות וסרטונים מהודעות (לחיצה ארוכה)</string>
     <string name="ig_dialog_misc_viewer_search">חפש בצופי הסטורי שלך</string>
     <string name="ig_viewer_search_hint">חפש צופים</string>
     <string name="ig_dialog_misc_like_undo">חלון ביטול ללייקים (4 שנ׳)</string>
     <string name="ig_like_undo_bar">❤ אהבת · בטל</string>
     <string name="ig_like_undo_cancelled">הלייק בוטל — רענן כדי לעדכן את הלב</string>
     <string name="ig_dialog_misc_exact_timestamps">הצג תאריכים מדויקים במקום \"לפני שעתיים\"</string>
+    <string name="ig_timestamp_format">תבנית תאריך</string>
+    <string name="ig_timestamp_format_default">ברירת המחדל של המכשיר</string>
+    <string name="ig_timestamp_format_custom">מותאם אישית…</string>
+    <string name="ig_timestamp_format_custom_hint">אותיות: yyyy שנה · MM חודש · MMM שם החודש · dd יום · EEE יום בשבוע · HH שעה (24) · h שעה (12) · mm דקות · ss שניות · a AM/PM. טקסט אחר יש לשים בין \'גרשיים בודדים\'.</string>
+    <string name="ig_timestamp_format_invalid">תבנית לא תקינה</string>
     <string name="ig_dialog_misc_hide_share_create_group">הסתר \"צור קבוצה\" בתפריט השיתוף</string>
     <string name="ig_dialog_misc_show_feature_toasts">הצג הודעות תכונות</string>
     <string name="ig_dialog_misc_show_follower_toast">הצג הודעת עוקב</string>
@@ -620,6 +636,18 @@
     <string name="ig_dialog_ghost_chat_export">כפתור ייצוא צ\'אט בצ\'אטים</string>
     <string name="ig_dialog_misc_comment_search">חיפוש בתגובות</string>
     <string name="ig_dialog_misc_follow_export">ייצא עוקבים/נעקבים ל-CSV</string>
+    <string name="ig_feat_followers_history">היסטוריית עוקבים (מי הפסיק לעקוב)</string>
+    <string name="ig_followers_history">היסטוריית עוקבים</string>
+    <string name="ig_followers_history_first">הרשימה הראשונה נשמרה: %1$d עוקבים. בדוק שוב מאוחר יותר כדי לראות מי הפסיק לעקוב או התחיל.</string>
+    <string name="ig_followers_history_changes">מאז %1$s: ‏%2$d הפסיקו, %3$d חדשים</string>
+    <string name="ig_followers_history_summary">%1$d עוקבים · נבדק %2$s</string>
+    <string name="ig_followers_history_empty">עדיין לא נרשמו שינויים.</string>
+    <string name="ig_followers_history_unfollowed">הפסיק לעקוב אחריך</string>
+    <string name="ig_followers_history_followed">התחיל לעקוב אחריך</string>
+    <string name="ig_followers_history_partial">הרשימה לא נטענה עד הסוף, לכן לא בוצעה השוואה. נסה שוב.</string>
+    <string name="ig_followers_history_note">שינויים מתגלים כשבודקים, לכן התאריך הוא מתי השינוי זוהה.</string>
+    <string name="ig_followers_history_clear">נקה היסטוריה</string>
+    <string name="ig_followers_history_wrong_tab">פתח את לשונית העוקבים שלך כדי לבדוק.</string>
     <string name="ig_export_media_saved">הייצוא נשמר — %1$d קובצי מדיה ב-%2$s</string>
     <string name="ig_feat_comment_search">חיפוש בתגובות</string>
     <string name="ig_feat_edit_history">היסטוריית עריכה</string>
@@ -665,4 +693,23 @@
     <string name="share_dl_label">הורד עם InstaEclipse</string>
     <string name="share_dl_no_instagram">אינסטגרם לא מותקן</string>
     <string name="share_dl_no_link">לא נמצא קישור לפוסט או לריל של אינסטגרם</string>
+    <string name="ig_spoof_device">זיוף מכשיר (וידאו HDR)</string>
+    <string name="ig_spoof_device_note">Instagram רואה את הטלפון הזה כמכשיר שנבחר. זה פותח וידאו HDR ותכונות אחרות ש-Instagram מגביל לטלפונים האלה, ומוסיף את אפשרויות המפתח המתאימות. הפעל מחדש את Instagram כדי להחיל. Instagram עשוי לבקש לאשר את החשבון פעם אחת.</string>
+    <string name="ig_dialog_downloader_stickers">הורדת מדבקות ו-GIF בהודעות (לחיצה ארוכה)</string>
+    <string name="ig_feat_sticker_download">הורדת מדבקות</string>
+    <string name="ig_story_tray_size">גודל סרגל הסטוריז</string>
+    <string name="ig_story_ring_color">צבע הטבעת של סטוריז שלא נצפו</string>
+    <string name="ig_story_ring_default">ברירת המחדל של Instagram</string>
+    <string name="ig_story_ring_custom">צבע מותאם</string>
+    <string name="ig_story_ring_custom_hint">צבע כמו #3897F0, או שניים למעבר צבע: #FF0066,#7638FA</string>
+    <string name="ig_story_ring_invalid">צבע לא תקין</string>
+    <string name="ig_feed_corner_radius">פינות מעוגלות לפוסטים</string>
+    <string name="ig_disable_search_history">לא לשמור חיפושים</string>
+    <string name="ig_call_confirm">לשאול לפני שיחה</string>
+    <string name="ig_call_confirm_audio">להתחיל שיחה קולית?</string>
+    <string name="ig_call_confirm_video">להתחיל שיחת וידאו?</string>
+    <string name="ig_call_confirm_call">התקשר</string>
+    <string name="ig_confirm_refresh">לשאול לפני רענון הפיד</string>
+    <string name="ig_confirm_refresh_question">לרענן את הפיד?</string>
+    <string name="ig_confirm_refresh_action">רענן</string>
 </resources>

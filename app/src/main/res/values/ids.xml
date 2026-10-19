@@ -2,4 +2,5 @@
 <resources>
     <item name="tag_module_dialog_root" type="id" />
     <item name="ie_follows_you_tag" type="id" />
+    <item name="ie_fancy_font" type="id" />
 </resources>

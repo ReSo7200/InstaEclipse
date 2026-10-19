@@ -1,5 +1,6 @@
 package ps.reso.instaeclipse.mods.media;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -37,5 +38,29 @@ public class DashAudioTest {
         assertNull(DashAudio.audioUrl(videoOnly));
         assertNull(DashAudio.audioUrl(""));
         assertNull(DashAudio.audioUrl(null));
+    }
+
+    private static final String VIDEO_MPD = "<MPD><Period>"
+            + "<AdaptationSet contentType=\"video\">"
+            + "<Representation height=\"1920\" bandwidth=\"1250000\" codecs=\"av01.0.09M.08\"><BaseURL>https://cdn/av1080.mp4</BaseURL></Representation>"
+            + "<Representation height=\"1280\" bandwidth=\"900000\" codecs=\"av01.0.08M.08\"><BaseURL>https://cdn/av720.mp4</BaseURL></Representation>"
+            + "</AdaptationSet>"
+            + "<AdaptationSet contentType=\"video\">"
+            + "<Representation height=\"1280\" bandwidth=\"700000\" codecs=\"avc1.64001F\"><BaseURL>https://cdn/h720a.mp4</BaseURL></Representation>"
+            + "<Representation height=\"1280\" bandwidth=\"800000\" codecs=\"avc1.64001F\"><BaseURL>https://cdn/h720b.mp4?a=1&amp;b=2</BaseURL></Representation>"
+            + "</AdaptationSet>"
+            + "<AdaptationSet contentType=\"audio\">"
+            + "<Representation height=\"9999\" bandwidth=\"64000\"><BaseURL>https://cdn/a.mp4</BaseURL></Representation>"
+            + "</AdaptationSet></Period></MPD>";
+
+    @Test
+    public void bestVideoPicksTallestStream() {
+        assertArrayEquals(new String[]{"https://cdn/av1080.mp4", "1920"}, DashAudio.bestVideo(VIDEO_MPD, false));
+    }
+
+    @Test
+    public void bestVideoCanSkipAv1() {
+        assertArrayEquals(new String[]{"https://cdn/h720b.mp4?a=1&b=2", "1280"}, DashAudio.bestVideo(VIDEO_MPD, true));
+        assertNull(DashAudio.bestVideo(null, true));
     }
 }

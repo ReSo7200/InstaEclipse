@@ -18,9 +18,9 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.Map;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.mods.devops.config.ConfigManager;
@@ -117,6 +117,10 @@ public class UIHookManager {
         // Distraction Free: collapse the story tray / Reels tab at the view level (the network drop
         // alone leaves IG's cached stories/reels visible on IG 447.0.0.39+).
         ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.watchActivity(activity);
+        ps.reso.instaeclipse.mods.ui.StoryTrayHook.watchActivity(activity);
+
+        // Fancy bio fonts: the bio's "Change font" button opens the module's font picker.
+        ps.reso.instaeclipse.mods.ui.FancyBioFontHook.watchActivity(activity);
 
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
@@ -304,6 +308,11 @@ public class UIHookManager {
             @Override
             public void onReceive(android.content.Context ctx, Intent intent) {
                 String json = intent.getStringExtra("json_content");
+                try { ps.reso.instaeclipse.utils.ipc.BrokerPayload.validateConfig(json); }
+                catch (IllegalArgumentException malformed) {
+                    ModuleLog.line("(IE|Config) Invalid or oversized configuration rejected");
+                    return;
+                }
                 if (json != null && !json.isEmpty()) {
                     ConfigManager.importConfigFromJson(ctx, json);
                 }
@@ -319,6 +328,11 @@ public class UIHookManager {
             @Override
             public void onReceive(android.content.Context ctx, Intent intent) {
                 String json = intent.getStringExtra("json_content");
+                try { ps.reso.instaeclipse.utils.ipc.BrokerPayload.validateConfig(json); }
+                catch (IllegalArgumentException malformed) {
+                    ModuleLog.line("(IE|Config) Invalid or oversized configuration rejected");
+                    return;
+                }
                 if (json == null || json.isEmpty()) return;
                 new Thread(() -> {
                     try {

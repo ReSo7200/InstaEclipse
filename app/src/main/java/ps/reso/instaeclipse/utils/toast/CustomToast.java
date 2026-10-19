@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.TextView;
 
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 public class CustomToast {
@@ -40,7 +40,8 @@ public class CustomToast {
         switch (key) {
             case "CustomTheme": case "CustomFont": case "CustomEmoji": case "ForceReelQuality":
             case "HideSuggestionsInFeed": case "HideThreadsSuggestions": case "HideLikedPosts":
-            case "HideNotesTray":
+            case "HideNotesTray": case "StoryRingColor": case "StoryTraySize": case "RoundedFeedPosts":
+            case "HidePlusUpsells": case "HideNavTabs": case "SpoofDevice":
                 return "Appearance";
             case "GhostSeen": case "GhostTyping": case "GhostStories": case "GhostLive":
             case "GhostViewOnce": case "GhostScreenshot": case "AllowScreenshots":
@@ -48,12 +49,15 @@ public class CustomToast {
             case "LockDirectMessages": case "HideSpecificChats": case "AdBlocker":
             case "DisableTrackingLinks": case "OpenLinksExternally": case "RemoveMetaAI": case "SpoofLastSeen":
             case "DisableDiscoverPeople": case "ChatExport": case "EditHistory":
-            case "LockSavedCollections": case "DisableRepost":
+            case "LockSavedCollections": case "DisableRepost": case "BlockAnalytics": case "LockWholeApp":
+            case "DisableSearchHistory": case "ConfirmCalls":
                 return "Privacy";
             case "PostDownload": case "ReelDownload": case "StoryDownload": case "ProfileDownload":
             case "CopyMediaLink": case "SaveInstants": case "UploadInstants": case "CacheStories":
             case "SpoofLocation": case "StoryMentions": case "CaptionCopy": case "CopyComment":
-            case "PhotoZoom": case "PlaybackSpeed": case "VoiceDownload": case "MaxUploadQuality":
+            case "PhotoZoom": case "PlaybackSpeed": case "VoiceDownload": case "StickerDownload": case "MaxUploadQuality":
+            case "AudioDownload": case "CopyImage": case "MediaInfo": case "ForceReelScrubber": case "DmMediaDownload":
+            case "DisableVideoAutoPlay": case "DisableStoryFlipping":
                 return "Media";
             default:
                 return "Tools"; // DevOptions, RemoveBuildExpiredPopup, FollowerToast, DisableDoubleTapLike…

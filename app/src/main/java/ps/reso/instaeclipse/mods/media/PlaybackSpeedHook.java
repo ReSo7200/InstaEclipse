@@ -1,7 +1,10 @@
 package ps.reso.instaeclipse.mods.media;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.ContextThemeWrapper;
+import android.view.MotionEvent;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.luckypray.dexkit.DexKitBridge;
@@ -22,8 +25,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
@@ -42,6 +45,11 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  *
  * Reels: IG's own attached scrubber is gated by ClipsExperimentUtil.shouldShowAttachedScrubber
  * ((UserSession, long, boolean, boolean)boolean using its purge-flag string); forced true.
+ *
+ * Hold for slow motion: IG's hold-for-2x fires on both halves of a reel. With
+ * FeatureFlags.holdLeftSlowMotion on, a 2x request from a hold that started on the left half of
+ * the screen becomes 0.5x (touch side from Activity.dispatchTouchEvent; the rewrite happens in the
+ * same Hero / player setters as the chosen speed), and IG's "2X" hint reads "½X" meanwhile.
  */
 public class PlaybackSpeedHook {
 
@@ -52,6 +60,29 @@ public class PlaybackSpeedHook {
     private static final List<Method> SETTERS = new ArrayList<>();
     private static final List<Method> WRAPPERS = new ArrayList<>();
     private static final ThreadLocal<Boolean> APPLYING = new ThreadLocal<>();
+    static final float SLOW = 0.5f;
+    private static volatile boolean leftDown;
+    private static volatile boolean slowActive;
+    private static volatile WeakReference<Activity> touchActivity;
+    private static final java.util.regex.Pattern TWO_X =
+            java.util.regex.Pattern.compile("(?<![\\d.,])2(\\s?[xX×])(?![\\p{L}\\d])");
+
+    /** Hold-for-2x from the left half becomes slow motion; IG's 1x reset ends it. */
+    private static float holdSpeed(float f) {
+        if (!FeatureFlags.holdLeftSlowMotion) return f;
+        if (f == 2f && leftDown) {
+            if (!slowActive) {
+                ModuleLog.line(TAG + "hold on the left: " + SLOW + "x");
+                slowActive = true;
+                // IG shows its "2X" hint before it sets the speed: fix the one already on screen
+                FeedVideoDownloadHook.mainHandler.post(PlaybackSpeedHook::relabel);
+                FeedVideoDownloadHook.mainHandler.postDelayed(PlaybackSpeedHook::relabel, 200);
+            }
+            return SLOW;
+        }
+        if (f == 1f) slowActive = false;
+        return f;
+    }
     private static final java.util.Map<Object, Boolean> PLAYERS =
             java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
 
@@ -84,6 +115,45 @@ public class PlaybackSpeedHook {
         installFeed(bridge, cl);
         installHero(bridge, cl);
         installReelScrubber(bridge, cl);
+        installHoldSide();
+    }
+
+    private void installHoldSide() {
+        try {
+            XposedBridge.hookMethod(Activity.class.getDeclaredMethod("dispatchTouchEvent", MotionEvent.class), new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (!FeatureFlags.holdLeftSlowMotion || INJECTING || !(param.args[0] instanceof MotionEvent ev)) return;
+                    if (onTouch((Activity) param.thisObject, ev)) param.setResult(true);
+                }
+            });
+            // IG's hint under the finger ("Slide down to lock 2X speed") is Litho text, laid out with
+            // StaticLayout/BoringLayout: only touched while a slow hold is active, and only the
+            // "2X" token. TextView.setText covers the same hint if it's ever a plain TextView.
+            XC_MethodHook hint = new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (!slowActive || param.args.length == 0 || !(param.args[0] instanceof CharSequence cs) || cs.length() > 80) return;
+                    java.util.regex.Matcher m = TWO_X.matcher(cs);
+                    if (!m.find()) return;
+                    String out = m.replaceAll("½$1"); // same width as "2X": the hint stays on one line
+                    // StaticLayout.Builder.obtain(source, start, end, …): keep a whole-text range whole
+                    if (param.args.length > 2 && param.args[1] instanceof Integer st && param.args[2] instanceof Integer en) {
+                        if (st != 0 || en != cs.length()) return;
+                        param.args[2] = out.length();
+                    }
+                    param.args[0] = out;
+                }
+            };
+            XposedBridge.hookMethod(TextView.class.getDeclaredMethod("setText", CharSequence.class, TextView.BufferType.class), hint);
+            XposedBridge.hookAllMethods(android.text.StaticLayout.Builder.class, "obtain", hint);
+            XposedBridge.hookAllMethods(android.text.BoringLayout.class, "make", hint);
+            XposedBridge.hookAllMethods(android.text.BoringLayout.class, "replaceOrMake", hint);
+            FeatureStatusTracker.setHooked("HoldSlowMotion");
+            ModuleLog.line(TAG + "✅ hold side tracking");
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ hold side: " + t);
+        }
     }
 
     // Hero layer: every IG video (feed, reels, stories, highlights) plays through the Hero player
@@ -123,6 +193,11 @@ public class PlaybackSpeedHook {
                 protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (param.args[0] != null) HEROES.put(param.args[0], Boolean.TRUE);
                     if (APPLYING.get() == Boolean.TRUE) return;
+                    if (param.args[1] instanceof Float f0 && f0 == 2f && FeatureFlags.holdLeftSlowMotion) {
+                        param.args[1] = holdSpeed(f0);
+                        return;
+                    }
+                    if (param.args[1] instanceof Float f1) holdSpeed(f1);
                     // IG resets to 1x on its own (e.g. after hold-for-2x); keep the chosen speed.
                     if (FeatureFlags.offerPlaybackSpeed && speed != 1f && param.args[1] instanceof Float f && f == 1f)
                         param.args[1] = speed;
@@ -141,6 +216,107 @@ public class PlaybackSpeedHook {
                     + ", prepare " + prepare.getName());
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ hero: " + t);
+        }
+    }
+
+    // IG 452 only speeds up a hold on the left edge of a reel; a hold elsewhere pauses it. The
+    // right-half hold (left of the like/comment/share column) is ours: just before IG's long press
+    // fires, IG gets an ACTION_CANCEL (so it never pauses) and the rest of the gesture is ours,
+    // 2x until the finger lifts.
+    private static volatile boolean rightActive;
+    private static boolean rightPending;
+    private static boolean INJECTING;
+    private static float downX, downY;
+    private static final Runnable RIGHT_HOLD = () -> {
+        WeakReference<Activity> ref = touchActivity;
+        Activity a = ref != null ? ref.get() : null;
+        if (a == null || !rightPending) return;
+        rightActive = true;
+        long now = android.os.SystemClock.uptimeMillis();
+        MotionEvent cancel = MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, downX, downY, 0);
+        INJECTING = true;
+        try {
+            a.dispatchTouchEvent(cancel);
+        } catch (Throwable ignored) {
+        } finally {
+            INJECTING = false;
+            cancel.recycle();
+        }
+        boolean ok = applyToPlayers(2f);
+        ok |= applyToHeroes(2f);
+        ModuleLog.line(TAG + "hold on the right: 2x, applied=" + ok);
+    };
+    /** @return true to swallow the event (the rest of a right-side hold). */
+    private static boolean onTouch(Activity a, MotionEvent ev) {
+        switch (ev.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN -> {
+                touchActivity = new WeakReference<>(a);
+                android.util.DisplayMetrics dm = a.getResources().getDisplayMetrics();
+                downX = ev.getRawX();
+                downY = ev.getRawY();
+                leftDown = downX < dm.widthPixels / 2f;
+                if (!leftDown && downX < dm.widthPixels * 0.82f && downY > dm.heightPixels * 0.15f
+                        && downY < dm.heightPixels * 0.85f && reelOnScreen(a)) {
+                    rightPending = true;
+                    // a bit before IG's own long press (getLongPressTimeout) so IG never pauses
+                    FeedVideoDownloadHook.mainHandler.postDelayed(RIGHT_HOLD,
+                            android.view.ViewConfiguration.getLongPressTimeout() * 3L / 4);
+                }
+                return false;
+            }
+            case MotionEvent.ACTION_MOVE -> {
+                if (rightActive) return true;
+                int slop = android.view.ViewConfiguration.get(a).getScaledTouchSlop();
+                if (rightPending && Math.hypot(ev.getRawX() - downX, ev.getRawY() - downY) > slop) cancelRight();
+                return false;
+            }
+            case MotionEvent.ACTION_POINTER_DOWN, MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                boolean was = rightActive;
+                cancelRight();
+                if (was) {
+                    float back = FeatureFlags.offerPlaybackSpeed ? speed : 1f;
+                    applyToPlayers(back);
+                    applyToHeroes(back);
+                }
+                return was;
+            }
+            default -> {
+                return rightActive;
+            }
+        }
+    }
+
+    private static void cancelRight() {
+        rightPending = false;
+        rightActive = false;
+        FeedVideoDownloadHook.mainHandler.removeCallbacks(RIGHT_HOLD);
+    }
+
+    private static int clipsContainerId = -1;
+
+    /** True when a reel is on screen (IG's clips_video_container is shown). */
+    private static boolean reelOnScreen(Activity a) {
+        if (clipsContainerId == -1)
+            clipsContainerId = ps.reso.instaeclipse.utils.ui.ResIds.id(a, "clips_video_container");
+        if (clipsContainerId == 0 || a.getWindow() == null) return false;
+        android.view.View v = a.getWindow().getDecorView().findViewById(clipsContainerId);
+        return v != null && v.isShown();
+    }
+
+    private static void relabel() {
+        WeakReference<Activity> ref = touchActivity;
+        Activity a = ref != null ? ref.get() : null;
+        if (!slowActive || a == null || a.getWindow() == null) return;
+        relabel(a.getWindow().getDecorView(), 0);
+    }
+
+    private static void relabel(android.view.View v, int depth) {
+        if (depth > 40 || v.getVisibility() != android.view.View.VISIBLE) return;
+        if (v instanceof TextView tv) {
+            CharSequence cs = tv.getText();
+            if (cs != null && cs.length() <= 80 && TWO_X.matcher(cs).find()) tv.setText(cs.toString());
+        } else if (v instanceof android.view.ViewGroup g) {
+            for (int i = 0; i < g.getChildCount(); i++) relabel(g.getChildAt(i), depth + 1);
         }
     }
 
@@ -261,6 +437,11 @@ public class PlaybackSpeedHook {
                         protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                             remember(param.thisObject);
                             if (APPLYING.get() == Boolean.TRUE) return;
+                            if (param.args[0] instanceof Float f0 && f0 == 2f && FeatureFlags.holdLeftSlowMotion) {
+                                param.args[0] = holdSpeed(f0);
+                                return;
+                            }
+                            if (param.args[0] instanceof Float f1) holdSpeed(f1);
                             if (FeatureFlags.offerPlaybackSpeed && speed != 1f && param.args[0] instanceof Float f && f == 1f)
                                 param.args[0] = speed;
                         }
@@ -307,6 +488,7 @@ public class PlaybackSpeedHook {
                     if (FeatureFlags.forceReelScrubber) param.setResult(true);
                 }
             });
+            FeatureStatusTracker.setHooked("ForceReelScrubber");
             ModuleLog.line(TAG + "✅ reel scrubber gate " + gate.getDeclaringClass().getName() + "." + gate.getName());
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ reel scrubber: " + t);

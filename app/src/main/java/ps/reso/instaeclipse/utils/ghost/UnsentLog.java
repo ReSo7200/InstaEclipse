@@ -1,13 +1,15 @@
 package ps.reso.instaeclipse.utils.ghost;
 
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.content.Context;
+import android.util.AtomicFile;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,9 @@ public class UnsentLog {
 
     private static final List<Entry> cache = new ArrayList<>();
     private static boolean loaded = false;
+    private static boolean loadFailed = false;
+
+    public enum RemovalResult { REMOVED, STALE, FAILED }
 
     private static File file() {
         Context ctx = AndroidAppHelper.currentApplication();
@@ -49,39 +54,79 @@ public class UnsentLog {
 
     private static synchronized void ensureLoaded() {
         if (loaded) return;
+        File f = file();
+        if (f == null) return;
         loaded = true;
         try {
-            File f = file();
-            if (f == null || !f.exists()) return;
-            byte[] b = new byte[(int) f.length()];
-            try (java.io.FileInputStream in = new java.io.FileInputStream(f)) {
-                int off = 0, n;
-                while (off < b.length && (n = in.read(b, off, b.length - off)) > 0) off += n;
-            }
+            if (!f.exists() && !new File(f.getPath() + ".bak").exists()) return;
+            byte[] b = new AtomicFile(f).readFully();
             JSONArray arr = new JSONArray(new String(b, StandardCharsets.UTF_8));
+            List<Entry> next = new ArrayList<>();
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject o = arr.getJSONObject(i);
-                cache.add(new Entry(o.optLong("t"), o.optString("th", ""), o.optString("s", ""), o.optString("m", "")));
+                next.add(new Entry(o.optLong("t"), o.optString("th", ""), o.optString("s", ""), o.optString("m", "")));
             }
+            cache.addAll(next);
         } catch (Throwable t) {
-            ModuleLog.line("(IE|UnsentLog) load failed: " + t.getMessage());
+            loadFailed = true;
+            ModuleLog.line("(IE|UnsentLog) local history could not be loaded");
         }
     }
 
     private static synchronized void persist() {
+        if (loadFailed) return; // Never overwrite unreadable history with a partial cache.
         try {
-            File f = file();
-            if (f == null) return;
-            JSONArray arr = new JSONArray();
-            for (Entry e : cache) {
-                JSONObject o = new JSONObject();
-                o.put("t", e.time); o.put("th", e.thread); o.put("s", e.sender); o.put("m", e.text);
-                arr.put(o);
-            }
-            // temp file + rename: a crash mid-write keeps the previous version intact
-            ps.reso.instaeclipse.utils.core.AtomicFiles.write(f, arr.toString());
+            writeSnapshot(file(), cache);
         } catch (Throwable t) {
-            ModuleLog.line("(IE|UnsentLog) persist failed: " + t.getMessage());
+            ModuleLog.line("(IE|UnsentLog) local history save failed");
+        }
+    }
+
+    /** Remove only the exact row held by a viewer snapshot, after its replacement is durable. */
+    public static synchronized RemovalResult removeEntry(Entry selected) {
+        ensureLoaded();
+        if (loadFailed) return RemovalResult.FAILED;
+        return removeEntryFrom(cache, selected, file());
+    }
+
+    /** Synthetic-list/file seam; never looks up real user history. */
+    static RemovalResult removeEntryFrom(List<Entry> entries, Entry selected, File destination) {
+        int index = -1;
+        for (int i = 0; i < entries.size(); i++) if (entries.get(i) == selected) { index = i; break; }
+        if (index < 0) return RemovalResult.STALE;
+        List<Entry> next = new ArrayList<>(entries);
+        next.remove(index);
+        try { writeSnapshot(destination, next); }
+        catch (IOException failure) { return RemovalResult.FAILED; }
+        entries.remove(index);
+        return RemovalResult.REMOVED;
+    }
+
+    static void writeSnapshot(File destination, List<Entry> entries) throws IOException {
+        if (destination == null) throw new IOException("Local history destination unavailable");
+        AtomicFile atomic = new AtomicFile(destination);
+        FileOutputStream output = null;
+        try {
+            JSONArray array = new JSONArray();
+            for (Entry entry : entries) {
+                JSONObject object = new JSONObject();
+                object.put("t", entry.time); object.put("th", entry.thread);
+                object.put("s", entry.sender); object.put("m", entry.text);
+                array.put(object);
+            }
+            byte[] bytes = array.toString().getBytes(StandardCharsets.UTF_8);
+            output = atomic.startWrite();
+            output.write(bytes);
+            output.getFD().sync();
+            atomic.finishWrite(output);
+            output = null;
+            // Some AtomicFile rename failures are only logged by Android. Verify the commit
+            // before exposing a removal to callers or dropping the selected cached object.
+            if (!java.util.Arrays.equals(bytes, atomic.readFully()))
+                throw new IOException("Local history commit could not be verified");
+        } catch (Exception failure) {
+            atomic.failWrite(output);
+            throw new IOException("Local history could not be saved", failure);
         }
     }
 
