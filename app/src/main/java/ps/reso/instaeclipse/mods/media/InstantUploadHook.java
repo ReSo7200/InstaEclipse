@@ -140,7 +140,7 @@ public class InstantUploadHook {
 
         static SwapBinding resolve(Class<?> vm, Class<?> contextType, Class<?> bitmapType) {
             SwapBinding found = null;
-            for (Method method : vm.getDeclaredMethods()) {
+            for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(vm)) {
                 if (!Modifier.isStatic(method.getModifiers()) || method.getReturnType() != Object.class) continue;
                 Class<?>[] p = method.getParameterTypes();
                 if (p.length < 4 || p[0] != contextType || p[1] != bitmapType) continue;
@@ -209,7 +209,7 @@ public class InstantUploadHook {
                 }
             };
             int n = 0;
-            for (Method m : vm.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(vm)) {
                 if (Modifier.isStatic(m.getModifiers())) continue;
                 if (m.getParameterCount() != 0) continue;
                 if (m.getReturnType() != void.class) continue;

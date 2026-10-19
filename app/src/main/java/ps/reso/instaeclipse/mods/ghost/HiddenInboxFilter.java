@@ -102,7 +102,7 @@ final class HiddenInboxFilter {
             if (classes.size() != 1) return;
             Class<?> type = classes.iterator().next();
             List<Method> candidates = new ArrayList<>();
-            for (Method method : type.getDeclaredMethods()) {
+            for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(type)) {
                 Class<?>[] parameters = method.getParameterTypes();
                 if (!Modifier.isStatic(method.getModifiers()) && method.getReturnType() == void.class
                         && parameters.length == 1 && parameters[0].isEnum()) candidates.add(method);
@@ -127,7 +127,7 @@ final class HiddenInboxFilter {
         try {
             Object inbox = null;
             if (inboxStoreClass.isInstance(store)) inbox = store;
-            else for (Field field : store.getClass().getDeclaredFields()) {
+            else for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(store.getClass())) {
                 if (Modifier.isStatic(field.getModifiers()) || field.getType() != inboxStoreClass) continue;
                 field.setAccessible(true);
                 Object candidate = field.get(store);
@@ -179,7 +179,7 @@ final class HiddenInboxFilter {
         Set<String> ids = new LinkedHashSet<>();
         try {
             for (Class<?> type = row.getClass(); type != null && type != Object.class; type = type.getSuperclass()) {
-                for (Field field : type.getDeclaredFields()) {
+                for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(type)) {
                     if (Modifier.isStatic(field.getModifiers()) || !field.getType().getName().equals(KEY)) continue;
                     field.setAccessible(true);
                     Object key = field.get(row);
@@ -191,7 +191,7 @@ final class HiddenInboxFilter {
             }
             // Current 447 row model exposes its key through the DirectThreadKey-returning accessor.
             // Resolve by signature, not the obfuscated CTG name. Refuse contradictory identities.
-            if (ids.isEmpty()) for (Method method : row.getClass().getMethods()) {
+            if (ids.isEmpty()) for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(row.getClass())) {
                 if (Modifier.isStatic(method.getModifiers()) || method.getParameterCount() != 0
                         || !method.getReturnType().getName().equals(KEY)) continue;
                 Object key = method.invoke(row);

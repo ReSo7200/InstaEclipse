@@ -147,7 +147,7 @@ public class FeedVideoDownloadHook {
             // IG 452 dropped it; the same lookup now ends one step earlier and returns the
             // ExtendedImageUrl (MediaExtKt.A0Y), whose URL we read via its getUrl().
             Method extVariant = null;
-            for (Method m : mediaExtKtClass.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(mediaExtKtClass)) {
                 Class<?>[] p = m.getParameterTypes();
                 if (p.length != 2 || !Modifier.isStatic(m.getModifiers())
                         || !"android.content.Context".equals(p[0].getName()) || p[1] != mediaClass) continue;
@@ -567,7 +567,7 @@ public class FeedVideoDownloadHook {
         while (cls != null && cls != Object.class) {
             String cn = cls.getName();
             if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.") && !cn.startsWith("com.facebook.")) break;
-            for (Method m : cls.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cls)) {
                 if (m.getParameterCount() != 0 || m.getReturnType() != String.class) continue;
                 try {
                     m.setAccessible(true);
@@ -608,7 +608,7 @@ public class FeedVideoDownloadHook {
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.") && !cn.startsWith("com.facebook.")) return null;
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
@@ -677,7 +677,7 @@ public class FeedVideoDownloadHook {
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.") && !cn.startsWith("com.facebook.")) return;
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
@@ -698,7 +698,7 @@ public class FeedVideoDownloadHook {
         // its no-arg List getter materializes the VideoVersion objects for inspection.
         cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Method method : cls.getDeclaredMethods()) {
+            for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cls)) {
                 if (method.getParameterCount() != 0
                         || !List.class.isAssignableFrom(method.getReturnType())) continue;
                 try {
@@ -916,7 +916,7 @@ public class FeedVideoDownloadHook {
         if (item == null) return null;
         Class<?> cls = item.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType() != String.class
                         || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try {
@@ -995,7 +995,7 @@ public class FeedVideoDownloadHook {
             out.add(directUrl);
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     f.setAccessible(true);
                     Object val = f.get(obj);
@@ -1025,7 +1025,7 @@ public class FeedVideoDownloadHook {
         if (obj == null || target == null || depth < 0) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (target.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
                     try { return f.get(obj); } catch (Throwable ignored) {}
@@ -1036,7 +1036,7 @@ public class FeedVideoDownloadHook {
         if (depth > 0) {
             cls = obj.getClass();
             while (cls != null && cls != Object.class) {
-                for (Field f : cls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                     f.setAccessible(true);
                     try {
                         Object v = f.get(obj);
@@ -1062,7 +1062,7 @@ public class FeedVideoDownloadHook {
         if (obj == null || targetType == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (targetType.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
                     try {
@@ -1465,7 +1465,7 @@ public class FeedVideoDownloadHook {
             Class<?> owner = getter.getDeclaringClass();
             if (!owner.isInstance(media)) {
                 target = null;
-                for (Field f : media.getClass().getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(media.getClass())) {
                     if (!owner.isAssignableFrom(f.getType())) continue;
                     f.setAccessible(true);
                     target = f.get(media);
@@ -1568,7 +1568,7 @@ public class FeedVideoDownloadHook {
         } catch (Throwable t) {
             return null;
         }
-        for (Method m : obj.getClass().getMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(obj.getClass())) {
             if (m.getParameterCount() != 0 || !type.isAssignableFrom(m.getReturnType())) continue;
             try {
                 Object v = m.invoke(obj);
@@ -1585,7 +1585,7 @@ public class FeedVideoDownloadHook {
      */
     private static java.util.Map<?, ?> fieldMap(Object obj) {
         if (obj == null) return null;
-        for (Method m : obj.getClass().getMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(obj.getClass())) {
             if (!java.util.Map.class.isAssignableFrom(m.getReturnType())) continue;
             try {
                 Object r = null;
@@ -1913,7 +1913,7 @@ public class FeedVideoDownloadHook {
             Class<?> curr = queue.poll();
             if (curr == null || !visited.add(curr)) continue;
 
-            for (Method m : curr.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(curr)) {
                 // We are looking for the method that returns the User class
                 // we found via "username_missing_during_update"
                 if (m.getParameterCount() == 0 && m.getReturnType().equals(userClass)) {
@@ -2907,7 +2907,7 @@ public class FeedVideoDownloadHook {
         // rely on depth limit + visited set to prevent runaway recursion
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 Class<?> ft = f.getType();
                 if (ft.isPrimitive() || ft == String.class || ft.isArray()) continue;
                 f.setAccessible(true);

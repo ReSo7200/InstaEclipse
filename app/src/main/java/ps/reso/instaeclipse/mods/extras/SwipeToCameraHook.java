@@ -28,7 +28,7 @@ public class SwipeToCameraHook {
 
         Field position = null;
         List<Field> strings = new ArrayList<>();
-        for (Field f : config.getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(config)) {
             if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
             if (f.getType() == float.class) {
                 if (position != null) {

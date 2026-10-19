@@ -146,7 +146,7 @@ public class StoryMentionHook {
         if (obj == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType().getName().equals(typeName)) {
                     try {
                         f.setAccessible(true);
@@ -335,7 +335,7 @@ public class StoryMentionHook {
 
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 Class<?> ft = f.getType();
                 if (ft.isPrimitive() || ft.isArray()) continue;
                 f.setAccessible(true);
@@ -425,7 +425,7 @@ public class StoryMentionHook {
         if (obj == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (Context.class.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
                     try {

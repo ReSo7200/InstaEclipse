@@ -225,7 +225,7 @@ public final class CurrentConversation {
             }
             addAccount(accounts, owner);
             for (Class<?> c = owner.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field field : c.getDeclaredFields()) {
+                for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (Modifier.isStatic(field.getModifiers()) || !field.getType().getName().equals(SESSION)) continue;
                     field.setAccessible(true);
                     Object session = field.get(owner);
@@ -248,7 +248,7 @@ public final class CurrentConversation {
     private static List<Object> ownedControllers(Object owner) throws IllegalAccessException {
         List<Object> controllers = new ArrayList<>();
         for (Class<?> c = owner.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field field : c.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(field.getModifiers()) || field.getType().isPrimitive()) continue;
                 field.setAccessible(true);
                 Object candidate = field.get(owner);
@@ -262,7 +262,7 @@ public final class CurrentConversation {
      * after proving controller ownership, so same-Fragment A -> B -> A invalidates old callbacks. */
     private static boolean watchRebinding(Object controller) {
         List<Method> candidates = new ArrayList<>();
-        for (Method method : controller.getClass().getDeclaredMethods()) {
+        for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(controller.getClass())) {
             Class<?>[] parameters = method.getParameterTypes();
             if (!Modifier.isStatic(method.getModifiers()) && method.getReturnType() == void.class
                     && parameters.length == 1 && parameters[0].getName().equals(KEY)) candidates.add(method);
@@ -285,7 +285,7 @@ public final class CurrentConversation {
     }
     private static void addDirectKeys(Object owner, Set<String> threads) throws IllegalAccessException {
         for (Class<?> c = owner.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field field : c.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(field.getModifiers()) || !field.getType().getName().equals(KEY)) continue;
                 field.setAccessible(true);
                 Object key = field.get(owner);
@@ -301,7 +301,7 @@ public final class CurrentConversation {
         String name = candidate.getClass().getName();
         if (!name.startsWith("X.") && !name.startsWith("com.instagram.")) return false;
         for (Class<?> c = candidate.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field field : c.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(field.getModifiers()) || !field.getType().isInstance(owner)) continue;
                 try { field.setAccessible(true); if (field.get(candidate) == owner) return true; }
                 catch (Throwable ignored) {}

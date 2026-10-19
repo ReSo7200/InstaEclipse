@@ -102,7 +102,7 @@ public class LocationSpoofHook {
     }
 
     private static void hookManager() {
-        for (Method m : LocationManager.class.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(LocationManager.class)) {
             switch (m.getName()) {
                 case "getLastKnownLocation":
                 case "getLastLocation":
@@ -195,7 +195,7 @@ public class LocationSpoofHook {
                     param.setResult(android.content.pm.PackageManager.PERMISSION_GRANTED);
                 }
             };
-            for (Method m : impl.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(impl)) {
                 String n = m.getName();
                 if ((n.equals("checkPermission") || n.equals("checkSelfPermission") || n.equals("checkCallingOrSelfPermission"))
                         && m.getReturnType() == int.class) {

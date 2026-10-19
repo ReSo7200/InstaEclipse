@@ -129,7 +129,7 @@ public class DisableRepostHook {
             if (hasPostRepostLauncher(enclosing)) owner = enclosing;
             if (owner == null) {
                 outer:
-                for (Constructor<?> c : lambda.getDeclaredConstructors()) {
+                for (Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(lambda)) {
                     for (Class<?> pt : c.getParameterTypes()) {
                         if (hasPostRepostLauncher(pt)) { owner = pt; break outer; }
                     }
@@ -141,7 +141,7 @@ public class DisableRepostHook {
                 return 0;
             }
 
-            for (Method m : owner.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(owner)) {
                 if (!isPostRepostLauncher(m)) continue;
                 try {
                     m.setAccessible(true);
@@ -175,7 +175,7 @@ public class DisableRepostHook {
         String n = c.getName();
         if (n.startsWith("java.") || n.startsWith("android") || n.startsWith("kotlin.")) return false;
         try {
-            for (Method m : c.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (isPostRepostLauncher(m)) return true;
             }
         } catch (Throwable ignored) {}

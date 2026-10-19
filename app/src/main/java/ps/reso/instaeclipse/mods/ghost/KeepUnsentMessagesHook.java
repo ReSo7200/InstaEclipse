@@ -71,7 +71,7 @@ public class KeepUnsentMessagesHook {
         if (dtk == null) return null;
         try {
             for (Class<?> c = dtk.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (f.getType() != String.class || Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     Object v = f.get(dtk);
@@ -280,7 +280,7 @@ public class KeepUnsentMessagesHook {
             }
             java.util.List<Method> hooked = new java.util.ArrayList<>();
             for (Class<?> store : stores) {
-                for (Method m : store.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(store)) {
                     if (m.getReturnType() != void.class || !Modifier.isSynchronized(m.getModifiers())) continue;
                     Class<?>[] p = m.getParameterTypes();
                     boolean r3 = p.length == 3 && p[0].getName().equals(DTK) && p[1] == String.class && p[2] == String.class;
@@ -311,7 +311,7 @@ public class KeepUnsentMessagesHook {
                     MethodMatcher.create().usingStrings(RECONCILE_ANCHOR)))) {
                 Class<?> owner = data.getMethodInstance(loader).getDeclaringClass();
                 if (owner != ownership.entryType()) continue;
-                for (Method method : owner.getDeclaredMethods()) {
+                for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(owner)) {
                     Class<?>[] parameters = method.getParameterTypes();
                     if (!Modifier.isStatic(method.getModifiers()) || method.getReturnType() != void.class
                             || parameters.length != 6 || parameters[0] != owner) continue;
@@ -367,7 +367,7 @@ public class KeepUnsentMessagesHook {
         if (args == null || args.length < 2 || args[0] == null) return null;
         Set<Object> fields = Collections.newSetFromMap(new IdentityHashMap<>());
         for (Class<?> type = args[0].getClass(); type != null && type != Object.class; type = type.getSuperclass()) {
-            for (Field field : type.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(type)) {
                 if (Modifier.isStatic(field.getModifiers()) || !List.class.isAssignableFrom(field.getType())) continue;
                 field.setAccessible(true);
                 Object value = field.get(args[0]);
@@ -414,7 +414,7 @@ public class KeepUnsentMessagesHook {
         if (BulkUnsend.isOwnUnsend(id)) return; // our own bulk unsend, not the other side's
         try {
             Object entry = null;
-            for (Method m : store.getClass().getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(store.getClass())) {
                 Class<?>[] p = m.getParameterTypes();
                 if (p.length == 1 && p[0].getName().equals(DTK) && m.getReturnType() == entryClass) {
                     m.setAccessible(true);
@@ -423,7 +423,7 @@ public class KeepUnsentMessagesHook {
                 }
             }
             if (entry == null) return;
-            for (Field f : entryClass.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(entryClass)) {
                 if (!List.class.isAssignableFrom(f.getType()) || Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Object v = f.get(entry);
@@ -462,7 +462,7 @@ public class KeepUnsentMessagesHook {
         String cn = obj.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return;
         for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Object v;
@@ -495,7 +495,7 @@ public class KeepUnsentMessagesHook {
         String cn = obj.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return false;
         for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Object v;

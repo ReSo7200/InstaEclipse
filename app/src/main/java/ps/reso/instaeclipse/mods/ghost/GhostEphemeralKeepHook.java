@@ -81,7 +81,7 @@ public class GhostEphemeralKeepHook {
                 found.add(expired);
                 Method shh = null;
                 int candidates = 0;
-                for (Method m : expired.getDeclaringClass().getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(expired.getDeclaringClass())) {
                     if (m.getParameterCount() == 0 && m.getReturnType() == boolean.class
                             && !java.lang.reflect.Modifier.isStatic(m.getModifiers())) { shh = m; candidates++; }
                 }
@@ -222,7 +222,7 @@ public class GhostEphemeralKeepHook {
                 } catch (Throwable ignored) {}
             }
             for (Class<?> c : owners) {
-                for (Method m : c.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                     String n = m.getName();
                     if ((n.equals("parseFromJsonParser") || n.equals("unsafeParseFromJson"))
                             && m.getReturnType() != void.class) targets.add(m);
@@ -252,7 +252,7 @@ public class GhostEphemeralKeepHook {
         long now = System.currentTimeMillis();
         long year2100 = 4_102_444_800_000L;
         try {
-            for (Field f : obj.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(obj.getClass())) {
                 if (f.getType() != long.class) continue;
                 f.setAccessible(true);
                 long val = f.getLong(obj);

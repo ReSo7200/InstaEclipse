@@ -362,7 +362,7 @@ public class PlaybackSpeedHook {
                     } catch (Throwable ignored) {}
                 }
                 for (ClassData cd : scan) {
-                    for (Method m : cd.getInstance(cl).getDeclaredMethods()) {
+                    for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cd.getInstance(cl))) {
                         Class<?>[] p = m.getParameterTypes();
                         if (p.length > 0 && p[0].getName().equals("com.instagram.feed.media.Media")
                                 && m.getReturnType() == boolean.class && !Modifier.isStatic(m.getModifiers())) {
@@ -447,7 +447,7 @@ public class PlaybackSpeedHook {
                                 param.args[0] = speed;
                         }
                     });
-                    for (java.lang.reflect.Constructor<?> c : m.getDeclaringClass().getDeclaredConstructors()) {
+                    for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(m.getDeclaringClass())) {
                         XposedBridge.hookMethod(c, new XC_MethodHook() {
                             @Override
                             protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method); remember(param.thisObject); }
@@ -552,7 +552,7 @@ public class PlaybackSpeedHook {
         String n = o.getClass().getName();
         if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) return null;
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try {
                     f.setAccessible(true);

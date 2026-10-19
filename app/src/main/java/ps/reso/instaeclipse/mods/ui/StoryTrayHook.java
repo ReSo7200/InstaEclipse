@@ -51,7 +51,7 @@ public final class StoryTrayHook {
         try {
             Class<?> spinner = cl.loadClass(SPINNER);
             int hooked = 0;
-            for (Method m : spinner.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(spinner)) {
                 if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != android.graphics.LinearGradient.class) continue;
                 int colorsArg = -1;
                 Class<?>[] p = m.getParameterTypes();

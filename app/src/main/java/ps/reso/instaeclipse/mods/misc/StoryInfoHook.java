@@ -279,7 +279,7 @@ public class StoryInfoHook {
         Method m = mapMethods.get(c);
         if (m == null) {
             Method zero = null, one = null;
-            for (Method cand : c.getDeclaredMethods()) {
+            for (Method cand : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (cand.getReturnType() != Map.class || Modifier.isStatic(cand.getModifiers()) || !cand.isSynthetic()) continue;
                 if (cand.getParameterCount() == 0 && zero == null) zero = cand;
                 else if (cand.getParameterCount() == 1 && one == null
@@ -341,7 +341,7 @@ public class StoryInfoHook {
         // so the named models inside them are still reachable by find().
         Map<String, Object> out = new LinkedHashMap<>();
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 try {
                     f.setAccessible(true);
@@ -806,7 +806,7 @@ public class StoryInfoHook {
         String n = o.getClass().getName();
         if (!n.startsWith("com.instagram.") && !n.startsWith("X.")) return;
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try { f.setAccessible(true); collectUsers(f.get(o), depth + 1, out, seen); } catch (Throwable ignored) {}
             }

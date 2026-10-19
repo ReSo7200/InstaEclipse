@@ -95,7 +95,7 @@ public final class CallConfirmHook {
         String cn = o.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return NONE;
         for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-            for (Field f : k.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                 f.setAccessible(true);
                 String r = findCallEnum(f.get(o), depth + 1);

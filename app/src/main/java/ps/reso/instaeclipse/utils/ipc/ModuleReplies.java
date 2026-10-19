@@ -125,7 +125,7 @@ public final class ModuleReplies {
     /** Reflect the existing settings schema instead of maintaining a second list of feature keys. */
     private static Map<String, Class<?>> preferenceTypes() {
         Map<String, Class<?>> types = new HashMap<>();
-        for (Field field : FeatureFlags.class.getDeclaredFields()) {
+        for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(FeatureFlags.class)) {
             if (!Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) continue;
             Class<?> type = field.getType();
             if (type == boolean.class) types.put(field.getName(), Boolean.class);

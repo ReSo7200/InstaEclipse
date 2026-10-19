@@ -75,7 +75,7 @@ public final class JitGuard {
             if (!(f instanceof Class<?> c) || done.contains(c) || !isStub(c.getName())) continue;
             done.add(c);
             int n = 0;
-            for (Method m : c.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (m.getDeclaringClass() != c) continue; // the backup copy of the original method
                 long art = (long) artMethod.get(m);
                 if (art == 0) continue;
@@ -89,7 +89,7 @@ public final class JitGuard {
             }
             if (done.size() <= 3 || done.size() % 25 == 0)
                 ModuleLog.line("(IE|JitGuard) stubs protected: " + done.size() + " (last: " + n + " of "
-                        + java.util.Arrays.toString(c.getDeclaredMethods()) + ")");
+                        + java.util.Arrays.toString(ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) + ")");
         }
     }
 }

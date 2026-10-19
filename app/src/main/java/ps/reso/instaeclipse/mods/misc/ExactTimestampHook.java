@@ -88,7 +88,7 @@ public class ExactTimestampHook {
 
     /** static String m(Resources, Enum, ownClass, Integer, double, double, boolean, boolean, boolean, boolean) */
     private static Method findFormatter(Class<?> c) {
-        for (Method m : c.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
             Class<?>[] p = m.getParameterTypes();
             if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != String.class || p.length != 10) continue;
             if (p[0] != Resources.class || p[3] != Integer.class

@@ -162,7 +162,7 @@ public class FollowingOnlyFeedHook {
     /** Every non-static {@code void (String, String)} method declared on the request builder. */
     private static List<Method> adders(Class<?> builder) {
         List<Method> out = new ArrayList<>();
-        for (Method m : builder.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(builder)) {
             Class<?>[] p = m.getParameterTypes();
             if (m.getReturnType() == void.class && !Modifier.isStatic(m.getModifiers())
                     && p.length == 2 && p[0] == String.class && p[1] == String.class) {

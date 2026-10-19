@@ -156,7 +156,7 @@ final class SelectedMediaAdapter implements SelectedMediaSnapshot.Access {
         Object selected = null;
         try {
             for (Class<?> c = holder.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field field : c.getDeclaredFields()) {
+                for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (Modifier.isStatic(field.getModifiers()) || field.getType() != type) continue;
                     field.setAccessible(true);
                     Object value = field.get(holder);
@@ -204,7 +204,7 @@ final class SelectedMediaAdapter implements SelectedMediaSnapshot.Access {
         try {
             for (Object owner : owners) {
                 for (Class<?> c = ownerType; c != null && c != Object.class; c = c.getSuperclass()) {
-                    for (Field field : c.getDeclaredFields()) {
+                    for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                         if (Modifier.isStatic(field.getModifiers()) || field.getType() != itemType) continue;
                         field.setAccessible(true);
                         Object value = field.get(owner);
@@ -264,7 +264,7 @@ final class SelectedMediaAdapter implements SelectedMediaSnapshot.Access {
             String name = holder.getClass().getName();
             if (name.startsWith("java.") || name.startsWith("android.") || name.startsWith("androidx.")) continue;
             for (Class<?> c = holder.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                     try {
                         f.setAccessible(true);

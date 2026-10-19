@@ -272,7 +272,7 @@ public final class IgColorRemapEngine {
         if (cl == null) return;
         try {
             Class<?> cls = cl.loadClass("com.instagram.android.R$color");
-            for (Field field : cls.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (field.getType() != int.class || (field.getModifiers() & java.lang.reflect.Modifier.STATIC) == 0) continue;
                 int slot = IgThemeEngine.slotForColorName(field.getName());
                 if (slot < 0) continue;

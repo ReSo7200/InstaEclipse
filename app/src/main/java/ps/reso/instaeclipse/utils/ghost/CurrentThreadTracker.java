@@ -163,7 +163,7 @@ public final class CurrentThreadTracker {
         String cn = o.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return null;
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try {
                     f.setAccessible(true);
@@ -180,7 +180,7 @@ public final class CurrentThreadTracker {
         if (o == null) return null;
         try {
             for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (f.getType() != String.class || Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     Object v = f.get(o);

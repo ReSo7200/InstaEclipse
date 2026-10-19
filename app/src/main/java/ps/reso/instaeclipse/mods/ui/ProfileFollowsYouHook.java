@@ -195,7 +195,7 @@ public class ProfileFollowsYouHook {
     /** True only when one of the User's String fields equals userId. */
     private static boolean sameUserStrict(Object user, String userId) {
         for (Class<?> c = user.getClass(); c != null && c != Object.class; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try { f.setAccessible(true); if (userId.equals(f.get(user))) return true; } catch (Throwable ignored) {}
             }
@@ -226,7 +226,7 @@ public class ProfileFollowsYouHook {
     private static boolean sameUser(Object user, String userId) {
         boolean sawString = false;
         for (Class<?> c = user.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try {
                     f.setAccessible(true);
@@ -250,7 +250,7 @@ public class ProfileFollowsYouHook {
 
     private static Object fieldOfType(Object o, String type) throws IllegalAccessException {
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (!f.getType().getName().equals(type)) continue;
                 f.setAccessible(true);
                 Object v = f.get(o);

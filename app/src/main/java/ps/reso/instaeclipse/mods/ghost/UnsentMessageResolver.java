@@ -323,7 +323,7 @@ final class UnsentMessageResolver {
         Field result = null;
         int count = 0;
         for (Class<?> c = owner; c != null && c != Object.class; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) if (!Modifier.isStatic(f.getModifiers()) && f.getType() == type) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) if (!Modifier.isStatic(f.getModifiers()) && f.getType() == type) {
                 count++;
                 result = f;
             }

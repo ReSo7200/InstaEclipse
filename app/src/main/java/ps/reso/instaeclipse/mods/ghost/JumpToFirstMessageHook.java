@@ -128,7 +128,7 @@ public class JumpToFirstMessageHook {
         try {
             Object ad = list.getClass().getMethod("getAdapter").invoke(list);
             if (ad == null) return -1;
-            for (java.lang.reflect.Method m : ad.getClass().getMethods())
+            for (java.lang.reflect.Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(ad.getClass()))
                 if (m.getName().equals("getItemCount") && m.getParameterCount() == 0) return (int) m.invoke(ad);
         } catch (Throwable ignored) {}
         return -1;

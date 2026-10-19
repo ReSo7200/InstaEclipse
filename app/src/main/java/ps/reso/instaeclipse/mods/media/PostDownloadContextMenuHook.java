@@ -672,7 +672,7 @@ public class PostDownloadContextMenuHook {
         if (obj == null || urlCount <= 1) return 0;
 
         // Scan all int fields for a value that fits as a carousel index
-        for (Field f : obj.getClass().getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(obj.getClass())) {
             if (f.getType() != int.class) continue;
             f.setAccessible(true);
             try {
@@ -690,7 +690,7 @@ public class PostDownloadContextMenuHook {
         if (obj == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (!Context.class.isAssignableFrom(f.getType())) continue;
                 f.setAccessible(true);
                 try {
@@ -719,7 +719,7 @@ public class PostDownloadContextMenuHook {
             Class<?> cls = clickHandler.getClass();
             outer:
             while (cls != null && cls != Object.class) {
-                for (Field f : cls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                     if (f.getType() != menuCreatorClass) continue;
                     f.setAccessible(true);
                     Object v = f.get(clickHandler);
@@ -731,7 +731,7 @@ public class PostDownloadContextMenuHook {
 
             Class<?> cCls = creator.getClass();
             while (cCls != null && cCls != Object.class) {
-                for (Field f : cCls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cCls)) {
                     if (f.getType().getName().equals("com.instagram.feed.media.Media")) {
                         f.setAccessible(true);
                         return f.get(creator);
@@ -756,7 +756,7 @@ public class PostDownloadContextMenuHook {
         List<Object> nextLevel = depth < 2 ? new ArrayList<>() : null;
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType().isPrimitive()) continue;
                 f.setAccessible(true);
                 try {

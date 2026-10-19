@@ -155,7 +155,7 @@ public class ProfilePicDownloadHook {
 
     private static Object fieldOfType(Object o, String type) throws IllegalAccessException {
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (!f.getType().getName().equals(type)) continue;
                 f.setAccessible(true);
                 Object v = f.get(o);
@@ -363,7 +363,7 @@ public class ProfilePicDownloadHook {
      */
     private static String getUrlFromImageUrlFields(View view) {
         for (Class<?> cls = view.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 if (!IMAGE_URL.equals(f.getType().getName())) continue;
                 try {

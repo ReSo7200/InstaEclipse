@@ -95,7 +95,7 @@ public class CommentSearchHook {
             }
             if (vm == null) { ModuleLog.line(TAG + "❌ view-model not found"); return; }
             int builders = 0;
-            for (Method m : vm.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(vm)) {
                 if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType().isPrimitive()
                         || m.getReturnType() == void.class || m.getParameterCount() < 10) continue;
                 boolean takesVm = false;
@@ -176,7 +176,7 @@ public class CommentSearchHook {
             Object user = null;
             String text = null;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers())) continue;
                     try {
                         f.setAccessible(true);
@@ -415,7 +415,7 @@ public class CommentSearchHook {
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)
                 src.getClass().getConstructor(int.class, int.class).newInstance(w, w);
         for (Class<?> k = src.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || !f.getType().isPrimitive()) continue;
                 try { f.setAccessible(true); f.set(lp, f.get(src)); } catch (Throwable ignored) {}
             }
@@ -1087,7 +1087,7 @@ public class CommentSearchHook {
                     }
                 }
                 for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                    for (Field f : k.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                         if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                         try { f.setAccessible(true); Object v = f.get(o); if (v != null) q.add(v); } catch (Throwable ignored) {}
                     }
