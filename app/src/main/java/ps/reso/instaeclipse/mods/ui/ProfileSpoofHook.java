@@ -14,8 +14,8 @@ import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
-import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
-import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 
 /**
  * Profile spoofer: your own follower / following / post counts and a verified badge, on this
@@ -27,6 +27,11 @@ import ps.reso.instaeclipse.xposedcompat.XposedBridge;
  * User getters. Their results are replaced only for the logged-in account's own User: its id
  * (the User's one final String field) is compared with the account of the screen in front, the
  * part after ':' of a resumed fragment's IgSessionManager.SESSION_TOKEN_KEY argument.
+ *
+ * <p>The profile header's follower / following numbers come from a separate header model, so they
+ * are also set on the views themselves (profile_header_familiar_*_value) while your own profile is
+ * shown (the account switcher's chevron, action_bar_title_chevron, is only there), and the badge
+ * is drawn after your username in the action bar.
  */
 public final class ProfileSpoofHook {
 
@@ -46,6 +51,7 @@ public final class ProfileSpoofHook {
         hooked += hook(bridge, cl, "media_count", "ProfileSpoofPosts", log, new String[]{"java.lang.Integer", "int", "java.lang.Long", "long"}, 2);
         hooked += hook(bridge, cl, "is_verified", "ProfileSpoofVerified", log, new String[]{"java.lang.Boolean", "boolean"}, 3);
         boolean session = trackAccount(cl);
+        hookHeaderViews();
         if (hooked > 0 && session) FeatureStatusTracker.setHooked("ProfileSpoofer");
         ModuleLog.line(TAG + (hooked > 0 && session ? "✅" : "❌") + " getters hooked=" + hooked + log
                 + ", account tracking=" + session);
@@ -149,5 +155,125 @@ public final class ProfileSpoofHook {
             ModuleLog.line(TAG + "⚠️ account tracking: " + t);
             return false;
         }
+    }
+
+    private static int followersId, followingId, titleId, chevronId;
+    private static final ThreadLocal<Boolean> SETTING = new ThreadLocal<>();
+
+    private static void hookHeaderViews() {
+        XposedBridge.hookAllMethods(android.widget.TextView.class, "setText", new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.profileSpoofer || SETTING.get() == Boolean.TRUE) return;
+                android.widget.TextView tv = (android.widget.TextView) param.thisObject;
+                int id = tv.getId();
+                if (id == android.view.View.NO_ID) return;
+                if (followersId == 0) resolveIds(tv);
+                if (id != followersId && id != followingId && id != titleId) return;
+                ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                tv.post(() -> apply(tv));
+            }
+        });
+    }
+
+    private static void resolveIds(android.view.View v) {
+        android.content.res.Resources r = v.getResources();
+        String pkg = v.getContext().getPackageName();
+        followersId = r.getIdentifier("profile_header_familiar_followers_value", "id", pkg);
+        followingId = r.getIdentifier("profile_header_familiar_following_value", "id", pkg);
+        titleId = r.getIdentifier("action_bar_title", "id", pkg);
+        chevronId = r.getIdentifier("action_bar_title_chevron", "id", pkg);
+        if (followersId == 0) followersId = -1;
+    }
+
+    /** Your own profile is on screen: the account switcher chevron is shown. */
+    private static boolean ownProfileShown(android.view.View v) {
+        android.view.View c = chevronId != 0 ? v.getRootView().findViewById(chevronId) : null;
+        return c != null && c.isShown();
+    }
+
+    private static void apply(android.widget.TextView tv) {
+        try {
+            if (!tv.isAttachedToWindow() || !ownProfileShown(tv)) return;
+            int id = tv.getId();
+            if (id == titleId) {
+                badge(tv, FeatureFlags.spoofVerified);
+                return;
+            }
+            int v = id == followersId ? FeatureFlags.spoofFollowers : FeatureFlags.spoofFollowing;
+            if (v < 0) return;
+            String text = shortCount(v);
+            if (text.contentEquals(tv.getText())) return;
+            SETTING.set(Boolean.TRUE);
+            try { tv.setText(text); } finally { SETTING.remove(); }
+        } catch (Throwable ignored) { }
+    }
+
+    /** Instagram's style: 1,234 · 12.3K · 1.2M. */
+    static String shortCount(int n) {
+        if (n < 10_000) return java.text.NumberFormat.getIntegerInstance().format(n);
+        if (n < 1_000_000) return trim(n / 1000.0) + "K";
+        return trim(n / 1_000_000.0) + "M";
+    }
+
+    private static String trim(double d) {
+        String s = d >= 100 ? String.valueOf((long) d) : String.format(java.util.Locale.US, "%.1f", Math.floor(d * 10) / 10);
+        return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
+    }
+
+    private static final String BADGE_TAG = "ie_verified_badge";
+
+    private static void badge(android.widget.TextView tv, boolean on) {
+        android.graphics.drawable.Drawable[] d = tv.getCompoundDrawablesRelative();
+        boolean has = d[2] instanceof VerifiedBadge;
+        if (on == has) return;
+        if (on) {
+            int size = Math.round(tv.getTextSize() * 0.85f);
+            VerifiedBadge b = new VerifiedBadge();
+            b.setBounds(0, 0, size, size);
+            tv.setCompoundDrawablePadding(Math.round(tv.getTextSize() * 0.2f));
+            tv.setCompoundDrawablesRelative(d[0], d[1], b, d[3]);
+        } else {
+            tv.setCompoundDrawablesRelative(d[0], d[1], null, d[3]);
+        }
+    }
+
+    /** Instagram's verified seal: a blue scalloped circle with a white check, painted directly so
+     *  the theme engine (which recolors shape drawables) leaves it blue. */
+    static final class VerifiedBadge extends android.graphics.drawable.Drawable {
+        private final android.graphics.Paint fill = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final android.graphics.Paint check = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        VerifiedBadge() {
+            fill.setColor(0xFF0095F6);
+            check.setColor(0xFFFFFFFF);
+            check.setStyle(android.graphics.Paint.Style.STROKE);
+            check.setStrokeCap(android.graphics.Paint.Cap.ROUND);
+            check.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+        }
+
+        @Override public void draw(android.graphics.Canvas c) {
+            android.graphics.Rect b = getBounds();
+            float cx = b.exactCenterX(), cy = b.exactCenterY(), r = Math.min(b.width(), b.height()) / 2f;
+            android.graphics.Path seal = new android.graphics.Path();
+            int points = 16;
+            for (int i = 0; i <= points * 2; i++) {
+                double a = Math.PI * i / points;
+                float rr = i % 2 == 0 ? r : r * 0.86f;
+                float x = cx + (float) (Math.cos(a) * rr), y = cy + (float) (Math.sin(a) * rr);
+                if (i == 0) seal.moveTo(x, y); else seal.lineTo(x, y);
+            }
+            seal.close();
+            c.drawPath(seal, fill);
+            check.setStrokeWidth(r * 0.2f);
+            android.graphics.Path p = new android.graphics.Path();
+            p.moveTo(cx - r * 0.38f, cy + r * 0.02f);
+            p.lineTo(cx - r * 0.1f, cy + r * 0.3f);
+            p.lineTo(cx + r * 0.4f, cy - r * 0.28f);
+            c.drawPath(p, check);
+        }
+
+        @Override public void setAlpha(int alpha) { fill.setAlpha(alpha); check.setAlpha(alpha); }
+        @Override public void setColorFilter(android.graphics.ColorFilter cf) { }
+        @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
     }
 }
