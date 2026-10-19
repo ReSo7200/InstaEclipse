@@ -277,7 +277,7 @@ public class ChatExportHook {
                         }
                         ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(a, it, error -> {
                             if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
-                                    android.widget.Toast.makeText(a, error, android.widget.Toast.LENGTH_LONG).show());
+                                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, error, android.widget.Toast.LENGTH_LONG).show());
                         });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated export (" + count + " msgs, " + mUrls.size()

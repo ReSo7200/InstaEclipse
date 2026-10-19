@@ -963,7 +963,7 @@ public class CommentSearchHook {
                         }
                         ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, it, error -> {
                             if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
-                                    android.widget.Toast.makeText(ctx, error, android.widget.Toast.LENGTH_LONG).show());
+                                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, error, android.widget.Toast.LENGTH_LONG).show());
                         });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated comment export (" + cCount + " comments, "

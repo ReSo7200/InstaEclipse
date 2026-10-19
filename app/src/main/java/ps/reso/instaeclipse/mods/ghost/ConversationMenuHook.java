@@ -288,6 +288,6 @@ public final class ConversationMenuHook {
     }
 
     private static void message(Activity a, int resource) {
-        if (a != null) Toast.makeText(a, I18n.t(a, resource), Toast.LENGTH_LONG).show();
+        if (a != null) ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, resource), Toast.LENGTH_LONG).show();
     }
 }
