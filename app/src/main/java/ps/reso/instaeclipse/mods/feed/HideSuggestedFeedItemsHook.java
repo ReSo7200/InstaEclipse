@@ -20,23 +20,17 @@ public class HideSuggestedFeedItemsHook {
 
     private static final String CACHE_KEY_PARSER = "FeedItemParserClass";
     private static final String CACHE_KEY_HAS_LIKED = "MediaHasLikedGetter";
-    private static final String CACHE_KEY_AI_DETECTION = "MediaGenAiDetectionGetter";
-    private static final String CACHE_KEY_AI_LABEL_INFO = "MediaAiLabelInfoGetter";
 
     // "has_liked" getter: Media.()Boolean on IG 447+, LiveTreeMediaDict.()Boolean on <= 446 (436)
     // — reached through the Media field of that type. Resolved once at install (#249).
     private static volatile Method hasLikedGetter;
-    // "gen_ai_detection_method" getter: Media.() -> the AI label's detection method (#271)
-    private static volatile Method aiDetectionGetter;
-    // "ai_label_info" getter: Media.() -> the "AI content" attribution label (#271)
-    private static volatile Method aiLabelInfoGetter;
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         XC_MethodHook filterHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.hideSuggestionsInFeed && !FeatureFlags.hideThreadsSuggestions
-                        && !FeatureFlags.hideLikedPosts && !FeatureFlags.hideAiLabeledPosts) return;
+                        && !FeatureFlags.hideLikedPosts) return;
 
                 Object result = param.getResult();
                 if (result == null) return;
@@ -71,8 +65,7 @@ public class HideSuggestedFeedItemsHook {
                 if (hasMedia) {
                     // Real post: only hidden when "Hide liked posts" is on and you already liked it.
                     // Applied at parse time, so a post liked now disappears on the next refresh.
-                    if ((FeatureFlags.hideLikedPosts && isLiked(media))
-                            || (FeatureFlags.hideAiLabeledPosts && isAiLabeled(media))) param.setResult(null);
+                    if (FeatureFlags.hideLikedPosts && isLiked(media)) param.setResult(null);
                     return;
                 }
                 if (!FeatureFlags.hideSuggestionsInFeed && !FeatureFlags.hideThreadsSuggestions) return;
@@ -86,7 +79,6 @@ public class HideSuggestedFeedItemsHook {
         };
 
         resolveHasLikedGetter(bridge, classLoader);
-        resolveAiDetectionGetter(bridge, classLoader);
 
         if (DexKitCache.isCacheValid()) {
             String cached = DexKitCache.loadString(CACHE_KEY_PARSER);
@@ -183,90 +175,6 @@ public class HideSuggestedFeedItemsHook {
         }
     }
 
-    /** Media getters for the AI label (#271), found like the has_liked one. */
-    private static void resolveAiDetectionGetter(DexKitBridge bridge, ClassLoader classLoader) {
-        aiDetectionGetter = resolveMediaGetter(bridge, classLoader, "gen_ai_detection_method", CACHE_KEY_AI_DETECTION);
-        aiLabelInfoGetter = resolveMediaGetter(bridge, classLoader, "ai_label_info", CACHE_KEY_AI_LABEL_INFO);
-    }
-
-    /** The no-argument Media getter that reads {@code field}, or null. */
-    private static Method resolveMediaGetter(DexKitBridge bridge, ClassLoader classLoader, String field, String cacheKey) {
-        try {
-            if (DexKitCache.isCacheValid()) {
-                Method cached = DexKitCache.loadMethod(cacheKey, classLoader);
-                if (cached != null) return cached;
-            }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
-                    .declaredClass("com.instagram.feed.media.Media")
-                    .usingEqStrings(java.util.List.of(field))
-                    .paramCount(0)))) {
-                if (!md.isMethod()) continue; // <clinit> lists the field names too
-                Method m = md.getMethodInstance(classLoader);
-                if (m.getReturnType() == void.class || m.getReturnType().isPrimitive()) continue;
-                m.setAccessible(true);
-                DexKitCache.saveMethod(cacheKey, m);
-                ModuleLog.line("(InstaEclipse | HideAiLabeled): ✅ " + field + " getter Media." + m.getName());
-                return m;
-            }
-            ModuleLog.line("(InstaEclipse | HideAiLabeled): ❌ " + field + " getter not found");
-        } catch (Throwable t) {
-            ModuleLog.line("(InstaEclipse | HideAiLabeled): ❌ " + field + ": " + t);
-        }
-        return null;
-    }
-
-    /**
-     * Whether Instagram labels this post as AI ("AI info" / "AI content"): its ai_label_info shows a
-     * label (label text, self-disclosed, or a labeling detection method), or its
-     * gen_ai_detection_method is one that labels (IPTC / C2PA metadata, Meta's invisible watermark,
-     * self-disclosure, a manual label; not Meta switching the label off). Values are read from the
-     * models' own field maps, so no obfuscated getter names are needed.
-     */
-    public static boolean isAiLabeled(Object media) {
-        if (media == null) return false;
-        try {
-            java.util.Map<?, ?> label = fieldMap(invoke(aiLabelInfoGetter, media));
-            if (label != null) {
-                Object text = label.get("attribution_label_text");
-                if (text != null && !String.valueOf(text).trim().isEmpty() && !"null".equals(String.valueOf(text))) return true;
-                if (Boolean.TRUE.equals(label.get("is_self_disclosed"))) return true;
-                if (labelingMethod(label.get("gen_ai_detection_method"))) return true;
-            }
-            return labelingMethod(invoke(aiDetectionGetter, media));
-        } catch (Throwable ignored) {
-            return false;
-        }
-    }
-
-    private static Object invoke(Method getter, Object media) throws ReflectiveOperationException {
-        return getter != null && getter.getDeclaringClass().isInstance(media) ? getter.invoke(media) : null;
-    }
-
-    /** A model's field map (its no-argument Map getter), or the value itself when it is one. */
-    private static java.util.Map<?, ?> fieldMap(Object model) throws ReflectiveOperationException {
-        if (model == null) return null;
-        if (model instanceof java.util.Map<?, ?> m) return m;
-        for (Method m : model.getClass().getMethods()) {
-            if (m.getParameterCount() != 0 || !java.util.Map.class.isAssignableFrom(m.getReturnType())) continue;
-            if (m.invoke(model) instanceof java.util.Map<?, ?> fields && !fields.isEmpty()) return fields;
-        }
-        return null;
-    }
-
-    /** A gen_ai_detection_method (model, map or plain value) that makes Instagram show the label. */
-    private static boolean labelingMethod(Object detection) throws ReflectiveOperationException {
-        if (detection == null) return false;
-        Object v = detection instanceof String ? detection : null;
-        if (v == null) {
-            java.util.Map<?, ?> fields = fieldMap(detection);
-            v = fields != null ? fields.get("detection_method") : null;
-        }
-        if (v == null) return false;
-        String method = String.valueOf(v);
-        return !method.isEmpty() && !method.equals("MANUAL_OVERRIDE_LABEL_OFF") && !method.equals("UNRECOGNIZED")
-                && !method.equalsIgnoreCase("NONE") && !method.equals("null");
-    }
-
     public static boolean isLiked(Object media) {
         Method getter = hasLikedGetter;
         if (media == null || getter == null) return false;
@@ -308,6 +216,5 @@ public class HideSuggestedFeedItemsHook {
         if (FeatureFlags.hideSuggestionsInFeed) FeatureStatusTracker.setHooked("HideSuggestionsInFeed");
         if (FeatureFlags.hideThreadsSuggestions) FeatureStatusTracker.setHooked("HideThreadsSuggestions");
         if (FeatureFlags.hideLikedPosts && hasLikedGetter != null) FeatureStatusTracker.setHooked("HideLikedPosts");
-        if (FeatureFlags.hideAiLabeledPosts && (aiDetectionGetter != null || aiLabelInfoGetter != null)) FeatureStatusTracker.setHooked("HideAiLabeledPosts");
     }
 }

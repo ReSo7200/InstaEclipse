@@ -731,7 +731,6 @@ Stay on this screen until it finishes.</string>
     <string name="ig_call_confirm_audio">Start an audio call?</string>
     <string name="ig_call_confirm_video">Start a video call?</string>
     <string name="ig_call_confirm_call">Call</string>
-    <string name="ig_hide_ai_labeled">Hide AI-Labeled Posts</string>
     <string name="ig_confirm_refresh">Ask Before Refreshing the Feed</string>
     <string name="ig_confirm_refresh_question">Refresh the feed?</string>
     <string name="ig_confirm_refresh_action">Refresh</string>

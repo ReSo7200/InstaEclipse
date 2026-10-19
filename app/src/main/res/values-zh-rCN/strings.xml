@@ -710,7 +710,6 @@
     <string name="ig_call_confirm_audio">要开始语音通话吗？</string>
     <string name="ig_call_confirm_video">要开始视频通话吗？</string>
     <string name="ig_call_confirm_call">呼叫</string>
-    <string name="ig_hide_ai_labeled">隐藏带 AI 标签的帖子</string>
     <string name="ig_confirm_refresh">刷新动态前确认</string>
     <string name="ig_confirm_refresh_question">要刷新动态吗？</string>
     <string name="ig_confirm_refresh_action">刷新</string>

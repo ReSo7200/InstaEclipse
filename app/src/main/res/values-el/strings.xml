@@ -711,7 +711,6 @@
     <string name="ig_call_confirm_audio">Έναρξη φωνητικής κλήσης;</string>
     <string name="ig_call_confirm_video">Έναρξη βιντεοκλήσης;</string>
     <string name="ig_call_confirm_call">Κλήση</string>
-    <string name="ig_hide_ai_labeled">Απόκρυψη αναρτήσεων με ετικέτα ΤΝ</string>
     <string name="ig_confirm_refresh">Ερώτηση πριν την ανανέωση της ροής</string>
     <string name="ig_confirm_refresh_question">Ανανέωση της ροής;</string>
     <string name="ig_confirm_refresh_action">Ανανέωση</string>

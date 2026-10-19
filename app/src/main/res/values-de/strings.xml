@@ -688,7 +688,6 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="ig_call_confirm_audio">Sprachanruf starten?</string>
     <string name="ig_call_confirm_video">Videoanruf starten?</string>
     <string name="ig_call_confirm_call">Anrufen</string>
-    <string name="ig_hide_ai_labeled">KI-gekennzeichnete Beiträge ausblenden</string>
     <string name="ig_confirm_refresh">Vor dem Aktualisieren des Feeds fragen</string>
     <string name="ig_confirm_refresh_question">Feed aktualisieren?</string>
     <string name="ig_confirm_refresh_action">Aktualisieren</string>

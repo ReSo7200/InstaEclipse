@@ -279,7 +279,6 @@
     <string name="ig_call_confirm_audio">Bắt đầu cuộc gọi thoại?</string>
     <string name="ig_call_confirm_video">Bắt đầu cuộc gọi video?</string>
     <string name="ig_call_confirm_call">Gọi</string>
-    <string name="ig_hide_ai_labeled">Ẩn bài viết gắn nhãn AI</string>
     <string name="ig_confirm_refresh">Hỏi trước khi làm mới bảng tin</string>
     <string name="ig_confirm_refresh_question">Làm mới bảng tin?</string>
     <string name="ig_confirm_refresh_action">Làm mới</string>
