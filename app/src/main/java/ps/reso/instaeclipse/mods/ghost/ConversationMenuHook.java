@@ -229,7 +229,7 @@ public final class ConversationMenuHook {
                 if (!CurrentConversation.revalidate(a, snapshot) || !FeatureFlags.keepUnsentMessages) {
                     message(a, R.string.ie_chat_changed); return;
                 }
-                DialogUtils.showThreadUnsent(a, snapshot.threadId, chatTitle(a));
+                DialogUtils.showThreadUnsent(a, snapshot.threadId, chatTitle(a), () -> show(a));
             });
         }
         if (labels.isEmpty()) { message(a, R.string.ie_chat_features_disabled); return; }

@@ -176,7 +176,8 @@ public class UnsentThreadButtonHook {
                             ps.reso.instaeclipse.utils.ghost.CurrentConversation.resolve(activity);
                     String threadId = s != null ? s.threadId : openThread.get();
                     ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
-                    ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity));
+                    ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity),
+                            () -> ThreadHeaderMenu.reopen(activity));
                 });
             if (FeatureFlags.hideSpecificChats)
                 ThreadHeaderMenu.add(activity, "hide", ConversationMenuHook.hideLabel(activity),
