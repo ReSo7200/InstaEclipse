@@ -559,6 +559,6 @@ public final class BulkUnsend {
     }
 
     private static void toast(Context c, String s) {
-        try { Toast.makeText(c, s, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+        try { ps.reso.instaeclipse.utils.toast.IeToast.makeText(c, s, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
     }
 }

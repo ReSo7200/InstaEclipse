@@ -185,7 +185,7 @@ public final class CompanionBridge {
     }
     private static void errorToast(Context context, String error) {
         if (context == null) return;
-        MAIN.post(() -> Toast.makeText(context, error, Toast.LENGTH_LONG).show());
+        MAIN.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, error, Toast.LENGTH_LONG).show());
     }
 
     private static Activity activity(Context context) {

@@ -398,6 +398,6 @@ final class SelectedMediaDownloads {
         toast(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, reason));
     }
     private static void toast(Context ctx, String message) {
-        FeedVideoDownloadHook.mainHandler.post(() -> Toast.makeText(ctx.getApplicationContext(), message, Toast.LENGTH_LONG).show());
+        FeedVideoDownloadHook.mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx.getApplicationContext(), message, Toast.LENGTH_LONG).show());
     }
 }

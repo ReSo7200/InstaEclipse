@@ -1,10 +1,12 @@
 package ps.reso.instaeclipse.utils.toast;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -50,7 +52,9 @@ public final class IeToast {
         if (ctx == null || text == null || text.length() == 0) return;
         Runnable r = () -> {
             try {
-                showNow();
+                if (inForeground(ctx)) showNow();
+                else Toast.makeText(ctx.getApplicationContext() != null ? ctx.getApplicationContext() : ctx,
+                        text, duration).show();
             } catch (Throwable t) {
                 ModuleLog.line("(IE|Toast) fallback: " + t);
                 try { Toast.makeText(ctx, text, duration).show(); } catch (Throwable ignored) {}
@@ -120,6 +124,22 @@ public final class IeToast {
         card.setTranslationY(14 * d);
         card.animate().alpha(1f).translationY(0f).setDuration(220).start();
         toast.show();
+    }
+
+    /**
+     * Android 11+ silently drops custom-view toasts from a process that isn't in the foreground
+     * (e.g. the companion app's DownloadSaveService while Instagram is on screen), so those get a
+     * plain text toast instead.
+     */
+    private static boolean inForeground(Context c) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return true;
+        try {
+            ActivityManager.RunningAppProcessInfo info = new ActivityManager.RunningAppProcessInfo();
+            ActivityManager.getMyMemoryState(info);
+            return info.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+        } catch (Throwable t) {
+            return true;
+        }
     }
 
     /** Module drawable: from our own APK inside Instagram, from resources in the companion app. */

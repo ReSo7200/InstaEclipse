@@ -1550,7 +1550,7 @@ public class FeaturesFragment extends Fragment {
                     b.putExtra("value", ids[which]);
                     ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
                     d.dismiss();
-                    Toast.makeText(requireContext(), R.string.ig_spoof_device_note, Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), R.string.ig_spoof_device_note, Toast.LENGTH_LONG).show();
                     loadQualityMenu();
                 })
                 .setNegativeButton(android.R.string.cancel, null)

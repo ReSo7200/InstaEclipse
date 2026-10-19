@@ -315,7 +315,7 @@ public final class VideoFramePickerActivity extends AppCompatActivity {
                 Logging.flush();
                 main.post(() -> {
                     if (!alive()) return;
-                    Toast.makeText(this, getString(cleaned ? R.string.ie_frame_saved : R.string.ie_frame_cleanup_pending,
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(cleaned ? R.string.ie_frame_saved : R.string.ie_frame_cleanup_pending,
                             saved.width, saved.height), Toast.LENGTH_LONG).show();
                     finish();
                 });
