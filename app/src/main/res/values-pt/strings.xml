@@ -240,6 +240,16 @@
     <string name="ig_data_backup_failed">Falha no backup</string>
     <string name="ig_data_restore_done">%1$d arquivos restaurados. Reiniciando o Instagram…</string>
     <string name="ig_data_restore_failed">Não foi possível restaurar este backup</string>
+    <string name="ig_post_counts_feature">Editar números das suas publicações (só você)</string>
+    <string name="ig_post_counts_title">Editar números</string>
+    <string name="ig_post_counts_hint">Aparece só neste telefone. Deixe vazio para manter o número real.</string>
+    <string name="ig_post_counts_likes">Curtidas</string>
+    <string name="ig_post_counts_comments">Comentários</string>
+    <string name="ig_post_counts_reposts">Republicações</string>
+    <string name="ig_post_counts_shares">Compartilhamentos</string>
+    <string name="ig_post_counts_keep">Manter real</string>
+    <string name="ig_post_counts_reset">Redefinir</string>
+    <string name="ig_post_counts_saved">Números salvos</string>
     <string name="ig_profile_menu_tools">Menu do perfil: copiar usuário, bio e baixar tudo</string>
     <string name="ig_profile_spoofer">Falsificar perfil (só neste telefone)</string>
     <string name="ig_profile_spoofer_edit">Números e selo falsos</string>

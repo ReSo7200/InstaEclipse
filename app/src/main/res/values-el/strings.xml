@@ -278,6 +278,16 @@
     <string name="ig_data_backup_failed">Η δημιουργία αντιγράφου απέτυχε</string>
     <string name="ig_data_restore_done">Επαναφέρθηκαν %1$d αρχεία. Επανεκκίνηση του Instagram…</string>
     <string name="ig_data_restore_failed">Δεν ήταν δυνατή η επαναφορά αυτού του αντιγράφου</string>
+    <string name="ig_post_counts_feature">Επεξεργασία αριθμών στις δημοσιεύσεις σας (μόνο εσείς)</string>
+    <string name="ig_post_counts_title">Επεξεργασία αριθμών</string>
+    <string name="ig_post_counts_hint">Εμφανίζεται μόνο σε αυτό το τηλέφωνο. Αφήστε κενό για τον πραγματικό αριθμό.</string>
+    <string name="ig_post_counts_likes">Likes</string>
+    <string name="ig_post_counts_comments">Σχόλια</string>
+    <string name="ig_post_counts_reposts">Αναδημοσιεύσεις</string>
+    <string name="ig_post_counts_shares">Κοινοποιήσεις</string>
+    <string name="ig_post_counts_keep">Πραγματικό</string>
+    <string name="ig_post_counts_reset">Επαναφορά</string>
+    <string name="ig_post_counts_saved">Οι αριθμοί αποθηκεύτηκαν</string>
     <string name="ig_profile_menu_tools">Μενού προφίλ: αντιγραφή ονόματος, βιογραφικού και λήψη όλων</string>
     <string name="ig_profile_spoofer">Παραποίηση προφίλ (μόνο σε αυτό το τηλέφωνο)</string>
     <string name="ig_profile_spoofer_edit">Ψεύτικοι αριθμοί και σήμα</string>

@@ -241,6 +241,16 @@
     <string name="ig_data_backup_failed">Не удалось создать копию</string>
     <string name="ig_data_restore_done">Восстановлено файлов: %1$d. Перезапуск Instagram…</string>
     <string name="ig_data_restore_failed">Не удалось восстановить эту копию</string>
+    <string name="ig_post_counts_feature">Изменить счётчики ваших публикаций (только для вас)</string>
+    <string name="ig_post_counts_title">Изменить счётчики</string>
+    <string name="ig_post_counts_hint">Видно только на этом телефоне. Оставьте пустым, чтобы сохранить настоящее число.</string>
+    <string name="ig_post_counts_likes">Отметки «Нравится»</string>
+    <string name="ig_post_counts_comments">Комментарии</string>
+    <string name="ig_post_counts_reposts">Репосты</string>
+    <string name="ig_post_counts_shares">Поделились</string>
+    <string name="ig_post_counts_keep">Оставить настоящее</string>
+    <string name="ig_post_counts_reset">Сбросить</string>
+    <string name="ig_post_counts_saved">Счётчики сохранены</string>
     <string name="ig_profile_menu_tools">Меню профиля: копировать имя, био и скачать всё</string>
     <string name="ig_profile_spoofer">Подмена профиля (только на этом телефоне)</string>
     <string name="ig_profile_spoofer_edit">Поддельные числа и значок</string>

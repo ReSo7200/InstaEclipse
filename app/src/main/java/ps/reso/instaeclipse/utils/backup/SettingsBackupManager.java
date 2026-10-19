@@ -116,6 +116,7 @@ public class SettingsBackupManager {
         s.put("confirmLikes",            FeatureFlags.confirmLikes);
         s.put("confirmFollows",          FeatureFlags.confirmFollows);
         s.put("profileMenuTools",        FeatureFlags.profileMenuTools);
+        s.put("postCountSpoof",          FeatureFlags.postCountSpoof);
         s.put("profileSpoofer",          FeatureFlags.profileSpoofer);
         s.put("spoofFollowers",          FeatureFlags.spoofFollowers);
         s.put("spoofFollowing",          FeatureFlags.spoofFollowing);
@@ -276,6 +277,7 @@ public class SettingsBackupManager {
         if (s.has("confirmLikes"))           FeatureFlags.confirmLikes           = s.getBoolean("confirmLikes");
         if (s.has("confirmFollows"))         FeatureFlags.confirmFollows         = s.getBoolean("confirmFollows");
         if (s.has("profileMenuTools"))       FeatureFlags.profileMenuTools       = s.getBoolean("profileMenuTools");
+        if (s.has("postCountSpoof"))         FeatureFlags.postCountSpoof         = s.getBoolean("postCountSpoof");
         if (s.has("profileSpoofer"))         FeatureFlags.profileSpoofer         = s.getBoolean("profileSpoofer");
         if (s.has("spoofFollowers"))         FeatureFlags.spoofFollowers         = Math.max(-1, s.getInt("spoofFollowers"));
         if (s.has("spoofFollowing"))         FeatureFlags.spoofFollowing         = Math.max(-1, s.getInt("spoofFollowing"));

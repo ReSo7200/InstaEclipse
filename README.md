@@ -198,6 +198,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Disable double tap to like | No accidental likes, in posts, comments and DMs |
 | Undo a like | A few seconds to take a like back |
+| Edit counts on your posts | Change the likes, comments, reposts and shares shown on your own posts from their ⋮ menu; shown only on your phone |
 | Ask before liking | A like is sent only after you confirm it |
 | Ask before following | A follow is sent only after you confirm it |
 | Disable repost | Keep the repost button from reposting |

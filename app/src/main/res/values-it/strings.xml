@@ -379,6 +379,16 @@
     <string name="ig_data_backup_failed">Backup non riuscito</string>
     <string name="ig_data_restore_done">%1$d file ripristinati. Riavvio di Instagram…</string>
     <string name="ig_data_restore_failed">Impossibile ripristinare questo backup</string>
+    <string name="ig_post_counts_feature">Modifica i numeri dei tuoi post (solo tu)</string>
+    <string name="ig_post_counts_title">Modifica numeri</string>
+    <string name="ig_post_counts_hint">Visibile solo su questo telefono. Lascia vuoto per il numero reale.</string>
+    <string name="ig_post_counts_likes">Mi piace</string>
+    <string name="ig_post_counts_comments">Commenti</string>
+    <string name="ig_post_counts_reposts">Repost</string>
+    <string name="ig_post_counts_shares">Condivisioni</string>
+    <string name="ig_post_counts_keep">Mantieni reale</string>
+    <string name="ig_post_counts_reset">Ripristina</string>
+    <string name="ig_post_counts_saved">Numeri salvati</string>
     <string name="ig_profile_menu_tools">Menu profilo: copia nome utente, bio e scarica tutto</string>
     <string name="ig_profile_spoofer">Profilo falso (solo su questo telefono)</string>
     <string name="ig_profile_spoofer_edit">Numeri e badge falsi</string>

@@ -240,6 +240,16 @@
     <string name="ig_data_backup_failed">Säkerhetskopieringen misslyckades</string>
     <string name="ig_data_restore_done">%1$d filer återställda. Startar om Instagram…</string>
     <string name="ig_data_restore_failed">Det gick inte att återställa den här säkerhetskopian</string>
+    <string name="ig_post_counts_feature">Redigera siffror på dina inlägg (bara du)</string>
+    <string name="ig_post_counts_title">Redigera siffror</string>
+    <string name="ig_post_counts_hint">Visas bara på den här telefonen. Lämna tomt för att behålla den riktiga siffran.</string>
+    <string name="ig_post_counts_likes">Gilla-markeringar</string>
+    <string name="ig_post_counts_comments">Kommentarer</string>
+    <string name="ig_post_counts_reposts">Återpubliceringar</string>
+    <string name="ig_post_counts_shares">Delningar</string>
+    <string name="ig_post_counts_keep">Behåll riktig</string>
+    <string name="ig_post_counts_reset">Återställ</string>
+    <string name="ig_post_counts_saved">Siffror sparade</string>
     <string name="ig_profile_menu_tools">Profilmeny: kopiera användarnamn, bio och ladda ner allt</string>
     <string name="ig_profile_spoofer">Profilförfalskare (bara på den här telefonen)</string>
     <string name="ig_profile_spoofer_edit">Falska siffror och märke</string>

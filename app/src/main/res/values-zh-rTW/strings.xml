@@ -240,6 +240,16 @@
     <string name="ig_data_backup_failed">備份失敗</string>
     <string name="ig_data_restore_done">已還原 %1$d 個檔案。正在重新啟動 Instagram…</string>
     <string name="ig_data_restore_failed">無法還原此備份</string>
+    <string name="ig_post_counts_feature">編輯你貼文的數據（僅你可見）</string>
+    <string name="ig_post_counts_title">編輯數據</string>
+    <string name="ig_post_counts_hint">只在這支手機上顯示。留空則保留真實數字。</string>
+    <string name="ig_post_counts_likes">讚</string>
+    <string name="ig_post_counts_comments">留言</string>
+    <string name="ig_post_counts_reposts">轉發</string>
+    <string name="ig_post_counts_shares">分享</string>
+    <string name="ig_post_counts_keep">保留真實</string>
+    <string name="ig_post_counts_reset">重設</string>
+    <string name="ig_post_counts_saved">數據已儲存</string>
     <string name="ig_profile_menu_tools">個人檔案選單：複製用戶名稱、簡介和全部下載</string>
     <string name="ig_profile_spoofer">個人檔案偽裝（僅限本機）</string>
     <string name="ig_profile_spoofer_edit">偽裝的數字和徽章</string>

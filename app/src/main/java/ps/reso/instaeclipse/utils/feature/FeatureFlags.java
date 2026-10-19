@@ -143,6 +143,7 @@ public class FeatureFlags {
     public static volatile boolean likeUndo = false; // hold likes for a few seconds with an Undo bar (#235)
     public static volatile boolean confirmLikes = false; // ask before a like is sent
     public static volatile boolean confirmFollows = false; // ask before a follow is sent
+    public static volatile boolean postCountSpoof = false; // edit likes / comments / reposts / shares on your posts, this phone only
     public static volatile boolean profileMenuTools = false; // profile ⋮ menu: copy username / bio, download all posts
     public static volatile boolean profileSpoofer = false; // own profile counts / verified badge, shown on this phone only
     public static volatile int     spoofFollowers = -1;    // -1 = unchanged

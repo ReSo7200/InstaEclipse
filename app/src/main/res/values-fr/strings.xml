@@ -277,6 +277,16 @@
     <string name="ig_data_backup_failed">Échec de la sauvegarde</string>
     <string name="ig_data_restore_done">%1$d fichiers restaurés. Redémarrage d’Instagram…</string>
     <string name="ig_data_restore_failed">Impossible de restaurer cette sauvegarde</string>
+    <string name="ig_post_counts_feature">Modifier les chiffres de vos publications (vous seul)</string>
+    <string name="ig_post_counts_title">Modifier les chiffres</string>
+    <string name="ig_post_counts_hint">Visible uniquement sur ce téléphone. Laissez vide pour garder le vrai chiffre.</string>
+    <string name="ig_post_counts_likes">J’aime</string>
+    <string name="ig_post_counts_comments">Commentaires</string>
+    <string name="ig_post_counts_reposts">Republications</string>
+    <string name="ig_post_counts_shares">Partages</string>
+    <string name="ig_post_counts_keep">Garder le vrai</string>
+    <string name="ig_post_counts_reset">Réinitialiser</string>
+    <string name="ig_post_counts_saved">Chiffres enregistrés</string>
     <string name="ig_profile_menu_tools">Menu du profil : copier le nom, la bio et tout télécharger</string>
     <string name="ig_profile_spoofer">Faux profil (sur ce téléphone uniquement)</string>
     <string name="ig_profile_spoofer_edit">Faux compteurs et badge</string>

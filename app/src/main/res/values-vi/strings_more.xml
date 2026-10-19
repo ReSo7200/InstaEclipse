@@ -188,6 +188,16 @@
     <string name="ig_data_backup_failed">Sao lưu thất bại</string>
     <string name="ig_data_restore_done">Đã khôi phục %1$d tệp. Đang khởi động lại Instagram…</string>
     <string name="ig_data_restore_failed">Không thể khôi phục bản sao lưu này</string>
+    <string name="ig_post_counts_feature">Sửa số liệu bài viết của bạn (chỉ bạn thấy)</string>
+    <string name="ig_post_counts_title">Sửa số liệu</string>
+    <string name="ig_post_counts_hint">Chỉ hiện trên điện thoại này. Để trống để giữ số thật.</string>
+    <string name="ig_post_counts_likes">Lượt thích</string>
+    <string name="ig_post_counts_comments">Bình luận</string>
+    <string name="ig_post_counts_reposts">Đăng lại</string>
+    <string name="ig_post_counts_shares">Chia sẻ</string>
+    <string name="ig_post_counts_keep">Giữ số thật</string>
+    <string name="ig_post_counts_reset">Đặt lại</string>
+    <string name="ig_post_counts_saved">Đã lưu số liệu</string>
     <string name="ig_profile_menu_tools">Menu hồ sơ: sao chép tên, tiểu sử và tải tất cả</string>
     <string name="ig_profile_spoofer">Giả mạo hồ sơ (chỉ trên điện thoại này)</string>
     <string name="ig_profile_spoofer_edit">Số liệu &amp; huy hiệu giả</string>

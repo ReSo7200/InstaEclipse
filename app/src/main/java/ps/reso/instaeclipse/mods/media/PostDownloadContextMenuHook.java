@@ -68,6 +68,9 @@ public class PostDownloadContextMenuHook {
     static final String SPEED_CARRIER = "PROMOTE_DEBUG";
     private static Object   mediaInfoOptionValue;
     private static Object   speedOptionValue;
+    // "Edit counts" (likes / comments / reposts / shares on your own posts, this phone only).
+    static final String COUNTS_CARRIER = "DEBUG_STICKER_TRANSLATION";
+    private static Object   countsOptionValue;
 
     // Obfuscated creator class found via "MediaOptionsOverflowMenuCreator" string
     private static Class<?> menuCreatorClass;
@@ -120,6 +123,8 @@ public class PostDownloadContextMenuHook {
                     mediaInfoOptionValue = v;
                 } else if (speedOptionValue == null && name.equals(SPEED_CARRIER)) {
                     speedOptionValue = v;
+                } else if (countsOptionValue == null && name.equals(COUNTS_CARRIER)) {
+                    countsOptionValue = v;
                 }
             }
             ps.reso.instaeclipse.mods.misc.CaptionCopyContextMenuHook.EXTRA_REEL_LABELS.put(MEDIA_INFO_CARRIER, R.string.ig_media_info_title);
@@ -296,6 +301,8 @@ public class PostDownloadContextMenuHook {
                     param.setResult(null);
                 } else if (FeatureFlags.offerPlaybackSpeed && opt == speedOptionValue) {
                     param.setResult(null);
+                } else if (FeatureFlags.postCountSpoof && opt == countsOptionValue) {
+                    param.setResult(null);
                 }
             }
 
@@ -308,13 +315,14 @@ public class PostDownloadContextMenuHook {
                 boolean wantCopyImage = FeatureFlags.offerCopyImage && copyImageOptionValue != null;
                 boolean wantInfo = FeatureFlags.offerMediaInfo && mediaInfoOptionValue != null;
                 boolean wantSpeed = FeatureFlags.offerPlaybackSpeed && speedOptionValue != null;
-                if (!wantDownload && !wantCopyLink && !wantCopyImage && !wantInfo && !wantSpeed) return;
+                boolean wantCounts = FeatureFlags.postCountSpoof && countsOptionValue != null;
+                if (!wantDownload && !wantCopyLink && !wantCopyImage && !wantInfo && !wantSpeed && !wantCounts) return;
 
                 // Don't react to our own target option types (suppressed in beforeHook)
                 Object opt = param.args[idxOption];
                 if (opt == downloadOptionValue || opt == copyLinkOptionValue
                         || (opt != null && (opt == copyImageOptionValue || opt == mediaInfoOptionValue
-                                || opt == speedOptionValue))) return;
+                                || opt == speedOptionValue || opt == countsOptionValue))) return;
 
                 Object self = param.args[idxSelf];
                 boolean alreadyProcessed;
@@ -329,8 +337,9 @@ public class PostDownloadContextMenuHook {
                 if (wantCopyImage) injectRow(param, copyImageOptionValue, R.string.ig_download_choice_copy_image);
                 if (wantInfo) injectRow(param, mediaInfoOptionValue, R.string.ig_media_info_title);
                 if (wantSpeed) injectRow(param, speedOptionValue, R.string.ig_playback_speed_title);
+                if (wantCounts && isOwnPost(self)) injectRow(param, countsOptionValue, R.string.ig_post_counts_title);
                 // Our carriers are debug options Instagram draws with the Meta logo; give them real icons.
-                if (wantCopyImage || wantInfo || wantSpeed) ps.reso.instaeclipse.mods.ui.MenuIcons.fixSoon();
+                if (wantCopyImage || wantInfo || wantSpeed || wantCounts) ps.reso.instaeclipse.mods.ui.MenuIcons.fixSoon();
             }
         });
 
@@ -578,7 +587,8 @@ public class PostDownloadContextMenuHook {
             boolean isCopyImage = option.equals(COPY_IMAGE_CARRIER) && FeatureFlags.offerCopyImage;
             boolean isInfo = option.equals(MEDIA_INFO_CARRIER) && FeatureFlags.offerMediaInfo;
             boolean isSpeed = option.equals(SPEED_CARRIER) && FeatureFlags.offerPlaybackSpeed;
-            if (!isDownload && !isCopyLink && !isCopyImage && !isInfo && !isSpeed) return;
+            boolean isCounts = option.equals(COUNTS_CARRIER) && FeatureFlags.postCountSpoof;
+            if (!isDownload && !isCopyLink && !isCopyImage && !isInfo && !isSpeed && !isCounts) return;
 
             param.setResult(null); // consume the event
 
@@ -607,11 +617,36 @@ public class PostDownloadContextMenuHook {
             }
 
             if (isInfo) { MediaInfo.show(ctx, media, thisObj); return; }
+            if (isCounts) { ps.reso.instaeclipse.mods.feed.PostCountSpoof.edit(ctx, media); return; }
             if (isCopyLink)       triggerCopyLink(ctx, media, thisObj);
             else if (isCopyImage) triggerCopyImage(ctx, media, thisObj);
             else                  triggerDownload(ctx, media, thisObj);
         } catch (Throwable t) {
             ModuleLog.line("(IE|Post) ❌ onOptionClicked: " + t);
+        }
+    }
+
+    /** The menu is for one of your own posts: its owner (the Media's User id) is the account in use. */
+    private static boolean isOwnPost(Object menuCreator) {
+        try {
+            Object media = findMedia(menuCreator);
+            if (media == null) return true; // can't tell: offer it, the edit is local anyway
+            String self = ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.selfId();
+            if (self == null) return true;
+            for (java.lang.reflect.Method m : media.getClass().getMethods()) {
+                if (m.getParameterCount() != 0 || !m.getReturnType().getName().equals("com.instagram.user.model.User")) continue;
+                Object user = m.invoke(media);
+                if (user == null) continue;
+                for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(user.getClass())) {
+                    if (f.getType() != String.class || !java.lang.reflect.Modifier.isFinal(f.getModifiers())
+                            || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                    f.setAccessible(true);
+                    if (f.get(user) instanceof String id && id.matches("\\d+")) return self.equals(id);
+                }
+            }
+            return true;
+        } catch (Throwable t) {
+            return true;
         }
     }
 

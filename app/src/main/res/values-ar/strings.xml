@@ -239,6 +239,16 @@
     <string name="ig_data_backup_failed">فشل النسخ الاحتياطي</string>
     <string name="ig_data_restore_done">تمت استعادة %1$d ملفات. جارٍ إعادة تشغيل إنستغرام…</string>
     <string name="ig_data_restore_failed">تعذّرت استعادة هذه النسخة</string>
+    <string name="ig_post_counts_feature">تعديل الأعداد على منشوراتك (لك فقط)</string>
+    <string name="ig_post_counts_title">تعديل الأعداد</string>
+    <string name="ig_post_counts_hint">تظهر على هذا الهاتف فقط. اترك الحقل فارغًا للإبقاء على الرقم الحقيقي.</string>
+    <string name="ig_post_counts_likes">الإعجابات</string>
+    <string name="ig_post_counts_comments">التعليقات</string>
+    <string name="ig_post_counts_reposts">إعادة النشر</string>
+    <string name="ig_post_counts_shares">المشاركات</string>
+    <string name="ig_post_counts_keep">الإبقاء على الحقيقي</string>
+    <string name="ig_post_counts_reset">إعادة تعيين</string>
+    <string name="ig_post_counts_saved">تم حفظ الأعداد</string>
     <string name="ig_profile_menu_tools">قائمة الملف الشخصي: نسخ اسم المستخدم والنبذة وتنزيل الكل</string>
     <string name="ig_profile_spoofer">تزييف الملف الشخصي (على هذا الهاتف فقط)</string>
     <string name="ig_profile_spoofer_edit">الأعداد والشارة المزيفة</string>
