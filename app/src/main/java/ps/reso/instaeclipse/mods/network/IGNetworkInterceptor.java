@@ -30,7 +30,7 @@ public class IGNetworkInterceptor {
     private static void neutralizeUrlFields(Object requestObj, URI original) {
         String orig = original.toString();
         String origPath = original.getPath();
-        for (java.lang.reflect.Field f : requestObj.getClass().getDeclaredFields()) {
+        for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(requestObj.getClass())) {
             try {
                 // Never touch statics: the request class keeps a shared static URI constant
                 // ("https://malformed.url.invalid/") that other requests read.
@@ -86,7 +86,7 @@ public class IGNetworkInterceptor {
 
             // Locate the TigonServiceLayer class dynamically
             Class<?> tigonClass = classLoader.loadClass("com.instagram.api.tigon.TigonServiceLayer");
-            Method[] methods = tigonClass.getDeclaredMethods();
+            Method[] methods = ps.reso.instaeclipse.utils.core.SafeReflect.methods(tigonClass);
 
             Class<?> random_param_1 = null;
             Class<?> random_param_2 = null;
@@ -106,7 +106,7 @@ public class IGNetworkInterceptor {
 
             // Dynamically identify the URI field in the request object
             if (random_param_1 != null) {
-                for (Field field : random_param_1.getDeclaredFields()) {
+                for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(random_param_1)) {
                     if (field.getType().equals(URI.class)
                             && !java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
                         uriFieldName = field.getName();

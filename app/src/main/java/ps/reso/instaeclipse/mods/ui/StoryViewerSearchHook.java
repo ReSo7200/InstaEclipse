@@ -68,7 +68,7 @@ public class StoryViewerSearchHook {
             }
             if (adapter == null) { ModuleLog.line(TAG + "❌ viewer adapter not found"); return; }
             Method build = null;
-            for (Method m : adapter.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(adapter)) {
                 Class<?>[] p = m.getParameterTypes();
                 if (m.getReturnType() == void.class && p.length == 4 && p[0] == List.class
                         && p[1] == boolean.class && p[2] == boolean.class && p[3] == boolean.class) build = m;
@@ -112,7 +112,7 @@ public class StoryViewerSearchHook {
     private static String username(Object record) {
         try {
             for (Class<?> k = record.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || !f.getType().getName().equals("com.instagram.user.model.User")) continue;
                     f.setAccessible(true);
                     return UserUtils.callUsernameGetter(f.get(record));

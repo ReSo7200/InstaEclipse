@@ -245,7 +245,7 @@ public class CaptionCopyContextMenuHook {
                 Class<?> cls = media.getClass();
                 outer:
                 while (cls != null && cls != Object.class) {
-                    for (Field f : cls.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                         if (owner.isAssignableFrom(f.getType())) {
                             f.setAccessible(true);
                             Object v = f.get(media);
@@ -264,14 +264,14 @@ public class CaptionCopyContextMenuHook {
             // String getters AND String fields so it works whether the text is exposed as a
             // getter or a bare field (the 442+ caption object shape is not name-stable).
             String bestVal = null;
-            for (Method m : captionObj.getClass().getMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(captionObj.getClass())) {
                 if (m.getParameterCount() != 0 || m.getReturnType() != String.class) continue;
                 try { bestVal = pickCaption(bestVal, (String) m.invoke(captionObj)); }
                 catch (Throwable ignored) {}
             }
             Class<?> c = captionObj.getClass();
             while (c != null && c != Object.class) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (f.getType() != String.class) continue;
                     try { f.setAccessible(true); bestVal = pickCaption(bestVal, (String) f.get(captionObj)); }
                     catch (Throwable ignored) {}
@@ -813,7 +813,7 @@ public class CaptionCopyContextMenuHook {
         if (listener == null) return null;
         Class<?> cls = listener.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 // Wrapper classes (e.g. CV4) often store the option in a generically-typed
                 // Object field, so match by runtime value type, not declared field type.
                 if (!mediaOptionEnumClass.isAssignableFrom(f.getType()) && f.getType() != Object.class)
@@ -976,7 +976,7 @@ public class CaptionCopyContextMenuHook {
             Class<?> cls = clickHandler.getClass();
             outer:
             while (cls != null && cls != Object.class) {
-                for (Field f : cls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                     if (f.getType() != menuCreatorClass) continue;
                     f.setAccessible(true);
                     Object v = f.get(clickHandler);
@@ -988,7 +988,7 @@ public class CaptionCopyContextMenuHook {
 
             Class<?> cCls = creator.getClass();
             while (cCls != null && cCls != Object.class) {
-                for (Field f : cCls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cCls)) {
                     if (f.getType().getName().equals("com.instagram.feed.media.Media")) {
                         f.setAccessible(true);
                         return f.get(creator);
@@ -1013,7 +1013,7 @@ public class CaptionCopyContextMenuHook {
         List<Object> nextLevel = depth < 2 ? new ArrayList<>() : null;
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType().isPrimitive()) continue;
                 f.setAccessible(true);
                 try {
@@ -1041,7 +1041,7 @@ public class CaptionCopyContextMenuHook {
         if (obj == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (!Context.class.isAssignableFrom(f.getType())) continue;
                 f.setAccessible(true);
                 try {

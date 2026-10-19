@@ -53,7 +53,7 @@ public final class OnboardingPromptHook {
         }
         for (Method m : launchers) {
             List<Field> fields = new ArrayList<>();
-            for (Field f : m.getDeclaringClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(m.getDeclaringClass())) {
                 if (f.getType() == String.class && !Modifier.isStatic(f.getModifiers())) {
                     f.setAccessible(true);
                     fields.add(f);

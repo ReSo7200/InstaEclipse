@@ -175,7 +175,7 @@ public class RemoveMetaAIHook {
                 Object r = p.getResult();
                 if (r == null) return;
                 try {
-                    for (java.lang.reflect.Field f : r.getClass().getDeclaredFields()) {
+                    for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(r.getClass())) {
                         if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                         f.setAccessible(true);
                         if (f.get(r) != null) f.set(r, "");
@@ -311,7 +311,7 @@ public class RemoveMetaAIHook {
                 Object r = p.getResult();
                 if (r == null) return;
                 try {
-                    for (java.lang.reflect.Field f : r.getClass().getDeclaredFields()) {
+                    for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(r.getClass())) {
                         if (f.getType() != String.class) continue;
                         if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                         f.setAccessible(true);

@@ -89,7 +89,7 @@ public class ReelDownloadHook {
             Method fallback = null;
             for (Class<?> cand : candidates) {
                 int voidMedia = 0;
-                for (Method m : cand.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cand)) {
                     if (m.getReturnType() != void.class) continue;
                     Class<?>[] params = m.getParameterTypes();
                     if (params.length < 2) continue;
@@ -142,7 +142,7 @@ public class ReelDownloadHook {
      */
     private static boolean hasButtonAdderMethod(Class<?> adder) {
         if (adder == null) return false;
-        for (Method m : adder.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(adder)) {
             Class<?>[] p = m.getParameterTypes();
             if (p.length == 4
                     && Context.class.isAssignableFrom(p[0])
@@ -337,7 +337,7 @@ public class ReelDownloadHook {
 
         Class<?> c = controller.getClass();
         while (c != null && c != Object.class) {
-            for (Field outerF : c.getDeclaredFields()) {
+            for (Field outerF : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (outerF.getType().isPrimitive()) continue;
                 String pkg = outerF.getType().getName();
                 if (pkg.startsWith("android.") || pkg.startsWith("java.")
@@ -354,7 +354,7 @@ public class ReelDownloadHook {
                     String npkg = nc.getName();
                     if (npkg.startsWith("android.") || npkg.startsWith("java.")
                             || npkg.startsWith("androidx.") || npkg.startsWith("kotlin.")) break;
-                    for (Field nf : nc.getDeclaredFields()) {
+                    for (Field nf : ps.reso.instaeclipse.utils.core.SafeReflect.fields(nc)) {
                         if (nf.getType() != int.class) continue;
                         intCount++;
                         singleIntField = nf;
@@ -492,7 +492,7 @@ public class ReelDownloadHook {
             Object buttonAdder = param.args[1];
 
             if (activityField == null) {
-                for (Field f : controller.getClass().getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(controller.getClass())) {
                     if (Activity.class.isAssignableFrom(f.getType())) {
                         f.setAccessible(true);
                         activityField = f;
@@ -509,7 +509,7 @@ public class ReelDownloadHook {
             if (activity == null) return;
 
             if (buttonAdderMethod == null) {
-                for (Method m : buttonAdder.getClass().getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(buttonAdder.getClass())) {
                     Class<?>[] p = m.getParameterTypes();
                     if (p.length != 4) continue;
                     if (!Context.class.isAssignableFrom(p[0])) continue;

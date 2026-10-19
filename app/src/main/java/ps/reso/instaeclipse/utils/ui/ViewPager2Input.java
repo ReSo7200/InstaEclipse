@@ -56,7 +56,7 @@ public final class ViewPager2Input {
             if (pager instanceof ViewGroup g) {
                 for (int i = 0; i < g.getChildCount() && inner == null; i++) {
                     Class<?> c = g.getChildAt(i).getClass();
-                    for (Field f : c.getDeclaredFields()) if (f.getType() == vp) { inner = c; break; }
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) if (f.getType() == vp) { inner = c; break; }
                 }
             }
             org.luckypray.dexkit.DexKitBridge bridge = ps.reso.instaeclipse.Xposed.Module.dexKitBridge;

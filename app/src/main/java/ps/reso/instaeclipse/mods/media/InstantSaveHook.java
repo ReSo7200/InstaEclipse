@@ -63,7 +63,7 @@ public class InstantSaveHook {
                 ModuleLog.line("(IE|InstantSave) ⚠️ viewer cache: viewer lambda not found");
                 return;
             }
-            for (java.lang.reflect.Constructor<?> c : lambda.getDeclaredConstructors()) {
+            for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(lambda)) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         try {
@@ -106,7 +106,7 @@ public class InstantSaveHook {
 
     /** The current-card coroutine: a ctor taking UserSession + AnimatedParticleEffectState (447/451). */
     private static boolean isViewerLambda(Class<?> c) {
-        for (java.lang.reflect.Constructor<?> k : c.getDeclaredConstructors()) {
+        for (java.lang.reflect.Constructor<?> k : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(c)) {
             boolean session = false, particles = false;
             for (Class<?> t : k.getParameterTypes()) {
                 String n = t.getName();
@@ -130,7 +130,7 @@ public class InstantSaveHook {
             if (a == null) continue;
             String cn = a.getClass().getName();
             if (cn.startsWith("java.") || cn.startsWith("android") || cn.startsWith("kotlin")) continue;
-            for (java.lang.reflect.Field f : a.getClass().getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(a.getClass())) {
                 if (!"com.instagram.feed.media.Media".equals(f.getType().getName())) continue;
                 try {
                     f.setAccessible(true);
@@ -156,7 +156,7 @@ public class InstantSaveHook {
         try {
             final Class<?> function1 = XposedHelpers.findClass("kotlin.jvm.functions.Function1", cl);
             Class<?> handler = XposedHelpers.findClass(LONGPRESS_LAMBDA, cl);
-            for (java.lang.reflect.Constructor<?> c : handler.getDeclaredConstructors()) {
+            for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(handler)) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         try {
@@ -203,7 +203,7 @@ public class InstantSaveHook {
             if (a != null && function1.isInstance(a) && ++seen == 2) { longPress = a; break; }
         }
         if (longPress != null) {
-            for (java.lang.reflect.Field f : p.thisObject.getClass().getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(p.thisObject.getClass())) {
                 if (f.getType() != function1) continue;
                 try {
                     f.setAccessible(true);

@@ -63,7 +63,7 @@ public class EditHistoryHook {
 
             // getter: ()List of the message class invoked by readers of DirectMessageEditHistory fields
             Method getter = null;
-            for (Field hf : history.getDeclaredFields()) {
+            for (Field hf : ps.reso.instaeclipse.utils.core.SafeReflect.fields(history)) {
                 if (Modifier.isStatic(hf.getModifiers())) continue;
                 String desc = "L" + HISTORY.replace('.', '/') + ";->" + hf.getName() + ":"
                         + (hf.getType() == long.class ? "J" : "Ljava/lang/String;");
@@ -83,7 +83,7 @@ public class EditHistoryHook {
             }
 
             Method merge = null;
-            for (Method m : msgClass.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(msgClass)) {
                 Class<?>[] p = m.getParameterTypes();
                 if (p.length == 3 && p[1] == msgClass && p[0].getName().equals("com.instagram.common.session.UserSession")
                         && Modifier.isSynchronized(m.getModifiers()) && !Modifier.isStatic(m.getModifiers())) { merge = m; break; }
@@ -95,7 +95,7 @@ public class EditHistoryHook {
 
             final List<Field> stringFields = new ArrayList<>();
             for (Class<?> k = msgClass; k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields())
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k))
                     if (f.getType() == String.class && !Modifier.isStatic(f.getModifiers())) { f.setAccessible(true); stringFields.add(f); }
 
             XposedBridge.hookMethod(merge, new XC_MethodHook() {

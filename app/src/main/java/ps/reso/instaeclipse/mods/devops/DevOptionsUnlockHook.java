@@ -268,7 +268,7 @@ public class DevOptionsUnlockHook {
                     }
                 }
             };
-            for (Method m : clazz.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(clazz)) {
                 if (m.getReturnType() != boolean.class) continue;
                 Class<?>[] params = m.getParameterTypes();
                 if (params.length != 1) continue;

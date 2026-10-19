@@ -427,7 +427,7 @@ public class DisableDoubleTapLikeHook {
         }
         int score = 0;
         for (Class<?> current = clazz; current != null && current != Object.class; current = current.getSuperclass()) {
-            for (Field field : current.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(current)) {
                 String typeName = field.getType().getName();
                 if ("com.instagram.clips.intf.ClipsViewerConfig".equals(typeName)) score += 3;
                 if ("com.instagram.common.session.UserSession".equals(typeName)) score++;
@@ -444,7 +444,7 @@ public class DisableDoubleTapLikeHook {
         Class<?> clazz = target.getClass();
         if (isLikelyClipsGestureClass(clazz)) return true;
         for (Class<?> current = clazz; current != null && current != Object.class; current = current.getSuperclass()) {
-            for (Field field : current.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(current)) {
                 try {
                     if (!View.class.isAssignableFrom(field.getType())) continue;
                     field.setAccessible(true);

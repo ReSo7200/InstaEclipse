@@ -183,11 +183,11 @@ public class FollowListExportHook {
     private static void findPager(DexKitBridge bridge, ClassLoader cl) throws Throwable {
         // pager = fragment field whose class has isLoading() and keeps the next max_id in a String field
         for (Class<?> c = fragClass; c != null && pagerField == null; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 try {
                     Method il = f.getType().getDeclaredMethod("isLoading");
                     if (il.getReturnType() != boolean.class) continue;
-                    for (Field sf : f.getType().getDeclaredFields())
+                    for (Field sf : ps.reso.instaeclipse.utils.core.SafeReflect.fields(f.getType()))
                         if (sf.getType() == String.class && !Modifier.isStatic(sf.getModifiers())) { sf.setAccessible(true); nextMaxIdField = sf; }
                     if (nextMaxIdField == null) continue;
                     f.setAccessible(true);
@@ -332,7 +332,7 @@ public class FollowListExportHook {
             if (!(token instanceof String t) || data == null) return null;
             String self = t.substring(t.lastIndexOf(':') + 1);
             boolean followers = false, own = false;
-            for (Field f : data.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(data.getClass())) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Object v = f.get(data);
@@ -528,7 +528,7 @@ public class FollowListExportHook {
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class
                             || android.content.Context.class.isAssignableFrom(f.getType()) || View.class.isAssignableFrom(f.getType())) continue;
                     try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1, row}); } catch (Throwable ignored) {}
@@ -538,7 +538,7 @@ public class FollowListExportHook {
     }
 
     private static String userId(Object user) {
-        for (Field f : user.getClass().getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(user.getClass())) {
             if (f.getType() != String.class || Modifier.isStatic(f.getModifiers()) || !Modifier.isFinal(f.getModifiers())) continue;
             try { f.setAccessible(true); Object v = f.get(user); if (v instanceof String s && s.matches("\\d+")) return s; } catch (Throwable ignored) {}
         }

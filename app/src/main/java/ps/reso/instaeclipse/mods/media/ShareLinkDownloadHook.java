@@ -151,7 +151,7 @@ public class ShareLinkDownloadHook {
             try {
                 Class<?> cache = s.getClass().getClassLoader().loadClass("com.instagram.feed.media.MediaCache");
                 Object mc = cache.getMethod("getInstance", s.getClass()).invoke(null, s);
-                for (Field f : cache.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cache)) {
                     if (!Map.class.isAssignableFrom(f.getType())) continue;
                     f.setAccessible(true);
                     Map<?, ?> map = (Map<?, ?>) f.get(mc);

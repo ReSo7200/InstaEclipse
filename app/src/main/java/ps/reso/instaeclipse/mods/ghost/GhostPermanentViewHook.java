@@ -124,7 +124,7 @@ public class GhostPermanentViewHook {
                 java.util.List<Long> keys = new java.util.ArrayList<>();
                 Class<?> cls = result.getClass();
                 while (cls != null && cls != Object.class) {
-                    for (Field f : cls.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                         if (f.getType() != int.class) continue;
                         f.setAccessible(true);
                         try { seenCount = f.getInt(result); } catch (Throwable ignored) {}
@@ -138,7 +138,7 @@ public class GhostPermanentViewHook {
                 // re-viewable media; stash the original once/twice type by each key for the render side.
                 cls = result.getClass();
                 while (cls != null && cls != Object.class) {
-                    for (Field f : cls.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                         if (f.getType() != String.class) continue;
                         f.setAccessible(true);
                         try {
@@ -178,7 +178,7 @@ public class GhostPermanentViewHook {
         String cn = obj.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return;
         for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Class<?> t = f.getType();

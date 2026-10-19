@@ -408,7 +408,7 @@ public class CustomFontHook {
     private static boolean failEmojiLoad(Object obj, int depth) throws Exception {
         if (obj == null || depth > 2) return false;
         for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 Class<?> t = f.getType();
                 if (!t.getName().startsWith("X.")) continue;
@@ -416,7 +416,7 @@ public class CustomFontHook {
                 Object v = f.get(obj);
                 if (v == null) continue;
                 if (java.lang.reflect.Modifier.isAbstract(t.getModifiers()) && !t.isInterface()) {
-                    for (java.lang.reflect.Method m : t.getDeclaredMethods()) {
+                    for (java.lang.reflect.Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(t)) {
                         Class<?>[] pt = m.getParameterTypes();
                         if (m.getReturnType() == void.class && pt.length == 1 && pt[0] == Throwable.class) {
                             m.setAccessible(true);

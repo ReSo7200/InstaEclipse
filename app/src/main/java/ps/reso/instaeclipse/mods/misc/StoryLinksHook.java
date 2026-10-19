@@ -239,7 +239,7 @@ public class StoryLinksHook {
         String n = o.getClass().getName();
         if (!n.startsWith("com.instagram.") && !n.startsWith("X.") && !n.startsWith("com.facebook.")) return;
         for (Class<?> cls = o.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType().isPrimitive() || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try {
                     f.setAccessible(true);

@@ -142,9 +142,9 @@ public class CommentCopyHook {
             Class<?> effectHandlerClass = classLoader.loadClass(EFFECT_HANDLER_CLASS);
 
             java.lang.reflect.Method fmj = null;
-            for (java.lang.reflect.Field f : effectHandlerClass.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(effectHandlerClass)) {
                 Class<?> t = f.getType();
-                for (java.lang.reflect.Method cand : t.getDeclaredMethods()) {
+                for (java.lang.reflect.Method cand : ps.reso.instaeclipse.utils.core.SafeReflect.methods(t)) {
                     Class<?>[] p = cand.getParameterTypes();
                     if (cand.getReturnType() == void.class && p.length == 4
                             && p[0] == String.class && p[1] == String.class
@@ -310,12 +310,12 @@ public class CommentCopyHook {
 
     private static Object findItemByClass(Object gestureListener, String targetClassName) {
         try {
-            for (Field f1 : gestureListener.getClass().getDeclaredFields()) {
+            for (Field f1 : ps.reso.instaeclipse.utils.core.SafeReflect.fields(gestureListener.getClass())) {
                 if (!isObfuscatedObject(f1)) continue;
                 f1.setAccessible(true);
                 Object holder = f1.get(gestureListener);
                 if (holder == null) continue;
-                for (Field f2 : holder.getClass().getDeclaredFields()) {
+                for (Field f2 : ps.reso.instaeclipse.utils.core.SafeReflect.fields(holder.getClass())) {
                     if (!isObfuscatedObject(f2)) continue;
                     f2.setAccessible(true);
                     Object item = f2.get(holder);
@@ -333,13 +333,13 @@ public class CommentCopyHook {
             Class<?> userClass = Class.forName(
                     "com.instagram.user.model.User", false, cl);
 
-            for (Field f1 : gestureListener.getClass().getDeclaredFields()) {
+            for (Field f1 : ps.reso.instaeclipse.utils.core.SafeReflect.fields(gestureListener.getClass())) {
                 if (!isObfuscatedObject(f1)) continue;
                 f1.setAccessible(true);
                 Object holder = f1.get(gestureListener);
                 if (holder == null) continue;
 
-                for (Field f2 : holder.getClass().getDeclaredFields()) {
+                for (Field f2 : ps.reso.instaeclipse.utils.core.SafeReflect.fields(holder.getClass())) {
                     if (!isObfuscatedObject(f2)) continue;
                     f2.setAccessible(true);
                     Object item = f2.get(holder);
@@ -366,7 +366,7 @@ public class CommentCopyHook {
     private static String[] findTextFieldLegacy(Object item) {
         String bestName = null;
         String bestVal  = null;
-        for (Field f : item.getClass().getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(item.getClass())) {
             if (f.getType() != String.class) continue;
             try {
                 f.setAccessible(true);
@@ -393,7 +393,7 @@ public class CommentCopyHook {
     }
 
     private static boolean hasFieldOfType(Class<?> clazz, Class<?> target) {
-        for (Field f : clazz.getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(clazz)) {
             if (target.isAssignableFrom(f.getType())) return true;
         }
         return false;
@@ -402,7 +402,7 @@ public class CommentCopyHook {
     private static boolean resolveRepoField(Class<?> dcqClass) {
         try {
             Class<?> repoClass = dcqClass.getClassLoader().loadClass(REPO_CLASS);
-            for (java.lang.reflect.Field f : dcqClass.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(dcqClass)) {
                 if (f.getType() == repoClass) {
                     f.setAccessible(true);
                     repoField = f;
@@ -418,7 +418,7 @@ public class CommentCopyHook {
     // several such holders (loading state, ui state, etc.), so the resolver's own expected
     // parameter type disambiguates which one is the actual comment cache.
     private static Object resolveHeldValue(Object repo, Class<?> targetType) {
-        for (java.lang.reflect.Field f : repo.getClass().getDeclaredFields()) {
+        for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(repo.getClass())) {
             try {
                 java.lang.reflect.Method getValue = f.getType().getMethod("getValue");
                 f.setAccessible(true);
@@ -469,7 +469,7 @@ public class CommentCopyHook {
 
     private static String findLongestTextField(Object model) {
         String best = null;
-        for (java.lang.reflect.Field f : model.getClass().getDeclaredFields()) {
+        for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(model.getClass())) {
             if (f.getType() != String.class) continue;
             try {
                 f.setAccessible(true);

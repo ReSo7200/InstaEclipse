@@ -118,7 +118,7 @@ public class LockedCollectionsHook {
                 Object v = args.get(k);
                 if (v instanceof Parcelable p && p.getClass().getName().endsWith("SavedCollection")) {
                     for (Class<?> c = p.getClass(); c != null && c != Object.class; c = c.getSuperclass())
-                        for (Field f : c.getDeclaredFields()) {
+                        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                             if (f.getType() != String.class) continue;
                             f.setAccessible(true);
                             Object s = f.get(p);

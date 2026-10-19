@@ -52,7 +52,7 @@ public class AirplaneModeHook {
                 }
             }
         };
-        for (java.lang.reflect.Constructor<?> c : manager.getDeclaredConstructors()) {
+        for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(manager)) {
             XposedBridge.hookMethod(c, track);
         }
 

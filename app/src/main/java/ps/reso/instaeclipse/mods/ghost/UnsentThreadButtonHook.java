@@ -221,7 +221,7 @@ public class UnsentThreadButtonHook {
         }
         try {
             for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                     f.setAccessible(true);
                     Object v;
@@ -270,7 +270,7 @@ public class UnsentThreadButtonHook {
         if (cn.contains("DirectThreadKey")) return firstStringField(obj);
         // shallow: some tags wrap the key
         try {
-            for (Field f : obj.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(obj.getClass())) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 if (f.getType().getName().contains("DirectThreadKey")) {
                     f.setAccessible(true);
@@ -285,7 +285,7 @@ public class UnsentThreadButtonHook {
     private String firstStringField(Object o) {
         try {
             for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (f.getType() != String.class || Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     Object val = f.get(o);

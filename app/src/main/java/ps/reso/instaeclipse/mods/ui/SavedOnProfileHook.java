@@ -169,7 +169,7 @@ public class SavedOnProfileHook {
     private static Object findSession(Object o, int depth) {
         java.util.List<Object> next = new java.util.ArrayList<>();
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try {
                     f.setAccessible(true);
