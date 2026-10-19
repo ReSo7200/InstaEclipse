@@ -316,7 +316,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | **Get this version** | [Instagram 451.0.0.20.80 on APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) |
 | **Survives updates** | Yes, DexKit finds what it needs at runtime |
 | **Android** | 9 and newer |
-| **Frameworks** | Vector 2.2 and newer (Xposed API 102), older LSPosed and Vector builds, and LSPatch |
+| **Frameworks** | Vector 2.2 or newer (root), LSPatch 1.0 or newer (no root) |
 
 A big Instagram update can still knock a feature out until it is patched. The menu inside Instagram shows how many features are active (for example "62/62 active"); tap it to see which ones could not attach. If something breaks right after an update, check the [Telegram channel](https://t.me/InstaEclipse) first.
 
@@ -326,20 +326,13 @@ A big Instagram update can still knock a feature out until it is patched. The me
 
 > Get Instagram [451.0.0.20.80 from APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) rather than the Play Store. The Play build is not always fully supported.
 
-Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone. Each release has two APKs with the same features:
-
-| APK | Use it with |
-|---|---|
-| **modern** | Vector 2.2 or newer. It loads through the new Xposed API (102) |
-| **legacy** | LSPatch, LSPosed 1.11 and older Vector builds |
-
-If you are not sure, take the legacy APK: Vector 2.2 loads it too.
+Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone. InstaEclipse uses the new Xposed API (102), so it needs Vector 2.2 or LSPatch 1.0 or newer.
 
 ### Rooted, with Vector
 
-> Needs [Vector](https://github.com/JingMatrix/Vector/releases/latest), JingMatrix's Xposed framework.
+> Needs [Vector](https://github.com/JingMatrix/Vector/releases/latest) 2.2 or newer, JingMatrix's Xposed framework.
 
-1. **Install InstaEclipse** from the APK you downloaded (the modern one on Vector 2.2 or newer).
+1. **Install InstaEclipse** from the APK you downloaded.
 2. **Enable the module.** In the Vector manager, open Modules, enable InstaEclipse and tick Instagram.
 3. **Restart Instagram.** Force stop it and open it again.
 4. **Open the menu.** Long press the Explore (search) tab.
@@ -349,9 +342,9 @@ If you are not sure, take the legacy APK: Vector 2.2 loads it too.
 
 ### No root, with LSPatch
 
-> Needs [JingMatrix's LSPatch](https://github.com/JingMatrix/LSPatch/releases/latest).
+> Needs [JingMatrix's LSPatch](https://github.com/JingMatrix/LSPatch/releases/latest) 1.0 or newer.
 
-1. **Install InstaEclipse** from the legacy APK.
+1. **Install InstaEclipse** from the APK.
 2. **Install LSPatch** (the JingMatrix fork).
 3. **Patch Instagram.** In LSPatch, tap **+**, pick the Instagram APK or the installed app, choose **Local Patch Mode**, turn on **Inject loader dex**, then tap **Start Patch**.
 4. **Install the patched APK** and log in.

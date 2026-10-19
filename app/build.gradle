@@ -17,20 +17,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // Two APKs from the same code (docs/xposed-api-102): "legacy" has only assets/xposed_init and
-    // loads on every framework (LSPatch, LSPosed <= 1.11, Vector); "modern" also ships
-    // META-INF/xposed (libxposed API 102) for Vector 2.2+. LSPosed 1.11 (API 100) picks
-    // META-INF/xposed whenever it exists and then fails, so it must not be in the legacy APK.
-    flavorDimensions = ['xposedApi']
-    productFlavors {
-        legacy {
-            dimension 'xposedApi'
-        }
-        modern {
-            dimension 'xposedApi'
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -79,14 +65,13 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core.v361
 
-    // Xposed APIs, provided by the framework at runtime: legacy (LSPatch, older LSPosed) and
-    // libxposed API 102 (Vector 2.2+). See docs/xposed-api-102.
+    // Xposed APIs, provided by the framework at runtime. The module loads through libxposed API 102
+    // (META-INF/xposed: Vector 2.2+, LSPatch 1.0+); the legacy API stays behind the compat layer.
+    // See docs/xposed-api-102.
     compileOnly files('libs/api-82.jar')
     compileOnly 'io.github.libxposed:api:102.0.0'
-    // modern flavor only: lets the companion write remote preferences that the hooked app reads
-    // (older frameworks speak an incompatible service protocol, so the legacy APK leaves it out).
-    // The classes of io.github.libxposed:service/interface 102.0.0 (Apache-2.0), used as jars: the
+    // Lets the companion write remote preferences that the hooked app reads. The classes of io.github.libxposed:service/interface 102.0.0 (Apache-2.0), used as jars: the
     // AARs declare minCompileSdk 37, which this project's AGP/compileSdk 34 doesn't meet; their
-    // XposedProvider is declared in src/modern/AndroidManifest.xml.
-    modernImplementation files('libs/modern/libxposed-service-102.0.0.jar', 'libs/modern/libxposed-interface-102.0.0.jar')
+    // XposedProvider is declared in AndroidManifest.xml.
+    implementation files('libs/modern/libxposed-service-102.0.0.jar', 'libs/modern/libxposed-interface-102.0.0.jar')
 }

@@ -40,7 +40,7 @@ a legacy module on LSPatch / older LSPosed.
 
 - [x] Vector 2.2 with the `modern` APK: loads `ModernEntry`, 86 hooks OK (the 2 failures predate the merge), feed features visible (2026-10-19)
 - [x] Vector 2.2 with the `legacy` APK: loads ("legacy XposedBridge 102"); modern APK loads as "libxposed 102 on Vector 2.2 (3080)", 86 hooks OK (2026-10-19)
-- [ ] LSPatch: legacy APK works (should, nothing changed for it); modern APK fails like LSPosed 1.11?
+- [x] LSPatch: 0.8 loads only legacy modules; LSPatch 1.0+ loads the modern APK ("libxposed 102 on LSPatch 1.2 (487)", 87 hooks, remote prefs connected, 2026-10-19). From 0.8.1 the build makes one APK (modern); legacy users stay on the 0.8.1-legacy branch.
 - [ ] Remote preferences on modern: does `RemotePrefsMirror` connect on Vector 2.2 (logcat tag
       `IE|RemotePrefs`: "connected to Vector ..., mirrored N values") and does Instagram read them
       on a cold start (`CompanionSync` applies them)?
