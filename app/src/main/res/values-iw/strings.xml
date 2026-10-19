@@ -272,6 +272,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">הסתר פתקים בהודעות</string>
     <string name="ig_hide_dm_suggestions">הסתר חשבונות מוצעים בהודעות</string>
     <string name="ig_profile_menu_tools">תפריט פרופיל: העתקת שם משתמש, ביו והורדת הכול</string>
+    <string name="ig_profile_spoofer">זיוף פרופיל (רק בטלפון הזה)</string>
+    <string name="ig_profile_spoofer_edit">מספרים ותג מזויפים</string>
+    <string name="ig_profile_spoofer_hint">משנה את מראה הפרופיל שלך רק בטלפון הזה. שום דבר לא נשלח לאינסטגרם. השאר שדה ריק כדי לשמור על המספר האמיתי.</string>
+    <string name="ig_profile_spoofer_followers">עוקבים</string>
+    <string name="ig_profile_spoofer_following">נעקבים</string>
+    <string name="ig_profile_spoofer_posts">פוסטים</string>
+    <string name="ig_profile_spoofer_verified">הצג תג מאומת</string>
     <string name="ig_profile_copy_username">העתקת שם משתמש</string>
     <string name="ig_profile_copy_bio">העתקת ביו</string>
     <string name="ig_profile_no_bio">לפרופיל הזה אין ביו</string>

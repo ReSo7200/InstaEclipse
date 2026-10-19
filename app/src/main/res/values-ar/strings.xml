@@ -234,6 +234,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">إخفاء الملاحظات في الرسائل</string>
     <string name="ig_hide_dm_suggestions">إخفاء الحسابات المقترحة في الرسائل</string>
     <string name="ig_profile_menu_tools">قائمة الملف الشخصي: نسخ اسم المستخدم والنبذة وتنزيل الكل</string>
+    <string name="ig_profile_spoofer">تزييف الملف الشخصي (على هذا الهاتف فقط)</string>
+    <string name="ig_profile_spoofer_edit">الأعداد والشارة المزيفة</string>
+    <string name="ig_profile_spoofer_hint">يغيّر شكل ملفك الشخصي على هذا الهاتف فقط. لا يُرسل أي شيء إلى إنستغرام. اترك الحقل فارغًا للإبقاء على الرقم الحقيقي.</string>
+    <string name="ig_profile_spoofer_followers">المتابِعون</string>
+    <string name="ig_profile_spoofer_following">المتابَعون</string>
+    <string name="ig_profile_spoofer_posts">المنشورات</string>
+    <string name="ig_profile_spoofer_verified">إظهار شارة التوثيق</string>
     <string name="ig_profile_copy_username">نسخ اسم المستخدم</string>
     <string name="ig_profile_copy_bio">نسخ النبذة</string>
     <string name="ig_profile_no_bio">لا توجد نبذة في هذا الملف</string>

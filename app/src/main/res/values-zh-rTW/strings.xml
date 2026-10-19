@@ -235,6 +235,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">隱藏訊息中的便利貼</string>
     <string name="ig_hide_dm_suggestions">隱藏訊息中的推薦帳號</string>
     <string name="ig_profile_menu_tools">個人檔案選單：複製用戶名稱、簡介和全部下載</string>
+    <string name="ig_profile_spoofer">個人檔案偽裝（僅限本機）</string>
+    <string name="ig_profile_spoofer_edit">偽裝的數字和徽章</string>
+    <string name="ig_profile_spoofer_hint">只在本機上改變你自己個人檔案的顯示方式，不會向 Instagram 傳送任何內容。留空即保留真實數字。</string>
+    <string name="ig_profile_spoofer_followers">粉絲</string>
+    <string name="ig_profile_spoofer_following">追蹤中</string>
+    <string name="ig_profile_spoofer_posts">貼文</string>
+    <string name="ig_profile_spoofer_verified">顯示驗證徽章</string>
     <string name="ig_profile_copy_username">複製用戶名稱</string>
     <string name="ig_profile_copy_bio">複製簡介</string>
     <string name="ig_profile_no_bio">此個人檔案沒有簡介</string>

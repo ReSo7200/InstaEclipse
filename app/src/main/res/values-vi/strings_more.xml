@@ -183,6 +183,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Ẩn Ghi chú trong Tin nhắn</string>
     <string name="ig_hide_dm_suggestions">Ẩn tài khoản được gợi ý trong Tin nhắn</string>
     <string name="ig_profile_menu_tools">Menu hồ sơ: sao chép tên, tiểu sử và tải tất cả</string>
+    <string name="ig_profile_spoofer">Giả mạo hồ sơ (chỉ trên điện thoại này)</string>
+    <string name="ig_profile_spoofer_edit">Số liệu &amp; huy hiệu giả</string>
+    <string name="ig_profile_spoofer_hint">Thay đổi cách hồ sơ của bạn hiển thị chỉ trên điện thoại này. Không có gì được gửi đến Instagram. Để trống một ô để giữ số thật.</string>
+    <string name="ig_profile_spoofer_followers">Người theo dõi</string>
+    <string name="ig_profile_spoofer_following">Đang theo dõi</string>
+    <string name="ig_profile_spoofer_posts">Bài viết</string>
+    <string name="ig_profile_spoofer_verified">Hiện huy hiệu xác minh</string>
     <string name="ig_profile_copy_username">Sao chép tên người dùng</string>
     <string name="ig_profile_copy_bio">Sao chép tiểu sử</string>
     <string name="ig_profile_no_bio">Hồ sơ này không có tiểu sử</string>

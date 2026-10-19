@@ -1637,6 +1637,8 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_content_copy, A_SOCIAL, getString(R.string.ig_profile_menu_tools), "profileMenuTools"),
+                createSwitch(R.drawable.ic_eye, A_SOCIAL, getString(R.string.ig_profile_spoofer), "profileSpoofer"),
+                profileSpoofItem(),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_confirm_follows), "confirmFollows"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_fancy_bio_font), "fancyBioFont"),
@@ -1648,6 +1650,55 @@ public class FeaturesFragment extends Fragment {
         ));
 
         return defs;
+    }
+
+    /** Profile spoofer values row: greyed out until "Profile spoofer" is on. */
+    private FeatureItem profileSpoofItem() {
+        FeatureItem item = createClickable(R.drawable.ic_tune, A_SOCIAL, getString(R.string.ig_profile_spoofer_edit), this::showProfileSpoofDialog);
+        item.requiresAnyOf = Arrays.asList("profileSpoofer");
+        return item;
+    }
+
+    private void showProfileSpoofDialog() {
+        android.content.Context c = requireContext();
+        int pad = (int) (20 * getResources().getDisplayMetrics().density);
+        android.widget.LinearLayout box = new android.widget.LinearLayout(c);
+        box.setOrientation(android.widget.LinearLayout.VERTICAL);
+        box.setPadding(pad, pad / 2, pad, 0);
+        android.widget.EditText followers = profileSpoofInput(box, R.string.ig_profile_spoofer_followers, localCache.getInt("spoofFollowers", -1));
+        android.widget.EditText following = profileSpoofInput(box, R.string.ig_profile_spoofer_following, localCache.getInt("spoofFollowing", -1));
+        android.widget.EditText posts = profileSpoofInput(box, R.string.ig_profile_spoofer_posts, localCache.getInt("spoofPosts", -1));
+        android.widget.CheckBox verified = new android.widget.CheckBox(c);
+        verified.setText(R.string.ig_profile_spoofer_verified);
+        verified.setChecked(localCache.getBoolean("spoofVerified", false));
+        box.addView(verified);
+        new MaterialAlertDialogBuilder(c)
+                .setTitle(R.string.ig_profile_spoofer)
+                .setMessage(R.string.ig_profile_spoofer_hint)
+                .setView(box)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    putIntPref("spoofFollowers", ps.reso.instaeclipse.utils.dialog.DialogUtils.parseSpoofCount(followers.getText().toString()));
+                    putIntPref("spoofFollowing", ps.reso.instaeclipse.utils.dialog.DialogUtils.parseSpoofCount(following.getText().toString()));
+                    putIntPref("spoofPosts", ps.reso.instaeclipse.utils.dialog.DialogUtils.parseSpoofCount(posts.getText().toString()));
+                    putBoolPref("spoofVerified", verified.isChecked());
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private android.widget.EditText profileSpoofInput(android.widget.LinearLayout box, int label, int value) {
+        com.google.android.material.textfield.TextInputLayout layout =
+                new com.google.android.material.textfield.TextInputLayout(box.getContext());
+        layout.setHint(getString(label));
+        com.google.android.material.textfield.TextInputEditText input =
+                new com.google.android.material.textfield.TextInputEditText(layout.getContext());
+        input.setSingleLine(true);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(10)});
+        if (value >= 0) input.setText(String.valueOf(value));
+        layout.addView(input);
+        box.addView(layout);
+        return input;
     }
 
     private void loadAppMenu() {

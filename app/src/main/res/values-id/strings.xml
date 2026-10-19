@@ -272,6 +272,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Sembunyikan Catatan di Pesan</string>
     <string name="ig_hide_dm_suggestions">Sembunyikan akun yang disarankan di Pesan</string>
     <string name="ig_profile_menu_tools">Menu profil: salin nama pengguna, bio &amp; unduh semua</string>
+    <string name="ig_profile_spoofer">Pemalsu profil (hanya di ponsel ini)</string>
+    <string name="ig_profile_spoofer_edit">Angka &amp; lencana palsu</string>
+    <string name="ig_profile_spoofer_hint">Mengubah tampilan profil Anda sendiri hanya di ponsel ini. Tidak ada yang dikirim ke Instagram. Kosongkan kolom untuk mempertahankan angka asli.</string>
+    <string name="ig_profile_spoofer_followers">Pengikut</string>
+    <string name="ig_profile_spoofer_following">Mengikuti</string>
+    <string name="ig_profile_spoofer_posts">Postingan</string>
+    <string name="ig_profile_spoofer_verified">Tampilkan lencana terverifikasi</string>
     <string name="ig_profile_copy_username">Salin nama pengguna</string>
     <string name="ig_profile_copy_bio">Salin bio</string>
     <string name="ig_profile_no_bio">Profil ini tidak punya bio</string>

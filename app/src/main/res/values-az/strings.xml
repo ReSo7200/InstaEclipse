@@ -236,6 +236,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Mesajlarda Qeydləri Gizlət</string>
     <string name="ig_hide_dm_suggestions">Mesajlarda təklif olunan hesabları gizlət</string>
     <string name="ig_profile_menu_tools">Profil menyusu: istifadəçi adı, bio kopyala və hamısını yüklə</string>
+    <string name="ig_profile_spoofer">Profil saxtalaşdırıcı (yalnız bu telefonda)</string>
+    <string name="ig_profile_spoofer_edit">Saxta saylar və nişan</string>
+    <string name="ig_profile_spoofer_hint">Profilinizin görünüşünü yalnız bu telefonda dəyişir. Instagram-a heç nə göndərilmir. Real rəqəmi saxlamaq üçün sahəni boş buraxın.</string>
+    <string name="ig_profile_spoofer_followers">İzləyicilər</string>
+    <string name="ig_profile_spoofer_following">İzlənilənlər</string>
+    <string name="ig_profile_spoofer_posts">Paylaşımlar</string>
+    <string name="ig_profile_spoofer_verified">Təsdiq nişanını göstər</string>
     <string name="ig_profile_copy_username">İstifadəçi adını kopyala</string>
     <string name="ig_profile_copy_bio">Bionu kopyala</string>
     <string name="ig_profile_no_bio">Bu profilin biosu yoxdur</string>
