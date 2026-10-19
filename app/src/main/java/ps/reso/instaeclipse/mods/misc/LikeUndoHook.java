@@ -109,6 +109,7 @@ public class LikeUndoHook {
         ModuleLog.line(TAG + "✅ Hooked " + sender.getDeclaringClass().getName() + "." + sender.getName());
         FeatureStatusTracker.setHooked("LikeUndo");
         hookHeartButtons();
+        hookLikeEntry(sender);
         FeatureStatusTracker.setHooked("ConfirmLikes");
     }
 
@@ -153,6 +154,50 @@ public class LikeUndoHook {
                 }));
             }
         });
+    }
+
+    /**
+     * Ask before liking, for hearts that aren't Views (the Compose feed heart on 451): the like
+     * entry (X.0A0e.A04 on 451, X.0E0b.A04 on 452; it takes the Activity and the Media, in the
+     * sender's class) updates the post's like state and then calls the sender. Held here, before
+     * the heart fills, so Cancel leaves it empty; Like replays it.
+     */
+    private static void hookLikeEntry(Method sender) {
+        int hooked = 0;
+        for (Method m : sender.getDeclaringClass().getDeclaredMethods()) {
+            if (m.equals(sender) || m.getReturnType() != void.class
+                    || java.lang.reflect.Modifier.isStatic(m.getModifiers())) continue;
+            boolean activity = false, media = false;
+            for (Class<?> p : m.getParameterTypes()) {
+                if (p == Activity.class) activity = true;
+                if (p.getName().equals("com.instagram.feed.media.Media")) media = true;
+            }
+            if (!activity || !media) continue;
+            XposedBridge.hookMethod(m, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (!FeatureFlags.confirmLikes || REPLAYING.get() == Boolean.TRUE
+                            || System.currentTimeMillis() <= confirmedUntil) return;
+                    Object media = null;
+                    for (Object a : param.args) {
+                        if (a != null && a.getClass().getName().equals("com.instagram.feed.media.Media")) { media = a; break; }
+                    }
+                    if (media == null || HideSuggestedFeedItemsHook.isLiked(media)) return; // already liked: not a new like
+                    Activity act = UIHookManager.getCurrentActivity();
+                    if (act == null) return;
+                    param.setResult(null);
+                    Member method = param.method;
+                    Object self = param.thisObject;
+                    Object[] args = param.args.clone();
+                    MAIN.post(() -> confirm(act, () -> {
+                        confirmedUntil = System.currentTimeMillis() + 3000;
+                        send(method, self, args);
+                    }));
+                }
+            });
+            hooked++;
+        }
+        ModuleLog.line(TAG + "like entry hooks=" + hooked);
     }
 
     private static Activity activityOf(android.content.Context c) {
