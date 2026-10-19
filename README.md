@@ -331,7 +331,7 @@ Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo
 
 | APK | Use it with |
 |---|---|
-| **modern** (version ends in `-api102`) | Vector 2.2 or newer. It loads through the new Xposed API (102) |
+| **modern** | Vector 2.2 or newer. It loads through the new Xposed API (102) |
 | **legacy** | LSPatch, LSPosed 1.11 and older Vector builds |
 
 If you are not sure, take the legacy APK: Vector 2.2 loads it too.

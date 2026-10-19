@@ -28,7 +28,6 @@ android {
         }
         modern {
             dimension 'xposedApi'
-            versionNameSuffix '-api102'
         }
     }
 
