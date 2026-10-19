@@ -288,6 +288,7 @@
     <string name="ig_post_counts_keep">Πραγματικό</string>
     <string name="ig_post_counts_reset">Επαναφορά</string>
     <string name="ig_post_counts_saved">Οι αριθμοί αποθηκεύτηκαν</string>
+    <string name="ig_dl_companion_fallback">Δεν ήταν δυνατή η σύνδεση με την εφαρμογή InstaEclipse, οπότε αποθηκεύτηκε στο Download. Για τον φάκελό σας, επιτρέψτε στο InstaEclipse αυτόματη εκκίνηση / λειτουργία στο παρασκήνιο.</string>
     <string name="ig_profile_menu_tools">Μενού προφίλ: αντιγραφή ονόματος, βιογραφικού και λήψη όλων</string>
     <string name="ig_profile_spoofer">Παραποίηση προφίλ (μόνο σε αυτό το τηλέφωνο)</string>
     <string name="ig_profile_spoofer_edit">Επεξεργασία ψεύτικου προφίλ</string>

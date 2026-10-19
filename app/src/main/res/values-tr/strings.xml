@@ -576,6 +576,7 @@
     <string name="ig_post_counts_keep">Gerçeği koru</string>
     <string name="ig_post_counts_reset">Sıfırla</string>
     <string name="ig_post_counts_saved">Sayılar kaydedildi</string>
+    <string name="ig_dl_companion_fallback">InstaEclipse uygulamasına ulaşılamadı, bu yüzden Download\'e kaydedildi. Kendi klasörünüz için InstaEclipse\'e otomatik başlatma / arka planda çalışma izni verin.</string>
     <string name="ig_profile_menu_tools">Profil menüsü: kullanıcı adı, biyografi kopyala ve tümünü indir</string>
     <string name="ig_profile_spoofer">Profil taklitçisi (yalnızca bu telefonda)</string>
     <string name="ig_profile_spoofer_edit">Sahte profili düzenle</string>
