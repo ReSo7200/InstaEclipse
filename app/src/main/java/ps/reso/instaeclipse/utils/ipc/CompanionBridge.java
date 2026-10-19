@@ -55,8 +55,47 @@ public final class CompanionBridge {
             if (HOST_SIGNER_SHA256.length() != 64) return false;
             for (int i = 0; i < expected.length; i++)
                 expected[i] = (byte) Integer.parseInt(HOST_SIGNER_SHA256.substring(i * 2, i * 2 + 2), 16);
-            return context.getPackageManager().hasSigningCertificate(packageName, expected, PackageManager.CERT_INPUT_SHA256);
+            if (context.getPackageManager().hasSigningCertificate(packageName, expected, PackageManager.CERT_INPUT_SHA256))
+                return true;
+            return lspatchOriginalSigner(context, packageName, expected);
         } catch (RuntimeException ignored) { return false; }
+    }
+
+    /** Patched Instagram (sourceDir + install time) -> whether its recorded signer matched. */
+    private static volatile String lspatchCheckedFor;
+    private static volatile boolean lspatchTrusted;
+
+    /**
+     * LSPatch re-signs the app it patches with its own key and records the original signer in
+     * assets/lspatch/config.json ("originalSignature", the certificate in hex). Without root that
+     * is how Instagram arrives, so its recorded signer is checked against the same pinned hash.
+     */
+    private static boolean lspatchOriginalSigner(Context context, String packageName, byte[] expected) {
+        try {
+            android.content.pm.PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);
+            String key = info.applicationInfo.sourceDir + "@" + info.lastUpdateTime;
+            if (key.equals(lspatchCheckedFor)) return lspatchTrusted;
+            boolean trusted = false;
+            try (java.util.zip.ZipFile apk = new java.util.zip.ZipFile(info.applicationInfo.sourceDir)) {
+                java.util.zip.ZipEntry entry = apk.getEntry("assets/lspatch/config.json");
+                if (entry != null && entry.getSize() > 0 && entry.getSize() < 64 * 1024) {
+                    byte[] raw;
+                    try (java.io.InputStream in = apk.getInputStream(entry)) { raw = in.readAllBytes(); }
+                    String cert = new org.json.JSONObject(new String(raw, java.nio.charset.StandardCharsets.UTF_8))
+                            .optString("originalSignature", "");
+                    if (!cert.isEmpty() && cert.length() % 2 == 0 && cert.matches("[0-9a-fA-F]+")) {
+                        byte[] der = new byte[cert.length() / 2];
+                        for (int i = 0; i < der.length; i++)
+                            der[i] = (byte) Integer.parseInt(cert.substring(i * 2, i * 2 + 2), 16);
+                        trusted = java.security.MessageDigest.isEqual(expected,
+                                java.security.MessageDigest.getInstance("SHA-256").digest(der));
+                    }
+                }
+            }
+            lspatchTrusted = trusted;
+            lspatchCheckedFor = key;
+            return trusted;
+        } catch (Exception ignored) { return false; }
     }
 
     /** Called only inside a Binder transaction with Binder.getCallingUid(), never a claimed extra. */
