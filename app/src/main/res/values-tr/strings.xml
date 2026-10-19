@@ -577,6 +577,10 @@
     <string name="ig_post_counts_reset">Sıfırla</string>
     <string name="ig_post_counts_saved">Sayılar kaydedildi</string>
     <string name="ig_dl_companion_fallback">InstaEclipse uygulamasına ulaşılamadı, bu yüzden Download\'e kaydedildi. Kendi klasörünüz için InstaEclipse\'e otomatik başlatma / arka planda çalışma izni verin.</string>
+    <string name="background_access_title">InstaEclipse\'in arka planda çalışmasına izin ver</string>
+    <string name="background_access_message">Klasörünüze indirmeleri Instagram\'dan başlatılan bu uygulama kaydeder. Telefon onu uyutursa Download\'a gider. Kısıtlamasız çalışmasına izin verin. Samsung\'da Uyuyan uygulamalardan çıkarın; Xiaomi\'de Otomatik başlatmayı açın.</string>
+    <string name="background_access_allow">İzin ver</string>
+    <string name="background_access_later">Sonra</string>
     <string name="ig_profile_menu_tools">Profil menüsü: kullanıcı adı, biyografi kopyala ve tümünü indir</string>
     <string name="ig_profile_spoofer">Profil taklitçisi (yalnızca bu telefonda)</string>
     <string name="ig_profile_spoofer_edit">Sahte profili düzenle</string>

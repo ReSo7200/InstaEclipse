@@ -252,6 +252,10 @@
     <string name="ig_post_counts_reset">Сбросить</string>
     <string name="ig_post_counts_saved">Счётчики сохранены</string>
     <string name="ig_dl_companion_fallback">Не удалось связаться с приложением InstaEclipse, поэтому файл сохранён в Download. Чтобы использовать свою папку, разрешите InstaEclipse автозапуск / работу в фоне.</string>
+    <string name="background_access_title">Разрешите InstaEclipse работать в фоне</string>
+    <string name="background_access_message">Загрузки в вашу папку сохраняет это приложение, запускаемое из Instagram. Если телефон его усыпляет, они попадают в Download. Разрешите работу без ограничений. На Samsung уберите его из спящих приложений, на Xiaomi включите автозапуск.</string>
+    <string name="background_access_allow">Разрешить</string>
+    <string name="background_access_later">Позже</string>
     <string name="ig_profile_menu_tools">Меню профиля: копировать имя, био и скачать всё</string>
     <string name="ig_profile_spoofer">Подмена профиля (только на этом телефоне)</string>
     <string name="ig_profile_spoofer_edit">Изменить поддельный профиль</string>

@@ -234,6 +234,7 @@ public class FeaturesFragment extends Fragment {
                 editor.putString("downloaderCustomUri", uriString);
                 editor.putString("downloaderCustomPath", path);
                 editor.commit();
+                ps.reso.instaeclipse.utils.core.BackgroundAccess.askIfNeeded(requireContext(), localCache, true);
                 makeLocalCacheWorldReadable();
 
                 Intent intentUri = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
@@ -269,6 +270,14 @@ public class FeaturesFragment extends Fragment {
                 notifPermLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
             }
         }
+        if (ps.reso.instaeclipse.utils.core.BackgroundAccess.needsStoragePermission()
+                && ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x5E);
+        }
+        // Downloads to a chosen folder need this app to start from Instagram.
+        if (!localCache.getString("downloaderCustomUri", "").isEmpty())
+            ps.reso.instaeclipse.utils.core.BackgroundAccess.askIfNeeded(requireContext(), localCache, false);
 
         recyclerFeatures = fragmentView.findViewById(R.id.recycler_features);
         recyclerFeatures.setLayoutManager(new LinearLayoutManager(requireContext()));

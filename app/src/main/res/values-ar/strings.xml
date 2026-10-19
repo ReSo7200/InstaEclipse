@@ -250,6 +250,10 @@
     <string name="ig_post_counts_reset">إعادة تعيين</string>
     <string name="ig_post_counts_saved">تم حفظ الأعداد</string>
     <string name="ig_dl_companion_fallback">تعذّر الوصول إلى تطبيق InstaEclipse، لذا حُفظ الملف في Download. لاستخدام مجلدك، اسمح لـ InstaEclipse بالتشغيل التلقائي / العمل في الخلفية.</string>
+    <string name="background_access_title">السماح لـ InstaEclipse بالعمل في الخلفية</string>
+    <string name="background_access_message">يحفظ هذا التطبيق التنزيلات في مجلدك عند تشغيله من إنستغرام. إذا أبقاه الهاتف نائمًا، تُحفظ في Download بدلًا من ذلك. اسمح له بالعمل دون قيود. على سامسونج أبعده عن التطبيقات النائمة، وعلى شاومي فعّل التشغيل التلقائي.</string>
+    <string name="background_access_allow">سماح</string>
+    <string name="background_access_later">لاحقًا</string>
     <string name="ig_profile_menu_tools">قائمة الملف الشخصي: نسخ اسم المستخدم والنبذة وتنزيل الكل</string>
     <string name="ig_profile_spoofer">تزييف الملف الشخصي (على هذا الهاتف فقط)</string>
     <string name="ig_profile_spoofer_edit">تعديل الملف الشخصي المزيف</string>
