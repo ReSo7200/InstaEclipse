@@ -56,6 +56,10 @@ public class FollowConfirmHook {
     private static Method statusSetter;
     /** The manager's reset (profile model -> re-read status), found as its 1-arg method calling the setter. */
     private static Method resetMethod;
+    /** User's current follow status (FollowStatus enum), read by the manager's setter. */
+    private static Method statusGetter;
+    private static int profileButtonId;
+    private static boolean replayingClick;
     private static final String DATA_SOURCE = "com.instagram.user.follow.mvvm.data.FollowUserDataSourceImpl";
 
     public void install(DexKitBridge bridge) {
@@ -119,10 +123,81 @@ public class FollowConfirmHook {
             }
         }
         hookDataSource(sender.getDeclaringClass());
+        if (statusSetter != null) {
+            try {
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
+                        .declaredClass(statusSetter.getDeclaringClass().getName()).name(statusSetter.getName()).paramCount(3)))) {
+                    for (MethodData c : md.getInvokes()) {
+                        if (!c.isMethod() || !c.getClassName().equals(USER) || c.getParamCount() != 0) continue;
+                        Method m = c.getMethodInstance(Module.hostClassLoader);
+                        if (m.getReturnType() == statusSetter.getParameterTypes()[0]) { statusGetter = m; break; }
+                    }
+                }
+            } catch (Throwable t) {
+                ModuleLog.line(TAG + "⚠️ status getter: " + t);
+            }
+        }
+        hookProfileButton();
         ModuleLog.line(TAG + "✅ Hooked " + sender.getDeclaringClass().getName() + "." + sender.getName()
                 + (statusSetter != null ? ", undo " + statusSetter.getName() : ", no undo")
-                + (resetMethod != null ? ", reset " + resetMethod.getName() : ", no reset"));
+                + (resetMethod != null ? ", reset " + resetMethod.getName() : ", no reset")
+                + (statusGetter != null ? ", status " + statusGetter.getName() : ", no status"));
         FeatureStatusTracker.setHooked("ConfirmFollows");
+    }
+
+    /**
+     * The profile header's Follow button goes through its own handler (the profile fragment), so it
+     * is held at the tap: while you don't follow the profile yet (read from its User model), the tap
+     * waits for the dialog and is replayed on Follow. Taps on "Following" / "Requested" pass.
+     */
+    private static void hookProfileButton() {
+        XposedBridge.hookAllMethods(android.view.View.class, "performClick", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.confirmFollows || replayingClick) return;
+                android.view.View v = (android.view.View) param.thisObject;
+                if (profileButtonId == 0) {
+                    if (v.getId() == android.view.View.NO_ID) return;
+                    profileButtonId = v.getResources().getIdentifier("profile_header_follow_button", "id", v.getContext().getPackageName());
+                    if (profileButtonId == 0) profileButtonId = -1;
+                }
+                if (v.getId() != profileButtonId) return;
+                ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                Activity act = activityOf(v.getContext());
+                String username = ps.reso.instaeclipse.mods.ui.ProfileMenuHook.profileUsername(act);
+                if (act == null || alreadyFollowing(act, username)) return;
+                param.setResult(true);
+                MAIN.post(() -> confirm(act, username, () -> {
+                    replayingClick = true;
+                    REPLAYING.set(Boolean.TRUE);
+                    try { v.performClick(); } finally { replayingClick = false; REPLAYING.remove(); }
+                    ModuleLog.line(TAG + "profile follow sent");
+                }, () -> ModuleLog.line(TAG + "profile follow cancelled")));
+            }
+        });
+    }
+
+    private static Activity activityOf(android.content.Context c) {
+        while (c instanceof android.content.ContextWrapper w) {
+            if (c instanceof Activity a) return a;
+            c = w.getBaseContext();
+        }
+        return UIHookManager.getCurrentActivity();
+    }
+
+    /** True only when the profile's User says you follow it or asked to; unknown counts as not. */
+    private static boolean alreadyFollowing(Activity act, String username) {
+        Method get = statusGetter;
+        if (get == null || username == null) return false;
+        try {
+            Object user = ps.reso.instaeclipse.mods.ui.ProfileMenuHook.findUser(act, username);
+            Object status = user != null ? get.invoke(user) : null;
+            if (!(status instanceof Enum<?> e)) return false;
+            String name = e.name().toUpperCase(java.util.Locale.ROOT);
+            return name.contains("FOLLOWING") && !name.contains("NOTFOLLOWING") || name.contains("REQUESTED");
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     /** The profile header's follow: FollowUserDataSourceImpl's suspend method taking the action enum. */
