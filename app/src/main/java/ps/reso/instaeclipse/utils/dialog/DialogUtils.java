@@ -196,8 +196,8 @@ public class DialogUtils {
         // ---- SOCIAL ---- likes, comments, profiles
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_social)));
         LinearLayout social = createGroupCard(context);
-        social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "enableCopyComment", "commentSearch", "enableCaptionCopy", "disableRepost")));
-        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
+        social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "confirmLikes", "enableCopyComment", "commentSearch", "enableCaptionCopy", "disableRepost")));
+        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileMenuTools", "confirmFollows", "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
         mainLayout.addView(social);
 
         // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
@@ -1715,6 +1715,7 @@ public class DialogUtils {
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_dialog_misc_disable_double_tap_like, "disableDoubleTapLike"),
                 flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_dialog_misc_like_undo, "likeUndo"),
+                flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_confirm_likes, "confirmLikes"),
                 flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_comment, "enableCopyComment"),
                 flagSwitch(context, R.drawable.ic_search, A_SOCIAL, R.string.ig_dialog_misc_comment_search, "commentSearch"),
                 flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_caption, "enableCaptionCopy"),
@@ -1726,6 +1727,8 @@ public class DialogUtils {
     private static void showProfilesOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
         layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_profile_menu_tools, "profileMenuTools"),
+                flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_confirm_follows, "confirmFollows"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_misc_profile_follows_label, "profileFollowsYouLabel"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_fancy_bio_font, "fancyBioFont"),
                 flagSwitch(context, R.drawable.ic_block, A_SOCIAL, R.string.ig_dialog_hide_threads_button, "hideThreadsButton"),

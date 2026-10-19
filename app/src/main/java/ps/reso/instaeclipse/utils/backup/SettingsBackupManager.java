@@ -113,6 +113,9 @@ public class SettingsBackupManager {
         s.put("hideShareCreateGroup",    FeatureFlags.hideShareCreateGroup);
         s.put("exactTimestamps",         FeatureFlags.exactTimestamps);
         s.put("likeUndo",                FeatureFlags.likeUndo);
+        s.put("confirmLikes",            FeatureFlags.confirmLikes);
+        s.put("confirmFollows",          FeatureFlags.confirmFollows);
+        s.put("profileMenuTools",        FeatureFlags.profileMenuTools);
         s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
         s.put("fancyBioFont",            FeatureFlags.fancyBioFont);
         s.put("storyViewerSearch",       FeatureFlags.storyViewerSearch);
@@ -264,6 +267,9 @@ public class SettingsBackupManager {
         if (s.has("hideShareCreateGroup"))   FeatureFlags.hideShareCreateGroup   = s.getBoolean("hideShareCreateGroup");
         if (s.has("exactTimestamps"))        FeatureFlags.exactTimestamps        = s.getBoolean("exactTimestamps");
         if (s.has("likeUndo"))               FeatureFlags.likeUndo               = s.getBoolean("likeUndo");
+        if (s.has("confirmLikes"))           FeatureFlags.confirmLikes           = s.getBoolean("confirmLikes");
+        if (s.has("confirmFollows"))         FeatureFlags.confirmFollows         = s.getBoolean("confirmFollows");
+        if (s.has("profileMenuTools"))       FeatureFlags.profileMenuTools       = s.getBoolean("profileMenuTools");
         if (s.has("profileFollowsYouLabel")) FeatureFlags.profileFollowsYouLabel = s.getBoolean("profileFollowsYouLabel");
         if (s.has("fancyBioFont"))           FeatureFlags.fancyBioFont           = s.getBoolean("fancyBioFont");
         if (s.has("storyViewerSearch"))      FeatureFlags.storyViewerSearch      = s.getBoolean("storyViewerSearch");
