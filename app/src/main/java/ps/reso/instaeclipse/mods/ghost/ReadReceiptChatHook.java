@@ -81,6 +81,12 @@ public class ReadReceiptChatHook {
         if (header == null) return false;
         if (ThreadHeaderMenu.has(a, "read")) return true;
         String threadId = HideChatsHook.resolveThreadId(a);
+        if (threadId == null) {
+            // Chats hosted in the main activity: the open-chat resolver knows which one it is.
+            ps.reso.instaeclipse.utils.ghost.CurrentConversation.Snapshot s =
+                    ps.reso.instaeclipse.utils.ghost.CurrentConversation.resolve(a);
+            if (s != null) threadId = s.threadId;
+        }
         if (threadId == null) return false;
         return addEntry(a, threadId, header);
     }

@@ -221,19 +221,7 @@ public final class ConversationMenuHook {
         ArrayList<Runnable> actions = new ArrayList<>();
         if (FeatureFlags.hideSpecificChats || hidden) {
             labels.add(I18n.t(a, hidden ? R.string.ie_unhide_this_chat : R.string.ie_hide_this_chat));
-            actions.add(() -> {
-                if (!CurrentConversation.revalidate(a, snapshot)) { message(a, R.string.ie_chat_changed); return; }
-                if (!hidden && !FeatureFlags.hideSpecificChats) { message(a, R.string.ie_chat_changed); return; }
-                View title = find(a, "header_title");
-                if (title == null) title = find(a, "thread_title");
-                String label = title instanceof TextView ? ((TextView) title).getText().toString() : "";
-                ps.reso.instaeclipse.utils.ghost.HiddenThreadStore.Result result =
-                        HiddenThreads.setHidden(snapshot.accountId, snapshot.threadId, label, !hidden);
-                if (!result.success) { message(a, R.string.ie_hidden_save_failed); return; }
-                HideChatsHook.refreshAccount(snapshot.accountId);
-                message(a, hidden ? R.string.ig_hide_chat_unhidden : R.string.ig_hide_chat_hidden);
-                if (!hidden) a.onBackPressed();
-            });
+            actions.add(() -> setHidden(a, snapshot, !hidden));
         }
         if (FeatureFlags.keepUnsentMessages) {
             labels.add(I18n.t(a, R.string.ie_view_deleted_for_chat));
@@ -241,7 +229,7 @@ public final class ConversationMenuHook {
                 if (!CurrentConversation.revalidate(a, snapshot) || !FeatureFlags.keepUnsentMessages) {
                     message(a, R.string.ie_chat_changed); return;
                 }
-                DialogUtils.showThreadUnsent(a, snapshot.threadId);
+                DialogUtils.showThreadUnsent(a, snapshot.threadId, chatTitle(a));
             });
         }
         if (labels.isEmpty()) { message(a, R.string.ie_chat_features_disabled); return; }
@@ -264,7 +252,39 @@ public final class ConversationMenuHook {
                 || !CurrentConversation.revalidate(a, snapshot)) {
             message(a, R.string.ig_hide_chat_no_thread); return;
         }
-        DialogUtils.showThreadUnsent(a, snapshot.threadId);
+        DialogUtils.showThreadUnsent(a, snapshot.threadId, chatTitle(a));
+    }
+
+    /** The open chat's name from its header, so lists are titled by person, not thread id. */
+    static String chatTitle(Activity a) {
+        View title = find(a, "header_title");
+        if (title == null) title = find(a, "thread_title");
+        return title instanceof TextView ? ((TextView) title).getText().toString().trim() : "";
+    }
+
+    /** Label for the header menu entry: hide or unhide, by this chat's state on this account. */
+    public static String hideLabel(Activity a) {
+        CurrentConversation.Snapshot s = CurrentConversation.resolve(a);
+        boolean hidden = s != null && HiddenThreads.isHidden(s.accountId, s.threadId);
+        return I18n.t(a, hidden ? R.string.ie_unhide_this_chat : R.string.ie_hide_this_chat);
+    }
+
+    /** Hide or unhide the open chat for the current account (header menu entry). */
+    public static void toggleHidden(Activity a) {
+        CurrentConversation.Snapshot s = CurrentConversation.resolve(a);
+        if (s == null) { message(a, R.string.ig_hide_chat_no_thread); return; }
+        setHidden(a, s, !HiddenThreads.isHidden(s.accountId, s.threadId));
+    }
+
+    private static void setHidden(Activity a, CurrentConversation.Snapshot snapshot, boolean hide) {
+        if (!CurrentConversation.revalidate(a, snapshot)) { message(a, R.string.ie_chat_changed); return; }
+        if (hide && !FeatureFlags.hideSpecificChats) { message(a, R.string.ie_chat_changed); return; }
+        ps.reso.instaeclipse.utils.ghost.HiddenThreadStore.Result result =
+                HiddenThreads.setHidden(snapshot.accountId, snapshot.threadId, chatTitle(a), hide);
+        if (!result.success) { message(a, R.string.ie_hidden_save_failed); return; }
+        HideChatsHook.refreshAccount(snapshot.accountId);
+        message(a, hide ? R.string.ig_hide_chat_hidden : R.string.ig_hide_chat_unhidden);
+        if (hide) a.onBackPressed();
     }
 
     private static void message(Activity a, int resource) {
