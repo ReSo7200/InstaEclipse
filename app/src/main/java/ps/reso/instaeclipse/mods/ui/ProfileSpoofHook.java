@@ -328,8 +328,23 @@ public final class ProfileSpoofHook {
 
     /** Your own profile is on screen: the account switcher chevron is shown. */
     private static boolean ownProfileShown(android.view.View v) {
-        android.view.View c = chevronId != 0 ? v.getRootView().findViewById(chevronId) : null;
-        return c != null && c.isShown();
+        if (chevronId == 0) return false;
+        // Your profile stays loaded behind other screens (isShown still true): look for a chevron
+        // that is really on screen.
+        java.util.ArrayDeque<android.view.View> st = new java.util.ArrayDeque<>();
+        st.push(v.getRootView());
+        while (!st.isEmpty()) {
+            android.view.View x = st.pop();
+            if (!x.isShown()) continue;
+            if (x.getId() == chevronId && onScreen(x)) return true;
+            if (x instanceof android.view.ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) st.push(g.getChildAt(i));
+        }
+        return false;
+    }
+
+    private static boolean onScreen(android.view.View x) {
+        android.graphics.Rect r = new android.graphics.Rect();
+        return x.isShown() && x.getGlobalVisibleRect(r) && r.width() > 0 && r.height() > 0;
     }
 
     /** The title is the one next to the shown chevron (not another screen's action bar title). */
@@ -337,7 +352,7 @@ public final class ProfileSpoofHook {
         android.view.ViewParent p = title.getParent();
         for (int i = 0; i < 5 && p instanceof android.view.ViewGroup g; i++, p = g.getParent()) {
             android.view.View c = g.findViewById(chevronId);
-            if (c != null) return c.isShown();
+            if (c != null) return onScreen(c) && onScreen(title);
         }
         return false;
     }
@@ -355,7 +370,9 @@ public final class ProfileSpoofHook {
             if (id == titleId) {
                 // The username only in the title next to the chevron (other screens' action bars
                 // reuse this id); the badge as before.
-                if (besideChevron(tv)) {
+                // Other screens' action bars reuse this id: only the title beside the chevron.
+                if (!besideChevron(tv)) { badge(tv, false); return; }
+                {
                     String user = FeatureFlags.spoofUsername;
                     CharSequence cur = tv.getText();
                     if (cur != null && cur.length() > 0 && !cur.toString().equals(user)
