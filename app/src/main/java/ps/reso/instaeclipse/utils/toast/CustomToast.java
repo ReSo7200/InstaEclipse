@@ -40,7 +40,7 @@ public class CustomToast {
         switch (key) {
             case "CustomTheme": case "CustomFont": case "CustomEmoji": case "ForceReelQuality":
             case "HideSuggestionsInFeed": case "HideThreadsSuggestions": case "HideLikedPosts":
-            case "HideNotesTray": case "StoryRingColor": case "StoryTraySize": case "RoundedFeedPosts":
+            case "HideNotesTray": case "HideDmSuggestions": case "StoryRingColor": case "StoryTraySize": case "RoundedFeedPosts":
             case "HidePlusUpsells": case "HideNavTabs": case "SpoofDevice":
                 return "Appearance";
             case "GhostSeen": case "GhostTyping": case "GhostStories": case "GhostLive":

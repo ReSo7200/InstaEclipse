@@ -181,6 +181,7 @@
     <string name="ig_playback_speed_title">Tốc độ phát</string>
     <string name="ig_playback_speed_next">Đã đặt tốc độ — áp dụng cho video tiếp theo</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Ẩn Ghi chú trong Tin nhắn</string>
+    <string name="ig_hide_dm_suggestions">Ẩn tài khoản được gợi ý trong Tin nhắn</string>
     <string name="ig_dialog_downloader_voice">Tải tin nhắn thoại (nhấn giữ)</string>
     <string name="ig_dialog_downloader_dm_media">Tải ảnh &amp; video trong tin nhắn (nhấn giữ)</string>
     <string name="ig_dialog_misc_viewer_search">Tìm người xem tin của bạn</string>

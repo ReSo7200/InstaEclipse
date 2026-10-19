@@ -372,6 +372,7 @@
     <string name="ig_playback_speed_title">Prędkość odtwarzania</string>
     <string name="ig_playback_speed_next">Ustawiono prędkość — dotyczy następnego uruchomionego filmu</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Ukryj notatki w Wiadomościach</string>
+    <string name="ig_hide_dm_suggestions">Ukryj sugerowane konta w Wiadomościach</string>
     <string name="ig_dialog_downloader_voice">Pobieraj wiadomości głosowe (długie naciśnięcie)</string>
     <string name="ig_dialog_downloader_dm_media">Pobieraj zdjęcia i filmy z wiadomości (przytrzymaj)</string>
     <string name="ig_dialog_misc_viewer_search">Wyszukuj wśród widzów swojej relacji</string>

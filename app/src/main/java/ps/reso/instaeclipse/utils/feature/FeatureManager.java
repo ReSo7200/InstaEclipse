@@ -308,6 +308,7 @@ public class FeatureManager {
         reg(FeatureFlags.followersHistory,     "FollowersHistory",     R.string.ig_feat_followers_history);
         reg(FeatureFlags.savedOnProfile,       "SavedOnProfile",       R.string.ig_feat_saved_on_profile);
         reg(FeatureFlags.hideNotesTray,        "HideNotesTray",        R.string.ig_feat_hide_notes);
+        reg(FeatureFlags.hideDmSuggestions,    "HideDmSuggestions",    R.string.ig_hide_dm_suggestions);
         reg(FeatureFlags.hideDmBlend,          "HideDmBlend",          R.string.ig_feat_hide_blend);
         reg(FeatureFlags.readReceiptChats,     "ReadReceiptChats",     R.string.ig_feat_read_receipt_chats);
         reg(FeatureFlags.hideThreadsButton,    "HideThreadsButton",    R.string.ig_feat_hide_threads);
