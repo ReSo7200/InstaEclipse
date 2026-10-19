@@ -240,6 +240,12 @@
     <string name="ig_playback_speed_next">Geschwindigkeit gesetzt — gilt für das nächste Video, das startet</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Notizen in Nachrichten verbergen</string>
     <string name="ig_hide_dm_suggestions">Vorgeschlagene Konten in Nachrichten ausblenden</string>
+    <string name="ig_data_backup">Daten sichern (gelöschte Nachrichten, analysierte Profile…)</string>
+    <string name="ig_data_restore">Daten wiederherstellen</string>
+    <string name="ig_data_backup_saved">Sicherung gespeichert: %1$s</string>
+    <string name="ig_data_backup_failed">Sicherung fehlgeschlagen</string>
+    <string name="ig_data_restore_done">%1$d Dateien wiederhergestellt. Instagram wird neu gestartet…</string>
+    <string name="ig_data_restore_failed">Diese Sicherung konnte nicht wiederhergestellt werden</string>
     <string name="ig_profile_menu_tools">Profilmenü: Benutzername &amp; Bio kopieren, alles laden</string>
     <string name="ig_profile_spoofer">Profil-Spoofer (nur auf diesem Gerät)</string>
     <string name="ig_profile_spoofer_edit">Gefälschte Zahlen &amp; Abzeichen</string>

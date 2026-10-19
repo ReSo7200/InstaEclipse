@@ -234,6 +234,12 @@
     <string name="ig_playback_speed_next">Hastighet inställd — gäller nästa video som startar</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Dölj anteckningar i meddelanden</string>
     <string name="ig_hide_dm_suggestions">Dölj föreslagna konton i Meddelanden</string>
+    <string name="ig_data_backup">Säkerhetskopiera data (raderade meddelanden, analyserade profiler…)</string>
+    <string name="ig_data_restore">Återställ data</string>
+    <string name="ig_data_backup_saved">Säkerhetskopia sparad: %1$s</string>
+    <string name="ig_data_backup_failed">Säkerhetskopieringen misslyckades</string>
+    <string name="ig_data_restore_done">%1$d filer återställda. Startar om Instagram…</string>
+    <string name="ig_data_restore_failed">Det gick inte att återställa den här säkerhetskopian</string>
     <string name="ig_profile_menu_tools">Profilmeny: kopiera användarnamn, bio och ladda ner allt</string>
     <string name="ig_profile_spoofer">Profilförfalskare (bara på den här telefonen)</string>
     <string name="ig_profile_spoofer_edit">Falska siffror och märke</string>

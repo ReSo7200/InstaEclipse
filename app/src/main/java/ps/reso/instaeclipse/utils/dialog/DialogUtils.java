@@ -2739,6 +2739,16 @@ public class DialogUtils {
             }
         }));
 
+        layout.addView(createActionRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_data_backup), "#30D158", v -> {
+            Activity a = UIHookManager.getCurrentActivity();
+            if (a != null && !a.isFinishing()) ps.reso.instaeclipse.mods.media.DataBackup.export(a);
+        }));
+        layout.addView(createActionRow(context, R.drawable.ic_folder, I18n.t(context, R.string.ig_data_restore), "#0A84FF", v -> {
+            Activity a = UIHookManager.getCurrentActivity();
+            if (a != null && !a.isFinishing()) ps.reso.instaeclipse.mods.media.DataBackup.pickAndRestore(a);
+            else showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_instagram_not_ready));
+        }));
+
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_backup_restore), layout, () -> {});
     }
 

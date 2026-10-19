@@ -235,6 +235,12 @@
     <string name="ig_playback_speed_next">Sürət təyin edildi — başlayan növbəti videoya tətbiq olunur</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Mesajlarda Qeydləri Gizlət</string>
     <string name="ig_hide_dm_suggestions">Mesajlarda təklif olunan hesabları gizlət</string>
+    <string name="ig_data_backup">Məlumatların ehtiyat nüsxəsi (silinmiş mesajlar, təhlil edilən profillər…)</string>
+    <string name="ig_data_restore">Məlumatları bərpa et</string>
+    <string name="ig_data_backup_saved">Ehtiyat nüsxə saxlanıldı: %1$s</string>
+    <string name="ig_data_backup_failed">Ehtiyat nüsxə alınmadı</string>
+    <string name="ig_data_restore_done">%1$d fayl bərpa edildi. Instagram yenidən başladılır…</string>
+    <string name="ig_data_restore_failed">Bu ehtiyat nüsxə bərpa edilə bilmədi</string>
     <string name="ig_profile_menu_tools">Profil menyusu: istifadəçi adı, bio kopyala və hamısını yüklə</string>
     <string name="ig_profile_spoofer">Profil saxtalaşdırıcı (yalnız bu telefonda)</string>
     <string name="ig_profile_spoofer_edit">Saxta saylar və nişan</string>

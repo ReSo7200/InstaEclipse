@@ -271,6 +271,12 @@
     <string name="ig_playback_speed_next">המהירות הוגדרה — תחול על הסרטון הבא שיתחיל</string>
     <string name="ig_dialog_distraction_hide_notes_tray">הסתר פתקים בהודעות</string>
     <string name="ig_hide_dm_suggestions">הסתר חשבונות מוצעים בהודעות</string>
+    <string name="ig_data_backup">גיבוי נתונים (הודעות שנמחקו, פרופילים שנותחו…)</string>
+    <string name="ig_data_restore">שחזור נתונים</string>
+    <string name="ig_data_backup_saved">הגיבוי נשמר: %1$s</string>
+    <string name="ig_data_backup_failed">הגיבוי נכשל</string>
+    <string name="ig_data_restore_done">שוחזרו %1$d קבצים. מפעיל מחדש את אינסטגרם…</string>
+    <string name="ig_data_restore_failed">לא ניתן לשחזר את הגיבוי הזה</string>
     <string name="ig_profile_menu_tools">תפריט פרופיל: העתקת שם משתמש, ביו והורדת הכול</string>
     <string name="ig_profile_spoofer">זיוף פרופיל (רק בטלפון הזה)</string>
     <string name="ig_profile_spoofer_edit">מספרים ותג מזויפים</string>

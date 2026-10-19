@@ -258,6 +258,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
                     try {
                         UIHookManager.registerSettingsRestoreReceiver(context);
+                        ps.reso.instaeclipse.mods.media.DataBackup.registerRestoreReceiver(context);
                     } catch (Throwable e) {
                         ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
                     }
