@@ -250,8 +250,10 @@ final class SelectedMediaDownloads {
                 || error.startsWith("Companion disconnected") || error.startsWith("Companion is busy"));
     }
 
-    private static void savedLocally(Context ctx) {
-        toast(ctx, I18n.t(ctx, R.string.ig_dl_companion_fallback));
+    /** Instagram saves it itself; a warning only when that can't be the chosen folder. */
+    static void savedLocally(Context ctx) {
+        if (!DownloadPublisher.reachesChosenFolder(FeatureFlags.downloaderCustomPath))
+            toast(ctx, I18n.t(ctx, R.string.ig_dl_companion_fallback));
     }
 
     private static void start(Context ctx, Captured captured, boolean video, boolean batch, boolean local) {

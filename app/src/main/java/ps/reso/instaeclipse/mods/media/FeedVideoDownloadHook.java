@@ -1673,9 +1673,15 @@ public class FeedVideoDownloadHook {
     static void downloadAudio(Context ctx, String url, String filename, String username,
                               boolean extractFromVideo, long trimStartMs, long trimDurationMs) {
         ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
+        downloadAudio(ctx, url, filename, username, extractFromVideo, trimStartMs, trimDurationMs, false);
+    }
+
+    /** {@code local}: saved by Instagram itself (the app couldn't be reached). */
+    private static void downloadAudio(Context ctx, String url, String filename, String username,
+                              boolean extractFromVideo, long trimStartMs, long trimDurationMs, boolean local) {
         executor.submit(() -> {
             try {
-                String uri = FeatureFlags.downloaderCustomUri.isEmpty()
+                String uri = local ? "" : FeatureFlags.downloaderCustomUri.isEmpty()
                         ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
                 if (!uri.isEmpty()) {
                     android.content.Intent intent = new android.content.Intent();
@@ -1688,10 +1694,8 @@ public class FeedVideoDownloadHook {
                     intent.putExtra("extractAudio", extractFromVideo);
                     intent.putExtra("trimStartMs", trimStartMs);
                     intent.putExtra("trimDurationMs", trimDurationMs);
-                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> {
-                        if (error != null) mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
-                                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
-                    });
+                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> companionResult(ctx, error,
+                            () -> downloadAudio(ctx, url, filename, username, extractFromVideo, trimStartMs, trimDurationMs, true)));
                     return;
                 }
                 File temp = File.createTempFile("ie_dl_", ".m4a", ctx.getCacheDir());
@@ -2349,10 +2353,26 @@ public class FeedVideoDownloadHook {
 
     static boolean downloadCapturedOriginal(Context ctx, String url, String filename, boolean isVideo,
             String username, String[] dash) throws Exception {
-        String uri = FeatureFlags.downloaderCustomUri.isEmpty() ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
+        return downloadCapturedOriginal(ctx, url, filename, isVideo, username, dash, false);
+    }
+
+    /** {@code local}: saved by Instagram itself (the app couldn't be reached). */
+    private static boolean downloadCapturedOriginal(Context ctx, String url, String filename, boolean isVideo,
+            String username, String[] dash, boolean local) throws Exception {
+        String uri = local ? "" : FeatureFlags.downloaderCustomUri.isEmpty() ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
         if (!uri.isEmpty()) {
-            if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username);
-            else delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
+            Runnable saveLocally = () -> executor.submit(() -> {
+                try {
+                    if (!downloadCapturedOriginal(ctx, url, filename, isVideo, username, dash, true))
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                                I18n.t(ctx, R.string.ig_toast_file_saved, filename), Toast.LENGTH_SHORT).show());
+                } catch (Throwable e) {
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                            I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(e.getMessage())), Toast.LENGTH_SHORT).show());
+                }
+            });
+            if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username, saveLocally);
+            else delegateUrlToCompanionApp(ctx, url, null, null, filename, isVideo, username, saveLocally);
             return true;
         }
         if (dash != null) {
@@ -2413,7 +2433,7 @@ public class FeedVideoDownloadHook {
                                                    String audioUrl,
                                                    String filename, boolean isVideo,
                                                    String username) throws Exception {
-        delegateUrlToCompanionApp(ctx, url, audioUrl, null, filename, isVideo, username);
+        delegateUrlToCompanionApp(ctx, url, audioUrl, null, filename, isVideo, username, null);
     }
 
     /** @param fallbackUrl saved instead when the merge fails (e.g. a codec the muxer can't write) */
@@ -2422,7 +2442,7 @@ public class FeedVideoDownloadHook {
                                                    String audioUrl,
                                                    String fallbackUrl,
                                                    String filename, boolean isVideo,
-                                                   String username) throws Exception {
+                                                   String username, Runnable saveLocally) throws Exception {
         android.content.Intent intent = new android.content.Intent();
         if (fallbackUrl != null) intent.putExtra("fallbackUrl", fallbackUrl);
         intent.setClassName("ps.reso.instaeclipse",
@@ -2432,11 +2452,23 @@ public class FeedVideoDownloadHook {
         intent.putExtra("filename", filename);
         intent.putExtra("mimeType", isVideo ? "video/mp4" : "image/jpeg");
         intent.putExtra("username", username);
-        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> {
-                        if (error != null) mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
-                                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
-                    });
+        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> companionResult(ctx, error, saveLocally));
         ModuleLog.line("(IE|DL) Submitted companion download request");
+    }
+
+    /**
+     * A companion download's result: when the app can't be reached, {@code saveLocally} (if any)
+     * saves it from Instagram instead; any other error is shown.
+     */
+    private static void companionResult(Context ctx, String error, Runnable saveLocally) {
+        if (error == null) return;
+        if (saveLocally != null && SelectedMediaDownloads.companionUnreachable(error)) {
+            SelectedMediaDownloads.savedLocally(ctx);
+            saveLocally.run();
+            return;
+        }
+        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
     }
 
     /**

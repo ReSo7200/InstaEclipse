@@ -90,13 +90,16 @@ public class LikeUndoHook {
                     if (a != null && a.getClass().getName().equals("com.instagram.feed.media.Media")) { media = a; break; }
                 }
                 if (media == null || !HideSuggestedFeedItemsHook.isLiked(media)) return; // unlike → send now
+                // A heart tap confirmed a moment ago: Instagram sends it now, unless Undo holds it.
+                boolean confirmed = !FeatureFlags.confirmLikes || System.currentTimeMillis() <= confirmedUntil;
+                if (confirmed && !FeatureFlags.likeUndo) return;
                 Activity act = UIHookManager.getCurrentActivity();
                 if (act == null) return;
                 param.setResult(null);
                 Member method = param.method;
                 Object self = param.thisObject;
                 Object[] args = param.args.clone();
-                if (FeatureFlags.confirmLikes && System.currentTimeMillis() > confirmedUntil) MAIN.post(() -> confirm(act, () -> {
+                if (!confirmed) MAIN.post(() -> confirm(act, () -> {
                     if (FeatureFlags.likeUndo) hold(act, method, self, args);
                     else send(method, self, args);
                 }));
@@ -106,6 +109,7 @@ public class LikeUndoHook {
         ModuleLog.line(TAG + "✅ Hooked " + sender.getDeclaringClass().getName() + "." + sender.getName());
         FeatureStatusTracker.setHooked("LikeUndo");
         hookHeartButtons();
+        FeatureStatusTracker.setHooked("ConfirmLikes");
     }
 
     /** Post like buttons (feed, carousel slide, reels): their heart shows "selected" once liked. */
@@ -194,8 +198,12 @@ public class LikeUndoHook {
 
     private static void send(Member method, Object self, Object[] args) {
         try {
+            // Called through the hook (which lets it pass while replaying): invoking the original
+            // directly isn't supported the same way on every framework (LSPatch).
             REPLAYING.set(Boolean.TRUE);
-            XposedBridge.invokeOriginalMethod(method, self, args);
+            Method m = (Method) method;
+            m.setAccessible(true);
+            m.invoke(self, args);
             ModuleLog.line(TAG + "like sent");
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ send failed: " + t);
