@@ -255,6 +255,9 @@
     <string name="background_access_message">Nedladdningar till din mapp sparas av den här appen, startad från Instagram. Om telefonen söver den hamnar de i Download. Tillåt obegränsad körning. På Samsung, ta bort den från Sovande appar; på Xiaomi, slå på Autostart.</string>
     <string name="background_access_allow">Tillåt</string>
     <string name="background_access_later">Senare</string>
+    <string name="folder_access_lost_title">Välj nedladdningsmappen igen</string>
+    <string name="folder_access_lost_message">InstaEclipse har inte längre åtkomst till din nedladdningsmapp (händer efter ominstallation eller rensade data), så nedladdningar hamnar i Download. Välj mappen igen.</string>
+    <string name="folder_access_lost_choose">Välj mapp</string>
     <string name="ig_profile_menu_tools">Profilmeny: kopiera användarnamn, bio och ladda ner allt</string>
     <string name="ig_profile_spoofer">Profilförfalskare (bara på den här telefonen)</string>
     <string name="ig_profile_spoofer_edit">Redigera falsk profil</string>

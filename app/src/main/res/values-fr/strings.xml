@@ -292,6 +292,9 @@
     <string name="background_access_message">Les téléchargements vers votre dossier sont enregistrés par cette app, lancée depuis Instagram. Si le téléphone la met en veille, ils vont dans Download. Autorisez-la sans restriction. Sur Samsung, retirez-la des applis en veille ; sur Xiaomi, activez le démarrage automatique.</string>
     <string name="background_access_allow">Autoriser</string>
     <string name="background_access_later">Plus tard</string>
+    <string name="folder_access_lost_title">Choisissez à nouveau votre dossier</string>
+    <string name="folder_access_lost_message">InstaEclipse n’a plus accès à votre dossier de téléchargement (après une réinstallation ou un effacement des données), les téléchargements vont donc dans Download. Choisissez à nouveau le dossier.</string>
+    <string name="folder_access_lost_choose">Choisir le dossier</string>
     <string name="ig_profile_menu_tools">Menu du profil : copier le nom, la bio et tout télécharger</string>
     <string name="ig_profile_spoofer">Faux profil (sur ce téléphone uniquement)</string>
     <string name="ig_profile_spoofer_edit">Modifier le faux profil</string>

@@ -255,6 +255,9 @@
     <string name="background_access_message">下載到你資料夾的內容由本應用程式儲存（由 Instagram 啟動）。若手機讓它休眠，檔案會改存到 Download。請允許它不受限制地執行。三星請將其移出休眠應用程式；小米請開啟自動啟動。</string>
     <string name="background_access_allow">允許</string>
     <string name="background_access_later">稍後</string>
+    <string name="folder_access_lost_title">重新選擇下載資料夾</string>
+    <string name="folder_access_lost_message">InstaEclipse 已無法存取你的下載資料夾（重新安裝或清除資料後會這樣），因此下載會存到 Download。請重新選擇資料夾。</string>
+    <string name="folder_access_lost_choose">選擇資料夾</string>
     <string name="ig_profile_menu_tools">個人檔案選單：複製用戶名稱、簡介和全部下載</string>
     <string name="ig_profile_spoofer">個人檔案偽裝（僅限本機）</string>
     <string name="ig_profile_spoofer_edit">編輯偽裝個人檔案</string>

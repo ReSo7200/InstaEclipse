@@ -581,6 +581,9 @@
     <string name="background_access_message">Klasörünüze indirmeleri Instagram\'dan başlatılan bu uygulama kaydeder. Telefon onu uyutursa Download\'a gider. Kısıtlamasız çalışmasına izin verin. Samsung\'da Uyuyan uygulamalardan çıkarın; Xiaomi\'de Otomatik başlatmayı açın.</string>
     <string name="background_access_allow">İzin ver</string>
     <string name="background_access_later">Sonra</string>
+    <string name="folder_access_lost_title">İndirme klasörünüzü yeniden seçin</string>
+    <string name="folder_access_lost_message">InstaEclipse\'in indirme klasörünüze erişimi kalmadı (yeniden kurulum veya veri silmeden sonra olur), bu yüzden indirmeler Download\'a gidiyor. Düzeltmek için klasörü yeniden seçin.</string>
+    <string name="folder_access_lost_choose">Klasör seç</string>
     <string name="ig_profile_menu_tools">Profil menüsü: kullanıcı adı, biyografi kopyala ve tümünü indir</string>
     <string name="ig_profile_spoofer">Profil taklitçisi (yalnızca bu telefonda)</string>
     <string name="ig_profile_spoofer_edit">Sahte profili düzenle</string>

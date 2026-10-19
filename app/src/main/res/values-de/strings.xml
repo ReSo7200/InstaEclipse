@@ -261,6 +261,9 @@
     <string name="background_access_message">Downloads in deinen Ordner speichert diese App, gestartet von Instagram. Hält das Handy sie im Schlaf, landen sie stattdessen in Download. Erlaube uneingeschränkte Akkunutzung. Bei Samsung nicht unter Schlafende Apps, bei Xiaomi Autostart an.</string>
     <string name="background_access_allow">Erlauben</string>
     <string name="background_access_later">Später</string>
+    <string name="folder_access_lost_title">Download-Ordner erneut wählen</string>
+    <string name="folder_access_lost_message">InstaEclipse hat keinen Zugriff mehr auf deinen Download-Ordner (passiert nach Neuinstallation oder Daten löschen), daher landen Downloads in Download. Wähle den Ordner erneut.</string>
+    <string name="folder_access_lost_choose">Ordner wählen</string>
     <string name="ig_profile_menu_tools">Profilmenü: Benutzername &amp; Bio kopieren, alles laden</string>
     <string name="ig_profile_spoofer">Profil-Spoofer (nur auf diesem Gerät)</string>
     <string name="ig_profile_spoofer_edit">Gefälschtes Profil bearbeiten</string>

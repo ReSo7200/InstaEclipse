@@ -255,6 +255,9 @@
     <string name="background_access_message">Os downloads para sua pasta são salvos por este app, iniciado pelo Instagram. Se o telefone o deixar em suspensão, vão para Download. Permita que funcione sem restrições. Na Samsung tire-o dos apps em suspensão; na Xiaomi ative a inicialização automática.</string>
     <string name="background_access_allow">Permitir</string>
     <string name="background_access_later">Depois</string>
+    <string name="folder_access_lost_title">Escolha de novo sua pasta de downloads</string>
+    <string name="folder_access_lost_message">O InstaEclipse não tem mais acesso à sua pasta de downloads (acontece após reinstalar ou limpar dados), então os downloads vão para Download. Escolha a pasta de novo.</string>
+    <string name="folder_access_lost_choose">Escolher pasta</string>
     <string name="ig_profile_menu_tools">Menu do perfil: copiar usuário, bio e baixar tudo</string>
     <string name="ig_profile_spoofer">Falsificar perfil (só neste telefone)</string>
     <string name="ig_profile_spoofer_edit">Editar perfil falso</string>

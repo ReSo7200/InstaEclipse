@@ -254,6 +254,9 @@
     <string name="background_access_message">يحفظ هذا التطبيق التنزيلات في مجلدك عند تشغيله من إنستغرام. إذا أبقاه الهاتف نائمًا، تُحفظ في Download بدلًا من ذلك. اسمح له بالعمل دون قيود. على سامسونج أبعده عن التطبيقات النائمة، وعلى شاومي فعّل التشغيل التلقائي.</string>
     <string name="background_access_allow">سماح</string>
     <string name="background_access_later">لاحقًا</string>
+    <string name="folder_access_lost_title">اختر مجلد التنزيل مرة أخرى</string>
+    <string name="folder_access_lost_message">لم يعد لدى InstaEclipse وصول إلى مجلد التنزيل (يحدث هذا بعد إعادة التثبيت أو مسح البيانات)، لذا تُحفظ التنزيلات في Download. اختر المجلد مرة أخرى لإصلاح ذلك.</string>
+    <string name="folder_access_lost_choose">اختيار المجلد</string>
     <string name="ig_profile_menu_tools">قائمة الملف الشخصي: نسخ اسم المستخدم والنبذة وتنزيل الكل</string>
     <string name="ig_profile_spoofer">تزييف الملف الشخصي (على هذا الهاتف فقط)</string>
     <string name="ig_profile_spoofer_edit">تعديل الملف الشخصي المزيف</string>

@@ -55,6 +55,27 @@ public final class BackgroundAccess {
         }
     }
 
+    /**
+     * The chosen download folder is reachable only while its grant is kept (it can be lost after a
+     * reinstall or clearing data, while the setting comes back through sync).
+     */
+    public static boolean folderGrantLost(Context ctx, String uri) {
+        if (uri == null || uri.isEmpty() || !uri.startsWith("content://")) return false;
+        for (android.content.UriPermission p : ctx.getContentResolver().getPersistedUriPermissions())
+            if (p.getUri().toString().equals(uri) && p.isWritePermission()) return false;
+        return true;
+    }
+
+    /** Asks to choose the folder again; {@code choose} opens the folder picker. */
+    public static void askToRechooseFolder(Context ctx, Runnable choose) {
+        new MaterialAlertDialogBuilder(ctx)
+                .setTitle(R.string.folder_access_lost_title)
+                .setMessage(R.string.folder_access_lost_message)
+                .setPositiveButton(R.string.folder_access_lost_choose, (d, w) -> choose.run())
+                .setNegativeButton(R.string.background_access_later, null)
+                .show();
+    }
+
     /** Android 9 and older save to shared storage with the storage permission. */
     public static boolean needsStoragePermission() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;

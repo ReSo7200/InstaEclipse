@@ -523,6 +523,9 @@
     <string name="background_access_message">Downloads to your folder are saved by this app, started from Instagram. If the phone keeps it asleep, they go to Download instead. Allow it to run unrestricted. On Samsung also keep it out of Sleeping apps; on Xiaomi turn on Autostart.</string>
     <string name="background_access_allow">Allow</string>
     <string name="background_access_later">Later</string>
+    <string name="folder_access_lost_title">Choose your download folder again</string>
+    <string name="folder_access_lost_message">InstaEclipse no longer has access to your download folder (this happens after reinstalling or clearing data), so downloads go to Download. Choose the folder again to fix it.</string>
+    <string name="folder_access_lost_choose">Choose folder</string>
     <string name="ig_profile_menu_tools">Profile Menu: Copy Username, Bio &amp; Download All</string>
     <string name="ig_profile_spoofer">Profile Spoofer (only on this phone)</string>
     <string name="ig_profile_spoofer_edit">Edit Spoofed Profile</string>

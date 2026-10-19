@@ -203,6 +203,9 @@
     <string name="background_access_message">Ứng dụng này lưu tệp tải vào thư mục của bạn khi được Instagram khởi động. Nếu điện thoại cho nó ngủ, tệp sẽ vào Download. Hãy cho phép chạy không hạn chế. Trên Samsung bỏ khỏi Ứng dụng ngủ; trên Xiaomi bật Tự khởi động.</string>
     <string name="background_access_allow">Cho phép</string>
     <string name="background_access_later">Để sau</string>
+    <string name="folder_access_lost_title">Chọn lại thư mục tải xuống</string>
+    <string name="folder_access_lost_message">InstaEclipse không còn quyền truy cập thư mục tải xuống của bạn (xảy ra sau khi cài lại hoặc xóa dữ liệu), nên tệp tải vào Download. Hãy chọn lại thư mục.</string>
+    <string name="folder_access_lost_choose">Chọn thư mục</string>
     <string name="ig_profile_menu_tools">Menu hồ sơ: sao chép tên, tiểu sử và tải tất cả</string>
     <string name="ig_profile_spoofer">Giả mạo hồ sơ (chỉ trên điện thoại này)</string>
     <string name="ig_profile_spoofer_edit">Sửa hồ sơ giả</string>
