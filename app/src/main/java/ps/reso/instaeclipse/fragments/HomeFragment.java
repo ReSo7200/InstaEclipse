@@ -83,7 +83,7 @@ public class HomeFragment extends Fragment {
             "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore",
             "disableComments", "hideNotesTray", "hideDmSuggestions", "hideDmBlend", "hideThreadsButton", "readReceiptChats",
             // Navigation bar
-            "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile",
+            "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile", "backLeavesHome",
             // Misc
             "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableSearchHistory", "confirmCalls", "disableRepost", "showFollowerToast",
             "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",

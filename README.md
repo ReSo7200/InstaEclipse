@@ -214,6 +214,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Tab order | Put the bottom tabs in any order |
 | Startup tab | Choose which tab Instagram opens on |
 | Disable swipe to camera | Stop the camera from opening on a swipe |
+| Back leaves Home | On the home feed, Back leaves Instagram instead of scrolling to the top |
 
 </details>
 

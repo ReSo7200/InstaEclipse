@@ -116,6 +116,7 @@ public class SettingsManager {
         editor.putBoolean("hideTabMessages", FeatureFlags.hideTabMessages);
         editor.putBoolean("hideTabActivity", FeatureFlags.hideTabActivity);
         editor.putBoolean("hideTabProfile", FeatureFlags.hideTabProfile);
+        editor.putBoolean("backLeavesHome", FeatureFlags.backLeavesHome);
         editor.putBoolean("hideNotesTray", FeatureFlags.hideNotesTray);
         editor.putBoolean("hideDmSuggestions", FeatureFlags.hideDmSuggestions);
         editor.putBoolean("hideDmBlend", FeatureFlags.hideDmBlend);
@@ -315,6 +316,7 @@ public class SettingsManager {
         FeatureFlags.hideTabMessages = prefs.getBoolean("hideTabMessages", false);
         FeatureFlags.hideTabActivity = prefs.getBoolean("hideTabActivity", false);
         FeatureFlags.hideTabProfile = prefs.getBoolean("hideTabProfile", false);
+        FeatureFlags.backLeavesHome = prefs.getBoolean("backLeavesHome", false);
         FeatureFlags.hideNotesTray = prefs.getBoolean("hideNotesTray", false);
         FeatureFlags.hideDmSuggestions = prefs.getBoolean("hideDmSuggestions", false);
         FeatureFlags.hideDmBlend = prefs.getBoolean("hideDmBlend", false);
