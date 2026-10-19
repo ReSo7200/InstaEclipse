@@ -111,7 +111,7 @@ public class ReelDownloadHook {
             }
 
             if (target == null) {
-                ModuleLog.line("(IE|Reel) ❌ hook method (Media, ButtonAdder)V not found");
+                ModuleLog.probe("(IE|Reel) legacy (Media, ButtonAdder)V hook not in this build (reel menu uses the dispatcher)");
                 return;
             }
 
@@ -295,7 +295,7 @@ public class ReelDownloadHook {
                             .usingNumbers(configId)));
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(IE|Reel) ⚠️ Gate method not found for config " + configId);
+                ModuleLog.probe("(IE|Reel) gate not in this build for config " + configId);
                 return;
             }
 

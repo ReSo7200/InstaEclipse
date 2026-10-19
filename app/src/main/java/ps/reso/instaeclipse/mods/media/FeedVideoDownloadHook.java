@@ -1959,7 +1959,7 @@ public class FeedVideoDownloadHook {
             }
         }
 
-        ModuleLog.line("(IE|DL|Username) ❌ Failed to resolve dictUserGetter in hierarchy");
+        ModuleLog.probe("(IE|DL|Username) dictUserGetter not in hierarchy (owner comes from the other getters)");
     }
 
     // ── Download dispatch ─────────────────────────────────────────────────────
