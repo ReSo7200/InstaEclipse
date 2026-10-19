@@ -2105,14 +2105,16 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_cache_stories), "cacheStories")
         ));
 
-        defs.add(getString(R.string.ie_downloader_mode_hint));
-        defs.add(Arrays.asList(
-                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_downloader_use_original), "downloaderUseOriginal"),
-                createClickable(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_quality), this::chooseDownloadQuality),
-                createSwitch(R.drawable.ic_tune, "#FF9F0A", getString(R.string.ie_download_compatibility), "downloaderCompatibility"),
-                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_fallback), "downloaderAllowFallback")
-        ));
-        defs.add(getString(R.string.ie_download_quality_hint));
+        defs.add(getString(R.string.menu_quality));
+        List<FeatureItem> quality = new ArrayList<>();
+        quality.add(createTool(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_quality),
+                downloadModeLabel(), this::chooseDownloadQuality));
+        // The two switches only apply to Best.
+        if (!getCurrentState("downloaderUseOriginal")) {
+            quality.add(createSwitch(R.drawable.ic_tune, "#FF9F0A", getString(R.string.ie_download_compatibility), "downloaderCompatibility"));
+            quality.add(createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_fallback), "downloaderAllowFallback"));
+        }
+        defs.add(quality);
 
         String customPath = localCache.getString("downloaderCustomPath", "");
         String folderTitle = customPath.isEmpty()
@@ -2128,23 +2130,40 @@ public class FeaturesFragment extends Fragment {
         return defs;
     }
 
+    /** Standard (the original downloader) or Best, with its resolution cap. */
+    private String downloadModeLabel() {
+        if (getCurrentState("downloaderUseOriginal")) return getString(R.string.ie_downloader_original);
+        int ceiling = localCache.getInt("downloaderQualityMaxShortSide", 0);
+        return ceiling <= 0 ? getString(R.string.ie_download_best) : getString(R.string.ie_download_ceiling, ceiling);
+    }
+
+    /** One choice for both: Standard, or Best with no cap / up to a resolution. */
     private void chooseDownloadQuality() {
-        if (getCurrentState("downloaderUseOriginal")) {
-            ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), getString(R.string.ie_downloader_mode_hint), Toast.LENGTH_LONG).show();
-            return;
-        }
-        int[] values = {0, 2160, 1440, 1080, 720, 480};
+        int[] values = {-1, 0, 2160, 1440, 1080, 720, 480}; // -1 = Standard
         String[] labels = new String[values.length];
+        boolean standard = getCurrentState("downloaderUseOriginal");
         int current = localCache.getInt("downloaderQualityMaxShortSide", 0), selected = 0;
         for (int i=0; i<values.length; i++) {
-            labels[i] = values[i] == 0 ? getString(R.string.ie_download_best) : getString(R.string.ie_download_ceiling, values[i]);
-            if (values[i] == current) selected = i;
+            labels[i] = values[i] < 0 ? getString(R.string.ie_downloader_original)
+                    : values[i] == 0 ? getString(R.string.ie_download_best) : getString(R.string.ie_download_ceiling, values[i]);
+            if (!standard && values[i] == current) selected = i;
         }
         new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ie_download_quality)
                 .setSingleChoiceItems(labels, selected, (dialog, which) -> {
-                    putIntPref("downloaderQualityMaxShortSide", values[which]);
+                    putBoolPref("downloaderUseOriginal", values[which] < 0);
+                    if (values[which] >= 0) putIntPref("downloaderQualityMaxShortSide", values[which]);
                     dialog.dismiss(); loadDownloaderMenu();
                 }).setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    private void putBoolPref(String key, boolean value) {
+        stagedChanges.remove(key);
+        localCache.edit().putBoolean(key, value).commit();
+        makeLocalCacheWorldReadable();
+        Intent b = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
+        b.putExtra("key", key);
+        b.putExtra("value", value);
+        ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
     }
 
     private void loadQualityMenu() {

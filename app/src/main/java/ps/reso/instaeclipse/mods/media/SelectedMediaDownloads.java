@@ -167,7 +167,7 @@ final class SelectedMediaDownloads {
 
     static String modeLabel(Context ctx, Captured captured) {
         return I18n.t(ctx, R.string.ie_downloader_mode,
-                I18n.t(ctx, captured.original ? R.string.ie_downloader_original : R.string.ie_downloader_custom));
+                I18n.t(ctx, captured.original ? R.string.ie_downloader_original : R.string.ie_download_best));
     }
 
     static Captured switchMode(Captured captured) {

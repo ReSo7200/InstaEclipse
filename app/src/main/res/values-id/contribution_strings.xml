@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_download_quality">Kualitas unduhan</string>
+    <string name="ie_downloader_original">Standar</string>
+    <string name="ie_download_best">Terbaik</string>
+    <string name="ie_download_ceiling">Terbaik, hingga %1$dp</string>
+    <string name="ie_downloader_mode">Kualitas: %1$s</string>
+    <string name="ie_download_compatibility">Utamakan video yang bisa diputar di mana saja</string>
+    <string name="ie_download_fallback">Gunakan kualitas lebih rendah jika Terbaik gagal</string>
+    <string name="ie_download_quality_hint">Standar adalah pengunduh klasik. Terbaik memeriksa setiap versi video, termasuk HDR, lalu menyimpan yang paling tajam, atau yang paling tajam hingga resolusi pilihanmu.</string>
+    <string name="ie_downloader_original_unavailable">Standar tidak bisa menyimpannya. Beralih ke Terbaik untuk mengunduhnya.</string>
+    <string name="ie_download_fallback_prompt">Terbaik tidak bisa menyimpannya. Coba kualitas lebih rendah?</string>
+</resources>
