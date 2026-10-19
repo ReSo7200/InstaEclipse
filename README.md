@@ -90,7 +90,6 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Hide specific chats | Hide chats from your inbox and manage them later |
 | Hide the Notes tray | Remove Notes from the top of your inbox |
 | Hide suggested accounts | Remove the "Suggested for you" accounts under your chats |
-| Hide Instants | Remove the stack of Instants floating over the app |
 | Hide Blend in chats | Remove the Blend button from the chat header |
 | Hide "Create group" | Remove it from the share sheet |
 
@@ -169,6 +168,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Hide posts you already liked | Skip what you have seen |
 | Hide community notes | Remove notes added under posts and reels |
 | Hide Instagram Plus upsells | No more Plus prompts |
+| Hide Instants | Remove the stack of Instants floating over the app |
 | Hide the story tray | Keep the feed, lose the story row |
 | Disable Discover People | Remove the "people you may know" row |
 | Always show full captions | No more "... more" |

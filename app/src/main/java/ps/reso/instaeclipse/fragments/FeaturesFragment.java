@@ -1116,7 +1116,6 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_hide_dm_suggestions), "hideDmSuggestions"),
-                createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_hide_instants), "hideInstants"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_hide_dm_blend), "hideDmBlend"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_share_create_group), "hideShareCreateGroup")
         ));
@@ -1278,7 +1277,8 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI"),
                 createExtrasSwitch("#30D158", "hideOnboardingPrompts"),
-                createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_clean_feed_hide_plus), "hidePlusUpsells")
+                createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_clean_feed_hide_plus), "hidePlusUpsells"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_hide_instants), "hideInstants")
         ));
         return defs;
     }
