@@ -122,6 +122,10 @@ public class SettingsBackupManager {
         s.put("spoofFollowing",          FeatureFlags.spoofFollowing);
         s.put("spoofPosts",              FeatureFlags.spoofPosts);
         s.put("spoofVerified",           FeatureFlags.spoofVerified);
+        s.put("spoofName",               FeatureFlags.spoofName);
+        s.put("spoofUsername",           FeatureFlags.spoofUsername);
+        s.put("spoofBio",                FeatureFlags.spoofBio);
+        s.put("spoofAvatar",             FeatureFlags.spoofAvatar);
         s.put("profileAnalyzer",         FeatureFlags.profileAnalyzer);
         s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
         s.put("fancyBioFont",            FeatureFlags.fancyBioFont);
@@ -283,6 +287,11 @@ public class SettingsBackupManager {
         if (s.has("spoofFollowing"))         FeatureFlags.spoofFollowing         = Math.max(-1, s.getInt("spoofFollowing"));
         if (s.has("spoofPosts"))             FeatureFlags.spoofPosts             = Math.max(-1, s.getInt("spoofPosts"));
         if (s.has("spoofVerified"))          FeatureFlags.spoofVerified          = s.getBoolean("spoofVerified");
+        if (s.has("spoofName"))              FeatureFlags.spoofName              = s.getString("spoofName");
+        if (s.has("spoofUsername"))          FeatureFlags.spoofUsername          = s.getString("spoofUsername");
+        if (s.has("spoofBio"))               FeatureFlags.spoofBio               = s.getString("spoofBio");
+        if (s.has("spoofAvatar") && ps.reso.instaeclipse.utils.profile.SpoofAvatar.isValid(s.getString("spoofAvatar")))
+            FeatureFlags.spoofAvatar = s.getString("spoofAvatar");
         if (s.has("profileAnalyzer"))        FeatureFlags.profileAnalyzer        = s.getBoolean("profileAnalyzer");
         if (s.has("profileFollowsYouLabel")) FeatureFlags.profileFollowsYouLabel = s.getBoolean("profileFollowsYouLabel");
         if (s.has("fancyBioFont"))           FeatureFlags.fancyBioFont           = s.getBoolean("fancyBioFont");

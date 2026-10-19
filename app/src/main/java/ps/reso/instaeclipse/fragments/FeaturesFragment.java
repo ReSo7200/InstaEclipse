@@ -84,6 +84,7 @@ public class FeaturesFragment extends Fragment {
     private ActivityResultLauncher<String> notifPermLauncher;
     private ActivityResultLauncher<Intent> locationPickerLauncher;
     private ActivityResultLauncher<Intent> themeCustomizerLauncher;
+    private ActivityResultLauncher<String> profilePhotoLauncher;
 
     private String currentMenu = "main";
 
@@ -206,6 +207,8 @@ public class FeaturesFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult(), result -> {
                     if ("theme".equals(currentMenu)) loadThemeMenu();
                 });
+
+        profilePhotoLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), this::onProfilePhotoPicked);
 
         dirPickerLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(), uri -> {
             if (uri != null) {
@@ -1661,46 +1664,71 @@ public class FeaturesFragment extends Fragment {
         return item;
     }
 
+    /** The open spoofer editor, so a picked photo lands in it. */
+    private ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor profileSpoofEditor;
+
+    /** Same editor as inside Instagram (preview + grouped fields); the photo is picked here. */
     private void showProfileSpoofDialog() {
-        android.content.Context c = requireContext();
-        int pad = (int) (20 * getResources().getDisplayMetrics().density);
-        android.widget.LinearLayout box = new android.widget.LinearLayout(c);
-        box.setOrientation(android.widget.LinearLayout.VERTICAL);
-        box.setPadding(pad, pad / 2, pad, 0);
-        android.widget.EditText followers = profileSpoofInput(box, R.string.ig_profile_spoofer_followers, localCache.getInt("spoofFollowers", -1));
-        android.widget.EditText following = profileSpoofInput(box, R.string.ig_profile_spoofer_following, localCache.getInt("spoofFollowing", -1));
-        android.widget.EditText posts = profileSpoofInput(box, R.string.ig_profile_spoofer_posts, localCache.getInt("spoofPosts", -1));
-        android.widget.CheckBox verified = new android.widget.CheckBox(c);
-        verified.setText(R.string.ig_profile_spoofer_verified);
-        verified.setChecked(localCache.getBoolean("spoofVerified", false));
-        box.addView(verified);
+        Context c = requireContext();
+        ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values v = new ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values();
+        v.username = localCache.getString("spoofUsername", "");
+        v.name = localCache.getString("spoofName", "");
+        v.bio = localCache.getString("spoofBio", "");
+        v.avatar = localCache.getString("spoofAvatar", "");
+        v.posts = localCache.getInt("spoofPosts", -1);
+        v.followers = localCache.getInt("spoofFollowers", -1);
+        v.following = localCache.getInt("spoofFollowing", -1);
+        v.verified = localCache.getBoolean("spoofVerified", false);
+        int text = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorOnSurface, Color.WHITE);
+        int sub = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY);
+        int field = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorSurfaceContainerHighest, Color.DKGRAY);
+        int accent = com.google.android.material.color.MaterialColors.getColor(c, androidx.appcompat.R.attr.colorPrimary, 0xFF0095F6);
+        int border = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorOutlineVariant, 0x33808080);
+        ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor editor = new ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor(c, v,
+                new ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Palette(text, sub, field, accent, border),
+                () -> profilePhotoLauncher.launch("image/*"), null, null);
+        profileSpoofEditor = editor;
+        android.widget.ScrollView scroll = new android.widget.ScrollView(c);
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        editor.view().setPadding(pad, pad / 2, pad, 0);
+        scroll.addView(editor.view());
         new MaterialAlertDialogBuilder(c)
-                .setTitle(R.string.ig_profile_spoofer)
-                .setMessage(R.string.ig_profile_spoofer_hint)
-                .setView(box)
-                .setPositiveButton(android.R.string.ok, (d, w) -> {
-                    putIntPref("spoofFollowers", ps.reso.instaeclipse.utils.dialog.DialogUtils.parseSpoofCount(followers.getText().toString()));
-                    putIntPref("spoofFollowing", ps.reso.instaeclipse.utils.dialog.DialogUtils.parseSpoofCount(following.getText().toString()));
-                    putIntPref("spoofPosts", ps.reso.instaeclipse.utils.dialog.DialogUtils.parseSpoofCount(posts.getText().toString()));
-                    putBoolPref("spoofVerified", verified.isChecked());
-                })
+                .setTitle(R.string.ig_profile_spoofer_editor_title)
+                .setView(scroll)
+                .setPositiveButton(R.string.ig_profile_spoofer_save, (d, w) -> saveProfileSpoof(v, editor.values()))
                 .setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener(d -> { if (profileSpoofEditor == editor) profileSpoofEditor = null; })
                 .show();
     }
 
-    private android.widget.EditText profileSpoofInput(android.widget.LinearLayout box, int label, int value) {
-        com.google.android.material.textfield.TextInputLayout layout =
-                new com.google.android.material.textfield.TextInputLayout(box.getContext());
-        layout.setHint(getString(label));
-        com.google.android.material.textfield.TextInputEditText input =
-                new com.google.android.material.textfield.TextInputEditText(layout.getContext());
-        input.setSingleLine(true);
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(10)});
-        if (value >= 0) input.setText(String.valueOf(value));
-        layout.addView(input);
-        box.addView(layout);
-        return input;
+    /** Sends only what changed, so untouched settings keep Instagram's newer values. */
+    private void saveProfileSpoof(ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values old,
+                                  ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values now) {
+        if (!now.username.equals(old.username)) putStringPref("spoofUsername", now.username);
+        if (!now.name.equals(old.name)) putStringPref("spoofName", now.name);
+        if (!now.bio.equals(old.bio)) putStringPref("spoofBio", now.bio);
+        if (!now.avatar.equals(old.avatar)) putStringPref("spoofAvatar", now.avatar);
+        if (now.posts != old.posts) putIntPref("spoofPosts", now.posts);
+        if (now.followers != old.followers) putIntPref("spoofFollowers", now.followers);
+        if (now.following != old.following) putIntPref("spoofFollowing", now.following);
+        if (now.verified != old.verified) putBoolPref("spoofVerified", now.verified);
+    }
+
+    /** Picked photo: downscaled, JPEG, Base64 (SpoofAvatar), into the open editor; saved with it. */
+    private void onProfilePhotoPicked(Uri uri) {
+        if (uri == null || !isAdded()) return;
+        Context app = requireContext().getApplicationContext();
+        new Thread(() -> {
+            String b64 = ps.reso.instaeclipse.utils.profile.SpoofAvatar.encode(app.getContentResolver(), uri);
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                if (b64 == null) {
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(app,
+                            app.getString(R.string.ig_profile_spoofer_photo_failed), Toast.LENGTH_SHORT).show();
+                } else if (profileSpoofEditor != null) {
+                    profileSpoofEditor.setAvatar(b64);
+                }
+            });
+        }, "IE-ProfilePhoto").start();
     }
 
     private void loadAppMenu() {

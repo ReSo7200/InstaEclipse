@@ -150,7 +150,11 @@ public final class ModuleReplies {
 
     public static boolean isPreferenceValue(String key, Object value) {
         Class<?> type = PREFERENCE_TYPES.get(key);
-        return type != null && type.isInstance(value)
-                && (!(value instanceof String) || ((String) value).length() <= MAX_PREFERENCE_STRING_CHARS);
+        if (type == null || !type.isInstance(value)) return false;
+        if (!(value instanceof String)) return true;
+        // The profile spoofer's picture is a small Base64 JPEG, larger than any other string
+        // setting: only that key gets the higher limit, and only for Base64 text.
+        if ("spoofAvatar".equals(key)) return ps.reso.instaeclipse.utils.profile.SpoofAvatar.isValid((String) value);
+        return ((String) value).length() <= MAX_PREFERENCE_STRING_CHARS;
     }
 }

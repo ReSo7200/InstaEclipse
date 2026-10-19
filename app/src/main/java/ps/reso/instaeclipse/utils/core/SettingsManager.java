@@ -156,6 +156,10 @@ public class SettingsManager {
         editor.putInt("spoofFollowing", FeatureFlags.spoofFollowing);
         editor.putInt("spoofPosts", FeatureFlags.spoofPosts);
         editor.putBoolean("spoofVerified", FeatureFlags.spoofVerified);
+        editor.putString("spoofName", FeatureFlags.spoofName);
+        editor.putString("spoofUsername", FeatureFlags.spoofUsername);
+        editor.putString("spoofBio", FeatureFlags.spoofBio);
+        editor.putString("spoofAvatar", FeatureFlags.spoofAvatar);
         editor.putBoolean("profileAnalyzer", FeatureFlags.profileAnalyzer);
         editor.putBoolean("profileFollowsYouLabel", FeatureFlags.profileFollowsYouLabel);
         editor.putBoolean("fancyBioFont", FeatureFlags.fancyBioFont);
@@ -367,6 +371,10 @@ public class SettingsManager {
         FeatureFlags.spoofFollowing = prefs.getInt("spoofFollowing", -1);
         FeatureFlags.spoofPosts = prefs.getInt("spoofPosts", -1);
         FeatureFlags.spoofVerified = prefs.getBoolean("spoofVerified", false);
+        FeatureFlags.spoofName = prefs.getString("spoofName", "");
+        FeatureFlags.spoofUsername = prefs.getString("spoofUsername", "");
+        FeatureFlags.spoofBio = prefs.getString("spoofBio", "");
+        FeatureFlags.spoofAvatar = prefs.getString("spoofAvatar", "");
         FeatureFlags.profileAnalyzer = prefs.getBoolean("profileAnalyzer", false);
         FeatureFlags.profileFollowsYouLabel = prefs.getBoolean("profileFollowsYouLabel", false);
         FeatureFlags.fancyBioFont = prefs.getBoolean("fancyBioFont", false);

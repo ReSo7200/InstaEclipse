@@ -207,7 +207,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Translate | Translate captions, comments and chat messages with your own translator app |
 | Save comment GIFs and images | Download the media in comments |
 | Profile menu tools | Copy a profile's username or bio, or download its posts (all, or the newest ones), from its ⋮ menu |
-| Profile spoofer | Your own follower, following and post counts and a verified badge, as you choose; shown only on your phone, nothing is sent to Instagram |
+| Profile spoofer | Change how your own profile looks to you: name, username, bio, profile picture, post / follower / following counts and a verified badge, with a live preview editor; shown only on your own profile on your phone, nothing is sent to Instagram |
 | Profile analyzer | Put a profile on your watchlist and analyze it from its ⋮ menu: its Followers and Following are loaded and compared with the last analysis, showing who it newly followed or unfollowed and who followed or stopped following it, with a dated change log per profile |
 | "Follows you" label | See on any profile whether they follow you back |
 | Fancy bio fonts | The bio's "Change font" button picks a style for what you type next: bold, italic, script, monospace and more; strikethrough and underline work in any language |

@@ -1746,39 +1746,52 @@ public class DialogUtils {
         showSectionDialog(context, I18n.t(context, R.string.menu_profiles), layout, () -> {});
     }
 
-    /** Profile spoofer values: own follower / following / post counts (empty = real) and the badge. */
+    /**
+     * Profile spoofer editor: live preview of your profile header, then name / username / bio,
+     * counts (empty = real), the badge and the picture. The picture is chosen in the InstaEclipse
+     * app (Instagram's process can't open a picker for us): "Choose photo" saves what is typed,
+     * closes this and opens the app's picker, which sends the picture back.
+     */
     private static void showProfileSpoofDialog(Context context) {
         try {
-            IeDialog dlg = new IeDialog(context)
-                    .title(I18n.t(context, R.string.ig_profile_spoofer))
-                    .message(I18n.t(context, R.string.ig_profile_spoofer_hint));
-            android.widget.EditText followers = spoofInput(dlg, I18n.t(context, R.string.ig_profile_spoofer_followers), FeatureFlags.spoofFollowers);
-            android.widget.EditText following = spoofInput(dlg, I18n.t(context, R.string.ig_profile_spoofer_following), FeatureFlags.spoofFollowing);
-            android.widget.EditText posts = spoofInput(dlg, I18n.t(context, R.string.ig_profile_spoofer_posts), FeatureFlags.spoofPosts);
-            android.widget.CheckBox verified = dlg.checkBox(I18n.t(context, R.string.ig_profile_spoofer_verified), FeatureFlags.spoofVerified);
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_profile_spoofer_editor_title));
+            ProfileSpoofEditor.Values v = new ProfileSpoofEditor.Values();
+            v.username = FeatureFlags.spoofUsername;
+            v.name = FeatureFlags.spoofName;
+            v.bio = FeatureFlags.spoofBio;
+            v.avatar = FeatureFlags.spoofAvatar;
+            v.posts = FeatureFlags.spoofPosts;
+            v.followers = FeatureFlags.spoofFollowers;
+            v.following = FeatureFlags.spoofFollowing;
+            v.verified = FeatureFlags.spoofVerified;
+            ProfileSpoofEditor[] editor = new ProfileSpoofEditor[1];
+            editor[0] = new ProfileSpoofEditor(dlg.ctx, v,
+                    new ProfileSpoofEditor.Palette(dlg.text, dlg.sub, dlg.field, dlg.accent, dlg.border),
+                    () -> {
+                        saveProfileSpoof(editor[0].values());
+                        dlg.dismiss();
+                        ModuleActivityLauncher.launch(context, ps.reso.instaeclipse.utils.ipc.BrokerPayload.PROFILE_PHOTO, null);
+                    },
+                    I18n.t(context, R.string.ig_profile_spoofer_photo_in_app),
+                    ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.knownUsername());
+            dlg.view(editor[0].view());
             dlg.secondary(context.getString(android.R.string.cancel), null);
-            dlg.primary(context.getString(android.R.string.ok), () -> {
-                FeatureFlags.spoofFollowers = parseSpoofCount(followers.getText().toString());
-                FeatureFlags.spoofFollowing = parseSpoofCount(following.getText().toString());
-                FeatureFlags.spoofPosts = parseSpoofCount(posts.getText().toString());
-                FeatureFlags.spoofVerified = verified.isChecked();
-                SettingsManager.saveAllFlags();
-            });
+            dlg.primary(I18n.t(context, R.string.ig_profile_spoofer_save), () -> saveProfileSpoof(editor[0].values()));
             dlg.show();
         } catch (Throwable ignored) {}
     }
 
-    private static android.widget.EditText spoofInput(IeDialog dlg, String label, int value) {
-        TextView title = new TextView(dlg.ctx);
-        title.setText(label);
-        title.setTextColor(dlg.sub);
-        title.setTextSize(13);
-        dlg.view(title);
-        android.widget.EditText input = dlg.input(label);
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(10)});
-        if (value >= 0) input.setText(String.valueOf(value));
-        return input;
+    private static void saveProfileSpoof(ProfileSpoofEditor.Values v) {
+        FeatureFlags.spoofUsername = v.username;
+        FeatureFlags.spoofName = v.name;
+        FeatureFlags.spoofBio = v.bio;
+        FeatureFlags.spoofAvatar = v.avatar;
+        FeatureFlags.spoofPosts = v.posts;
+        FeatureFlags.spoofFollowers = v.followers;
+        FeatureFlags.spoofFollowing = v.following;
+        FeatureFlags.spoofVerified = v.verified;
+        SettingsManager.saveAllFlags();
+        ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.refreshNow();
     }
 
     /** A typed count, or -1 (keep the real one) when empty or not a number. */
