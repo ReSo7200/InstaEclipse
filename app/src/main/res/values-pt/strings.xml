@@ -250,6 +250,7 @@
     <string name="ig_post_counts_keep">Manter real</string>
     <string name="ig_post_counts_reset">Redefinir</string>
     <string name="ig_post_counts_saved">Números salvos</string>
+    <string name="ig_dl_companion_fallback">Não foi possível conectar ao app InstaEclipse; salvo em Download. Para usar sua pasta, permita que o InstaEclipse inicie automaticamente / rode em segundo plano.</string>
     <string name="ig_profile_menu_tools">Menu do perfil: copiar usuário, bio e baixar tudo</string>
     <string name="ig_profile_spoofer">Falsificar perfil (só neste telefone)</string>
     <string name="ig_profile_spoofer_edit">Editar perfil falso</string>

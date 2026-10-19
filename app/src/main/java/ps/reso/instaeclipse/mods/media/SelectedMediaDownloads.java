@@ -237,18 +237,37 @@ final class SelectedMediaDownloads {
 
     /** {@code batch}: part of "Download all", which shows its own toast, so no per-item ones. */
     static void start(Context ctx, Captured captured, boolean video, boolean batch) {
+        start(ctx, captured, video, batch, false);
+    }
+
+    /**
+     * The companion can't be reached (Instagram can't bind to it: autostart / background limits on
+     * some phones, or the app missing). The file is saved by Instagram itself instead, to
+     * Download/InstaEclipse, since the folder chosen in the companion is only writable there.
+     */
+    static boolean companionUnreachable(String error) {
+        return error != null && (error.startsWith("Companion connection") || error.startsWith("Companion unavailable")
+                || error.startsWith("Companion disconnected") || error.startsWith("Companion is busy"));
+    }
+
+    private static void savedLocally(Context ctx) {
+        toast(ctx, I18n.t(ctx, R.string.ig_dl_companion_fallback));
+    }
+
+    private static void start(Context ctx, Captured captured, boolean video, boolean batch, boolean local) {
         if (captured.original && (video ? captured.media.originalPlan == null : captured.photoUrl == null)) {
             toast(ctx, I18n.t(ctx, R.string.ie_downloader_original_unavailable));
             return;
         }
         if (video && captured.original) { startOriginal(ctx, captured); return; }
-        if (video) { startVideo(ctx, captured.selectedVideo(), batch); return; }
+        if (video) { startVideo(ctx, captured.selectedVideo(), batch, local); return; }
         if (captured.photoUrl == null) { unavailable(ctx, null); return; }
         try {
-            if (FeedVideoDownloadHook.hasCompanionDestination()) {
+            if (!local && FeedVideoDownloadHook.hasCompanionDestination()) {
                 CompanionBridge.downloadLegacy(ctx, captured.photoUrl, null, captured.photoFilename,
                         "image/jpeg", captured.media.owner, error -> {
-                            if (error != null) failed(ctx, error);
+                            if (companionUnreachable(error)) { savedLocally(ctx); start(ctx, captured, false, batch, true); }
+                            else if (error != null) failed(ctx, error);
                             else if (!batch) toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_photo));
                         });
                 return;
@@ -292,11 +311,16 @@ final class SelectedMediaDownloads {
     }
 
     static void startVideo(Context ctx, DownloadRequest request, boolean batch) {
+        startVideo(ctx, request, batch, false);
+    }
+
+    static void startVideo(Context ctx, DownloadRequest request, boolean batch, boolean local) {
         if (request == null) { unavailable(ctx, null); return; }
         try {
-            if (FeedVideoDownloadHook.hasCompanionDestination()) {
+            if (!local && FeedVideoDownloadHook.hasCompanionDestination()) {
                 CompanionBridge.download(ctx, request, error -> {
-                    if (error != null) failed(ctx, error);
+                    if (companionUnreachable(error)) { savedLocally(ctx); startVideo(ctx, request, batch, true); }
+                    else if (error != null) failed(ctx, error);
                     else if (!batch) toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_video));
                 });
                 return;
@@ -319,7 +343,7 @@ final class SelectedMediaDownloads {
                     // Occupy this serial worker until the prompt is dismissed, so a later item
                     // of a batch cannot cover a decision about this one.
                     if (offerFallbackAndWait(ctx, failure.getMessage(), cancel))
-                        startVideo(ctx, allowFallback(request), batch);
+                        startVideo(ctx, allowFallback(request), batch, local);
                 } else failed(ctx, failure.getMessage());
             } catch (Throwable error) {
                 failed(ctx, cancel.isCancelled() ? I18n.t(ctx, R.string.ie_download_cancelled)

@@ -250,6 +250,7 @@
     <string name="ig_post_counts_keep">保留真實</string>
     <string name="ig_post_counts_reset">重設</string>
     <string name="ig_post_counts_saved">數據已儲存</string>
+    <string name="ig_dl_companion_fallback">無法連線到 InstaEclipse 應用程式，已儲存到 Download。若要使用你的資料夾，請允許 InstaEclipse 自動啟動 / 在背景執行。</string>
     <string name="ig_profile_menu_tools">個人檔案選單：複製用戶名稱、簡介和全部下載</string>
     <string name="ig_profile_spoofer">個人檔案偽裝（僅限本機）</string>
     <string name="ig_profile_spoofer_edit">編輯偽裝個人檔案</string>

@@ -249,23 +249,25 @@ public final class PostCountSpoof {
         try {
             int[] c = countsFor(mediaForView(row));
             if (c == null) c = byContent(row);
-            if (c == null) return;
-            for (int i = 0; i < row.getChildCount() - 1; i++) {
-                android.view.View child = row.getChildAt(i);
-                for (int k = 0; k < BUTTON_IDS.length; k++) {
-                    if (BUTTON_IDS[k] <= 0 || c[k] < 0 || child.findViewById(BUTTON_IDS[k]) == null) continue;
-                    if (!(row.getChildAt(i + 1) instanceof android.widget.TextView label)) continue;
-                    String text = ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.shortCount(c[k]);
-                    if (label.getVisibility() != android.view.View.VISIBLE) label.setVisibility(android.view.View.VISIBLE);
-                    fitWidth(row, label, text);
-                    if (!text.contentEquals(label.getText())) {
-                        SETTING.set(Boolean.TRUE);
-                        try { label.setText(text); } finally { SETTING.remove(); }
-                        fitWidth(row, label, text);
-                    }
-                }
-            }
+            if (c != null) writeRow(row, c);
         } catch (Throwable ignored) { }
+    }
+
+    private static void writeRow(android.view.ViewGroup row, int[] c) {
+        for (int i = 0; i < row.getChildCount() - 1; i++) {
+            android.view.View child = row.getChildAt(i);
+            for (int k = 0; k < BUTTON_IDS.length; k++) {
+                if (BUTTON_IDS[k] <= 0 || c[k] < 0 || child.findViewById(BUTTON_IDS[k]) == null) continue;
+                if (!(row.getChildAt(i + 1) instanceof android.widget.TextView label)) continue;
+                String text = c[k] == 0 ? "" : ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.shortCount(c[k]);
+                if (label.getVisibility() != android.view.View.VISIBLE) label.setVisibility(android.view.View.VISIBLE);
+                if (!text.contentEquals(label.getText())) {
+                    SETTING.set(Boolean.TRUE);
+                    try { label.setText(text); } finally { SETTING.remove(); }
+                }
+                fitWidth(row, label, text);
+            }
+        }
     }
 
     /**
@@ -295,6 +297,64 @@ public final class PostCountSpoof {
         }
     }
 
+    /**
+     * Right after an edit: the rows on screen showing this post get the new numbers (or its real
+     * ones back after Reset), without leaving and reopening it.
+     */
+    private static void refreshShown(Context ctx, String id, int[] before, int[] after) {
+        android.app.Activity a = ps.reso.instaeclipse.mods.ui.UIHookManager.getCurrentActivity();
+        android.view.View root = a != null ? a.getWindow().getDecorView() : null;
+        if (root == null) return;
+        root.post(() -> {
+            java.util.ArrayDeque<android.view.View> st = new java.util.ArrayDeque<>();
+            st.push(root);
+            while (!st.isEmpty()) {
+                android.view.View v = st.pop();
+                if (BUTTON_IDS[0] == 0) resolveIds(v);
+                if (v.getId() == BUTTON_IDS[0] && BUTTON_IDS[0] > 0) {
+                    android.view.ViewGroup row = rowOf(v);
+                    if (row != null && showsPost(row, id, before)) writeRow(row, after != null ? after : realOf(id));
+                    continue;
+                }
+                if (v instanceof android.view.ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) st.push(g.getChildAt(i));
+            }
+        });
+    }
+
+    /** The real counts recorded for a post (what Instagram's models report), -1 when unknown. */
+    private static int[] realOf(String id) {
+        long[] v = REAL.get(id);
+        int[] out = new int[FIELDS.length];
+        for (int k = 0; k < FIELDS.length; k++) out[k] = v == null ? -1 : (int) v[k];
+        return out;
+    }
+
+    /** The row shows this post: its numbers are the post's previous edited or real numbers. */
+    private static boolean showsPost(android.view.ViewGroup row, String id, int[] before) {
+        long[] real = REAL.get(id);
+        if (real == null) return false;
+        String[] shown = shownIn(row);
+        boolean any = false;
+        for (int k = 0; k < 4; k++) {
+            if (shown[k] == null) continue;
+            String r = real[k] < 0 ? null : real[k] == 0 ? "" : ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.shortCount((int) real[k]);
+            String b = before == null || before[k] < 0 ? null : ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.shortCount(before[k]);
+            if (!(shown[k].equals(r) || shown[k].equals(b) || (real[k] == 0 && shown[k].equals("0")))) return false;
+            any = true;
+        }
+        return any;
+    }
+
+    private static String[] shownIn(android.view.ViewGroup row) {
+        String[] shown = new String[BUTTON_IDS.length];
+        for (int i = 0; i < row.getChildCount() - 1; i++)
+            for (int k = 0; k < BUTTON_IDS.length; k++)
+                if (BUTTON_IDS[k] > 0 && row.getChildAt(i).findViewById(BUTTON_IDS[k]) != null
+                        && row.getChildAt(i + 1) instanceof android.widget.TextView label)
+                    shown[k] = label.getVisibility() == android.view.View.VISIBLE && label.getText() != null ? label.getText().toString() : "";
+        return shown;
+    }
+
     /** Real counts of edited posts, as Instagram's models report them: key -> {likes, comments,
      *  reposts, shares (-1 unknown), last seen}. Used to recognize an edited post's row. */
     private static final ConcurrentHashMap<String, long[]> REAL = new ConcurrentHashMap<>();
@@ -320,12 +380,7 @@ public final class PostCountSpoof {
         android.view.View name = nameId != 0 ? item.findViewById(nameId) : null;
         if (self != null && name instanceof android.widget.TextView tv && tv.getText() != null
                 && !tv.getText().toString().trim().equalsIgnoreCase(self)) return null;
-        String[] shown = new String[BUTTON_IDS.length];
-        for (int i = 0; i < row.getChildCount() - 1; i++)
-            for (int k = 0; k < BUTTON_IDS.length; k++)
-                if (BUTTON_IDS[k] > 0 && row.getChildAt(i).findViewById(BUTTON_IDS[k]) != null
-                        && row.getChildAt(i + 1) instanceof android.widget.TextView label)
-                    shown[k] = label.getVisibility() == android.view.View.VISIBLE && label.getText() != null ? label.getText().toString() : "";
+        String[] shown = shownIn(row);
         String best = null;
         long bestTime = -1;
         for (java.util.Map.Entry<String, long[]> e : REAL.entrySet()) {
@@ -472,7 +527,8 @@ public final class PostCountSpoof {
             inputs[i].setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(10)});
             if (cur != null && cur[i] >= 0) inputs[i].setText(String.valueOf(cur[i]));
         }
-        dlg.secondary(I18n.t(ctx, R.string.ig_post_counts_reset), () -> { COUNTS.remove(id); save(); });
+        final int[] before = cur == null ? null : cur.clone();
+        dlg.secondary(I18n.t(ctx, R.string.ig_post_counts_reset), () -> { COUNTS.remove(id); save(); refreshShown(ctx, id, before, null); });
         dlg.primary(ctx.getString(android.R.string.ok), () -> {
             int[] c = new int[FIELDS.length];
             boolean any = false;
@@ -482,6 +538,7 @@ public final class PostCountSpoof {
             }
             if (any) COUNTS.put(id, c); else COUNTS.remove(id);
             save();
+            refreshShown(ctx, id, before, any ? c : null);
             ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_post_counts_saved),
                     android.widget.Toast.LENGTH_SHORT).show();
         });

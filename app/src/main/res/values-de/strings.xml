@@ -256,6 +256,7 @@
     <string name="ig_post_counts_keep">Echte behalten</string>
     <string name="ig_post_counts_reset">Zurücksetzen</string>
     <string name="ig_post_counts_saved">Zahlen gespeichert</string>
+    <string name="ig_dl_companion_fallback">InstaEclipse-App nicht erreichbar, daher in Download gespeichert. Für deinen Ordner erlaube InstaEclipse Autostart / Hintergrundaktivität.</string>
     <string name="ig_profile_menu_tools">Profilmenü: Benutzername &amp; Bio kopieren, alles laden</string>
     <string name="ig_profile_spoofer">Profil-Spoofer (nur auf diesem Gerät)</string>
     <string name="ig_profile_spoofer_edit">Gefälschtes Profil bearbeiten</string>

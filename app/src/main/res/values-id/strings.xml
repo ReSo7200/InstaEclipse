@@ -287,6 +287,7 @@
     <string name="ig_post_counts_keep">Biarkan asli</string>
     <string name="ig_post_counts_reset">Atur ulang</string>
     <string name="ig_post_counts_saved">Angka disimpan</string>
+    <string name="ig_dl_companion_fallback">Tidak dapat menjangkau aplikasi InstaEclipse, jadi disimpan ke Download. Untuk memakai folder Anda, izinkan InstaEclipse mulai otomatis / berjalan di latar belakang.</string>
     <string name="ig_profile_menu_tools">Menu profil: salin nama pengguna, bio &amp; unduh semua</string>
     <string name="ig_profile_spoofer">Pemalsu profil (hanya di ponsel ini)</string>
     <string name="ig_profile_spoofer_edit">Edit profil palsu</string>

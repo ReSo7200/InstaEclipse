@@ -198,6 +198,7 @@
     <string name="ig_post_counts_keep">Giữ số thật</string>
     <string name="ig_post_counts_reset">Đặt lại</string>
     <string name="ig_post_counts_saved">Đã lưu số liệu</string>
+    <string name="ig_dl_companion_fallback">Không kết nối được ứng dụng InstaEclipse nên đã lưu vào Download. Để dùng thư mục của bạn, hãy cho phép InstaEclipse tự khởi động / chạy nền.</string>
     <string name="ig_profile_menu_tools">Menu hồ sơ: sao chép tên, tiểu sử và tải tất cả</string>
     <string name="ig_profile_spoofer">Giả mạo hồ sơ (chỉ trên điện thoại này)</string>
     <string name="ig_profile_spoofer_edit">Sửa hồ sơ giả</string>
