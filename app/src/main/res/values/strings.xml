@@ -518,7 +518,7 @@
     <string name="ig_post_counts_keep">Keep real</string>
     <string name="ig_post_counts_reset">Reset</string>
     <string name="ig_post_counts_saved">Counts saved</string>
-    <string name="ig_dl_companion_fallback">Couldn\'t reach the InstaEclipse app, so this was saved to Download. To use your folder, allow InstaEclipse to autostart / run in the background.</string>
+    <string name="ig_dl_companion_fallback">Couldn\'t reach the InstaEclipse app, so this was saved to Download. To use your folder, let InstaEclipse run in the background: not in Sleeping apps (Samsung), autostart on (Xiaomi), battery unrestricted.</string>
     <string name="ig_profile_menu_tools">Profile Menu: Copy Username, Bio &amp; Download All</string>
     <string name="ig_profile_spoofer">Profile Spoofer (only on this phone)</string>
     <string name="ig_profile_spoofer_edit">Edit Spoofed Profile</string>
