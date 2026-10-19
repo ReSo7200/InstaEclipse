@@ -142,6 +142,7 @@ public final class DeviceSpoofHook {
                 XposedHelpers.findAndHookMethod(pm, "hasSystemFeature", String.class, feature);
                 XposedHelpers.findAndHookMethod(pm, "hasSystemFeature", String.class, int.class, feature);
             }
+            ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("SpoofDevice");
             ModuleLog.line("(InstaEclipse | DeviceSpoof): ✅ " + p.manufacturer + " " + p.model);
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse | DeviceSpoof): ❌ " + t);

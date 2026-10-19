@@ -192,6 +192,7 @@ public class FeedVideoDownloadHook {
         // installed). Hooking Uri.parse app-wide — one of the hottest framework methods — triggers
         // ART's JIT SIGSEGV on IG 451+, so it is not installed any more.
         FeatureStatusTracker.setHooked("PostDownload");
+        FeatureStatusTracker.setHooked("AudioDownload");
     }
 
     // ── Hook 1: Uri.parse (fallback buffer) ──────────────────────────────────
@@ -218,6 +219,7 @@ public class FeedVideoDownloadHook {
                         }
                     });
             FeatureStatusTracker.setHooked("PostDownload");
+            FeatureStatusTracker.setHooked("AudioDownload");
         } catch (Throwable t) {
             ModuleLog.line("(InstaEclipse | MediaDownload): ❌ Uri.parse hook: " + t);
         }

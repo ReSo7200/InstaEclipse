@@ -125,9 +125,14 @@ public class DistractionFreeUIHook {
             if (FeatureFlags.disableReels && clipsTabId != 0) collapseAllById((ViewGroup) root, clipsTabId);
             if (FeatureFlags.disableReels && tabPagerId != 0) disableTabSwipe((ViewGroup) root);
             for (int i = 0; i < NAV_TAB_NAMES.length; i++)
-                if (navTabIds[i] != 0 && navTabHidden(i)) collapseAllById((ViewGroup) root, navTabIds[i]);
-            if (FeatureFlags.hidePlusUpsells)
+                if (navTabIds[i] != 0 && navTabHidden(i)) {
+                    collapseAllById((ViewGroup) root, navTabIds[i]);
+                    ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("HideNavTabs");
+                }
+            if (FeatureFlags.hidePlusUpsells) {
                 for (int id : plusUpsellIds) if (id != 0) collapseAllById((ViewGroup) root, id);
+                ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("HidePlusUpsells");
+            }
             if (FeatureFlags.disableDiscoverPeople && discoverPeopleId != 0) collapseAllById((ViewGroup) root, discoverPeopleId);
             if (!FeatureFlags.navTabOrder.isEmpty()) reorderTabs(a, (ViewGroup) root);
         } catch (Throwable ignored) {}

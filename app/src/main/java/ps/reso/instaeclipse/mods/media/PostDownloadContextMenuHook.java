@@ -335,6 +335,8 @@ public class PostDownloadContextMenuHook {
 
         if (downloadOptionValue != null) FeatureStatusTracker.setHooked("PostDownload");
         if (copyLinkOptionValue != null) FeatureStatusTracker.setHooked("CopyMediaLink");
+        if (copyImageOptionValue != null) FeatureStatusTracker.setHooked("CopyImage");
+        if (mediaInfoOptionValue != null) FeatureStatusTracker.setHooked("MediaInfo");
         ModuleLog.line("(IE|Post) ✅ Post menu inject hook installed");
     }
 

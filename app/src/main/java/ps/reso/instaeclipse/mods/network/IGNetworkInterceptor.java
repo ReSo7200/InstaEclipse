@@ -268,6 +268,10 @@ public class IGNetworkInterceptor {
                 XposedHelpers.findAndHookMethod("com.instagram.api.tigon.TigonServiceLayer", classLoader, "startRequest",
                         random_param_1, random_param_2, random_param_3, dropHook);
                 hookChainEntry(classLoader, random_param_1, random_param_2, random_param_3, dropHook);
+                // These act on every matching request, so they are in place once the hook is.
+                for (String key : new String[]{"BlockAnalytics", "DisableStoriesSection", "DisableFeedSection",
+                        "DisableReelsSection", "DisableExploreSection", "DisableCommentsSection"})
+                    FeatureStatusTracker.setHooked(key);
             } else {
                 ModuleLog.line("(InstaEclipse | Interceptor): Could not resolve required classes or fields.");
             }

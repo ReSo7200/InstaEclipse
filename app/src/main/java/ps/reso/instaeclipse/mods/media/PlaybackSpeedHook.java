@@ -488,6 +488,7 @@ public class PlaybackSpeedHook {
                     if (FeatureFlags.forceReelScrubber) param.setResult(true);
                 }
             });
+            FeatureStatusTracker.setHooked("ForceReelScrubber");
             ModuleLog.line(TAG + "✅ reel scrubber gate " + gate.getDeclaringClass().getName() + "." + gate.getName());
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ reel scrubber: " + t);
