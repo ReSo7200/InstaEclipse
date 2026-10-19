@@ -119,6 +119,7 @@ public class SettingsManager {
         editor.putBoolean("backLeavesHome", FeatureFlags.backLeavesHome);
         editor.putBoolean("hideNotesTray", FeatureFlags.hideNotesTray);
         editor.putBoolean("hideDmSuggestions", FeatureFlags.hideDmSuggestions);
+        editor.putBoolean("hideInstants", FeatureFlags.hideInstants);
         editor.putBoolean("hideDmBlend", FeatureFlags.hideDmBlend);
         editor.putBoolean("readReceiptChats", FeatureFlags.readReceiptChats);
         editor.putBoolean("hideThreadsButton", FeatureFlags.hideThreadsButton);
@@ -319,6 +320,7 @@ public class SettingsManager {
         FeatureFlags.backLeavesHome = prefs.getBoolean("backLeavesHome", false);
         FeatureFlags.hideNotesTray = prefs.getBoolean("hideNotesTray", false);
         FeatureFlags.hideDmSuggestions = prefs.getBoolean("hideDmSuggestions", false);
+        FeatureFlags.hideInstants = prefs.getBoolean("hideInstants", false);
         FeatureFlags.hideDmBlend = prefs.getBoolean("hideDmBlend", false);
         FeatureFlags.readReceiptChats = prefs.getBoolean("readReceiptChats", false);
         FeatureFlags.hideThreadsButton = prefs.getBoolean("hideThreadsButton", false);

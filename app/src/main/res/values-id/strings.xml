@@ -271,6 +271,7 @@
     <string name="ig_playback_speed_next">Kecepatan diatur — berlaku untuk video berikutnya yang diputar</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Sembunyikan Catatan di Pesan</string>
     <string name="ig_hide_dm_suggestions">Sembunyikan akun yang disarankan di Pesan</string>
+    <string name="ig_hide_instants">Sembunyikan Instants</string>
     <string name="ig_back_leaves_home">Kembali di Beranda keluar dari Instagram</string>
     <string name="ig_dialog_downloader_voice">Unduh Pesan Suara (tekan lama)</string>
     <string name="ig_dialog_downloader_dm_media">Unduh foto &amp; video pesan (tekan lama)</string>

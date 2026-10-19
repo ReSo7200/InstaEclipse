@@ -373,6 +373,7 @@
     <string name="ig_playback_speed_next">Velocità impostata — si applica al prossimo video che parte</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Nascondi le note nei messaggi</string>
     <string name="ig_hide_dm_suggestions">Nascondi gli account suggeriti nei Messaggi</string>
+    <string name="ig_hide_instants">Nascondi Instants</string>
     <string name="ig_back_leaves_home">Indietro nella Home esce da Instagram</string>
     <string name="ig_dialog_downloader_voice">Scarica i messaggi vocali (pressione prolungata)</string>
     <string name="ig_dialog_downloader_dm_media">Scarica foto e video dei messaggi (pressione lunga)</string>

@@ -560,6 +560,7 @@
     <string name="ig_playback_speed_next">Hız ayarlandı — başlayan bir sonraki videoya uygulanır</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Mesajlardaki Notları Gizle</string>
     <string name="ig_hide_dm_suggestions">Mesajlarda önerilen hesapları gizle</string>
+    <string name="ig_hide_instants">Instants\'ı gizle</string>
     <string name="ig_back_leaves_home">Ana sayfada Geri, Instagram\'dan çıkar</string>
     <string name="ig_dialog_downloader_voice">Sesli Mesajları İndir (uzun basma)</string>
     <string name="ig_dialog_downloader_dm_media">Mesajlardaki fotoğraf ve videoları indir (uzun bas)</string>

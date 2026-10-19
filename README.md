@@ -90,6 +90,7 @@ Everything here is a switch in the menu. Tap a section to open it.
 | Hide specific chats | Hide chats from your inbox and manage them later |
 | Hide the Notes tray | Remove Notes from the top of your inbox |
 | Hide suggested accounts | Remove the "Suggested for you" accounts under your chats |
+| Hide Instants | Remove the stack of Instants floating over the app |
 | Hide Blend in chats | Remove the Blend button from the chat header |
 | Hide "Create group" | Remove it from the share sheet |
 
