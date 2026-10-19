@@ -676,7 +676,6 @@
     <string name="ig_call_confirm_audio">بدء مكالمة صوتية؟</string>
     <string name="ig_call_confirm_video">بدء مكالمة فيديو؟</string>
     <string name="ig_call_confirm_call">اتصال</string>
-    <string name="ig_hide_ai_labeled">إخفاء المنشورات الموسومة بالذكاء الاصطناعي</string>
     <string name="ig_confirm_refresh">السؤال قبل تحديث الخلاصة</string>
     <string name="ig_confirm_refresh_question">تحديث الخلاصة؟</string>
     <string name="ig_confirm_refresh_action">تحديث</string>

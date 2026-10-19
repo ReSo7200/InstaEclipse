@@ -710,7 +710,6 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_call_confirm_audio">Mulai panggilan suara?</string>
     <string name="ig_call_confirm_video">Mulai panggilan video?</string>
     <string name="ig_call_confirm_call">Telepon</string>
-    <string name="ig_hide_ai_labeled">Sembunyikan postingan berlabel AI</string>
     <string name="ig_confirm_refresh">Tanya sebelum memuat ulang feed</string>
     <string name="ig_confirm_refresh_question">Muat ulang feed?</string>
     <string name="ig_confirm_refresh_action">Muat ulang</string>

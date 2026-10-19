@@ -678,7 +678,6 @@
     <string name="ig_call_confirm_audio">要開始語音通話嗎？</string>
     <string name="ig_call_confirm_video">要開始視訊通話嗎？</string>
     <string name="ig_call_confirm_call">撥打</string>
-    <string name="ig_hide_ai_labeled">隱藏帶 AI 標籤的貼文</string>
     <string name="ig_confirm_refresh">重新整理動態前確認</string>
     <string name="ig_confirm_refresh_question">要重新整理動態嗎？</string>
     <string name="ig_confirm_refresh_action">重新整理</string>

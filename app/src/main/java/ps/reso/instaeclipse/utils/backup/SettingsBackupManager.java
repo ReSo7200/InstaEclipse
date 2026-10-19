@@ -47,7 +47,6 @@ public class SettingsBackupManager {
         s.put("hideThreadsSuggestions",     FeatureFlags.hideThreadsSuggestions);
         s.put("hideLikedPosts",             FeatureFlags.hideLikedPosts);
         s.put("confirmFeedRefresh",         FeatureFlags.confirmFeedRefresh);
-        s.put("hideAiLabeledPosts",         FeatureFlags.hideAiLabeledPosts);
         s.put("hideCommunityNotes",         FeatureFlags.hideCommunityNotes);
         s.put("followingOnlyFeed",         FeatureFlags.followingOnlyFeed);
         s.put("hidePlusUpsells",            FeatureFlags.hidePlusUpsells);
@@ -197,7 +196,6 @@ public class SettingsBackupManager {
         if (s.has("hideThreadsSuggestions"))    FeatureFlags.hideThreadsSuggestions    = s.getBoolean("hideThreadsSuggestions");
         if (s.has("hideLikedPosts"))            FeatureFlags.hideLikedPosts            = s.getBoolean("hideLikedPosts");
         if (s.has("confirmFeedRefresh"))        FeatureFlags.confirmFeedRefresh        = s.getBoolean("confirmFeedRefresh");
-        if (s.has("hideAiLabeledPosts"))        FeatureFlags.hideAiLabeledPosts        = s.getBoolean("hideAiLabeledPosts");
         if (s.has("hideCommunityNotes"))        FeatureFlags.hideCommunityNotes        = s.getBoolean("hideCommunityNotes");
         if (s.has("followingOnlyFeed"))        FeatureFlags.followingOnlyFeed        = s.getBoolean("followingOnlyFeed");
         if (s.has("hidePlusUpsells"))           FeatureFlags.hidePlusUpsells           = s.getBoolean("hidePlusUpsells");

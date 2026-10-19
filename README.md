@@ -165,7 +165,6 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Hide suggestions | Remove suggested posts, reels and accounts |
 | Hide Threads suggestions | Drop the Threads promos |
 | Hide posts you already liked | Skip what you have seen |
-| Hide AI-labeled posts | Drop posts and reels that Instagram labels as AI ("AI info" / "AI content") from the home feed |
 | Hide community notes | Remove notes added under posts and reels |
 | Hide Instagram Plus upsells | No more Plus prompts |
 | Hide the story tray | Keep the feed, lose the story row |

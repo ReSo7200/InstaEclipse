@@ -613,7 +613,6 @@ Resta su questa schermata fino al termine.</string>
     <string name="ig_call_confirm_audio">Avviare una chiamata vocale?</string>
     <string name="ig_call_confirm_video">Avviare una videochiamata?</string>
     <string name="ig_call_confirm_call">Chiama</string>
-    <string name="ig_hide_ai_labeled">Nascondi i post etichettati come IA</string>
     <string name="ig_confirm_refresh">Chiedi prima di aggiornare il feed</string>
     <string name="ig_confirm_refresh_question">Aggiornare il feed?</string>
     <string name="ig_confirm_refresh_action">Aggiorna</string>
