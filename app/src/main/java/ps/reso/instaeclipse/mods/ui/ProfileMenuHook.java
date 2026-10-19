@@ -116,42 +116,63 @@ public final class ProfileMenuHook {
                 return;
             }
 
-            int at = list.indexOfChild(scroller);
-            list.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_username), () -> {
+            // Our rows and Instagram's list go into one ScrollView, so they scroll together.
+            LinearLayout column = new LinearLayout(ctx);
+            column.setOrientation(LinearLayout.VERTICAL);
+            column.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_username), () -> {
                 pw.dismiss();
                 copy(a, username);
-            }), at++);
-            list.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_bio), () -> {
+            }));
+            column.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_bio), () -> {
                 pw.dismiss();
                 String bio = bioOf(a, username);
                 if (bio == null || bio.trim().isEmpty())
                     ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_profile_no_bio), Toast.LENGTH_SHORT).show();
                 else copy(a, bio.trim());
-            }), at++);
-            list.addView(row(template, R.drawable.ic_download, I18n.t(ctx, R.string.ig_profile_download_all), () -> {
+            }));
+            column.addView(row(template, R.drawable.ic_download, I18n.t(ctx, R.string.ig_profile_download_all), () -> {
                 pw.dismiss();
                 ps.reso.instaeclipse.mods.media.ProfileDownloadAll.start(a, username);
-            }), at);
-            fit(content, scroller, 3 * template.getHeight());
+            }));
+            int listHeight = scroller.getHeight();
+            int at = list.indexOfChild(scroller);
+            ViewGroup.LayoutParams old = scroller.getLayoutParams();
+            list.removeView(scroller);
+            scroller.setNestedScrollingEnabled(false);
+            // Instagram's list keeps a fixed size, so it is laid out once tall enough for every row,
+            // then trimmed to its last row: the ScrollView does all the scrolling.
+            column.addView(scroller, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 10_000));
+            scroller.post(() -> {
+                View last = scroller.getChildCount() > 0 ? scroller.getChildAt(scroller.getChildCount() - 1) : null;
+                if (last == null) return;
+                ViewGroup.LayoutParams rl = scroller.getLayoutParams();
+                rl.height = last.getBottom() + scroller.getPaddingBottom();
+                scroller.setLayoutParams(rl);
+            });
+            android.widget.ScrollView sv = new android.widget.ScrollView(ctx);
+            sv.setVerticalScrollBarEnabled(false);
+            sv.setOverScrollMode(View.OVER_SCROLL_NEVER);
+            sv.addView(column);
+            LinearLayout.LayoutParams lp = old instanceof LinearLayout.LayoutParams l ? new LinearLayout.LayoutParams(l)
+                    : new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.height = fitHeight(content, listHeight, 3 * template.getHeight());
+            list.addView(sv, at, lp);
             pw.update(); // the popup measures its new height
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ inject: " + t);
         }
     }
 
-    /** The menu grows by {@code extra}; past the screen's bottom Instagram's own list gives up
-     *  height and scrolls instead, so the popup never runs off screen. */
-    private static void fit(View content, ViewGroup scroller, int extra) {
+    /** Height for the rows + list: all of it when it fits on screen, else what is left above the
+     *  screen's bottom (the ScrollView scrolls the rest). */
+    private static int fitHeight(View content, int listHeight, int extra) {
         int[] loc = new int[2];
         content.getLocationOnScreen(loc);
         android.graphics.Rect frame = new android.graphics.Rect();
         content.getRootView().getWindowVisibleDisplayFrame(frame);
-        int bottom = loc[1] + content.getHeight() + extra;
-        int over = bottom - frame.bottom + (int) (16 * content.getResources().getDisplayMetrics().density);
-        if (over <= 0) return;
-        ViewGroup.LayoutParams lp = scroller.getLayoutParams();
-        lp.height = Math.max(scroller.getHeight() - over, scroller.getHeight() / 3);
-        scroller.setLayoutParams(lp);
+        int margin = (int) (16 * content.getResources().getDisplayMetrics().density);
+        int over = loc[1] + content.getHeight() + extra - frame.bottom + margin;
+        return over <= 0 ? ViewGroup.LayoutParams.WRAP_CONTENT : Math.max(listHeight + extra - over, extra);
     }
 
     /** x of {@code v} inside {@code ancestor} (layout positions, so the popup's open animation doesn't skew it). */
