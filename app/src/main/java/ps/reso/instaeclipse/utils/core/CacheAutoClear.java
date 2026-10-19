@@ -40,6 +40,7 @@ public class CacheAutoClear {
         Context appCtx = ctx.getApplicationContext();
         if (!(appCtx instanceof Application)) return;
         installed = true;
+        ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("AutoClearCache");
         final Application app = (Application) appCtx;
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override public void onActivityStarted(Activity a) { startedActivities++; }

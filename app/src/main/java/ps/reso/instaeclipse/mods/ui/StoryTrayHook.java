@@ -205,5 +205,6 @@ public final class StoryTrayHook {
         clp.height = wantHeight;
         container.setLayoutParams(clp);
         container.setClipChildren(true);
+        FeatureStatusTracker.setHooked("StoryTraySize");
     }
 }
