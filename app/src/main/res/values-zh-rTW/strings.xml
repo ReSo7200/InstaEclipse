@@ -669,9 +669,9 @@
     <string name="ig_story_tray_size">限時動態列大小</string>
     <string name="ig_story_ring_color">未看限時動態圓環顏色</string>
     <string name="ig_story_ring_default">Instagram 預設</string>
-    <string name="ig_story_ring_custom">自訂顏色</string>
-    <string name="ig_story_ring_custom_hint">顏色如 #3897F0，或兩種顏色組成漸層：#FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">無效的顏色</string>
+    <string name="ig_story_ring_solid">單色</string>
+    <string name="ig_story_ring_gradient">漸層</string>
+    <string name="ig_story_ring_stops_hint">點按顏色進行編輯，長按可移除</string>
     <string name="ig_feed_corner_radius">貼文圓角</string>
     <string name="ig_disable_search_history">不儲存搜尋紀錄</string>
     <string name="ig_call_confirm">通話前確認</string>

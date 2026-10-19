@@ -718,9 +718,9 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_story_tray_size">Rozmiar paska relacji</string>
     <string name="ig_story_ring_color">Kolor obwódki nieobejrzanych relacji</string>
     <string name="ig_story_ring_default">Domyślny Instagrama</string>
-    <string name="ig_story_ring_custom">Własny kolor</string>
-    <string name="ig_story_ring_custom_hint">Kolor jak #3897F0 lub dwa dla gradientu: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Nieprawidłowy kolor</string>
+    <string name="ig_story_ring_solid">Jeden kolor</string>
+    <string name="ig_story_ring_gradient">Gradient</string>
+    <string name="ig_story_ring_stops_hint">Dotknij koloru, aby go edytować, przytrzymaj, aby go usunąć</string>
     <string name="ig_feed_corner_radius">Zaokrąglone rogi postów</string>
     <string name="ig_disable_search_history">Nie zapisuj wyszukiwań</string>
     <string name="ig_call_confirm">Pytaj przed połączeniem</string>

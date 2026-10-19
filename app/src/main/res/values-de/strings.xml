@@ -679,9 +679,9 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="ig_story_tray_size">Größe der Story-Leiste</string>
     <string name="ig_story_ring_color">Ringfarbe ungesehener Storys</string>
     <string name="ig_story_ring_default">Instagram-Standard</string>
-    <string name="ig_story_ring_custom">Eigene Farbe</string>
-    <string name="ig_story_ring_custom_hint">Eine Farbe wie #3897F0 oder zwei für einen Verlauf: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Keine gültige Farbe</string>
+    <string name="ig_story_ring_solid">Eine Farbe</string>
+    <string name="ig_story_ring_gradient">Verlauf</string>
+    <string name="ig_story_ring_stops_hint">Farbe antippen zum Bearbeiten, gedrückt halten zum Entfernen</string>
     <string name="ig_feed_corner_radius">Abgerundete Beitragsecken</string>
     <string name="ig_disable_search_history">Suchen nicht speichern</string>
     <string name="ig_call_confirm">Vor Anrufen fragen</string>

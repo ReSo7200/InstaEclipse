@@ -702,9 +702,9 @@
     <string name="ig_story_tray_size">Μέγεθος γραμμής ιστοριών</string>
     <string name="ig_story_ring_color">Χρώμα δακτυλίου μη προβεβλημένων ιστοριών</string>
     <string name="ig_story_ring_default">Προεπιλογή Instagram</string>
-    <string name="ig_story_ring_custom">Προσαρμοσμένο χρώμα</string>
-    <string name="ig_story_ring_custom_hint">Ένα χρώμα όπως #3897F0 ή δύο για διαβάθμιση: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Μη έγκυρο χρώμα</string>
+    <string name="ig_story_ring_solid">Ένα χρώμα</string>
+    <string name="ig_story_ring_gradient">Διαβάθμιση</string>
+    <string name="ig_story_ring_stops_hint">Πατήστε ένα χρώμα για επεξεργασία, κρατήστε το για αφαίρεση</string>
     <string name="ig_feed_corner_radius">Στρογγυλεμένες γωνίες αναρτήσεων</string>
     <string name="ig_disable_search_history">Να μην αποθηκεύονται οι αναζητήσεις</string>
     <string name="ig_call_confirm">Ερώτηση πριν την κλήση</string>

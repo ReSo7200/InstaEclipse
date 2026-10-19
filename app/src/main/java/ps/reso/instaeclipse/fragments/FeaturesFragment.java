@@ -1986,45 +1986,28 @@ public class FeaturesFragment extends Fragment {
 
     private String storyRingColorText() {
         String v = localCache.getString("storyRingColor", "");
-        return getString(R.string.ig_story_ring_color) + "  ·  " + (v.isEmpty() ? getString(R.string.ig_story_ring_default) : v);
+        return getString(R.string.ig_story_ring_color) + "  ·  "
+                + (v.isEmpty() ? getString(R.string.ig_story_ring_default) : v.replace(",", " → "));
     }
 
+    /** Same picker as inside Instagram: live preview, one color or a gradient of up to 4. */
     private void chooseStoryRingColor() {
-        String[] presets = ps.reso.instaeclipse.utils.dialog.DialogUtils.STORY_RING_PRESETS;
-        CharSequence[] rows = new CharSequence[presets.length + 2];
-        String current = localCache.getString("storyRingColor", "");
-        rows[0] = getString(R.string.ig_story_ring_default);
-        int selected = current.isEmpty() ? 0 : rows.length - 1;
-        for (int i = 0; i < presets.length; i++) {
-            rows[i + 1] = ps.reso.instaeclipse.utils.dialog.DialogUtils.storyRingSwatch(presets[i]);
-            if (presets[i].equalsIgnoreCase(current)) selected = i + 1;
-        }
-        rows[rows.length - 1] = getString(R.string.ig_story_ring_custom);
-        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_story_ring_color)
-                .setSingleChoiceItems(rows, selected, (dialog, which) -> {
-                    dialog.dismiss();
-                    if (which == rows.length - 1) { customStoryRingColor(current); return; }
-                    putStringPref("storyRingColor", which == 0 ? "" : presets[which - 1]);
-                    loadStoriesMenu();
-                }).setNegativeButton(android.R.string.cancel, null).show();
-    }
-
-    private void customStoryRingColor(String current) {
-        android.widget.EditText input = new android.widget.EditText(requireContext());
-        input.setHint("#3897F0");
-        input.setText(current);
-        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_story_ring_custom)
-                .setMessage(R.string.ig_story_ring_custom_hint)
-                .setView(input)
+        Context ctx = requireContext();
+        String[] picked = {localCache.getString("storyRingColor", "")};
+        int text = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSurface, Color.WHITE);
+        int sub = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY);
+        int field = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorSurfaceContainerHighest, Color.DKGRAY);
+        int accent = com.google.android.material.color.MaterialColors.getColor(ctx, androidx.appcompat.R.attr.colorPrimary, 0xFF0095F6);
+        View picker = ps.reso.instaeclipse.utils.dialog.RingColorPicker.build(ctx, picked[0],
+                new ps.reso.instaeclipse.utils.dialog.RingColorPicker.Palette(text, sub, field, accent), v -> picked[0] = v);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(ctx);
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        picker.setPadding(pad, pad / 2, pad, 0);
+        scroll.addView(picker);
+        new MaterialAlertDialogBuilder(ctx).setTitle(R.string.ig_story_ring_color)
+                .setView(scroll)
                 .setPositiveButton(android.R.string.ok, (d, w) -> {
-                    String v = input.getText().toString().trim().replace(" ", "");
-                    if (ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(v) == null) {
-                        Toast.makeText(requireContext(), R.string.ig_story_ring_invalid, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    StringBuilder norm = new StringBuilder();
-                    for (String p : v.split(",")) norm.append(norm.length() > 0 ? "," : "").append(p.startsWith("#") ? p : "#" + p);
-                    putStringPref("storyRingColor", norm.toString().toUpperCase(java.util.Locale.ROOT));
+                    putStringPref("storyRingColor", picked[0]);
                     loadStoriesMenu();
                 })
                 .setNegativeButton(android.R.string.cancel, null).show();

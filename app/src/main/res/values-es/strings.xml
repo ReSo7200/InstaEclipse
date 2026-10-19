@@ -673,9 +673,9 @@
     <string name="ig_story_tray_size">Tamaño de la bandeja de historias</string>
     <string name="ig_story_ring_color">Color del anillo de historias no vistas</string>
     <string name="ig_story_ring_default">Predeterminado de Instagram</string>
-    <string name="ig_story_ring_custom">Color personalizado</string>
-    <string name="ig_story_ring_custom_hint">Un color como #3897F0, o dos para un degradado: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Color no válido</string>
+    <string name="ig_story_ring_solid">Un color</string>
+    <string name="ig_story_ring_gradient">Degradado</string>
+    <string name="ig_story_ring_stops_hint">Toca un color para editarlo, mantenlo pulsado para quitarlo</string>
     <string name="ig_feed_corner_radius">Esquinas redondeadas en publicaciones</string>
     <string name="ig_disable_search_history">No guardar búsquedas</string>
     <string name="ig_call_confirm">Preguntar antes de llamar</string>

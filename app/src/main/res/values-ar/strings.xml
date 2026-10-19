@@ -667,9 +667,9 @@
     <string name="ig_story_tray_size">حجم شريط القصص</string>
     <string name="ig_story_ring_color">لون حلقة القصص غير المشاهدة</string>
     <string name="ig_story_ring_default">افتراضي Instagram</string>
-    <string name="ig_story_ring_custom">لون مخصص</string>
-    <string name="ig_story_ring_custom_hint">لون مثل #3897F0، أو لونان للتدرج: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">لون غير صالح</string>
+    <string name="ig_story_ring_solid">لون واحد</string>
+    <string name="ig_story_ring_gradient">تدرّج</string>
+    <string name="ig_story_ring_stops_hint">اضغط على لون لتعديله، واضغط عليه مطولًا لإزالته</string>
     <string name="ig_feed_corner_radius">زوايا المنشورات المستديرة</string>
     <string name="ig_disable_search_history">عدم حفظ عمليات البحث</string>
     <string name="ig_call_confirm">السؤال قبل الاتصال</string>

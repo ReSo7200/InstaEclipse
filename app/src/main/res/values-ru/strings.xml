@@ -670,9 +670,9 @@
     <string name="ig_story_tray_size">Размер ленты историй</string>
     <string name="ig_story_ring_color">Цвет кольца непросмотренных историй</string>
     <string name="ig_story_ring_default">Стандарт Instagram</string>
-    <string name="ig_story_ring_custom">Свой цвет</string>
-    <string name="ig_story_ring_custom_hint">Цвет вида #3897F0 или два для градиента: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Неверный цвет</string>
+    <string name="ig_story_ring_solid">Один цвет</string>
+    <string name="ig_story_ring_gradient">Градиент</string>
+    <string name="ig_story_ring_stops_hint">Нажмите на цвет, чтобы изменить его, удерживайте, чтобы убрать</string>
     <string name="ig_feed_corner_radius">Скруглённые углы публикаций</string>
     <string name="ig_disable_search_history">Не сохранять поиск</string>
     <string name="ig_call_confirm">Спрашивать перед звонком</string>
