@@ -10,6 +10,7 @@ import org.luckypray.dexkit.query.matchers.ClassMatcher;
 import org.luckypray.dexkit.query.matchers.MethodMatcher;
 import org.luckypray.dexkit.result.MethodData;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -138,6 +139,7 @@ public class FollowConfirmHook {
             }
         }
         hookProfileButton();
+        if (statusSetter != null) resolveStatusEvent(bridge, statusSetter.getParameterTypes()[0]);
         ModuleLog.line(TAG + "✅ Hooked " + sender.getDeclaringClass().getName() + "." + sender.getName()
                 + (statusSetter != null ? ", undo " + statusSetter.getName() : ", no undo")
                 + (resetMethod != null ? ", reset " + resetMethod.getName() : ", no reset")
@@ -388,8 +390,76 @@ public class FollowConfirmHook {
             if (notFollowing == null) return;
             setter.setAccessible(true);
             setter.invoke(manager, notFollowing, user, true);
+            announce(manager, user, notFollowing);
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ undo: " + t);
         }
+    }
+
+    // Instagram's follow-status event ((FollowStatus, user id), posted on the session's event bus
+    // after every follow tap): the feed's inline buttons and suggestion cards redraw from it.
+    private static Constructor<?> statusEvent;
+    private static Method busFactory, busPost;
+
+    private static void resolveStatusEvent(DexKitBridge bridge, Class<?> statusType) {
+        try {
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
+                    .name("<init>").paramTypes(statusType.getName(), "java.lang.String")))) {
+                Class<?> c = Class.forName(md.getClassName(), false, Module.hostClassLoader);
+                if (c.getInterfaces().length != 1 || c.getInterfaces()[0].getDeclaredMethods().length != 0) continue;
+                Class<?> marker = c.getInterfaces()[0];
+                for (MethodData post : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
+                        .paramTypes(marker.getName()).returnType("void")))) {
+                    if (!post.isMethod()) continue;
+                    Class<?> bus = Class.forName(post.getClassName(), false, Module.hostClassLoader);
+                    try { bus.getDeclaredConstructor(android.os.Looper.class); } catch (NoSuchMethodException e) { continue; }
+                    Method factory = null;
+                    for (Method m : SafeReflect.methods(bus))
+                        if (Modifier.isStatic(m.getModifiers()) && m.getReturnType() == bus && m.getParameterCount() == 1) factory = m;
+                    if (factory == null) continue;
+                    statusEvent = c.getDeclaredConstructor(statusType, String.class);
+                    busFactory = factory;
+                    busPost = post.getMethodInstance(Module.hostClassLoader);
+                    ModuleLog.line(TAG + "status event " + c.getName() + " on " + bus.getName());
+                    return;
+                }
+            }
+            ModuleLog.line(TAG + "⚠️ status event not found");
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ status event: " + t);
+        }
+    }
+
+    private static void announce(Object manager, Object user, Object status) {
+        if (statusEvent == null) return;
+        try {
+            Object session = null;
+            for (Field f : SafeReflect.fields(manager.getClass())) {
+                if (!f.getType().getName().equals("com.instagram.common.session.UserSession")) continue;
+                f.setAccessible(true);
+                session = f.get(manager);
+            }
+            String id = userId(user);
+            if (session == null || id == null) return;
+            busFactory.setAccessible(true);
+            Object bus = busFactory.invoke(null, session);
+            statusEvent.setAccessible(true);
+            busPost.setAccessible(true);
+            busPost.invoke(bus, statusEvent.newInstance(status, id));
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ announce: " + t);
+        }
+    }
+
+    /** The User's id: its final String field holding only digits. */
+    private static String userId(Object user) {
+        for (Field f : SafeReflect.fields(user.getClass())) {
+            if (f.getType() != String.class || Modifier.isStatic(f.getModifiers()) || !Modifier.isFinal(f.getModifiers())) continue;
+            try {
+                f.setAccessible(true);
+                if (f.get(user) instanceof String s && s.matches("\\d+")) return s;
+            } catch (Throwable ignored) { }
+        }
+        return null;
     }
 }
