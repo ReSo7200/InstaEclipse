@@ -76,6 +76,7 @@ public class SettingsBackupManager {
         s.put("hideTabActivity", FeatureFlags.hideTabActivity);
         s.put("hideTabProfile", FeatureFlags.hideTabProfile);
         s.put("hideNotesTray", FeatureFlags.hideNotesTray);
+        s.put("hideDmSuggestions", FeatureFlags.hideDmSuggestions);
         s.put("hideDmBlend", FeatureFlags.hideDmBlend);
         s.put("readReceiptChats", FeatureFlags.readReceiptChats);
         s.put("hideThreadsButton", FeatureFlags.hideThreadsButton);
@@ -227,6 +228,7 @@ public class SettingsBackupManager {
         if (s.has("hideTabActivity")) FeatureFlags.hideTabActivity = s.getBoolean("hideTabActivity");
         if (s.has("hideTabProfile")) FeatureFlags.hideTabProfile = s.getBoolean("hideTabProfile");
         if (s.has("hideNotesTray")) FeatureFlags.hideNotesTray = s.getBoolean("hideNotesTray");
+        if (s.has("hideDmSuggestions")) FeatureFlags.hideDmSuggestions = s.getBoolean("hideDmSuggestions");
         if (s.has("hideDmBlend")) FeatureFlags.hideDmBlend = s.getBoolean("hideDmBlend");
         if (s.has("readReceiptChats")) FeatureFlags.readReceiptChats = s.getBoolean("readReceiptChats");
         if (s.has("hideThreadsButton")) FeatureFlags.hideThreadsButton = s.getBoolean("hideThreadsButton");

@@ -57,6 +57,7 @@ public class FeatureFlags {
     public static volatile boolean hideDmBlend = false; // hide the Blend button in DM thread headers
     public static volatile boolean hideThreadsButton = false; // hide the Threads button on profiles
     public static volatile boolean hideNotesTray = false; // hide the Notes tray in the DM inbox (#241)
+    public static volatile boolean hideDmSuggestions = false; // no "Suggested for you" accounts under the DM inbox (#282)
     public static volatile boolean chatExport = false; // header button: export the open chat to HTML (#225)
     public static volatile boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
     public static volatile boolean translateMessages = false; // "Translate" in the DM message long-press menu

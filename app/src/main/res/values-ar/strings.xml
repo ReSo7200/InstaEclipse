@@ -232,6 +232,7 @@
     <string name="ig_playback_speed_title">سرعة التشغيل</string>
     <string name="ig_playback_speed_next">تم ضبط السرعة — تُطبَّق على الفيديو التالي الذي يبدأ</string>
     <string name="ig_dialog_distraction_hide_notes_tray">إخفاء الملاحظات في الرسائل</string>
+    <string name="ig_hide_dm_suggestions">إخفاء الحسابات المقترحة في الرسائل</string>
     <string name="ig_dialog_downloader_voice">تنزيل الرسائل الصوتية (ضغط مطوّل)</string>
     <string name="ig_dialog_downloader_dm_media">تنزيل صور وفيديوهات الرسائل (ضغط مطوّل)</string>
     <string name="ig_dialog_misc_viewer_search">البحث في مشاهدي قصتك</string>

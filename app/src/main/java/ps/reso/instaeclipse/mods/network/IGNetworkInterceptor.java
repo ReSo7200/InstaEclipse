@@ -209,6 +209,11 @@ public class IGNetworkInterceptor {
                                                 || uri.getPath().contains("/discover/topical_explore_stream")
                                                 || (host != null && host.contains("i.instagram.com") && uri.getPath().contains("/api/v1/fbsearch/top_serp/"));
                                     }
+                                    // Suggested accounts under the DM inbox (#282): the inbox's
+                                    // "empty state" unit carries them; the chat list is unaffected.
+                                    if (FeatureFlags.hideDmSuggestions) {
+                                        shouldDrop |= uri.getPath().contains("/dynamic_onboarding/get_direct_empty_state/");
+                                    }
                                     if (FeatureFlags.disableComments) {
                                         shouldDrop |= uri.getPath().contains("/api/v1/media/") && uri.getPath().contains("comments/");
                                     }
@@ -271,7 +276,7 @@ public class IGNetworkInterceptor {
                 hookChainEntry(classLoader, random_param_1, random_param_2, random_param_3, dropHook);
                 // These act on every matching request, so they are in place once the hook is.
                 for (String key : new String[]{"BlockAnalytics", "DisableStoriesSection", "DisableFeedSection",
-                        "DisableReelsSection", "DisableExploreSection", "DisableCommentsSection"})
+                        "DisableReelsSection", "DisableExploreSection", "DisableCommentsSection", "HideDmSuggestions"})
                     FeatureStatusTracker.setHooked(key);
             } else {
                 ModuleLog.line("(InstaEclipse | Interceptor): Could not resolve required classes or fields.");
