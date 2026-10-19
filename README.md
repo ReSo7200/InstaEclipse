@@ -198,6 +198,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Save comment GIFs and images | Download the media in comments |
 | Profile menu tools | Copy a profile's username or bio, or download its posts (all, or the newest ones), from its ⋮ menu |
 | Profile spoofer | Your own follower, following and post counts and a verified badge, as you choose; shown only on your phone, nothing is sent to Instagram |
+| Profile analyzer | Put a profile on your watchlist and analyze it from its ⋮ menu: its Followers and Following are loaded and compared with the last analysis, showing who it newly followed or unfollowed and who followed or stopped following it, with a dated change log per profile |
 | "Follows you" label | See on any profile whether they follow you back |
 | Follower toast | A quick message when you open a profile |
 | Export followers and following | Save the whole list as CSV |
