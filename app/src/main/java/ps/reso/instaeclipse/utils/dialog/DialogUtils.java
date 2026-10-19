@@ -167,42 +167,43 @@ public class DialogUtils {
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_appearance)));
         LinearLayout appearance = createGroupCard(context);
         appearance.addView(createMenuRow(context, R.drawable.ic_palette, I18n.t(context, R.string.ig_dialog_menu_theme), A_APPEARANCE, () -> showThemeOptions(context), onCount(context, "customThemeEnabled", "customFontEnabled", "customEmojiEnabled")));
-        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_feed), A_APPEARANCE, () -> showFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideAiLabeledPosts", "confirmFeedRefresh", "hideCommunityNotes", "hidePlusUpsells", "followingOnlyFeed", "hideStoriesTray", "disableDiscoverPeople", "expandCaptions", "exactTimestamps", "highResolutionImages", "enablePhotoZoom", "disableVideoAutoPlay")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_feed), A_APPEARANCE, () -> showFeedOptions(context), onCount(context, "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "hideAiLabeledPosts", "confirmFeedRefresh", "hideCommunityNotes", "followingOnlyFeed", "disableDiscoverPeople", "expandCaptions", "exactTimestamps", "enablePhotoZoom", "disableVideoAutoPlay")));
         appearance.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.menu_navigation), A_APPEARANCE, () -> showNavigationOptions(context), navCount(context)));
-        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels), A_APPEARANCE, () -> showReelsOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "holdLeftSlowMotion", "disableRepost")));
-        appearance.addView(createMenuRow(context, R.drawable.ic_story_ring, I18n.t(context, R.string.menu_stories), A_APPEARANCE, () -> showStoriesOptions(context), onCount(context, "disableStoryFlipping", "enableStoryMentions", "storyLinks", "storyInfo", "storyViewerSearch")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_movie, I18n.t(context, R.string.menu_reels), A_APPEARANCE, () -> showReelsOptions(context), onCount(context, "reelsAutoScroll", "reelsLockScroll", "forceReelScrubber", "holdLeftSlowMotion", "offerPlaybackSpeed")));
+        appearance.addView(createMenuRow(context, R.drawable.ic_story_ring, I18n.t(context, R.string.menu_stories), A_APPEARANCE, () -> showStoriesOptions(context), onCount(context, "disableStoryFlipping", "enableStoryMentions", "storyLinks", "storyInfo", "storyViewerSearch", "hideStoriesTray")));
         mainLayout.addView(appearance);
 
         // ---- PRIVACY ---- ghost, messages, hidden chats, lock, ads/tracking, location, distraction-free
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_privacy)));
         LinearLayout privacy = createGroupCard(context);
-        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "isGhostScreenshot", "allowScreenshots", "isGhostViewOnce", "permanentViewMode", "readReceiptChats", "spoofLastSeen", "disableSearchHistory", "airplaneMode")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_chat, I18n.t(context, R.string.menu_messages), A_PRIVACY, () -> showMessagesOptions(context), onCount(context, "keepEphemeralMessages", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "confirmCalls", "translateMessages", "bulkUnsend", "chatExport", "hideNotesTray", "hideDmBlend", "hideShareCreateGroup")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "isGhostScreenshot", "isGhostViewOnce", "readReceiptChats", "spoofLastSeen", "airplaneMode")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_chat, I18n.t(context, R.string.menu_messages), A_PRIVACY, () -> showMessagesOptions(context), onCount(context, "keepEphemeralMessages", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "confirmCalls", "allowScreenshots", "permanentViewMode", "translateMessages", "bulkUnsend", "chatExport", "hideNotesTray", "hideDmBlend", "hideShareCreateGroup")));
         privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context), onCount(context, "hideSpecificChats")));
         privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.menu_ads_tracking), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally", "removeMetaAI", "hideOnboardingPrompts")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.menu_ads_tracking), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "disableSearchHistory")));
         privacy.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_PRIVACY, () -> showLocationOptions(context), onCount(context, "spoofLocation")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "isExtremeMode", "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "isExtremeMode", "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments", "removeMetaAI", "hideOnboardingPrompts", "hidePlusUpsells")));
         mainLayout.addView(privacy);
 
         // ---- MEDIA ---- downloading, post-menu extras and uploads
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_media)));
         LinearLayout media = createGroupCard(context);
         media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "enableStickerDownload", "enableDmMediaDownload", "offerAudioDownload", "saveInstants", "cacheStories", "downloaderUsernameFolder", "downloaderAddTimestamp")));
-        media.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.menu_post_menu), A_MEDIA, () -> showPostMenuOptions(context), onCount(context, "copyMediaLink", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed", "maxUploadQuality", "uploadInstants")));
+        media.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.menu_post_menu), A_MEDIA, () -> showPostMenuOptions(context), onCount(context, "copyMediaLink", "offerCopyImage", "offerMediaInfo", "uploadInstants")));
+        media.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_quality), A_MEDIA, () -> showQualityOptions(context), onCount(context, "highResolutionImages", "maxUploadQuality")));
         mainLayout.addView(media);
 
         // ---- SOCIAL ---- likes, comments, profiles
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_social)));
         LinearLayout social = createGroupCard(context);
-        social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "enableCopyComment", "commentSearch", "enableCaptionCopy")));
+        social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "enableCopyComment", "commentSearch", "enableCaptionCopy", "disableRepost")));
         social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
         mainLayout.addView(social);
 
         // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_tools)));
         LinearLayout tools = createGroupCard(context);
-        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.menu_app), A_TOOLS, () -> showAppOptions(context), onCount(context, "unlimitedAccounts", "fixNotificationRegistration", "showFeatureToasts")));
+        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.menu_app), A_TOOLS, () -> showAppOptions(context), onCount(context, "unlimitedAccounts", "fixNotificationRegistration", "showFeatureToasts", "openLinksExternally")));
         tools.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_menu_dev_options), A_TOOLS, () -> showDevOptions(context), onCount(context, "isDevEnabled", "removeBuildExpiredPopup")));
         tools.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.ig_dialog_menu_backup_restore), A_TOOLS, () -> showBackupRestoreOptions(context)));
         tools.addView(createMenuRow(context, R.drawable.ic_restart, I18n.t(context, R.string.ig_dialog_menu_restart), A_TOOLS, () -> showRestartSection(context)));
@@ -809,8 +810,6 @@ public class DialogUtils {
             SettingsManager.saveAllFlags();
         });
         layout.addView(buildExpiredSwitch);
-        layout.addView(createActionRow(context, R.drawable.ic_movie, spoofDeviceLabel(context), "#0A84FF",
-                v -> showSpoofDeviceDialog(context, (TextView) findFirstText(v))));
 
         // Save current dev mode flag when dialog is closed
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_dev_options), layout, SettingsManager::saveAllFlags);
@@ -1103,16 +1102,13 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_story_ring, "#5E5CE6", R.string.ig_dialog_ghost_hide_story_views, "isGhostStory", refreshGhostEmoji),
                 flagSwitch(context, R.drawable.ic_live, "#5E5CE6", R.string.ig_dialog_ghost_hide_live_presence, "isGhostLive", refreshGhostEmoji),
                 flagSwitch(context, R.drawable.ic_camera, "#5E5CE6", R.string.ig_dialog_ghost_bypass_screenshot, "isGhostScreenshot", refreshGhostEmoji),
-                flagSwitch(context, R.drawable.ic_camera, "#5E5CE6", R.string.ig_dialog_ghost_allow_screenshots_dms, "allowScreenshots", refreshGhostEmoji),
-                flagSwitch(context, R.drawable.ic_eye_off, "#5E5CE6", R.string.ig_dialog_ghost_hide_view_once, "isGhostViewOnce", refreshGhostEmoji),
-                flagSwitch(context, R.drawable.ic_eye, "#5E5CE6", R.string.ig_dialog_ghost_permanent_view_once, "permanentViewMode", refreshGhostEmoji));
+                flagSwitch(context, R.drawable.ic_eye_off, "#5E5CE6", R.string.ig_dialog_ghost_hide_view_once, "isGhostViewOnce", refreshGhostEmoji));
 
         // Outside the master switch: last-seen spoofing and airplane mode.
         layout.addView(createDivider(context));
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_eye, "#5E5CE6", R.string.ig_dialog_ghost_read_receipt_chats, "readReceiptChats"),
                 flagSwitch(context, R.drawable.ic_timer, "#5E5CE6", R.string.ig_dialog_misc_spoof_last_seen, "spoofLastSeen"),
-                flagSwitch(context, R.drawable.ic_search, "#5E5CE6", R.string.ig_disable_search_history, "disableSearchHistory"),
                 // Airplane mode takes effect at once: stop / restart the live MQTT connection.
                 extraSwitch(context, "#5E5CE6", "airplaneMode", ps.reso.instaeclipse.mods.extras.AirplaneModeHook::apply)));
 
@@ -1138,6 +1134,8 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_ghost_edit_history, "keepEditHistory"),
                 flagSwitch(context, R.drawable.ic_jump_first, "#5E5CE6", R.string.ig_dialog_ghost_jump_first, "jumpToFirstMessage"),
                 flagSwitch(context, R.drawable.ic_shield, "#5E5CE6", R.string.ig_call_confirm, "confirmCalls"),
+                flagSwitch(context, R.drawable.ic_camera, "#5E5CE6", R.string.ig_dialog_ghost_allow_screenshots_dms, "allowScreenshots"),
+                flagSwitch(context, R.drawable.ic_eye, "#5E5CE6", R.string.ig_dialog_ghost_permanent_view_once, "permanentViewMode"),
                 flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_translate_messages, "translateMessages"),
                 flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_bulk_unsend, "bulkUnsend"),
                 flagSwitch(context, R.drawable.ic_download, "#5E5CE6", R.string.ig_dialog_ghost_chat_export, "chatExport"),
@@ -1155,17 +1153,12 @@ public class DialogUtils {
         LinearLayout adCard = addMasterGroup(context, layout,
                 flagSwitch(context, R.drawable.ic_shield, "#FF453A", R.string.ig_dialog_ad_block_ads, "isAdBlockEnabled"),
                 flagSwitch(context, R.drawable.ic_shield, "#FF453A", R.string.ig_dialog_ad_block_analytics, "isAnalyticsBlocked"),
-                flagSwitch(context, R.drawable.ic_link, "#FF453A", R.string.ig_dialog_ad_disable_tracking, "disableTrackingLinks"),
-                flagSwitch(context, R.drawable.ic_link, "#FF453A", R.string.ig_dialog_open_links_externally, "openLinksExternally"));
-        // The master group's card ends with the custom share-domain row, as before.
-        adCard.addView(createActionRow(context, R.drawable.ic_link, shareDomainLabel(context), "#FF453A",
-                v -> showShareDomainDialog(context, (TextView) findFirstText(v))));
+                flagSwitch(context, R.drawable.ic_link, "#FF453A", R.string.ig_dialog_ad_disable_tracking, "disableTrackingLinks"));
 
-        // Outside the master switch.
+        // Outside the master switch: what Instagram keeps about your searches (#280).
         layout.addView(createDivider(context));
         layout.addView(cardOf(context,
-                flagSwitch(context, R.drawable.ic_sparkle, "#FF453A", R.string.ig_dialog_misc_remove_meta_ai, "removeMetaAI"),
-                extraSwitch(context, "#FF453A", "hideOnboardingPrompts")));
+                flagSwitch(context, R.drawable.ic_search, "#FF453A", R.string.ig_disable_search_history, "disableSearchHistory")));
 
         showSectionDialog(context, I18n.t(context, R.string.menu_ads_tracking), layout, () -> {});
     }
@@ -1306,6 +1299,13 @@ public class DialogUtils {
             groupCard.addView(s);
         }
         layout.addView(groupCard);
+
+        // Outside the extreme-mode group: parts of the app removed (Meta AI, prompts, upsells).
+        layout.addView(createDivider(context));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_dialog_misc_remove_meta_ai, "removeMetaAI"),
+                extraSwitch(context, "#30D158", "hideOnboardingPrompts"),
+                flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_dialog_clean_feed_hide_plus, "hidePlusUpsells")));
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {
             FeatureFlags.disableStories = disableStoriesSwitch.isChecked();
@@ -1472,9 +1472,7 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_liked, "hideLikedPosts"),
                 flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_hide_ai_labeled, "hideAiLabeledPosts"),
                 flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_community_notes, "hideCommunityNotes"),
-                flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_hide_plus, "hidePlusUpsells"),
                 flagSwitch(context, R.drawable.ic_sparkle, "#64D2FF", R.string.ig_dialog_clean_feed_following_only, "followingOnlyFeed"),
-                extraSwitch(context, "#64D2FF", "hideStoriesTray"),
                 flagSwitch(context, R.drawable.ic_block, "#64D2FF", R.string.ig_dialog_misc_disable_discover_people, "disableDiscoverPeople")));
 
         // feat_options reads "Options:" (written for the companion app), so drop the colon for a header.
@@ -1488,7 +1486,6 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_timer, "#64D2FF", R.string.ig_dialog_misc_exact_timestamps, "exactTimestamps",
                         () -> setRowEnabled(tsFormat, FeatureFlags.exactTimestamps)),
                 tsFormat,
-                extraSwitch(context, "#64D2FF", "highResolutionImages"),
                 flagSwitch(context, R.drawable.ic_search, "#64D2FF", R.string.ig_dialog_misc_photo_zoom, "enablePhotoZoom"),
                 flagSwitch(context, R.drawable.ic_movie, "#64D2FF", R.string.ig_dialog_misc_disable_video_autoplay, "disableVideoAutoPlay"),
                 flagSwitch(context, R.drawable.ic_restart, "#64D2FF", R.string.ig_confirm_refresh, "confirmFeedRefresh"),
@@ -1530,40 +1527,12 @@ public class DialogUtils {
     private static void showReelsOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        // Force Reels Quality — inline single choice (FeatureFlags.forceReelQuality, 0 = auto).
-        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_dialog_quality_force_reels)));
-        String[] labels = {
-                I18n.t(context, R.string.ig_dialog_quality_auto),
-                I18n.t(context, R.string.ig_dialog_quality_360),
-                I18n.t(context, R.string.ig_dialog_quality_480),
-                I18n.t(context, R.string.ig_dialog_quality_720),
-                I18n.t(context, R.string.ig_dialog_quality_1080),
-                I18n.t(context, R.string.ig_dialog_quality_max)
-        };
-        int[] values = {0, 360, 480, 720, 1080, Integer.MAX_VALUE};
-        int current = FeatureFlags.forceReelQuality;
-        LinearLayout qualityCard = card(context);
-        RadioRow[] rows = new RadioRow[labels.length];
-        for (int i = 0; i < labels.length; i++) {
-            int idx = i;
-            rows[i] = new RadioRow(context, labels[i], values[i] == current);
-            rows[i].setOnClickListener(v -> {
-                FeatureFlags.forceReelQuality = values[idx];
-                SettingsManager.saveAllFlags();
-                for (RadioRow r : rows) r.setChecked(false);
-                rows[idx].setChecked(true);
-            });
-            qualityCard.addView(rows[i]);
-        }
-        layout.addView(qualityCard);
-
-        layout.addView(createDivider(context));
         layout.addView(cardOf(context,
                 extraSwitch(context, "#FF375F", "reelsAutoScroll"),
                 extraSwitch(context, "#FF375F", "reelsLockScroll"),
                 flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_downloader_reel_scrubber, "forceReelScrubber"),
                 flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_reels_hold_left_slow, "holdLeftSlowMotion"),
-                flagSwitch(context, R.drawable.ic_block, "#FF375F", R.string.ig_dialog_misc_disable_repost, "disableRepost")));
+                flagSwitch(context, R.drawable.ic_movie, "#FF375F", R.string.ig_dialog_downloader_offer_speed, "offerPlaybackSpeed")));
 
         showSectionDialog(context, I18n.t(context, R.string.menu_reels), layout, () -> {});
     }
@@ -1575,7 +1544,8 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_at, "#FF375F", R.string.ig_dialog_misc_view_story_mentions, "enableStoryMentions"),
                 flagSwitch(context, R.drawable.ic_link, "#FF375F", R.string.ig_dialog_misc_story_links, "storyLinks"),
                 flagSwitch(context, R.drawable.ic_info, "#FF375F", R.string.ig_dialog_misc_story_info, "storyInfo"),
-                flagSwitch(context, R.drawable.ic_search, "#FF375F", R.string.ig_dialog_misc_viewer_search, "storyViewerSearch")));
+                flagSwitch(context, R.drawable.ic_search, "#FF375F", R.string.ig_dialog_misc_viewer_search, "storyViewerSearch"),
+                extraSwitch(context, "#FF375F", "hideStoriesTray")));
         View ringRow = createActionRow(context, R.drawable.ic_palette, storyRingColorLabel(context).toString(), "#FF375F",
                 v -> showStoryRingColorDialog(context, (TextView) findFirstText(v)));
         View ringText = findFirstText(ringRow);
@@ -1772,7 +1742,8 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_dialog_misc_like_undo, "likeUndo"),
                 flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_comment, "enableCopyComment"),
                 flagSwitch(context, R.drawable.ic_search, A_SOCIAL, R.string.ig_dialog_misc_comment_search, "commentSearch"),
-                flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_caption, "enableCaptionCopy")));
+                flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_caption, "enableCaptionCopy"),
+                flagSwitch(context, R.drawable.ic_block, A_SOCIAL, R.string.ig_dialog_misc_disable_repost, "disableRepost")));
         showSectionDialog(context, I18n.t(context, R.string.menu_likes_comments), layout, () -> {});
     }
 
@@ -1796,7 +1767,10 @@ public class DialogUtils {
         layout.addView(cardOf(context,
                 extraSwitch(context, "#0A84FF", "unlimitedAccounts"),
                 extraSwitch(context, "#0A84FF", "fixNotificationRegistration"),
-                flagSwitch(context, R.drawable.ic_notification, "#0A84FF", R.string.ig_dialog_misc_show_feature_toasts, "showFeatureToasts")));
+                flagSwitch(context, R.drawable.ic_notification, "#0A84FF", R.string.ig_dialog_misc_show_feature_toasts, "showFeatureToasts"),
+                flagSwitch(context, R.drawable.ic_link, "#0A84FF", R.string.ig_dialog_open_links_externally, "openLinksExternally"),
+                createActionRow(context, R.drawable.ic_link, shareDomainLabel(context), "#0A84FF",
+                        v -> showShareDomainDialog(context, (TextView) findFirstText(v)))));
         showSectionDialog(context, I18n.t(context, R.string.menu_app), layout, () -> {});
     }
 
@@ -2482,17 +2456,56 @@ public class DialogUtils {
     }
 
     /** Post ⋮ menu extras (copy link/image, media info, playback speed) and upload/Instants tweaks. */
+    /** Quality: image, reel, upload and HDR video quality in one place. */
+    private static void showQualityOptions(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+
+        // Force Reels Quality — inline single choice (FeatureFlags.forceReelQuality, 0 = auto).
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_dialog_quality_force_reels)));
+        String[] labels = {
+                I18n.t(context, R.string.ig_dialog_quality_auto),
+                I18n.t(context, R.string.ig_dialog_quality_360),
+                I18n.t(context, R.string.ig_dialog_quality_480),
+                I18n.t(context, R.string.ig_dialog_quality_720),
+                I18n.t(context, R.string.ig_dialog_quality_1080),
+                I18n.t(context, R.string.ig_dialog_quality_max)
+        };
+        int[] values = {0, 360, 480, 720, 1080, Integer.MAX_VALUE};
+        int current = FeatureFlags.forceReelQuality;
+        LinearLayout qualityCard = card(context);
+        RadioRow[] rows = new RadioRow[labels.length];
+        for (int i = 0; i < labels.length; i++) {
+            int idx = i;
+            rows[i] = new RadioRow(context, labels[i], values[i] == current);
+            rows[i].setOnClickListener(v -> {
+                FeatureFlags.forceReelQuality = values[idx];
+                SettingsManager.saveAllFlags();
+                for (RadioRow r : rows) r.setChecked(false);
+                rows[idx].setChecked(true);
+            });
+            qualityCard.addView(rows[i]);
+        }
+        layout.addView(qualityCard);
+
+        layout.addView(createDivider(context));
+        layout.addView(cardOf(context,
+                extraSwitch(context, "#FF9F0A", "highResolutionImages"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_max_upload_quality, "maxUploadQuality"),
+                createActionRow(context, R.drawable.ic_movie, spoofDeviceLabel(context), "#FF9F0A",
+                        v -> showSpoofDeviceDialog(context, (TextView) findFirstText(v)))));
+
+        showSectionDialog(context, I18n.t(context, R.string.menu_quality), layout, () -> {});
+    }
+
     private static void showPostMenuOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
         layout.addView(cardOf(context,
                 // Copy Media Link (#117) — copies the current slide's direct CDN url to the clipboard.
                 flagSwitch(context, R.drawable.ic_link, "#FF9F0A", R.string.ig_dialog_downloader_copy_link, "copyMediaLink"),
                 flagSwitch(context, R.drawable.ic_content_copy, "#FF9F0A", R.string.ig_dialog_downloader_offer_copy_image, "offerCopyImage"),
-                flagSwitch(context, R.drawable.ic_search, "#FF9F0A", R.string.ig_dialog_downloader_offer_media_info, "offerMediaInfo"),
-                flagSwitch(context, R.drawable.ic_movie, "#FF9F0A", R.string.ig_dialog_downloader_offer_speed, "offerPlaybackSpeed")));
+                flagSwitch(context, R.drawable.ic_search, "#FF9F0A", R.string.ig_dialog_downloader_offer_media_info, "offerMediaInfo")));
         layout.addView(createDivider(context));
         layout.addView(cardOf(context,
-                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_max_upload_quality, "maxUploadQuality"),
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_upload_instants, "uploadInstants")));
         showSectionDialog(context, I18n.t(context, R.string.menu_post_menu), layout, () -> {});
     }

@@ -16,4 +16,5 @@
     <string name="menu_reels">Reels</string>
     <string name="menu_stories">Storys</string>
     <string name="nav_tab_order_changed">Tab-Reihenfolge geändert</string>
+    <string name="menu_quality">Qualität</string>
 </resources>

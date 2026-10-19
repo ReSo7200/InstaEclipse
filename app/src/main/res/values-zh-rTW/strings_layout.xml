@@ -16,4 +16,5 @@
     <string name="menu_reels">Reels</string>
     <string name="menu_stories">限時動態</string>
     <string name="nav_tab_order_changed">分頁順序已變更</string>
+    <string name="menu_quality">畫質</string>
 </resources>
