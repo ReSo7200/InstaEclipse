@@ -250,7 +250,7 @@ public final class ProfileMenuHook {
      * they hold (lists, maps, Kotlin flows, ViewModels), nearest first, for a User with this
      * username. Instagram's androidx is obfuscated, so fragments can't be listed by name.
      */
-    private static Object findUser(Activity a, String username) {
+    public static Object findUser(Activity a, String username) {
         Method name = ps.reso.instaeclipse.utils.users.UserUtils.userUsernameGetter;
         if (name == null || a == null) return null;
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
