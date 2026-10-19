@@ -65,11 +65,11 @@ public final class CurrentConversation {
                 if (method == null) continue;
                 final boolean resumed = name.equals("performResume");
                 XposedBridge.hookMethod(method, new XC_MethodHook() {
-                    @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    @Override protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         state.invalidate();
                         if (!resumed) removeFragment(param.thisObject);
                     }
-                    @Override protected void afterHookedMethod(MethodHookParam param) {
+                    @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (resumed) {
                             removeFragment(param.thisObject);
                             fragments.add(new WeakReference<>(param.thisObject));
@@ -87,7 +87,7 @@ public final class CurrentConversation {
                     .usingStrings("igThreadIgid").paramTypes(KEY, "boolean").returnType("void")))) {
                 XposedBridge.hookMethod(data.getMethodInstance(loader), new XC_MethodHook() {
                     private boolean logged;
-                    @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    @Override protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!logged) {
                             logged = true;
                             ModuleLog.line("(IE|Conversation) igThreadIgid callback observed; not used as foreground authority");
@@ -272,7 +272,7 @@ public final class CurrentConversation {
         if (rebindHooks.contains(method)) return true;
         try {
             XposedBridge.hookMethod(method, new XC_MethodHook() {
-                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                @Override protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     for (WeakReference<Object> reference : boundControllers) {
                         if (reference.get() == param.thisObject) { state.invalidate(); break; }
                     }

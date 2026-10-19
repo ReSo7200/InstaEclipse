@@ -56,7 +56,7 @@ final class HiddenInboxFilter {
         for (Method method : methods) {
             try {
                 XposedBridge.hookMethod(method, new XC_MethodHook() {
-                    @Override protected void afterHookedMethod(MethodHookParam param) {
+                    @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (param.hasThrowable()) return;
                         rememberInboxStore(param.thisObject);
                         String requestAccount = CurrentConversation.accountIdOf(param.thisObject);
@@ -115,7 +115,7 @@ final class HiddenInboxFilter {
             inboxStoreClass = type;
             refreshMethod = method;
             XposedBridge.hookAllConstructors(type, new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam param) {
+                @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!param.hasThrowable()) rememberInboxStore(param.thisObject);
                 }
             });

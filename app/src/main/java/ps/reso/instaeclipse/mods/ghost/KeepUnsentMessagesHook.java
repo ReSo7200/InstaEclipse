@@ -326,7 +326,7 @@ public class KeepUnsentMessagesHook {
             method.setAccessible(true);
             XposedBridge.hookMethod(method, new XC_MethodHook() {
                 @Override @SuppressWarnings("unchecked")
-                protected void afterHookedMethod(MethodHookParam param) {
+                protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     onSettingsChanged();
                     if (!FeatureFlags.keepUnsentMessages || !FeatureFlags.keepUnsentInChat || param.hasThrowable()) return;
                     Object[] args = param.args;
