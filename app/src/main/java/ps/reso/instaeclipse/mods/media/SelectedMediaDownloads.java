@@ -199,7 +199,7 @@ final class SelectedMediaDownloads {
         switch (choice) {
             case PHOTO -> start(ctx, captured, false);
             case VIDEO -> start(ctx, captured, true);
-            case FRAME -> startFrame(ctx, captured.video);
+            case FRAME -> startFrame(ctx, frameRequest(captured));
             case AUDIO -> {
                 OriginalMediaSelection.Audio audio = captured.media.separateAudio;
                 if (captured.offersAudio()) FeedVideoDownloadHook.downloadAudio(ctx, audio.url,
@@ -207,6 +207,17 @@ final class SelectedMediaDownloads {
                         captured.media.owner, audio.extract, audio.startMs, audio.durationMs);
             }
         }
+    }
+
+    /** The frame picker decodes with Android's own frame reader, and some phones' AV1/VP9 software
+     *  decoders hand it frames with the color channels mixed up (a magenta/green picture). H.264
+     *  decodes correctly everywhere and Instagram offers it at full resolution, so the picker
+     *  always prefers it, whatever the Downloader setting. */
+    static DownloadRequest frameRequest(Captured captured) {
+        DownloadRequest v = captured.video;
+        if (v == null || v.options.originalSelection) return v;
+        return new DownloadRequest(v.mediaId, v.owner, v.filename, v.manifest, v.direct,
+                new DownloadRequest.Options(v.options.maxShortSide, true, true), v.audio);
     }
 
     static void startFrame(Context ctx, DownloadRequest request) {
