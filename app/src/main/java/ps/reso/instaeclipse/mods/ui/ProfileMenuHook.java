@@ -38,7 +38,8 @@ import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
 import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 
 /**
- * Profile ⋮ menu extras: Copy username, Copy bio, Download all posts.
+ * Profile ⋮ menu extras: Copy username, Copy bio, Download all posts (profileMenuTools) and
+ * Analyze profile (profileAnalyzer, see ProfileAnalyzer).
  *
  * <p>The menu is a plain PopupWindow whose content holds Instagram's context menu
  * (context_menu_start_items). When one opens over a profile, three rows are added, cloned from
@@ -68,7 +69,7 @@ public final class ProfileMenuHook {
             }
             XC_MethodHook onShow = new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                    if (FeatureFlags.profileMenuTools && param.thisObject instanceof PopupWindow pw) inject(pw);
+                    if ((FeatureFlags.profileMenuTools || FeatureFlags.profileAnalyzer) && param.thisObject instanceof PopupWindow pw) inject(pw);
                 }
             };
             XposedBridge.hookAllMethods(PopupWindow.class, "showAsDropDown", onShow);
@@ -119,21 +120,29 @@ public final class ProfileMenuHook {
             // Our rows and Instagram's list go into one ScrollView, so they scroll together.
             LinearLayout column = new LinearLayout(ctx);
             column.setOrientation(LinearLayout.VERTICAL);
-            column.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_username), () -> {
-                pw.dismiss();
-                copy(a, username);
-            }));
-            column.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_bio), () -> {
-                pw.dismiss();
-                String bio = bioOf(a, username);
-                if (bio == null || bio.trim().isEmpty())
-                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_profile_no_bio), Toast.LENGTH_SHORT).show();
-                else copy(a, bio.trim());
-            }));
-            column.addView(row(template, R.drawable.ic_download, I18n.t(ctx, R.string.ig_profile_download_all), () -> {
-                pw.dismiss();
-                ps.reso.instaeclipse.mods.media.ProfileDownloadAll.start(a, username);
-            }));
+            if (FeatureFlags.profileMenuTools) {
+                column.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_username), () -> {
+                    pw.dismiss();
+                    copy(a, username);
+                }));
+                column.addView(row(template, R.drawable.ic_content_copy, I18n.t(ctx, R.string.ig_profile_copy_bio), () -> {
+                    pw.dismiss();
+                    String bio = bioOf(a, username);
+                    if (bio == null || bio.trim().isEmpty())
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, R.string.ig_profile_no_bio), Toast.LENGTH_SHORT).show();
+                    else copy(a, bio.trim());
+                }));
+                column.addView(row(template, R.drawable.ic_download, I18n.t(ctx, R.string.ig_profile_download_all), () -> {
+                    pw.dismiss();
+                    ps.reso.instaeclipse.mods.media.ProfileDownloadAll.start(a, username);
+                }));
+            }
+            if (FeatureFlags.profileAnalyzer) {
+                column.addView(row(template, R.drawable.ic_search, I18n.t(ctx, R.string.ig_pa_analyze), () -> {
+                    pw.dismiss();
+                    ps.reso.instaeclipse.mods.misc.ProfileAnalyzer.start(a, findUser(a, username), username);
+                }));
+            }
             int listHeight = scroller.getHeight();
             int at = list.indexOfChild(scroller);
             ViewGroup.LayoutParams old = scroller.getLayoutParams();
@@ -155,7 +164,7 @@ public final class ProfileMenuHook {
             sv.addView(column);
             LinearLayout.LayoutParams lp = old instanceof LinearLayout.LayoutParams l ? new LinearLayout.LayoutParams(l)
                     : new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.height = fitHeight(content, listHeight, 3 * template.getHeight());
+            lp.height = fitHeight(content, listHeight, column.getChildCount() * template.getHeight());
             list.addView(sv, at, lp);
             pw.update(); // the popup measures its new height
         } catch (Throwable t) {

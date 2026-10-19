@@ -121,6 +121,7 @@ public class SettingsBackupManager {
         s.put("spoofFollowing",          FeatureFlags.spoofFollowing);
         s.put("spoofPosts",              FeatureFlags.spoofPosts);
         s.put("spoofVerified",           FeatureFlags.spoofVerified);
+        s.put("profileAnalyzer",         FeatureFlags.profileAnalyzer);
         s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
         s.put("fancyBioFont",            FeatureFlags.fancyBioFont);
         s.put("storyViewerSearch",       FeatureFlags.storyViewerSearch);
@@ -280,6 +281,7 @@ public class SettingsBackupManager {
         if (s.has("spoofFollowing"))         FeatureFlags.spoofFollowing         = Math.max(-1, s.getInt("spoofFollowing"));
         if (s.has("spoofPosts"))             FeatureFlags.spoofPosts             = Math.max(-1, s.getInt("spoofPosts"));
         if (s.has("spoofVerified"))          FeatureFlags.spoofVerified          = s.getBoolean("spoofVerified");
+        if (s.has("profileAnalyzer"))        FeatureFlags.profileAnalyzer        = s.getBoolean("profileAnalyzer");
         if (s.has("profileFollowsYouLabel")) FeatureFlags.profileFollowsYouLabel = s.getBoolean("profileFollowsYouLabel");
         if (s.has("fancyBioFont"))           FeatureFlags.fancyBioFont           = s.getBoolean("fancyBioFont");
         if (s.has("storyViewerSearch"))      FeatureFlags.storyViewerSearch      = s.getBoolean("storyViewerSearch");

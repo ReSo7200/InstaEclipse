@@ -197,7 +197,7 @@ public class DialogUtils {
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_social)));
         LinearLayout social = createGroupCard(context);
         social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "confirmLikes", "enableCopyComment", "commentSearch", "enableCaptionCopy", "disableRepost")));
-        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileMenuTools", "profileSpoofer", "confirmFollows", "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
+        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileMenuTools", "profileSpoofer", "profileAnalyzer", "confirmFollows", "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
         mainLayout.addView(social);
 
         // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
@@ -1731,6 +1731,9 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_eye, A_SOCIAL, R.string.ig_profile_spoofer, "profileSpoofer"),
                 createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_profile_spoofer_edit), A_SOCIAL,
                         v -> showProfileSpoofDialog(context)),
+                flagSwitch(context, R.drawable.ic_search, A_SOCIAL, R.string.ig_profile_analyzer, "profileAnalyzer"),
+                createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_pa_watchlist), A_SOCIAL,
+                        v -> ps.reso.instaeclipse.mods.misc.ProfileAnalyzer.showWatchlist(context)),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_confirm_follows, "confirmFollows"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_misc_profile_follows_label, "profileFollowsYouLabel"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_fancy_bio_font, "fancyBioFont"),

@@ -155,6 +155,7 @@ public class SettingsManager {
         editor.putInt("spoofFollowing", FeatureFlags.spoofFollowing);
         editor.putInt("spoofPosts", FeatureFlags.spoofPosts);
         editor.putBoolean("spoofVerified", FeatureFlags.spoofVerified);
+        editor.putBoolean("profileAnalyzer", FeatureFlags.profileAnalyzer);
         editor.putBoolean("profileFollowsYouLabel", FeatureFlags.profileFollowsYouLabel);
         editor.putBoolean("fancyBioFont", FeatureFlags.fancyBioFont);
         editor.putBoolean("savedOnProfile", FeatureFlags.savedOnProfile);
@@ -364,6 +365,7 @@ public class SettingsManager {
         FeatureFlags.spoofFollowing = prefs.getInt("spoofFollowing", -1);
         FeatureFlags.spoofPosts = prefs.getInt("spoofPosts", -1);
         FeatureFlags.spoofVerified = prefs.getBoolean("spoofVerified", false);
+        FeatureFlags.profileAnalyzer = prefs.getBoolean("profileAnalyzer", false);
         FeatureFlags.profileFollowsYouLabel = prefs.getBoolean("profileFollowsYouLabel", false);
         FeatureFlags.fancyBioFont = prefs.getBoolean("fancyBioFont", false);
         FeatureFlags.savedOnProfile = prefs.getBoolean("savedOnProfile", false);
