@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_download_quality">Качество загрузки</string>
+    <string name="ie_downloader_original">Стандартное</string>
+    <string name="ie_download_best">Лучшее</string>
+    <string name="ie_download_ceiling">Лучшее, до %1$dp</string>
+    <string name="ie_downloader_mode">Качество: %1$s</string>
+    <string name="ie_download_compatibility">Предпочитать видео, которые везде воспроизводятся</string>
+    <string name="ie_download_fallback">Брать качество ниже, если Лучшее не получилось</string>
+    <string name="ie_download_quality_hint">Стандартное: классический загрузчик. Лучшее проверяет все версии видео, включая HDR, и сохраняет самую чёткую или самую чёткую до выбранного разрешения.</string>
+    <string name="ie_downloader_original_unavailable">Стандартное не смогло это сохранить. Переключитесь на Лучшее.</string>
+    <string name="ie_download_fallback_prompt">Лучшее не смогло это сохранить. Попробовать качество ниже?</string>
+</resources>

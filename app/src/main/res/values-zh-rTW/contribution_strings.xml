@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_download_quality">下載畫質</string>
+    <string name="ie_downloader_original">標準</string>
+    <string name="ie_download_best">最佳</string>
+    <string name="ie_download_ceiling">最佳，最高 %1$dp</string>
+    <string name="ie_downloader_mode">畫質：%1$s</string>
+    <string name="ie_download_compatibility">優先選擇到處都能播放的影片</string>
+    <string name="ie_download_fallback">最佳失敗時使用較低畫質</string>
+    <string name="ie_download_quality_hint">標準是經典下載方式。最佳會檢查影片的所有版本（包括 HDR），儲存最清晰的版本，或不超過你所選解析度的最清晰版本。</string>
+    <string name="ie_downloader_original_unavailable">標準無法儲存此項目。切換到最佳即可下載。</string>
+    <string name="ie_download_fallback_prompt">最佳無法儲存此項目。改用較低畫質？</string>
+</resources>

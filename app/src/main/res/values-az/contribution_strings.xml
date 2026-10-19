@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ie_download_quality">Yükləmə keyfiyyəti</string>
+    <string name="ie_downloader_original">Standart</string>
+    <string name="ie_download_best">Ən yaxşı</string>
+    <string name="ie_download_ceiling">Ən yaxşı, %1$dp-yə qədər</string>
+    <string name="ie_downloader_mode">Keyfiyyət: %1$s</string>
+    <string name="ie_download_compatibility">Hər yerdə açılan videolara üstünlük ver</string>
+    <string name="ie_download_fallback">Ən yaxşı alınmasa, aşağı keyfiyyət istifadə et</string>
+    <string name="ie_download_quality_hint">Standart klassik yükləyicidir. Ən yaxşı videonun bütün versiyalarını, HDR daxil, yoxlayır və ən aydınını, ya da seçdiyiniz ölçüyə qədər ən aydınını saxlayır.</string>
+    <string name="ie_downloader_original_unavailable">Standart bunu saxlaya bilmədi. Yükləmək üçün Ən yaxşı seçiminə keçin.</string>
+    <string name="ie_download_fallback_prompt">Ən yaxşı bunu saxlaya bilmədi. Aşağı keyfiyyət sınansın?</string>
+</resources>

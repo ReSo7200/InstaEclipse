@@ -2348,38 +2348,38 @@ public class DialogUtils {
                 : I18n.t(context, R.string.ie_download_ceiling, ceiling);
     }
 
-    private static void showDownloadQuality(Context context) {
-        if (FeatureFlags.downloaderUseOriginal) return;
-        int[] ceilings = {0, 2160, 1440, 1080, 720, 480};
+    /** Standard (the original downloader) or Best, with its resolution cap. */
+    private static String downloadModeLabel(Context context) {
+        return FeatureFlags.downloaderUseOriginal ? I18n.t(context, R.string.ie_downloader_original)
+                : downloadQualityLabel(context, FeatureFlags.downloaderQualityMaxShortSide);
+    }
+
+    /** One choice for both: Standard, or Best with no cap / up to a resolution. */
+    private static void showDownloadQuality(Context context, TextView label, Runnable onChange) {
+        int[] ceilings = {-1, 0, 2160, 1440, 1080, 720, 480}; // -1 = Standard
         String[] labels = new String[ceilings.length];
         int selected = 0;
         for (int i = 0; i < ceilings.length; i++) {
-            labels[i] = downloadQualityLabel(context, ceilings[i]);
-            if (ceilings[i] == FeatureFlags.downloaderQualityMaxShortSide) selected = i;
+            labels[i] = ceilings[i] < 0 ? I18n.t(context, R.string.ie_downloader_original)
+                    : downloadQualityLabel(context, ceilings[i]);
+            if (!FeatureFlags.downloaderUseOriginal && ceilings[i] == FeatureFlags.downloaderQualityMaxShortSide) selected = i;
         }
-        new android.app.AlertDialog.Builder(context)
-                .setTitle(I18n.t(context, R.string.ie_download_quality))
-                .setSingleChoiceItems(labels, selected, (dialog, which) -> {
-                    if (!FeatureFlags.downloaderUseOriginal) {
-                        FeatureFlags.downloaderQualityMaxShortSide = ceilings[which];
-                        SettingsManager.saveAllFlags();
-                    }
-                    dialog.dismiss();
-                }).setNegativeButton(android.R.string.cancel, null).show();
+        new IeDialog(context)
+                .title(I18n.t(context, R.string.ie_download_quality))
+                .message(I18n.t(context, R.string.ie_download_quality_hint))
+                .choices(labels, selected, which -> {
+                    FeatureFlags.downloaderUseOriginal = ceilings[which] < 0;
+                    if (ceilings[which] >= 0) FeatureFlags.downloaderQualityMaxShortSide = ceilings[which];
+                    SettingsManager.saveAllFlags();
+                    if (label != null) label.setText(I18n.t(context, R.string.ie_download_quality) + " · " + downloadModeLabel(context));
+                    onChange.run();
+                })
+                .show();
     }
 
     private static void showDownloaderOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
 
-        ToggleRow original = createSwitch(context, R.drawable.ic_download, "#FF9F0A",
-                I18n.t(context, R.string.ie_downloader_use_original), FeatureFlags.downloaderUseOriginal);
-        layout.addView(original);
-        layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_downloader_mode_hint)));
-        View quality = createActionRow(context, R.drawable.ic_download,
-                I18n.t(context, R.string.ie_download_quality) + " · "
-                        + downloadQualityLabel(context, FeatureFlags.downloaderQualityMaxShortSide),
-                "#FF9F0A", v -> showDownloadQuality(context));
-        layout.addView(quality);
         ToggleRow compatibility = createSwitch(context, R.drawable.ic_tune, "#FF9F0A",
                 I18n.t(context, R.string.ie_download_compatibility), FeatureFlags.downloaderCompatibility);
         compatibility.setOnCheckedChangeListener((b, checked) -> {
@@ -2392,23 +2392,17 @@ public class DialogUtils {
             FeatureFlags.downloaderAllowFallback = checked;
             SettingsManager.saveAllFlags();
         });
-        layout.addView(compatibility);
-        layout.addView(lowerFallback);
-        Runnable updateCustomControls = () -> {
-            boolean custom = !FeatureFlags.downloaderUseOriginal;
-            quality.setEnabled(custom);
-            quality.setAlpha(custom ? 1f : 0.38f);
-            compatibility.setEnabled(custom);
-            lowerFallback.setEnabled(custom);
+        // The two switches only apply to Best, so they show only then.
+        Runnable updateBestControls = () -> {
+            int visibility = FeatureFlags.downloaderUseOriginal ? View.GONE : View.VISIBLE;
+            compatibility.setVisibility(visibility);
+            lowerFallback.setVisibility(visibility);
         };
-        original.setOnCheckedChangeListener((b, checked) -> {
-            FeatureFlags.downloaderUseOriginal = checked;
-            updateCustomControls.run();
-            SettingsManager.saveAllFlags();
-        });
-        updateCustomControls.run();
-        layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_download_quality_hint)));
-
+        View quality = createActionRow(context, R.drawable.ic_download,
+                I18n.t(context, R.string.ie_download_quality) + " · " + downloadModeLabel(context),
+                "#FF9F0A", v -> showDownloadQuality(context, (TextView) findFirstText(v), updateBestControls));
+        layout.addView(cardOf(context, quality, compatibility, lowerFallback));
+        updateBestControls.run();
 
         addMasterGroup(context, layout,
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_posts, "enablePostDownload"),
