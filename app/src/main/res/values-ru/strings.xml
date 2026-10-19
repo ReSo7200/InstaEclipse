@@ -235,6 +235,7 @@
     <string name="ig_playback_speed_next">Скорость задана — применится к следующему запущенному видео</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Скрыть заметки в сообщениях</string>
     <string name="ig_hide_dm_suggestions">Скрыть рекомендуемые аккаунты в сообщениях</string>
+    <string name="ig_hide_instants">Скрыть Instants</string>
     <string name="ig_back_leaves_home">«Назад» на главной закрывает Instagram</string>
     <string name="ig_dialog_downloader_voice">Скачивать голосовые сообщения (долгое нажатие)</string>
     <string name="ig_dialog_downloader_dm_media">Скачивать фото и видео из сообщений (долгое нажатие)</string>
