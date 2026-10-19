@@ -151,7 +151,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Story cache | Keep stories you watched for 24 hours, so you can save ones that expired |
 | Save Instants | Long press an Instant to save it |
 | Upload Instant from gallery | Send a picture from your gallery as an Instant |
-| Download folder | Choose the folder, sort into a folder per account, and add the date to file names. If the InstaEclipse app can't be reached (asleep or not allowed to autostart), downloads still save, to Download |
+| Download folder | Choose the folder, sort into a folder per account, and add the date to file names. If the InstaEclipse app can't be reached (asleep or not allowed to autostart), downloads still save: to your folder when it's inside Download, otherwise to Download |
 
 </details>
 
@@ -201,7 +201,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Disable double tap to like | No accidental likes, in posts, comments and DMs |
 | Undo a like | A few seconds to take a like back |
 | Edit counts on your posts | Change the likes, comments, reposts and shares shown on your own posts from their ⋮ menu; shown only on your phone |
-| Ask before liking | A like is sent only after you confirm it |
+| Ask before liking | A like is sent only after you confirm it, and the heart stays empty until you do |
 | Ask before following | A follow is sent only after you confirm it |
 | Disable repost | Keep the repost button from reposting |
 | Comment search | Search a post's comments, load them all (on Reels the sheet opens to full height so every comment loads), and export them |
@@ -326,7 +326,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 
 | | |
 |---|---|
-| **Tested on** | Instagram `452.0.0.33.64` and `452.0.0.43.64` |
+| **Tested on** | Instagram `451.0.0.20.80` |
 | **Get this version** | [Instagram 451.0.0.20.80 on APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) |
 | **Survives updates** | Yes, DexKit finds what it needs at runtime |
 | **Android** | 9 and newer |
