@@ -852,6 +852,12 @@ public class DialogUtils {
 
     /** Styled per-thread Unsent Messages viewer, opened from the in-thread bin button. */
     public static void showThreadUnsent(Context context, String threadId, String chatName) {
+        showThreadUnsent(context, threadId, chatName, null);
+    }
+
+    /** {@code onBack}: where Back goes (e.g. the chat's own menu) instead of the main menu. */
+    public static void showThreadUnsent(Context context, String threadId, String chatName, Runnable onBack) {
+        pendingBackTarget = onBack;
         LinearLayout layout = createSwitchLayout(context);
 
         // Never widen to every chat: an unknown thread (null) shows only the entries that were
@@ -2893,7 +2899,12 @@ public class DialogUtils {
         currentSectionTitle = null;
     }
 
+    /** Set just before a section opens from outside the menu: its Back goes here, not to the main menu. */
+    private static Runnable pendingBackTarget;
+
     private static void showSectionDialog(Context context, String title, LinearLayout contentLayout, Runnable onSave) {
+        final Runnable backTarget = pendingBackTarget;
+        pendingBackTarget = null;
         if (currentDialog != null) {
             if (currentSectionTitle != null && !currentSectionTitle.equals(title) && currentDialog.isShowing()) {
                 currentDialog.hide(); // opened from another section: keep it to come back to
@@ -2946,6 +2957,11 @@ public class DialogUtils {
                 currentDialog = (AlertDialog) parent[0];
                 currentSectionTitle = (String) parent[1];
                 currentDialog.show();
+            } else if (backTarget != null) {
+                if (currentDialog != null) { try { currentDialog.dismiss(); } catch (Exception ignored) {} }
+                currentDialog = null;
+                currentSectionTitle = null;
+                backTarget.run();
             } else {
                 showEclipseOptionsDialog(context);
             }
