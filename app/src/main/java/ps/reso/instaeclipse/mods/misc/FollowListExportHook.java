@@ -44,6 +44,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 import ps.reso.instaeclipse.utils.users.UserUtils;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Export a followers / following list to CSV (#224).
@@ -75,13 +76,13 @@ public class FollowListExportHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> frag = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("Invalid entry type for FollowListFragment")))) {
                 frag = cl.loadClass(md.getClassName());
                 break;
             }
             if (frag == null) { ModuleLog.line(TAG + "❌ FollowListFragment not found"); return; }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(USER).paramCount(0).returnType("java.lang.String").usingNumbers(-1677176261)))) {
                 fullNameGetter = md.getMethodInstance(cl); // "full_name".hashCode()
                 break;
@@ -197,7 +198,7 @@ public class FollowListExportHook {
             }
         if (pagerField != null) {
             // "load more if idle": the no-arg void method that checks the lifecycle first
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(pagerField.getType().getName()).paramCount(0).returnType("void")
                     .addInvoke(MethodMatcher.create().name("getLifecycle"))))) {
                 pagerLoadMore = md.getMethodInstance(cl);

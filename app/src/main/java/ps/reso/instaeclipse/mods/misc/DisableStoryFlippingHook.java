@@ -14,6 +14,7 @@ import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class DisableStoryFlippingHook {
 
@@ -48,7 +49,7 @@ public class DisableStoryFlippingHook {
             // interface method became a bare bridge to it, and the progress callback also calls
             // it at 100%, so hooking it covers both paths.
             String rvf = "instagram.features.stories.fragment.ReelViewerFragment";
-            List<MethodData> methods = bridge.findMethod(
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, 
                     FindMethod.create().matcher(
                             MethodMatcher.create()
                                     .declaredClass(rvf)
@@ -59,7 +60,7 @@ public class DisableStoryFlippingHook {
             );
             // IG <=451: the (Object)V interface method itself held the body.
             if (methods.isEmpty()) {
-                methods = bridge.findMethod(
+                methods = DexKitQueryCache.findMethod(bridge, 
                         FindMethod.create().matcher(
                                 MethodMatcher.create()
                                         .declaredClass(rvf)

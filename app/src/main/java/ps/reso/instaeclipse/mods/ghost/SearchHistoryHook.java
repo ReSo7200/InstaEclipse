@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Don't save searches (#280): profiles, tags and places you open from Search stay out of Recent.
@@ -36,14 +37,14 @@ public final class SearchHistoryHook {
         try {
             Method add = DexKitCache.isCacheValid() ? DexKitCache.loadMethod(CACHE_KEY, cl) : null;
             if (add == null) {
-                List<MethodData> owners = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> owners = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("Error saving recent searches. Clearing results.")));
                 if (owners.isEmpty()) {
                     ModuleLog.line(TAG + "❌ RecentSearchCache not found");
                     return;
                 }
                 // The add: (Object) -> void that puts the new entry at the top (List.add(0, entry)).
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(owners.get(0).getClassName())
                         .paramCount(1).returnType("void")
                         .addInvoke("Ljava/util/List;->add(ILjava/lang/Object;)V")))) {

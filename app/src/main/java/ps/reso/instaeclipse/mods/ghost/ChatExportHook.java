@@ -56,6 +56,7 @@ import ps.reso.instaeclipse.utils.ghost.ThreadNames;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 import ps.reso.instaeclipse.utils.users.UserUtils;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Export a DM chat to an HTML file (#225): header button in the open chat.
@@ -85,7 +86,7 @@ public class ChatExportHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> store = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("getUnseenMessageCount directMessage is null")))) {
                 store = cl.loadClass(md.getClassName());
                 break;
@@ -101,14 +102,14 @@ public class ChatExportHook {
                     protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method); STORES.put(param.thisObject, Boolean.TRUE); }
                 });
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("timestamp_in_micro", "client_context").returnType("void").paramCount(2)))) {
                 Method m = md.getMethodInstance(cl);
                 if (Modifier.isStatic(m.getModifiers())) { serializer = m; break; }
             }
             if (serializer != null) {
                 Class<?> gen = serializer.getParameterTypes()[0];
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .paramTypes("java.io.Writer").returnType(gen.getName())))) {
                     Method m = md.getMethodInstance(cl);
                     if (Modifier.isStatic(m.getModifiers())) continue;

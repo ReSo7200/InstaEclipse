@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * DexKit lookups shared by the "Extras" hooks: resolve once, cache the result per IG version,
@@ -49,7 +50,7 @@ final class ExtrasLookup {
 
     /** Methods whose body references every given string. */
     static List<MethodData> byStrings(DexKitBridge bridge, String... strings) {
-        return bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create().usingStrings(strings)));
+        return DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create().usingStrings(strings)));
     }
 
     /** First method invoked by {@code owner} that is static and satisfies {@code test}. */

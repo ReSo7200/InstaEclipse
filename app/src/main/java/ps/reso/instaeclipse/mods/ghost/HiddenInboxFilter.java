@@ -24,6 +24,7 @@ import ps.reso.instaeclipse.utils.ghost.CurrentConversation;
 import ps.reso.instaeclipse.utils.ghost.HiddenThreads;
 import ps.reso.instaeclipse.utils.ghost.InboxListFilter;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /** Local inbox-result projection only. Header actions live in the shared discreet-menu hook. */
 final class HiddenInboxFilter {
@@ -43,7 +44,7 @@ final class HiddenInboxFilter {
         if (methods == null || methods.isEmpty() || methods.stream().anyMatch(m -> !validMethod(m))) {
             methods = new ArrayList<>();
             try {
-                for (MethodData data : bridge.findMethod(FindMethod.create()
+                for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings(ANCHOR)))) {
                     Method method = data.getMethodInstance(loader);
                     if (validMethod(method)) methods.add(method);
@@ -95,7 +96,7 @@ final class HiddenInboxFilter {
     private static void installRefresh(DexKitBridge bridge, ClassLoader loader) {
         try {
             Set<Class<?>> classes = new LinkedHashSet<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("DirectThreadStoreImpl.notifyFolderChange"))))
                 classes.add(data.getMethodInstance(loader).getDeclaringClass());
             if (classes.size() != 1) return;

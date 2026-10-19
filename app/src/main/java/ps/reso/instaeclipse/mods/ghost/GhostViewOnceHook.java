@@ -16,6 +16,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class GhostViewOnceHook {
 
@@ -60,7 +61,7 @@ public class GhostViewOnceHook {
      */
     private boolean tryHookViewOnce(DexKitBridge bridge, FindMethod query, String tag) {
         try {
-            List<MethodData> methods = bridge.findMethod(query);
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, query);
             for (MethodData method : methods) {
                 if (method.getParamTypes().size() != 3) continue;
                 if (!String.valueOf(method.getReturnType()).contains("void")) continue;

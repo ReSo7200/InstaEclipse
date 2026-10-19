@@ -74,6 +74,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.users.UserUtils;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class FeedVideoDownloadHook {
 
@@ -1171,7 +1172,7 @@ public class FeedVideoDownloadHook {
         }
 
         try {
-            List<ClassData> classes = bridge.findClass(FindClass.create()
+            List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create()
                             .addInterface("com.instagram.model.mediasize.VideoVersionIntf",
                                     StringMatchType.Equals, false)));
@@ -1181,7 +1182,7 @@ public class FeedVideoDownloadHook {
             List<Method> hooked = new ArrayList<>();
             for (ClassData classData : classes) {
                 try {
-                    List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                    List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create()
                                     .declaredClass(classData.getName())
                                     .name("getUrl")
@@ -1223,7 +1224,7 @@ public class FeedVideoDownloadHook {
                 }
             }
             if (discovered == null && liveTreeMediaDictClass == null) {
-                List<ClassData> classes = bridge.findClass(FindClass.create()
+                List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                         .matcher(ClassMatcher.create()
                                 .usingStrings("video_to_carousel_cut_info")));
                 for (ClassData data : classes) {
@@ -1272,7 +1273,7 @@ public class FeedVideoDownloadHook {
             }
 
             if (resolvedVideoVersionsGetters.isEmpty()) {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .paramCount(0)
                                 .usingEqStrings(List.of("video_versions"))));
@@ -1332,7 +1333,7 @@ public class FeedVideoDownloadHook {
                 }
             }
             if (carouselMediaGetter == null) {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .paramCount(0)
                                 .returnType("java.util.List")
@@ -1367,7 +1368,7 @@ public class FeedVideoDownloadHook {
                 Method cached = DexKitCache.loadMethod("MediaDownload_HasAudio", classLoader);
                 if (cached != null) { cached.setAccessible(true); hasAudioGetter = cached; return; }
             }
-            List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass("com.instagram.feed.media.Media")
                     .paramCount(0)
                     .returnType("java.lang.Boolean")
@@ -1407,7 +1408,7 @@ public class FeedVideoDownloadHook {
                     "com.instagram.feed.media.LiveTreeMediaDict"}) {
                 List<MethodData> found;
                 try {
-                    found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .declaredClass(owner)
                             .paramCount(0)
                             .returnType("java.lang.String")
@@ -1604,7 +1605,7 @@ public class FeedVideoDownloadHook {
     /** A no-arg getter on Media that reads the given JSON field (matched by its field-name string). */
     private static Method resolveMediaGetter(DexKitBridge bridge, ClassLoader classLoader, String field) {
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass("com.instagram.feed.media.Media")
                     .paramCount(0)
                     .usingEqStrings(List.of(field))))) {
@@ -1730,7 +1731,7 @@ public class FeedVideoDownloadHook {
                         "MediaDownload_IsVideo", classLoader);
             }
             if (resolvedIsVideoMethod == null) {
-                List<MethodData> wrappers = bridge.findMethod(FindMethod.create()
+                List<MethodData> wrappers = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .returnType("void")
                                 .usingStrings("asl_session_id", "is_video", "is_carousel")));
@@ -1784,7 +1785,7 @@ public class FeedVideoDownloadHook {
 
         try {
             // Step 1: find the user class via the stable validation string
-            List<MethodData> userMethods = bridge.findMethod(FindMethod.create()
+            List<MethodData> userMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("username_missing_during_update")));
 
@@ -1808,7 +1809,7 @@ public class FeedVideoDownloadHook {
             // dropping any candidate that ALSO references the `full_name` field id — the pure
             // username getter never reads full_name. (Fix ported from PR #200 by izadiegizabal.)
             try {
-                List<MethodData> ugMethods = bridge.findMethod(FindMethod.create()
+                List<MethodData> ugMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass("com.instagram.user.model.User")
                                 .returnType("java.lang.String")
@@ -1818,7 +1819,7 @@ public class FeedVideoDownloadHook {
                     // Candidates that ALSO read full_name = the display-name getter → exclude.
                     java.util.Set<String> readsFullName = new java.util.HashSet<>();
                     try {
-                        for (MethodData md : bridge.findMethod(FindMethod.create()
+                        for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                                 .matcher(MethodMatcher.create()
                                         .declaredClass("com.instagram.user.model.User")
                                         .returnType("java.lang.String")
@@ -1870,7 +1871,7 @@ public class FeedVideoDownloadHook {
         }
 
         try {
-            List<MethodData> res = bridge.findMethod(FindMethod.create()
+            List<MethodData> res = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .declaredClass("com.instagram.feed.media.Media")
                             .paramCount(0)
@@ -1938,7 +1939,7 @@ public class FeedVideoDownloadHook {
         // authorship, e.g. QpF's own-post check) rather than "owner"/"group"/etc.
         if (liveTreeMediaDictClass != null) {
             try {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass(liveTreeMediaDictClass.getName())
                                 .paramCount(0)

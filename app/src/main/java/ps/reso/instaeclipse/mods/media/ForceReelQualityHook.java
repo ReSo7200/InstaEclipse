@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Forces reel/video playback to a specific quality by hooking LiveTreeMediaDict's
@@ -138,7 +139,7 @@ public class ForceReelQualityHook {
     private static Method resolveVideoVersionsGetter(DexKitBridge bridge, ClassLoader classLoader) {
         for (String dictClass : DICT_CLASS_CANDIDATES) {
             try {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass(dictClass)
                                 .paramCount(0)
@@ -161,7 +162,7 @@ public class ForceReelQualityHook {
     private static String resolveHeightGetterName(DexKitBridge bridge, ClassLoader classLoader) {
         for (String versionClass : VIDEO_VERSION_CLASS_CANDIDATES) {
             try {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass(versionClass)
                                 .paramCount(0)

@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Load the largest image Instagram already offers. The picker
@@ -32,7 +33,7 @@ public final class HighResolutionImageHook {
         List<Method> pickers = DexKitCache.isCacheValid() ? DexKitCache.loadMethods(CACHE, cl) : null;
         if (pickers == null || pickers.isEmpty()) {
             pickers = new ArrayList<>();
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType(IMAGE).paramTypes("java.lang.Integer", "java.util.List", "int")))) {
                 try {
                     pickers.add(md.getMethodInstance(cl));

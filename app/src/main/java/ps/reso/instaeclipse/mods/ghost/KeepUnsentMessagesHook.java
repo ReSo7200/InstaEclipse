@@ -28,6 +28,7 @@ import ps.reso.instaeclipse.utils.ghost.CurrentConversation;
 import ps.reso.instaeclipse.utils.ghost.UnsentRetentionState;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Unsent messages log (anti-unsend). GitHub issue #25.
@@ -107,7 +108,7 @@ public class KeepUnsentMessagesHook {
             rememberThreadName(id, activity);
         });
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("igThreadIgid")
                             .paramTypes("com.instagram.model.direct.DirectThreadKey", "boolean")));
@@ -271,7 +272,7 @@ public class KeepUnsentMessagesHook {
         try {
             LinkedHashSet<Class<?>> stores = new LinkedHashSet<>();
             for (String anchor : STORE_ANCHORS) {
-                for (MethodData md : bridge.findMethod(FindMethod.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings(anchor)))) {
                     try { stores.add(md.getMethodInstance(classLoader).getDeclaringClass()); } catch (Throwable ignored) {}
                 }
@@ -306,7 +307,7 @@ public class KeepUnsentMessagesHook {
     private boolean hookReconcile(DexKitBridge bridge, ClassLoader loader) {
         try {
             Set<Method> candidates = new LinkedHashSet<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(
                     MethodMatcher.create().usingStrings(RECONCILE_ANCHOR)))) {
                 Class<?> owner = data.getMethodInstance(loader).getDeclaringClass();
                 if (owner != ownership.entryType()) continue;
@@ -385,7 +386,7 @@ public class KeepUnsentMessagesHook {
     /** The entry class declares the reconcile anchored by RECONCILE_ANCHOR. */
     private static void resolveEntryClass(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings(RECONCILE_ANCHOR)))) {
                 entryClass = md.getMethodInstance(classLoader).getDeclaringClass();
                 ModuleLog.line("(IE|KeepUnsent) ✅ thread entry → " + entryClass.getName());

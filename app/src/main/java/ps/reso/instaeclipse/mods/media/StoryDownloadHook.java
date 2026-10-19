@@ -31,6 +31,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.users.UserUtils;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class StoryDownloadHook {
 
@@ -176,7 +177,7 @@ public class StoryDownloadHook {
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         SelectedMediaAdapter.install(bridge, classLoader);
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("Reel with pending media should have an owner.")))) {
                 reelClass = classLoader.loadClass(md.getClassName());
                 break;
@@ -210,7 +211,7 @@ public class StoryDownloadHook {
     private void installHighlightTrayHook(DexKitBridge bridge, ClassLoader cl) {
         try {
             MethodData builder = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("HighlightsTrayDialogHelper").paramCount(4)))) { builder = md; break; }
             if (builder == null) { ModuleLog.line("(IE|HighlightTray) builder not found"); return; }
             Method build = builder.getMethodInstance(cl);
@@ -310,14 +311,14 @@ public class StoryDownloadHook {
     private static void findReelLoader(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> loader = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("reel_store_on_story_unavailable")))) {
                 for (java.lang.reflect.Constructor<?> c : cl.loadClass(md.getClassName()).getDeclaredConstructors())
                     if (c.getParameterCount() > 0 && c.getParameterTypes()[0].getName().startsWith("X.")) { loader = c.getParameterTypes()[0]; break; }
                 if (loader != null) break;
             }
             if (loader == null) return;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType(loader.getName()).paramTypes("com.instagram.common.session.UserSession")))) {
                 Method m = md.getMethodInstance(cl);
                 if (java.lang.reflect.Modifier.isStatic(m.getModifiers())) { m.setAccessible(true); loaderGetter = m; break; }
@@ -401,7 +402,7 @@ public class StoryDownloadHook {
                 java.lang.reflect.Method c = DexKitCache.loadMethod("StoryCache_expiring", cl);
                 if (c != null) { c.setAccessible(true); expiringGetter = c; return; }
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass("com.instagram.feed.media.Media").paramCount(0)
                     .returnType("java.lang.Long").usingStrings("expiring_at")))) {
                 try {
@@ -432,7 +433,7 @@ public class StoryDownloadHook {
         };
         try {
             int n = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("ReelViewerFragment.onCurrentActiveItemBound")))) {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), capture); n++; } catch (Throwable ignored) {}
             }
@@ -495,7 +496,7 @@ public class StoryDownloadHook {
         if (out != null && !out.isEmpty()) return out;
         out = new java.util.ArrayList<>();
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType("void").usingStrings("[INTERNAL] Pause Playback")))) {
                 try { out.add(md.getMethodInstance(cl)); } catch (Throwable ignored) {}
             }
@@ -538,7 +539,7 @@ public class StoryDownloadHook {
         // music, which IG's native Save drops. (Ported from PR #200 by izadiegizabal.) Anchored on
         // the stable string only, so it stays valid across versions; static + instance both accepted.
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("[INTERNAL] Pause Playback")));
             if (methods.isEmpty()) {
@@ -622,7 +623,7 @@ public class StoryDownloadHook {
         try {
             Class<?> itemType = loader.loadClass("com.instagram.model.reels.ReelItem");
             List<MethodData> anchors = new ArrayList<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType("java.util.ArrayList").usingStrings("story_highlight_action_sheet")))) {
                 if (StoryMenuOptions.isOwnedListBuilder(data.getMethodInstance(loader), itemType)) {
                     anchors.add(data);
@@ -635,7 +636,7 @@ public class StoryDownloadHook {
             MethodData anchor = anchors.get(0);
             String ownerName = anchor.getDeclaredClassName();
             Set<Method> builders = new LinkedHashSet<>();
-            for (MethodData caller : anchor.getCallers()) {
+            for (MethodData caller : DexKitQueryCache.callers(bridge, anchor)) {
                 if (!ownerName.equals(caller.getDeclaredClassName())
                         || !"void".equals(caller.getReturnTypeName())) continue;
                 for (MethodData invoked : caller.getInvokes()) {
@@ -670,7 +671,7 @@ public class StoryDownloadHook {
         // hooking the extra dispatchers is harmless. (Ported from PR #200 by izadiegizabal.)
         List<MethodData> methods;
         try {
-            methods = bridge.findMethod(FindMethod.create()
+            methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("void")
                             .usingStrings("[INTERNAL] Pause Playback")));

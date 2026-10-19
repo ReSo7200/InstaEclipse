@@ -14,6 +14,7 @@ import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Extends "Disable double-tap to like" ({@link DisableDoubleTapLikeHook}: feed and reels) to
@@ -65,7 +66,7 @@ public class DoubleTapExtrasHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         List<Method> comments = cached("Extras_DoubleTapComments", cl, () -> {
             List<Method> out = new ArrayList<>();
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .name("onDoubleTap").returnType("boolean").usingStrings("fb_comment_double_tap")))) {
                 out.add(md.getMethodInstance(cl));
             }
@@ -75,10 +76,10 @@ public class DoubleTapExtrasHook {
 
         List<Method> direct = cached("Extras_DoubleTapDirect", cl, () -> {
             List<Method> out = new ArrayList<>();
-            for (MethodData getter : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData getter : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType("java.lang.String").paramTypes("com.instagram.common.session.UserSession", "int")
                     .usingStrings("❤")))) {
-                for (MethodData caller : getter.getCallers()) {
+                for (MethodData caller : DexKitQueryCache.callers(bridge, getter)) {
                     if (caller.isMethod() && "void".equals(caller.getReturnTypeName())) {
                         out.add(caller.getMethodInstance(cl));
                     }
@@ -90,7 +91,7 @@ public class DoubleTapExtrasHook {
 
         List<Method> composeDirect = cached("Extras_DoubleTapDirectCompose", cl, () -> {
             List<Method> out = new ArrayList<>();
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType("void").usingStrings("double_tap", "should_show_like_direct_message_count")))) {
                 if (md.isMethod()) out.add(md.getMethodInstance(cl));
             }

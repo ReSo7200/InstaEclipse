@@ -31,6 +31,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class CommentCopyHook {
 
@@ -168,7 +169,7 @@ public class CommentCopyHook {
                 return false;
             }
 
-            List<MethodData> callees = bridge.findMethod(FindMethod.create()
+            List<MethodData> callees = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .paramCount(3)
                             .addCaller(MethodMatcher.create(fmj))));
@@ -210,7 +211,7 @@ public class CommentCopyHook {
     private static final String CACHE_KEY_OLD = "CommentCopy_LongPress";
 
     private void findAndHookOld(DexKitBridge bridge, ClassLoader classLoader) {
-        List<MethodData> found = bridge.findMethod(FindMethod.create()
+        List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                 .matcher(MethodMatcher.create()
                         .name("onLongPress")
                         .usingStrings("fb_comment_long_press")
@@ -218,7 +219,7 @@ public class CommentCopyHook {
         );
 
         if (found.isEmpty()) {
-            found = bridge.findMethod(FindMethod.create()
+            found = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .name("onLongPress")
                             .usingStrings("comment_row_component")
@@ -227,13 +228,13 @@ public class CommentCopyHook {
         }
 
         if (found.isEmpty()) {
-            List<ClassData> classes = bridge.findClass(FindClass.create()
+            List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create()
                             .usingStrings("fb_comment_long_press")
                     )
             );
             for (ClassData cd : classes) {
-                found.addAll(bridge.findMethod(FindMethod.create()
+                found.addAll(DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass(cd.getName())
                                 .name("onLongPress")

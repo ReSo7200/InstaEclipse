@@ -12,6 +12,7 @@ import ps.reso.instaeclipse.mods.misc.FollowStatusHook;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class IGNetworkInterceptor {
 
@@ -60,7 +61,7 @@ public class IGNetworkInterceptor {
         try {
             if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return;
             java.util.List<org.luckypray.dexkit.result.MethodData> found =
-                    ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findMethod(
+                    DexKitQueryCache.findMethod(ps.reso.instaeclipse.Xposed.Module.dexKitBridge, 
                             org.luckypray.dexkit.query.FindMethod.create().matcher(
                                     org.luckypray.dexkit.query.matchers.MethodMatcher.create()
                                             .name("startRequest")

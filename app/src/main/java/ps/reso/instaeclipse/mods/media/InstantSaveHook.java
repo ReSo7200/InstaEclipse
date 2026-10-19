@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Save a received Instant (#184). "Instants" is internally `quicksnap`, and its viewer is Jetpack
@@ -87,7 +88,7 @@ public class InstantSaveHook {
         }
         try {
             if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return null;
-            for (org.luckypray.dexkit.result.ClassData cd : ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findClass(
+            for (org.luckypray.dexkit.result.ClassData cd : DexKitQueryCache.findClass(ps.reso.instaeclipse.Xposed.Module.dexKitBridge, 
                     org.luckypray.dexkit.query.FindClass.create().matcher(
                             org.luckypray.dexkit.query.matchers.ClassMatcher.create().className(
                                     VIEWER_PREFIX, org.luckypray.dexkit.query.enums.StringMatchType.StartsWith)))) {

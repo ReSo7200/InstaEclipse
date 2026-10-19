@@ -44,6 +44,7 @@ import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Bulk unsend (#245): select several of your own messages right in the chat and unsend them at once.
@@ -104,10 +105,10 @@ public final class BulkUnsend {
         if (message == null) { ModuleLog.line(TAG + "❌ no message class"); return; }
         try {
             Class<?> dtk = cl.loadClass(DTK);
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("DirectUnsendMessageInteractor")))) {
                 String owner = md.getClassName();
-                for (MethodData m : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData m : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(owner)))) {
                     for (MethodData inv : m.getInvokes()) {
                         if (!"com.google.common.util.concurrent.ListenableFuture".equals(inv.getReturnTypeName())) continue;
@@ -127,7 +128,7 @@ public final class BulkUnsend {
             if (unsendMethod == null) { ModuleLog.line(TAG + "❌ unsend method not found"); return; }
             unsendMethod.setAccessible(true);
             Class<?> refBase = unsendMethod.getParameterTypes()[0];
-            for (ClassData cd : bridge.findClass(FindClass.create().matcher(ClassMatcher.create()
+            for (ClassData cd : DexKitQueryCache.findClass(bridge, FindClass.create().matcher(ClassMatcher.create()
                     .superClass(refBase.getName())))) {
                 Class<?> c = cd.getInstance(cl);
                 for (Constructor<?> k : c.getDeclaredConstructors()) {

@@ -23,6 +23,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class DevOptionsUnlockHook {
 
@@ -71,7 +72,7 @@ public class DevOptionsUnlockHook {
         try {
             // Tier 1: Existing String-based search
             ModuleLog.line("(InstaEclipse | DevOptionsEnable): 🔍 Discovery Tier 1 (String)...");
-            List<ClassData> classes = bridge.findClass(FindClass.create()
+            List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create().usingStrings("is_employee"))
             );
 
@@ -81,7 +82,7 @@ public class DevOptionsUnlockHook {
                     String className = classData.getName();
                     if (!className.startsWith("X.")) continue;
 
-                    List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                    List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create()
                                     .declaredClass(className)
                                     .usingStrings("is_employee"))
@@ -122,7 +123,7 @@ public class DevOptionsUnlockHook {
             if (!found) {
                 ModuleLog.line("(InstaEclipse | DevOptionsEnable): ⚠️ Tier 2 failed. Discovery Tier 3 (Config ID)...");
                 for (long configId : IS_EMPLOYEE_CONFIG_IDS) {
-                    List<MethodData> idMethods = bridge.findMethod(FindMethod.create()
+                    List<MethodData> idMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create()
                                     .usingNumbers(configId)
                                     .returnType("boolean")
@@ -143,7 +144,7 @@ public class DevOptionsUnlockHook {
             // Final Debug Trace: If all tiers fail, log where the string is used ANYWHERE
             if (!found) {
                 ModuleLog.line("(InstaEclipse | DevOptionsEnable): ❌ Tier 3 failed. Debugging global references...");
-                List<MethodData> debugMethods = bridge.findMethod(FindMethod.create()
+                List<MethodData> debugMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings("is_employee")));
                 for (MethodData m : debugMethods) {
                     ModuleLog.line("(InstaEclipse | DevOptionsDebug): String 'is_employee' found in: " + m.getClassName() + "." + m.getName());
@@ -170,7 +171,7 @@ public class DevOptionsUnlockHook {
      */
     private MethodData resolveEmployeeGateStructurally(DexKitBridge bridge) {
         try {
-            List<MethodData> getters = bridge.findMethod(FindMethod.create()
+            List<MethodData> getters = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .declaredClass(MOBILECONFIG_GETTER_CLASS)
                             .returnType("boolean")
@@ -182,7 +183,7 @@ public class DevOptionsUnlockHook {
                 getterInvoke.add(MethodMatcher.create(getter.getDescriptor()));
             }
 
-            List<MethodData> candidates = bridge.findMethod(FindMethod.create()
+            List<MethodData> candidates = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("boolean")
                             .paramTypes(USER_SESSION_CLASS)
@@ -194,7 +195,7 @@ public class DevOptionsUnlockHook {
                 if (candidate.getOpCodes().size() > MAX_GATE_OPCODES) continue;
 
                 Set<String> callerClasses = new HashSet<>();
-                for (MethodData caller : candidate.getCallers()) {
+                for (MethodData caller : DexKitQueryCache.callers(bridge, candidate)) {
                     callerClasses.add(caller.getClassName());
                 }
                 if (callerClasses.size() > bestFanIn) {
@@ -283,7 +284,7 @@ public class DevOptionsUnlockHook {
 
     private void hookAllBooleanMethodsInClass(DexKitBridge bridge, String className) {
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().declaredClass(className))
             );
 

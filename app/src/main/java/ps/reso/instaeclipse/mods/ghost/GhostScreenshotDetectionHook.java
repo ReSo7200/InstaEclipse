@@ -19,6 +19,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class GhostScreenshotDetectionHook {
 
@@ -42,7 +43,7 @@ public class GhostScreenshotDetectionHook {
 
         try {
             // Step 1: Find class referencing "ScreenshotNotificationManager"
-            List<ClassData> classes = bridge.findClass(FindClass.create()
+            List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create().usingStrings("ScreenshotNotificationManager")));
 
             if (classes.isEmpty()) {
@@ -54,7 +55,7 @@ public class GhostScreenshotDetectionHook {
                 String className = classData.getName();
 
                 // Step 2: Find all methods in that class
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().declaredClass(className)));
 
                 for (MethodData method : methods) {

@@ -45,6 +45,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Profile Picture Downloader
@@ -103,7 +104,7 @@ public class ProfilePicDownloadHook {
         try {
             Method m = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("ProfilePic_hdGetter", cl) : null;
             if (m == null) {
-                List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(USER)
                         .usingEqStrings(List.of("hd_profile_pic_url_info"))
                         .returnType("com.instagram.api.schemas.ProfilePicUrlInfo")

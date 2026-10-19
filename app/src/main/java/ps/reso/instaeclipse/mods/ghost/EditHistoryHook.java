@@ -22,6 +22,7 @@ import de.robv.android.xposed.XposedBridge;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Message edit history (#243): keep the text a DM had before it was edited and show it in
@@ -49,7 +50,7 @@ public class EditHistoryHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> msgClass = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings(": null_direct_message")))) {
                 msgClass = md.getMethodInstance(cl).getReturnType();
                 break;
@@ -66,7 +67,7 @@ public class EditHistoryHook {
                 if (Modifier.isStatic(hf.getModifiers())) continue;
                 String desc = "L" + HISTORY.replace('.', '/') + ";->" + hf.getName() + ":"
                         + (hf.getType() == long.class ? "J" : "Ljava/lang/String;");
-                for (MethodData reader : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData reader : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .addUsingField(desc)))) {
                     for (MethodData inv : reader.getInvokes()) {
                         if (!inv.isMethod() || inv.getParamCount() != 0) continue;

@@ -14,6 +14,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Hide community notes on posts and reels (#259).
@@ -39,7 +40,7 @@ public class HideCommunityNotesHook {
         String name = DexKitCache.isCacheValid() ? DexKitCache.loadString(CACHE_KEY) : null;
         if (name == null) {
             try {
-                List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(PANDO).paramCount(0).usingNumbers(NOTES_BLOKS_DATA)));
                 if (found.size() != 1) {
                     ModuleLog.line(TAG + "❌ notes getter not found (" + found.size() + ")");

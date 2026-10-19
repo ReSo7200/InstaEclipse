@@ -25,6 +25,7 @@ import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class DisableVideoAutoPlayHook {
     private static final String PLAY_DRAWABLE_FIELD = "InstaEclipseManualVideoPlayDrawable";
@@ -58,7 +59,7 @@ public class DisableVideoAutoPlayHook {
     private void findAndHookDynamicMethod(DexKitBridge bridge) {
         try {
             // Step 1: Find methods referencing "ig_disable_video_autoplay"
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("ig_disable_video_autoplay")
                     )

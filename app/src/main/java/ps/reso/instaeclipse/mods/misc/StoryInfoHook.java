@@ -45,6 +45,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Story ⋯ menu extras: "Story Info" (exact times, music, location, hashtags, reshare source, app,
@@ -100,7 +101,7 @@ public class StoryInfoHook {
         StringBuilder keys = new StringBuilder();
         for (String key : KEYS) {
             try {
-                List<MethodData> found = bridge.findMethod(FindMethod.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass("com.instagram.feed.media.Media")
                                 .paramCount(0)
@@ -130,7 +131,7 @@ public class StoryInfoHook {
         if (DexKitCache.isCacheValid()) builders = DexKitCache.loadMethods("MentionButtons", classLoader);
         if (builders == null || builders.isEmpty()) {
             try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings("[INTERNAL] Pause Playback")));
                 builders = new ArrayList<>(
                         ps.reso.instaeclipse.mods.media.StoryDownloadHook.storyOptionBuilders(methods, classLoader));
