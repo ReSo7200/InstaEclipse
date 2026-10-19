@@ -1308,7 +1308,8 @@ public class FeaturesFragment extends Fragment {
         ));
 
         defs.add(getString(R.string.menu_nav_gestures));
-        defs.add(Arrays.asList(createExtrasSwitch("#30D158", "disableSwipeToCamera")));
+        defs.add(Arrays.asList(createExtrasSwitch("#30D158", "disableSwipeToCamera"),
+                createSwitch(R.drawable.ic_home, "#30D158", getString(R.string.ig_back_leaves_home), "backLeavesHome")));
 
         return defs;
     }

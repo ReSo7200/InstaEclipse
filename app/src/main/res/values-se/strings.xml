@@ -234,6 +234,7 @@
     <string name="ig_playback_speed_next">Hastighet inställd — gäller nästa video som startar</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Dölj anteckningar i meddelanden</string>
     <string name="ig_hide_dm_suggestions">Dölj föreslagna konton i Meddelanden</string>
+    <string name="ig_back_leaves_home">Tillbaka på Hem lämnar Instagram</string>
     <string name="ig_dialog_downloader_voice">Ladda ned röstmeddelanden (långt tryck)</string>
     <string name="ig_dialog_downloader_dm_media">Ladda ner foton och videor i meddelanden (långt tryck)</string>
     <string name="ig_dialog_misc_viewer_search">Sök bland dina Story-tittare</string>

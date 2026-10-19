@@ -264,7 +264,7 @@ public class DialogUtils {
     /** Navigation: the switch count, plus "· Tab order changed" when the tab order isn't Instagram's. */
     private static String navCount(Context context) {
         String base = onCount(context, "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages",
-                "hideTabActivity", "hideTabProfile", "disableSwipeToCamera");
+                "hideTabActivity", "hideTabProfile", "disableSwipeToCamera", "backLeavesHome");
         return ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(FeatureFlags.navTabOrder)
                 ? base + " · " + I18n.t(context, R.string.nav_tab_order_changed) : base;
     }
@@ -1341,7 +1341,8 @@ public class DialogUtils {
                         v -> showStartupTabDialog(context, (TextView) findFirstText(v)))));
 
         layout.addView(sectionHeader(context, I18n.t(context, R.string.menu_nav_gestures)));
-        layout.addView(cardOf(context, extraSwitch(context, "#30D158", "disableSwipeToCamera")));
+        layout.addView(cardOf(context, extraSwitch(context, "#30D158", "disableSwipeToCamera"),
+                flagSwitch(context, R.drawable.ic_home, "#30D158", R.string.ig_back_leaves_home, "backLeavesHome")));
 
         showSectionDialog(context, I18n.t(context, R.string.menu_navigation), layout, () -> {});
     }

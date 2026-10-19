@@ -53,6 +53,7 @@ public class FeatureFlags {
     public static volatile boolean hideTabMessages = false;
     public static volatile boolean hideTabActivity = false;
     public static volatile boolean hideTabProfile = false;
+    public static volatile boolean backLeavesHome = false; // Back on the scrolled home feed leaves Instagram (#272)
     public static volatile boolean readReceiptChats = false; // per-chat read receipts, chosen in the chat menu
     public static volatile boolean hideDmBlend = false; // hide the Blend button in DM thread headers
     public static volatile boolean hideThreadsButton = false; // hide the Threads button on profiles

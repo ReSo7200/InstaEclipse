@@ -460,6 +460,13 @@ public class Module {
                         ModuleLog.line("(InstaEclipse | StartupTab): ❌ Failed to hook: " + t);
                     }
 
+                    // Back on the home feed leaves Instagram (#272)
+                    try {
+                        if (!skip("BackLeavesHomeHook")) new ps.reso.instaeclipse.mods.ui.BackLeavesHomeHook().install(hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(IE|BackLeavesHome): ❌ Failed to hook: " + t);
+                    }
+
                     // Extras: no swipe to camera from the feed
                     try {
                         if (!skip("SwipeToCameraHook")) new ps.reso.instaeclipse.mods.extras.SwipeToCameraHook().install(hostClassLoader);
