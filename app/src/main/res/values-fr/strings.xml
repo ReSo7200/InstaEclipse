@@ -288,6 +288,10 @@
     <string name="ig_post_counts_reset">Réinitialiser</string>
     <string name="ig_post_counts_saved">Chiffres enregistrés</string>
     <string name="ig_dl_companion_fallback">Impossible de joindre l’app InstaEclipse : enregistré dans Download. Pour utiliser votre dossier, autorisez InstaEclipse à démarrer automatiquement / en arrière-plan.</string>
+    <string name="background_access_title">Laisser InstaEclipse fonctionner en arrière-plan</string>
+    <string name="background_access_message">Les téléchargements vers votre dossier sont enregistrés par cette app, lancée depuis Instagram. Si le téléphone la met en veille, ils vont dans Download. Autorisez-la sans restriction. Sur Samsung, retirez-la des applis en veille ; sur Xiaomi, activez le démarrage automatique.</string>
+    <string name="background_access_allow">Autoriser</string>
+    <string name="background_access_later">Plus tard</string>
     <string name="ig_profile_menu_tools">Menu du profil : copier le nom, la bio et tout télécharger</string>
     <string name="ig_profile_spoofer">Faux profil (sur ce téléphone uniquement)</string>
     <string name="ig_profile_spoofer_edit">Modifier le faux profil</string>

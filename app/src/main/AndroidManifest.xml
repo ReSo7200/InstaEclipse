@@ -170,6 +170,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <!-- Post notifications (required API 33+ to show download progress) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Downloads to a chosen folder: let the app be started from Instagram (battery unrestricted). -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Android 9 and older: saving to shared storage. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
 
 </manifest>

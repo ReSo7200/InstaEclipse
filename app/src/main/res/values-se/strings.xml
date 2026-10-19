@@ -251,6 +251,10 @@
     <string name="ig_post_counts_reset">Återställ</string>
     <string name="ig_post_counts_saved">Siffror sparade</string>
     <string name="ig_dl_companion_fallback">Kunde inte nå InstaEclipse-appen, så den sparades i Download. För att använda din mapp, tillåt InstaEclipse att autostarta / köras i bakgrunden.</string>
+    <string name="background_access_title">Låt InstaEclipse köras i bakgrunden</string>
+    <string name="background_access_message">Nedladdningar till din mapp sparas av den här appen, startad från Instagram. Om telefonen söver den hamnar de i Download. Tillåt obegränsad körning. På Samsung, ta bort den från Sovande appar; på Xiaomi, slå på Autostart.</string>
+    <string name="background_access_allow">Tillåt</string>
+    <string name="background_access_later">Senare</string>
     <string name="ig_profile_menu_tools">Profilmeny: kopiera användarnamn, bio och ladda ner allt</string>
     <string name="ig_profile_spoofer">Profilförfalskare (bara på den här telefonen)</string>
     <string name="ig_profile_spoofer_edit">Redigera falsk profil</string>

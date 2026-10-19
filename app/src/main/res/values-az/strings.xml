@@ -252,6 +252,10 @@
     <string name="ig_post_counts_reset">Sıfırla</string>
     <string name="ig_post_counts_saved">Saylar saxlanıldı</string>
     <string name="ig_dl_companion_fallback">InstaEclipse tətbiqinə qoşulmaq olmadı, ona görə Download-ə saxlanıldı. Öz qovluğunuz üçün InstaEclipse-ə avtomatik başlama / arxa fonda işləmə icazəsi verin.</string>
+    <string name="background_access_title">InstaEclipse-ə arxa fonda işləməyə icazə verin</string>
+    <string name="background_access_message">Qovluğunuza yükləmələri Instagram-dan başladılan bu tətbiq saxlayır. Telefon onu yuxuda saxlasa, Download-a düşür. Məhdudiyyətsiz işləməyə icazə verin. Samsung-da Yuxu tətbiqlərindən çıxarın, Xiaomi-də Avtomatik başlamanı açın.</string>
+    <string name="background_access_allow">İcazə ver</string>
+    <string name="background_access_later">Sonra</string>
     <string name="ig_profile_menu_tools">Profil menyusu: istifadəçi adı, bio kopyala və hamısını yüklə</string>
     <string name="ig_profile_spoofer">Profil saxtalaşdırıcı (yalnız bu telefonda)</string>
     <string name="ig_profile_spoofer_edit">Saxta profili redaktə et</string>

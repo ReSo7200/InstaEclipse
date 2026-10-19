@@ -289,6 +289,10 @@
     <string name="ig_post_counts_reset">Επαναφορά</string>
     <string name="ig_post_counts_saved">Οι αριθμοί αποθηκεύτηκαν</string>
     <string name="ig_dl_companion_fallback">Δεν ήταν δυνατή η σύνδεση με την εφαρμογή InstaEclipse, οπότε αποθηκεύτηκε στο Download. Για τον φάκελό σας, επιτρέψτε στο InstaEclipse αυτόματη εκκίνηση / λειτουργία στο παρασκήνιο.</string>
+    <string name="background_access_title">Επιτρέψτε στο InstaEclipse να λειτουργεί στο παρασκήνιο</string>
+    <string name="background_access_message">Οι λήψεις στον φάκελό σας αποθηκεύονται από αυτή την εφαρμογή, που ξεκινά από το Instagram. Αν το τηλέφωνο την κρατά σε αδράνεια, πάνε στο Download. Επιτρέψτε απεριόριστη λειτουργία. Στη Samsung βγάλτε την από τις εφαρμογές σε αδράνεια· στη Xiaomi ενεργοποιήστε την αυτόματη εκκίνηση.</string>
+    <string name="background_access_allow">Να επιτρέπεται</string>
+    <string name="background_access_later">Αργότερα</string>
     <string name="ig_profile_menu_tools">Μενού προφίλ: αντιγραφή ονόματος, βιογραφικού και λήψη όλων</string>
     <string name="ig_profile_spoofer">Παραποίηση προφίλ (μόνο σε αυτό το τηλέφωνο)</string>
     <string name="ig_profile_spoofer_edit">Επεξεργασία ψεύτικου προφίλ</string>

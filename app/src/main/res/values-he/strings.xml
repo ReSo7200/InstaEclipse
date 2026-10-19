@@ -288,6 +288,10 @@
     <string name="ig_post_counts_reset">איפוס</string>
     <string name="ig_post_counts_saved">המספרים נשמרו</string>
     <string name="ig_dl_companion_fallback">לא ניתן להתחבר לאפליקציית InstaEclipse, ולכן הקובץ נשמר ב-Download. כדי להשתמש בתיקייה שלך, אפשר ל-InstaEclipse הפעלה אוטומטית / פעולה ברקע.</string>
+    <string name="background_access_title">לאפשר ל-InstaEclipse לפעול ברקע</string>
+    <string name="background_access_message">הורדות לתיקייה שלך נשמרות על ידי האפליקציה הזו, שמופעלת מאינסטגרם. אם הטלפון מרדים אותה, הן נשמרות ב-Download. אפשר לה לפעול ללא הגבלה. בסמסונג הוצא אותה מאפליקציות רדומות; בשיאומי הפעל הפעלה אוטומטית.</string>
+    <string name="background_access_allow">לאפשר</string>
+    <string name="background_access_later">מאוחר יותר</string>
     <string name="ig_profile_menu_tools">תפריט פרופיל: העתקת שם משתמש, ביו והורדת הכול</string>
     <string name="ig_profile_spoofer">זיוף פרופיל (רק בטלפון הזה)</string>
     <string name="ig_profile_spoofer_edit">עריכת פרופיל מזויף</string>

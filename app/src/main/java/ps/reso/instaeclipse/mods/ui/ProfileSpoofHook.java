@@ -270,7 +270,7 @@ public final class ProfileSpoofHook {
 
     // ---- View level: counts, username, name, bio TextView, picture ------------------------
 
-    private static int followersId, followingId, titleId, chevronId, nameId, nameAltId, bioTextId, avatarId;
+    private static int followersId, followingId, titleId, chevronId, nameId, nameAltId, bioTextId, avatarId, tabAvatarId;
     private static final ThreadLocal<Boolean> SETTING = new ThreadLocal<>();
 
     private static void hookHeaderViews() {
@@ -300,6 +300,7 @@ public final class ProfileSpoofHook {
                 int id = iv.getId();
                 if (id == android.view.View.NO_ID) return;
                 if (followersId == 0) resolveIds(iv);
+                if (id == tabAvatarId && tabAvatarId != 0) { watchTabAvatar(iv); return; }
                 if (id != avatarId) return;
                 ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 // Not on screen yet during the first bind: try again once it is laid out.
@@ -321,6 +322,7 @@ public final class ProfileSpoofHook {
         nameAltId = r.getIdentifier("profile_header_full_name", "id", pkg);
         bioTextId = r.getIdentifier("profile_header_bio_text", "id", pkg);
         avatarId = r.getIdentifier("row_profile_header_imageview", "id", pkg);
+        tabAvatarId = r.getIdentifier("profile_tab_icon_view", "id", pkg);
         // 0 never matches a real id; followersId last, it marks the lookup as done.
         int f = r.getIdentifier("profile_header_familiar_followers_value", "id", pkg);
         followersId = f != 0 ? f : -1;
@@ -420,6 +422,43 @@ public final class ProfileSpoofHook {
         String value = FeatureFlags.spoofAvatar;
         if (avatarId != 0 && value != null && !value.isEmpty()
                 && root.findViewById(avatarId) instanceof android.widget.ImageView iv) applyAvatar(iv);
+    }
+
+    /**
+     * The profile tab's avatar (bottom right) shows the spoofed picture while your profile is on
+     * screen, and Instagram's own picture again on other screens. Checked on each layout of the
+     * window (switching screens lays it out), not every frame.
+     */
+    private static final java.util.WeakHashMap<android.widget.ImageView, android.graphics.drawable.Drawable> TAB_REAL = new java.util.WeakHashMap<>();
+    private static final java.util.Set<android.widget.ImageView> TAB_WATCHED =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    private static void watchTabAvatar(android.widget.ImageView iv) {
+        if (!(iv.getDrawable() instanceof ps.reso.instaeclipse.utils.profile.SpoofAvatar.CircleDrawable))
+            TAB_REAL.put(iv, iv.getDrawable()); // Instagram set its own picture: remember it
+        if (TAB_WATCHED.add(iv))
+            iv.getViewTreeObserver().addOnGlobalLayoutListener(() -> syncTabAvatar(iv));
+        iv.post(() -> syncTabAvatar(iv));
+    }
+
+    private static void syncTabAvatar(android.widget.ImageView iv) {
+        try {
+            if (!iv.isAttachedToWindow()) return;
+            String value = FeatureFlags.spoofAvatar;
+            boolean want = FeatureFlags.profileSpoofer && value != null && !value.isEmpty() && ownProfileShown(iv);
+            boolean ours = iv.getDrawable() instanceof ps.reso.instaeclipse.utils.profile.SpoofAvatar.CircleDrawable;
+            if (want && !ours) {
+                android.graphics.Bitmap bitmap = ps.reso.instaeclipse.utils.profile.SpoofAvatar.bitmap(value);
+                if (bitmap == null) return;
+                TAB_REAL.put(iv, iv.getDrawable());
+                SETTING.set(Boolean.TRUE);
+                try { iv.setImageDrawable(new ps.reso.instaeclipse.utils.profile.SpoofAvatar.CircleDrawable(bitmap)); }
+                finally { SETTING.remove(); }
+            } else if (!want && ours) {
+                SETTING.set(Boolean.TRUE);
+                try { iv.setImageDrawable(TAB_REAL.get(iv)); } finally { SETTING.remove(); }
+            }
+        } catch (Throwable ignored) { }
     }
 
     /** Shows the spoofed picture on the header avatar; false when your profile isn't on screen. */

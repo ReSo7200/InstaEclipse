@@ -254,6 +254,10 @@
     <string name="ig_post_counts_reset">Restablecer</string>
     <string name="ig_post_counts_saved">Cifras guardadas</string>
     <string name="ig_dl_companion_fallback">No se pudo conectar con la app InstaEclipse; se guardó en Download. Para usar tu carpeta, permite a InstaEclipse el inicio automático / segundo plano.</string>
+    <string name="background_access_title">Deja que InstaEclipse funcione en segundo plano</string>
+    <string name="background_access_message">Las descargas a tu carpeta las guarda esta app, iniciada desde Instagram. Si el teléfono la mantiene dormida, van a Download. Permite que funcione sin restricciones. En Samsung sácala de Apps en suspensión; en Xiaomi activa el inicio automático.</string>
+    <string name="background_access_allow">Permitir</string>
+    <string name="background_access_later">Más tarde</string>
     <string name="ig_profile_menu_tools">Menú de perfil: copiar usuario, biografía y descargar todo</string>
     <string name="ig_profile_spoofer">Falsear perfil (solo en este teléfono)</string>
     <string name="ig_profile_spoofer_edit">Editar perfil falso</string>
