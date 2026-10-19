@@ -165,9 +165,23 @@ public class UnsentThreadButtonHook {
                 if (threadId == null) threadId = resolveFromIntent(activity);
                 return threadId;
             };
-            // History owns a title gesture and an independently optional shortcut. Keep upstream
-            // export/jump/read entries in ThreadHeaderMenu; they must not depend on a history icon.
+            // The chat's tools live in the one InstaEclipse header menu, as in 0.8.0: unsent
+            // messages and hide/unhide join export, jump and read receipts. The title long-press
+            // and the optional header icons (ConversationMenuHook) still work alongside.
             ConversationMenuHook.refreshAll();
+            if (FeatureFlags.keepUnsentMessages)
+                ThreadHeaderMenu.add(activity, "unsent", ps.reso.instaeclipse.utils.i18n.I18n.t(activity,
+                        ps.reso.instaeclipse.R.string.ig_unsent_messages), () -> {
+                    ps.reso.instaeclipse.utils.ghost.CurrentConversation.Snapshot s =
+                            ps.reso.instaeclipse.utils.ghost.CurrentConversation.resolve(activity);
+                    String threadId = s != null ? s.threadId : openThread.get();
+                    ModuleLog.line("(IE|UnsentBtn) open thread=" + threadId);
+                    ps.reso.instaeclipse.utils.dialog.DialogUtils.showThreadUnsent(activity, threadId, threadTitle(activity),
+                            () -> ThreadHeaderMenu.reopen(activity));
+                });
+            if (FeatureFlags.hideSpecificChats)
+                ThreadHeaderMenu.add(activity, "hide", ConversationMenuHook.hideLabel(activity),
+                        () -> ConversationMenuHook.toggleHidden(activity));
             if (FeatureFlags.jumpToFirstMessage) JumpToFirstMessageHook.inject(activity);
             ChatExportHook.inject(activity);
             return true;
@@ -221,7 +235,7 @@ public class UnsentThreadButtonHook {
         }
         try {
             for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                     f.setAccessible(true);
                     Object v;
@@ -270,7 +284,7 @@ public class UnsentThreadButtonHook {
         if (cn.contains("DirectThreadKey")) return firstStringField(obj);
         // shallow: some tags wrap the key
         try {
-            for (Field f : obj.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(obj.getClass())) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 if (f.getType().getName().contains("DirectThreadKey")) {
                     f.setAccessible(true);
@@ -285,7 +299,7 @@ public class UnsentThreadButtonHook {
     private String firstStringField(Object o) {
         try {
             for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (f.getType() != String.class || Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     Object val = f.get(o);

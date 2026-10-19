@@ -63,7 +63,7 @@ public class StartupTabHook {
             }
         };
         int hooked = 0;
-        for (Method m : android.app.Instrumentation.class.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(android.app.Instrumentation.class)) {
             if (m.getName().equals("callActivityOnCreate")) {
                 XposedBridge.hookMethod(m, hook);
                 hooked++;
@@ -93,7 +93,7 @@ public class StartupTabHook {
         }
         // The extras can be read while the tab controller is still null, so the pick is dropped;
         // switch tabs through the controller once the activity first resumes.
-        for (Method m : android.app.Instrumentation.class.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(android.app.Instrumentation.class)) {
             if (!m.getName().equals("callActivityOnResume")) continue;
             XposedBridge.hookMethod(m, new XC_MethodHook() {
                 @Override
@@ -121,10 +121,10 @@ public class StartupTabHook {
     @SuppressWarnings({"unchecked", "rawtypes"})
     static void switchTab(Activity activity, String tab) {
         for (Class<?> c = activity.getClass(); c != null && c != Activity.class; c = c.getSuperclass()) {
-            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 Class<?> type = f.getType();
                 if (type.isPrimitive() || type.getName().startsWith("android.") || type.getName().startsWith("java.")) continue;
-                for (Method m : type.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(type)) {
                     Class<?>[] p = m.getParameterTypes();
                     if (m.getReturnType() != void.class || p.length != 3 || !p[0].isEnum()
                             || p[1] != String.class || p[2] != boolean.class) continue;

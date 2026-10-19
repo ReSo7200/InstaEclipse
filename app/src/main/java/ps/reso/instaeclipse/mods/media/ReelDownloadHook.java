@@ -23,6 +23,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class ReelDownloadHook {
 
@@ -62,7 +63,7 @@ public class ReelDownloadHook {
         }
 
         try {
-            var methods = bridge.findMethod(FindMethod.create()
+            var methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("ClipsOrganicMediaItemViewMoreOptionsController")));
 
@@ -88,7 +89,7 @@ public class ReelDownloadHook {
             Method fallback = null;
             for (Class<?> cand : candidates) {
                 int voidMedia = 0;
-                for (Method m : cand.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cand)) {
                     if (m.getReturnType() != void.class) continue;
                     Class<?>[] params = m.getParameterTypes();
                     if (params.length < 2) continue;
@@ -110,7 +111,7 @@ public class ReelDownloadHook {
             }
 
             if (target == null) {
-                ModuleLog.line("(IE|Reel) ❌ hook method (Media, ButtonAdder)V not found");
+                ModuleLog.probe("(IE|Reel) legacy (Media, ButtonAdder)V hook not in this build (reel menu uses the dispatcher)");
                 return;
             }
 
@@ -141,7 +142,7 @@ public class ReelDownloadHook {
      */
     private static boolean hasButtonAdderMethod(Class<?> adder) {
         if (adder == null) return false;
-        for (Method m : adder.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(adder)) {
             Class<?>[] p = m.getParameterTypes();
             if (p.length == 4
                     && Context.class.isAssignableFrom(p[0])
@@ -218,7 +219,7 @@ public class ReelDownloadHook {
             }
 
             String optionDesc = "Lcom/instagram/feed/media/mediaoption/MediaOption$Option;";
-            var methods = bridge.findMethod(FindMethod.create()
+            var methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("java.util.ArrayList")
                             .addUsingField(optionDesc + "->PLAYBACK_CONTROLS:" + optionDesc)
@@ -287,14 +288,14 @@ public class ReelDownloadHook {
         }
 
         try {
-            var methods = bridge.findMethod(FindMethod.create()
+            var methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .paramTypes(param1Type, param2Type)
                             .returnType("boolean")
                             .usingNumbers(configId)));
 
             if (methods.isEmpty()) {
-                ModuleLog.line("(IE|Reel) ⚠️ Gate method not found for config " + configId);
+                ModuleLog.probe("(IE|Reel) gate not in this build for config " + configId);
                 return;
             }
 
@@ -336,7 +337,7 @@ public class ReelDownloadHook {
 
         Class<?> c = controller.getClass();
         while (c != null && c != Object.class) {
-            for (Field outerF : c.getDeclaredFields()) {
+            for (Field outerF : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (outerF.getType().isPrimitive()) continue;
                 String pkg = outerF.getType().getName();
                 if (pkg.startsWith("android.") || pkg.startsWith("java.")
@@ -353,7 +354,7 @@ public class ReelDownloadHook {
                     String npkg = nc.getName();
                     if (npkg.startsWith("android.") || npkg.startsWith("java.")
                             || npkg.startsWith("androidx.") || npkg.startsWith("kotlin.")) break;
-                    for (Field nf : nc.getDeclaredFields()) {
+                    for (Field nf : ps.reso.instaeclipse.utils.core.SafeReflect.fields(nc)) {
                         if (nf.getType() != int.class) continue;
                         intCount++;
                         singleIntField = nf;
@@ -491,7 +492,7 @@ public class ReelDownloadHook {
             Object buttonAdder = param.args[1];
 
             if (activityField == null) {
-                for (Field f : controller.getClass().getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(controller.getClass())) {
                     if (Activity.class.isAssignableFrom(f.getType())) {
                         f.setAccessible(true);
                         activityField = f;
@@ -508,7 +509,7 @@ public class ReelDownloadHook {
             if (activity == null) return;
 
             if (buttonAdderMethod == null) {
-                for (Method m : buttonAdder.getClass().getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(buttonAdder.getClass())) {
                     Class<?>[] p = m.getParameterTypes();
                     if (p.length != 4) continue;
                     if (!Context.class.isAssignableFrom(p[0])) continue;

@@ -45,6 +45,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Profile Picture Downloader
@@ -103,7 +104,7 @@ public class ProfilePicDownloadHook {
         try {
             Method m = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("ProfilePic_hdGetter", cl) : null;
             if (m == null) {
-                List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(USER)
                         .usingEqStrings(List.of("hd_profile_pic_url_info"))
                         .returnType("com.instagram.api.schemas.ProfilePicUrlInfo")
@@ -154,7 +155,7 @@ public class ProfilePicDownloadHook {
 
     private static Object fieldOfType(Object o, String type) throws IllegalAccessException {
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (!f.getType().getName().equals(type)) continue;
                 f.setAccessible(true);
                 Object v = f.get(o);
@@ -362,7 +363,7 @@ public class ProfilePicDownloadHook {
      */
     private static String getUrlFromImageUrlFields(View view) {
         for (Class<?> cls = view.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 if (!IMAGE_URL.equals(f.getType().getName())) continue;
                 try {

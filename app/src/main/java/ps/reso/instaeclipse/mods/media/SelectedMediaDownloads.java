@@ -3,7 +3,6 @@ package ps.reso.instaeclipse.mods.media;
 import android.app.Activity;
 import android.app.AlertDialog;
 import ps.reso.instaeclipse.utils.dialog.IeDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.widget.Toast;
@@ -24,7 +23,6 @@ import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.download.DownloadEngine;
 import ps.reso.instaeclipse.utils.download.DownloadRequest;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
-import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
@@ -115,33 +113,61 @@ final class SelectedMediaDownloads {
     }
 
     static void captureAndShowPost(Context ctx, Object media, String type) {
+        captureAndShowPost(ctx, media, type, null);
+    }
+
+    /** {@code currentSlide}: slide count -> the carousel slide on screen (-1 when unknown), or null. */
+    static void captureAndShowPost(Context ctx, Object media, String type,
+            java.util.function.IntUnaryOperator currentSlide) {
         try {
             Captured captured = capture(ctx, media, type); // Synchronous, at Download tap.
-            // The chooser numbers are always tied to the snapshot. We deliberately do not infer
-            // a current slide from unrelated visible pagers or arbitrary controller int fields.
-            showPost(ctx, captured);
+            int n = captured.children.size();
+            showPost(ctx, captured, n > 1 && currentSlide != null ? currentSlide.applyAsInt(n) : -1);
         } catch (Throwable error) { unavailable(ctx, error); }
     }
 
     static void showPost(Context ctx, Captured captured) {
+        showPost(ctx, captured, -1);
+    }
+
+    /** A carousel offers the slide on screen and all of them, like 0.8.0; any slide is one tap further. */
+    static void showPost(Context ctx, Captured captured, int current) {
         if (captured.children.isEmpty()) { showItemChoices(ctx, captured); return; }
+        if (!canShow(ctx)) return;
+        int n = captured.children.size();
+        boolean known = current >= 0 && current < n;
+        ArrayList<CharSequence> labels = new ArrayList<>();
+        if (known) labels.add(I18n.t(ctx, R.string.ig_dl_carousel_current, current + 1, n));
+        labels.add(I18n.t(ctx, R.string.ig_dl_carousel_all, n));
+        labels.add(I18n.t(ctx, R.string.ie_download_select_item));
+        int offset = known ? 1 : 0;
+        IeDialog dialog = new IeDialog(ctx).title(I18n.t(ctx, R.string.ig_dl_title));
+        dialog.choices(labels.toArray(new CharSequence[0]), -1, which -> {
+            if (known && which == 0) showItemChoices(ctx, captured.children.get(current));
+            else if (which == offset) startAll(ctx, captured);
+            else showItemList(ctx, captured);
+        });
+        dialog.show();
+    }
+
+    private static void showItemList(Context ctx, Captured captured) {
         if (!canShow(ctx)) return;
         ArrayList<CharSequence> labels = new ArrayList<>();
         for (int i = 0; i < captured.children.size(); i++)
             labels.add(I18n.t(ctx, R.string.ie_download_item, i + 1));
-        labels.add(I18n.t(ctx, R.string.ig_dl_carousel_all, captured.children.size()));
         IeDialog dialog = new IeDialog(ctx).title(I18n.t(ctx, R.string.ie_download_select_item));
-        dialog.choices(labels.toArray(new CharSequence[0]), -1, which -> {
-            if (which == captured.children.size()) {
-                for (Captured child : captured.children) start(ctx, child, child.video != null);
-            } else showItemChoices(ctx, captured.children.get(which));
-        });
-        dialog.secondary(modeLabel(ctx, captured), () -> showPost(ctx, switchMode(captured)));
+        dialog.choices(labels.toArray(new CharSequence[0]), -1,
+                which -> showItemChoices(ctx, captured.children.get(which)));
         dialog.show();
     }
 
+    /** Every slide, with one toast for the batch instead of one per item. */
+    private static void startAll(Context ctx, Captured captured) {
+        toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_all_n_items, captured.children.size()));
+        for (Captured child : captured.children) start(ctx, child, child.video != null, true);
+    }
+
     private static void showItemChoices(Context ctx, Captured captured) {
-        if (!canShow(ctx)) return;
         ArrayList<CharSequence> labels = new ArrayList<>();
         ArrayList<Choice> choices = new ArrayList<>();
         if (captured.media.imageUrl != null) {
@@ -158,30 +184,22 @@ final class SelectedMediaDownloads {
             labels.add(I18n.t(ctx, R.string.ig_download_choice_audio));
             choices.add(Choice.AUDIO);
         }
+        // Nothing to choose (a photo): download it right away. The quality comes from the
+        // Downloader setting, so the dialog no longer switches it.
+        if (choices.size() == 1) { startChoice(ctx, captured, choices.get(0)); return; }
+        if (choices.isEmpty()) { unavailable(ctx, null); return; }
+        if (!canShow(ctx)) return;
         IeDialog dialog = new IeDialog(ctx).title(I18n.t(ctx, R.string.ig_dl_title));
         dialog.choices(labels.toArray(new CharSequence[0]), -1,
                 which -> startChoice(ctx, captured, choices.get(which)));
-        dialog.secondary(modeLabel(ctx, captured), () -> showItemChoices(ctx, switchMode(captured)));
         dialog.show();
-    }
-
-    static String modeLabel(Context ctx, Captured captured) {
-        return I18n.t(ctx, R.string.ie_downloader_mode,
-                I18n.t(ctx, captured.original ? R.string.ie_downloader_original : R.string.ie_download_best));
-    }
-
-    static Captured switchMode(Captured captured) {
-        Captured next = captured.withOriginal(!captured.original);
-        FeatureFlags.downloaderUseOriginal = next.original;
-        SettingsManager.saveAllFlags();
-        return next;
     }
 
     static void startChoice(Context ctx, Captured captured, Choice choice) {
         switch (choice) {
             case PHOTO -> start(ctx, captured, false);
             case VIDEO -> start(ctx, captured, true);
-            case FRAME -> startFrame(ctx, captured.video);
+            case FRAME -> startFrame(ctx, frameRequest(captured));
             case AUDIO -> {
                 OriginalMediaSelection.Audio audio = captured.media.separateAudio;
                 if (captured.offersAudio()) FeedVideoDownloadHook.downloadAudio(ctx, audio.url,
@@ -189,6 +207,17 @@ final class SelectedMediaDownloads {
                         captured.media.owner, audio.extract, audio.startMs, audio.durationMs);
             }
         }
+    }
+
+    /** The frame picker decodes with Android's own frame reader, and some phones' AV1/VP9 software
+     *  decoders hand it frames with the color channels mixed up (a magenta/green picture). H.264
+     *  decodes correctly everywhere and Instagram offers it at full resolution, so the picker
+     *  always prefers it, whatever the Downloader setting. */
+    static DownloadRequest frameRequest(Captured captured) {
+        DownloadRequest v = captured.video;
+        if (v == null || v.options.originalSelection) return v;
+        return new DownloadRequest(v.mediaId, v.owner, v.filename, v.manifest, v.direct,
+                new DownloadRequest.Options(v.options.maxShortSide, true, true), v.audio);
     }
 
     static void startFrame(Context ctx, DownloadRequest request) {
@@ -203,39 +232,64 @@ final class SelectedMediaDownloads {
     }
 
     static void start(Context ctx, Captured captured, boolean video) {
+        start(ctx, captured, video, false);
+    }
+
+    /** {@code batch}: part of "Download all", which shows its own toast, so no per-item ones. */
+    static void start(Context ctx, Captured captured, boolean video, boolean batch) {
+        start(ctx, captured, video, batch, false);
+    }
+
+    /**
+     * The companion can't be reached (Instagram can't bind to it: autostart / background limits on
+     * some phones, or the app missing). The file is saved by Instagram itself instead, to
+     * Download/InstaEclipse, since the folder chosen in the companion is only writable there.
+     */
+    static boolean companionUnreachable(String error) {
+        return error != null && (error.startsWith("Companion connection") || error.startsWith("Companion unavailable")
+                || error.startsWith("Companion disconnected") || error.startsWith("Companion is busy"));
+    }
+
+    /** Instagram saves it itself; a warning only when that can't be the chosen folder. */
+    static void savedLocally(Context ctx) {
+        if (!DownloadPublisher.reachesChosenFolder(FeatureFlags.downloaderCustomPath))
+            toast(ctx, I18n.t(ctx, R.string.ig_dl_companion_fallback));
+    }
+
+    private static void start(Context ctx, Captured captured, boolean video, boolean batch, boolean local) {
         if (captured.original && (video ? captured.media.originalPlan == null : captured.photoUrl == null)) {
             toast(ctx, I18n.t(ctx, R.string.ie_downloader_original_unavailable));
             return;
         }
         if (video && captured.original) { startOriginal(ctx, captured); return; }
-        if (video) { startVideo(ctx, captured.selectedVideo()); return; }
+        if (video) { startVideo(ctx, captured.selectedVideo(), batch, local); return; }
         if (captured.photoUrl == null) { unavailable(ctx, null); return; }
         try {
-            if (FeedVideoDownloadHook.hasCompanionDestination()) {
+            if (!local && FeedVideoDownloadHook.hasCompanionDestination()) {
                 CompanionBridge.downloadLegacy(ctx, captured.photoUrl, null, captured.photoFilename,
                         "image/jpeg", captured.media.owner, error -> {
-                            if (error != null) failed(ctx, error);
-                            else toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_photo));
+                            if (companionUnreachable(error)) { savedLocally(ctx); start(ctx, captured, false, batch, true); }
+                            else if (error != null) failed(ctx, error);
+                            else if (!batch) toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_photo));
                         });
                 return;
             }
         } catch (Throwable error) { failed(ctx, "Could not start download service"); return; }
         DownloadEngine.Cancellation cancel = new DownloadEngine.Cancellation();
         Context app = ctx.getApplicationContext();
+        if (!batch) toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_photo));
         WORKER.submit(() -> {
-            ProgressUi progress = new ProgressUi(ctx, cancel);
-            progress.show();
             File temp = null;
             try {
                 temp = File.createTempFile("ie_photo_", ".bin", app.getCacheDir());
-                String mime = DownloadEngine.fetch(app, captured.photoUrl, temp, "image/jpeg", cancel, progress);
+                String mime = DownloadEngine.fetch(app, captured.photoUrl, temp, "image/jpeg", cancel, NO_PROGRESS);
                 MediaTypeDetector.Result detected = MediaTypeDetector.verified(mime, captured.photoFilename);
                 DownloadPublisher.save(app, temp, detected.filename, detected.mimeType, captured.media.owner, cancel);
-                toast(ctx, I18n.t(ctx, R.string.ig_toast_file_saved, detected.filename));
+                if (!batch) toast(ctx, I18n.t(ctx, R.string.ig_toast_file_saved, detected.filename));
             } catch (Throwable error) {
                 failed(ctx, cancel.isCancelled() ? I18n.t(ctx, R.string.ie_download_cancelled)
                         : error instanceof DownloadEngine.Failure failure ? failure.getMessage() : "Photo download failed");
-            } finally { if (temp != null) temp.delete(); progress.close(); }
+            } finally { if (temp != null) temp.delete(); }
         });
     }
 
@@ -255,12 +309,21 @@ final class SelectedMediaDownloads {
     }
 
     static void startVideo(Context ctx, DownloadRequest request) {
+        startVideo(ctx, request, false);
+    }
+
+    static void startVideo(Context ctx, DownloadRequest request, boolean batch) {
+        startVideo(ctx, request, batch, false);
+    }
+
+    static void startVideo(Context ctx, DownloadRequest request, boolean batch, boolean local) {
         if (request == null) { unavailable(ctx, null); return; }
         try {
-            if (FeedVideoDownloadHook.hasCompanionDestination()) {
+            if (!local && FeedVideoDownloadHook.hasCompanionDestination()) {
                 CompanionBridge.download(ctx, request, error -> {
-                    if (error != null) failed(ctx, error);
-                    else toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_video));
+                    if (companionUnreachable(error)) { savedLocally(ctx); startVideo(ctx, request, batch, true); }
+                    else if (error != null) failed(ctx, error);
+                    else if (!batch) toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_video));
                 });
                 return;
             }
@@ -268,28 +331,25 @@ final class SelectedMediaDownloads {
 
         DownloadEngine.Cancellation cancel = new DownloadEngine.Cancellation();
         Context app = ctx.getApplicationContext();
+        if (!batch) toast(ctx, I18n.t(ctx, R.string.ig_toast_downloading_video));
         WORKER.submit(() -> {
-            ProgressUi progress = new ProgressUi(ctx, cancel);
-            progress.show();
-            try (DownloadEngine.Result result = DownloadEngine.execute(app, request, cancel, progress)) {
+            try (DownloadEngine.Result result = DownloadEngine.execute(app, request, cancel, NO_PROGRESS)) {
                 DownloadPublisher.save(app, result.file, request.filename, result.mime, request.owner, cancel);
-                toast(ctx, I18n.t(ctx, result.lowerFallback ? R.string.ie_download_fallback_used
-                        : R.string.ie_download_verified, result.summary));
+                if (!batch || result.lowerFallback)
+                    toast(ctx, I18n.t(ctx, result.lowerFallback ? R.string.ie_download_fallback_used
+                            : R.string.ie_download_verified, result.summary));
                 ModuleLog.line("(IE|Download) published " + result.summary);
             } catch (DownloadEngine.Failure failure) {
-                progress.close();
                 if (cancel.isCancelled()) toast(ctx, I18n.t(ctx, R.string.ie_download_cancelled));
                 else if (failure.canOfferFallback && !request.options.allowFallback && canShow(ctx)) {
-                    // Occupy this serial worker until the prompt is dismissed, so later batch
-                    // progress cannot cover a decision about this captured item.
+                    // Occupy this serial worker until the prompt is dismissed, so a later item
+                    // of a batch cannot cover a decision about this one.
                     if (offerFallbackAndWait(ctx, failure.getMessage(), cancel))
-                        startVideo(ctx, allowFallback(request));
+                        startVideo(ctx, allowFallback(request), batch, local);
                 } else failed(ctx, failure.getMessage());
             } catch (Throwable error) {
                 failed(ctx, cancel.isCancelled() ? I18n.t(ctx, R.string.ie_download_cancelled)
                         : "Could not save verified video");
-            } finally {
-                progress.close();
             }
         });
     }
@@ -329,48 +389,8 @@ final class SelectedMediaDownloads {
         }
     }
 
-    private static final class ProgressUi implements DownloadEngine.Progress {
-        private final Context ctx;
-        private final DownloadEngine.Cancellation cancellation;
-        private final AtomicReference<ProgressDialog> dialog = new AtomicReference<>();
-        private long lastUpdate;
-        ProgressUi(Context ctx, DownloadEngine.Cancellation cancellation) {
-            this.ctx = ctx; this.cancellation = cancellation;
-        }
-        void show() {
-            FeedVideoDownloadHook.mainHandler.post(() -> {
-                if (!canShow(ctx)) return;
-                try {
-                    ProgressDialog view = new ProgressDialog(ctx);
-                    view.setTitle(I18n.t(ctx, R.string.ig_dl_title));
-                    view.setMessage(I18n.t(ctx, R.string.ig_toast_downloading));
-                    view.setIndeterminate(true);
-                    view.setCancelable(true);
-                    view.setOnCancelListener(ignored -> cancellation.cancel());
-                    view.setButton(ProgressDialog.BUTTON_NEGATIVE, ctx.getString(android.R.string.cancel),
-                            (ignored, which) -> cancellation.cancel());
-                    dialog.set(view);
-                    view.show();
-                } catch (Throwable ignored) { }
-            });
-        }
-        @Override public void onProgress(String phase, long done, long total) {
-            long now = System.currentTimeMillis();
-            if (now - lastUpdate < 250 && done != total) return;
-            lastUpdate = now;
-            FeedVideoDownloadHook.mainHandler.post(() -> {
-                ProgressDialog view = dialog.get();
-                if (view != null && canShow(ctx) && view.isShowing()) view.setMessage(phase
-                        + (total > 0 ? " " + Math.min(100, done * 100 / total) + "%" : ""));
-            });
-        }
-        void close() {
-            FeedVideoDownloadHook.mainHandler.post(() -> {
-                try { ProgressDialog view = dialog.get(); if (view != null) view.dismiss(); }
-                catch (Throwable ignored) { }
-            });
-        }
-    }
+    /** Downloads run quietly behind a toast at the start and one at the end, as in 0.8.0 (#287). */
+    private static final DownloadEngine.Progress NO_PROGRESS = (phase, done, total) -> { };
 
     static DownloadRequest allowFallback(DownloadRequest original) {
         return new DownloadRequest(original.mediaId, original.owner, original.filename,
@@ -385,8 +405,9 @@ final class SelectedMediaDownloads {
         toast(ctx, I18n.t(ctx, R.string.ie_download_unavailable));
     }
 
+    /** No quality suffix in the name, like 0.8.0; the save picks a free name for a repeat download. */
     private static String filename(String base, boolean video, boolean original) {
-        return base + (original ? "_original" : "_custom") + (video ? ".mp4" : ".jpg");
+        return base + (video ? ".mp4" : ".jpg");
     }
 
     private static boolean canShow(Context context) {
@@ -403,6 +424,6 @@ final class SelectedMediaDownloads {
         toast(ctx, I18n.t(ctx, R.string.ig_toast_download_failed, reason));
     }
     private static void toast(Context ctx, String message) {
-        FeedVideoDownloadHook.mainHandler.post(() -> Toast.makeText(ctx.getApplicationContext(), message, Toast.LENGTH_LONG).show());
+        FeedVideoDownloadHook.mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx.getApplicationContext(), message, Toast.LENGTH_LONG).show());
     }
 }

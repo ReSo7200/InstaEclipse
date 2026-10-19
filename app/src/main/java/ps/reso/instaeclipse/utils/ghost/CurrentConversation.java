@@ -23,6 +23,7 @@ import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
 import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /** Shared foreground binding, independent of retention and never sourced from a last-thread ID. */
 public final class CurrentConversation {
@@ -64,11 +65,11 @@ public final class CurrentConversation {
                 if (method == null) continue;
                 final boolean resumed = name.equals("performResume");
                 XposedBridge.hookMethod(method, new XC_MethodHook() {
-                    @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    @Override protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         state.invalidate();
                         if (!resumed) removeFragment(param.thisObject);
                     }
-                    @Override protected void afterHookedMethod(MethodHookParam param) {
+                    @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (resumed) {
                             removeFragment(param.thisObject);
                             fragments.add(new WeakReference<>(param.thisObject));
@@ -82,11 +83,11 @@ public final class CurrentConversation {
         // igThreadIgid is also an ephemeral-removal path in this build. It is telemetry only:
         // neither a true boolean nor a background store callback proves a foreground conversation.
         try {
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("igThreadIgid").paramTypes(KEY, "boolean").returnType("void")))) {
                 XposedBridge.hookMethod(data.getMethodInstance(loader), new XC_MethodHook() {
                     private boolean logged;
-                    @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    @Override protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (!logged) {
                             logged = true;
                             ModuleLog.line("(IE|Conversation) igThreadIgid callback observed; not used as foreground authority");
@@ -124,7 +125,7 @@ public final class CurrentConversation {
         if (validFormatter(cached)) { keyFormatter = cached; return; }
         try {
             List<Method> found = new ArrayList<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(KEY).usingStrings("thread:", "recipients:").returnType("java.lang.String")))) {
                 Method method = data.getMethodInstance(loader);
                 if (validFormatter(method)) found.add(method);
@@ -224,7 +225,7 @@ public final class CurrentConversation {
             }
             addAccount(accounts, owner);
             for (Class<?> c = owner.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field field : c.getDeclaredFields()) {
+                for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (Modifier.isStatic(field.getModifiers()) || !field.getType().getName().equals(SESSION)) continue;
                     field.setAccessible(true);
                     Object session = field.get(owner);
@@ -247,7 +248,7 @@ public final class CurrentConversation {
     private static List<Object> ownedControllers(Object owner) throws IllegalAccessException {
         List<Object> controllers = new ArrayList<>();
         for (Class<?> c = owner.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field field : c.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(field.getModifiers()) || field.getType().isPrimitive()) continue;
                 field.setAccessible(true);
                 Object candidate = field.get(owner);
@@ -261,7 +262,7 @@ public final class CurrentConversation {
      * after proving controller ownership, so same-Fragment A -> B -> A invalidates old callbacks. */
     private static boolean watchRebinding(Object controller) {
         List<Method> candidates = new ArrayList<>();
-        for (Method method : controller.getClass().getDeclaredMethods()) {
+        for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(controller.getClass())) {
             Class<?>[] parameters = method.getParameterTypes();
             if (!Modifier.isStatic(method.getModifiers()) && method.getReturnType() == void.class
                     && parameters.length == 1 && parameters[0].getName().equals(KEY)) candidates.add(method);
@@ -271,7 +272,7 @@ public final class CurrentConversation {
         if (rebindHooks.contains(method)) return true;
         try {
             XposedBridge.hookMethod(method, new XC_MethodHook() {
-                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                @Override protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     for (WeakReference<Object> reference : boundControllers) {
                         if (reference.get() == param.thisObject) { state.invalidate(); break; }
                     }
@@ -284,7 +285,7 @@ public final class CurrentConversation {
     }
     private static void addDirectKeys(Object owner, Set<String> threads) throws IllegalAccessException {
         for (Class<?> c = owner.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field field : c.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(field.getModifiers()) || !field.getType().getName().equals(KEY)) continue;
                 field.setAccessible(true);
                 Object key = field.get(owner);
@@ -300,7 +301,7 @@ public final class CurrentConversation {
         String name = candidate.getClass().getName();
         if (!name.startsWith("X.") && !name.startsWith("com.instagram.")) return false;
         for (Class<?> c = candidate.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field field : c.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(field.getModifiers()) || !field.getType().isInstance(owner)) continue;
                 try { field.setAccessible(true); if (field.get(candidate) == owner) return true; }
                 catch (Throwable ignored) {}

@@ -249,7 +249,7 @@ public final class IgThemeEngine {
     private static void scanFields(SparseIntArray map, ClassLoader cl, String className, boolean attrs) {
         try {
             Class<?> cls = cl.loadClass(className);
-            for (Field field : cls.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if ((field.getModifiers() & java.lang.reflect.Modifier.STATIC) != 0 && field.getType() == int.class) {
                     String name = field.getName();
                     int slot = attrs ? slotForAttrName(name) : slotForColorName(name);

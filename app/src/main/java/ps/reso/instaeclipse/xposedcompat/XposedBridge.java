@@ -37,7 +37,7 @@ public final class XposedBridge {
 
     public static Set<XC_MethodHook.Unhook> hookAllMethods(Class<?> clazz, String name, XC_MethodHook callback) {
         Set<XC_MethodHook.Unhook> out = new HashSet<>();
-        for (Method m : clazz.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(clazz)) {
             if (m.getName().equals(name) && !Modifier.isAbstract(m.getModifiers())) out.add(hookMethod(m, callback));
         }
         return out;
@@ -45,7 +45,7 @@ public final class XposedBridge {
 
     public static Set<XC_MethodHook.Unhook> hookAllConstructors(Class<?> clazz, XC_MethodHook callback) {
         Set<XC_MethodHook.Unhook> out = new HashSet<>();
-        for (Constructor<?> c : clazz.getDeclaredConstructors()) out.add(hookMethod(c, callback));
+        for (Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(clazz)) out.add(hookMethod(c, callback));
         return out;
     }
 

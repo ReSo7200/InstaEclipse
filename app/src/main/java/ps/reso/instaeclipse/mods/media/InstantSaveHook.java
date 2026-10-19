@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Save a received Instant (#184). "Instants" is internally `quicksnap`, and its viewer is Jetpack
@@ -62,7 +63,7 @@ public class InstantSaveHook {
                 ModuleLog.line("(IE|InstantSave) ⚠️ viewer cache: viewer lambda not found");
                 return;
             }
-            for (java.lang.reflect.Constructor<?> c : lambda.getDeclaredConstructors()) {
+            for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(lambda)) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         try {
@@ -87,7 +88,7 @@ public class InstantSaveHook {
         }
         try {
             if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return null;
-            for (org.luckypray.dexkit.result.ClassData cd : ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findClass(
+            for (org.luckypray.dexkit.result.ClassData cd : DexKitQueryCache.findClass(ps.reso.instaeclipse.Xposed.Module.dexKitBridge, 
                     org.luckypray.dexkit.query.FindClass.create().matcher(
                             org.luckypray.dexkit.query.matchers.ClassMatcher.create().className(
                                     VIEWER_PREFIX, org.luckypray.dexkit.query.enums.StringMatchType.StartsWith)))) {
@@ -105,7 +106,7 @@ public class InstantSaveHook {
 
     /** The current-card coroutine: a ctor taking UserSession + AnimatedParticleEffectState (447/451). */
     private static boolean isViewerLambda(Class<?> c) {
-        for (java.lang.reflect.Constructor<?> k : c.getDeclaredConstructors()) {
+        for (java.lang.reflect.Constructor<?> k : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(c)) {
             boolean session = false, particles = false;
             for (Class<?> t : k.getParameterTypes()) {
                 String n = t.getName();
@@ -129,7 +130,7 @@ public class InstantSaveHook {
             if (a == null) continue;
             String cn = a.getClass().getName();
             if (cn.startsWith("java.") || cn.startsWith("android") || cn.startsWith("kotlin")) continue;
-            for (java.lang.reflect.Field f : a.getClass().getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(a.getClass())) {
                 if (!"com.instagram.feed.media.Media".equals(f.getType().getName())) continue;
                 try {
                     f.setAccessible(true);
@@ -155,7 +156,7 @@ public class InstantSaveHook {
         try {
             final Class<?> function1 = XposedHelpers.findClass("kotlin.jvm.functions.Function1", cl);
             Class<?> handler = XposedHelpers.findClass(LONGPRESS_LAMBDA, cl);
-            for (java.lang.reflect.Constructor<?> c : handler.getDeclaredConstructors()) {
+            for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(handler)) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
                     @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         try {
@@ -202,7 +203,7 @@ public class InstantSaveHook {
             if (a != null && function1.isInstance(a) && ++seen == 2) { longPress = a; break; }
         }
         if (longPress != null) {
-            for (java.lang.reflect.Field f : p.thisObject.getClass().getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(p.thisObject.getClass())) {
                 if (f.getType() != function1) continue;
                 try {
                     f.setAccessible(true);

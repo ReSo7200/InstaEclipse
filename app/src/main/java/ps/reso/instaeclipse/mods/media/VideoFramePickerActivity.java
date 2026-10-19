@@ -72,32 +72,101 @@ public final class VideoFramePickerActivity extends AppCompatActivity {
         worker.execute(this::prepare);
     }
 
+    /** One frame at the usual 30 fps: the step buttons move the selection by this much. */
+    private static final long FRAME_US = 1_000_000 / 30;
+    private View stepBack, stepForward;
+
     private void buildUi() {
+        int surface = color(com.google.android.material.R.attr.colorSurface, 0xFF121212);
+        int onSurface = color(com.google.android.material.R.attr.colorOnSurface, 0xFFFFFFFF);
+        int muted = color(com.google.android.material.R.attr.colorOnSurfaceVariant, 0xFF9E9E9E);
+        int primary = color(androidx.appcompat.R.attr.colorPrimary, 0xFF7C6CF2);
+
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        int pad = dp(20);
+        root.setBackgroundColor(surface);
+        int pad = dp(16);
+        root.setPadding(pad, dp(8), pad, pad);
         ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-            view.setPadding(pad + bars.left, pad + bars.top, pad + bars.right, pad + bars.bottom);
+            view.setPadding(pad + bars.left, dp(8) + bars.top, pad + bars.right, pad + bars.bottom);
             return insets;
         });
-        root.setPadding(pad, pad, pad, pad);
+
+        // Top bar: close + title (Back and ✕ both leave; nothing is saved without Save PNG).
+        LinearLayout bar = new LinearLayout(this);
+        bar.setGravity(Gravity.CENTER_VERTICAL);
+        ImageView close = new ImageView(this);
+        close.setImageResource(R.drawable.ic_close);
+        close.setColorFilter(onSurface);
+        close.setPadding(dp(10), dp(10), dp(10), dp(10));
+        close.setBackground(ripple(true));
+        close.setContentDescription(getString(android.R.string.cancel));
+        close.setOnClickListener(view -> finish());
+        bar.addView(close, new LinearLayout.LayoutParams(dp(44), dp(44)));
         TextView title = new TextView(this);
-        title.setText(R.string.ie_save_video_frame); title.setTextSize(23);
-        title.setAccessibilityHeading(true); root.addView(title);
-        TextView help = new TextView(this);
-        help.setText(R.string.ie_frame_help); help.setTextSize(14);
-        help.setPadding(0, dp(10), 0, dp(12)); root.addView(help);
+        title.setText(R.string.ie_save_video_frame);
+        title.setTextSize(20);
+        title.setTextColor(onSurface);
+        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        title.setAccessibilityHeading(true);
+        title.setPadding(dp(8), 0, 0, 0);
+        bar.addView(title);
+        root.addView(bar);
+
+        // The frame, on a rounded black card; spinner in the middle, status chip at the bottom.
+        android.widget.FrameLayout card = new android.widget.FrameLayout(this);
+        android.graphics.drawable.GradientDrawable cardBg = new android.graphics.drawable.GradientDrawable();
+        cardBg.setColor(0xFF000000);
+        cardBg.setCornerRadius(dp(22));
+        card.setBackground(cardBg);
+        card.setClipToOutline(true);
         preview = new ImageView(this);
         preview.setContentDescription(getString(R.string.ie_frame_preview));
         preview.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        root.addView(preview, new LinearLayout.LayoutParams(-1, 0, 1));
-        status = new TextView(this); status.setText(R.string.ie_frame_preparing);
-        status.setPadding(0, dp(8), 0, dp(8)); root.addView(status);
-        progress = new ProgressBar(this); root.addView(progress);
-        position = new TextView(this); position.setGravity(Gravity.CENTER); root.addView(position);
-        slider = new SeekBar(this); slider.setMax(10_000); slider.setEnabled(false);
-        slider.setContentDescription(getString(R.string.ie_frame_position)); root.addView(slider);
+        card.addView(preview, new android.widget.FrameLayout.LayoutParams(-1, -1));
+        progress = new ProgressBar(this);
+        progress.setIndeterminateTintList(android.content.res.ColorStateList.valueOf(0xFFFFFFFF));
+        card.addView(progress, new android.widget.FrameLayout.LayoutParams(dp(44), dp(44), Gravity.CENTER));
+        status = new TextView(this);
+        status.setText(R.string.ie_frame_preparing);
+        status.setTextColor(0xFFFFFFFF);
+        status.setTextSize(13);
+        status.setPadding(dp(12), dp(6), dp(12), dp(6));
+        android.graphics.drawable.GradientDrawable chip = new android.graphics.drawable.GradientDrawable();
+        chip.setColor(0x99000000);
+        chip.setCornerRadius(dp(14));
+        status.setBackground(chip);
+        android.widget.FrameLayout.LayoutParams chipLp = new android.widget.FrameLayout.LayoutParams(-2, -2,
+                Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        chipLp.bottomMargin = dp(12);
+        card.addView(status, chipLp);
+        LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(-1, 0, 1);
+        cardLp.topMargin = dp(8);
+        root.addView(card, cardLp);
+
+        // Time, then the scrubber with one-frame steps on each side.
+        position = new TextView(this);
+        position.setGravity(Gravity.CENTER);
+        position.setTextSize(17);
+        position.setTextColor(onSurface);
+        position.setTypeface(android.graphics.Typeface.MONOSPACE);
+        position.setPadding(0, dp(14), 0, dp(4));
+        root.addView(position);
+        LinearLayout scrub = new LinearLayout(this);
+        scrub.setGravity(Gravity.CENTER_VERTICAL);
+        stepBack = stepButton(onSurface, true);
+        stepForward = stepButton(onSurface, false);
+        slider = new SeekBar(this);
+        slider.setMax(10_000);
+        slider.setEnabled(false);
+        slider.setContentDescription(getString(R.string.ie_frame_position));
+        slider.setProgressTintList(android.content.res.ColorStateList.valueOf(primary));
+        slider.setThumbTintList(android.content.res.ColorStateList.valueOf(primary));
+        scrub.addView(stepBack, new LinearLayout.LayoutParams(dp(44), dp(44)));
+        scrub.addView(slider, new LinearLayout.LayoutParams(0, -2, 1));
+        scrub.addView(stepForward, new LinearLayout.LayoutParams(dp(44), dp(44)));
+        root.addView(scrub);
         slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar bar, int value, boolean fromUser) {
                 if (!fromUser || !ready || saving) return;
@@ -108,11 +177,67 @@ public final class VideoFramePickerActivity extends AppCompatActivity {
             @Override public void onStartTrackingTouch(SeekBar bar) { }
             @Override public void onStopTrackingTouch(SeekBar bar) { }
         });
-        save = new Button(this); save.setText(R.string.ie_frame_save); save.setEnabled(false);
-        save.setOnClickListener(view -> saveSelected()); root.addView(save);
-        Button cancel = new Button(this); cancel.setText(android.R.string.cancel);
-        cancel.setOnClickListener(view -> finish()); root.addView(cancel);
+        TextView help = new TextView(this);
+        help.setText(R.string.ie_frame_help);
+        help.setTextSize(12.5f);
+        help.setTextColor(muted);
+        help.setGravity(Gravity.CENTER);
+        help.setPadding(dp(8), dp(6), dp(8), dp(14));
+        root.addView(help);
+
+        com.google.android.material.button.MaterialButton saveButton = new com.google.android.material.button.MaterialButton(this);
+        saveButton.setText(R.string.ie_frame_save);
+        saveButton.setIconResource(R.drawable.ic_save);
+        saveButton.setIconGravity(com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START);
+        saveButton.setCornerRadius(dp(16));
+        saveButton.setTextSize(16);
+        saveButton.setEnabled(false);
+        saveButton.setOnClickListener(view -> saveSelected());
+        save = saveButton;
+        root.addView(save, new LinearLayout.LayoutParams(-1, dp(56)));
         setContentView(root);
+    }
+
+    private View stepButton(int tint, boolean back) {
+        ImageView b = new ImageView(this);
+        b.setImageResource(R.drawable.ic_chevron_right);
+        if (back) b.setRotation(180f);
+        b.setColorFilter(tint);
+        b.setPadding(dp(10), dp(10), dp(10), dp(10));
+        b.setBackground(ripple(true));
+        b.setContentDescription(getString(R.string.ie_frame_position) + (back ? " −" : " +"));
+        b.setEnabled(false);
+        b.setAlpha(0.4f);
+        b.setOnClickListener(view -> step(back ? -FRAME_US : FRAME_US));
+        return b;
+    }
+
+    /** Moves the selection by one frame and keeps the slider in step. */
+    private void step(long deltaUs) {
+        if (!ready || saving) return;
+        long end = Math.max(0, durationUs - 1);
+        selectedUs = Math.max(0, Math.min(end, selectedUs + deltaUs));
+        slider.setProgress(end == 0 ? 0 : (int) (selectedUs * 10_000 / end));
+        updatePosition(); schedulePreview();
+    }
+
+    private void setStepsEnabled(boolean on) {
+        for (View v : new View[]{stepBack, stepForward}) {
+            if (v == null) continue;
+            v.setEnabled(on);
+            v.setAlpha(on ? 1f : 0.4f);
+        }
+    }
+
+    private android.graphics.drawable.Drawable ripple(boolean borderless) {
+        android.util.TypedValue tv = new android.util.TypedValue();
+        getTheme().resolveAttribute(borderless ? android.R.attr.selectableItemBackgroundBorderless
+                : android.R.attr.selectableItemBackground, tv, true);
+        return tv.resourceId != 0 ? androidx.core.content.ContextCompat.getDrawable(this, tv.resourceId) : null;
+    }
+
+    private int color(int attr, int fallback) {
+        return com.google.android.material.color.MaterialColors.getColor(this, attr, fallback);
     }
 
     private void prepare() {
@@ -137,7 +262,7 @@ public final class VideoFramePickerActivity extends AppCompatActivity {
             main.post(() -> {
                 if (!alive()) return;
                 durationUs = duration; exportWidth = width; exportHeight = height;
-                ready = true; slider.setEnabled(true);
+                ready = true; slider.setEnabled(true); setStepsEnabled(true);
                 updatePosition(); schedulePreview();
             });
         } catch (Exception | OutOfMemoryError failure) { failed(failure); }
@@ -174,7 +299,7 @@ public final class VideoFramePickerActivity extends AppCompatActivity {
 
     private void saveSelected() {
         if (!ready || saving || !save.isEnabled()) return;
-        saving = true; slider.setEnabled(false); save.setEnabled(false);
+        saving = true; slider.setEnabled(false); setStepsEnabled(false); save.setEnabled(false);
         status.setText(R.string.ie_frame_saving); progress.setVisibility(View.VISIBLE);
         long time = selectedUs;
         worker.execute(() -> {
@@ -190,7 +315,7 @@ public final class VideoFramePickerActivity extends AppCompatActivity {
                 Logging.flush();
                 main.post(() -> {
                     if (!alive()) return;
-                    Toast.makeText(this, getString(cleaned ? R.string.ie_frame_saved : R.string.ie_frame_cleanup_pending,
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(this, getString(cleaned ? R.string.ie_frame_saved : R.string.ie_frame_cleanup_pending,
                             saved.width, saved.height), Toast.LENGTH_LONG).show();
                     finish();
                 });
@@ -231,7 +356,7 @@ public final class VideoFramePickerActivity extends AppCompatActivity {
 
     private void failMessage(String message) {
         if (pendingPreview != null) main.removeCallbacks(pendingPreview);
-        ready = false; slider.setEnabled(false); save.setEnabled(false);
+        ready = false; slider.setEnabled(false); setStepsEnabled(false); save.setEnabled(false);
         progress.setVisibility(View.GONE); status.setText(message);
     }
     private boolean alive() { return !closed.get() && !isFinishing() && !isDestroyed(); }

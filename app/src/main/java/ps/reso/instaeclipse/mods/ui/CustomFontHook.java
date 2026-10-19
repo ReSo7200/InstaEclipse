@@ -14,6 +14,7 @@ import ps.reso.instaeclipse.utils.core.SettingsManager;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Custom UI font: replace Instagram's text typeface with a user-supplied .ttf/.otf.
@@ -369,7 +370,7 @@ public class CustomFontHook {
         try {
             if (ps.reso.instaeclipse.Xposed.Module.dexKitBridge == null) return false;
             java.util.List<org.luckypray.dexkit.result.MethodData> found =
-                    ps.reso.instaeclipse.Xposed.Module.dexKitBridge.findMethod(
+                    DexKitQueryCache.findMethod(ps.reso.instaeclipse.Xposed.Module.dexKitBridge, 
                             org.luckypray.dexkit.query.FindMethod.create().matcher(
                                     org.luckypray.dexkit.query.matchers.MethodMatcher.create()
                                             .name("run")
@@ -407,7 +408,7 @@ public class CustomFontHook {
     private static boolean failEmojiLoad(Object obj, int depth) throws Exception {
         if (obj == null || depth > 2) return false;
         for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 Class<?> t = f.getType();
                 if (!t.getName().startsWith("X.")) continue;
@@ -415,7 +416,7 @@ public class CustomFontHook {
                 Object v = f.get(obj);
                 if (v == null) continue;
                 if (java.lang.reflect.Modifier.isAbstract(t.getModifiers()) && !t.isInterface()) {
-                    for (java.lang.reflect.Method m : t.getDeclaredMethods()) {
+                    for (java.lang.reflect.Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(t)) {
                         Class<?>[] pt = m.getParameterTypes();
                         if (m.getReturnType() == void.class && pt.length == 1 && pt[0] == Throwable.class) {
                             m.setAccessible(true);

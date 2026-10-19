@@ -16,6 +16,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Limits the home feed to accounts the user follows by forcing the feed/timeline request's
@@ -132,7 +133,7 @@ public class FollowingOnlyFeedHook {
 
     private static Method findBuildMethod(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("homecoming_all", "X-IG-PRIMED-FEED-REQUEST")))) {
                 if (md.isConstructor() || md.isStaticInitializer()) continue;
                 Method m = md.getMethodInstance(classLoader);
@@ -161,7 +162,7 @@ public class FollowingOnlyFeedHook {
     /** Every non-static {@code void (String, String)} method declared on the request builder. */
     private static List<Method> adders(Class<?> builder) {
         List<Method> out = new ArrayList<>();
-        for (Method m : builder.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(builder)) {
             Class<?>[] p = m.getParameterTypes();
             if (m.getReturnType() == void.class && !Modifier.isStatic(m.getModifiers())
                     && p.length == 2 && p[0] == String.class && p[1] == String.class) {

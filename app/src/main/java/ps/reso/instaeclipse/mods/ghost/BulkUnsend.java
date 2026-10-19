@@ -44,6 +44,7 @@ import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Bulk unsend (#245): select several of your own messages right in the chat and unsend them at once.
@@ -104,10 +105,10 @@ public final class BulkUnsend {
         if (message == null) { ModuleLog.line(TAG + "❌ no message class"); return; }
         try {
             Class<?> dtk = cl.loadClass(DTK);
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("DirectUnsendMessageInteractor")))) {
                 String owner = md.getClassName();
-                for (MethodData m : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData m : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(owner)))) {
                     for (MethodData inv : m.getInvokes()) {
                         if (!"com.google.common.util.concurrent.ListenableFuture".equals(inv.getReturnTypeName())) continue;
@@ -127,10 +128,10 @@ public final class BulkUnsend {
             if (unsendMethod == null) { ModuleLog.line(TAG + "❌ unsend method not found"); return; }
             unsendMethod.setAccessible(true);
             Class<?> refBase = unsendMethod.getParameterTypes()[0];
-            for (ClassData cd : bridge.findClass(FindClass.create().matcher(ClassMatcher.create()
+            for (ClassData cd : DexKitQueryCache.findClass(bridge, FindClass.create().matcher(ClassMatcher.create()
                     .superClass(refBase.getName())))) {
                 Class<?> c = cd.getInstance(cl);
-                for (Constructor<?> k : c.getDeclaredConstructors()) {
+                for (Constructor<?> k : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(c)) {
                     Class<?>[] p = k.getParameterTypes();
                     if (p.length == 2 && p[0] == message && p[1] == dtk) { refCtor = k; break; }
                 }
@@ -171,7 +172,7 @@ public final class BulkUnsend {
             return c.session != null && c.threadKey != null;
         });
         if (c.session == null) {
-            for (Field f : c.sender.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c.sender.getClass())) {
                 if (!SESSION.equals(f.getType().getName())) continue;
                 try { f.setAccessible(true); c.session = f.get(c.sender); } catch (Throwable ignored) {}
             }
@@ -214,7 +215,7 @@ public final class BulkUnsend {
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.") && !n.startsWith("androidx.recyclerview.")) continue;
             for (Class<?> x = k; x != null && x != Object.class; x = x.getSuperclass()) {
                 if (x.getName().startsWith("android.")) break;
-                for (Field f : x.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(x)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                     try {
                         f.setAccessible(true);
@@ -237,7 +238,7 @@ public final class BulkUnsend {
     private static boolean isMine(Object msg, String me) {
         if (me == null) return false;
         for (Class<?> k = msg.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-            for (Field f : k.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType() != String.class) continue;
                 try { f.setAccessible(true); if (me.equals(f.get(msg))) return true; } catch (Throwable ignored) {}
             }
@@ -247,7 +248,7 @@ public final class BulkUnsend {
 
     private static Object threadKeyOf(Object msg) {
         for (Class<?> k = msg.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-            for (Field f : k.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (Modifier.isStatic(f.getModifiers()) || !DTK.equals(f.getType().getName())) continue;
                 try { f.setAccessible(true); Object v = f.get(msg); if (v != null) return v; } catch (Throwable ignored) {}
             }
@@ -545,7 +546,7 @@ public final class BulkUnsend {
     private static void rememberIds(Object msg, Object key) {
         String thread = ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.firstStringField(key);
         for (Class<?> k = msg.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-            for (Field f : k.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType() != String.class) continue;
                 try {
                     f.setAccessible(true);
@@ -558,6 +559,6 @@ public final class BulkUnsend {
     }
 
     private static void toast(Context c, String s) {
-        try { Toast.makeText(c, s, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
+        try { ps.reso.instaeclipse.utils.toast.IeToast.makeText(c, s, Toast.LENGTH_SHORT).show(); } catch (Throwable ignored) {}
     }
 }

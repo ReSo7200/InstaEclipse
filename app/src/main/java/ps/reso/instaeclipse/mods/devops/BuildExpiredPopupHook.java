@@ -14,6 +14,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class BuildExpiredPopupHook {
 
@@ -67,7 +68,7 @@ public class BuildExpiredPopupHook {
         // ── DexKit path ───────────────────────────────────────────────────────
         try {
             // Primary: find the show-popup method via "lockout_active" string.
-            List<MethodData> showMethods = bridge.findMethod(FindMethod.create()
+            List<MethodData> showMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("lockout_active")
                             .returnType("void")));
@@ -95,7 +96,7 @@ public class BuildExpiredPopupHook {
             }
 
             // Secondary: hook the snooze-expired boolean check
-            List<MethodData> checkMethods = bridge.findMethod(FindMethod.create()
+            List<MethodData> checkMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("snooze_expiration_lockout_manager")
                             .returnType("boolean")));

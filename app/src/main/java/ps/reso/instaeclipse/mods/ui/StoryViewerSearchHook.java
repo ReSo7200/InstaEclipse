@@ -31,6 +31,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 import ps.reso.instaeclipse.utils.users.UserUtils;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Search your story's viewers (Instagram Plus–style, our own implementation; no Plus check is
@@ -55,24 +56,24 @@ public class StoryViewerSearchHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> adapter = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("search_result_rendered")))) {
                 adapter = cl.loadClass(md.getClassName());
                 break;
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("XDTViewerFeedbackDict")))) {
                 recordClass = cl.loadClass(md.getClassName());
                 break;
             }
             if (adapter == null) { ModuleLog.line(TAG + "❌ viewer adapter not found"); return; }
             Method build = null;
-            for (Method m : adapter.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(adapter)) {
                 Class<?>[] p = m.getParameterTypes();
                 if (m.getReturnType() == void.class && p.length == 4 && p[0] == List.class
                         && p[1] == boolean.class && p[2] == boolean.class && p[3] == boolean.class) build = m;
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(adapter.getName()).paramCount(0).returnType("void")
                     .usingStrings("dismissed_reel_viewers_list_megaphone")))) {
                 rebuild = md.getMethodInstance(cl);
@@ -111,7 +112,7 @@ public class StoryViewerSearchHook {
     private static String username(Object record) {
         try {
             for (Class<?> k = record.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || !f.getType().getName().equals("com.instagram.user.model.User")) continue;
                     f.setAccessible(true);
                     return UserUtils.callUsernameGetter(f.get(record));

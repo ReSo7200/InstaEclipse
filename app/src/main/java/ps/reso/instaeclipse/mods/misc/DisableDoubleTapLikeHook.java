@@ -30,6 +30,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class DisableDoubleTapLikeHook {
 
@@ -106,7 +107,7 @@ public class DisableDoubleTapLikeHook {
         boolean reelsHooked = reelsAlreadyHooked;
 
         if (!feedHooked) {
-            List<MethodData> feedMethods = bridge.findMethod(FindMethod.create()
+            List<MethodData> feedMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("double_tap_on_liked", "used_double_tap")
                     )
@@ -120,11 +121,11 @@ public class DisableDoubleTapLikeHook {
                 // synchronously under GestureDetector.onDoubleTap, so the same stack-gated HOOK
                 // blocks only double-tap likes; button likes still go through.
                 feedMethods = new ArrayList<>();
-                feedMethods.addAll(bridge.findMethod(FindMethod.create()
+                feedMethods.addAll(DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .usingStrings("double_tap_on_liked", "like", "unlike")
                                 .returnType("void"))));
-                feedMethods.addAll(bridge.findMethod(FindMethod.create()
+                feedMethods.addAll(DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .usingStrings("used_double_tap", "used_double_tap_hint_impressions")
                                 .returnType("void"))));
@@ -153,7 +154,7 @@ public class DisableDoubleTapLikeHook {
         if (!reelsHooked) {
             try {
                 List<Method> reelLike = new ArrayList<>();
-                for (MethodData md : bridge.findMethod(FindMethod.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings("LIKE_FIRED", "DOUBLE_TAP_MEDIA")))) {
                     Method m = md.getMethodInstance(classLoader);
                     if (hookMethod(m, HOOK)) {
@@ -180,13 +181,13 @@ public class DisableDoubleTapLikeHook {
         }
 
         if (!reelsHooked) {
-            List<ClassData> reelsClasses = bridge.findClass(FindClass.create()
+            List<ClassData> reelsClasses = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create()
                             .usingStrings("clips_doubletap", "LIKE_FIRED")
                     )
             );
             for (ClassData cd : reelsClasses) {
-                List<MethodData> ecgMethods = bridge.findMethod(FindMethod.create()
+                List<MethodData> ecgMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass(cd.getName())
                                 .usingStrings("clips_doubletap")
@@ -225,11 +226,11 @@ public class DisableDoubleTapLikeHook {
                 // A negative result is version-scoped by DexKitCache, just like method entries.
                 if (DexKitCache.isCacheValid() && "absent".equals(DexKitCache.loadString(CACHE_BOUND_ACTION)))
                     return false;
-                List<MethodData> setters = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> setters = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("android_purge_26_q3_GestureActionHandler_setOnLikeMediaAction")));
-                List<MethodData> dispatchers = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> dispatchers = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("android_purge_26_q3_GestureActionHandler_handleDoubleTapMedia")));
-                List<MethodData> actions = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> actions = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .name("invoke").usingStrings("android_purge_26_q3_LikeNavigator_onLikeMedia",
                                 "DOUBLE_TAP_MEDIA", "LIKE_FIRED")));
                 if (setters.size() != 1 || dispatchers.size() != 1 || actions.size() != 1) {
@@ -362,7 +363,7 @@ public class DisableDoubleTapLikeHook {
     private List<Method> findReelsGestureMethods(DexKitBridge bridge, ClassLoader classLoader) {
         List<Method> methods = new ArrayList<>();
         try {
-            List<MethodData> callbacks = bridge.findMethod(FindMethod.create()
+            List<MethodData> callbacks = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .name("onDoubleTap")
                             .paramTypes("android.view.MotionEvent")
@@ -426,7 +427,7 @@ public class DisableDoubleTapLikeHook {
         }
         int score = 0;
         for (Class<?> current = clazz; current != null && current != Object.class; current = current.getSuperclass()) {
-            for (Field field : current.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(current)) {
                 String typeName = field.getType().getName();
                 if ("com.instagram.clips.intf.ClipsViewerConfig".equals(typeName)) score += 3;
                 if ("com.instagram.common.session.UserSession".equals(typeName)) score++;
@@ -443,7 +444,7 @@ public class DisableDoubleTapLikeHook {
         Class<?> clazz = target.getClass();
         if (isLikelyClipsGestureClass(clazz)) return true;
         for (Class<?> current = clazz; current != null && current != Object.class; current = current.getSuperclass()) {
-            for (Field field : current.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(current)) {
                 try {
                     if (!View.class.isAssignableFrom(field.getType())) continue;
                     field.setAccessible(true);

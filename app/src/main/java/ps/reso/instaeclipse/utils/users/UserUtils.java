@@ -20,7 +20,7 @@ public class UserUtils {
         }
 
         // 2. Fallback: DexKit was wrong. Scan for the real lowercase username method.
-        for (Method m : user.getClass().getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(user.getClass())) {
             if (m.getParameterCount() != 0 || !m.getReturnType().equals(String.class)) continue;
             try {
                 m.setAccessible(true);

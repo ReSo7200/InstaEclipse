@@ -98,7 +98,7 @@ public class ReelsControlsHook {
     }
 
     private static Field viewPagerField(Class<?> c) {
-        for (Field f : c.getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
             if (f.getType().getName().equals("androidx.viewpager2.widget.ViewPager2")) {
                 f.setAccessible(true);
                 return f;

@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Disable Repost (feed + reels/clips + profile grid).
@@ -89,7 +90,7 @@ public class DisableRepostHook {
         Set<String> hooked = new HashSet<>();
         for (String anchor : NEUTRALIZE_ANCHORS) {
             try {
-                for (MethodData md : bridge.findMethod(FindMethod.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings(anchor)))) {
                     String key = md.getDescriptor();
                     if (!hooked.add(key)) continue; // avoid double-hooking a shared method
@@ -128,7 +129,7 @@ public class DisableRepostHook {
             if (hasPostRepostLauncher(enclosing)) owner = enclosing;
             if (owner == null) {
                 outer:
-                for (Constructor<?> c : lambda.getDeclaredConstructors()) {
+                for (Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(lambda)) {
                     for (Class<?> pt : c.getParameterTypes()) {
                         if (hasPostRepostLauncher(pt)) { owner = pt; break outer; }
                     }
@@ -140,7 +141,7 @@ public class DisableRepostHook {
                 return 0;
             }
 
-            for (Method m : owner.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(owner)) {
                 if (!isPostRepostLauncher(m)) continue;
                 try {
                     m.setAccessible(true);
@@ -174,7 +175,7 @@ public class DisableRepostHook {
         String n = c.getName();
         if (n.startsWith("java.") || n.startsWith("android") || n.startsWith("kotlin.")) return false;
         try {
-            for (Method m : c.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (isPostRepostLauncher(m)) return true;
             }
         } catch (Throwable ignored) {}

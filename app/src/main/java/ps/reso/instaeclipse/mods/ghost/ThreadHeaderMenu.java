@@ -56,6 +56,14 @@ final class ThreadHeaderMenu {
         }
     }
 
+    /** Opens the open chat's menu again (Back from a list opened from it). */
+    static void reopen(Activity a) {
+        try {
+            View btn = a.getWindow().getDecorView().findViewWithTag(TAG);
+            if (btn != null) show(btn);
+        } catch (Throwable ignored) { }
+    }
+
     @SuppressLint("DiscouragedApi")
     private static View createButton(Activity a) {
         String pkg = a.getPackageName();

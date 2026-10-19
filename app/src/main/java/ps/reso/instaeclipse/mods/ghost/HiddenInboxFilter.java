@@ -24,6 +24,7 @@ import ps.reso.instaeclipse.utils.ghost.CurrentConversation;
 import ps.reso.instaeclipse.utils.ghost.HiddenThreads;
 import ps.reso.instaeclipse.utils.ghost.InboxListFilter;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /** Local inbox-result projection only. Header actions live in the shared discreet-menu hook. */
 final class HiddenInboxFilter {
@@ -43,7 +44,7 @@ final class HiddenInboxFilter {
         if (methods == null || methods.isEmpty() || methods.stream().anyMatch(m -> !validMethod(m))) {
             methods = new ArrayList<>();
             try {
-                for (MethodData data : bridge.findMethod(FindMethod.create()
+                for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings(ANCHOR)))) {
                     Method method = data.getMethodInstance(loader);
                     if (validMethod(method)) methods.add(method);
@@ -55,7 +56,7 @@ final class HiddenInboxFilter {
         for (Method method : methods) {
             try {
                 XposedBridge.hookMethod(method, new XC_MethodHook() {
-                    @Override protected void afterHookedMethod(MethodHookParam param) {
+                    @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                         if (param.hasThrowable()) return;
                         rememberInboxStore(param.thisObject);
                         String requestAccount = CurrentConversation.accountIdOf(param.thisObject);
@@ -95,13 +96,13 @@ final class HiddenInboxFilter {
     private static void installRefresh(DexKitBridge bridge, ClassLoader loader) {
         try {
             Set<Class<?>> classes = new LinkedHashSet<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("DirectThreadStoreImpl.notifyFolderChange"))))
                 classes.add(data.getMethodInstance(loader).getDeclaringClass());
             if (classes.size() != 1) return;
             Class<?> type = classes.iterator().next();
             List<Method> candidates = new ArrayList<>();
-            for (Method method : type.getDeclaredMethods()) {
+            for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(type)) {
                 Class<?>[] parameters = method.getParameterTypes();
                 if (!Modifier.isStatic(method.getModifiers()) && method.getReturnType() == void.class
                         && parameters.length == 1 && parameters[0].isEnum()) candidates.add(method);
@@ -114,7 +115,7 @@ final class HiddenInboxFilter {
             inboxStoreClass = type;
             refreshMethod = method;
             XposedBridge.hookAllConstructors(type, new XC_MethodHook() {
-                @Override protected void afterHookedMethod(MethodHookParam param) {
+                @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (!param.hasThrowable()) rememberInboxStore(param.thisObject);
                 }
             });
@@ -126,7 +127,7 @@ final class HiddenInboxFilter {
         try {
             Object inbox = null;
             if (inboxStoreClass.isInstance(store)) inbox = store;
-            else for (Field field : store.getClass().getDeclaredFields()) {
+            else for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(store.getClass())) {
                 if (Modifier.isStatic(field.getModifiers()) || field.getType() != inboxStoreClass) continue;
                 field.setAccessible(true);
                 Object candidate = field.get(store);
@@ -178,7 +179,7 @@ final class HiddenInboxFilter {
         Set<String> ids = new LinkedHashSet<>();
         try {
             for (Class<?> type = row.getClass(); type != null && type != Object.class; type = type.getSuperclass()) {
-                for (Field field : type.getDeclaredFields()) {
+                for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(type)) {
                     if (Modifier.isStatic(field.getModifiers()) || !field.getType().getName().equals(KEY)) continue;
                     field.setAccessible(true);
                     Object key = field.get(row);
@@ -190,7 +191,7 @@ final class HiddenInboxFilter {
             }
             // Current 447 row model exposes its key through the DirectThreadKey-returning accessor.
             // Resolve by signature, not the obfuscated CTG name. Refuse contradictory identities.
-            if (ids.isEmpty()) for (Method method : row.getClass().getMethods()) {
+            if (ids.isEmpty()) for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(row.getClass())) {
                 if (Modifier.isStatic(method.getModifiers()) || method.getParameterCount() != 0
                         || !method.getReturnType().getName().equals(KEY)) continue;
                 Object key = method.invoke(row);

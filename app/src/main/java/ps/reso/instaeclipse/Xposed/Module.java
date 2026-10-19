@@ -148,6 +148,9 @@ public class Module {
 
     /** DexKitCache key set once every feature hook has been installed for this IG version. */
     private static final String CACHE_COMPLETE_KEY = "InstallComplete";
+    /** ...by this module build: a new build can bring new lookups, so its first launch is a cold
+     *  one too (the old "1" marker predates DexKitQueryCache, whose entries that launch fills). */
+    private static final String CACHE_COMPLETE_VALUE = String.valueOf(ps.reso.instaeclipse.BuildConfig.VERSION_CODE);
 
     private static java.util.Set<String> skipped;
 
@@ -262,6 +265,7 @@ public class Module {
                     }
                     try {
                         UIHookManager.registerSettingsRestoreReceiver(context);
+                        ps.reso.instaeclipse.mods.media.DataBackup.registerRestoreReceiver(context);
                     } catch (Throwable e) {
                         ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
                     }
@@ -457,6 +461,13 @@ public class Module {
                         ModuleLog.line("(InstaEclipse | StartupTab): ❌ Failed to hook: " + t);
                     }
 
+                    // Back on the home feed leaves Instagram (#272)
+                    try {
+                        if (!skip("BackLeavesHomeHook")) new ps.reso.instaeclipse.mods.ui.BackLeavesHomeHook().install(hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(IE|BackLeavesHome): ❌ Failed to hook: " + t);
+                    }
+
                     // Extras: no swipe to camera from the feed
                     try {
                         if (!skip("SwipeToCameraHook")) new ps.reso.instaeclipse.mods.extras.SwipeToCameraHook().install(hostClassLoader);
@@ -547,6 +558,22 @@ public class Module {
                         if (!skip("LikeUndoHook")) new ps.reso.instaeclipse.mods.misc.LikeUndoHook().install(dexKitBridge);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | LikeUndo): ❌ Failed to hook");
+                    }
+                    try {
+                        if (!skip("FollowConfirmHook")) new ps.reso.instaeclipse.mods.misc.FollowConfirmHook().install(dexKitBridge);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | FollowConfirm): ❌ Failed to hook");
+                    }
+                    try {
+                        if (!skip("ProfileMenuHook")) new ps.reso.instaeclipse.mods.ui.ProfileMenuHook().install(dexKitBridge, hostClassLoader);
+                        if (!skip("PostCountSpoof")) ps.reso.instaeclipse.mods.feed.PostCountSpoof.install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|ProfileMenu) ❌ Failed to hook");
+                    }
+                    try {
+                        if (!skip("ProfileSpoofHook")) new ps.reso.instaeclipse.mods.ui.ProfileSpoofHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|ProfileSpoof) ❌ Failed to hook");
                     }
 
                     // Hide "Create group" on the DM share sheet (#240)
@@ -799,20 +826,21 @@ public class Module {
                     }
 
                     // Every lookup is cached now: later launches install inline.
-                    DexKitCache.saveString(CACHE_COMPLETE_KEY, "1");
+                    DexKitCache.saveString(CACHE_COMPLETE_KEY, CACHE_COMPLETE_VALUE);
                     };
 
-                    if (DexKitCache.isCacheValid() && "1".equals(DexKitCache.loadString(CACHE_COMPLETE_KEY))) {
-                        // Warm cache: installing is quick (reflection only), so hooks are in place
-                        // before Instagram's own startup code runs.
+                    if (DexKitCache.isCacheValid() && CACHE_COMPLETE_VALUE.equals(DexKitCache.loadString(CACHE_COMPLETE_KEY))) {
+                        // Warm cache: installing is quick (every DexKit query is answered by
+                        // DexKitQueryCache, the rest is reflection), so hooks are in place before
+                        // Instagram's own startup code runs.
                         installFeatureHooks.run();
                     } else {
-                        // First launch for this Instagram version (or an interrupted one): DexKit has
+                        // First launch for this Instagram version or module build (or an interrupted one): DexKit has
                         // to scan the APK, which takes many seconds. Inside Application.attach that
                         // risks Android killing the app for not finishing startup, before the cache
                         // is even written. Resolve in the background instead; features turn on a few
                         // seconds after launch, and from the next launch on everything is cached.
-                        ModuleLog.line("(InstaEclipse): first launch for this Instagram version — installing hooks in background");
+                        ModuleLog.line("(InstaEclipse): first launch for this Instagram version or module build — installing hooks in background");
                         Thread t = new Thread(() -> {
                             long start = android.os.SystemClock.elapsedRealtime();
                             installFeatureHooks.run();

@@ -45,6 +45,8 @@ public class DistractionFreeUIHook {
     // Disable Discover People: the profile's "Discover people" carousel (IG shows cached
     // suggestions even when the network drop blocks new ones).
     private static int discoverPeopleId = 0;
+    // Hide Instants: the stack of Instants (quicksnap) photos floating over the app.
+    private static int instantsId = 0;
 
     private static boolean navTabHidden(int index) {
         switch (index) {
@@ -76,7 +78,7 @@ public class DistractionFreeUIHook {
 
     private static boolean anyFlag() {
         return FeatureFlags.disableStories || FeatureFlags.hideStoriesTray || FeatureFlags.disableReels || anyNavTabHidden() || FeatureFlags.hidePlusUpsells
-                || !FeatureFlags.navTabOrder.isEmpty() || FeatureFlags.disableDiscoverPeople;
+                || !FeatureFlags.navTabOrder.isEmpty() || FeatureFlags.disableDiscoverPeople || FeatureFlags.hideInstants;
     }
 
     @SuppressLint("DiscouragedApi")
@@ -93,6 +95,7 @@ public class DistractionFreeUIHook {
             for (int i = 0; i < PLUS_UPSELL_NAMES.length; i++)
                 plusUpsellIds[i] = res.getIdentifier(PLUS_UPSELL_NAMES[i], "id", pkg);
             discoverPeopleId = res.getIdentifier("similar_accounts_container", "id", pkg);
+            instantsId = res.getIdentifier("direct_quick_snap_consumption_preview", "id", pkg);
             idsResolved = true;
             ModuleLog.line("(IE|DistractUI) resolved: tray=" + trayId + " clipsTab=" + clipsTabId);
         } catch (Throwable ignored) {}
@@ -134,6 +137,10 @@ public class DistractionFreeUIHook {
                 ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("HidePlusUpsells");
             }
             if (FeatureFlags.disableDiscoverPeople && discoverPeopleId != 0) collapseAllById((ViewGroup) root, discoverPeopleId);
+            if (FeatureFlags.hideInstants && instantsId != 0) {
+                collapseAllById((ViewGroup) root, instantsId);
+                ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("HideInstants");
+            }
             if (!FeatureFlags.navTabOrder.isEmpty()) reorderTabs(a, (ViewGroup) root);
         } catch (Throwable ignored) {}
     }

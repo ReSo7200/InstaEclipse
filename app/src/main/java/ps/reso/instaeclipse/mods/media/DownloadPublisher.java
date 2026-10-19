@@ -116,6 +116,17 @@ final class DownloadPublisher {
         } finally { temp.delete(); }
     }
 
+    /**
+     * Whether a save made by Instagram itself (the app unreachable) lands in the folder chosen in
+     * the app: one inside Download is reachable through MediaStore without any permission.
+     */
+    static boolean reachesChosenFolder(String customPath) {
+        String root = Environment.getExternalStorageDirectory().getAbsolutePath();
+        if (customPath == null || !customPath.startsWith(root + "/")) return false;
+        String top = customPath.substring(root.length() + 1).split("/")[0];
+        return top.equals("Download");
+    }
+
     static String mediaStorePath(String customPath, String externalRoot, String owner, boolean usernameFolder) {
         String base = "Download/InstaEclipse";
         if (!customPath.isEmpty() && !customPath.startsWith("content://")

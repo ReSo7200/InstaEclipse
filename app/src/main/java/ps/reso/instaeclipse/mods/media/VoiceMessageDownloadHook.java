@@ -30,6 +30,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Download voice messages from the DM long-press menu (#223).
@@ -98,7 +99,7 @@ public class VoiceMessageDownloadHook {
             } catch (Throwable t) {
                 ModuleLog.line(TAG + "sticker classes: " + t);
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("audio_src_expiration_timestamp_us", "waveform_sampling_frequency_hz")
                     .returnType("java.util.Map")))) {
                 Method m = md.getMethodInstance(cl);
@@ -108,11 +109,11 @@ public class VoiceMessageDownloadHook {
 
             // message lookup → remember the long-pressed message
             int lookups = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings(": null_direct_message")))) {
                 Class<?> owner = md.getMethodInstance(cl).getDeclaringClass();
                 messageClass = md.getMethodInstance(cl).getReturnType();
-                for (Method m : owner.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(owner)) {
                     // static on some builds, instance methods on others (X.0Awd on 452.0.0.33)
                     if (m.getReturnType() != messageClass || Modifier.isAbstract(m.getModifiers())) continue;
                     XposedBridge.hookMethod(m, new XC_MethodHook() {
@@ -135,14 +136,14 @@ public class VoiceMessageDownloadHook {
             Class<?> vm = cl.loadClass(VIEW_MODEL);
             Class<?> data = cl.loadClass(ACTION_DATA);
             Constructor<?> dataCtor = null;
-            for (Constructor<?> c : data.getDeclaredConstructors()) if (c.getParameterCount() == 11) dataCtor = c;
+            for (Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(data)) if (c.getParameterCount() == 11) dataCtor = c;
             final Constructor<?> ctor = dataCtor;
             if (ctor != null) {
                 for (Object v : ctor.getParameterTypes()[2].getEnumConstants())
                     if (CARRIER.equals(((Enum<?>) v).name())) saveMediaAction = v;
             }
             int factories = 0;
-            for (Method m : vm.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(vm)) {
                 if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != vm) continue;
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
                     @Override
@@ -206,7 +207,7 @@ public class VoiceMessageDownloadHook {
 
             // tap dispatcher
             int dispatchers = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("DirectReportDailyPromptInteractor.reportDailyPrompt")))) {
                 Method m = md.getMethodInstance(cl);
                 XposedBridge.hookMethod(m, new XC_MethodHook() {
@@ -262,7 +263,7 @@ public class VoiceMessageDownloadHook {
             }
             // Row taps of the long-press menu go through the static method of the menu controller
             // that takes a LongPressActionData (MessageActionsController.A02 on 452).
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .paramTypes(ACTION_DATA, null, "java.lang.String")))) {
                 Method m = md.getMethodInstance(cl);
                 if (!Modifier.isStatic(m.getModifiers())) continue;
@@ -297,7 +298,7 @@ public class VoiceMessageDownloadHook {
             // "Action selected" listeners: (ActionEnum, String) -> void, e.g. X.0lMj.E5t on 452.
             if (ctor != null) {
                 String actionEnum = ctor.getParameterTypes()[2].getName();
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .paramTypes(actionEnum, "java.lang.String").returnType("void")))) {
                     Method m;
                     try { m = md.getMethodInstance(cl); } catch (Throwable t) { continue; }
@@ -335,7 +336,7 @@ public class VoiceMessageDownloadHook {
             int composeRows = 0;
             try {
                 java.lang.reflect.Field labelField = null;
-                for (Field f : data.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(data)) {
                     if (f.getType() == String.class && !Modifier.isStatic(f.getModifiers())) {
                         // label = constructor param 8 (index 7); pick the field set from it
                         Class<?>[] cp = ctor.getParameterTypes();
@@ -352,7 +353,7 @@ public class VoiceMessageDownloadHook {
                     final Field lf = labelField;
                     String desc = "L" + ACTION_DATA.replace('.', '/') + ";->" + lf.getName() + ":Ljava/lang/String;";
                     Class<?> fn1 = cl.loadClass("kotlin.jvm.functions.Function1");
-                    for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .addUsingField(desc)))) {
                         if (!md.isMethod()) continue;
                         Method m;
@@ -496,7 +497,7 @@ public class VoiceMessageDownloadHook {
                     String n = o.getClass().getName();
                     if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
                     for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                        for (Field f : k.getDeclaredFields()) {
+                        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                             if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                             try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
                         }
@@ -527,14 +528,14 @@ public class VoiceMessageDownloadHook {
             for (java.lang.ref.WeakReference<Object> ref : userCaches) {
                 Object cache = ref.get();
                 if (cache == null) continue;
-                for (Field f : cache.getClass().getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cache.getClass())) {
                     if (Modifier.isStatic(f.getModifiers()) || !Map.class.isAssignableFrom(f.getType())) continue;
                     f.setAccessible(true);
                     if (f.get(cache) instanceof Map<?, ?> m) maps.add(m);
                 }
             }
             for (Class<?> k = message.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers())) continue;
                     Class<?> t = f.getType();
                     if (t != String.class && t != long.class && t != Long.class) continue;
@@ -661,7 +662,7 @@ public class VoiceMessageDownloadHook {
             List<Object> children = new ArrayList<>();
             boolean textType = false; // the message type enum (TEXT on 451); skips media/stickers
             for (Class<?> k = msg.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                     f.setAccessible(true);
                     Object v = f.get(msg);
@@ -674,7 +675,7 @@ public class VoiceMessageDownloadHook {
             Set<String> nested = new java.util.HashSet<>();
             for (Object c : children)
                 for (Class<?> k = c.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                    for (Field f : k.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                         if (Modifier.isStatic(f.getModifiers()) || f.getType() != String.class) continue;
                         try { f.setAccessible(true); Object v = f.get(c); if (v instanceof String s) nested.add(s); } catch (Throwable ignored) {}
                     }
@@ -753,7 +754,7 @@ public class VoiceMessageDownloadHook {
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                     try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
                 }
@@ -807,8 +808,8 @@ public class VoiceMessageDownloadHook {
 
     private static String actionName(Object row) {
         try {
-            Field f = row.getClass().getDeclaredFields()[0];
-            for (Field g : row.getClass().getDeclaredFields()) {
+            Field f = ps.reso.instaeclipse.utils.core.SafeReflect.fields(row.getClass())[0];
+            for (Field g : ps.reso.instaeclipse.utils.core.SafeReflect.fields(row.getClass())) {
                 if (Modifier.isStatic(g.getModifiers()) || !g.getType().isEnum()) continue;
                 g.setAccessible(true);
                 Object v = g.get(row);
@@ -823,7 +824,7 @@ public class VoiceMessageDownloadHook {
     }
 
     private static boolean isSaveMedia(Object row) {
-        for (Field f : row.getClass().getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(row.getClass())) {
             if (Modifier.isStatic(f.getModifiers()) || !f.getType().isEnum()) continue;
             try {
                 f.setAccessible(true);
@@ -839,7 +840,7 @@ public class VoiceMessageDownloadHook {
         try {
             StringBuilder sb = new StringBuilder();
             for (Class<?> k = msg.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                     f.setAccessible(true);
                     Object v = f.get(msg);
@@ -872,7 +873,7 @@ public class VoiceMessageDownloadHook {
             if (saveMediaAction == null) return null;
             Object style = null;
             Integer icon = null;
-            for (Field f : template.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(template.getClass())) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 if (f.getType() == p[1] && style == null) style = f.get(template);
@@ -935,12 +936,12 @@ public class VoiceMessageDownloadHook {
                 }
                 if (animatedMediaClass.isInstance(o)) {
                     String best = null;
-                    for (Field f : animatedMediaClass.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(animatedMediaClass)) {
                         if (f.getType() != gifUrlClass || Modifier.isStatic(f.getModifiers())) continue;
                         f.setAccessible(true);
                         Object gif = f.get(o);
                         if (gif == null) continue;
-                        for (Field g : gifUrlClass.getDeclaredFields()) {
+                        for (Field g : ps.reso.instaeclipse.utils.core.SafeReflect.fields(gifUrlClass)) {
                             if (g.getType() != String.class || Modifier.isStatic(g.getModifiers())) continue;
                             g.setAccessible(true);
                             if (!(g.get(gif) instanceof String u) || !u.startsWith("http")) continue;
@@ -955,7 +956,7 @@ public class VoiceMessageDownloadHook {
                 String n = o.getClass().getName();
                 if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
                 for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-                    for (Field f : k.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                         if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                         try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
                     }
@@ -972,14 +973,14 @@ public class VoiceMessageDownloadHook {
         if (typedImageUrlClass == null || imageUrlClass == null) return null;
         String best = null;
         long bestArea = -1;
-        for (Field f : storeStickerClass.getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(storeStickerClass)) {
             if (f.getType() != typedImageUrlClass || Modifier.isStatic(f.getModifiers())) continue;
             f.setAccessible(true);
             Object typed = f.get(sticker);
             if (typed == null) continue;
             String type = null;
             Object image = null;
-            for (Field g : typedImageUrlClass.getDeclaredFields()) {
+            for (Field g : ps.reso.instaeclipse.utils.core.SafeReflect.fields(typedImageUrlClass)) {
                 if (Modifier.isStatic(g.getModifiers())) continue;
                 g.setAccessible(true);
                 if (g.getType() == String.class) type = (String) g.get(typed);
@@ -1034,7 +1035,7 @@ public class VoiceMessageDownloadHook {
                     continue;
                 }
                 if (o.getClass().getName().equals(MEDIA)) {
-                    for (Method m : o.getClass().getMethods()) {
+                    for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(o.getClass())) {
                         if (m.getParameterCount() == 0 && m.getReturnType() == audioInfoClass) {
                             try { q.add(new Object[]{m.invoke(o), d + 1}); } catch (Throwable ignored) {}
                         }
@@ -1045,7 +1046,7 @@ public class VoiceMessageDownloadHook {
                 String n = o.getClass().getName();
                 if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
                 for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass()) {
-                    for (Field f : k.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                         if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                         try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
                     }

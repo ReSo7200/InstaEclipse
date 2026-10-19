@@ -308,6 +308,15 @@ public class FeatureManager {
         reg(FeatureFlags.followersHistory,     "FollowersHistory",     R.string.ig_feat_followers_history);
         reg(FeatureFlags.savedOnProfile,       "SavedOnProfile",       R.string.ig_feat_saved_on_profile);
         reg(FeatureFlags.hideNotesTray,        "HideNotesTray",        R.string.ig_feat_hide_notes);
+        reg(FeatureFlags.hideDmSuggestions,    "HideDmSuggestions",    R.string.ig_hide_dm_suggestions);
+        reg(FeatureFlags.confirmLikes,         "ConfirmLikes",         R.string.ig_confirm_likes);
+        reg(FeatureFlags.confirmFollows,       "ConfirmFollows",       R.string.ig_confirm_follows);
+        reg(FeatureFlags.profileMenuTools,     "ProfileMenuTools",     R.string.ig_profile_menu_tools);
+        reg(FeatureFlags.postCountSpoof,       "PostCountSpoof",       R.string.ig_post_counts_feature);
+        reg(FeatureFlags.profileSpoofer,       "ProfileSpoofer",       R.string.ig_profile_spoofer);
+        reg(FeatureFlags.profileAnalyzer,      "ProfileAnalyzer",      R.string.ig_profile_analyzer);
+        reg(FeatureFlags.hideInstants,         "HideInstants",         R.string.ig_hide_instants);
+        reg(FeatureFlags.backLeavesHome,       "BackLeavesHome",       R.string.ig_back_leaves_home);
         reg(FeatureFlags.hideDmBlend,          "HideDmBlend",          R.string.ig_feat_hide_blend);
         reg(FeatureFlags.readReceiptChats,     "ReadReceiptChats",     R.string.ig_feat_read_receipt_chats);
         reg(FeatureFlags.hideThreadsButton,    "HideThreadsButton",    R.string.ig_feat_hide_threads);

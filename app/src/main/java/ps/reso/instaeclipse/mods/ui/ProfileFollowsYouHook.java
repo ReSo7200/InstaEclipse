@@ -25,6 +25,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * "Follows you" label on profiles (#239), instead of only the follower toast.
@@ -51,9 +52,9 @@ public class ProfileFollowsYouHook {
             Method updated = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("FollowsYou_onUserUpdated", cl) : null;
             followedByGetter = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("FollowsYou_followedBy", cl) : null;
             if (updated == null || followedByGetter == null) {
-                List<MethodData> u = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> u = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(FRAGMENT).usingStrings("UserDetailFragment.onUserUpdated")));
-                List<MethodData> f = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> f = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .declaredClass(USER).paramCount(0).returnType("java.lang.Boolean")
                         .usingEqStrings(java.util.List.of("followed_by"))));
                 if (u.isEmpty() || f.size() != 1) {
@@ -194,7 +195,7 @@ public class ProfileFollowsYouHook {
     /** True only when one of the User's String fields equals userId. */
     private static boolean sameUserStrict(Object user, String userId) {
         for (Class<?> c = user.getClass(); c != null && c != Object.class; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try { f.setAccessible(true); if (userId.equals(f.get(user))) return true; } catch (Throwable ignored) {}
             }
@@ -225,7 +226,7 @@ public class ProfileFollowsYouHook {
     private static boolean sameUser(Object user, String userId) {
         boolean sawString = false;
         for (Class<?> c = user.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try {
                     f.setAccessible(true);
@@ -249,7 +250,7 @@ public class ProfileFollowsYouHook {
 
     private static Object fieldOfType(Object o, String type) throws IllegalAccessException {
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (!f.getType().getName().equals(type)) continue;
                 f.setAccessible(true);
                 Object v = f.get(o);

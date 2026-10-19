@@ -27,6 +27,7 @@ import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * "Media info" (#231): resolution, duration, codec, audio, the available video qualities (from the
@@ -219,7 +220,7 @@ final class MediaInfo {
                 m = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("MediaInfo_" + key, Module.hostClassLoader) : null;
                 if (m == null) {
                     DexKitBridge bridge = Module.dexKitBridge;
-                    List<MethodData> found = bridge == null ? List.of() : bridge.findMethod(FindMethod.create()
+                    List<MethodData> found = bridge == null ? List.of() : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create().declaredClass(MEDIA).paramCount(0)
                                     .usingEqStrings(List.of(key)).returnType(rt.getName())));
                     if (found.size() != 1) {
