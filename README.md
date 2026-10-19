@@ -108,7 +108,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Music links | Open the song in Spotify, YouTube Music or Apple Music, from Story Info, or from Media info on posts and reels |
 | Poll, slider and quiz results | Results drawn as bars, your own answer marked, and the correct quiz answer in green |
 | Copy story links | Copy the links from link stickers, or pick from a list when there are several |
-| Story tray | Make the story tray smaller so more stories fit in a row, and pick the color of the ring around unseen stories (a preset, your own color or a two-color gradient) |
+| Story tray | Make the story tray smaller so more stories fit in a row, and color the ring around unseen stories with a real color picker: Instagram's colors, one color or a gradient of 2 to 4 colors, with presets, sliders and hex |
 | Hide the story tray | Keep the feed, lose the story row |
 | View story mentions | See every @mention at once. Tap to copy, hold to open the profile |
 | Search your story viewers | A search box over your viewer list |
@@ -139,7 +139,9 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 
 | Feature | What it does |
 |---|---|
-| Download posts, reels and stories | Single photos, full carousels, reels, and stories (your own included, with music), always at the best quality available |
+| Download posts, reels and stories | Single photos, full carousels, reels, and stories (your own included, with music), always at the best quality available. A carousel offers the slide on screen, all slides, or a pick |
+| Download a whole profile | Download all of a profile's posts, or just the newest 12, 30, 50, 100 or any number, from its ⋮ menu |
+| Save video frame | Step through a video one frame at a time and save the frame as a full-resolution PNG, in true colors |
 | Download profile pictures | Long press a profile picture to see the full-size original, square, and save it |
 | Audio only | Save just the audio of a video or reel as .m4a, including a post's music |
 | Copy media link | Copy the direct link for a post, reel or a single carousel slide |
@@ -149,7 +151,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Story cache | Keep stories you watched for 24 hours, so you can save ones that expired |
 | Save Instants | Long press an Instant to save it |
 | Upload Instant from gallery | Send a picture from your gallery as an Instant |
-| Download folder | Choose the folder, sort into a folder per account, and add the date to file names |
+| Download folder | Choose the folder, sort into a folder per account, and add the date to file names. If the InstaEclipse app can't be reached (asleep or not allowed to autostart), downloads still save, to Download |
 
 </details>
 
@@ -202,7 +204,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Ask before liking | A like is sent only after you confirm it |
 | Ask before following | A follow is sent only after you confirm it |
 | Disable repost | Keep the repost button from reposting |
-| Comment search | Search a post's comments, load them all, and export them |
+| Comment search | Search a post's comments, load them all (on Reels the sheet opens to full height so every comment loads), and export them |
 | Copy comments and captions | Copy any comment, or a caption with or without hashtags |
 | Translate | Translate captions, comments and chat messages with your own translator app |
 | Save comment GIFs and images | Download the media in comments |
@@ -296,6 +298,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | Notification fix | Repair notifications that stopped arriving |
 | Auto clear cache | Clear Instagram's media cache once it gets too big |
 | Backup and restore | All settings to a file and back |
+| Back up data | Deleted messages, analyzed profiles, followers history, hidden chats and edited post counts in one file, restored in one tap after reinstalling |
 | Feature toasts | See which features loaded when Instagram starts |
 
 </details>
@@ -309,6 +312,8 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Home dashboard | Module status, Instagram version, quick launch and restart, and your pinned shortcuts |
 | Feature search | Find any switch by name |
+| Instant sync | Switches flipped in the app apply in Instagram right away, and the two menus stay in step |
+| Setup checks | Asks to let the app run in the background when you choose a download folder, and to choose the folder again if its access was lost |
 | Live logs | Hook status from Instagram and the app, no adb needed |
 | Help | Frequently asked questions, setup links for Vector and LSPatch, and the community |
 | 18 languages | English, Arabic, Azerbaijani, Chinese (Simplified and Traditional), French, German, Greek, Hebrew, Indonesian, Italian, Polish, Portuguese, Russian, Spanish, Swedish, Turkish and Vietnamese |
@@ -321,11 +326,11 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 
 | | |
 |---|---|
-| **Tested on** | Instagram `451.0.0.20.80` |
+| **Tested on** | Instagram `452.0.0.33.64` and `452.0.0.43.64` |
 | **Get this version** | [Instagram 451.0.0.20.80 on APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) |
 | **Survives updates** | Yes, DexKit finds what it needs at runtime |
 | **Android** | 9 and newer |
-| **Frameworks** | Vector 2.2 or newer (root), LSPatch 1.0 or newer (no root) |
+| **Frameworks** | Vector 2.2 or newer (root), LSPatch 1.0 or newer (no root); the Legacy build (`-L`) for LSPosed and other frameworks on the classic API |
 
 A big Instagram update can still knock a feature out until it is patched. The menu inside Instagram shows how many features are active (for example "62/62 active"); tap it to see which ones could not attach. If something breaks right after an update, check the [Telegram channel](https://t.me/InstaEclipse) first.
 
@@ -335,7 +340,12 @@ A big Instagram update can still knock a feature out until it is patched. The me
 
 > Get Instagram [451.0.0.20.80 from APKMirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-451-0-0-20-80-release/) rather than the Play Store. The Play build is not always fully supported.
 
-Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone. InstaEclipse uses the new Xposed API (102), so it needs Vector 2.2 or LSPatch 1.0 or newer.
+Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo7200/InstaEclipse/releases/latest), then follow the path for your phone. Each release has two builds with the same features:
+
+| Build | For |
+|---|---|
+| **InstaEclipse** | The new Xposed API (102): Vector 2.2 or newer (root), LSPatch 1.0 or newer (no root) |
+| **InstaEclipse Legacy** (version ends in `-L`) | The classic Xposed API: LSPosed and other frameworks that don't support the new API yet. Try it if the main build doesn't load on your phone |
 
 ### Rooted, with Vector
 
