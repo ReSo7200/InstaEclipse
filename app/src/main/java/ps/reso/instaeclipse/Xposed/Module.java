@@ -559,6 +559,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
                     try {
                         if (!skip("ProfileMenuHook")) new ps.reso.instaeclipse.mods.ui.ProfileMenuHook().install(dexKitBridge, hostClassLoader);
+                        if (!skip("PostCountSpoof")) ps.reso.instaeclipse.mods.feed.PostCountSpoof.install(dexKitBridge, hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(IE|ProfileMenu) ❌ Failed to hook");
                     }

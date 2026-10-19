@@ -277,6 +277,16 @@
     <string name="ig_data_backup_failed">הגיבוי נכשל</string>
     <string name="ig_data_restore_done">שוחזרו %1$d קבצים. מפעיל מחדש את אינסטגרם…</string>
     <string name="ig_data_restore_failed">לא ניתן לשחזר את הגיבוי הזה</string>
+    <string name="ig_post_counts_feature">עריכת מספרים בפוסטים שלך (רק אתה)</string>
+    <string name="ig_post_counts_title">עריכת מספרים</string>
+    <string name="ig_post_counts_hint">מוצג רק בטלפון הזה. השאר שדה ריק כדי לשמור על המספר האמיתי.</string>
+    <string name="ig_post_counts_likes">לייקים</string>
+    <string name="ig_post_counts_comments">תגובות</string>
+    <string name="ig_post_counts_reposts">פרסומים מחדש</string>
+    <string name="ig_post_counts_shares">שיתופים</string>
+    <string name="ig_post_counts_keep">להשאיר אמיתי</string>
+    <string name="ig_post_counts_reset">איפוס</string>
+    <string name="ig_post_counts_saved">המספרים נשמרו</string>
     <string name="ig_profile_menu_tools">תפריט פרופיל: העתקת שם משתמש, ביו והורדת הכול</string>
     <string name="ig_profile_spoofer">זיוף פרופיל (רק בטלפון הזה)</string>
     <string name="ig_profile_spoofer_edit">מספרים ותג מזויפים</string>

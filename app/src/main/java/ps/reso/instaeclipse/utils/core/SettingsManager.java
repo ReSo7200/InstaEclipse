@@ -150,6 +150,7 @@ public class SettingsManager {
         editor.putBoolean("confirmLikes", FeatureFlags.confirmLikes);
         editor.putBoolean("confirmFollows", FeatureFlags.confirmFollows);
         editor.putBoolean("profileMenuTools", FeatureFlags.profileMenuTools);
+        editor.putBoolean("postCountSpoof", FeatureFlags.postCountSpoof);
         editor.putBoolean("profileSpoofer", FeatureFlags.profileSpoofer);
         editor.putInt("spoofFollowers", FeatureFlags.spoofFollowers);
         editor.putInt("spoofFollowing", FeatureFlags.spoofFollowing);
@@ -360,6 +361,7 @@ public class SettingsManager {
         FeatureFlags.confirmLikes = prefs.getBoolean("confirmLikes", false);
         FeatureFlags.confirmFollows = prefs.getBoolean("confirmFollows", false);
         FeatureFlags.profileMenuTools = prefs.getBoolean("profileMenuTools", false);
+        FeatureFlags.postCountSpoof = prefs.getBoolean("postCountSpoof", false);
         FeatureFlags.profileSpoofer = prefs.getBoolean("profileSpoofer", false);
         FeatureFlags.spoofFollowers = prefs.getInt("spoofFollowers", -1);
         FeatureFlags.spoofFollowing = prefs.getInt("spoofFollowing", -1);

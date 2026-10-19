@@ -379,6 +379,16 @@
     <string name="ig_data_backup_failed">Tworzenie kopii nie powiodło się</string>
     <string name="ig_data_restore_done">Przywrócono pliki: %1$d. Ponowne uruchamianie Instagrama…</string>
     <string name="ig_data_restore_failed">Nie można przywrócić tej kopii</string>
+    <string name="ig_post_counts_feature">Edytuj liczby na swoich postach (tylko ty)</string>
+    <string name="ig_post_counts_title">Edytuj liczby</string>
+    <string name="ig_post_counts_hint">Widoczne tylko na tym telefonie. Zostaw puste, aby zachować prawdziwą liczbę.</string>
+    <string name="ig_post_counts_likes">Polubienia</string>
+    <string name="ig_post_counts_comments">Komentarze</string>
+    <string name="ig_post_counts_reposts">Udostępnienia ponowne</string>
+    <string name="ig_post_counts_shares">Udostępnienia</string>
+    <string name="ig_post_counts_keep">Zachowaj prawdziwe</string>
+    <string name="ig_post_counts_reset">Resetuj</string>
+    <string name="ig_post_counts_saved">Liczby zapisane</string>
     <string name="ig_profile_menu_tools">Menu profilu: kopiuj nazwę, bio i pobierz wszystko</string>
     <string name="ig_profile_spoofer">Fałszywy profil (tylko na tym telefonie)</string>
     <string name="ig_profile_spoofer_edit">Fałszywe liczby i odznaka</string>

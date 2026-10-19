@@ -62,7 +62,7 @@ public final class DataBackup {
 
     /** Files that belong in a backup: our stores only (not caches or logs). */
     private static boolean included(String name) {
-        return name.equals(UNSENT) || name.equals("ie_hidden_threads.json") || name.equals("ie_thread_names.json")
+        return name.equals(UNSENT) || name.equals("ie_hidden_threads.json") || name.equals("ie_thread_names.json") || name.equals("ie_post_counts.json")
                 || name.startsWith("ie_watch") || name.startsWith("ie_followers_history_");
     }
 

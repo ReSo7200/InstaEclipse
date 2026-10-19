@@ -40,6 +40,9 @@ public final class ProfileSpoofHook {
     private static final String TOKEN = "IgSessionManager.SESSION_TOKEN_KEY";
 
     private static volatile String selfId;
+
+    /** The logged-in account's user id (null until a screen of it has resumed). */
+    public static String selfId() { return selfId; }
     private static volatile Field idField;
     private static volatile boolean idFieldSearched;
 

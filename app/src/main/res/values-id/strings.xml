@@ -277,6 +277,16 @@
     <string name="ig_data_backup_failed">Pencadangan gagal</string>
     <string name="ig_data_restore_done">%1$d file dipulihkan. Memulai ulang Instagram…</string>
     <string name="ig_data_restore_failed">Tidak dapat memulihkan cadangan ini</string>
+    <string name="ig_post_counts_feature">Ubah angka di postingan Anda (hanya Anda)</string>
+    <string name="ig_post_counts_title">Ubah angka</string>
+    <string name="ig_post_counts_hint">Hanya terlihat di ponsel ini. Biarkan kosong untuk angka asli.</string>
+    <string name="ig_post_counts_likes">Suka</string>
+    <string name="ig_post_counts_comments">Komentar</string>
+    <string name="ig_post_counts_reposts">Posting ulang</string>
+    <string name="ig_post_counts_shares">Bagikan</string>
+    <string name="ig_post_counts_keep">Biarkan asli</string>
+    <string name="ig_post_counts_reset">Atur ulang</string>
+    <string name="ig_post_counts_saved">Angka disimpan</string>
     <string name="ig_profile_menu_tools">Menu profil: salin nama pengguna, bio &amp; unduh semua</string>
     <string name="ig_profile_spoofer">Pemalsu profil (hanya di ponsel ini)</string>
     <string name="ig_profile_spoofer_edit">Angka &amp; lencana palsu</string>

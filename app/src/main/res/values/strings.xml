@@ -508,6 +508,16 @@
     <string name="ig_data_backup_failed">Backup failed</string>
     <string name="ig_data_restore_done">Restored %1$d files. Restarting Instagram…</string>
     <string name="ig_data_restore_failed">Could not restore this backup</string>
+    <string name="ig_post_counts_feature">Edit Counts on Your Posts (only you)</string>
+    <string name="ig_post_counts_title">Edit counts</string>
+    <string name="ig_post_counts_hint">Shown only on this phone. Leave a field empty to keep the real number.</string>
+    <string name="ig_post_counts_likes">Likes</string>
+    <string name="ig_post_counts_comments">Comments</string>
+    <string name="ig_post_counts_reposts">Reposts</string>
+    <string name="ig_post_counts_shares">Shares</string>
+    <string name="ig_post_counts_keep">Keep real</string>
+    <string name="ig_post_counts_reset">Reset</string>
+    <string name="ig_post_counts_saved">Counts saved</string>
     <string name="ig_profile_menu_tools">Profile Menu: Copy Username, Bio &amp; Download All</string>
     <string name="ig_profile_spoofer">Profile Spoofer (only on this phone)</string>
     <string name="ig_profile_spoofer_edit">Spoofed Counts &amp; Badge</string>

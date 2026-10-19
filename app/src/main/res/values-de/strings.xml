@@ -246,6 +246,16 @@
     <string name="ig_data_backup_failed">Sicherung fehlgeschlagen</string>
     <string name="ig_data_restore_done">%1$d Dateien wiederhergestellt. Instagram wird neu gestartet…</string>
     <string name="ig_data_restore_failed">Diese Sicherung konnte nicht wiederhergestellt werden</string>
+    <string name="ig_post_counts_feature">Zahlen deiner Beiträge bearbeiten (nur für dich)</string>
+    <string name="ig_post_counts_title">Zahlen bearbeiten</string>
+    <string name="ig_post_counts_hint">Nur auf diesem Handy sichtbar. Feld leer lassen, um die echte Zahl zu behalten.</string>
+    <string name="ig_post_counts_likes">Likes</string>
+    <string name="ig_post_counts_comments">Kommentare</string>
+    <string name="ig_post_counts_reposts">Reposts</string>
+    <string name="ig_post_counts_shares">Geteilt</string>
+    <string name="ig_post_counts_keep">Echte behalten</string>
+    <string name="ig_post_counts_reset">Zurücksetzen</string>
+    <string name="ig_post_counts_saved">Zahlen gespeichert</string>
     <string name="ig_profile_menu_tools">Profilmenü: Benutzername &amp; Bio kopieren, alles laden</string>
     <string name="ig_profile_spoofer">Profil-Spoofer (nur auf diesem Gerät)</string>
     <string name="ig_profile_spoofer_edit">Gefälschte Zahlen &amp; Abzeichen</string>
