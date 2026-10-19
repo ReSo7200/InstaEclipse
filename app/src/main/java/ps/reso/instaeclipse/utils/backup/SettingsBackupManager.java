@@ -191,6 +191,10 @@ public class SettingsBackupManager {
         if (s.has("quickToggleEphemeral"))   FeatureFlags.quickToggleEphemeral   = s.getBoolean("quickToggleEphemeral");
         if (s.has("quickTogglePermanentView")) FeatureFlags.quickTogglePermanentView = s.getBoolean("quickTogglePermanentView");
         if (s.has("quickToggleAllowScreenshots")) FeatureFlags.quickToggleAllowScreenshots = s.getBoolean("quickToggleAllowScreenshots");
+        if (s.has("hideChatBackLongPress"))     FeatureFlags.hideChatBackLongPress     = s.getBoolean("hideChatBackLongPress");
+        if (s.has("hideChatsBackLongPressSeconds")) FeatureFlags.hideChatsBackLongPressSeconds = s.getInt("hideChatsBackLongPressSeconds");
+        if (s.has("emptyGeneralFolder"))        FeatureFlags.emptyGeneralFolder        = s.getBoolean("emptyGeneralFolder");
+        if (s.has("hideDirectFoldersBar"))      FeatureFlags.hideDirectFoldersBar      = s.getBoolean("hideDirectFoldersBar");
 
         if (s.has("hideSuggestionsInFeed"))     FeatureFlags.hideSuggestionsInFeed     = s.getBoolean("hideSuggestionsInFeed");
         if (s.has("hideThreadsSuggestions"))    FeatureFlags.hideThreadsSuggestions    = s.getBoolean("hideThreadsSuggestions");

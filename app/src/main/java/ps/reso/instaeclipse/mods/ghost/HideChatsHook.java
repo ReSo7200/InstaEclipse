@@ -33,6 +33,7 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 public class HideChatsHook {
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         new HiddenInboxFilter().install(bridge, classLoader);
+        new InboxFoldersHook().install(bridge, classLoader);
         ConversationMenuHook.install();
     }
 
@@ -42,6 +43,10 @@ public class HideChatsHook {
 
     public static int refreshKnownAccounts() {
         return HiddenInboxFilter.refreshKnownAccounts();
+    }
+
+    public static void refreshActiveInbox(Activity activity) {
+        InboxFoldersHook.refreshActiveInbox(activity);
     }
     // ── thread-id resolution ──
     /** The open DM thread's id for {@code activity} (shared with ReadReceiptChatHook), or null.

@@ -3,12 +3,11 @@ name: Build Debug APK
 on:
   push:
     branches:
-      - main  # Trigger workflow on pushes to the main branch
-      - 0.4
+      - "**"
   pull_request:
     branches:
-      - main  # Trigger workflow on pull requests to the main branch
-  workflow_dispatch:  # Allow manual triggering via the GitHub Actions UI
+      - main
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,13 +16,17 @@ concurrency:
 jobs:
   build_debug_apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 17 (also caches Gradle dependencies/wrapper)
+      - name: Get short SHA
+        id: vars
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -31,27 +34,60 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      # Step 3: Set up Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools'  # the old 'tools' package no longer exists
+          packages: 'build-tools;34.0.0'
 
-      # Step 4: Grant execution permissions to gradlew
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      # Step 5: Run unit tests before building
+      - name: Set Android SDK permissions for keystore generation
+        run: |
+          mkdir -p ~/.android
+          chmod -R 777 ~/.android
+          mkdir -p ~/.config/.android
+          chmod -R 777 ~/.config/.android
+
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
-      # Step 6: Build the debug APK
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
-      # Step 7: Upload the debug APK as an artifact
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Sign APK
+        id: sign
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/debug -name "*.apk" -print -quit)
+          echo "Found APK at $APK_PATH"
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "Secrets not found. Using unsigned APK for release..."
+            cp $APK_PATH app/build/outputs/apk/debug/InstaEclipse-unsigned.apk
+            echo "signed_apk=app/build/outputs/apk/debug/InstaEclipse-unsigned.apk" >> $GITHUB_ENV
+          else
+            echo "Secrets found. Decoding keystore..."
+            echo $KEYSTORE_BASE64 | base64 --decode > release.jks
+            KEYSTORE_FILE=release.jks
+            STORE_PASS=$KEYSTORE_PASSWORD
+            KEY_PASS=$KEY_PASSWORD
+
+            # align before signing
+            BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+            $BUILD_TOOLS_DIR/zipalign -p -f -v 4 $APK_PATH app/build/outputs/apk/debug/aligned.apk
+            mv app/build/outputs/apk/debug/aligned.apk $APK_PATH
+
+            $BUILD_TOOLS_DIR/apksigner sign --ks $KEYSTORE_FILE --ks-pass pass:$STORE_PASS --key-pass pass:$KEY_PASS --out app/build/outputs/apk/debug/InstaEclipse-signed.apk $APK_PATH
+            echo "signed_apk=app/build/outputs/apk/debug/InstaEclipse-signed.apk" >> $GITHUB_ENV
+          fi
+
+      - name: Release APK
+        uses: softprops/action-gh-release@v2
         with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          tag_name: build-${{ github.ref_name }}-${{ github.run_number }}-${{ env.short_sha }}
+          name: Build ${{ github.ref_name }} #${{ github.run_number }}
+          files: ${{ env.signed_apk }}

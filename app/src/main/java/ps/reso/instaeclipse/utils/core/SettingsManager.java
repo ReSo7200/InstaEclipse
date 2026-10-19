@@ -251,6 +251,10 @@ public class SettingsManager {
         FeatureFlags.lockDirectAlways = prefs.getBoolean("lockDirectAlways", false);
         FeatureFlags.lockWholeApp = prefs.getBoolean("lockWholeApp", false);
         FeatureFlags.hideSpecificChats = prefs.getBoolean("hideSpecificChats", false);
+        FeatureFlags.hideChatBackLongPress = prefs.getBoolean("hideChatBackLongPress", false);
+        FeatureFlags.hideChatsBackLongPressSeconds = prefs.getInt("hideChatsBackLongPressSeconds", 2);
+        FeatureFlags.emptyGeneralFolder = prefs.getBoolean("emptyGeneralFolder", false);
+        FeatureFlags.hideDirectFoldersBar = prefs.getBoolean("hideDirectFoldersBar", false);
         FeatureFlags.showHideChatButton = prefs.getBoolean("showHideChatButton", false);
         FeatureFlags.showDeletedMessagesButton = prefs.getBoolean("showDeletedMessagesButton", false);
         FeatureFlags.keepUnsentInChat = prefs.getBoolean("keepUnsentInChat", false);

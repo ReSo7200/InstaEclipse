@@ -1753,12 +1753,38 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats"),
-                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ie_show_hide_button), "showHideChatButton")
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ie_show_hide_button), "showHideChatButton"),
+                createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_direct_hide_chat_back_long_press), "hideChatBackLongPress"),
+                createClickable(R.drawable.ic_timer, "#5E5CE6",
+                        getString(R.string.ig_direct_back_long_press_duration) + "  ·  " + localCache.getInt("hideChatsBackLongPressSeconds", 2) + "s",
+                        this::showBackLongPressDurationDialog)
+        ));
+
+        defs.add(getString(R.string.feat_options));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_folder, "#5E5CE6", getString(R.string.ig_direct_empty_general_folder), "emptyGeneralFolder"),
+                createSwitch(R.drawable.ic_folder, "#5E5CE6", getString(R.string.ig_direct_hide_folders_bar), "hideDirectFoldersBar")
         ));
 
         // Note: hiding/unhiding a specific chat is done from inside Instagram.
 
         return defs;
+    }
+
+    private void showBackLongPressDurationDialog() {
+        String[] durs = new String[10];
+        for (int j = 0; j < 10; j++) durs[j] = (j + 1) + "s";
+        int current = Math.max(1, Math.min(10, localCache.getInt("hideChatsBackLongPressSeconds", 2))) - 1;
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.ig_direct_back_long_press_duration))
+                .setSingleChoiceItems(durs, current, (dialog, which) -> {
+                    putIntPref("hideChatsBackLongPressSeconds", which + 1);
+                    dialog.dismiss();
+                    loadHideChatsMenu();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private void loadLocationMenu() {

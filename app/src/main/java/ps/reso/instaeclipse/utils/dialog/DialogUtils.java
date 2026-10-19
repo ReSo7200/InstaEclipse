@@ -1797,6 +1797,54 @@ public class DialogUtils {
         hideCard.addView(flagSwitch(context, R.drawable.ic_eye_off, A_PRIVACY,
                 R.string.ie_show_hide_button, "showHideChatButton",
                 ps.reso.instaeclipse.mods.ghost.ConversationMenuHook::refreshAll));
+
+        ToggleRow hideChatBackLongPress = createSwitch(context, R.drawable.ic_timer, A_PRIVACY,
+                I18n.t(context, R.string.ig_direct_hide_chat_back_long_press), FeatureFlags.hideChatBackLongPress);
+        hideChatBackLongPress.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.hideChatBackLongPress = checked;
+            SettingsManager.saveAllFlags();
+            ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.refreshAll();
+        });
+        hideCard.addView(hideChatBackLongPress);
+
+        hideCard.addView(createActionRow(context, R.drawable.ic_timer,
+                I18n.t(context, R.string.ig_direct_back_long_press_duration) + "  ·  " + FeatureFlags.hideChatsBackLongPressSeconds + "s", A_PRIVACY, v -> {
+            String[] options = new String[10];
+            for (int i = 0; i < 10; i++) options[i] = (i + 1) + "s";
+            int currentSelection = FeatureFlags.hideChatsBackLongPressSeconds - 1;
+            if (currentSelection < 0 || currentSelection > 9) currentSelection = 1;
+            IeDialog dialog = new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_direct_back_long_press_duration))
+                    .choices(options, currentSelection, new java.util.function.IntConsumer() {
+                        @Override
+                        public void accept(int which) {
+                            FeatureFlags.hideChatsBackLongPressSeconds = which + 1;
+                            SettingsManager.saveAllFlags();
+                            showHideChatsOptions(context);
+                        }
+                    });
+            dialog.secondary(context.getString(android.R.string.cancel), null);
+            dialog.show();
+        }));
+
+        ToggleRow emptyGeneralFolder = createSwitch(context, R.drawable.ic_folder, A_PRIVACY,
+                I18n.t(context, R.string.ig_direct_empty_general_folder), FeatureFlags.emptyGeneralFolder);
+        emptyGeneralFolder.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.emptyGeneralFolder = checked;
+            SettingsManager.saveAllFlags();
+            ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activityOf(context));
+        });
+        hideCard.addView(emptyGeneralFolder);
+
+        ToggleRow hideDirectFoldersBar = createSwitch(context, R.drawable.ic_folder, A_PRIVACY,
+                I18n.t(context, R.string.ig_direct_hide_folders_bar), FeatureFlags.hideDirectFoldersBar);
+        hideDirectFoldersBar.setOnCheckedChangeListener((b, checked) -> {
+            FeatureFlags.hideDirectFoldersBar = checked;
+            SettingsManager.saveAllFlags();
+            ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activityOf(context));
+        });
+        hideCard.addView(hideDirectFoldersBar);
+
         hideCard.addView(createActionRow(context, R.drawable.ic_chat,
                 I18n.t(context, R.string.ie_chat_actions), A_PRIVACY,
                 v -> ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.show(activityOf(context))));

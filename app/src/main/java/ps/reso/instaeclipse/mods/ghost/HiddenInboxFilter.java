@@ -64,6 +64,29 @@ final class HiddenInboxFilter {
                         if (!observed) { observed = true; ModuleLog.line("(IE|HideChats) inbox builder executed"); }
                         if (!FeatureFlags.hideSpecificChats || !(param.getResult() instanceof List<?> list) || list.isEmpty()) return;
                         try {
+                            if (FeatureFlags.emptyGeneralFolder) {
+                                boolean isGeneral = false;
+                                if (param.args != null) {
+                                    for (Object arg : param.args) {
+                                        if (InboxFoldersHook.isGeneralDescriptor(arg)) {
+                                            isGeneral = true;
+                                            break;
+                                        } else if (arg instanceof java.util.Collection) {
+                                            for (Object elem : (java.util.Collection<?>) arg) {
+                                                if (InboxFoldersHook.isGeneralDescriptor(elem)) {
+                                                    isGeneral = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (isGeneral) break;
+                                    }
+                                }
+                                if (isGeneral) {
+                                    param.setResult(new ArrayList<>());
+                                    return;
+                                }
+                            }
                             // Scope from THIS store, never the foreground account or last seen session.
                             String account = CurrentConversation.accountIdOf(param.thisObject);
                             if (account == null) {

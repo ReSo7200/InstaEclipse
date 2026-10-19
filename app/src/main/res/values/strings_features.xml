@@ -5,4 +5,8 @@
     <string name="feat_search_no_results">No matching features</string>
     <string name="feat_count_on">%1$d on</string>
     <string name="feat_count_off">Off</string>
+    <string name="ig_direct_hide_chat_back_long_press">Hide chat on Back button long-press</string>
+    <string name="ig_direct_back_long_press_duration">Back Long-Press Duration</string>
+    <string name="ig_direct_empty_general_folder">Show \'General\' Folder as Empty</string>
+    <string name="ig_direct_hide_folders_bar">Hide Folders Bar</string>
 </resources>

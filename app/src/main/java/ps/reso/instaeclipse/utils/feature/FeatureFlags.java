@@ -89,6 +89,10 @@ public class FeatureFlags {
     public static volatile boolean confirmFeedRefresh = false; // ask before pull-to-refresh reloads the home feed (#278)
     public static volatile boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static volatile boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
+    public static volatile boolean hideChatBackLongPress = false;
+    public static volatile int hideChatsBackLongPressSeconds = 2;
+    public static volatile boolean emptyGeneralFolder = false;
+    public static volatile boolean hideDirectFoldersBar = false;
 
     // Which ghost mode features the quick toggle will control
     public static volatile boolean quickToggleSeen = false;

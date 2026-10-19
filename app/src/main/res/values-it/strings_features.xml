@@ -5,4 +5,8 @@
     <string name="feat_search_no_results">Nessuna funzionalità trovata</string>
     <string name="feat_count_on">%1$d attive</string>
     <string name="feat_count_off">Disattivate</string>
+    <string name="ig_direct_hide_chat_back_long_press">Nascondi chat tenendo premuto Indietro</string>
+    <string name="ig_direct_back_long_press_duration">Durata pressione tasto Indietro</string>
+    <string name="ig_direct_empty_general_folder">Mostra cartella \'Generale\' vuota</string>
+    <string name="ig_direct_hide_folders_bar">Nascondi barra delle cartelle</string>
 </resources>
