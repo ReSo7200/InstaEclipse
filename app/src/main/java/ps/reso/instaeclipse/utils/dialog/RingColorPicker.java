@@ -289,13 +289,9 @@ public final class RingColorPicker {
         String current = value();
         for (String preset : mode == GRADIENT ? GRADIENT_PRESETS : SOLID_PRESETS) {
             int[] colors = StoryTrayHook.parseColors(preset);
-            GradientDrawable dot = colors.length == 1 ? oval(colors[0])
-                    : new GradientDrawable(GradientDrawable.Orientation.TR_BL, colors);
-            dot.setShape(GradientDrawable.OVAL);
             boolean on = preset.equalsIgnoreCase(current);
-            dot.setStroke(dp(on ? 3 : 1), on ? p.accent : 0x33888888);
             View v = new View(ctx);
-            v.setBackground(dot);
+            v.setBackground(new Swatch(colors, true, 0, on ? p.accent : 0x33888888, dp(on ? 3 : 1)));
             v.setOnClickListener(x -> applyPreset(preset));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(38), dp(38));
             lp.setMarginEnd(dp(10));
@@ -308,10 +304,9 @@ public final class RingColorPicker {
         if (mode != GRADIENT) return;
         for (int i = 0; i < stops.size(); i++) {
             final int idx = i;
-            GradientDrawable dot = oval(stops.get(i));
-            dot.setStroke(dp(idx == selected ? 3 : 1), idx == selected ? p.accent : 0x33888888);
             View v = new View(ctx);
-            v.setBackground(dot);
+            v.setBackground(new Swatch(new int[]{stops.get(i)}, true, 0,
+                    idx == selected ? p.accent : 0x33888888, dp(idx == selected ? 3 : 1)));
             v.setOnClickListener(x -> { selected = idx; refresh(); });
             v.setOnLongClickListener(x -> {
                 if (stops.size() <= 2) return false;
@@ -323,8 +318,7 @@ public final class RingColorPicker {
             stopsRow.addView(v, chipParams(34));
             if (i < stops.size() - 1) {
                 View link = new View(ctx);
-                link.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
-                        new int[]{stops.get(i), stops.get(i + 1)}));
+                link.setBackground(new Swatch(new int[]{stops.get(i), stops.get(i + 1)}, false, dp(2), 0, 0));
                 LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(dp(14), dp(4));
                 llp.setMarginEnd(dp(6));
                 stopsRow.addView(link, llp);
@@ -368,18 +362,16 @@ public final class RingColorPicker {
         s.setMax(max);
         s.setSplitTrack(false);
         s.setPadding(dp(14), dp(8), dp(14), dp(8));
-        GradientDrawable thumb = oval(0xFFFFFFFF);
-        thumb.setSize(dp(24), dp(24));
-        thumb.setStroke(dp(2), 0x40000000);
+        Swatch thumb = new Swatch(new int[]{0xFFFFFFFF}, true, 0, 0x40000000, dp(2));
+        thumb.size = dp(24);
         s.setThumb(thumb);
         s.setThumbOffset(dp(12));
         return s;
     }
 
     private void track(SeekBar s, int[] colors) {
-        GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        g.setCornerRadius(dp(6));
-        g.setSize(0, dp(12));
+        Swatch g = new Swatch(colors, false, dp(6), 0, 0);
+        g.height = dp(12);
         s.setProgressDrawable(g);
         s.setMinimumHeight(dp(12));
     }
@@ -419,6 +411,54 @@ public final class RingColorPicker {
             canvas.drawOval(cx - avatar * 0.62f, cy + avatar * 0.28f, cx + avatar * 0.62f, cy + avatar * 1.25f, fill);
             canvas.restore();
         }
+    }
+
+    /**
+     * Color content painted directly. Instagram's theme engine recolors GradientDrawable and
+     * ColorDrawable fills, which would turn every swatch into the theme's colors; a plain Paint
+     * keeps the real ones. Several colors run diagonally (a dot, like the ring) or left to right.
+     */
+    private static final class Swatch extends android.graphics.drawable.Drawable {
+        private final int[] colors;
+        private final boolean oval;
+        private final float radius;
+        private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final RectF box = new RectF();
+        int size = -1, height = -1;
+
+        Swatch(int[] colors, boolean oval, float radius, int strokeColor, float strokeWidth) {
+            this.colors = colors;
+            this.oval = oval;
+            this.radius = radius;
+            stroke.setStyle(Paint.Style.STROKE);
+            stroke.setColor(strokeColor);
+            stroke.setStrokeWidth(strokeWidth);
+        }
+
+        @Override public void draw(Canvas canvas) {
+            android.graphics.Rect b = getBounds();
+            float inset = stroke.getStrokeWidth() / 2f;
+            box.set(b.left + inset, b.top + inset, b.right - inset, b.bottom - inset);
+            if (colors.length == 1) {
+                fill.setShader(null);
+                fill.setColor(colors[0]);
+            } else {
+                fill.setShader(oval
+                        ? new LinearGradient(box.right, box.top, box.left, box.bottom, colors, null, Shader.TileMode.CLAMP)
+                        : new LinearGradient(box.left, 0, box.right, 0, colors, null, Shader.TileMode.CLAMP));
+            }
+            if (oval) canvas.drawOval(box, fill); else canvas.drawRoundRect(box, radius, radius, fill);
+            if (stroke.getStrokeWidth() > 0) {
+                if (oval) canvas.drawOval(box, stroke); else canvas.drawRoundRect(box, radius, radius, stroke);
+            }
+        }
+
+        @Override public int getIntrinsicWidth() { return size; }
+        @Override public int getIntrinsicHeight() { return height > 0 ? height : size; }
+        @Override public void setAlpha(int alpha) { fill.setAlpha(alpha); }
+        @Override public void setColorFilter(android.graphics.ColorFilter filter) { }
+        @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
     }
 
     // ---- helpers ----
