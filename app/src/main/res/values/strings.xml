@@ -2,7 +2,7 @@
     <!-- app wide -->
     <string name="app_name">InstaEclipse</string>
     <string name="module_description">Enhance your Instagram experience</string>
-    <string name="version" translatable="false">v0.8.1</string>
+    <string name="version" translatable="false">v0.8.2</string>
     <string name="home">Home</string>
     <string name="features">Features</string>
     <string name="help">Help</string>
