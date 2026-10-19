@@ -2495,18 +2495,11 @@ public class FeaturesFragment extends Fragment {
     // STAGING LOGIC
     // =========================================================
 
+    /** A switch applies at once, like in Instagram's menu: saved, stamped and sent to Instagram
+     *  live (or picked up by Instagram's sync on its next start / resume). No Save step. */
     private void stageChange(String prefKey, boolean isChecked) {
-        if (localCache.getBoolean(prefKey, "downloaderUseOriginal".equals(prefKey)) == isChecked) {
-            stagedChanges.remove(prefKey);
-        } else {
-            stagedChanges.put(prefKey, isChecked);
-        }
-
-        if (stagedChanges.isEmpty()) {
-            fabSave.hide();
-        } else {
-            fabSave.show();
-        }
+        if (localCache.getBoolean(prefKey, "downloaderUseOriginal".equals(prefKey)) == isChecked) return;
+        putBoolPref(prefKey, isChecked);
     }
 
     private void commitStagedChanges() {
@@ -2540,9 +2533,21 @@ public class FeaturesFragment extends Fragment {
     // LIFECYCLE BROADCAST REGISTRATION
     // =========================================================
 
+    /** Settings changed elsewhere (inside Instagram, pushed by its sync, or a restore) redraw the
+     *  page on screen, so both menus always show the same values. Coalesced and posted, so a burst
+     *  of changes or a change made from a switch callback never rebinds mid-toggle. */
+    private final Runnable syncRefresh = this::refreshVisibleMenu;
+    private final SharedPreferences.OnSharedPreferenceChangeListener prefsListener = (prefs, key) -> {
+        View v = getView();
+        if (v == null) return;
+        v.removeCallbacks(syncRefresh);
+        v.postDelayed(syncRefresh, 250);
+    };
+
     @Override
     public void onResume() {
         super.onResume();
+        if (localCache != null) localCache.registerOnSharedPreferenceChangeListener(prefsListener);
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_PREFS");
         if (prefsReply != null) prefsReply.cancel();
         prefsNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
@@ -2557,6 +2562,7 @@ public class FeaturesFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        if (localCache != null) localCache.unregisterOnSharedPreferenceChangeListener(prefsListener);
         if (prefsReply != null) { prefsReply.cancel(); prefsReply = null; }
         if (configReply != null) { configReply.cancel(); configReply = null; }
     }
