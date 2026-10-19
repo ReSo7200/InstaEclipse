@@ -544,7 +544,8 @@ public class InstantUploadHook {
             if (host == null || !FeatureFlags.uploadInstants) return;
             boolean hasCam = hasCameraView(host);
             // 2 s margin: the quicksnap view model can start just before its modal reports resumed.
-            boolean on = hasCam && quickSnapActiveAt >= watchStartedAt - 2000 && cameraOnScreen(host);
+            boolean on = hasCam && (quickSnapActiveAt >= watchStartedAt - 2000 || isQuickSnapCamera(host))
+                    && cameraOnScreen(host);
             if (on && (chip == null || chipHost != host)) injectChip(host);
             if (chip != null && chipHost == host) {
                 int vis = on || pickerOpen ? View.VISIBLE : View.GONE;
@@ -585,6 +586,26 @@ public class InstantUploadHook {
         } catch (Throwable t) {
             return true;
         }
+    }
+
+    /** Opened straight from the Instants stack, the camera never touches its view model until the
+     *  grid is opened, so the screen is recognised by its own views instead: the quicksnap camera
+     *  draws named com.instagram.quicksnap.camera.ui views (cover frame, dual bounds); the chat
+     *  camera does not. Remembered per window once seen. */
+    private static final java.util.Map<Activity, Boolean> quickSnapHosts = new java.util.WeakHashMap<>();
+
+    private static boolean isQuickSnapCamera(Activity act) {
+        if (Boolean.TRUE.equals(quickSnapHosts.get(act))) return true;
+        boolean found = hasQuickSnapView(act.getWindow().getDecorView(), 0);
+        if (found) quickSnapHosts.put(act, true);
+        return found;
+    }
+
+    private static boolean hasQuickSnapView(View v, int depth) {
+        if (v.getClass().getName().startsWith("com.instagram.quicksnap.camera.ui.")) return true;
+        if (depth > 40 || !(v instanceof android.view.ViewGroup g)) return false;
+        for (int i = 0; i < g.getChildCount(); i++) if (hasQuickSnapView(g.getChildAt(i), depth + 1)) return true;
+        return false;
     }
 
     @SuppressLint("DiscouragedApi")
