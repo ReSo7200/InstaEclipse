@@ -1131,6 +1131,60 @@ public class CommentSearchHook {
      *  the next page itself near the end). Progress = comments collected so far. */
     private static void loadAll(java.util.function.IntConsumer progress, Runnable done) {
         View root = sheet.get();
+        // Reels open comments in a half-height sheet; at that size the list can't scroll far
+        // enough for Instagram to fetch more pages. Drag the sheet open to full height first.
+        if (root != null && expandSheet(root)) {
+            MAIN.postDelayed(() -> startLoadAll(progress, done), 700);
+            return;
+        }
+        startLoadAll(progress, done);
+    }
+
+    /**
+     * Drags the comments sheet's handle to the top of the screen, the way a finger would: touch
+     * events dispatched into Instagram's own window, so no permission is needed and the sheet's
+     * own drag logic opens it. Returns true when a drag was started (the sheet was not open yet).
+     */
+    @android.annotation.SuppressLint("DiscouragedApi")
+    private static boolean expandSheet(View sheetRoot) {
+        try {
+            View decor = sheetRoot.getRootView();
+            int id = decor.getResources().getIdentifier("bottom_sheet_drag_handle_frame", "id", decor.getContext().getPackageName());
+            View handle = id != 0 ? decor.findViewById(id) : null;
+            if (handle == null || !handle.isShown()) return false;
+            int[] at = new int[2];
+            handle.getLocationInWindow(at);
+            float x = at[0] + handle.getWidth() / 2f, fromY = at[1] + handle.getHeight() / 2f;
+            float toY = decor.getHeight() * 0.06f;
+            if (fromY < decor.getHeight() * 0.25f) return false; // already (nearly) full height
+            final long down = android.os.SystemClock.uptimeMillis();
+            final int steps = 12;
+            decor.dispatchTouchEvent(android.view.MotionEvent.obtain(down, down, android.view.MotionEvent.ACTION_DOWN, x, fromY, 0));
+            for (int i = 1; i <= steps; i++) {
+                final float y = fromY + (toY - fromY) * i / steps;
+                final boolean last = i == steps;
+                MAIN.postDelayed(() -> {
+                    long now = android.os.SystemClock.uptimeMillis();
+                    android.view.MotionEvent move = android.view.MotionEvent.obtain(down, now, android.view.MotionEvent.ACTION_MOVE, x, y, 0);
+                    decor.dispatchTouchEvent(move);
+                    move.recycle();
+                    if (last) {
+                        android.view.MotionEvent up = android.view.MotionEvent.obtain(down, now + 10, android.view.MotionEvent.ACTION_UP, x, y, 0);
+                        decor.dispatchTouchEvent(up);
+                        up.recycle();
+                    }
+                }, i * 16L);
+            }
+            ModuleLog.line(TAG + "load all: opening the sheet to full height");
+            return true;
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ expand sheet: " + t);
+            return false;
+        }
+    }
+
+    private static void startLoadAll(java.util.function.IntConsumer progress, Runnable done) {
+        View root = sheet.get();
         View list = root != null ? scrollable(root) : null; // inside the sheet, not the feed behind it
         ModuleLog.line(TAG + "load all: list=" + (list != null ? list.getClass().getName() + " h=" + list.getHeight() : null));
         if (list == null) {
