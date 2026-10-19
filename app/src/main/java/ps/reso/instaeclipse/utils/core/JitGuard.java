@@ -9,11 +9,12 @@ import java.util.Set;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 /**
- * Keeps ART's JIT away from LSPlant's generated hook stubs (class "LSPHooker_", one per hooked
- * method, defined from an in-memory dex). On Android 13 compiling such a stub crashes the JIT in
- * DexCache::SetResolvedType (SIGSEGV in "Jit thread pool"), so any hook whose target is called a
- * few thousand times kills Instagram. Every hook callback calls {@link #tick}, which takes a
- * backtrace, finds the stub classes on it and marks their methods kAccCompileDontBother.
+ * Keeps ART's JIT away from LSPlant's generated hook stubs (class "LSPHooker_" on LSPosed,
+ * "Vector_" on Vector, one per hooked method, defined from an in-memory dex). On Android 13
+ * compiling such a stub crashes the JIT in DexCache::SetResolvedType (SIGSEGV in "Jit thread
+ * pool"), so any hook whose target is called a few thousand times kills Instagram. Every hook
+ * callback calls {@link #tick}, which takes a backtrace, finds the stub classes on it and marks
+ * their methods kAccCompileDontBother.
  */
 public final class JitGuard {
     private static final int K_ACC_COMPILE_DONT_BOTHER = 0x02000000; // art/libdexfile/dex/modifiers.h
@@ -51,6 +52,10 @@ public final class JitGuard {
         }
     }
 
+    private static boolean isStub(String name) {
+        return name.startsWith("LSPHooker_") || name.startsWith("Vector_");
+    }
+
     private static void scan() throws Throwable {
         if (backtrace == null) {
             backtrace = Throwable.class.getDeclaredField("backtrace");
@@ -67,7 +72,7 @@ public final class JitGuard {
         Object bt = backtrace.get(new Throwable());
         if (!(bt instanceof Object[] frames)) return;
         for (Object f : frames) {
-            if (!(f instanceof Class<?> c) || done.contains(c) || !c.getName().startsWith("LSPHooker_")) continue;
+            if (!(f instanceof Class<?> c) || done.contains(c) || !isStub(c.getName())) continue;
             done.add(c);
             int n = 0;
             for (Method m : c.getDeclaredMethods()) {
