@@ -41,14 +41,14 @@ public final class ConversationMenuHook {
         installed = true;
         // Hook the actual superclass callback; inherited methods and renamed Activities work too.
         XposedBridge.hookAllMethods(Activity.class, "onPostResume", new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam p) {
+            @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 Activity a = (Activity) p.thisObject;
                 if (!"com.instagram.android".equals(a.getPackageName())) return;
                 register(a);
             }
         });
         XC_MethodHook release = new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 Dialog dialog = openDialog.get();
                 if (dialog != null && dialog.getOwnerActivity() == p.thisObject) dialog.dismiss();
                 Registration r = registrations.remove((Activity) p.thisObject);
@@ -59,7 +59,7 @@ public final class ConversationMenuHook {
         XposedBridge.hookAllMethods(Activity.class, "onDestroy", release);
         // No replacement native click/long-click listener is ever installed.
         XposedBridge.hookAllMethods(View.class, "performLongClick", new XC_MethodHook() {
-            @Override protected void beforeHookedMethod(MethodHookParam p) {
+            @Override protected void beforeHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                 View v = (View) p.thisObject;
                 WeakReference<Registration> ref = titles.get(v);
                 Registration registration = ref == null ? null : ref.get();

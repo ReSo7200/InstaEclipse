@@ -606,7 +606,7 @@ public class StoryDownloadHook {
 
     private static XC_MethodHook menuButtonInjector() {
         return new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
+            @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableStoryDownload || param.hasThrowable()) return;
                 Object original = param.getResult();
                 String label = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
