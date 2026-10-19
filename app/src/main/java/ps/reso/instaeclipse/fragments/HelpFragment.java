@@ -33,7 +33,7 @@ import ps.reso.instaeclipse.utils.core.ExportBrand;
 
 public class HelpFragment extends Fragment {
 
-    private static final String LSPOSED_URL = "https://github.com/JingMatrix/LSPosed/releases/latest";
+    private static final String VECTOR_URL = "https://github.com/JingMatrix/Vector/releases/latest";
     private static final String LSPATCH_URL = "https://github.com/JingMatrix/LSPatch/releases/latest";
     private static final String LSPATCH_GUIDE_URL = "https://t.me/instaEclipse_discussion/158/5149";
 
@@ -51,11 +51,11 @@ public class HelpFragment extends Fragment {
 
         buildFaq(view.findViewById(R.id.faq_container));
 
-        // Troubleshooting: JingMatrix's LSPosed (rooted) / LSPatch (not rooted) + the LSPatch guide.
-        view.findViewById(R.id.lsposed_row).setOnClickListener(v -> openUrl(LSPOSED_URL));
+        // Troubleshooting: JingMatrix's Vector (rooted) / LSPatch (not rooted) + the LSPatch guide.
+        view.findViewById(R.id.vector_row).setOnClickListener(v -> openUrl(VECTOR_URL));
         view.findViewById(R.id.lspatch_row).setOnClickListener(v -> openUrl(LSPATCH_URL));
         view.findViewById(R.id.lspatch_guide_button).setOnClickListener(v -> openUrl(LSPATCH_GUIDE_URL));
-        for (int id : new int[]{R.id.lsposed_logo, R.id.lspatch_logo}) {
+        for (int id : new int[]{R.id.vector_logo, R.id.lspatch_logo}) {
             View logo = view.findViewById(id);
             logo.setOutlineProvider(new android.view.ViewOutlineProvider() {
                 @Override

@@ -46,8 +46,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;

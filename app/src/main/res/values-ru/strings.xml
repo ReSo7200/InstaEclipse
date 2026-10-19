@@ -51,7 +51,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">Часто задаваемые вопросы (FAQ)</string>
     <string name="faq_1">1. Не работает/вылетает с версией из Google Play?\n- Используйте APK файлы с APKMirror</string>
-    <string name="faq_2">2. Модуль не включен?\n- Выключите and сново включите модуль в LSPosed.</string>
+    <string name="faq_2">2. Модуль не включен?\n- Выключите and сново включите модуль в Vector.</string>
     <string name="faq_3">3. Функции не работают?\n- Остановите и перезапустите Instagram.</string>
     <string name="faq_4">4. Режим Разработчика вызывает вылеты?\n- Следуйте инструкции для Режима Разработчика.</string>
     <string name="faq_5">5. Режим Разработчика имеет странные название или цифры?\n- Используйте Alpha и Beta версии, так как обычные версии имеют искажение.</string>

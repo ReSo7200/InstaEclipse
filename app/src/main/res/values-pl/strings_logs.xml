@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Zapisany log · Instagram nie działa</string>
     <string name="logs_status_none">Brak zainstalowanej obsługiwanej aplikacji Instagram</string>
     <string name="logs_empty_title">Brak logów</string>
-    <string name="logs_empty_body">Otwórz raz Instagrama z włączonym InstaEclipse w LSPosed, a potem wróć tutaj i stuknij Odśwież. Log Instagrama zapisuje się tu automatycznie, nawet po zamknięciu aplikacji.</string>
+    <string name="logs_empty_body">Otwórz raz Instagrama z włączonym InstaEclipse w Vector, a potem wróć tutaj i stuknij Odśwież. Log Instagrama zapisuje się tu automatycznie, nawet po zamknięciu aplikacji.</string>
     <string name="logs_empty_filter_title">Nic nie pasuje do tego filtra</string>
     <string name="logs_empty_filter_body">Wróć do widoku Wszystkie, aby zobaczyć wszystkie wpisy.</string>
     <string name="logs_nothing_to_copy">Brak logów do skopiowania</string>

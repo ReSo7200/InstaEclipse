@@ -50,7 +50,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">שאלות נפוצות</string>
     <string name="faq_1"><b>1. אינו עובד/קורס אצל שימוש בגרסת האפליקציה מהGoogle Play?</b>\n- נא להשתמש בקובץ APK מאתר APKMirror.</string>
-    <string name="faq_2"><b>2. מודול אינו מופעל?</b>\n- השבת את המודול ותפעילו אותו מחדש בLSPosed.</string>
+    <string name="faq_2"><b>2. מודול אינו מופעל?</b>\n- השבת את המודול ותפעילו אותו מחדש בVector.</string>
     <string name="faq_3"><b>3. התכונות אינם עובדות?</b>\n- נא לעצור בכוח את אפליקציית אינסטגרם ותפעילו אותו מחדש.</string>
     <string name="faq_4"><b>4. הגדרות מפתחים גורמים לקריסות?</b>\n- נא לעקוב אחרי מדריך ההגרות מפתחים.</string>
     <string name="faq_5"><b>5. להגרות מפתחים יש תגים מוזרים או מספרים?</b>\n- נא להשתמש בגרסת Beta או Alpha במקום, כי גרסאות יציבות )Stable) של האפליקציה עוברות אובפוסקציה.</string>

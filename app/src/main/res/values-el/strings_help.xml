@@ -9,8 +9,8 @@
     <string name="help_source_code">Πηγαίος κώδικας στο GitHub</string>
     <string name="help_faq_expand">Ανάπτυξη απάντησης</string>
     <string name="help_faq_collapse">Σύμπτυξη απάντησης</string>
-    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
-    <string name="help_lsposed_sub">Έχεις root; Χρησιμοποίησε αυτή την έκδοση</string>
+    <string name="help_vector_title">Vector (JingMatrix)</string>
+    <string name="help_vector_sub">Έχεις root; Χρησιμοποίησε αυτή την έκδοση</string>
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Χωρίς root; Εγκατάστησε αυτό</string>
     <string name="help_lspatch_guide">Δες τον οδηγό εγκατάστασης</string>

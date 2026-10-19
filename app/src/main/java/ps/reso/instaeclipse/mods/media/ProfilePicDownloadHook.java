@@ -35,9 +35,9 @@ import java.util.List;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.mods.feed.ZoomableImageView;
 import ps.reso.instaeclipse.utils.core.DexKitCache;

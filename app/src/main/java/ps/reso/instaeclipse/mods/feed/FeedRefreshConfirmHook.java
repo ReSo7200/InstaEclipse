@@ -8,8 +8,8 @@ import android.view.View;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.dialog.IeDialog;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;

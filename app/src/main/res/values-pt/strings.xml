@@ -50,7 +50,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">Perguntas Frequentes</string>
     <string name="faq_1">1. Não está funcionando/travando ao usar a versão do Google Play?\n- Use os APKs do APKMirror.</string>
-    <string name="faq_2">2. O módulo não está habilitado?\n- Desative e reative o módulo no LSPosed.</string>
+    <string name="faq_2">2. O módulo não está habilitado?\n- Desative e reative o módulo no Vector.</string>
     <string name="faq_3">3. Recursos não estão funcionando?\n- Force a parada e reinicie o Instagram.</string>
     <string name="faq_4">4. As opções de desenvolvedor causam falhas?\n- Siga o guia de opções de desenvolvedor.</string>
     <string name="faq_5">5. As opções de desenvolvedor têm rótulos ou números estranhos?\n- Use versões Beta ou Alpha, pois as versões estáveis possuem ofuscação.</string>

@@ -7,10 +7,10 @@ import android.util.Log;
  * class/method/line, still logs to logcat, and additionally appends to Logging's in-memory
  * ring buffer so the message shows up in InstaEclipse's in-app log viewer, not just adb logcat.
  *
- * Logs to logcat via android.util.Log rather than XposedBridge.log: LSPosed refuses to let a
+ * Logs to logcat via android.util.Log rather than XposedBridge.log: Vector refuses to let a
  * module hook XposedBridge's own methods ("Do not allow hooking inner methods"), which is
  * what made the original auto-capture-via-hook approach a dead end, and Class.forName("de.robv
- * .android.xposed.XposedBridge") also fails under LSPosed's legacy-API compat even though a
+ * .android.xposed.XposedBridge") also fails under Vector's legacy-API compat even though a
  * direct compiled reference to XposedBridge works fine. android.util.Log has neither problem
  * and works identically in the companion app's own (un-hooked) process.
  */
@@ -35,7 +35,9 @@ public final class ModuleLog {
         for (int i = 2; i < stack.length; i++) {
             String cn = stack[i].getClassName();
             if (!cn.equals(ModuleLog.class.getName()) && !cn.equals(Logging.class.getName())
-                    && !cn.equals(Thread.class.getName()) && !cn.startsWith("de.robv.android.xposed.")) {
+                    && !cn.equals(Thread.class.getName()) && !cn.startsWith("de.robv.android.xposed.")
+                    && !cn.startsWith("ps.reso.instaeclipse.xposedcompat.") && !cn.startsWith("io.github.libxposed.")
+                    && !cn.startsWith("LSPHooker")) {
                 String simpleName = cn.substring(cn.lastIndexOf('.') + 1);
                 return "[" + simpleName + "." + stack[i].getMethodName() + ":" + stack[i].getLineNumber() + "] ";
             }

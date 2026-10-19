@@ -50,7 +50,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">FAQ</string>
     <string name="faq_1"><![CDATA[<b>1. Ne fonctionne pas/plante lors de l&#39;utilisation de la version Google Play ?</b><br/>- Utilisez les APKs de APKMirror]]></string>
-    <string name="faq_2"><![CDATA[<b>2. Le module n&#39;est pas activé ?</b><br/>- Désactivez et réactivez le module dans LSPosed.]]></string>
+    <string name="faq_2"><![CDATA[<b>2. Le module n&#39;est pas activé ?</b><br/>- Désactivez et réactivez le module dans Vector.]]></string>
     <string name="faq_3"><![CDATA[<b>3. Les fonctionnalités ne fonctionnent pas ?</b><br/>- Forcez l&#39;arrêt et redémarrez Instagram.]]></string>
     <string name="faq_4"><![CDATA[<b>4. Les options développeur provoquent des plantages ?</b><br/>- Suivez le guide des options pour développeurs.]]></string>
     <string name="faq_5"><![CDATA[<b>5. Les options développeur ont des étiquettes ou des numéros bizarres ?</b><br/>- Utilisez les versions Bêta ou Alpha car les versions Stables ont des obfuscations.]]></string>

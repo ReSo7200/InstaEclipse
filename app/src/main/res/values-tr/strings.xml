@@ -52,7 +52,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">Sıkça Sorulan Sorular</string>
     <string name="faq_1"><b>1. Google Play Sürümünü kullanırken çalışmıyor veya çöküyor mu?</b>\n- APKMirror APK\'lerini kullanın.</string>
-    <string name="faq_2"><b>2. Modül etkin değil mi?</b>\n- Modülü LSPosed\'de devre dışı bırakıp tekrar etkinleştirin.</string>
+    <string name="faq_2"><b>2. Modül etkin değil mi?</b>\n- Modülü Vector\'de devre dışı bırakıp tekrar etkinleştirin.</string>
     <string name="faq_3"><b>3. Özellikler çalışmıyor mu?</b>\n- Instagram\'ı zorla durdurup yeniden başlatın.</string>
     <string name="faq_4"><b>4. Geliştirici seçenekleri çöküyor mu?</b>\n- Geliştirici seçenekleri rehberini takip edin.</string>
     <string name="faq_5"><b>5. Geliştirici seçeneklerinde garip etiketler veya numaralar mı var?</b>\n- Kararlı sürümler karıştırma içerdiğinden Beta veya Alpha sürümlerini kullanın.</string>

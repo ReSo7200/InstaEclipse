@@ -2,7 +2,6 @@ package ps.reso.instaeclipse.mods.ghost;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.XModuleResources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
@@ -12,9 +11,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.i18n.I18n;
@@ -64,7 +63,7 @@ public class GhostDMMarkAsReadHook {
         ghostBtn.setTag(GHOST_BTN_TAG);
 
         try {
-            @SuppressLint("UseCompatLoadingForDrawables") Drawable icon = XModuleResources.createInstance(moduleSourceDir, null)
+            @SuppressLint("UseCompatLoadingForDrawables") Drawable icon = ps.reso.instaeclipse.xposedcompat.ModuleResources.get()
                     .getDrawable(R.drawable.ic_eye, null);
             ghostBtn.setImageDrawable(icon);
         } catch (Exception e) {

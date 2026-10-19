@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Registo guardado · Instagram não está em execução</string>
     <string name="logs_status_none">Nenhuma app do Instagram compatível instalada</string>
     <string name="logs_empty_title">Ainda não há registos</string>
-    <string name="logs_empty_body">Abra o Instagram uma vez com o InstaEclipse ativado no LSPosed, depois volte aqui e toque em Atualizar. O registo do Instagram é guardado aqui automaticamente, mesmo depois de o Instagram ser fechado.</string>
+    <string name="logs_empty_body">Abra o Instagram uma vez com o InstaEclipse ativado no Vector, depois volte aqui e toque em Atualizar. O registo do Instagram é guardado aqui automaticamente, mesmo depois de o Instagram ser fechado.</string>
     <string name="logs_empty_filter_title">Nada corresponde a este filtro</string>
     <string name="logs_empty_filter_body">Volte a Todos para ver todas as entradas.</string>
     <string name="logs_nothing_to_copy">Não há registos para copiar</string>

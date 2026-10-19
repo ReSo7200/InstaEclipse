@@ -15,13 +15,10 @@ import org.luckypray.dexkit.DexKitBridge;
 import java.util.List;
 import java.util.Map;
 
-import de.robv.android.xposed.IXposedHookLoadPackage;
-import de.robv.android.xposed.IXposedHookZygoteInit;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XSharedPreferences;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_LoadPackage;
 import ps.reso.instaeclipse.mods.ads.AdBlocker;
 import ps.reso.instaeclipse.mods.feed.FeedPhotoZoomHook;
 import ps.reso.instaeclipse.mods.location.LocationSpoofHook;
@@ -67,7 +64,12 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 
 @SuppressLint("UnsafeDynamicallyLoadedCode")
-public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
+/**
+ * The module's bootstrap, shared by both entry points: {@code LegacyEntry} (assets/xposed_init,
+ * legacy frameworks) and {@code ModernEntry} (META-INF/xposed/java_init.list, libxposed 102).
+ * It references no framework API itself, so it loads on either. See docs/xposed-api-102.
+ */
+public class Module {
     // List of supported Instagram package names (maintained in CommonUtils)
     private static final List<String> SUPPORTED_PACKAGES = CommonUtils.SUPPORTED_PACKAGES;
     public static DexKitBridge dexKitBridge;
@@ -82,9 +84,14 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
     }
     */
 
-    @Override
-    public void initZygote(StartupParam startupParam) {
-        moduleSourceDir = startupParam.modulePath;
+    /** The module APK, and its native library folder when the framework knows it (else derived). */
+    public static void setModulePaths(String apkPath, String nativeLibDir) {
+        moduleSourceDir = apkPath;
+        ps.reso.instaeclipse.xposedcompat.ModuleResources.setApkPath(apkPath);
+        if (nativeLibDir != null && new java.io.File(nativeLibDir, "libdexkit.so").exists()) {
+            moduleLibDir = nativeLibDir;
+            return;
+        }
 
         String abi = Build.SUPPORTED_ABIS[0];
         String abiFolder;
@@ -98,7 +105,6 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
         moduleLibDir = moduleSourceDir.substring(0, moduleSourceDir.lastIndexOf("/")) + "/lib/" + abiFolder;
     }
 
-    @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
         // Ensure preferences are loaded
 
@@ -116,6 +122,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             if (lpparam.processName != null && !lpparam.processName.equals(lpparam.packageName)) {
                 return;
             }
+            ModuleLog.line("(InstaEclipse): Xposed backend: " + ps.reso.instaeclipse.xposedcompat.XposedBridge.backend().name());
             try {
                 if (dexKitBridge == null) {
                     // Load the .so file from your module (if not already loaded)
@@ -176,6 +183,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Install CommentCopyButtonHook BEFORE Instagram's Application.attach() runs
                     // so we catch any ViewBinding pre-inflation that happens during attach()
                     Context context = (Context) param.args[0];
+                    if (param.thisObject instanceof android.app.Application app)
+                        ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.setCurrentApplication(app);
                     SettingsManager.init(context);
                     SettingsManager.loadAllFlags(context);
 
@@ -234,10 +243,8 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     // Pull downloader path from companion app's cache so it's available even
                     // when Instagram was started without ever receiving the sync broadcast.
                     try {
-                        XSharedPreferences cp = new XSharedPreferences(CommonUtils.MY_PACKAGE_NAME, "instaeclipse_cache");
-                        cp.reload();
-                        String path = cp.getString("downloaderCustomPath", "");
-                        String uri  = cp.getString("downloaderCustomUri",  "");
+                        String path = ps.reso.instaeclipse.xposedcompat.CompanionPrefs.getString("downloaderCustomPath", "");
+                        String uri  = ps.reso.instaeclipse.xposedcompat.CompanionPrefs.getString("downloaderCustomUri",  "");
                         if (!path.isEmpty()) FeatureFlags.downloaderCustomPath = path;
                         if (!uri.isEmpty())  FeatureFlags.downloaderCustomUri  = uri;
                     } catch (Throwable ignored) {
@@ -245,7 +252,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
                     FeatureManager.refreshFeatureStatus(); // Update internal feature states
 
-                    // Activate the LSPosed Sync Bridge to listen to FeaturesFragment updates
+                    // Activate the sync bridge to listen to FeaturesFragment updates
                     registerSyncReceiver(context);
 
                     try {

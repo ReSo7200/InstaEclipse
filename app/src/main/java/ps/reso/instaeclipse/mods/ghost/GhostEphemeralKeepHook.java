@@ -9,8 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;

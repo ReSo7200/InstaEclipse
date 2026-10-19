@@ -46,7 +46,8 @@ public final class I18n {
             if (res == null || apkConfig == null || !apkConfig.equals(cfg)) {
                 String apk = ps.reso.instaeclipse.Xposed.Module.moduleSourceDir;
                 if (apk == null) throw notVisible;
-                android.content.res.XModuleResources x = android.content.res.XModuleResources.createInstance(apk, null);
+                Resources x = ps.reso.instaeclipse.xposedcompat.ModuleResources.get(hostContext);
+                if (x == null) throw notVisible;
                 res = new Resources(x.getAssets(), hostContext.getResources().getDisplayMetrics(), cfg);
                 apkConfig = new Configuration(cfg);
                 apkResources = res;

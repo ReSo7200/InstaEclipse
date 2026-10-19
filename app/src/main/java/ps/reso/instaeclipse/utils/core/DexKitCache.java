@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 /**

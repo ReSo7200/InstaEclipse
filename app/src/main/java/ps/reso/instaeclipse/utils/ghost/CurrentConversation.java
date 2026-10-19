@@ -1,7 +1,7 @@
 package ps.reso.instaeclipse.utils.ghost;
 
 import android.app.Activity;
-import android.app.AndroidAppHelper;
+import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
 import android.app.Application;
 import android.os.Bundle;
 import android.os.Looper;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 

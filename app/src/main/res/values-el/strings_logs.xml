@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Αποθηκευμένη καταγραφή · Το Instagram δεν εκτελείται</string>
     <string name="logs_status_none">Δεν έχει εγκατασταθεί υποστηριζόμενη εφαρμογή Instagram</string>
     <string name="logs_empty_title">Δεν υπάρχουν καταγραφές ακόμα</string>
-    <string name="logs_empty_body">Ανοίξτε μία φορά το Instagram με το InstaEclipse ενεργό στο LSPosed, μετά επιστρέψτε εδώ και πατήστε Ανανέωση. Η καταγραφή του Instagram αποθηκεύεται εδώ αυτόματα, ακόμα και αφού κλείσει το Instagram.</string>
+    <string name="logs_empty_body">Ανοίξτε μία φορά το Instagram με το InstaEclipse ενεργό στο Vector, μετά επιστρέψτε εδώ και πατήστε Ανανέωση. Η καταγραφή του Instagram αποθηκεύεται εδώ αυτόματα, ακόμα και αφού κλείσει το Instagram.</string>
     <string name="logs_empty_filter_title">Τίποτα δεν ταιριάζει με αυτό το φίλτρο</string>
     <string name="logs_empty_filter_body">Επιστρέψτε στο «Όλα» για να δείτε όλες τις εγγραφές.</string>
     <string name="logs_nothing_to_copy">Δεν υπάρχουν καταγραφές για αντιγραφή</string>

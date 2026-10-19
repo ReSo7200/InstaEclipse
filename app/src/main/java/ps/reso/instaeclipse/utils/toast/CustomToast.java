@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.TextView;
 
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 public class CustomToast {

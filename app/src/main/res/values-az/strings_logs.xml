@@ -18,7 +18,7 @@
     <string name="logs_status_saved">Saxlanmış log · Instagram işləmir</string>
     <string name="logs_status_none">Dəstəklənən Instagram tətbiqi quraşdırılmayıb</string>
     <string name="logs_empty_title">Hələ log yoxdur</string>
-    <string name="logs_empty_body">InstaEclipse LSPosed-də aktiv olduğu halda Instagram-ı bir dəfə açın, sonra bura qayıdıb Yenilə düyməsinə toxunun. Instagram-ın logu, hətta Instagram bağlandıqdan sonra da, avtomatik olaraq burada saxlanılır.</string>
+    <string name="logs_empty_body">InstaEclipse Vector-də aktiv olduğu halda Instagram-ı bir dəfə açın, sonra bura qayıdıb Yenilə düyməsinə toxunun. Instagram-ın logu, hətta Instagram bağlandıqdan sonra da, avtomatik olaraq burada saxlanılır.</string>
     <string name="logs_empty_filter_title">Bu filtrə uyğun heç nə yoxdur</string>
     <string name="logs_empty_filter_body">Bütün qeydləri görmək üçün Hamısı seçiminə qayıdın.</string>
     <string name="logs_nothing_to_copy">Kopyalanacaq log yoxdur</string>

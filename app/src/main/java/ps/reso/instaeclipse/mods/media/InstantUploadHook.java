@@ -25,9 +25,9 @@ import android.widget.Toast;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedHelpers;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
@@ -235,7 +235,7 @@ public class InstantUploadHook {
         if (lifecycleRegistered) return;
         try {
             android.app.Application app = (android.app.Application)
-                    android.app.AndroidAppHelper.currentApplication();
+                    ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
             if (app == null) {
                 if (attempt < 30) FeedVideoDownloadHook.mainHandler.postDelayed(() -> registerLifecycle(attempt + 1), 1000);
                 else ModuleLog.line("(IE|InstantUpload) ⚠️ no Application; chip lifecycle not registered");

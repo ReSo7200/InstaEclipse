@@ -13,7 +13,7 @@ import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;

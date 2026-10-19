@@ -38,7 +38,7 @@
     <string name="help_community">Community</string>
     <string name="frequently_asked_questions">Domande frequenti</string>
     <string name="faq_1"><b>1. Non funziona/si blocca con la versione di Google Play?</b>\n- Usa gli APK di APKMirror</string>
-    <string name="faq_2"><b>2. Modulo non abilitato?</b>\n- Disabilita e riabilita il modulo in LSPosed.</string>
+    <string name="faq_2"><b>2. Modulo non abilitato?</b>\n- Disabilita e riabilita il modulo in Vector.</string>
     <string name="faq_3"><b>3. Le funzionalità non funzionano?</b>\n- Forza l\'arresto e riavvia Instagram.</string>
     <string name="faq_4"><b>4. Le opzioni sviluppatore causano crash?</b>\n- Segui la guida alle opzioni sviluppatore.</string>
     <string name="faq_5"><b>5. Le opzioni sviluppatore hanno etichette o numeri strani?</b>\n- Usa le versioni Beta o Alpha, poiché le versioni Stabili sono offuscate.</string>

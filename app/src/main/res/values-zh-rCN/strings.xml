@@ -51,7 +51,7 @@
     <!--  faq  -->
     <string name="frequently_asked_questions">常见问题</string>
     <string name="faq_1"><b>1. 使用 Google Play 版本时无法正常运行或崩溃？</b>\n- 请使用 APKMirror 下载的版本。</string>
-    <string name="faq_2"><b>2. 模块未启用？</b>\n- 在 LSPosed 中禁用并重新启用该模块。</string>
+    <string name="faq_2"><b>2. 模块未启用？</b>\n- 在 Vector 中禁用并重新启用该模块。</string>
     <string name="faq_3"><b>3. 功能无法使用？</b>\n- 强制停止并重新启动 Instagram。</string>
     <string name="faq_4"><b>4. 开发者选项导致崩溃？</b>\n- 按照开发者选项指南操作。</string>
     <string name="faq_5"><b>5. 开发者选项的标签或数字异常</b>\n- 使用 Beta 或 Alpha 版本，因为稳定版有进行过混淆。</string>

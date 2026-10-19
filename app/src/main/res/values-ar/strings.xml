@@ -45,7 +45,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">الأسئلة الشائعة</string>
     <string name="faq_1">1. لا يعمل/يتعطل عند استخدام إصدار Google Play؟ استخدم APKs من APKMirror</string>
-    <string name="faq_2">2. الوحدة غير مفعلة؟ قم بتعطيل وإعادة تفعيل الوحدة من LSPosed.</string>
+    <string name="faq_2">2. الوحدة غير مفعلة؟ قم بتعطيل وإعادة تفعيل الوحدة من Vector.</string>
     <string name="faq_3">3. الميزات لا تعمل؟ أوقف إنستجرام بالقوة وأعد تشغيله.</string>
     <string name="faq_4">4. تتسبب خيارات المطور في تعطل التطبيق؟ اتبع دليل خيارات المطور.</string>
     <string name="faq_5">5. خيارات المطور بها تسميات أو أرقام غريبة؟ استخدم الإصدارات Beta أو Alpha حيث أن الإصدارات المستقرة بها تعتيم.</string>

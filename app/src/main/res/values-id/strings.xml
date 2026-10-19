@@ -50,7 +50,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">Pertanyaan yang Sering Diajukan</string>
     <string name="faq_1"><b>1. Tidak berfungsi/crash saat menggunakan Versi Google Play?</b>\n- Gunakan APK dari APKMirror</string>
-    <string name="faq_2"><b>2. Modul tidak aktif?</b>\n- Nonaktifkan dan aktifkan kembali modul di LSPosed.</string>
+    <string name="faq_2"><b>2. Modul tidak aktif?</b>\n- Nonaktifkan dan aktifkan kembali modul di Vector.</string>
     <string name="faq_3"><b>3. Fitur tidak berfungsi?</b>\n- Paksa berhenti dan mulai ulang Instagram.</string>
     <string name="faq_4"><b>4. Opsi pengembang menyebabkan crash?</b>\n- Ikuti panduan opsi pengembang.</string>
     <string name="faq_5"><b>5. Opsi pengembang memiliki label atau angka yang aneh?</b>\n- Gunakan versi Beta atau Alpha karena versi Stabil memiliki obfuskasi.</string>

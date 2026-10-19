@@ -9,8 +9,8 @@
     <string name="help_source_code">GitHub\'da kaynak kod</string>
     <string name="help_faq_expand">Yanıtı genişlet</string>
     <string name="help_faq_collapse">Yanıtı daralt</string>
-    <string name="help_lsposed_title">LSPosed (JingMatrix)</string>
-    <string name="help_lsposed_sub">Root var mı? Bu sürümü kullanın</string>
+    <string name="help_vector_title">Vector (JingMatrix)</string>
+    <string name="help_vector_sub">Root var mı? Bu sürümü kullanın</string>
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Root yok mu? Bunu kurun</string>
     <string name="help_lspatch_guide">Kurulum rehberini izleyin</string>

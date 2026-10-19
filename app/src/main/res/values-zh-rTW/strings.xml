@@ -49,7 +49,7 @@
     <!-- faq -->
     <string name="frequently_asked_questions">常見問題</string>
     <string name="faq_1"><b>1. 使用 Google Play 版本時無法正常執行或崩潰？</b>\n- 請使用 APKMirror 下載的版本。</string>
-    <string name="faq_2"><b>2. 模組未啟用？</b>\n- 在 LSPosed 中禁用並重新啟用該模組。</string>
+    <string name="faq_2"><b>2. 模組未啟用？</b>\n- 在 Vector 中禁用並重新啟用該模組。</string>
     <string name="faq_3"><b>3. 功能無法使用？</b>\n- 強制停止並重新啟動 Instagram。</string>
     <string name="faq_4"><b>4. 開發者選項導致崩潰？</b>\n- 按照開發者選項指南操作。</string>
     <string name="faq_5"><b>5. 開發者選項的標籤或數字異常</b>\n- 使用 Beta 或 Alpha 版本，因為穩定版有進行過混淆。</string>

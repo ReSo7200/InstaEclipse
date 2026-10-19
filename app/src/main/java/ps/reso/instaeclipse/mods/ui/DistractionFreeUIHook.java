@@ -205,7 +205,7 @@ public class DistractionFreeUIHook {
         }
         if (inner == null) return;
         pagerTouchHooked = true;
-        de.robv.android.xposed.XC_MethodHook gate = new de.robv.android.xposed.XC_MethodHook() {
+        ps.reso.instaeclipse.xposedcompat.XC_MethodHook gate = new ps.reso.instaeclipse.xposedcompat.XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.disableReels) return;
@@ -221,7 +221,7 @@ public class DistractionFreeUIHook {
         for (String name : new String[]{"onInterceptTouchEvent", "onTouchEvent"}) {
             try {
                 java.lang.reflect.Method m = inner.getDeclaredMethod(name, android.view.MotionEvent.class);
-                de.robv.android.xposed.XposedBridge.hookMethod(m, gate);
+                ps.reso.instaeclipse.xposedcompat.XposedBridge.hookMethod(m, gate);
                 n++;
             } catch (Throwable ignored) {}
         }

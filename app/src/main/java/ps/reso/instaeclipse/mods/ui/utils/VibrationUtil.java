@@ -5,7 +5,7 @@ import android.content.Context;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 
-import de.robv.android.xposed.XposedBridge;
+import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 public class VibrationUtil {
