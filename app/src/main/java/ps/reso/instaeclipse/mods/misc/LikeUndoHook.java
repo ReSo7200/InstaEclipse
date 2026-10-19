@@ -44,6 +44,9 @@ import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
  * call is a like (unlikes are sent immediately). Anchor: "source_of_like" + "fetchLikeCount".
  *
  * Undo only cancels the request; the heart may stay filled until the post is refreshed.
+ *
+ * <p>Ask before liking holds the heart button's tap before Instagram fills it (see
+ * {@link #hookHeartButtons}); other likes (double tap) are held here at the sender.
  */
 public class LikeUndoHook {
 
@@ -93,7 +96,7 @@ public class LikeUndoHook {
                 Member method = param.method;
                 Object self = param.thisObject;
                 Object[] args = param.args.clone();
-                if (FeatureFlags.confirmLikes) MAIN.post(() -> confirm(act, () -> {
+                if (FeatureFlags.confirmLikes && System.currentTimeMillis() > confirmedUntil) MAIN.post(() -> confirm(act, () -> {
                     if (FeatureFlags.likeUndo) hold(act, method, self, args);
                     else send(method, self, args);
                 }));
@@ -102,6 +105,58 @@ public class LikeUndoHook {
         });
         ModuleLog.line(TAG + "✅ Hooked " + sender.getDeclaringClass().getName() + "." + sender.getName());
         FeatureStatusTracker.setHooked("LikeUndo");
+        hookHeartButtons();
+    }
+
+    /** Post like buttons (feed, carousel slide, reels): their heart shows "selected" once liked. */
+    private static final String[] HEARTS = {"row_feed_button_like", "row_feed_media_per_media_like_button", "clips_ufi_like_button"};
+    private static final java.util.Set<Integer> heartIds = new java.util.HashSet<>();
+    private static volatile long confirmedUntil;
+    private static boolean replayingTap;
+
+    /**
+     * Ask before liking holds the heart tap itself, before Instagram fills the heart, and replays it
+     * on Like; the like then passes the sender for a moment. Double-tap likes have no button, so
+     * they are still held at the sender (the heart may stay filled after Cancel).
+     */
+    private static void hookHeartButtons() {
+        XposedBridge.hookAllMethods(View.class, "performClick", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.confirmLikes || replayingTap) return;
+                View v = (View) param.thisObject;
+                if (heartIds.isEmpty()) {
+                    for (String name : HEARTS) {
+                        int id = v.getResources().getIdentifier(name, "id", v.getContext().getPackageName());
+                        if (id != 0) heartIds.add(id);
+                    }
+                    if (heartIds.isEmpty()) heartIds.add(-1);
+                }
+                // The heart itself, or the unnamed touch area that wraps it (feed).
+                View heart = heartIds.contains(v.getId()) ? v : null;
+                if (heart == null && v instanceof ViewGroup g)
+                    for (int i = 0; i < g.getChildCount() && heart == null; i++)
+                        if (heartIds.contains(g.getChildAt(i).getId())) heart = g.getChildAt(i);
+                if (heart == null || heart.isSelected()) return; // a filled heart: this is an unlike
+                ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                Activity act = activityOf(v.getContext());
+                if (act == null) return;
+                param.setResult(true);
+                MAIN.post(() -> confirm(act, () -> {
+                    confirmedUntil = System.currentTimeMillis() + 3000;
+                    replayingTap = true;
+                    try { v.performClick(); } finally { replayingTap = false; }
+                }));
+            }
+        });
+    }
+
+    private static Activity activityOf(android.content.Context c) {
+        while (c instanceof android.content.ContextWrapper w) {
+            if (c instanceof Activity a) return a;
+            c = w.getBaseContext();
+        }
+        return UIHookManager.getCurrentActivity();
     }
 
     private static void hold(Activity act, Member method, Object self, Object[] args) {
