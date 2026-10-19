@@ -256,6 +256,9 @@
     <string name="background_access_message">Qovluğunuza yükləmələri Instagram-dan başladılan bu tətbiq saxlayır. Telefon onu yuxuda saxlasa, Download-a düşür. Məhdudiyyətsiz işləməyə icazə verin. Samsung-da Yuxu tətbiqlərindən çıxarın, Xiaomi-də Avtomatik başlamanı açın.</string>
     <string name="background_access_allow">İcazə ver</string>
     <string name="background_access_later">Sonra</string>
+    <string name="folder_access_lost_title">Yükləmə qovluğunu yenidən seçin</string>
+    <string name="folder_access_lost_message">InstaEclipse-in yükləmə qovluğunuza girişi yoxdur (yenidən quraşdırma və ya məlumat silinməsindən sonra olur), ona görə yükləmələr Download-a gedir. Düzəltmək üçün qovluğu yenidən seçin.</string>
+    <string name="folder_access_lost_choose">Qovluq seç</string>
     <string name="ig_profile_menu_tools">Profil menyusu: istifadəçi adı, bio kopyala və hamısını yüklə</string>
     <string name="ig_profile_spoofer">Profil saxtalaşdırıcı (yalnız bu telefonda)</string>
     <string name="ig_profile_spoofer_edit">Saxta profili redaktə et</string>

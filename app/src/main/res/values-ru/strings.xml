@@ -256,6 +256,9 @@
     <string name="background_access_message">Загрузки в вашу папку сохраняет это приложение, запускаемое из Instagram. Если телефон его усыпляет, они попадают в Download. Разрешите работу без ограничений. На Samsung уберите его из спящих приложений, на Xiaomi включите автозапуск.</string>
     <string name="background_access_allow">Разрешить</string>
     <string name="background_access_later">Позже</string>
+    <string name="folder_access_lost_title">Выберите папку загрузок снова</string>
+    <string name="folder_access_lost_message">У InstaEclipse больше нет доступа к папке загрузок (так бывает после переустановки или очистки данных), поэтому загрузки идут в Download. Выберите папку снова.</string>
+    <string name="folder_access_lost_choose">Выбрать папку</string>
     <string name="ig_profile_menu_tools">Меню профиля: копировать имя, био и скачать всё</string>
     <string name="ig_profile_spoofer">Подмена профиля (только на этом телефоне)</string>
     <string name="ig_profile_spoofer_edit">Изменить поддельный профиль</string>

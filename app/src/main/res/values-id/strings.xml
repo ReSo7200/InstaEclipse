@@ -292,6 +292,9 @@
     <string name="background_access_message">Unduhan ke folder Anda disimpan oleh aplikasi ini, dijalankan dari Instagram. Jika ponsel menidurkannya, unduhan masuk ke Download. Izinkan berjalan tanpa batasan. Di Samsung keluarkan dari Aplikasi tidur; di Xiaomi aktifkan Mulai otomatis.</string>
     <string name="background_access_allow">Izinkan</string>
     <string name="background_access_later">Nanti</string>
+    <string name="folder_access_lost_title">Pilih lagi folder unduhan Anda</string>
+    <string name="folder_access_lost_message">InstaEclipse tidak lagi punya akses ke folder unduhan Anda (terjadi setelah instal ulang atau hapus data), jadi unduhan masuk ke Download. Pilih folder lagi untuk memperbaikinya.</string>
+    <string name="folder_access_lost_choose">Pilih folder</string>
     <string name="ig_profile_menu_tools">Menu profil: salin nama pengguna, bio &amp; unduh semua</string>
     <string name="ig_profile_spoofer">Pemalsu profil (hanya di ponsel ini)</string>
     <string name="ig_profile_spoofer_edit">Edit profil palsu</string>

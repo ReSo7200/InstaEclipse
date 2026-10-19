@@ -394,6 +394,9 @@
     <string name="background_access_message">Pobrania do Twojego folderu zapisuje ta aplikacja uruchamiana z Instagrama. Jeśli telefon ją usypia, trafiają do Download. Zezwól na działanie bez ograniczeń. Na Samsungu usuń ją z uśpionych aplikacji, na Xiaomi włącz autostart.</string>
     <string name="background_access_allow">Zezwól</string>
     <string name="background_access_later">Później</string>
+    <string name="folder_access_lost_title">Wybierz ponownie folder pobierania</string>
+    <string name="folder_access_lost_message">InstaEclipse nie ma już dostępu do folderu pobierania (po ponownej instalacji lub wyczyszczeniu danych), więc pobrania trafiają do Download. Wybierz folder ponownie.</string>
+    <string name="folder_access_lost_choose">Wybierz folder</string>
     <string name="ig_profile_menu_tools">Menu profilu: kopiuj nazwę, bio i pobierz wszystko</string>
     <string name="ig_profile_spoofer">Fałszywy profil (tylko na tym telefonie)</string>
     <string name="ig_profile_spoofer_edit">Edytuj fałszywy profil</string>

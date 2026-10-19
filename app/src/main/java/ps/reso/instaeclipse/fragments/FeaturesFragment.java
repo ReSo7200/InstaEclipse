@@ -275,8 +275,11 @@ public class FeaturesFragment extends Fragment {
                 != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x5E);
         }
-        // Downloads to a chosen folder need this app to start from Instagram.
-        if (!localCache.getString("downloaderCustomUri", "").isEmpty())
+        // Downloads to a chosen folder need this app to start from Instagram, and the folder's grant.
+        String folder = localCache.getString("downloaderCustomUri", "");
+        if (ps.reso.instaeclipse.utils.core.BackgroundAccess.folderGrantLost(requireContext(), folder))
+            ps.reso.instaeclipse.utils.core.BackgroundAccess.askToRechooseFolder(requireContext(), () -> dirPickerLauncher.launch(null));
+        else if (!folder.isEmpty())
             ps.reso.instaeclipse.utils.core.BackgroundAccess.askIfNeeded(requireContext(), localCache, false);
 
         recyclerFeatures = fragmentView.findViewById(R.id.recycler_features);

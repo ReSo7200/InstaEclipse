@@ -394,6 +394,9 @@
     <string name="background_access_message">I download nella tua cartella li salva questa app, avviata da Instagram. Se il telefono la tiene sospesa, finiscono in Download. Consenti l’uso senza restrizioni. Su Samsung toglila dalle app in sospensione; su Xiaomi attiva l’avvio automatico.</string>
     <string name="background_access_allow">Consenti</string>
     <string name="background_access_later">Più tardi</string>
+    <string name="folder_access_lost_title">Scegli di nuovo la cartella dei download</string>
+    <string name="folder_access_lost_message">InstaEclipse non ha più accesso alla tua cartella dei download (succede dopo una reinstallazione o la cancellazione dei dati), quindi i download vanno in Download. Scegli di nuovo la cartella.</string>
+    <string name="folder_access_lost_choose">Scegli cartella</string>
     <string name="ig_profile_menu_tools">Menu profilo: copia nome utente, bio e scarica tutto</string>
     <string name="ig_profile_spoofer">Profilo falso (solo su questo telefono)</string>
     <string name="ig_profile_spoofer_edit">Modifica profilo falso</string>

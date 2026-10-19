@@ -292,6 +292,9 @@
     <string name="background_access_message">הורדות לתיקייה שלך נשמרות על ידי האפליקציה הזו, שמופעלת מאינסטגרם. אם הטלפון מרדים אותה, הן נשמרות ב-Download. אפשר לה לפעול ללא הגבלה. בסמסונג הוצא אותה מאפליקציות רדומות; בשיאומי הפעל הפעלה אוטומטית.</string>
     <string name="background_access_allow">לאפשר</string>
     <string name="background_access_later">מאוחר יותר</string>
+    <string name="folder_access_lost_title">בחר שוב את תיקיית ההורדות</string>
+    <string name="folder_access_lost_message">ל-InstaEclipse כבר אין גישה לתיקיית ההורדות (קורה אחרי התקנה מחדש או מחיקת נתונים), ולכן ההורדות נשמרות ב-Download. בחר שוב את התיקייה כדי לתקן.</string>
+    <string name="folder_access_lost_choose">בחירת תיקייה</string>
     <string name="ig_profile_menu_tools">תפריט פרופיל: העתקת שם משתמש, ביו והורדת הכול</string>
     <string name="ig_profile_spoofer">זיוף פרופיל (רק בטלפון הזה)</string>
     <string name="ig_profile_spoofer_edit">עריכת פרופיל מזויף</string>

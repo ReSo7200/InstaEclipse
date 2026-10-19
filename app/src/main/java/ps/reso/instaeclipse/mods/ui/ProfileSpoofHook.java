@@ -322,7 +322,7 @@ public final class ProfileSpoofHook {
         nameAltId = r.getIdentifier("profile_header_full_name", "id", pkg);
         bioTextId = r.getIdentifier("profile_header_bio_text", "id", pkg);
         avatarId = r.getIdentifier("row_profile_header_imageview", "id", pkg);
-        tabAvatarId = r.getIdentifier("profile_tab_icon_view", "id", pkg);
+        tabAvatarId = r.getIdentifier("tab_avatar", "id", pkg); // the bottom bar's profile tab picture
         // 0 never matches a real id; followersId last, it marks the lookup as done.
         int f = r.getIdentifier("profile_header_familiar_followers_value", "id", pkg);
         followersId = f != 0 ? f : -1;

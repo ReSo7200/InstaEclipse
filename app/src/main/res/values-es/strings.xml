@@ -258,6 +258,9 @@
     <string name="background_access_message">Las descargas a tu carpeta las guarda esta app, iniciada desde Instagram. Si el teléfono la mantiene dormida, van a Download. Permite que funcione sin restricciones. En Samsung sácala de Apps en suspensión; en Xiaomi activa el inicio automático.</string>
     <string name="background_access_allow">Permitir</string>
     <string name="background_access_later">Más tarde</string>
+    <string name="folder_access_lost_title">Vuelve a elegir tu carpeta de descargas</string>
+    <string name="folder_access_lost_message">InstaEclipse ya no tiene acceso a tu carpeta de descargas (pasa tras reinstalar o borrar datos), así que las descargas van a Download. Vuelve a elegir la carpeta.</string>
+    <string name="folder_access_lost_choose">Elegir carpeta</string>
     <string name="ig_profile_menu_tools">Menú de perfil: copiar usuario, biografía y descargar todo</string>
     <string name="ig_profile_spoofer">Falsear perfil (solo en este teléfono)</string>
     <string name="ig_profile_spoofer_edit">Editar perfil falso</string>
