@@ -81,7 +81,7 @@ public class LikeUndoHook {
         XposedBridge.hookMethod(sender, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                if (!FeatureFlags.likeUndo || REPLAYING.get() == Boolean.TRUE) return;
+                if (!(FeatureFlags.likeUndo || FeatureFlags.confirmLikes) || REPLAYING.get() == Boolean.TRUE) return;
                 Object media = null;
                 for (Object a : param.args) {
                     if (a != null && a.getClass().getName().equals("com.instagram.feed.media.Media")) { media = a; break; }
@@ -90,7 +90,14 @@ public class LikeUndoHook {
                 Activity act = UIHookManager.getCurrentActivity();
                 if (act == null) return;
                 param.setResult(null);
-                hold(act, param.method, param.thisObject, param.args.clone());
+                Member method = param.method;
+                Object self = param.thisObject;
+                Object[] args = param.args.clone();
+                if (FeatureFlags.confirmLikes) MAIN.post(() -> confirm(act, () -> {
+                    if (FeatureFlags.likeUndo) hold(act, method, self, args);
+                    else send(method, self, args);
+                }));
+                else hold(act, method, self, args);
             }
         });
         ModuleLog.line(TAG + "✅ Hooked " + sender.getDeclaringClass().getName() + "." + sender.getName());
@@ -109,17 +116,37 @@ public class LikeUndoHook {
                     ps.reso.instaeclipse.utils.toast.IeToast.makeText(act, I18n.t(act, R.string.ig_like_undo_cancelled), Toast.LENGTH_SHORT).show();
                     return;
                 }
-                try {
-                    REPLAYING.set(Boolean.TRUE);
-                    XposedBridge.invokeOriginalMethod(method, self, args);
-                    ModuleLog.line(TAG + "like sent after the undo window");
-                } catch (Throwable t) {
-                    ModuleLog.line(TAG + "⚠️ send failed: " + t);
-                } finally {
-                    REPLAYING.remove();
-                }
+                send(method, self, args);
             }, DELAY_MS);
         });
+    }
+
+    /** Ask before liking: the like goes out only on Like; Cancel drops it. */
+    private static void confirm(Activity act, Runnable onLike) {
+        try {
+            ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(act)
+                    .title(I18n.t(act, R.string.ig_confirm_like_title))
+                    .message(I18n.t(act, R.string.ig_confirm_like_message));
+            final boolean[] answered = {false};
+            dlg.secondary(act.getString(android.R.string.cancel), () -> answered[0] = true);
+            dlg.primary(I18n.t(act, R.string.ig_confirm_like_yes), () -> { answered[0] = true; onLike.run(); });
+            dlg.onDismiss(() -> { if (!answered[0]) ModuleLog.line(TAG + "like not confirmed"); });
+            dlg.show();
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ confirm: " + t);
+        }
+    }
+
+    private static void send(Member method, Object self, Object[] args) {
+        try {
+            REPLAYING.set(Boolean.TRUE);
+            XposedBridge.invokeOriginalMethod(method, self, args);
+            ModuleLog.line(TAG + "like sent");
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ send failed: " + t);
+        } finally {
+            REPLAYING.remove();
+        }
     }
 
     private static View showBar(Activity act, Runnable onUndo) {

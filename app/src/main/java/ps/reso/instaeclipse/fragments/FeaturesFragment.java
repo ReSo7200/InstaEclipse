@@ -1616,6 +1616,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_heart, A_SOCIAL, getString(R.string.ig_dialog_misc_disable_double_tap_like), "disableDoubleTapLike"),
                 createSwitch(R.drawable.ic_heart, A_SOCIAL, getString(R.string.ig_dialog_misc_like_undo), "likeUndo"),
+                createSwitch(R.drawable.ic_heart, A_SOCIAL, getString(R.string.ig_confirm_likes), "confirmLikes"),
                 createSwitch(R.drawable.ic_content_copy, A_SOCIAL, getString(R.string.ig_dialog_misc_copy_comment), "enableCopyComment"),
                 createSwitch(R.drawable.ic_search, A_SOCIAL, getString(R.string.ig_dialog_misc_comment_search), "commentSearch"),
                 createSwitch(R.drawable.ic_content_copy, A_SOCIAL, getString(R.string.ig_dialog_misc_copy_caption), "enableCaptionCopy"),
@@ -1635,6 +1636,8 @@ public class FeaturesFragment extends Fragment {
 
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_content_copy, A_SOCIAL, getString(R.string.ig_profile_menu_tools), "profileMenuTools"),
+                createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_confirm_follows), "confirmFollows"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_fancy_bio_font), "fancyBioFont"),
                 createSwitch(R.drawable.ic_block, A_SOCIAL, getString(R.string.ig_dialog_hide_threads_button), "hideThreadsButton"),

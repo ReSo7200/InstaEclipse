@@ -551,6 +551,16 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | LikeUndo): ❌ Failed to hook");
                     }
+                    try {
+                        if (!skip("FollowConfirmHook")) new ps.reso.instaeclipse.mods.misc.FollowConfirmHook().install(dexKitBridge);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | FollowConfirm): ❌ Failed to hook");
+                    }
+                    try {
+                        if (!skip("ProfileMenuHook")) new ps.reso.instaeclipse.mods.ui.ProfileMenuHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|ProfileMenu) ❌ Failed to hook");
+                    }
 
                     // Hide "Create group" on the DM share sheet (#240)
                     try {

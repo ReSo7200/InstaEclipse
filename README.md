@@ -190,10 +190,13 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 |---|---|
 | Disable double tap to like | No accidental likes, in posts, comments and DMs |
 | Undo a like | A few seconds to take a like back |
+| Ask before liking | A like is sent only after you confirm it |
+| Ask before following | A follow is sent only after you confirm it |
 | Comment search | Search a post's comments, load them all, and export them |
 | Copy comments and captions | Copy any comment, or a caption with or without hashtags |
 | Translate | Translate captions, comments and chat messages with your own translator app |
 | Save comment GIFs and images | Download the media in comments |
+| Profile menu tools | Copy a profile's username or bio, or download its posts (all, or the newest ones), from its ⋮ menu |
 | "Follows you" label | See on any profile whether they follow you back |
 | Follower toast | A quick message when you open a profile |
 | Export followers and following | Save the whole list as CSV |
