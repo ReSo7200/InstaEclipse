@@ -237,6 +237,12 @@
     <string name="ig_playback_speed_next">Velocidad establecida — se aplica al siguiente vídeo que empiece</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Ocultar notas en Mensajes</string>
     <string name="ig_hide_dm_suggestions">Ocultar cuentas sugeridas en Mensajes</string>
+    <string name="ig_data_backup">Copia de datos (mensajes eliminados, perfiles analizados…)</string>
+    <string name="ig_data_restore">Restaurar datos</string>
+    <string name="ig_data_backup_saved">Copia guardada: %1$s</string>
+    <string name="ig_data_backup_failed">No se pudo crear la copia</string>
+    <string name="ig_data_restore_done">Se restauraron %1$d archivos. Reiniciando Instagram…</string>
+    <string name="ig_data_restore_failed">No se pudo restaurar esta copia</string>
     <string name="ig_profile_menu_tools">Menú de perfil: copiar usuario, biografía y descargar todo</string>
     <string name="ig_profile_spoofer">Falsear perfil (solo en este teléfono)</string>
     <string name="ig_profile_spoofer_edit">Cifras e insignia falsas</string>

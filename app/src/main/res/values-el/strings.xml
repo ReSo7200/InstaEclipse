@@ -272,6 +272,12 @@
     <string name="ig_playback_speed_next">Η ταχύτητα ορίστηκε — ισχύει για το επόμενο βίντεο που ξεκινά</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Απόκρυψη Σημειώσεων στα Μηνύματα</string>
     <string name="ig_hide_dm_suggestions">Απόκρυψη προτεινόμενων λογαριασμών στα Μηνύματα</string>
+    <string name="ig_data_backup">Αντίγραφο δεδομένων (διαγραμμένα μηνύματα, αναλυμένα προφίλ…)</string>
+    <string name="ig_data_restore">Επαναφορά δεδομένων</string>
+    <string name="ig_data_backup_saved">Το αντίγραφο αποθηκεύτηκε: %1$s</string>
+    <string name="ig_data_backup_failed">Η δημιουργία αντιγράφου απέτυχε</string>
+    <string name="ig_data_restore_done">Επαναφέρθηκαν %1$d αρχεία. Επανεκκίνηση του Instagram…</string>
+    <string name="ig_data_restore_failed">Δεν ήταν δυνατή η επαναφορά αυτού του αντιγράφου</string>
     <string name="ig_profile_menu_tools">Μενού προφίλ: αντιγραφή ονόματος, βιογραφικού και λήψη όλων</string>
     <string name="ig_profile_spoofer">Παραποίηση προφίλ (μόνο σε αυτό το τηλέφωνο)</string>
     <string name="ig_profile_spoofer_edit">Ψεύτικοι αριθμοί και σήμα</string>

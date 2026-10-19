@@ -272,6 +272,12 @@
     <string name="ig_playback_speed_next">速度已设置 — 将应用于下一个开始播放的视频</string>
     <string name="ig_dialog_distraction_hide_notes_tray">隐藏消息中的便签</string>
     <string name="ig_hide_dm_suggestions">隐藏私信中的推荐账号</string>
+    <string name="ig_data_backup">备份数据（已删除的消息、分析过的主页…）</string>
+    <string name="ig_data_restore">恢复数据</string>
+    <string name="ig_data_backup_saved">备份已保存：%1$s</string>
+    <string name="ig_data_backup_failed">备份失败</string>
+    <string name="ig_data_restore_done">已恢复 %1$d 个文件。正在重启 Instagram…</string>
+    <string name="ig_data_restore_failed">无法恢复此备份</string>
     <string name="ig_profile_menu_tools">主页菜单：复制用户名、简介和全部下载</string>
     <string name="ig_profile_spoofer">个人主页伪装（仅限本机）</string>
     <string name="ig_profile_spoofer_edit">伪装的数字和徽章</string>

@@ -235,6 +235,12 @@
     <string name="ig_playback_speed_next">Скорость задана — применится к следующему запущенному видео</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Скрыть заметки в сообщениях</string>
     <string name="ig_hide_dm_suggestions">Скрыть рекомендуемые аккаунты в сообщениях</string>
+    <string name="ig_data_backup">Резервная копия данных (удалённые сообщения, проанализированные профили…)</string>
+    <string name="ig_data_restore">Восстановить данные</string>
+    <string name="ig_data_backup_saved">Копия сохранена: %1$s</string>
+    <string name="ig_data_backup_failed">Не удалось создать копию</string>
+    <string name="ig_data_restore_done">Восстановлено файлов: %1$d. Перезапуск Instagram…</string>
+    <string name="ig_data_restore_failed">Не удалось восстановить эту копию</string>
     <string name="ig_profile_menu_tools">Меню профиля: копировать имя, био и скачать всё</string>
     <string name="ig_profile_spoofer">Подмена профиля (только на этом телефоне)</string>
     <string name="ig_profile_spoofer_edit">Поддельные числа и значок</string>

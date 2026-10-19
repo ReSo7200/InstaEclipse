@@ -560,6 +560,12 @@
     <string name="ig_playback_speed_next">Hız ayarlandı — başlayan bir sonraki videoya uygulanır</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Mesajlardaki Notları Gizle</string>
     <string name="ig_hide_dm_suggestions">Mesajlarda önerilen hesapları gizle</string>
+    <string name="ig_data_backup">Verileri yedekle (silinen mesajlar, analiz edilen profiller…)</string>
+    <string name="ig_data_restore">Verileri geri yükle</string>
+    <string name="ig_data_backup_saved">Yedek kaydedildi: %1$s</string>
+    <string name="ig_data_backup_failed">Yedekleme başarısız</string>
+    <string name="ig_data_restore_done">%1$d dosya geri yüklendi. Instagram yeniden başlatılıyor…</string>
+    <string name="ig_data_restore_failed">Bu yedek geri yüklenemedi</string>
     <string name="ig_profile_menu_tools">Profil menüsü: kullanıcı adı, biyografi kopyala ve tümünü indir</string>
     <string name="ig_profile_spoofer">Profil taklitçisi (yalnızca bu telefonda)</string>
     <string name="ig_profile_spoofer_edit">Sahte sayılar ve rozet</string>

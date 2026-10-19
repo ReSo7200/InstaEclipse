@@ -271,6 +271,12 @@
     <string name="ig_playback_speed_next">Kecepatan diatur — berlaku untuk video berikutnya yang diputar</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Sembunyikan Catatan di Pesan</string>
     <string name="ig_hide_dm_suggestions">Sembunyikan akun yang disarankan di Pesan</string>
+    <string name="ig_data_backup">Cadangkan data (pesan terhapus, profil yang dianalisis…)</string>
+    <string name="ig_data_restore">Pulihkan data</string>
+    <string name="ig_data_backup_saved">Cadangan disimpan: %1$s</string>
+    <string name="ig_data_backup_failed">Pencadangan gagal</string>
+    <string name="ig_data_restore_done">%1$d file dipulihkan. Memulai ulang Instagram…</string>
+    <string name="ig_data_restore_failed">Tidak dapat memulihkan cadangan ini</string>
     <string name="ig_profile_menu_tools">Menu profil: salin nama pengguna, bio &amp; unduh semua</string>
     <string name="ig_profile_spoofer">Pemalsu profil (hanya di ponsel ini)</string>
     <string name="ig_profile_spoofer_edit">Angka &amp; lencana palsu</string>

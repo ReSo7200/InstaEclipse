@@ -233,6 +233,12 @@
     <string name="ig_playback_speed_next">تم ضبط السرعة — تُطبَّق على الفيديو التالي الذي يبدأ</string>
     <string name="ig_dialog_distraction_hide_notes_tray">إخفاء الملاحظات في الرسائل</string>
     <string name="ig_hide_dm_suggestions">إخفاء الحسابات المقترحة في الرسائل</string>
+    <string name="ig_data_backup">نسخ البيانات احتياطيًا (الرسائل المحذوفة، الملفات المحلّلة…)</string>
+    <string name="ig_data_restore">استعادة البيانات</string>
+    <string name="ig_data_backup_saved">تم حفظ النسخة: %1$s</string>
+    <string name="ig_data_backup_failed">فشل النسخ الاحتياطي</string>
+    <string name="ig_data_restore_done">تمت استعادة %1$d ملفات. جارٍ إعادة تشغيل إنستغرام…</string>
+    <string name="ig_data_restore_failed">تعذّرت استعادة هذه النسخة</string>
     <string name="ig_profile_menu_tools">قائمة الملف الشخصي: نسخ اسم المستخدم والنبذة وتنزيل الكل</string>
     <string name="ig_profile_spoofer">تزييف الملف الشخصي (على هذا الهاتف فقط)</string>
     <string name="ig_profile_spoofer_edit">الأعداد والشارة المزيفة</string>

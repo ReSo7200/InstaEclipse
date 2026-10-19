@@ -33,6 +33,12 @@
         </activity>
 
         <activity
+            android:name=".mods.devops.config.DataImportActivity"
+            android:exported="false"
+            android:theme="@style/Theme.InstaEclipse">
+        </activity>
+
+        <activity
             android:name=".mods.devops.config.JsonExportActivity"
             android:exported="false"
             android:theme="@style/Theme.InstaEclipse" />

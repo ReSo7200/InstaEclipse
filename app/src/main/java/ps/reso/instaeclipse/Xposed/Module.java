@@ -265,6 +265,7 @@ public class Module {
                     }
                     try {
                         UIHookManager.registerSettingsRestoreReceiver(context);
+                        ps.reso.instaeclipse.mods.media.DataBackup.registerRestoreReceiver(context);
                     } catch (Throwable e) {
                         ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
                     }

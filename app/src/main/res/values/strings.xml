@@ -502,6 +502,12 @@
     <string name="ig_playback_speed_next">Speed set — applies to the next video that starts</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Hide Notes in Messages</string>
     <string name="ig_hide_dm_suggestions">Hide suggested accounts in Messages</string>
+    <string name="ig_data_backup">Back Up Data (deleted messages, analyzed profiles…)</string>
+    <string name="ig_data_restore">Restore Data</string>
+    <string name="ig_data_backup_saved">Backup saved: %1$s</string>
+    <string name="ig_data_backup_failed">Backup failed</string>
+    <string name="ig_data_restore_done">Restored %1$d files. Restarting Instagram…</string>
+    <string name="ig_data_restore_failed">Could not restore this backup</string>
     <string name="ig_profile_menu_tools">Profile Menu: Copy Username, Bio &amp; Download All</string>
     <string name="ig_profile_spoofer">Profile Spoofer (only on this phone)</string>
     <string name="ig_profile_spoofer_edit">Spoofed Counts &amp; Badge</string>

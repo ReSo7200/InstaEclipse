@@ -19,6 +19,7 @@ public final class BrokerPayload {
     public static final String HOST = "com.instagram.android";
     public static final String IMPORT = "ps.reso.instaeclipse.mods.devops.config.JsonImportActivity";
     public static final String EXPORT = "ps.reso.instaeclipse.mods.devops.config.JsonExportActivity";
+    public static final String DATA_IMPORT = "ps.reso.instaeclipse.mods.devops.config.DataImportActivity";
     public static final String LOCATION = "ps.reso.instaeclipse.mods.location.LocationPickerActivity";
     public static final String THEME = "ps.reso.instaeclipse.ui.theme.ThemeCustomizerActivity";
     public static final String FRAME = "ps.reso.instaeclipse.mods.media.VideoFramePickerActivity";
@@ -71,6 +72,7 @@ public final class BrokerPayload {
         Set<String> allowed;
         if (IMPORT.equals(target)) allowed = set("target_package", "broadcast_action");
         else if (EXPORT.equals(target)) allowed = set("json_content", "file_name");
+        else if (DATA_IMPORT.equals(target)) allowed = set("target_package");
         else if (LOCATION.equals(target)) allowed = set("lat", "lng");
         else if (THEME.equals(target)) allowed = Collections.emptySet();
         else if (FRAME.equals(target)) allowed = set(FRAME_REQUEST);
@@ -89,6 +91,10 @@ public final class BrokerPayload {
             String restoreAction = BuildConfig.APPLICATION_ID + ".ACTION_RESTORE_SETTINGS";
             if (action != null && !action.isEmpty() && !action.equals(importAction) && !action.equals(restoreAction)) invalid();
             copy.put("broadcast_action", action == null || action.isEmpty() ? importAction : action);
+        } else if (DATA_IMPORT.equals(target)) {
+            String pkg = copy.get("target_package");
+            if (pkg != null && !pkg.isEmpty() && !HOST.equals(pkg)) invalid();
+            copy.put("target_package", HOST);
         } else if (EXPORT.equals(target)) {
             String json = copy.get("json_content");
             jsonObject(json, MAX_CONFIG_CHARS);

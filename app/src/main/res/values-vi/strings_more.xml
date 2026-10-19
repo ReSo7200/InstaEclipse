@@ -182,6 +182,12 @@
     <string name="ig_playback_speed_next">Đã đặt tốc độ — áp dụng cho video tiếp theo</string>
     <string name="ig_dialog_distraction_hide_notes_tray">Ẩn Ghi chú trong Tin nhắn</string>
     <string name="ig_hide_dm_suggestions">Ẩn tài khoản được gợi ý trong Tin nhắn</string>
+    <string name="ig_data_backup">Sao lưu dữ liệu (tin nhắn đã xóa, hồ sơ đã phân tích…)</string>
+    <string name="ig_data_restore">Khôi phục dữ liệu</string>
+    <string name="ig_data_backup_saved">Đã lưu bản sao lưu: %1$s</string>
+    <string name="ig_data_backup_failed">Sao lưu thất bại</string>
+    <string name="ig_data_restore_done">Đã khôi phục %1$d tệp. Đang khởi động lại Instagram…</string>
+    <string name="ig_data_restore_failed">Không thể khôi phục bản sao lưu này</string>
     <string name="ig_profile_menu_tools">Menu hồ sơ: sao chép tên, tiểu sử và tải tất cả</string>
     <string name="ig_profile_spoofer">Giả mạo hồ sơ (chỉ trên điện thoại này)</string>
     <string name="ig_profile_spoofer_edit">Số liệu &amp; huy hiệu giả</string>
