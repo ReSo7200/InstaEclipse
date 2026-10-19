@@ -23,6 +23,7 @@ public final class BrokerPayload {
     public static final String LOCATION = "ps.reso.instaeclipse.mods.location.LocationPickerActivity";
     public static final String THEME = "ps.reso.instaeclipse.ui.theme.ThemeCustomizerActivity";
     public static final String FRAME = "ps.reso.instaeclipse.mods.media.VideoFramePickerActivity";
+    public static final String PROFILE_PHOTO = "ps.reso.instaeclipse.ui.ProfilePhotoPickerActivity";
     public static final String FRAME_REQUEST = "selectedDownloadRequest";
     public static final int MAX_PARCEL_BYTES = 600 * 1024;
     public static final int MAX_CONFIG_CHARS = 200_000;
@@ -74,7 +75,7 @@ public final class BrokerPayload {
         else if (EXPORT.equals(target)) allowed = set("json_content", "file_name");
         else if (DATA_IMPORT.equals(target)) allowed = set("target_package");
         else if (LOCATION.equals(target)) allowed = set("lat", "lng");
-        else if (THEME.equals(target)) allowed = Collections.emptySet();
+        else if (THEME.equals(target) || PROFILE_PHOTO.equals(target)) allowed = Collections.emptySet();
         else if (FRAME.equals(target)) allowed = set(FRAME_REQUEST);
         else { invalid(); return Collections.emptyMap(); }
         Map<String, String> copy = new LinkedHashMap<>();

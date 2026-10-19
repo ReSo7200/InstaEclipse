@@ -26,8 +26,8 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
-import ps.reso.instaeclipse.xposedcompat.XC_MethodHook;
-import ps.reso.instaeclipse.xposedcompat.XposedBridge;
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 
 /**
  * Edit a post's likes / comments / reposts / shares, on this phone only (post ⋮ menu → "Edit
@@ -159,7 +159,7 @@ public final class PostCountSpoof {
     // ----- storage -----
 
     private static File file() {
-        Context c = ps.reso.instaeclipse.xposedcompat.AndroidAppHelper.currentApplication();
+        Context c = android.app.AndroidAppHelper.currentApplication();
         return c == null ? null : new File(c.getFilesDir(), FILE);
     }
 

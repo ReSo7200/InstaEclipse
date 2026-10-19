@@ -150,6 +150,10 @@ public class FeatureFlags {
     public static volatile int     spoofFollowing = -1;    // -1 = unchanged
     public static volatile int     spoofPosts = -1;        // -1 = unchanged
     public static volatile boolean spoofVerified = false;  // show the verified badge on your own profile
+    public static volatile String  spoofName = "";         // own profile header name, "" = unchanged
+    public static volatile String  spoofUsername = "";     // own profile action bar username, "" = unchanged
+    public static volatile String  spoofBio = "";          // own profile bio, "" = unchanged
+    public static volatile String  spoofAvatar = "";       // own profile picture: Base64 JPEG (max 320x320), "" = unchanged
     public static volatile boolean profileAnalyzer = false; // watchlist: compare a profile's Followers / Following between analyses
     public static volatile boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)
     public static volatile String  exactTimestampFormat = ""; // its SimpleDateFormat pattern, "" = device default (#265)

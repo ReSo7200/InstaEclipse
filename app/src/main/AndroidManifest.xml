@@ -93,6 +93,13 @@
             android:exported="true" />
 
         <activity android:name=".mods.media.VideoFramePickerActivity" android:exported="false" android:theme="@style/Theme.InstaEclipse" />
+        <!-- Profile spoofer: picks your spoofed profile picture for Instagram's in-app menu. -->
+        <activity
+            android:name=".ui.ProfilePhotoPickerActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <service android:name=".mods.media.DownloadBrokerService" android:exported="true" />
 
         <!-- Xposed Meta-data -->

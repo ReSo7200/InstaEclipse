@@ -79,6 +79,8 @@ public class BrokerPayloadTest {
         rejects(() -> BrokerPayload.activity(BrokerPayload.THEME, entry("target_package", BrokerPayload.HOST)));
         rejects(() -> BrokerPayload.activity(BrokerPayload.EXPORT, entry("unknown", "value")));
         assertTrue(BrokerPayload.activity(BrokerPayload.THEME, Collections.emptyMap()).isEmpty());
+        assertTrue(BrokerPayload.activity(BrokerPayload.PROFILE_PHOTO, Collections.emptyMap()).isEmpty());
+        rejects(() -> BrokerPayload.activity(BrokerPayload.PROFILE_PHOTO, entry("spoofAvatar", "x")));
     }
     @Test public void locationRequiresFiniteBoundedCoordinates() {
         assertEquals("90", BrokerPayload.activity(BrokerPayload.LOCATION, entry("lat", "90")).get("lat"));
