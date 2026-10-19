@@ -700,9 +700,9 @@
     <string name="ig_story_tray_size">גודל סרגל הסטוריז</string>
     <string name="ig_story_ring_color">צבע הטבעת של סטוריז שלא נצפו</string>
     <string name="ig_story_ring_default">ברירת המחדל של Instagram</string>
-    <string name="ig_story_ring_custom">צבע מותאם</string>
-    <string name="ig_story_ring_custom_hint">צבע כמו #3897F0, או שניים למעבר צבע: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">צבע לא תקין</string>
+    <string name="ig_story_ring_solid">צבע אחד</string>
+    <string name="ig_story_ring_gradient">מעבר צבעים</string>
+    <string name="ig_story_ring_stops_hint">הקש על צבע כדי לערוך אותו, החזק כדי להסיר אותו</string>
     <string name="ig_feed_corner_radius">פינות מעוגלות לפוסטים</string>
     <string name="ig_disable_search_history">לא לשמור חיפושים</string>
     <string name="ig_call_confirm">לשאול לפני שיחה</string>

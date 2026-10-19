@@ -722,9 +722,10 @@ Stay on this screen until it finishes.</string>
     <string name="ig_story_tray_size">Story tray size</string>
     <string name="ig_story_ring_color">Unseen story ring color</string>
     <string name="ig_story_ring_default">Instagram default</string>
-    <string name="ig_story_ring_custom">Custom color</string>
-    <string name="ig_story_ring_custom_hint">A color like #3897F0, or two for a gradient: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Not a valid color</string>
+    <string name="ig_story_ring_mode_default" translatable="false">Instagram</string>
+    <string name="ig_story_ring_solid">One color</string>
+    <string name="ig_story_ring_gradient">Gradient</string>
+    <string name="ig_story_ring_stops_hint">Tap a color to edit it, hold it to remove it</string>
     <string name="ig_feed_corner_radius">Rounded post corners</string>
     <string name="ig_disable_search_history">Don\'t Save Searches</string>
     <string name="ig_call_confirm">Ask Before Calling</string>

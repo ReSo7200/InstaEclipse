@@ -704,9 +704,9 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="ig_story_tray_size">Taille de la barre des stories</string>
     <string name="ig_story_ring_color">Couleur du cercle des stories non vues</string>
     <string name="ig_story_ring_default">Par défaut d\'Instagram</string>
-    <string name="ig_story_ring_custom">Couleur personnalisée</string>
-    <string name="ig_story_ring_custom_hint">Une couleur comme #3897F0, ou deux pour un dégradé : #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Couleur non valide</string>
+    <string name="ig_story_ring_solid">Une couleur</string>
+    <string name="ig_story_ring_gradient">Dégradé</string>
+    <string name="ig_story_ring_stops_hint">Touchez une couleur pour la modifier, maintenez-la pour la retirer</string>
     <string name="ig_feed_corner_radius">Coins arrondis des publications</string>
     <string name="ig_disable_search_history">Ne pas enregistrer les recherches</string>
     <string name="ig_call_confirm">Demander avant d\'appeler</string>

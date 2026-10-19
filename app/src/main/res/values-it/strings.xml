@@ -604,9 +604,9 @@ Resta su questa schermata fino al termine.</string>
     <string name="ig_story_tray_size">Dimensione della barra delle storie</string>
     <string name="ig_story_ring_color">Colore dell\'anello delle storie non viste</string>
     <string name="ig_story_ring_default">Predefinito di Instagram</string>
-    <string name="ig_story_ring_custom">Colore personalizzato</string>
-    <string name="ig_story_ring_custom_hint">Un colore come #3897F0, o due per una sfumatura: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Colore non valido</string>
+    <string name="ig_story_ring_solid">Un colore</string>
+    <string name="ig_story_ring_gradient">Sfumatura</string>
+    <string name="ig_story_ring_stops_hint">Tocca un colore per modificarlo, tienilo premuto per rimuoverlo</string>
     <string name="ig_feed_corner_radius">Angoli dei post arrotondati</string>
     <string name="ig_disable_search_history">Non salvare le ricerche</string>
     <string name="ig_call_confirm">Chiedi prima di chiamare</string>

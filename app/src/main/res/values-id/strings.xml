@@ -701,9 +701,9 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_story_tray_size">Ukuran baki cerita</string>
     <string name="ig_story_ring_color">Warna cincin cerita yang belum dilihat</string>
     <string name="ig_story_ring_default">Bawaan Instagram</string>
-    <string name="ig_story_ring_custom">Warna kustom</string>
-    <string name="ig_story_ring_custom_hint">Warna seperti #3897F0, atau dua untuk gradasi: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Warna tidak valid</string>
+    <string name="ig_story_ring_solid">Satu warna</string>
+    <string name="ig_story_ring_gradient">Gradien</string>
+    <string name="ig_story_ring_stops_hint">Ketuk warna untuk mengubahnya, tahan untuk menghapusnya</string>
     <string name="ig_feed_corner_radius">Sudut postingan membulat</string>
     <string name="ig_disable_search_history">Jangan simpan pencarian</string>
     <string name="ig_call_confirm">Tanya sebelum menelepon</string>

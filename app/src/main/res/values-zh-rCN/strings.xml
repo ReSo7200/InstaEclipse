@@ -701,9 +701,9 @@
     <string name="ig_story_tray_size">快拍栏大小</string>
     <string name="ig_story_ring_color">未看快拍圆环颜色</string>
     <string name="ig_story_ring_default">Instagram 默认</string>
-    <string name="ig_story_ring_custom">自定义颜色</string>
-    <string name="ig_story_ring_custom_hint">颜色如 #3897F0，或两种颜色组成渐变：#FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">无效的颜色</string>
+    <string name="ig_story_ring_solid">单色</string>
+    <string name="ig_story_ring_gradient">渐变</string>
+    <string name="ig_story_ring_stops_hint">点按颜色进行编辑，长按可移除</string>
     <string name="ig_feed_corner_radius">帖子圆角</string>
     <string name="ig_disable_search_history">不保存搜索记录</string>
     <string name="ig_call_confirm">通话前确认</string>

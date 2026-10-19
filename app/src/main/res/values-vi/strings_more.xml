@@ -270,9 +270,9 @@
     <string name="ig_story_tray_size">Kích thước khay tin</string>
     <string name="ig_story_ring_color">Màu vòng tin chưa xem</string>
     <string name="ig_story_ring_default">Mặc định của Instagram</string>
-    <string name="ig_story_ring_custom">Màu tùy chỉnh</string>
-    <string name="ig_story_ring_custom_hint">Một màu như #3897F0, hoặc hai màu cho dải chuyển: #FF0066,#7638FA</string>
-    <string name="ig_story_ring_invalid">Màu không hợp lệ</string>
+    <string name="ig_story_ring_solid">Một màu</string>
+    <string name="ig_story_ring_gradient">Chuyển màu</string>
+    <string name="ig_story_ring_stops_hint">Chạm vào một màu để sửa, giữ để xóa</string>
     <string name="ig_feed_corner_radius">Bo góc bài viết</string>
     <string name="ig_disable_search_history">Không lưu tìm kiếm</string>
     <string name="ig_call_confirm">Hỏi trước khi gọi</string>
