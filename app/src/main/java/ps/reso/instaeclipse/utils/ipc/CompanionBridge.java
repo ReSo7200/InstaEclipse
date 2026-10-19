@@ -210,7 +210,10 @@ public final class CompanionBridge {
         final Writer writer;
         final Callback callback;
         final AtomicBoolean complete = new AtomicBoolean();
-        final Runnable timeout = () -> finish(null, "Companion connection timed out");
+        final Runnable timeout = () -> {
+            ps.reso.instaeclipse.utils.log.ModuleLog.line("(IE|Companion) connection timed out after 10 s (app frozen or starting slowly)");
+            finish(null, "Companion connection timed out");
+        };
         boolean bound;
         int expectedUid;
         Operation(Context context, int code, Writer writer, Callback callback) {
@@ -222,9 +225,22 @@ public final class CompanionBridge {
             MAIN.postDelayed(timeout, 10_000);
             try {
                 expectedUid = app.getPackageManager().getApplicationInfo(BuildConfig.APPLICATION_ID, 0).uid;
+            } catch (Exception missing) {
+                // Instagram can't see the app: not installed for this user (Dual Messenger, Secure
+                // Folder, work profile) or hidden from it.
+                unreachable("not installed for this Instagram (Dual Messenger / Secure Folder / work profile?) " + missing);
+                return;
+            }
+            try {
                 bound = app.bindService(new Intent().setClassName(BuildConfig.APPLICATION_ID, SERVICE), this, Context.BIND_AUTO_CREATE);
-                if (!bound) finish(null, "Companion connection unavailable");
-            } catch (Exception error) { finish(null, "Companion connection unavailable"); }
+                // Refused by the system: the app is asleep or not allowed to start from another app
+                // (Samsung sleeping / deep sleeping apps, Xiaomi autostart, battery restrictions).
+                if (!bound) unreachable("start refused by the system (sleeping app / autostart / battery limits)");
+            } catch (Exception error) { unreachable("bind failed: " + error); }
+        }
+        void unreachable(String why) {
+            ps.reso.instaeclipse.utils.log.ModuleLog.line("(IE|Companion) connection unavailable: " + why);
+            finish(null, "Companion connection unavailable");
         }
         @Override public void onServiceConnected(ComponentName name, IBinder binder) {
             if (complete.get()) return;
@@ -277,6 +293,6 @@ public final class CompanionBridge {
         }
         @Override public void onServiceDisconnected(ComponentName name) { finish(null, "Companion disconnected"); }
         @Override public void onBindingDied(ComponentName name) { finish(null, "Companion connection closed"); }
-        @Override public void onNullBinding(ComponentName name) { finish(null, "Companion connection unavailable"); }
+        @Override public void onNullBinding(ComponentName name) { unreachable("the app returned no connection (outdated or disabled service?)"); }
     }
 }
