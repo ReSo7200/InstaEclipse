@@ -175,6 +175,7 @@ All chat tools live in one InstaEclipse button in the chat header, next to the b
 | High resolution images | Load the sharpest version of every photo |
 | Photo zoom | Long press a photo to zoom in |
 | Rounded posts | Round the corners of photos and videos in the feed (8 to 24 dp) |
+| Ask before refreshing | Pulling the home feed down asks before it reloads, so an accidental pull doesn't lose your place |
 | Disable video autoplay | Videos wait for a tap |
 
 </details>

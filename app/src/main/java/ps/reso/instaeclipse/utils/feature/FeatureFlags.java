@@ -87,6 +87,7 @@ public class FeatureFlags {
     public static volatile boolean disableSwipeToCamera = false; // sideways swipe on the feed no longer opens the camera
     public static volatile boolean followingOnlyFeed = false; // home feed shows only accounts you follow
     public static volatile boolean hideAiLabeledPosts = false; // drop posts and reels with Instagram's AI label from the feed (#271)
+    public static volatile boolean confirmFeedRefresh = false; // ask before pull-to-refresh reloads the home feed (#278)
     public static volatile boolean hideLikedPosts = false; // drop already-liked posts from the feed at parse time (#249)
     public static volatile boolean hideSpecificChats = false; // hide chosen DM threads from the inbox (per-thread)
 

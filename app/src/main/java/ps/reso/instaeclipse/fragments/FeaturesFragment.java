@@ -1211,6 +1211,7 @@ public class FeaturesFragment extends Fragment {
                 createExtrasSwitch("#64D2FF", "highResolutionImages"),
                 createSwitch(R.drawable.ic_search, "#64D2FF", getString(R.string.ig_dialog_misc_photo_zoom), "enablePhotoZoom"),
                 createSwitch(R.drawable.ic_movie, "#64D2FF", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
+                createSwitch(R.drawable.ic_restart, "#64D2FF", getString(R.string.ig_confirm_refresh), "confirmFeedRefresh"),
                 createClickable(R.drawable.ic_sparkle, "#64D2FF", feedCornerText(), this::chooseFeedCorner)
         ));
 

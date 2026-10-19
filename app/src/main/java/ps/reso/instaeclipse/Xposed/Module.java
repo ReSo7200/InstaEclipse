@@ -733,6 +733,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                         ModuleLog.line("(InstaEclipse | SearchHistory): ❌ Failed to hook");
                     }
 
+                    // Ask before refreshing the feed (#278)
+                    try {
+                        if (!skip("FeedRefreshConfirmHook")) ps.reso.instaeclipse.mods.feed.FeedRefreshConfirmHook.install(hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | RefreshConfirm): ❌ Failed to hook");
+                    }
+
                     // Rounded feed post corners (#276)
                     try {
                         if (!skip("RoundedFeedPostsHook")) ps.reso.instaeclipse.mods.feed.RoundedFeedPostsHook.install(hostClassLoader);

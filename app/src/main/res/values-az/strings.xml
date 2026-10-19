@@ -681,4 +681,7 @@
     <string name="ig_call_confirm_video">Video zəng başlasın?</string>
     <string name="ig_call_confirm_call">Zəng et</string>
     <string name="ig_hide_ai_labeled">Süni intellekt etiketli paylaşımları gizlət</string>
+    <string name="ig_confirm_refresh">Lentni yeniləmədən əvvəl soruş</string>
+    <string name="ig_confirm_refresh_question">Lent yenilənsin?</string>
+    <string name="ig_confirm_refresh_action">Yenilə</string>
 </resources>

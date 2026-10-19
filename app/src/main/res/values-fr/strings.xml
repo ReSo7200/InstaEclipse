@@ -714,4 +714,7 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="ig_call_confirm_video">Démarrer un appel vidéo ?</string>
     <string name="ig_call_confirm_call">Appeler</string>
     <string name="ig_hide_ai_labeled">Masquer les publications étiquetées IA</string>
+    <string name="ig_confirm_refresh">Demander avant d\'actualiser le fil</string>
+    <string name="ig_confirm_refresh_question">Actualiser le fil ?</string>
+    <string name="ig_confirm_refresh_action">Actualiser</string>
 </resources>

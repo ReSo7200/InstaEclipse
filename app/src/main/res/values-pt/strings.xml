@@ -678,4 +678,7 @@
     <string name="ig_call_confirm_video">Iniciar uma chamada de vídeo?</string>
     <string name="ig_call_confirm_call">Ligar</string>
     <string name="ig_hide_ai_labeled">Ocultar publicações marcadas como IA</string>
+    <string name="ig_confirm_refresh">Perguntar antes de atualizar o feed</string>
+    <string name="ig_confirm_refresh_question">Atualizar o feed?</string>
+    <string name="ig_confirm_refresh_action">Atualizar</string>
 </resources>

@@ -680,4 +680,7 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_call_confirm_video">Starta ett videosamtal?</string>
     <string name="ig_call_confirm_call">Ring</string>
     <string name="ig_hide_ai_labeled">Dölj AI-märkta inlägg</string>
+    <string name="ig_confirm_refresh">Fråga innan flödet uppdateras</string>
+    <string name="ig_confirm_refresh_question">Uppdatera flödet?</string>
+    <string name="ig_confirm_refresh_action">Uppdatera</string>
 </resources>

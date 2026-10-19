@@ -132,6 +132,12 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("HideAiLabeledPosts");
         }
 
+        if (FeatureFlags.confirmFeedRefresh) {
+            FeatureStatusTracker.setEnabled("ConfirmFeedRefresh", R.string.ig_confirm_refresh);
+        } else {
+            FeatureStatusTracker.setDisabled("ConfirmFeedRefresh");
+        }
+
         if (FeatureFlags.hideLikedPosts) {
             FeatureStatusTracker.setEnabled("HideLikedPosts", R.string.ig_dialog_clean_feed_hide_liked);
         } else {
