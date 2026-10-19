@@ -252,15 +252,40 @@ public final class ProfileMenuHook {
     @SuppressLint("DiscouragedApi")
     public static String profileUsername(Activity a) {
         if (a == null) return null;
-        int header = a.getResources().getIdentifier("profile_header_container", "id", a.getPackageName());
-        int title = a.getResources().getIdentifier("action_bar_title", "id", a.getPackageName());
-        View h = header != 0 ? a.findViewById(header) : null;
-        if (h == null || !h.isShown()) return null;
-        View root = h.getRootView();
-        View t = title != 0 ? root.findViewById(title) : null;
+        android.content.res.Resources r = a.getResources();
+        String pkg = a.getPackageName();
+        int header = r.getIdentifier("profile_header_container", "id", pkg);
+        int title = r.getIdentifier("action_bar_title", "id", pkg);
+        int bar = r.getIdentifier("profile_action_bar", "id", pkg);
+        if (header == 0 || title == 0) return null;
+        // Profiles stay in the view tree behind other tabs (isShown still true), so both the
+        // header and the profile action bar's title must really be on screen.
+        View root = a.getWindow().getDecorView();
+        if (onScreen(root, header, 0) == null) return null;
+        View t = onScreen(root, title, bar);
         if (!(t instanceof TextView tv) || tv.getText() == null) return null;
         String s = tv.getText().toString().trim();
         return s.isEmpty() ? null : s;
+    }
+
+    /** A view with {@code id} visible on screen, inside a view with {@code ancestorId} if set. */
+    private static View onScreen(View root, int id, int ancestorId) {
+        java.util.ArrayDeque<View> st = new java.util.ArrayDeque<>();
+        st.push(root);
+        android.graphics.Rect rect = new android.graphics.Rect();
+        while (!st.isEmpty()) {
+            View v = st.pop();
+            if (!v.isShown()) continue;
+            if (v.getId() == id && v.getGlobalVisibleRect(rect) && rect.width() > 0 && rect.height() > 0
+                    && (ancestorId == 0 || hasAncestor(v, ancestorId))) return v;
+            if (v instanceof ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) st.push(g.getChildAt(i));
+        }
+        return null;
+    }
+
+    private static boolean hasAncestor(View v, int id) {
+        for (Object p = v.getParent(); p instanceof View pv; p = pv.getParent()) if (pv.getId() == id) return true;
+        return false;
     }
 
     /** The bio from the profile's User model: a User reachable from the shown fragments whose
