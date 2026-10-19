@@ -144,6 +144,11 @@ public class FeatureFlags {
     public static volatile boolean confirmLikes = false; // ask before a like is sent
     public static volatile boolean confirmFollows = false; // ask before a follow is sent
     public static volatile boolean profileMenuTools = false; // profile ⋮ menu: copy username / bio, download all posts
+    public static volatile boolean profileSpoofer = false; // own profile counts / verified badge, shown on this phone only
+    public static volatile int     spoofFollowers = -1;    // -1 = unchanged
+    public static volatile int     spoofFollowing = -1;    // -1 = unchanged
+    public static volatile int     spoofPosts = -1;        // -1 = unchanged
+    public static volatile boolean spoofVerified = false;  // show the verified badge on your own profile
     public static volatile boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)
     public static volatile String  exactTimestampFormat = ""; // its SimpleDateFormat pattern, "" = device default (#265)
     public static volatile String  spoofDevice = "";          // device Instagram sees: "" = real, "pixel", "s26" (DeviceSpoofHook)

@@ -374,6 +374,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Nascondi le note nei messaggi</string>
     <string name="ig_hide_dm_suggestions">Nascondi gli account suggeriti nei Messaggi</string>
     <string name="ig_profile_menu_tools">Menu profilo: copia nome utente, bio e scarica tutto</string>
+    <string name="ig_profile_spoofer">Profilo falso (solo su questo telefono)</string>
+    <string name="ig_profile_spoofer_edit">Numeri e badge falsi</string>
+    <string name="ig_profile_spoofer_hint">Cambia l\'aspetto del tuo profilo solo su questo telefono. Nulla viene inviato a Instagram. Lascia un campo vuoto per mantenere il numero reale.</string>
+    <string name="ig_profile_spoofer_followers">Follower</string>
+    <string name="ig_profile_spoofer_following">Seguiti</string>
+    <string name="ig_profile_spoofer_posts">Post</string>
+    <string name="ig_profile_spoofer_verified">Mostra il badge verificato</string>
     <string name="ig_profile_copy_username">Copia nome utente</string>
     <string name="ig_profile_copy_bio">Copia bio</string>
     <string name="ig_profile_no_bio">Questo profilo non ha una bio</string>

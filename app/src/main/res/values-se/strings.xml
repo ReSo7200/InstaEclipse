@@ -235,6 +235,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Dölj anteckningar i meddelanden</string>
     <string name="ig_hide_dm_suggestions">Dölj föreslagna konton i Meddelanden</string>
     <string name="ig_profile_menu_tools">Profilmeny: kopiera användarnamn, bio och ladda ner allt</string>
+    <string name="ig_profile_spoofer">Profilförfalskare (bara på den här telefonen)</string>
+    <string name="ig_profile_spoofer_edit">Falska siffror och märke</string>
+    <string name="ig_profile_spoofer_hint">Ändrar hur din egen profil ser ut bara på den här telefonen. Inget skickas till Instagram. Lämna ett fält tomt för att behålla det riktiga talet.</string>
+    <string name="ig_profile_spoofer_followers">Följare</string>
+    <string name="ig_profile_spoofer_following">Följer</string>
+    <string name="ig_profile_spoofer_posts">Inlägg</string>
+    <string name="ig_profile_spoofer_verified">Visa verifieringsmärket</string>
     <string name="ig_profile_copy_username">Kopiera användarnamn</string>
     <string name="ig_profile_copy_bio">Kopiera bio</string>
     <string name="ig_profile_no_bio">Den här profilen har ingen bio</string>

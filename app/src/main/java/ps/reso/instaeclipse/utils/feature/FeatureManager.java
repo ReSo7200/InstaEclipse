@@ -312,6 +312,7 @@ public class FeatureManager {
         reg(FeatureFlags.confirmLikes,         "ConfirmLikes",         R.string.ig_confirm_likes);
         reg(FeatureFlags.confirmFollows,       "ConfirmFollows",       R.string.ig_confirm_follows);
         reg(FeatureFlags.profileMenuTools,     "ProfileMenuTools",     R.string.ig_profile_menu_tools);
+        reg(FeatureFlags.profileSpoofer,       "ProfileSpoofer",       R.string.ig_profile_spoofer);
         reg(FeatureFlags.hideInstants,         "HideInstants",         R.string.ig_hide_instants);
         reg(FeatureFlags.backLeavesHome,       "BackLeavesHome",       R.string.ig_back_leaves_home);
         reg(FeatureFlags.hideDmBlend,          "HideDmBlend",          R.string.ig_feat_hide_blend);

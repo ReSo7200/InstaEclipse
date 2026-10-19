@@ -561,6 +561,11 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     } catch (Throwable ignored) {
                         ModuleLog.line("(IE|ProfileMenu) ❌ Failed to hook");
                     }
+                    try {
+                        if (!skip("ProfileSpoofHook")) new ps.reso.instaeclipse.mods.ui.ProfileSpoofHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|ProfileSpoof) ❌ Failed to hook");
+                    }
 
                     // Hide "Create group" on the DM share sheet (#240)
                     try {

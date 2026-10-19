@@ -561,6 +561,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Mesajlardaki Notları Gizle</string>
     <string name="ig_hide_dm_suggestions">Mesajlarda önerilen hesapları gizle</string>
     <string name="ig_profile_menu_tools">Profil menüsü: kullanıcı adı, biyografi kopyala ve tümünü indir</string>
+    <string name="ig_profile_spoofer">Profil taklitçisi (yalnızca bu telefonda)</string>
+    <string name="ig_profile_spoofer_edit">Sahte sayılar ve rozet</string>
+    <string name="ig_profile_spoofer_hint">Kendi profilinin yalnızca bu telefonda nasıl göründüğünü değiştirir. Instagram\'a hiçbir şey gönderilmez. Gerçek sayıyı korumak için alanı boş bırak.</string>
+    <string name="ig_profile_spoofer_followers">Takipçi</string>
+    <string name="ig_profile_spoofer_following">Takip</string>
+    <string name="ig_profile_spoofer_posts">Gönderi</string>
+    <string name="ig_profile_spoofer_verified">Doğrulanmış rozetini göster</string>
     <string name="ig_profile_copy_username">Kullanıcı adını kopyala</string>
     <string name="ig_profile_copy_bio">Biyografiyi kopyala</string>
     <string name="ig_profile_no_bio">Bu profilin biyografisi yok</string>

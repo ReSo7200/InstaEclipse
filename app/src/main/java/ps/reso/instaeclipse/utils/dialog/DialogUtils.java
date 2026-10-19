@@ -197,7 +197,7 @@ public class DialogUtils {
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_social)));
         LinearLayout social = createGroupCard(context);
         social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "confirmLikes", "enableCopyComment", "commentSearch", "enableCaptionCopy", "disableRepost")));
-        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileMenuTools", "confirmFollows", "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
+        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileMenuTools", "profileSpoofer", "confirmFollows", "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
         mainLayout.addView(social);
 
         // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
@@ -1728,6 +1728,9 @@ public class DialogUtils {
         LinearLayout layout = createSwitchLayout(context);
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_profile_menu_tools, "profileMenuTools"),
+                flagSwitch(context, R.drawable.ic_eye, A_SOCIAL, R.string.ig_profile_spoofer, "profileSpoofer"),
+                createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_profile_spoofer_edit), A_SOCIAL,
+                        v -> showProfileSpoofDialog(context)),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_confirm_follows, "confirmFollows"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_misc_profile_follows_label, "profileFollowsYouLabel"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_fancy_bio_font, "fancyBioFont"),
@@ -1737,6 +1740,51 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_eye, A_SOCIAL, R.string.ig_feat_followers_history, "followersHistory"),
                 flagSwitch(context, R.drawable.ic_save, A_SOCIAL, R.string.ig_saved_on_profile, "savedOnProfile")));
         showSectionDialog(context, I18n.t(context, R.string.menu_profiles), layout, () -> {});
+    }
+
+    /** Profile spoofer values: own follower / following / post counts (empty = real) and the badge. */
+    private static void showProfileSpoofDialog(Context context) {
+        try {
+            IeDialog dlg = new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_profile_spoofer))
+                    .message(I18n.t(context, R.string.ig_profile_spoofer_hint));
+            android.widget.EditText followers = spoofInput(dlg, I18n.t(context, R.string.ig_profile_spoofer_followers), FeatureFlags.spoofFollowers);
+            android.widget.EditText following = spoofInput(dlg, I18n.t(context, R.string.ig_profile_spoofer_following), FeatureFlags.spoofFollowing);
+            android.widget.EditText posts = spoofInput(dlg, I18n.t(context, R.string.ig_profile_spoofer_posts), FeatureFlags.spoofPosts);
+            android.widget.CheckBox verified = dlg.checkBox(I18n.t(context, R.string.ig_profile_spoofer_verified), FeatureFlags.spoofVerified);
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(context.getString(android.R.string.ok), () -> {
+                FeatureFlags.spoofFollowers = parseSpoofCount(followers.getText().toString());
+                FeatureFlags.spoofFollowing = parseSpoofCount(following.getText().toString());
+                FeatureFlags.spoofPosts = parseSpoofCount(posts.getText().toString());
+                FeatureFlags.spoofVerified = verified.isChecked();
+                SettingsManager.saveAllFlags();
+            });
+            dlg.show();
+        } catch (Throwable ignored) {}
+    }
+
+    private static android.widget.EditText spoofInput(IeDialog dlg, String label, int value) {
+        TextView title = new TextView(dlg.ctx);
+        title.setText(label);
+        title.setTextColor(dlg.sub);
+        title.setTextSize(13);
+        dlg.view(title);
+        android.widget.EditText input = dlg.input(label);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(10)});
+        if (value >= 0) input.setText(String.valueOf(value));
+        return input;
+    }
+
+    /** A typed count, or -1 (keep the real one) when empty or not a number. */
+    public static int parseSpoofCount(String s) {
+        try {
+            long v = Long.parseLong(s.trim());
+            return v < 0 ? -1 : (int) Math.min(v, Integer.MAX_VALUE);
+        } catch (Throwable t) {
+            return -1;
+        }
     }
 
     /** App & Account: account limit, notification fix, InstaEclipse's own toasts. */

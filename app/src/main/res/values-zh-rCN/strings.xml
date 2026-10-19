@@ -273,6 +273,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">隐藏消息中的便签</string>
     <string name="ig_hide_dm_suggestions">隐藏私信中的推荐账号</string>
     <string name="ig_profile_menu_tools">主页菜单：复制用户名、简介和全部下载</string>
+    <string name="ig_profile_spoofer">个人主页伪装（仅限本机）</string>
+    <string name="ig_profile_spoofer_edit">伪装的数字和徽章</string>
+    <string name="ig_profile_spoofer_hint">只在本机上改变你自己主页的显示效果，不会向 Instagram 发送任何内容。留空即保留真实数字。</string>
+    <string name="ig_profile_spoofer_followers">粉丝</string>
+    <string name="ig_profile_spoofer_following">关注</string>
+    <string name="ig_profile_spoofer_posts">帖子</string>
+    <string name="ig_profile_spoofer_verified">显示认证徽章</string>
     <string name="ig_profile_copy_username">复制用户名</string>
     <string name="ig_profile_copy_bio">复制简介</string>
     <string name="ig_profile_no_bio">此主页没有简介</string>

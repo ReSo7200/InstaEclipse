@@ -273,6 +273,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Απόκρυψη Σημειώσεων στα Μηνύματα</string>
     <string name="ig_hide_dm_suggestions">Απόκρυψη προτεινόμενων λογαριασμών στα Μηνύματα</string>
     <string name="ig_profile_menu_tools">Μενού προφίλ: αντιγραφή ονόματος, βιογραφικού και λήψη όλων</string>
+    <string name="ig_profile_spoofer">Παραποίηση προφίλ (μόνο σε αυτό το τηλέφωνο)</string>
+    <string name="ig_profile_spoofer_edit">Ψεύτικοι αριθμοί και σήμα</string>
+    <string name="ig_profile_spoofer_hint">Αλλάζει πώς φαίνεται το προφίλ σου μόνο σε αυτό το τηλέφωνο. Τίποτα δεν στέλνεται στο Instagram. Άφησε ένα πεδίο κενό για να κρατήσεις τον πραγματικό αριθμό.</string>
+    <string name="ig_profile_spoofer_followers">Ακόλουθοι</string>
+    <string name="ig_profile_spoofer_following">Ακολουθείς</string>
+    <string name="ig_profile_spoofer_posts">Δημοσιεύσεις</string>
+    <string name="ig_profile_spoofer_verified">Εμφάνιση σήματος επαλήθευσης</string>
     <string name="ig_profile_copy_username">Αντιγραφή ονόματος χρήστη</string>
     <string name="ig_profile_copy_bio">Αντιγραφή βιογραφικού</string>
     <string name="ig_profile_no_bio">Αυτό το προφίλ δεν έχει βιογραφικό</string>

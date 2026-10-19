@@ -236,6 +236,13 @@
     <string name="ig_dialog_distraction_hide_notes_tray">Скрыть заметки в сообщениях</string>
     <string name="ig_hide_dm_suggestions">Скрыть рекомендуемые аккаунты в сообщениях</string>
     <string name="ig_profile_menu_tools">Меню профиля: копировать имя, био и скачать всё</string>
+    <string name="ig_profile_spoofer">Подмена профиля (только на этом телефоне)</string>
+    <string name="ig_profile_spoofer_edit">Поддельные числа и значок</string>
+    <string name="ig_profile_spoofer_hint">Меняет вид вашего профиля только на этом телефоне. В Instagram ничего не отправляется. Оставьте поле пустым, чтобы сохранить настоящее число.</string>
+    <string name="ig_profile_spoofer_followers">Подписчики</string>
+    <string name="ig_profile_spoofer_following">Подписки</string>
+    <string name="ig_profile_spoofer_posts">Публикации</string>
+    <string name="ig_profile_spoofer_verified">Показывать значок подтверждения</string>
     <string name="ig_profile_copy_username">Копировать имя пользователя</string>
     <string name="ig_profile_copy_bio">Копировать био</string>
     <string name="ig_profile_no_bio">В этом профиле нет био</string>
