@@ -179,23 +179,29 @@ public class ProfilePicDownloadHook {
             protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableProfileDownload) return;
                 View v = (View) param.thisObject;
-                int vid = v.getId();
-                if (vid == View.NO_ID) return;
-
-                // Fast path: cached int comparison (only resolves resource name once)
-                if (expandedPicViewId != 0) {
-                    if (vid != expandedPicViewId) return;
-                } else {
-                    try {
-                        String name = v.getResources().getResourceEntryName(vid);
-                        if (!"expanded_profile_pic".equals(name)) return;
-                        expandedPicViewId = vid;
-                    } catch (Throwable ignored) { return; }
+                if (isProfileAvatarView(v)) {
+                    injectLongPress(v);
                 }
-
-                injectLongPress(v);
             }
         });
+    }
+
+    private static boolean isProfileAvatarView(View v) {
+        try {
+            int vid = v.getId();
+            if (vid == View.NO_ID) return false;
+            String name = v.getResources().getResourceEntryName(vid);
+            if (name == null) return false;
+            return name.equals("expanded_profile_pic")
+                    || name.equals("row_profile_header_imageview")
+                    || name.equals("circular_image_view")
+                    || name.equals("avatar_image_view")
+                    || name.equals("profile_header_avatar_container")
+                    || name.equals("row_profile_header_avatar_container")
+                    || (name.contains("profile_header") && (name.contains("image") || name.contains("avatar")));
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     // ── UI injection ──────────────────────────────────────────────────────────
@@ -228,54 +234,120 @@ public class ProfilePicDownloadHook {
 
     // ── Viewer ────────────────────────────────────────────────────────────────
 
-    /** Full-screen square picture (pinch / double-tap to zoom, tap to close) with a Download pill. */
+    /**
+     * Shows the uncropped profile picture enlarged inside a modern square container (1:1 ratio)
+     * with pinch-to-zoom, pan, HD loading, and download/share actions.
+     */
     private static void showViewer(Context ctx, String url, String username) {
         android.app.Dialog dialog = new android.app.Dialog(ctx, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        float dp = ctx.getResources().getDisplayMetrics().density;
+        android.util.DisplayMetrics dm = ctx.getResources().getDisplayMetrics();
+        int screenWidth = dm.widthPixels;
+        int screenHeight = dm.heightPixels;
+        int squareSize = (int) (Math.min(screenWidth, screenHeight) * 0.88f);
+
+        // Semi-transparent dimmed root background
         FrameLayout root = new FrameLayout(ctx);
-        root.setBackgroundColor(Color.BLACK);
+        root.setBackgroundColor(0xCC000000);
+        root.setOnClickListener(v -> dialog.dismiss());
+
+        // Centered Content Layout
+        android.widget.LinearLayout contentLayout = new android.widget.LinearLayout(ctx);
+        contentLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        contentLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+        FrameLayout.LayoutParams contentLp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+        contentLayout.setLayoutParams(contentLp);
+
+        // Header: Username & Dimensions
+        android.widget.LinearLayout headerLayout = new android.widget.LinearLayout(ctx);
+        headerLayout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        headerLayout.setGravity(Gravity.CENTER_VERTICAL);
+        headerLayout.setPadding((int) (8 * dp), 0, (int) (8 * dp), (int) (12 * dp));
+
+        TextView userTitle = new TextView(ctx);
+        userTitle.setText(username != null && !username.isEmpty() ? "@" + username : "");
+        userTitle.setTextColor(Color.WHITE);
+        userTitle.setTextSize(16);
+        userTitle.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        headerLayout.addView(userTitle, new android.widget.LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
+
+        TextView sizeView = new TextView(ctx);
+        sizeView.setTextColor(0xB3FFFFFF);
+        sizeView.setTextSize(12);
+        headerLayout.addView(sizeView);
+
+        contentLayout.addView(headerLayout, new android.widget.LinearLayout.LayoutParams(
+                squareSize, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // Square Card Container (1:1)
+        FrameLayout squareCard = new FrameLayout(ctx);
+        GradientDrawable cardBg = new GradientDrawable();
+        cardBg.setColor(0xFF161616);
+        cardBg.setCornerRadius(20 * dp);
+        cardBg.setStroke((int) (1.5f * dp), 0x33FFFFFF);
+        squareCard.setBackground(cardBg);
+        squareCard.setClipToOutline(true);
+        // Intercept clicks on card so touching the picture doesn't dismiss the modal
+        squareCard.setOnClickListener(v -> {});
 
         ZoomableImageView image = new ZoomableImageView(ctx);
         image.setOnDismissRequest(dialog::dismiss);
-        root.addView(image, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        squareCard.addView(image, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         ProgressBar spinner = new ProgressBar(ctx);
-        root.addView(spinner, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        squareCard.addView(spinner, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
 
-        float dp = ctx.getResources().getDisplayMetrics().density;
-        TextView size = new TextView(ctx);
-        size.setTextColor(0xB3FFFFFF);
-        size.setTextSize(12);
-        FrameLayout.LayoutParams sizeLp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-        sizeLp.topMargin = (int) (40 * dp);
-        root.addView(size, sizeLp);
+        contentLayout.addView(squareCard, new android.widget.LinearLayout.LayoutParams(squareSize, squareSize));
 
-        TextView download = new TextView(ctx);
-        download.setText(I18n.t(ctx, R.string.ig_download_choice_title));
-        download.setTextColor(Color.WHITE);
-        download.setTextSize(15);
-        download.setGravity(Gravity.CENTER);
-        int ph = (int) (28 * dp), pv = (int) (12 * dp);
-        download.setPadding(ph, pv, ph, pv);
-        GradientDrawable pill = new GradientDrawable();
-        pill.setColor(0x33FFFFFF);
-        pill.setCornerRadius(24 * dp);
-        download.setBackground(pill);
-        FrameLayout.LayoutParams dlLp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-        dlLp.bottomMargin = (int) (56 * dp);
-        root.addView(download, dlLp);
-        download.setOnClickListener(v -> {
+        // Action Buttons Row: Download, Copy Link, Close
+        android.widget.LinearLayout actionsLayout = new android.widget.LinearLayout(ctx);
+        actionsLayout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        actionsLayout.setGravity(Gravity.CENTER);
+        actionsLayout.setPadding(0, (int) (16 * dp), 0, 0);
+
+        // 1. Download Pill
+        TextView downloadBtn = createActionPill(ctx, dp, "📥 " + I18n.t(ctx, R.string.ig_download_choice_title), 0xFF0A84FF);
+        downloadBtn.setOnClickListener(v -> {
             dialog.dismiss();
             save(ctx, url, username);
         });
+        actionsLayout.addView(downloadBtn);
 
+        // Spacer
+        View spacer = new View(ctx);
+        actionsLayout.addView(spacer, new android.widget.LinearLayout.LayoutParams((int) (12 * dp), 1));
+
+        // 2. Copy Link Pill
+        TextView copyBtn = createActionPill(ctx, dp, "🔗 " + I18n.t(ctx, R.string.ig_dialog_downloader_copy_link), 0x33FFFFFF);
+        copyBtn.setOnClickListener(v -> {
+            dialog.dismiss();
+            copyLinkToClipboard(ctx, url);
+        });
+        actionsLayout.addView(copyBtn);
+
+        // Spacer
+        View spacer2 = new View(ctx);
+        actionsLayout.addView(spacer2, new android.widget.LinearLayout.LayoutParams((int) (12 * dp), 1));
+
+        // 3. Close Pill
+        TextView closeBtn = createActionPill(ctx, dp, "✕", 0x22FFFFFF);
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+        actionsLayout.addView(closeBtn);
+
+        contentLayout.addView(actionsLayout, new android.widget.LinearLayout.LayoutParams(
+                squareSize, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        root.addView(contentLayout);
         dialog.setContentView(root);
+
         Window w = dialog.getWindow();
         if (w != null) {
-            w.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+            w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             w.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         }
         dialog.show();
@@ -298,9 +370,36 @@ public class ProfilePicDownloadHook {
                     return;
                 }
                 image.setImageBitmap(b);
-                size.setText(b.getWidth() + " × " + b.getHeight());
+                sizeView.setText(b.getWidth() + " × " + b.getHeight() + " px");
             });
         }).start();
+    }
+
+    private static TextView createActionPill(Context ctx, float dp, String text, int bgColor) {
+        TextView tv = new TextView(ctx);
+        tv.setText(text);
+        tv.setTextColor(Color.WHITE);
+        tv.setTextSize(13);
+        tv.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        tv.setGravity(Gravity.CENTER);
+        int ph = (int) (16 * dp), pv = (int) (10 * dp);
+        tv.setPadding(ph, pv, ph, pv);
+
+        GradientDrawable pill = new GradientDrawable();
+        pill.setColor(bgColor);
+        pill.setCornerRadius(20 * dp);
+        tv.setBackground(pill);
+        return tv;
+    }
+
+    private static void copyLinkToClipboard(Context ctx, String url) {
+        try {
+            android.content.ClipboardManager cm = (android.content.ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm != null) {
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("Profile Pic URL", url));
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.logging_copied), Toast.LENGTH_SHORT).show();
+            }
+        } catch (Throwable ignored) {}
     }
 
     private static void save(Context ctx, String url, String username) {

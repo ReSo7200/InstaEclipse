@@ -107,6 +107,8 @@ public class ForceReelQualityHook {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                     if (FeatureFlags.forceReelQuality <= 0 || RAW.get() != null) return;
+                    // Do not restrict qualities when sharing, sending in DMs, creating stories, or uploading.
+                    if (isCallerSharingOrComposing()) return;
                     try {
                         Object result = param.getResult();
                         if (!(result instanceof List)) return;
@@ -115,7 +117,10 @@ public class ForceReelQualityHook {
 
                         Object chosen = pickBestQuality(versions, FeatureFlags.forceReelQuality, finalHeightGetterName);
                         if (chosen != null) {
-                            param.setResult(Collections.singletonList(chosen));
+                            // Return a mutable list so callers that sort/modify the list do not crash with UnsupportedOperationException
+                            java.util.List<Object> mutable = new java.util.ArrayList<>(1);
+                            mutable.add(chosen);
+                            param.setResult(mutable);
                         }
                     } catch (Throwable t) {
                         ModuleLog.line("(InstaEclipse | ForceReelQuality): ❌ hook body – " + t);
@@ -175,6 +180,27 @@ public class ForceReelQualityHook {
             }
         }
         return null;
+    }
+
+    private static boolean isCallerSharingOrComposing() {
+        try {
+            StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+            for (int i = 2; i < Math.min(stack.length, 30); i++) {
+                String cn = stack[i].getClassName();
+                if (cn.contains("direct") || cn.contains("Direct")
+                        || cn.contains("share") || cn.contains("Share")
+                        || cn.contains("story") || cn.contains("Story")
+                        || cn.contains("creation") || cn.contains("Creation")
+                        || cn.contains("pending_media") || cn.contains("PendingMedia")
+                        || cn.contains("upload") || cn.contains("Upload")
+                        || cn.contains("transcode") || cn.contains("Transcode")
+                        || cn.contains("composer") || cn.contains("Composer")
+                        || cn.contains("exporter") || cn.contains("Exporter")) {
+                    return true;
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
     }
 
     private static Object pickBestQuality(List<?> items, int desired, String heightGetterName) {

@@ -96,7 +96,8 @@ public class TrackingLinkDisable {
     }
 
     /** Strips tracking params from a share Intent's text (EXTRA_TEXT) and any ClipData it carries,
-     *  so the system chooser's "Copy" and every "Share to app" target get the clean link. */
+     *  while preserving any media URIs (content://) and permissions for video/photo sharing,
+     *  so the system chooser's "Copy" and every "Share to app" target get the clean link without breaking media sharing. */
     private static void sanitizeIntentText(Intent target) {
         try {
             CharSequence text = target.getCharSequenceExtra(Intent.EXTRA_TEXT);
@@ -106,9 +107,29 @@ public class TrackingLinkDisable {
                 if (cleaned != null) target.putExtra(Intent.EXTRA_TEXT, cleaned);
             }
             android.content.ClipData cd = target.getClipData();
-            if (cd != null && cd.getItemCount() > 0 && cd.getItemAt(0).getText() != null) {
-                String cleaned = rewrite(cd.getItemAt(0).getText().toString());
-                if (cleaned != null) target.setClipData(android.content.ClipData.newPlainText("URL", cleaned));
+            if (cd != null && cd.getItemCount() > 0) {
+                boolean changed = false;
+                android.content.ClipData.Item[] items = new android.content.ClipData.Item[cd.getItemCount()];
+                for (int i = 0; i < cd.getItemCount(); i++) {
+                    android.content.ClipData.Item item = cd.getItemAt(i);
+                    CharSequence itemText = item != null ? item.getText() : null;
+                    if (itemText != null) {
+                        String cleaned = rewrite(itemText.toString());
+                        if (cleaned != null) {
+                            items[i] = new android.content.ClipData.Item(cleaned, item.getHtmlText(), item.getIntent(), item.getUri());
+                            changed = true;
+                            continue;
+                        }
+                    }
+                    items[i] = item;
+                }
+                if (changed) {
+                    android.content.ClipData newCd = new android.content.ClipData(cd.getDescription(), items[0]);
+                    for (int i = 1; i < items.length; i++) {
+                        newCd.addItem(items[i]);
+                    }
+                    target.setClipData(newCd);
+                }
             }
         } catch (Throwable ignored) {}
     }

@@ -344,6 +344,12 @@ public class Module {
                     }
 
                     try {
+                        if (!skip("ComposerSendTranslateHook")) new ps.reso.instaeclipse.mods.ghost.ComposerSendTranslateHook().install(lpparam.classLoader); // DM send button translate
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | SendTranslate): ❌ Failed to hook");
+                    }
+
+                    try {
                         if (!skip("CustomFontHook")) new ps.reso.instaeclipse.mods.ui.CustomFontHook().install(lpparam.classLoader); // Custom UI font
                     } catch (Throwable ignored) {
                         ModuleLog.line("(InstaEclipse | CustomFont): ❌ Failed to hook");

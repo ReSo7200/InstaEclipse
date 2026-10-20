@@ -108,6 +108,7 @@ public class SettingsManager {
         editor.putBoolean("keepEditHistory", FeatureFlags.keepEditHistory);
         editor.putBoolean("jumpToFirstMessage", FeatureFlags.jumpToFirstMessage);
         editor.putBoolean("translateMessages", FeatureFlags.translateMessages);
+        editor.putBoolean("dmSendTranslate", FeatureFlags.dmSendTranslate);
         editor.putBoolean("bulkUnsend", FeatureFlags.bulkUnsend);
         editor.putBoolean("chatExport", FeatureFlags.chatExport);
         editor.putBoolean("hideTabHome", FeatureFlags.hideTabHome);
@@ -323,6 +324,7 @@ public class SettingsManager {
         FeatureFlags.keepEditHistory = prefs.getBoolean("keepEditHistory", false);
         FeatureFlags.jumpToFirstMessage = prefs.getBoolean("jumpToFirstMessage", false);
         FeatureFlags.translateMessages = prefs.getBoolean("translateMessages", false);
+        FeatureFlags.dmSendTranslate   = prefs.getBoolean("dmSendTranslate", true);
         FeatureFlags.bulkUnsend = prefs.getBoolean("bulkUnsend", false);
         FeatureFlags.chatExport = prefs.getBoolean("chatExport", false);
         FeatureFlags.hideTabHome = prefs.getBoolean("hideTabHome", false);

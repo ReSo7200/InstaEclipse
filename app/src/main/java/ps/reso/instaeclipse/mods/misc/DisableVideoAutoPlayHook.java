@@ -104,9 +104,35 @@ public class DisableVideoAutoPlayHook {
         XposedBridge.hookMethod(targetMethod, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                if (FeatureFlags.disableVideoAutoPlay) param.setResult(true);
+                if (FeatureFlags.disableVideoAutoPlay) {
+                    if (isExemptFromAutoPlayDisable()) return;
+                    param.setResult(true);
+                }
             }
         });
+    }
+
+    private static boolean isExemptFromAutoPlayDisable() {
+        try {
+            StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+            for (int i = 2; i < Math.min(stack.length, 30); i++) {
+                String cn = stack[i].getClassName();
+                // Exempt Reels, Stories, DMs, Video Composer/Preview, and Share/Upload
+                if (cn.contains("clips") || cn.contains("Clips")
+                        || cn.contains("reel") || cn.contains("Reel")
+                        || cn.contains("story") || cn.contains("Story")
+                        || cn.contains("direct") || cn.contains("Direct")
+                        || cn.contains("creation") || cn.contains("Creation")
+                        || cn.contains("composer") || cn.contains("Composer")
+                        || cn.contains("upload") || cn.contains("Upload")
+                        || cn.contains("share") || cn.contains("Share")
+                        || cn.contains("pending_media") || cn.contains("PendingMedia")
+                        || cn.contains("transcode") || cn.contains("Transcode")) {
+                    return true;
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
     }
 
     private void hookManualPlayOverlayLifecycle() {

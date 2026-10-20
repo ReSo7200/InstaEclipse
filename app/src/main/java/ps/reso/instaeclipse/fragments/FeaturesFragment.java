@@ -1127,6 +1127,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_ghost_allow_screenshots_dms), "allowScreenshots"),
                 createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_ghost_permanent_view_once), "permanentViewMode"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_translate_messages), "translateMessages"),
+                createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dm_send_translate), "dmSendTranslate"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_bulk_unsend), "bulkUnsend"),
                 createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray"),

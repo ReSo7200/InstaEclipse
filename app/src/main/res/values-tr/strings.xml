@@ -529,6 +529,10 @@
     <string name="theme_light_mode">Açık mod</string>
     <string name="theme_dark_mode">Koyu mod</string>
     <string name="ig_dialog_translate_messages">Sohbetlerde çeviri düğmesi</string>
+    <string name="ig_dm_send_translate">Gönder tuşuna uzun basıldığında çevir</string>
+    <string name="ig_toast_enter_text_to_translate">Lütfen çevrilecek bir mesaj yazın</string>
+    <string name="ig_toast_translating">Çevriliyor…</string>
+    <string name="ig_toast_translated">Metin çevrildi</string>
     <string name="ig_chat_translate_row">Uygulamayla çevir</string>
     <string name="ig_dialog_bulk_unsend">Birden çok mesajı geri al</string>
     <string name="ig_bulk_unsend_row">Birden çok geri al</string>
