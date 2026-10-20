@@ -432,6 +432,10 @@
     <string name="theme_light_mode">Light mode</string>
     <string name="theme_dark_mode">Dark mode</string>
     <string name="ig_dialog_translate_messages">Translate Button in Chats</string>
+    <string name="ig_dm_send_translate">Translate on Send Button Long Press</string>
+    <string name="ig_toast_enter_text_to_translate">Please enter text to translate</string>
+    <string name="ig_toast_translating">Translating…</string>
+    <string name="ig_toast_translated">Text translated</string>
     <string name="ig_chat_translate_row">Translate with app</string>
     <string name="ig_dialog_bulk_unsend">Unsend Multiple Messages</string>
     <string name="ig_bulk_unsend_row">Unsend multiple</string>
