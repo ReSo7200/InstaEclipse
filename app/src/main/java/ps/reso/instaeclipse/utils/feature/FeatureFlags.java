@@ -63,7 +63,7 @@ public class FeatureFlags {
     public static volatile boolean chatExport = false; // header button: export the open chat to HTML (#225)
     public static volatile boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
     public static volatile boolean translateMessages = false; // "Translate" in the DM message long-press menu
-    public static volatile boolean dmSendTranslate = true; // long-press send button in DM to translate draft text
+    public static volatile boolean dmSendTranslate = false; // long-press send button in DM to translate draft text
     public static volatile boolean bulkUnsend = false; // "Unsend multiple" in the DM message long-press menu (#245)
     public static volatile boolean keepEditHistory = false; // show previous text of edited DMs (#243)
     public static volatile boolean offerMediaInfo = false; // "Media info" row in the post menu (#231)
