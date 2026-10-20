@@ -1,6 +1,7 @@
 name: Branch Releases
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - '**'
@@ -30,7 +31,7 @@ jobs:
           fi
 
   build-and-release:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -71,7 +72,7 @@ jobs:
           SHA: ${{ github.sha }}
           APK_PATH: ${{ steps.find_apk.outputs.apk_path }}
         run: |
-          # 1. Rimuove la release esistente e il rispettivo tag remoto per puntarlo al commit corrente
+          # 1. Rimuove la release esistente e il relativo tag
           if gh release view "$TAG_NAME" > /dev/null 2>&1; then
             echo "Aggiornamento release esistente: $TAG_NAME"
             gh release delete "$TAG_NAME" --cleanup-tag --yes
