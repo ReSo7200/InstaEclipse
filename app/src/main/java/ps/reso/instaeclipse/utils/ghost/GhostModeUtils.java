@@ -21,7 +21,10 @@ public class GhostModeUtils {
         if (FeatureFlags.quickToggleLive && FeatureFlags.isGhostLive) return true;
         if (FeatureFlags.quickToggleEphemeral && FeatureFlags.keepEphemeralMessages) return true;
         if (FeatureFlags.quickTogglePermanentView && FeatureFlags.permanentViewMode) return true;
-        return FeatureFlags.quickToggleAllowScreenshots && FeatureFlags.allowScreenshots;
+        if (FeatureFlags.quickToggleAllowScreenshots && FeatureFlags.allowScreenshots) return true;
+        if (FeatureFlags.quickToggleHideChats && FeatureFlags.hideSpecificChats) return true;
+        if (FeatureFlags.quickToggleHideFolderBar && FeatureFlags.hideDirectFoldersBar) return true;
+        return FeatureFlags.quickToggleEmptyGeneral && FeatureFlags.emptyGeneralFolder;
     }
 
 
@@ -65,6 +68,18 @@ public class GhostModeUtils {
             anySelected = true;
             if (FeatureFlags.allowScreenshots) shouldDisable = true;
         }
+        if (FeatureFlags.quickToggleHideChats) {
+            anySelected = true;
+            if (FeatureFlags.hideSpecificChats) shouldDisable = true;
+        }
+        if (FeatureFlags.quickToggleHideFolderBar) {
+            anySelected = true;
+            if (FeatureFlags.hideDirectFoldersBar) shouldDisable = true;
+        }
+        if (FeatureFlags.quickToggleEmptyGeneral) {
+            anySelected = true;
+            if (FeatureFlags.emptyGeneralFolder) shouldDisable = true;
+        }
 
         if (!anySelected) {
             Activity activity = UIHookManager.getCurrentActivity();
@@ -86,6 +101,9 @@ public class GhostModeUtils {
         if (FeatureFlags.quickToggleEphemeral) FeatureFlags.keepEphemeralMessages = newState;
         if (FeatureFlags.quickTogglePermanentView) FeatureFlags.permanentViewMode = newState;
         if (FeatureFlags.quickToggleAllowScreenshots) FeatureFlags.allowScreenshots = newState;
+        if (FeatureFlags.quickToggleHideChats) FeatureFlags.hideSpecificChats = newState;
+        if (FeatureFlags.quickToggleHideFolderBar) FeatureFlags.hideDirectFoldersBar = newState;
+        if (FeatureFlags.quickToggleEmptyGeneral) FeatureFlags.emptyGeneralFolder = newState;
 
         // Save changes
         SettingsManager.saveAllFlags();
@@ -93,6 +111,13 @@ public class GhostModeUtils {
         Activity activity = UIHookManager.getCurrentActivity();
         if (activity != null) {
             GhostEmojiManager.addGhostEmojiNextToInbox(activity, newState); // true = show ghost, false = hide
+            if (FeatureFlags.quickToggleHideFolderBar || FeatureFlags.quickToggleEmptyGeneral) {
+                ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshActiveInbox(activity);
+            }
+            if (FeatureFlags.quickToggleHideChats) {
+                ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.refreshAll();
+                ps.reso.instaeclipse.mods.ghost.HideChatsHook.refreshKnownAccounts();
+            }
         }
 
 

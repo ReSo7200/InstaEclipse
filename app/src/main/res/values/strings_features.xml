@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- Features tab: search + per-category counts -->
+
     <string name="feat_search_hint">Search features</string>
     <string name="feat_search_no_results">No matching features</string>
     <string name="feat_count_on">%1$d on</string>
@@ -9,4 +9,17 @@
     <string name="ig_direct_back_long_press_duration">Back Long-Press Duration</string>
     <string name="ig_direct_empty_general_folder">Show \'General\' Folder as Empty</string>
     <string name="ig_direct_hide_folders_bar">Hide Folders Bar</string>
-</resources>
+<string name="ig_dialog_secret_menu_trigger">Secret Menu Trigger</string>
+    <string name="ig_dialog_secret_menu_long_press">Long press</string>
+    <string name="ig_dialog_secret_menu_double_tap_long_press">Double tap + long press</string>
+    <string name="ig_dialog_batch_hide_chats">Enable Batch Move to Hidden</string>
+    <string name="ig_dialog_quick_hide_chats">Include Hide Specific Chats</string>
+    <string name="ig_dialog_quick_hide_folder_bar">Include Hide Folders Bar</string>
+    <string name="ig_dialog_quick_empty_general">Include Empty General Folder</string>
+    <string name="ig_dialog_app_disguise">App Disguise (Icon &amp; Name)</string>
+    <string name="app_name_calculator">Calculator</string>
+    <string name="app_name_notes">Notes</string>
+    <string name="app_name_file_manager">File Manager</string>
+    <string name="app_name_calendar">Calendar</string>
+    <string name="app_name_weather">Weather</string>
+    </resources>

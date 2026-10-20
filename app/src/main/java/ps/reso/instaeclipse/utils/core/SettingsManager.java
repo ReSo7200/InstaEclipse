@@ -53,6 +53,12 @@ public class SettingsManager {
         editor.putBoolean("lockDirectAlways", FeatureFlags.lockDirectAlways);
         editor.putBoolean("lockWholeApp", FeatureFlags.lockWholeApp);
         editor.putBoolean("hideSpecificChats", FeatureFlags.hideSpecificChats);
+        editor.putBoolean("secretMenuDoubleTap", FeatureFlags.secretMenuDoubleTap);
+        editor.putBoolean("enableBatchHideChats", FeatureFlags.enableBatchHideChats);
+        editor.putBoolean("quickToggleHideChats", FeatureFlags.quickToggleHideChats);
+        editor.putBoolean("quickToggleHideFolderBar", FeatureFlags.quickToggleHideFolderBar);
+        editor.putBoolean("quickToggleEmptyGeneral", FeatureFlags.quickToggleEmptyGeneral);
+        editor.putString("appDisguise", FeatureFlags.appDisguise);
         editor.putBoolean("showHideChatButton", FeatureFlags.showHideChatButton);
         editor.putBoolean("showDeletedMessagesButton", FeatureFlags.showDeletedMessagesButton);
         editor.putBoolean("keepUnsentInChat", FeatureFlags.keepUnsentInChat);
@@ -251,6 +257,12 @@ public class SettingsManager {
         FeatureFlags.lockDirectAlways = prefs.getBoolean("lockDirectAlways", false);
         FeatureFlags.lockWholeApp = prefs.getBoolean("lockWholeApp", false);
         FeatureFlags.hideSpecificChats = prefs.getBoolean("hideSpecificChats", false);
+        FeatureFlags.secretMenuDoubleTap = prefs.getBoolean("secretMenuDoubleTap", false);
+        FeatureFlags.enableBatchHideChats = prefs.getBoolean("enableBatchHideChats", false);
+        FeatureFlags.quickToggleHideChats = prefs.getBoolean("quickToggleHideChats", false);
+        FeatureFlags.quickToggleHideFolderBar = prefs.getBoolean("quickToggleHideFolderBar", false);
+        FeatureFlags.quickToggleEmptyGeneral = prefs.getBoolean("quickToggleEmptyGeneral", false);
+        FeatureFlags.appDisguise = prefs.getString("appDisguise", "default");
         FeatureFlags.hideChatBackLongPress = prefs.getBoolean("hideChatBackLongPress", false);
         FeatureFlags.hideChatsBackLongPressSeconds = prefs.getInt("hideChatsBackLongPressSeconds", 2);
         FeatureFlags.emptyGeneralFolder = prefs.getBoolean("emptyGeneralFolder", false);

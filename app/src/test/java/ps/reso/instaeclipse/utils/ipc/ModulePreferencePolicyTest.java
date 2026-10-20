@@ -59,4 +59,13 @@ public class ModulePreferencePolicyTest {
         assertFalse(ModuleReplies.isPreferenceUpdate(BOOLEAN, "synthetic_unknown_downloader_mode", true));
         assertFalse(ModuleReplies.isPreferenceValue("synthetic_unknown_downloader_mode", false));
     }
+
+    @Test public void newFeaturesAddedToSchema() {
+        assertTrue(ModuleReplies.isPreferenceValue("secretMenuDoubleTap", true));
+        assertTrue(ModuleReplies.isPreferenceValue("enableBatchHideChats", true));
+        assertTrue(ModuleReplies.isPreferenceValue("quickToggleHideChats", true));
+        assertTrue(ModuleReplies.isPreferenceValue("quickToggleHideFolderBar", true));
+        assertTrue(ModuleReplies.isPreferenceValue("quickToggleEmptyGeneral", true));
+        assertTrue(ModuleReplies.isPreferenceValue("appDisguise", "calculator"));
+    }
 }

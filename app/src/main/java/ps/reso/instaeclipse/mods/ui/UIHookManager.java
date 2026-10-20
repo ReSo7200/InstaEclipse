@@ -122,6 +122,12 @@ public class UIHookManager {
         // Fancy bio fonts: the bio's "Change font" button opens the module's font picker.
         ps.reso.instaeclipse.mods.ui.FancyBioFontHook.watchActivity(activity);
 
+                // Attach Batch Hide Chats Hook for Direct Multi-Select
+        View root = activity.findViewById(android.R.id.content);
+        if (root != null) {
+            ps.reso.instaeclipse.mods.ghost.BatchHideChatsHook.attach(activity, root);
+        }
+
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
 
@@ -281,10 +287,55 @@ public class UIHookManager {
     }
 
     private static void applySearchHook(Activity activity, View v) {
-        v.setOnLongClickListener(view -> {
-            DialogUtils.showEclipseOptionsDialog(activity);
-            VibrationUtil.vibrate(activity);
-            return true;
+        if (!FeatureFlags.secretMenuDoubleTap) {
+            v.setOnLongClickListener(view -> {
+                DialogUtils.showEclipseOptionsDialog(activity);
+                VibrationUtil.vibrate(activity);
+                return true;
+            });
+            v.setOnTouchListener(null);
+            return;
+        }
+
+        v.setOnLongClickListener(null); // remove standard listener to avoid conflicts
+        v.setOnTouchListener(new View.OnTouchListener() {
+            private int tapCount = 0;
+            private long lastTapTime = 0;
+            private final android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+            private final Runnable resetTaps = () -> tapCount = 0;
+            private final Runnable longPressAction = () -> {
+                if (tapCount == 2) {
+                    DialogUtils.showEclipseOptionsDialog(activity);
+                    ps.reso.instaeclipse.mods.ui.utils.VibrationUtil.vibrate(activity);
+                    tapCount = 0;
+                }
+            };
+
+            @Override
+            public boolean onTouch(View view, android.view.MotionEvent event) {
+                switch (event.getAction()) {
+                    case android.view.MotionEvent.ACTION_DOWN:
+                        long time = System.currentTimeMillis();
+                        if (time - lastTapTime > 350) {
+                            tapCount = 0;
+                        }
+                        tapCount++;
+                        lastTapTime = time;
+                        handler.removeCallbacks(resetTaps);
+                        handler.removeCallbacks(longPressAction);
+
+                        if (tapCount == 3) {
+                            handler.postDelayed(longPressAction, 450);
+                        }
+                        break;
+                    case android.view.MotionEvent.ACTION_UP:
+                    case android.view.MotionEvent.ACTION_CANCEL:
+                        handler.removeCallbacks(longPressAction);
+                        handler.postDelayed(resetTaps, 350);
+                        break;
+                }
+                return false; // Let normal clicks through
+            }
         });
     }
 

@@ -1136,7 +1136,8 @@ public class FeaturesFragment extends Fragment {
                         "quickToggleSeen", "quickToggleTyping", "quickToggleScreenshot",
                         "quickToggleViewOnce", "quickToggleStory", "quickToggleLive",
                         "quickToggleEphemeral", "quickTogglePermanentView",
-                        "quickToggleAllowScreenshots"
+                        "quickToggleAllowScreenshots", "quickToggleHideChats",
+                        "quickToggleHideFolderBar", "quickToggleEmptyGeneral"
                 )),
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_seen), "quickToggleSeen"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_typing), "quickToggleTyping"),
@@ -1146,7 +1147,10 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_live, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_live_seen), "quickToggleLive"),
                 createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_dialog_quick_keep_ephemeral), "quickToggleEphemeral"),
                 createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_quick_permanent_view), "quickTogglePermanentView"),
-                createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_quick_allow_screenshots), "quickToggleAllowScreenshots")
+                createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_quick_allow_screenshots), "quickToggleAllowScreenshots"),
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_chats), "quickToggleHideChats"),
+                createSwitch(R.drawable.ic_folder, "#5E5CE6", getString(R.string.ig_dialog_quick_hide_folder_bar), "quickToggleHideFolderBar"),
+                createSwitch(R.drawable.ic_folder, "#5E5CE6", getString(R.string.ig_dialog_quick_empty_general), "quickToggleEmptyGeneral")
         ));
 
         return defs;
@@ -1382,6 +1386,53 @@ public class FeaturesFragment extends Fragment {
     }
 
     /** Custom share domain (saved as the "customShareDomain" string pref). */
+        private void showSecretMenuModeDialog(android.view.View trigger) {
+        String[] options = {getString(R.string.ig_dialog_secret_menu_long_press), getString(R.string.ig_dialog_secret_menu_double_tap_long_press)};
+        int selected = localCache.getBoolean("secretMenuDoubleTap", false) ? 1 : 0;
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.ig_dialog_secret_menu_trigger)
+                .setSingleChoiceItems(options, selected, (d, which) -> {
+                    boolean val = (which == 1);
+                    localCache.edit().putBoolean("secretMenuDoubleTap", val).apply();
+                    ps.reso.instaeclipse.utils.feature.FeatureFlags.secretMenuDoubleTap = val;
+                    if (trigger instanceof android.widget.TextView) {
+                        ((android.widget.TextView) trigger).setText(getString(R.string.ig_dialog_secret_menu_trigger) + "  ·  " + options[which]);
+                    }
+                    d.dismiss();
+                    try { java.lang.reflect.Method m = getClass().getDeclaredMethod("syncToModule"); m.setAccessible(true); m.invoke(this); } catch (Exception ignored) {}
+                }).show();
+    }
+
+    private void showAppDisguiseDialog(android.view.View trigger) {
+        String[] options = {"Default", "Calculator", "Notes", "File Manager", "Calendar", "Weather"};
+        String[] keys = {
+            ps.reso.instaeclipse.utils.core.AppDisguiseManager.DEFAULT,
+            ps.reso.instaeclipse.utils.core.AppDisguiseManager.CALCULATOR,
+            ps.reso.instaeclipse.utils.core.AppDisguiseManager.NOTES,
+            ps.reso.instaeclipse.utils.core.AppDisguiseManager.FILE_MANAGER,
+            ps.reso.instaeclipse.utils.core.AppDisguiseManager.CALENDAR,
+            ps.reso.instaeclipse.utils.core.AppDisguiseManager.WEATHER
+        };
+        String current = localCache.getString("appDisguise", ps.reso.instaeclipse.utils.core.AppDisguiseManager.DEFAULT);
+        int selected = java.util.Arrays.asList(keys).indexOf(current);
+        if (selected == -1) selected = 0;
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.ig_dialog_app_disguise)
+                .setSingleChoiceItems(options, selected, (d, which) -> {
+                    String val = keys[which];
+                    localCache.edit().putString("appDisguise", val).apply();
+                    ps.reso.instaeclipse.utils.core.AppDisguiseManager.applyDisguise(requireContext(), val);
+                    if (trigger instanceof android.widget.TextView) {
+                        ((android.widget.TextView) trigger).setText(getString(R.string.ig_dialog_app_disguise) + "  ·  " + options[which]);
+                    }
+                    android.widget.Toast.makeText(requireContext(), "Disguise changed. Restarting app may be required.", android.widget.Toast.LENGTH_LONG).show();
+                    d.dismiss();
+                    try { java.lang.reflect.Method m = getClass().getDeclaredMethod("syncToModule"); m.setAccessible(true); m.invoke(this); } catch (Exception ignored) {}
+                }).show();
+    }
+
+
     private void showShareDomainDialog() {
         final android.widget.EditText input = new android.widget.EditText(requireContext());
         input.setSingleLine(true);
@@ -1658,7 +1709,9 @@ public class FeaturesFragment extends Fragment {
                 createExtrasSwitch("#0A84FF", "fixNotificationRegistration"),
                 createSwitch(R.drawable.ic_notification, "#0A84FF", getString(R.string.ig_dialog_misc_show_feature_toasts), "showFeatureToasts"),
                 createSwitch(R.drawable.ic_link, "#0A84FF", getString(R.string.ig_dialog_open_links_externally), "openLinksExternally"),
-                createClickable(R.drawable.ic_link, "#0A84FF", shareDomainLabel(), this::showShareDomainDialog)
+                createClickable(R.drawable.ic_link, "#0A84FF", shareDomainLabel(), this::showShareDomainDialog),
+                createClickable(R.drawable.ic_settings_gear, "#0A84FF", getString(R.string.ig_dialog_secret_menu_trigger) + "  ·  " + (localCache.getBoolean("secretMenuDoubleTap", false) ? getString(R.string.ig_dialog_secret_menu_double_tap_long_press) : getString(R.string.ig_dialog_secret_menu_long_press)), () -> { showSecretMenuModeDialog(null); }),
+                createClickable(R.drawable.ic_settings_gear, "#0A84FF", getString(R.string.ig_dialog_app_disguise), () -> { showAppDisguiseDialog(null); })
         ));
         // Auto-clear cache (mirrors the in-IG dialog's Tools section).
         defs.add(getString(R.string.ig_dialog_section_auto_clear_cache));
@@ -1754,6 +1807,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_chats), "hideSpecificChats"),
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ie_show_hide_button), "showHideChatButton"),
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_batch_hide_chats), "enableBatchHideChats"),
                 createSwitch(R.drawable.ic_timer, "#5E5CE6", getString(R.string.ig_direct_hide_chat_back_long_press), "hideChatBackLongPress"),
                 createClickable(R.drawable.ic_timer, "#5E5CE6",
                         getString(R.string.ig_direct_back_long_press_duration) + "  ·  " + localCache.getInt("hideChatsBackLongPressSeconds", 2) + "s",
