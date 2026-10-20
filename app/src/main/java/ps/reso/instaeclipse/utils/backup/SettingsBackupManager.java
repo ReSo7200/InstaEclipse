@@ -32,6 +32,9 @@ public class SettingsBackupManager {
         s.put("keepUnsentMessages",      FeatureFlags.keepUnsentMessages);
 
         // Quick Toggles
+        s.put("cleanUiToggleGesture",    FeatureFlags.cleanUiToggleGesture);
+        s.put("isCleanUiActive",         FeatureFlags.isCleanUiActive);
+        s.put("cleanUiSavedSnapshot",    FeatureFlags.cleanUiSavedSnapshot);
         s.put("quickToggleSeen",         FeatureFlags.quickToggleSeen);
         s.put("quickToggleTyping",       FeatureFlags.quickToggleTyping);
         s.put("quickToggleScreenshot",   FeatureFlags.quickToggleScreenshot);
@@ -182,6 +185,9 @@ public class SettingsBackupManager {
         if (s.has("permanentViewMode"))        FeatureFlags.permanentViewMode        = s.getBoolean("permanentViewMode");
         if (s.has("keepUnsentMessages"))       FeatureFlags.keepUnsentMessages       = s.getBoolean("keepUnsentMessages");
 
+        if (s.has("cleanUiToggleGesture"))   FeatureFlags.cleanUiToggleGesture   = s.getInt("cleanUiToggleGesture");
+        if (s.has("isCleanUiActive"))        FeatureFlags.isCleanUiActive        = s.getBoolean("isCleanUiActive");
+        if (s.has("cleanUiSavedSnapshot"))   FeatureFlags.cleanUiSavedSnapshot   = s.getString("cleanUiSavedSnapshot");
         if (s.has("quickToggleSeen"))        FeatureFlags.quickToggleSeen        = s.getBoolean("quickToggleSeen");
         if (s.has("quickToggleTyping"))      FeatureFlags.quickToggleTyping      = s.getBoolean("quickToggleTyping");
         if (s.has("quickToggleScreenshot"))  FeatureFlags.quickToggleScreenshot  = s.getBoolean("quickToggleScreenshot");

@@ -1352,9 +1352,29 @@ public class DialogUtils {
                         v -> showStartupTabDialog(context, (TextView) findFirstText(v)))));
 
         layout.addView(sectionHeader(context, I18n.t(context, R.string.menu_nav_gestures)));
-        layout.addView(cardOf(context, extraSwitch(context, "#30D158", "disableSwipeToCamera")));
+        layout.addView(cardOf(context,
+                extraSwitch(context, "#30D158", "disableSwipeToCamera"),
+                createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.clean_ui_toggle_title), "#30D158",
+                        v -> showCleanUiGestureDialog(context))));
 
         showSectionDialog(context, I18n.t(context, R.string.menu_navigation), layout, () -> {});
+    }
+
+    private static void showCleanUiGestureDialog(Context context) {
+        String[] options = new String[]{
+                I18n.t(context, R.string.clean_ui_gesture_off),
+                I18n.t(context, R.string.clean_ui_gesture_long_press),
+                I18n.t(context, R.string.clean_ui_gesture_double_tap_long)
+        };
+        int current = FeatureFlags.cleanUiToggleGesture;
+        IeDialog dialog = new IeDialog(context)
+                .title(I18n.t(context, R.string.clean_ui_gesture_mode))
+                .choices(options, current, which -> {
+                    FeatureFlags.cleanUiToggleGesture = which;
+                    SettingsManager.saveAllFlags();
+                });
+        dialog.secondary(I18n.t(context, android.R.string.cancel), null);
+        dialog.show();
     }
 
     static String[] startupTabNames(Context context) {

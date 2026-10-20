@@ -9,7 +9,18 @@
     <string name="ig_direct_back_long_press_duration">Back Long-Press Duration</string>
     <string name="ig_direct_empty_general_folder">Show \'General\' Folder as Empty</string>
     <string name="ig_direct_hide_folders_bar">Hide Folders Bar</string>
-<string name="ig_dialog_secret_menu_trigger">Secret Menu Trigger</string>
+
+    <!-- Clean UI Quick Toggle -->
+    <string name="clean_ui_toggle_title">Clean UI Quick Toggle</string>
+    <string name="clean_ui_gesture_mode">Home Button Shortcut</string>
+    <string name="clean_ui_gesture_off">Off</string>
+    <string name="clean_ui_gesture_long_press">Long Press</string>
+    <string name="clean_ui_gesture_double_tap_long">2 Taps + Long Press</string>
+    <string name="clean_ui_toast_on">Clean UI: On (Buttons hidden)</string>
+    <string name="clean_ui_toast_off">Clean UI: Off (Buttons restored)</string>
+
+    <!-- Secret Menu, Batch Hide & App Disguise -->
+    <string name="ig_dialog_secret_menu_trigger">Secret Menu Trigger</string>
     <string name="ig_dialog_secret_menu_long_press">Long press</string>
     <string name="ig_dialog_secret_menu_double_tap_long_press">Double tap + long press</string>
     <string name="ig_dialog_batch_hide_chats">Enable Batch Move to Hidden</string>
@@ -22,4 +33,4 @@
     <string name="app_name_file_manager">File Manager</string>
     <string name="app_name_calendar">Calendar</string>
     <string name="app_name_weather">Weather</string>
-    </resources>
+</resources>

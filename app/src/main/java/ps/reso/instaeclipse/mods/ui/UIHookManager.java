@@ -25,6 +25,11 @@ import ps.reso.instaeclipse.R;
 import ps.reso.instaeclipse.Xposed.Module;
 import ps.reso.instaeclipse.mods.devops.config.ConfigManager;
 import ps.reso.instaeclipse.mods.ui.utils.BottomSheetHookUtil;
+import android.view.MotionEvent;
+import android.view.ViewConfiguration;
+
+import ps.reso.instaeclipse.mods.ui.utils.BottomSheetHookUtil;
+import ps.reso.instaeclipse.mods.ui.utils.CleanUiManager;
 import ps.reso.instaeclipse.mods.ui.utils.LifecycleHookUtil;
 import ps.reso.instaeclipse.mods.ui.utils.VibrationUtil;
 import ps.reso.instaeclipse.utils.core.SettingsManager;
@@ -81,6 +86,8 @@ public class UIHookManager {
     private static volatile int sActionBarEndId = 0;
     private static volatile int sInboxButtonId = 0;
     private static volatile int sDirectTabId = 0;
+    private static volatile int sTabBarId = 0;
+    private static volatile int sFeedTabId = 0;
 
     @SuppressLint("DiscouragedApi")
     private static void ensureIdsCached(Activity activity) {
@@ -96,6 +103,99 @@ public class UIHookManager {
             sInboxButtonId = res.getIdentifier("action_bar_inbox_button", "id", pkg);
         if (sDirectTabId == 0)
             sDirectTabId = res.getIdentifier("direct_tab", "id", pkg);
+        if (sTabBarId == 0)
+            sTabBarId = res.getIdentifier("tab_bar", "id", pkg);
+        if (sFeedTabId == 0)
+            sFeedTabId = res.getIdentifier("feed_tab", "id", pkg);
+    }
+
+    // Tracks views we've already attached the Clean UI listener to
+    private static final java.util.WeakHashMap<View, Boolean> sCleanUiListenerAttached = new java.util.WeakHashMap<>();
+
+    private static void setupCleanUiGesture(Activity activity, View v) {
+        if (v == null || sCleanUiListenerAttached.containsKey(v)) return;
+        sCleanUiListenerAttached.put(v, true);
+
+        v.setOnTouchListener(new View.OnTouchListener() {
+            private int tapCount = 0;
+            private boolean longPressTriggered = false;
+            private float startX, startY;
+            private final Handler handler = new Handler(Looper.getMainLooper());
+
+            private final Runnable longPressRunnable = () -> {
+                longPressTriggered = true;
+                v.setPressed(false);
+                tapCount = 0;
+                VibrationUtil.vibrate(activity);
+                CleanUiManager.toggleCleanUi(activity);
+            };
+
+            private final Runnable resetTapCountRunnable = () -> {
+                tapCount = 0;
+            };
+
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                int mode = FeatureFlags.cleanUiToggleGesture;
+                if (mode == 0) return false;
+
+                int slop = ViewConfiguration.get(view.getContext()).getScaledTouchSlop();
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startX = event.getX();
+                        startY = event.getY();
+                        longPressTriggered = false;
+
+                        if (mode == 1) {
+                            handler.postDelayed(longPressRunnable, 500);
+                        } else if (mode == 2) {
+                            if (tapCount == 2) {
+                                handler.postDelayed(longPressRunnable, 450);
+                            }
+                        }
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (Math.hypot(event.getX() - startX, event.getY() - startY) > slop) {
+                            handler.removeCallbacks(longPressRunnable);
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        handler.removeCallbacks(longPressRunnable);
+
+                        if (longPressTriggered) {
+                            return true; // Consume event so normal scroll/refresh doesn't happen
+                        }
+
+                        if (event.getAction() == MotionEvent.ACTION_UP && mode == 2) {
+                            tapCount++;
+                            handler.removeCallbacks(resetTapCountRunnable);
+                            handler.postDelayed(resetTapCountRunnable, 350);
+                        }
+                        break;
+                }
+                return false;
+            }
+        });
+    }
+
+    private static void processCleanUiHomeTab(Activity activity) {
+        if (FeatureFlags.cleanUiToggleGesture == 0) return;
+
+        View homeTab = null;
+        if (sFeedTabId != 0) {
+            homeTab = activity.findViewById(sFeedTabId);
+        }
+        if (homeTab == null && sTabBarId != 0) {
+            View tabBar = activity.findViewById(sTabBarId);
+            if (tabBar instanceof ViewGroup && ((ViewGroup) tabBar).getChildCount() > 0) {
+                homeTab = ((ViewGroup) tabBar).getChildAt(0);
+            }
+        }
+        if (homeTab != null) {
+            setupCleanUiGesture(activity, homeTab);
+        }
     }
 
     public static void setupHooks(Activity activity) {
@@ -130,6 +230,8 @@ public class UIHookManager {
 
         // Cache resource IDs once per IG install (string table lookup is non-trivial).
         ensureIdsCached(activity);
+
+        processCleanUiHomeTab(activity);
 
         // Always re-apply the search long-press listener. Instagram may overwrite it after
         // a config change (e.g. when InstaEclipse settings are toggled), so we cannot skip
@@ -169,6 +271,7 @@ public class UIHookManager {
                         sGlobalListenerPending.remove(activity);
                         sSearchWiringDone.put(activity, true);
                     }
+                    processCleanUiHomeTab(activity);
                 }
             });
         }

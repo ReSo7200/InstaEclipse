@@ -1,0 +1,89 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Get short SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Check Keystore Secrets
+        id: check_secrets
+        run: |
+          if [ -n "${{ secrets.PERSONAL_KEYSTORE_BASE64 }}" ]; then
+            echo "SIGNING_LEVEL=1" >> $GITHUB_ENV
+          elif [ -n "${{ secrets.ORG_KEYSTORE_BASE64 }}" ]; then
+            echo "SIGNING_LEVEL=2" >> $GITHUB_ENV
+          else
+            echo "SIGNING_LEVEL=3" >> $GITHUB_ENV
+          fi
+
+      - name: Sign APK (Personal Keystore)
+        if: env.SIGNING_LEVEL == '1'
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.PERSONAL_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.PERSONAL_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.PERSONAL_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.PERSONAL_KEY_PASSWORD }}
+
+      - name: Sign APK (Organization Keystore)
+        if: env.SIGNING_LEVEL == '2'
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.ORG_KEYSTORE_BASE64 }}
+          alias: ${{ secrets.ORG_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ORG_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ORG_KEY_PASSWORD }}
+
+      - name: Rename APK
+        id: rename_apk
+        run: |
+          # Sanitize branch name to prevent slashes from creating subdirectories during rename
+          SAFE_BRANCH_NAME=$(echo "${{ github.ref_name }}" | tr '/' '-')
+
+          if [ "${{ env.SIGNING_LEVEL }}" == "1" ] || [ "${{ env.SIGNING_LEVEL }}" == "2" ]; then
+            APK_PATH="${{ env.SIGNED_RELEASE_FILE }}"
+            NEW_APK_NAME="app-${SAFE_BRANCH_NAME}-${{ env.SHORT_SHA }}-signed.apk"
+          else
+            APK_PATH=$(find app/build/outputs/apk/release -maxdepth 1 -name "*.apk" | head -n 1)
+            NEW_APK_NAME="app-${SAFE_BRANCH_NAME}-${{ env.SHORT_SHA }}-unsigned.apk"
+          fi
+
+          mv "$APK_PATH" "app/build/outputs/apk/release/$NEW_APK_NAME"
+          echo "FINAL_APK_PATH=app/build/outputs/apk/release/$NEW_APK_NAME" >> $GITHUB_ENV
+
+      - name: Create Rolling Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}-latest
+          name: ${{ github.ref_name }} (Latest)
+          artifacts: ${{ env.FINAL_APK_PATH }}
+          allowUpdates: true
+          replacesArtifacts: true
+          generateReleaseNotes: true

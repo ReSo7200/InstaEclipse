@@ -1311,9 +1311,31 @@ public class FeaturesFragment extends Fragment {
         ));
 
         defs.add(getString(R.string.menu_nav_gestures));
-        defs.add(Arrays.asList(createExtrasSwitch("#30D158", "disableSwipeToCamera")));
+        defs.add(Arrays.asList(
+                createExtrasSwitch("#30D158", "disableSwipeToCamera"),
+                createClickable(R.drawable.ic_tune, "#30D158", getString(R.string.clean_ui_toggle_title), this::showCleanUiGestureDialog)
+        ));
 
         return defs;
+    }
+
+    private void showCleanUiGestureDialog() {
+        Context context = getContext();
+        if (context == null) return;
+        String[] options = new String[]{
+                getString(R.string.clean_ui_gesture_off),
+                getString(R.string.clean_ui_gesture_long_press),
+                getString(R.string.clean_ui_gesture_double_tap_long)
+        };
+        int current = localCache.getInt("cleanUiToggleGesture", 0);
+        new MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.clean_ui_gesture_mode)
+                .setSingleChoiceItems(options, current, (dialog, which) -> {
+                    putIntPref("cleanUiToggleGesture", which);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     /** #238: reorder the bottom-nav tabs (saved as the "navTabOrder" string pref). */

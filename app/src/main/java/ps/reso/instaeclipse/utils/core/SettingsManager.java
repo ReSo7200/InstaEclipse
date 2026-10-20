@@ -72,6 +72,9 @@ public class SettingsManager {
         editor.putBoolean("lockUseFingerprint", FeatureFlags.lockUseFingerprint);
 
         // Quick Toggles
+        editor.putInt("cleanUiToggleGesture", FeatureFlags.cleanUiToggleGesture);
+        editor.putBoolean("isCleanUiActive", FeatureFlags.isCleanUiActive);
+        editor.putString("cleanUiSavedSnapshot", FeatureFlags.cleanUiSavedSnapshot);
         editor.putBoolean("quickToggleSeen", FeatureFlags.quickToggleSeen);
         editor.putBoolean("quickToggleTyping", FeatureFlags.quickToggleTyping);
         editor.putBoolean("quickToggleScreenshot", FeatureFlags.quickToggleScreenshot);
@@ -280,6 +283,9 @@ public class SettingsManager {
         FeatureFlags.lockUseFingerprint = prefs.getBoolean("lockUseFingerprint", true);
 
         // Quick Toggles
+        FeatureFlags.cleanUiToggleGesture = prefs.getInt("cleanUiToggleGesture", 0);
+        FeatureFlags.isCleanUiActive = prefs.getBoolean("isCleanUiActive", false);
+        FeatureFlags.cleanUiSavedSnapshot = prefs.getString("cleanUiSavedSnapshot", "");
         FeatureFlags.quickToggleSeen = prefs.getBoolean("quickToggleSeen", false);
         FeatureFlags.quickToggleTyping = prefs.getBoolean("quickToggleTyping", false);
         FeatureFlags.quickToggleScreenshot = prefs.getBoolean("quickToggleScreenshot", false);

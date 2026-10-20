@@ -101,6 +101,10 @@ public class FeatureFlags {
     public static volatile boolean hideDirectFoldersBar = false;
 
     // Which ghost mode features the quick toggle will control
+    public static volatile int cleanUiToggleGesture = 0; // 0 = Off, 1 = Long Press, 2 = 2 Tap + Long Press
+    public static volatile boolean isCleanUiActive = false;
+    public static volatile String cleanUiSavedSnapshot = "";
+
     public static volatile boolean quickToggleSeen = false;
     public static volatile boolean quickToggleTyping = false;
     public static volatile boolean quickToggleScreenshot = false;
