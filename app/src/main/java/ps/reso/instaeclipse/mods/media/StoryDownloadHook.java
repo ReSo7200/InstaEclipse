@@ -31,6 +31,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.users.UserUtils;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class StoryDownloadHook {
 
@@ -91,7 +92,7 @@ public class StoryDownloadHook {
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.") && !n.startsWith("instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                     try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
                 }
@@ -109,7 +110,7 @@ public class StoryDownloadHook {
 
     private static boolean isHighlight(Object reel) {
         for (Class<?> k = reel.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try {
                     f.setAccessible(true);
@@ -126,7 +127,7 @@ public class StoryDownloadHook {
 
     private static List<?> highlightItemsWith(Object reel, Object session) {
         List<?> best = null;
-        for (Method m : reel.getClass().getMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(reel.getClass())) {
             Class<?>[] p = m.getParameterTypes();
             if (p.length != 1 || !List.class.isAssignableFrom(m.getReturnType())
                     || !p[0].getName().equals("com.instagram.common.session.UserSession")) continue;
@@ -176,7 +177,7 @@ public class StoryDownloadHook {
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         SelectedMediaAdapter.install(bridge, classLoader);
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("Reel with pending media should have an owner.")))) {
                 reelClass = classLoader.loadClass(md.getClassName());
                 break;
@@ -210,7 +211,7 @@ public class StoryDownloadHook {
     private void installHighlightTrayHook(DexKitBridge bridge, ClassLoader cl) {
         try {
             MethodData builder = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("HighlightsTrayDialogHelper").paramCount(4)))) { builder = md; break; }
             if (builder == null) { ModuleLog.line("(IE|HighlightTray) builder not found"); return; }
             Method build = builder.getMethodInstance(cl);
@@ -310,25 +311,25 @@ public class StoryDownloadHook {
     private static void findReelLoader(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> loader = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("reel_store_on_story_unavailable")))) {
-                for (java.lang.reflect.Constructor<?> c : cl.loadClass(md.getClassName()).getDeclaredConstructors())
+                for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(cl.loadClass(md.getClassName())))
                     if (c.getParameterCount() > 0 && c.getParameterTypes()[0].getName().startsWith("X.")) { loader = c.getParameterTypes()[0]; break; }
                 if (loader != null) break;
             }
             if (loader == null) return;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType(loader.getName()).paramTypes("com.instagram.common.session.UserSession")))) {
                 Method m = md.getMethodInstance(cl);
                 if (java.lang.reflect.Modifier.isStatic(m.getModifiers())) { m.setAccessible(true); loaderGetter = m; break; }
             }
-            for (Method m : loader.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(loader)) {
                 Class<?>[] p = m.getParameterTypes();
                 if (p.length == 4 && p[0].isInterface() && p[1] == String.class && p[2] == String.class && p[3] == boolean.class) loaderRegister = m;
                 else if (p.length == 4 && p[0].isEnum() && p[1] == String.class && p[2] == String.class && p[3] == java.util.Map.class) loaderFetch = m;
             }
             if (loaderRegister != null)
-                for (Method m : loader.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(loader)) {
                     Class<?>[] p = m.getParameterTypes();
                     if (p.length == 2 && p[0] == loaderRegister.getParameterTypes()[0] && p[1] == String.class) loaderUnregister = m;
                 }
@@ -339,7 +340,7 @@ public class StoryDownloadHook {
 
     private static String highlightId(Object reel) {
         for (Class<?> k = reel.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-            for (Field f : k.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (f.getType() != String.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try { f.setAccessible(true); if (f.get(reel) instanceof String s && s.startsWith("highlight:")) return s; } catch (Throwable ignored) {}
             }
@@ -401,7 +402,7 @@ public class StoryDownloadHook {
                 java.lang.reflect.Method c = DexKitCache.loadMethod("StoryCache_expiring", cl);
                 if (c != null) { c.setAccessible(true); expiringGetter = c; return; }
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass("com.instagram.feed.media.Media").paramCount(0)
                     .returnType("java.lang.Long").usingStrings("expiring_at")))) {
                 try {
@@ -432,7 +433,7 @@ public class StoryDownloadHook {
         };
         try {
             int n = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("ReelViewerFragment.onCurrentActiveItemBound")))) {
                 try { XposedBridge.hookMethod(md.getMethodInstance(cl), capture); n++; } catch (Throwable ignored) {}
             }
@@ -495,7 +496,7 @@ public class StoryDownloadHook {
         if (out != null && !out.isEmpty()) return out;
         out = new java.util.ArrayList<>();
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType("void").usingStrings("[INTERNAL] Pause Playback")))) {
                 try { out.add(md.getMethodInstance(cl)); } catch (Throwable ignored) {}
             }
@@ -517,7 +518,7 @@ public class StoryDownloadHook {
             } catch (Throwable ignored) {}
         }
         for (Class<?> c : owners) {
-            for (Method m : c.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (isCharSequenceArray(m.getReturnType())) out.add(m);
             }
         }
@@ -538,7 +539,7 @@ public class StoryDownloadHook {
         // music, which IG's native Save drops. (Ported from PR #200 by izadiegizabal.) Anchored on
         // the stable string only, so it stays valid across versions; static + instance both accepted.
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("[INTERNAL] Pause Playback")));
             if (methods.isEmpty()) {
@@ -605,7 +606,7 @@ public class StoryDownloadHook {
 
     private static XC_MethodHook menuButtonInjector() {
         return new XC_MethodHook() {
-            @Override protected void afterHookedMethod(MethodHookParam param) {
+            @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.enableStoryDownload || param.hasThrowable()) return;
                 Object original = param.getResult();
                 String label = I18n.t(AndroidAppHelper.currentApplication(), R.string.ig_dl_title);
@@ -622,7 +623,7 @@ public class StoryDownloadHook {
         try {
             Class<?> itemType = loader.loadClass("com.instagram.model.reels.ReelItem");
             List<MethodData> anchors = new ArrayList<>();
-            for (MethodData data : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData data : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .returnType("java.util.ArrayList").usingStrings("story_highlight_action_sheet")))) {
                 if (StoryMenuOptions.isOwnedListBuilder(data.getMethodInstance(loader), itemType)) {
                     anchors.add(data);
@@ -635,7 +636,7 @@ public class StoryDownloadHook {
             MethodData anchor = anchors.get(0);
             String ownerName = anchor.getDeclaredClassName();
             Set<Method> builders = new LinkedHashSet<>();
-            for (MethodData caller : anchor.getCallers()) {
+            for (MethodData caller : DexKitQueryCache.callers(bridge, anchor)) {
                 if (!ownerName.equals(caller.getDeclaredClassName())
                         || !"void".equals(caller.getReturnTypeName())) continue;
                 for (MethodData invoked : caller.getInvokes()) {
@@ -670,7 +671,7 @@ public class StoryDownloadHook {
         // hooking the extra dispatchers is harmless. (Ported from PR #200 by izadiegizabal.)
         List<MethodData> methods;
         try {
-            methods = bridge.findMethod(FindMethod.create()
+            methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .returnType("void")
                             .usingStrings("[INTERNAL] Pause Playback")));
@@ -856,7 +857,7 @@ public class StoryDownloadHook {
         if (obj == null) return false;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType().getName().equals("com.instagram.model.reels.ReelItem")) return true;
             }
             cls = cls.getSuperclass();
@@ -971,7 +972,7 @@ public class StoryDownloadHook {
 
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Method method : cls.getDeclaredMethods()) {
+            for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cls)) {
                 if (method.getParameterCount() != 0
                         || java.lang.reflect.Modifier.isStatic(method.getModifiers())) continue;
                 Class<?> returnType = method.getReturnType();
@@ -993,7 +994,7 @@ public class StoryDownloadHook {
     private static Object readFieldByTypeName(Object obj, String typeName) {
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType().getName().equals(typeName)) {
                     f.setAccessible(true);
                     try { return f.get(obj); } catch (Throwable ignored) {}
@@ -1025,7 +1026,7 @@ public class StoryDownloadHook {
 
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
@@ -1067,7 +1068,7 @@ public class StoryDownloadHook {
 
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
@@ -1132,7 +1133,7 @@ public class StoryDownloadHook {
 
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 try {
@@ -1155,7 +1156,7 @@ public class StoryDownloadHook {
         if (cn.startsWith("X.") || cn.startsWith("com.instagram.") || cn.startsWith("com.facebook.")) {
             cls = obj.getClass();
             while (cls != null && cls != Object.class) {
-                for (Method m : cls.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cls)) {
                     if (m.getParameterCount() != 0) continue;
                     try {
                         m.setAccessible(true);
@@ -1186,7 +1187,7 @@ public class StoryDownloadHook {
         // Not a candidate — recurse into Instagram/Facebook/X. objects and lists
         cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
@@ -1214,7 +1215,7 @@ public class StoryDownloadHook {
         if (obj == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (Context.class.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
                     try {
@@ -1298,7 +1299,7 @@ public class StoryDownloadHook {
             Object reelItem = null;
             Class<?> cls = holder.getClass();
             while (cls != null && cls != Object.class) {
-                for (Field f : cls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                     f.setAccessible(true);
                     try {
                         Object val = f.get(holder);
@@ -1327,7 +1328,7 @@ public class StoryDownloadHook {
             // Step 2: probe all no-arg non-primitive methods on ReelItem.
             // Priority: find a method returning com.instagram.user.model.User.
             // Fallback: if a method returns com.instagram.feed.media.Media → delegate to feed extractor.
-            for (Method m : reelItem.getClass().getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(reelItem.getClass())) {
                 if (m.getParameterCount() != 0) continue;
                 Class<?> ret = m.getReturnType();
                 if (ret.isPrimitive() || ret == String.class || ret == void.class) continue;

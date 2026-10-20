@@ -40,6 +40,18 @@ public class ModulePreferencePolicyTest {
         assertFalse(ModuleReplies.isPreferenceUpdate(STRING, "downloaderCustomPath", atLimit + "x"));
     }
 
+    @Test public void spoofedPictureAloneMayExceedTheStringLimitAndMustBeBase64() {
+        String picture = "A".repeat(60 * 1024);
+        assertTrue(ModuleReplies.isPreferenceUpdate(STRING, "spoofAvatar", picture));
+        assertTrue(ModuleReplies.isPreferenceUpdate(STRING, "spoofAvatar", ""));
+        assertFalse(ModuleReplies.isPreferenceUpdate(STRING, "spoofBio", picture));
+        assertFalse(ModuleReplies.isPreferenceUpdate(STRING, "spoofAvatar", "not base64!"));
+        assertFalse(ModuleReplies.isPreferenceUpdate(STRING, "spoofAvatar",
+                "A".repeat(ps.reso.instaeclipse.utils.profile.SpoofAvatar.MAX_CHARS + 1)));
+        assertTrue(ModuleReplies.isPreferenceUpdate(STRING, "spoofName", "Name"));
+        assertTrue(ModuleReplies.isPreferenceUpdate(STRING, "spoofUsername", "user"));
+    }
+
     @Test public void downloaderModeParticipatesInBooleanSchemaAndUpdates() {
         for (boolean original : new boolean[]{false, true}) {
             assertTrue(ModuleReplies.isPreferenceValue("downloaderUseOriginal", original));

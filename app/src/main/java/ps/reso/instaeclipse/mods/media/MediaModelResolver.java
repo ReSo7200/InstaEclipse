@@ -103,7 +103,7 @@ final class MediaModelResolver {
 
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field field : cls.getDeclaredFields()) {
+            for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) continue;
                     field.setAccessible(true);
@@ -126,7 +126,7 @@ final class MediaModelResolver {
         if (depth > 0 && isInstagramModelClass(obj.getClass().getName())) {
             cls = obj.getClass();
             while (cls != null && cls != Object.class) {
-                for (Method method : cls.getDeclaredMethods()) {
+                for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cls)) {
                     if (method.getParameterCount() != 0
                             || java.lang.reflect.Modifier.isStatic(method.getModifiers())) continue;
                     Class<?> returnType = method.getReturnType();
@@ -158,7 +158,7 @@ final class MediaModelResolver {
     }
 
     private static void addListMethods(Class<?> type, List<Method> out, Set<String> seen) {
-        for (Method method : type.getDeclaredMethods()) {
+        for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(type)) {
             if (method.getParameterCount() != 0
                     || !List.class.isAssignableFrom(method.getReturnType())) continue;
             String key = method.getDeclaringClass().getName() + '#' + method.getName()

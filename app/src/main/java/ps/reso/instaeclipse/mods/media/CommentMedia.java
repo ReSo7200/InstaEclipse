@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Media attached to a comment (#242): photo comments carry a com.instagram.feed.media.Media
@@ -54,12 +55,12 @@ public final class CommentMedia {
                 String n = c.getName();
                 if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
                 for (Class<?> k = c; k != null && k != Object.class; k = k.getSuperclass()) {
-                    for (Field f : k.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                         if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                         try { f.setAccessible(true); queue.add(new Object[]{f.get(o), depth + 1}); } catch (Throwable ignored) {}
                     }
                 }
-                for (Method m : c.getMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(c)) {
                     if (m.getParameterCount() != 0 || Modifier.isStatic(m.getModifiers())) continue;
                     String rt = m.getReturnType().getName();
                     if (rt.equals(MEDIA) || (rt.startsWith("com.instagram.api.schemas.")
@@ -77,19 +78,19 @@ public final class CommentMedia {
     /** First http URL reachable through getUrl()-style getters of a Giphy schema object. */
     private static String giphyUrl(Object o) {
         try {
-            for (Method m : o.getClass().getMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(o.getClass())) {
                 if (m.getParameterCount() != 0 || Modifier.isStatic(m.getModifiers())) continue;
                 if (m.getReturnType() == String.class && m.getName().equals("getUrl")) {
                     Object r = m.invoke(o);
                     if (r instanceof String s && s.startsWith("http")) return s;
                 }
             }
-            for (Method m : o.getClass().getMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(o.getClass())) {
                 if (m.getParameterCount() != 0 || Modifier.isStatic(m.getModifiers())) continue;
                 if (m.getReturnType().getName().startsWith("com.instagram.api.schemas.")) {
                     Object r = m.invoke(o);
                     if (r != null && r != o) {
-                        for (Method g : r.getClass().getMethods()) {
+                        for (Method g : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(r.getClass())) {
                             if (g.getParameterCount() == 0 && g.getReturnType() == String.class && g.getName().equals("getUrl")) {
                                 Object u = g.invoke(r);
                                 if (u instanceof String s && s.startsWith("http")) return s;
@@ -134,7 +135,7 @@ public final class CommentMedia {
      *  452); after onViewCreated its Media is remembered so comment downloads know the post's author. */
     public static void trackCommentSheet(org.luckypray.dexkit.DexKitBridge bridge, ClassLoader cl) {
         try {
-            for (org.luckypray.dexkit.result.MethodData md : bridge.findMethod(org.luckypray.dexkit.query.FindMethod.create()
+            for (org.luckypray.dexkit.result.MethodData md : DexKitQueryCache.findMethod(bridge, org.luckypray.dexkit.query.FindMethod.create()
                     .matcher(org.luckypray.dexkit.query.matchers.MethodMatcher.create().usingStrings("Failed to ingest comments close signal")))) {
                 Class<?> frag = cl.loadClass(md.getClassName());
                 Method ovc = frag.getDeclaredMethod("onViewCreated", android.view.View.class, android.os.Bundle.class);
@@ -206,7 +207,7 @@ public final class CommentMedia {
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class
                             || Context.class.isAssignableFrom(f.getType()) || android.view.View.class.isAssignableFrom(f.getType())) continue;
                     try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
@@ -217,7 +218,7 @@ public final class CommentMedia {
 
     private static boolean hasStringPrefix(Object o, String prefix) {
         for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-            for (Field f : k.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (f.getType() != String.class || Modifier.isStatic(f.getModifiers())) continue;
                 try { f.setAccessible(true); if (f.get(o) instanceof String s && s.startsWith(prefix)) return true; } catch (Throwable ignored) {}
             }

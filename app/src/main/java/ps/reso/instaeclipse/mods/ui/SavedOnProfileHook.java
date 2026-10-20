@@ -25,6 +25,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Saved one tap away on your own profile (#237): a bookmark button in the profile action bar
@@ -51,7 +52,7 @@ public class SavedOnProfileHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         if (!FeatureFlags.savedOnProfile) return; // applies after an Instagram restart
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(HANDLER).paramCount(3)))) {
                 for (MethodData inv : md.getInvokes()) {
                     if (!inv.isMethod()) continue;
@@ -168,7 +169,7 @@ public class SavedOnProfileHook {
     private static Object findSession(Object o, int depth) {
         java.util.List<Object> next = new java.util.ArrayList<>();
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try {
                     f.setAccessible(true);

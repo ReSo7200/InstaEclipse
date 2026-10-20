@@ -144,7 +144,7 @@ public final class XposedHelpers {
     private static Method findCompatibleMethod(Class<?> clazz, String name, Object[] args, boolean isStatic) {
         Method best = null;
         for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-            for (Method m : c.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (!m.getName().equals(name) || Modifier.isStatic(m.getModifiers()) != isStatic) continue;
                 if (!accepts(m.getParameterTypes(), args)) continue;
                 if (best == null || moreSpecific(m.getParameterTypes(), best.getParameterTypes())) best = m;

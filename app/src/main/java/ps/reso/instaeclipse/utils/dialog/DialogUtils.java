@@ -177,12 +177,12 @@ public class DialogUtils {
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_privacy)));
         LinearLayout privacy = createGroupCard(context);
         privacy.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_dialog_menu_ghost_settings), A_PRIVACY, () -> showGhostOptions(context), onCount(context, "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "isGhostScreenshot", "isGhostViewOnce", "readReceiptChats", "spoofLastSeen", "airplaneMode")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_chat, I18n.t(context, R.string.menu_messages), A_PRIVACY, () -> showMessagesOptions(context), onCount(context, "keepEphemeralMessages", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "confirmCalls", "allowScreenshots", "permanentViewMode", "translateMessages", "bulkUnsend", "chatExport", "hideNotesTray", "hideDmBlend", "hideShareCreateGroup")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_chat, I18n.t(context, R.string.menu_messages), A_PRIVACY, () -> showMessagesOptions(context), onCount(context, "keepEphemeralMessages", "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "confirmCalls", "allowScreenshots", "permanentViewMode", "translateMessages", "bulkUnsend", "chatExport", "hideNotesTray", "hideDmSuggestions", "hideDmBlend", "hideShareCreateGroup")));
         privacy.addView(createMenuRow(context, R.drawable.ic_eye_off, I18n.t(context, R.string.ig_hide_chats_title), A_PRIVACY, () -> showHideChatsOptions(context), onCount(context, "hideSpecificChats")));
         privacy.addView(createMenuRow(context, R.drawable.ic_shield, I18n.t(context, R.string.ig_dialog_misc_lock_section), A_PRIVACY, () -> showLockOptions(context), onCount(context, "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint")));
         privacy.addView(createMenuRow(context, R.drawable.ic_block, I18n.t(context, R.string.menu_ads_tracking), A_PRIVACY, () -> showAdOptions(context), onCount(context, "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "disableSearchHistory")));
         privacy.addView(createMenuRow(context, R.drawable.ic_pin, I18n.t(context, R.string.ig_dialog_menu_location), A_PRIVACY, () -> showLocationOptions(context), onCount(context, "spoofLocation")));
-        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "isExtremeMode", "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments", "removeMetaAI", "hideOnboardingPrompts", "hidePlusUpsells")));
+        privacy.addView(createMenuRow(context, R.drawable.ic_notification, I18n.t(context, R.string.ig_dialog_menu_distraction_free), A_PRIVACY, () -> showDistractionOptions(context), onCount(context, "isExtremeMode", "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore", "disableComments", "removeMetaAI", "hideOnboardingPrompts", "hidePlusUpsells", "hideInstants")));
         mainLayout.addView(privacy);
 
         // ---- MEDIA ---- downloading, post-menu extras and uploads
@@ -196,8 +196,8 @@ public class DialogUtils {
         // ---- SOCIAL ---- likes, comments, profiles
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_social)));
         LinearLayout social = createGroupCard(context);
-        social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "enableCopyComment", "commentSearch", "enableCaptionCopy", "disableRepost")));
-        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
+        social.addView(createMenuRow(context, R.drawable.ic_heart, I18n.t(context, R.string.menu_likes_comments), A_SOCIAL, () -> showLikesCommentsOptions(context), onCount(context, "disableDoubleTapLike", "likeUndo", "confirmLikes", "enableCopyComment", "commentSearch", "enableCaptionCopy", "disableRepost")));
+        social.addView(createMenuRow(context, R.drawable.ic_eye, I18n.t(context, R.string.menu_profiles), A_SOCIAL, () -> showProfilesOptions(context), onCount(context, "profileMenuTools", "postCountSpoof", "profileSpoofer", "profileAnalyzer", "confirmFollows", "profileFollowsYouLabel", "fancyBioFont", "showFollowerToast", "followListExport", "followersHistory", "savedOnProfile", "hideThreadsButton")));
         mainLayout.addView(social);
 
         // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
@@ -264,7 +264,7 @@ public class DialogUtils {
     /** Navigation: the switch count, plus "· Tab order changed" when the tab order isn't Instagram's. */
     private static String navCount(Context context) {
         String base = onCount(context, "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages",
-                "hideTabActivity", "hideTabProfile", "disableSwipeToCamera");
+                "hideTabActivity", "hideTabProfile", "disableSwipeToCamera", "backLeavesHome");
         return ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.isCustomTabOrder(FeatureFlags.navTabOrder)
                 ? base + " · " + I18n.t(context, R.string.nav_tab_order_changed) : base;
     }
@@ -864,6 +864,12 @@ public class DialogUtils {
 
     /** Styled per-thread Unsent Messages viewer, opened from the in-thread bin button. */
     public static void showThreadUnsent(Context context, String threadId, String chatName) {
+        showThreadUnsent(context, threadId, chatName, null);
+    }
+
+    /** {@code onBack}: where Back goes (e.g. the chat's own menu) instead of the main menu. */
+    public static void showThreadUnsent(Context context, String threadId, String chatName, Runnable onBack) {
+        pendingBackTarget = onBack;
         LinearLayout layout = createSwitchLayout(context);
 
         // Never widen to every chat: an unknown thread (null) shows only the entries that were
@@ -1152,6 +1158,7 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ig_dialog_bulk_unsend, "bulkUnsend"),
                 flagSwitch(context, R.drawable.ic_download, "#5E5CE6", R.string.ig_dialog_ghost_chat_export, "chatExport"),
                 flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_distraction_hide_notes_tray, "hideNotesTray"),
+                flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_hide_dm_suggestions, "hideDmSuggestions"),
                 flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_hide_dm_blend, "hideDmBlend"),
                 flagSwitch(context, R.drawable.ic_block, "#5E5CE6", R.string.ig_dialog_misc_hide_share_create_group, "hideShareCreateGroup")));
         layout.addView(createInfoSection(context, "", I18n.t(context, R.string.ie_keep_unsent_in_chat_hint)));
@@ -1317,7 +1324,8 @@ public class DialogUtils {
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_dialog_misc_remove_meta_ai, "removeMetaAI"),
                 extraSwitch(context, "#30D158", "hideOnboardingPrompts"),
-                flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_dialog_clean_feed_hide_plus, "hidePlusUpsells")));
+                flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_dialog_clean_feed_hide_plus, "hidePlusUpsells"),
+                flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_hide_instants, "hideInstants")));
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {
             FeatureFlags.disableStories = disableStoriesSwitch.isChecked();
@@ -1354,6 +1362,7 @@ public class DialogUtils {
         layout.addView(sectionHeader(context, I18n.t(context, R.string.menu_nav_gestures)));
         layout.addView(cardOf(context,
                 extraSwitch(context, "#30D158", "disableSwipeToCamera"),
+                flagSwitch(context, R.drawable.ic_home, "#30D158", R.string.ig_back_leaves_home, "backLeavesHome"),
                 createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.clean_ui_toggle_title), "#30D158",
                         v -> showCleanUiGestureDialog(context))));
 
@@ -1590,8 +1599,6 @@ public class DialogUtils {
     }
 
     public static final int[] STORY_TRAY_SIZES = {100, 90, 80, 70, 60, 50};
-    public static final String[] STORY_RING_PRESETS = {"#3897F0", "#A855F7", "#FF3B30", "#FFD60A", "#FFFFFF",
-            "#FF0066,#7638FA", "#00C6FF,#0072FF"};
 
     private static String storyTraySizeLabel(Context context) {
         return I18n.t(context, R.string.ig_story_tray_size) + "  ·  " + FeatureFlags.storyTrayScale + "%";
@@ -1635,46 +1642,15 @@ public class DialogUtils {
                 : sb.append(storyRingSwatch(FeatureFlags.storyRingColor));
     }
 
-    /** Unseen story ring color (#283): Instagram's, a preset, or a custom one / two-color gradient. */
+    /** Unseen story ring color (#283): Instagram's, one color, or a gradient of up to 4, with a live preview. */
     private static void showStoryRingColorDialog(Context context, TextView label) {
-        CharSequence[] rows = new CharSequence[STORY_RING_PRESETS.length + 2];
-        rows[0] = I18n.t(context, R.string.ig_story_ring_default);
-        int checked = FeatureFlags.storyRingColor.isEmpty() ? 0 : rows.length - 1;
-        for (int i = 0; i < STORY_RING_PRESETS.length; i++) {
-            rows[i + 1] = storyRingSwatch(STORY_RING_PRESETS[i]);
-            if (STORY_RING_PRESETS[i].equalsIgnoreCase(FeatureFlags.storyRingColor)) checked = i + 1;
-        }
-        rows[rows.length - 1] = checked == rows.length - 1
-                ? new android.text.SpannableStringBuilder(I18n.t(context, R.string.ig_story_ring_custom) + "  ").append(storyRingSwatch(FeatureFlags.storyRingColor))
-                : I18n.t(context, R.string.ig_story_ring_custom);
-        new IeDialog(context)
-                .title(I18n.t(context, R.string.ig_story_ring_color))
-                .choices(rows, checked, which -> {
-                    if (which == rows.length - 1) { showCustomStoryRingColor(context, label); return; }
-                    saveStoryRingColor(context, which == 0 ? "" : STORY_RING_PRESETS[which - 1], label);
-                })
-                .show();
-    }
-
-    private static void showCustomStoryRingColor(Context context, TextView label) {
         try {
-            IeDialog dlg = new IeDialog(context)
-                    .title(I18n.t(context, R.string.ig_story_ring_custom))
-                    .message(I18n.t(context, R.string.ig_story_ring_custom_hint));
-            final android.widget.EditText input = dlg.input("#3897F0");
-            input.setText(FeatureFlags.storyRingColor);
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_story_ring_color));
+            String[] picked = {FeatureFlags.storyRingColor};
+            dlg.view(RingColorPicker.build(context, FeatureFlags.storyRingColor,
+                    new RingColorPicker.Palette(dlg.text, dlg.sub, dlg.field, dlg.accent), v -> picked[0] = v));
             dlg.secondary(context.getString(android.R.string.cancel), null);
-            dlg.primary(context.getString(android.R.string.ok), () -> {
-                String v = input.getText().toString().trim().replace(" ", "");
-                if (ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(v) == null) {
-                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, I18n.t(context, R.string.ig_story_ring_invalid), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String[] parts = v.split(",");
-                StringBuilder norm = new StringBuilder();
-                for (String p : parts) norm.append(norm.length() > 0 ? "," : "").append(p.startsWith("#") ? p : "#" + p);
-                saveStoryRingColor(context, norm.toString().toUpperCase(java.util.Locale.ROOT), label);
-            });
+            dlg.primary(context.getString(android.R.string.ok), () -> saveStoryRingColor(context, picked[0], label));
             dlg.show();
         } catch (Throwable ignored) {}
     }
@@ -1771,6 +1747,7 @@ public class DialogUtils {
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_dialog_misc_disable_double_tap_like, "disableDoubleTapLike"),
                 flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_dialog_misc_like_undo, "likeUndo"),
+                flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_confirm_likes, "confirmLikes"),
                 flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_comment, "enableCopyComment"),
                 flagSwitch(context, R.drawable.ic_search, A_SOCIAL, R.string.ig_dialog_misc_comment_search, "commentSearch"),
                 flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_dialog_misc_copy_caption, "enableCaptionCopy"),
@@ -1782,6 +1759,15 @@ public class DialogUtils {
     private static void showProfilesOptions(Context context) {
         LinearLayout layout = createSwitchLayout(context);
         layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_content_copy, A_SOCIAL, R.string.ig_profile_menu_tools, "profileMenuTools"),
+                flagSwitch(context, R.drawable.ic_heart, A_SOCIAL, R.string.ig_post_counts_feature, "postCountSpoof"),
+                flagSwitch(context, R.drawable.ic_eye, A_SOCIAL, R.string.ig_profile_spoofer, "profileSpoofer"),
+                createActionRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_profile_spoofer_edit), A_SOCIAL,
+                        v -> showProfileSpoofDialog(context)),
+                flagSwitch(context, R.drawable.ic_search, A_SOCIAL, R.string.ig_profile_analyzer, "profileAnalyzer"),
+                createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_pa_watchlist), A_SOCIAL,
+                        v -> ps.reso.instaeclipse.mods.misc.ProfileAnalyzer.showWatchlist(context)),
+                flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_confirm_follows, "confirmFollows"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_misc_profile_follows_label, "profileFollowsYouLabel"),
                 flagSwitch(context, R.drawable.ic_notification, A_SOCIAL, R.string.ig_dialog_fancy_bio_font, "fancyBioFont"),
                 flagSwitch(context, R.drawable.ic_block, A_SOCIAL, R.string.ig_dialog_hide_threads_button, "hideThreadsButton"),
@@ -1790,6 +1776,64 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_eye, A_SOCIAL, R.string.ig_feat_followers_history, "followersHistory"),
                 flagSwitch(context, R.drawable.ic_save, A_SOCIAL, R.string.ig_saved_on_profile, "savedOnProfile")));
         showSectionDialog(context, I18n.t(context, R.string.menu_profiles), layout, () -> {});
+    }
+
+    /**
+     * Profile spoofer editor: live preview of your profile header, then name / username / bio,
+     * counts (empty = real), the badge and the picture. The picture is chosen in the InstaEclipse
+     * app (Instagram's process can't open a picker for us): "Choose photo" saves what is typed,
+     * closes this and opens the app's picker, which sends the picture back.
+     */
+    private static void showProfileSpoofDialog(Context context) {
+        try {
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_profile_spoofer_editor_title));
+            ProfileSpoofEditor.Values v = new ProfileSpoofEditor.Values();
+            v.username = FeatureFlags.spoofUsername;
+            v.name = FeatureFlags.spoofName;
+            v.bio = FeatureFlags.spoofBio;
+            v.avatar = FeatureFlags.spoofAvatar;
+            v.posts = FeatureFlags.spoofPosts;
+            v.followers = FeatureFlags.spoofFollowers;
+            v.following = FeatureFlags.spoofFollowing;
+            v.verified = FeatureFlags.spoofVerified;
+            ProfileSpoofEditor[] editor = new ProfileSpoofEditor[1];
+            editor[0] = new ProfileSpoofEditor(dlg.ctx, v,
+                    new ProfileSpoofEditor.Palette(dlg.text, dlg.sub, dlg.field, dlg.accent, dlg.border),
+                    () -> {
+                        saveProfileSpoof(editor[0].values());
+                        dlg.dismiss();
+                        ModuleActivityLauncher.launch(context, ps.reso.instaeclipse.utils.ipc.BrokerPayload.PROFILE_PHOTO, null);
+                    },
+                    I18n.t(context, R.string.ig_profile_spoofer_photo_in_app),
+                    ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.knownUsername());
+            dlg.view(editor[0].view());
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(I18n.t(context, R.string.ig_profile_spoofer_save), () -> saveProfileSpoof(editor[0].values()));
+            dlg.show();
+        } catch (Throwable ignored) {}
+    }
+
+    private static void saveProfileSpoof(ProfileSpoofEditor.Values v) {
+        FeatureFlags.spoofUsername = v.username;
+        FeatureFlags.spoofName = v.name;
+        FeatureFlags.spoofBio = v.bio;
+        FeatureFlags.spoofAvatar = v.avatar;
+        FeatureFlags.spoofPosts = v.posts;
+        FeatureFlags.spoofFollowers = v.followers;
+        FeatureFlags.spoofFollowing = v.following;
+        FeatureFlags.spoofVerified = v.verified;
+        SettingsManager.saveAllFlags();
+        ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.refreshNow();
+    }
+
+    /** A typed count, or -1 (keep the real one) when empty or not a number. */
+    public static int parseSpoofCount(String s) {
+        try {
+            long v = Long.parseLong(s.trim());
+            return v < 0 ? -1 : (int) Math.min(v, Integer.MAX_VALUE);
+        } catch (Throwable t) {
+            return -1;
+        }
     }
 
     /** App & Account: account limit, notification fix, InstaEclipse's own toasts. */
@@ -2830,6 +2874,16 @@ public class DialogUtils {
             }
         }));
 
+        layout.addView(createActionRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_data_backup), "#30D158", v -> {
+            Activity a = UIHookManager.getCurrentActivity();
+            if (a != null && !a.isFinishing()) ps.reso.instaeclipse.mods.media.DataBackup.export(a);
+        }));
+        layout.addView(createActionRow(context, R.drawable.ic_folder, I18n.t(context, R.string.ig_data_restore), "#0A84FF", v -> {
+            Activity a = UIHookManager.getCurrentActivity();
+            if (a != null && !a.isFinishing()) ps.reso.instaeclipse.mods.media.DataBackup.pickAndRestore(a);
+            else showSimpleDialog(context, I18n.t(context, R.string.ig_dialog_error), I18n.t(context, R.string.ig_dialog_instagram_not_ready));
+        }));
+
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_backup_restore), layout, () -> {});
     }
 
@@ -3044,7 +3098,12 @@ public class DialogUtils {
         currentSectionTitle = null;
     }
 
+    /** Set just before a section opens from outside the menu: its Back goes here, not to the main menu. */
+    private static Runnable pendingBackTarget;
+
     private static void showSectionDialog(Context context, String title, LinearLayout contentLayout, Runnable onSave) {
+        final Runnable backTarget = pendingBackTarget;
+        pendingBackTarget = null;
         if (currentDialog != null) {
             if (currentSectionTitle != null && !currentSectionTitle.equals(title) && currentDialog.isShowing()) {
                 currentDialog.hide(); // opened from another section: keep it to come back to
@@ -3097,6 +3156,11 @@ public class DialogUtils {
                 currentDialog = (AlertDialog) parent[0];
                 currentSectionTitle = (String) parent[1];
                 currentDialog.show();
+            } else if (backTarget != null) {
+                if (currentDialog != null) { try { currentDialog.dismiss(); } catch (Exception ignored) {} }
+                currentDialog = null;
+                currentSectionTitle = null;
+                backTarget.run();
             } else {
                 showEclipseOptionsDialog(context);
             }

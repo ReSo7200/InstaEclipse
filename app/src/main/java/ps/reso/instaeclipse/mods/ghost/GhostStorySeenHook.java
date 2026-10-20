@@ -17,6 +17,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Hide Story / Reel Views.
@@ -73,7 +74,7 @@ public class GhostStorySeenHook {
     /** IG 442+/447: block the reel-seen store's inserts + immediate sender. */
     private boolean tryModernBatchBlock(DexKitBridge bridge) {
         try {
-            List<MethodData> seenMethods = bridge.findMethod(FindMethod.create()
+            List<MethodData> seenMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings("media/seen/")));
             if (seenMethods.isEmpty()) return false;
 
@@ -89,7 +90,7 @@ public class GhostStorySeenHook {
 
             String itemClassName = builder.getClassName();
             String storeClassName = null;
-            for (MethodData caller : builder.getCallers()) {
+            for (MethodData caller : DexKitQueryCache.callers(bridge, builder)) {
                 String cn = caller.getClassName();
                 if (cn != null && !cn.equals(itemClassName)) { storeClassName = cn; break; }
             }
@@ -142,7 +143,7 @@ public class GhostStorySeenHook {
         String cn = o.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return;
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (java.lang.reflect.Field f : c.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try { f.setAccessible(true); collectStrings(f.get(o), out, depth + 1, seen); }
                 catch (Throwable ignored) {}
@@ -183,7 +184,7 @@ public class GhostStorySeenHook {
     /** IG <=441 (436): the sender is a single {@code final void ()} method referencing "media/seen/". */
     private boolean tryLegacyBlock(DexKitBridge bridge) {
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings("media/seen/")));
             for (MethodData method : methods) {
                 Method m;
@@ -241,7 +242,7 @@ public class GhostStorySeenHook {
         // Batch inserts live on the base class (PendingActionStore).
         for (Class<?> c = storeClass.getSuperclass(); c != null && c != Object.class; c = c.getSuperclass()) {
             boolean found = false;
-            for (Method m : c.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (m.getReturnType() != void.class) continue;
                 Class<?>[] p = m.getParameterTypes();
                 boolean perItem = p.length == 2 && p[0] == String.class && p[1] == Object.class;
@@ -255,7 +256,7 @@ public class GhostStorySeenHook {
 
         // Immediate sender: the store's OWN void method taking a single non-framework object
         // (the pending item, e.g. LX/00dT). That is A0O — builds+sends one seen directly.
-        for (Method m : storeClass.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(storeClass)) {
             if (m.getReturnType() != void.class) continue;
             Class<?>[] p = m.getParameterTypes();
             if (p.length != 1) continue;

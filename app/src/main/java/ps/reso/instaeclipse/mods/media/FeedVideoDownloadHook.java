@@ -74,6 +74,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.users.UserUtils;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class FeedVideoDownloadHook {
 
@@ -146,7 +147,7 @@ public class FeedVideoDownloadHook {
             // IG 452 dropped it; the same lookup now ends one step earlier and returns the
             // ExtendedImageUrl (MediaExtKt.A0Y), whose URL we read via its getUrl().
             Method extVariant = null;
-            for (Method m : mediaExtKtClass.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(mediaExtKtClass)) {
                 Class<?>[] p = m.getParameterTypes();
                 if (p.length != 2 || !Modifier.isStatic(m.getModifiers())
                         || !"android.content.Context".equals(p[0].getName()) || p[1] != mediaClass) continue;
@@ -566,7 +567,7 @@ public class FeedVideoDownloadHook {
         while (cls != null && cls != Object.class) {
             String cn = cls.getName();
             if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.") && !cn.startsWith("com.facebook.")) break;
-            for (Method m : cls.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cls)) {
                 if (m.getParameterCount() != 0 || m.getReturnType() != String.class) continue;
                 try {
                     m.setAccessible(true);
@@ -607,7 +608,7 @@ public class FeedVideoDownloadHook {
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.") && !cn.startsWith("com.facebook.")) return null;
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
@@ -676,7 +677,7 @@ public class FeedVideoDownloadHook {
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.") && !cn.startsWith("com.facebook.")) return;
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
@@ -697,7 +698,7 @@ public class FeedVideoDownloadHook {
         // its no-arg List getter materializes the VideoVersion objects for inspection.
         cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Method method : cls.getDeclaredMethods()) {
+            for (Method method : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cls)) {
                 if (method.getParameterCount() != 0
                         || !List.class.isAssignableFrom(method.getReturnType())) continue;
                 try {
@@ -915,7 +916,7 @@ public class FeedVideoDownloadHook {
         if (item == null) return null;
         Class<?> cls = item.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType() != String.class
                         || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try {
@@ -994,7 +995,7 @@ public class FeedVideoDownloadHook {
             out.add(directUrl);
 
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 try {
                     f.setAccessible(true);
                     Object val = f.get(obj);
@@ -1024,7 +1025,7 @@ public class FeedVideoDownloadHook {
         if (obj == null || target == null || depth < 0) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (target.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
                     try { return f.get(obj); } catch (Throwable ignored) {}
@@ -1035,7 +1036,7 @@ public class FeedVideoDownloadHook {
         if (depth > 0) {
             cls = obj.getClass();
             while (cls != null && cls != Object.class) {
-                for (Field f : cls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                     f.setAccessible(true);
                     try {
                         Object v = f.get(obj);
@@ -1061,7 +1062,7 @@ public class FeedVideoDownloadHook {
         if (obj == null || targetType == null) return null;
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (targetType.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
                     try {
@@ -1171,7 +1172,7 @@ public class FeedVideoDownloadHook {
         }
 
         try {
-            List<ClassData> classes = bridge.findClass(FindClass.create()
+            List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                     .matcher(ClassMatcher.create()
                             .addInterface("com.instagram.model.mediasize.VideoVersionIntf",
                                     StringMatchType.Equals, false)));
@@ -1181,7 +1182,7 @@ public class FeedVideoDownloadHook {
             List<Method> hooked = new ArrayList<>();
             for (ClassData classData : classes) {
                 try {
-                    List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                    List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                             .matcher(MethodMatcher.create()
                                     .declaredClass(classData.getName())
                                     .name("getUrl")
@@ -1223,7 +1224,7 @@ public class FeedVideoDownloadHook {
                 }
             }
             if (discovered == null && liveTreeMediaDictClass == null) {
-                List<ClassData> classes = bridge.findClass(FindClass.create()
+                List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                         .matcher(ClassMatcher.create()
                                 .usingStrings("video_to_carousel_cut_info")));
                 for (ClassData data : classes) {
@@ -1272,7 +1273,7 @@ public class FeedVideoDownloadHook {
             }
 
             if (resolvedVideoVersionsGetters.isEmpty()) {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .paramCount(0)
                                 .usingEqStrings(List.of("video_versions"))));
@@ -1332,7 +1333,7 @@ public class FeedVideoDownloadHook {
                 }
             }
             if (carouselMediaGetter == null) {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .paramCount(0)
                                 .returnType("java.util.List")
@@ -1367,7 +1368,7 @@ public class FeedVideoDownloadHook {
                 Method cached = DexKitCache.loadMethod("MediaDownload_HasAudio", classLoader);
                 if (cached != null) { cached.setAccessible(true); hasAudioGetter = cached; return; }
             }
-            List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass("com.instagram.feed.media.Media")
                     .paramCount(0)
                     .returnType("java.lang.Boolean")
@@ -1407,7 +1408,7 @@ public class FeedVideoDownloadHook {
                     "com.instagram.feed.media.LiveTreeMediaDict"}) {
                 List<MethodData> found;
                 try {
-                    found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .declaredClass(owner)
                             .paramCount(0)
                             .returnType("java.lang.String")
@@ -1464,7 +1465,7 @@ public class FeedVideoDownloadHook {
             Class<?> owner = getter.getDeclaringClass();
             if (!owner.isInstance(media)) {
                 target = null;
-                for (Field f : media.getClass().getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(media.getClass())) {
                     if (!owner.isAssignableFrom(f.getType())) continue;
                     f.setAccessible(true);
                     target = f.get(media);
@@ -1567,7 +1568,7 @@ public class FeedVideoDownloadHook {
         } catch (Throwable t) {
             return null;
         }
-        for (Method m : obj.getClass().getMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(obj.getClass())) {
             if (m.getParameterCount() != 0 || !type.isAssignableFrom(m.getReturnType())) continue;
             try {
                 Object v = m.invoke(obj);
@@ -1584,7 +1585,7 @@ public class FeedVideoDownloadHook {
      */
     private static java.util.Map<?, ?> fieldMap(Object obj) {
         if (obj == null) return null;
-        for (Method m : obj.getClass().getMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.publicMethods(obj.getClass())) {
             if (!java.util.Map.class.isAssignableFrom(m.getReturnType())) continue;
             try {
                 Object r = null;
@@ -1604,7 +1605,7 @@ public class FeedVideoDownloadHook {
     /** A no-arg getter on Media that reads the given JSON field (matched by its field-name string). */
     private static Method resolveMediaGetter(DexKitBridge bridge, ClassLoader classLoader, String field) {
         try {
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass("com.instagram.feed.media.Media")
                     .paramCount(0)
                     .usingEqStrings(List.of(field))))) {
@@ -1672,9 +1673,15 @@ public class FeedVideoDownloadHook {
     static void downloadAudio(Context ctx, String url, String filename, String username,
                               boolean extractFromVideo, long trimStartMs, long trimDurationMs) {
         ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, I18n.t(ctx, R.string.ig_toast_downloading_audio), Toast.LENGTH_SHORT).show();
+        downloadAudio(ctx, url, filename, username, extractFromVideo, trimStartMs, trimDurationMs, false);
+    }
+
+    /** {@code local}: saved by Instagram itself (the app couldn't be reached). */
+    private static void downloadAudio(Context ctx, String url, String filename, String username,
+                              boolean extractFromVideo, long trimStartMs, long trimDurationMs, boolean local) {
         executor.submit(() -> {
             try {
-                String uri = FeatureFlags.downloaderCustomUri.isEmpty()
+                String uri = local ? "" : FeatureFlags.downloaderCustomUri.isEmpty()
                         ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
                 if (!uri.isEmpty()) {
                     android.content.Intent intent = new android.content.Intent();
@@ -1687,10 +1694,8 @@ public class FeedVideoDownloadHook {
                     intent.putExtra("extractAudio", extractFromVideo);
                     intent.putExtra("trimStartMs", trimStartMs);
                     intent.putExtra("trimDurationMs", trimDurationMs);
-                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> {
-                        if (error != null) mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
-                                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
-                    });
+                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> companionResult(ctx, error,
+                            () -> downloadAudio(ctx, url, filename, username, extractFromVideo, trimStartMs, trimDurationMs, true)));
                     return;
                 }
                 File temp = File.createTempFile("ie_dl_", ".m4a", ctx.getCacheDir());
@@ -1730,7 +1735,7 @@ public class FeedVideoDownloadHook {
                         "MediaDownload_IsVideo", classLoader);
             }
             if (resolvedIsVideoMethod == null) {
-                List<MethodData> wrappers = bridge.findMethod(FindMethod.create()
+                List<MethodData> wrappers = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .returnType("void")
                                 .usingStrings("asl_session_id", "is_video", "is_carousel")));
@@ -1784,7 +1789,7 @@ public class FeedVideoDownloadHook {
 
         try {
             // Step 1: find the user class via the stable validation string
-            List<MethodData> userMethods = bridge.findMethod(FindMethod.create()
+            List<MethodData> userMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("username_missing_during_update")));
 
@@ -1808,7 +1813,7 @@ public class FeedVideoDownloadHook {
             // dropping any candidate that ALSO references the `full_name` field id — the pure
             // username getter never reads full_name. (Fix ported from PR #200 by izadiegizabal.)
             try {
-                List<MethodData> ugMethods = bridge.findMethod(FindMethod.create()
+                List<MethodData> ugMethods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass("com.instagram.user.model.User")
                                 .returnType("java.lang.String")
@@ -1818,7 +1823,7 @@ public class FeedVideoDownloadHook {
                     // Candidates that ALSO read full_name = the display-name getter → exclude.
                     java.util.Set<String> readsFullName = new java.util.HashSet<>();
                     try {
-                        for (MethodData md : bridge.findMethod(FindMethod.create()
+                        for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                                 .matcher(MethodMatcher.create()
                                         .declaredClass("com.instagram.user.model.User")
                                         .returnType("java.lang.String")
@@ -1870,7 +1875,7 @@ public class FeedVideoDownloadHook {
         }
 
         try {
-            List<MethodData> res = bridge.findMethod(FindMethod.create()
+            List<MethodData> res = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .declaredClass("com.instagram.feed.media.Media")
                             .paramCount(0)
@@ -1912,7 +1917,7 @@ public class FeedVideoDownloadHook {
             Class<?> curr = queue.poll();
             if (curr == null || !visited.add(curr)) continue;
 
-            for (Method m : curr.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(curr)) {
                 // We are looking for the method that returns the User class
                 // we found via "username_missing_during_update"
                 if (m.getParameterCount() == 0 && m.getReturnType().equals(userClass)) {
@@ -1938,7 +1943,7 @@ public class FeedVideoDownloadHook {
         // authorship, e.g. QpF's own-post check) rather than "owner"/"group"/etc.
         if (liveTreeMediaDictClass != null) {
             try {
-                List<MethodData> results = bridge.findMethod(FindMethod.create()
+                List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass(liveTreeMediaDictClass.getName())
                                 .paramCount(0)
@@ -1958,7 +1963,7 @@ public class FeedVideoDownloadHook {
             }
         }
 
-        ModuleLog.line("(IE|DL|Username) ❌ Failed to resolve dictUserGetter in hierarchy");
+        ModuleLog.probe("(IE|DL|Username) dictUserGetter not in hierarchy (owner comes from the other getters)");
     }
 
     // ── Download dispatch ─────────────────────────────────────────────────────
@@ -2348,10 +2353,26 @@ public class FeedVideoDownloadHook {
 
     static boolean downloadCapturedOriginal(Context ctx, String url, String filename, boolean isVideo,
             String username, String[] dash) throws Exception {
-        String uri = FeatureFlags.downloaderCustomUri.isEmpty() ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
+        return downloadCapturedOriginal(ctx, url, filename, isVideo, username, dash, false);
+    }
+
+    /** {@code local}: saved by Instagram itself (the app couldn't be reached). */
+    private static boolean downloadCapturedOriginal(Context ctx, String url, String filename, boolean isVideo,
+            String username, String[] dash, boolean local) throws Exception {
+        String uri = local ? "" : FeatureFlags.downloaderCustomUri.isEmpty() ? readCompanionUri() : FeatureFlags.downloaderCustomUri;
         if (!uri.isEmpty()) {
-            if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username);
-            else delegateUrlToCompanionApp(ctx, url, null, filename, isVideo, username);
+            Runnable saveLocally = () -> executor.submit(() -> {
+                try {
+                    if (!downloadCapturedOriginal(ctx, url, filename, isVideo, username, dash, true))
+                        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                                I18n.t(ctx, R.string.ig_toast_file_saved, filename), Toast.LENGTH_SHORT).show());
+                } catch (Throwable e) {
+                    mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                            I18n.t(ctx, R.string.ig_toast_download_failed, String.valueOf(e.getMessage())), Toast.LENGTH_SHORT).show());
+                }
+            });
+            if (dash != null) delegateUrlToCompanionApp(ctx, dash[0], dash[1], url, filename, true, username, saveLocally);
+            else delegateUrlToCompanionApp(ctx, url, null, null, filename, isVideo, username, saveLocally);
             return true;
         }
         if (dash != null) {
@@ -2412,7 +2433,7 @@ public class FeedVideoDownloadHook {
                                                    String audioUrl,
                                                    String filename, boolean isVideo,
                                                    String username) throws Exception {
-        delegateUrlToCompanionApp(ctx, url, audioUrl, null, filename, isVideo, username);
+        delegateUrlToCompanionApp(ctx, url, audioUrl, null, filename, isVideo, username, null);
     }
 
     /** @param fallbackUrl saved instead when the merge fails (e.g. a codec the muxer can't write) */
@@ -2421,7 +2442,7 @@ public class FeedVideoDownloadHook {
                                                    String audioUrl,
                                                    String fallbackUrl,
                                                    String filename, boolean isVideo,
-                                                   String username) throws Exception {
+                                                   String username, Runnable saveLocally) throws Exception {
         android.content.Intent intent = new android.content.Intent();
         if (fallbackUrl != null) intent.putExtra("fallbackUrl", fallbackUrl);
         intent.setClassName("ps.reso.instaeclipse",
@@ -2431,11 +2452,23 @@ public class FeedVideoDownloadHook {
         intent.putExtra("filename", filename);
         intent.putExtra("mimeType", isVideo ? "video/mp4" : "image/jpeg");
         intent.putExtra("username", username);
-        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> {
-                        if (error != null) mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
-                                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
-                    });
+        ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, intent, error -> companionResult(ctx, error, saveLocally));
         ModuleLog.line("(IE|DL) Submitted companion download request");
+    }
+
+    /**
+     * A companion download's result: when the app can't be reached, {@code saveLocally} (if any)
+     * saves it from Instagram instead; any other error is shown.
+     */
+    private static void companionResult(Context ctx, String error, Runnable saveLocally) {
+        if (error == null) return;
+        if (saveLocally != null && SelectedMediaDownloads.companionUnreachable(error)) {
+            SelectedMediaDownloads.savedLocally(ctx);
+            saveLocally.run();
+            return;
+        }
+        mainHandler.post(() -> ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                I18n.t(ctx, R.string.ig_toast_download_failed, error), Toast.LENGTH_SHORT).show());
     }
 
     /**
@@ -2902,7 +2935,7 @@ public class FeedVideoDownloadHook {
         // rely on depth limit + visited set to prevent runaway recursion
         Class<?> cls = obj.getClass();
         while (cls != null && cls != Object.class) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 Class<?> ft = f.getType();
                 if (ft.isPrimitive() || ft == String.class || ft.isArray()) continue;
                 f.setAccessible(true);

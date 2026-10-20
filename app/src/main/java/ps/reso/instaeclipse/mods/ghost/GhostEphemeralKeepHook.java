@@ -16,6 +16,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Prevents disappearing/vanish-mode messages from being deleted locally.
@@ -71,7 +72,7 @@ public class GhostEphemeralKeepHook {
         }
         try {
             List<Method> found = new java.util.ArrayList<>();
-            for (MethodData md : bridge.findMethod(FindMethod.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("Unexpected null timestamp for disappearing message, removed message")
                             .paramTypes("boolean")
@@ -80,7 +81,7 @@ public class GhostEphemeralKeepHook {
                 found.add(expired);
                 Method shh = null;
                 int candidates = 0;
-                for (Method m : expired.getDeclaringClass().getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(expired.getDeclaringClass())) {
                     if (m.getParameterCount() == 0 && m.getReturnType() == boolean.class
                             && !java.lang.reflect.Modifier.isStatic(m.getModifiers())) { shh = m; candidates++; }
                 }
@@ -113,7 +114,7 @@ public class GhostEphemeralKeepHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("igThreadIgid")
                             .paramTypes("com.instagram.model.direct.DirectThreadKey", "boolean")
@@ -151,7 +152,7 @@ public class GhostEphemeralKeepHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("mark_ephemeral_item_ranges_viewed")));
 
@@ -204,7 +205,7 @@ public class GhostEphemeralKeepHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("message_expiration_timestamp_ms")));
 
@@ -221,7 +222,7 @@ public class GhostEphemeralKeepHook {
                 } catch (Throwable ignored) {}
             }
             for (Class<?> c : owners) {
-                for (Method m : c.getDeclaredMethods()) {
+                for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                     String n = m.getName();
                     if ((n.equals("parseFromJsonParser") || n.equals("unsafeParseFromJson"))
                             && m.getReturnType() != void.class) targets.add(m);
@@ -251,7 +252,7 @@ public class GhostEphemeralKeepHook {
         long now = System.currentTimeMillis();
         long year2100 = 4_102_444_800_000L;
         try {
-            for (Field f : obj.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(obj.getClass())) {
                 if (f.getType() != long.class) continue;
                 f.setAccessible(true);
                 long val = f.getLong(obj);

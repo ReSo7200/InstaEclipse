@@ -20,6 +20,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Exact timestamps (#232): "3 hours ago" / "92 weeks ago" / "3w" → "20/09/2026 16:32".
@@ -44,7 +45,7 @@ public class ExactTimestampHook {
 
         if (target == null) {
             try {
-                List<ClassData> classes = bridge.findClass(FindClass.create()
+                List<ClassData> classes = DexKitQueryCache.findClass(bridge, FindClass.create()
                         .matcher(ClassMatcher.create().usingStrings("%d:%02d:%02d", "MMMM d", "MMM d")));
                 for (ClassData cd : classes) {
                     target = findFormatter(cd.getInstance(Module.hostClassLoader));
@@ -87,7 +88,7 @@ public class ExactTimestampHook {
 
     /** static String m(Resources, Enum, ownClass, Integer, double, double, boolean, boolean, boolean, boolean) */
     private static Method findFormatter(Class<?> c) {
-        for (Method m : c.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
             Class<?>[] p = m.getParameterTypes();
             if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != String.class || p.length != 10) continue;
             if (p[0] != Resources.class || p[3] != Integer.class

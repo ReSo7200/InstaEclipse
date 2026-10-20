@@ -91,7 +91,7 @@ public class HideChatsHook {
         }
         try {
             for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-                for (Field f : c.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                     f.setAccessible(true);
                     Object v;
@@ -109,7 +109,7 @@ public class HideChatsHook {
     private static String firstStringField(Object o) {
         if (o == null) return null;
         try {
-            for (Field f : o.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(o.getClass())) {
                 if (f.getType() != String.class) continue;
                 f.setAccessible(true);
                 Object v = f.get(o);

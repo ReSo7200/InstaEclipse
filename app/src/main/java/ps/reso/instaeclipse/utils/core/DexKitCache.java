@@ -152,7 +152,7 @@ public class DexKitCache {
             String methodName = encoded.substring(i1 + 1, i2);
             String desc       = encoded.substring(i2 + 1);
             Class<?> clazz = Class.forName(className, false, loader);
-            for (Method m : clazz.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(clazz)) {
                 if (m.getName().equals(methodName) && descriptor(m).equals(desc)) {
                     m.setAccessible(true);
                     return m;

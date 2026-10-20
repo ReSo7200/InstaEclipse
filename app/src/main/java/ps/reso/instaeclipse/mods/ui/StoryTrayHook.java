@@ -51,7 +51,7 @@ public final class StoryTrayHook {
         try {
             Class<?> spinner = cl.loadClass(SPINNER);
             int hooked = 0;
-            for (Method m : spinner.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(spinner)) {
                 if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType() != android.graphics.LinearGradient.class) continue;
                 int colorsArg = -1;
                 Class<?>[] p = m.getParameterTypes();
@@ -78,11 +78,11 @@ public final class StoryTrayHook {
 
     // ---- ring color ----
 
-    /** "#RRGGBB" or "#RRGGBB,#RRGGBB" (a gradient); null for Instagram's own colors or invalid input. */
+    /** "#RRGGBB", or 2 to 4 of them for a gradient; null for Instagram's own colors or invalid input. */
     public static int[] parseColors(String value) {
         if (value == null || value.trim().isEmpty()) return null;
         String[] parts = value.split(",");
-        if (parts.length > 2) return null;
+        if (parts.length > 4) return null;
         int[] out = new int[parts.length];
         for (int i = 0; i < parts.length; i++) {
             String p = parts[i].trim();
@@ -92,13 +92,14 @@ public final class StoryTrayHook {
         return out;
     }
 
-    /** {@code count} colors running from the first custom color to the last. */
+    /** {@code count} colors running through the custom colors in order. */
     static int[] spread(int[] custom, int count) {
         int[] out = new int[count];
         for (int i = 0; i < count; i++) {
             if (custom.length == 1 || count == 1) { out[i] = custom[0]; continue; }
-            float f = (float) i / (count - 1);
-            out[i] = blend(custom[0], custom[custom.length - 1], f);
+            float pos = (float) i / (count - 1) * (custom.length - 1);
+            int from = Math.min((int) pos, custom.length - 2);
+            out[i] = blend(custom[from], custom[from + 1], pos - from);
         }
         return out;
     }

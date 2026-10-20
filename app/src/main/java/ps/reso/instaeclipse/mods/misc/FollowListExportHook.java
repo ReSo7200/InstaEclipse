@@ -44,6 +44,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 import ps.reso.instaeclipse.utils.users.UserUtils;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Export a followers / following list to CSV (#224).
@@ -75,13 +76,13 @@ public class FollowListExportHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> frag = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("Invalid entry type for FollowListFragment")))) {
                 frag = cl.loadClass(md.getClassName());
                 break;
             }
             if (frag == null) { ModuleLog.line(TAG + "❌ FollowListFragment not found"); return; }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(USER).paramCount(0).returnType("java.lang.String").usingNumbers(-1677176261)))) {
                 fullNameGetter = md.getMethodInstance(cl); // "full_name".hashCode()
                 break;
@@ -95,14 +96,22 @@ public class FollowListExportHook {
             XposedBridge.hookMethod(ovc, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                    if ((!FeatureFlags.followListExport && !FeatureFlags.followersHistory)
+                    if ((!FeatureFlags.followListExport && !FeatureFlags.followersHistory && !FeatureFlags.profileAnalyzer)
                             || !fragClass.isInstance(param.thisObject)) return;
                     if (param.args[0] instanceof View root) {
                         live.put(param.thisObject, root);
                         Object frag = param.thisObject;
                         root.post(() -> {
                             if (FeatureFlags.followListExport) addPill(root);
-                            if (FeatureFlags.followersHistory && ownFollowersOf(frag) != null) addHistoryPill(root);
+                            boolean history = FeatureFlags.followersHistory && ownFollowersOf(frag) != null;
+                            if (history) addHistoryPill(root);
+                            if (FeatureFlags.profileAnalyzer) {
+                                ListInfo info = listInfo(frag);
+                                if (info != null) {
+                                    ps.reso.instaeclipse.utils.users.WatchlistStore.setSelf(root.getContext().getApplicationContext(), info.self);
+                                    if (info.type != null) ProfileAnalyzer.addPill(root, history);
+                                }
+                            }
                         });
                     }
                 }
@@ -111,6 +120,7 @@ public class FollowListExportHook {
             ModuleLog.line(TAG + "✅ " + frag.getName() + " fullName=" + (fullNameGetter != null));
             FeatureStatusTracker.setHooked("FollowListExport");
             FeatureStatusTracker.setHooked("FollowersHistory");
+            FeatureStatusTracker.setHooked("ProfileAnalyzer");
         } catch (Throwable t) {
             ModuleLog.line(TAG + "❌ " + t);
         }
@@ -121,7 +131,7 @@ public class FollowListExportHook {
 
     /** The tab whose list is on screen right now. The tab pager keeps neighbouring tabs attached
      *  (isShown() is true for them too), so take the one with the largest on-screen area. */
-    private static Object[] visibleList() {
+    static Object[] visibleList() {
         Object[] best = null;
         long bestArea = 0;
         android.graphics.Rect rc = new android.graphics.Rect();
@@ -182,11 +192,11 @@ public class FollowListExportHook {
     private static void findPager(DexKitBridge bridge, ClassLoader cl) throws Throwable {
         // pager = fragment field whose class has isLoading() and keeps the next max_id in a String field
         for (Class<?> c = fragClass; c != null && pagerField == null; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 try {
                     Method il = f.getType().getDeclaredMethod("isLoading");
                     if (il.getReturnType() != boolean.class) continue;
-                    for (Field sf : f.getType().getDeclaredFields())
+                    for (Field sf : ps.reso.instaeclipse.utils.core.SafeReflect.fields(f.getType()))
                         if (sf.getType() == String.class && !Modifier.isStatic(sf.getModifiers())) { sf.setAccessible(true); nextMaxIdField = sf; }
                     if (nextMaxIdField == null) continue;
                     f.setAccessible(true);
@@ -197,7 +207,7 @@ public class FollowListExportHook {
             }
         if (pagerField != null) {
             // "load more if idle": the no-arg void method that checks the lifecycle first
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .declaredClass(pagerField.getType().getName()).paramCount(0).returnType("void")
                     .addInvoke(MethodMatcher.create().name("getLifecycle"))))) {
                 pagerLoadMore = md.getMethodInstance(cl);
@@ -213,13 +223,21 @@ public class FollowListExportHook {
      *  non-cancelable progress dialog keeps the user here; its button (or a second tap on the pill)
      *  stops early. */
     private static void loadAll(View root, Object frag, int titleRes, java.util.function.Consumer<Boolean> done) {
+        loadAll(root, frag, I18n.t(root.getContext(), titleRes), done);
+    }
+
+    static boolean isLoading() { return loading; }
+
+    static void stopLoading() { loading = false; }
+
+    static void loadAll(View root, Object frag, CharSequence title, java.util.function.Consumer<Boolean> done) {
         Object pager = null;
         try { if (pagerField != null) pager = pagerField.get(frag); } catch (Throwable ignored) {}
         if (pager == null || pagerLoadMore == null) { done.accept(false); return; }
         loading = true;
         final Object pg = pager;
         Handler h = new Handler(Looper.getMainLooper());
-        ps.reso.instaeclipse.utils.dialog.IeDialog dlg = progressDialog(root.getContext(), titleRes);
+        ps.reso.instaeclipse.utils.dialog.IeDialog dlg = progressDialog(root.getContext(), title);
         new Runnable() {
             int idle = 0;
             boolean first = true;
@@ -271,7 +289,7 @@ public class FollowListExportHook {
         }
     }
 
-    private static ps.reso.instaeclipse.utils.dialog.IeDialog progressDialog(android.content.Context c, int titleRes) {
+    private static ps.reso.instaeclipse.utils.dialog.IeDialog progressDialog(android.content.Context c, CharSequence title) {
         try {
             // the Activity that hosts the list (UIHookManager's current one can be a different, hidden one)
             android.content.Context ctx = c;
@@ -281,7 +299,7 @@ public class FollowListExportHook {
                 ctx = act != null ? act : c;
             }
             ps.reso.instaeclipse.utils.dialog.IeDialog d = new ps.reso.instaeclipse.utils.dialog.IeDialog(ctx)
-                    .title(I18n.t(ctx, titleRes))
+                    .title(title)
                     .message(I18n.t(ctx, R.string.ig_follow_export_loading, 0))
                     .cancelable(false); // leaving the list would stop IG's pager
             android.widget.ProgressBar bar = new android.widget.ProgressBar(d.ctx, null, android.R.attr.progressBarStyleHorizontal);
@@ -300,7 +318,7 @@ public class FollowListExportHook {
     }
 
     /** Every user of the pages IG has received, as held by the list's adapter. */
-    private static Map<String, String[]> listUsers(View root) {
+    static Map<String, String[]> listUsers(View root) {
         AbsListView list = findList(root);
         Adapter ad = list != null ? list.getAdapter() : null;
         if (ad instanceof HeaderViewListAdapter h) ad = h.getWrappedAdapter();
@@ -319,6 +337,116 @@ public class FollowListExportHook {
         new Thread(() -> writeCsv(ctx, users, file)).start();
     }
 
+    // ---- Whose list, which tab (Profile analyzer) ----
+
+    static final String FOLLOWERS = "FOLLOWERS", FOLLOWING = "FOLLOWING";
+
+    /** A list fragment's arguments: the logged-in user, the profile whose list it is, and the tab. */
+    static final class ListInfo {
+        String self;      // logged-in user id (from the session token argument)
+        String owner;     // the profile whose list this is (FollowListData's numeric String)
+        String type;      // FOLLOWERS / FOLLOWING, or null for other tabs (mutual, suggested, …)
+        String username;  // the profile's username when IG passes it
+        Object frag;
+    }
+
+    /** What {@code frag} lists, from its FollowListFragment.FollowListData argument (IG's list-type
+     *  enum keeps its constant names; its String fields hold the profile's id). */
+    static ListInfo listInfo(Object frag) {
+        try {
+            android.os.Bundle b = (android.os.Bundle) frag.getClass().getMethod("getArguments").invoke(frag);
+            if (b == null) return null;
+            Object token = b.get("IgSessionManager.SESSION_TOKEN_KEY");
+            Object data = b.get("FollowListFragment.FollowListData");
+            if (data == null) return null;
+            ListInfo info = new ListInfo();
+            info.frag = frag;
+            if (token instanceof String t) {
+                String s = t.substring(t.lastIndexOf(':') + 1);
+                if (s.matches("\\d+")) info.self = s;
+            }
+            Object un = b.get("FollowListFragment.Username");
+            if (un instanceof String u && !u.isEmpty()) info.username = u;
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(data.getClass())) {
+                if (Modifier.isStatic(f.getModifiers())) continue;
+                f.setAccessible(true);
+                Object v = f.get(data);
+                if (v instanceof Enum<?> e) {
+                    String n = e.name();
+                    if (n.equals("FOLLOWERS") || n.equals("SELF_FOLLOWERS")) info.type = FOLLOWERS;
+                    else if (n.equals("FOLLOWING") || n.equals("FOLLOWING_SIMPLIFIED") || n.equals("SELF_FOLLOWING")) info.type = FOLLOWING;
+                } else if (v instanceof String s && s.matches("\\d+") && info.owner == null) info.owner = s;
+            }
+            return info.owner != null ? info : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /** Live list fragments of {@code owner}'s {@code type} tab, the one on screen first. */
+    static Object[] listOf(String owner, String type) {
+        Object[] vis = visibleList();
+        if (vis != null) {
+            ListInfo i = listInfo(vis[0]);
+            if (i != null && owner.equals(i.owner) && type.equals(i.type)) return vis;
+        }
+        return null;
+    }
+
+    /**
+     * Shows {@code type}'s tab of the follow list screen that holds {@code frag}: the parent
+     * UnifiedFollowFragment keeps its tabs (IG's list-type enum, constant names kept) in a List and
+     * its ViewPager2 in the "viewPager" field. False when the screen doesn't have that tab.
+     */
+    static boolean showTab(Object frag, String type) {
+        try {
+            Object parent = null;
+            for (Class<?> c = frag.getClass(); c != null && parent == null; c = c.getSuperclass())
+                try {
+                    Field pf = c.getDeclaredField("mParentFragment");
+                    pf.setAccessible(true);
+                    parent = pf.get(frag);
+                } catch (NoSuchFieldException ignored) {}
+            if (parent == null) return false;
+            Object pager = null;
+            List<?> tabs = null;
+            for (Class<?> c = parent.getClass(); c != null && c != Object.class; c = c.getSuperclass())
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
+                    if (Modifier.isStatic(f.getModifiers())) continue;
+                    f.setAccessible(true);
+                    Object v = f.get(parent);
+                    if (v instanceof View vp && pager == null) {
+                        for (Class<?> k = vp.getClass(); k != null; k = k.getSuperclass())
+                            if (k.getName().equals("androidx.viewpager2.widget.ViewPager2")) { pager = vp; break; }
+                    } else if (v instanceof List<?> l && tabs == null && isTabList(l)) tabs = l;
+                }
+            if (pager == null || tabs == null) return false;
+            for (int i = 0; i < tabs.size(); i++) {
+                String n = ((Enum<?>) tabs.get(i)).name();
+                boolean match = FOLLOWERS.equals(type) ? n.equals("FOLLOWERS") || n.equals("SELF_FOLLOWERS")
+                        : n.equals("FOLLOWING") || n.equals("FOLLOWING_SIMPLIFIED") || n.equals("SELF_FOLLOWING");
+                if (match) {
+                    pager.getClass().getMethod("setCurrentItem", int.class).invoke(pager, i);
+                    return true;
+                }
+            }
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ tab: " + t);
+        }
+        return false;
+    }
+
+    private static boolean isTabList(List<?> l) {
+        boolean tab = false;
+        for (Object o : l) {
+            if (!(o instanceof Enum<?> e)) return false;
+            if (e.name().startsWith("FOLLOW")) tab = true;
+        }
+        return tab;
+    }
+
+    static String idOf(Object user) { return userId(user); }
+
     // ---- Followers history ----
 
     /** Your user id when {@code frag} is your own Followers tab, else null. */
@@ -331,7 +459,7 @@ public class FollowListExportHook {
             if (!(token instanceof String t) || data == null) return null;
             String self = t.substring(t.lastIndexOf(':') + 1);
             boolean followers = false, own = false;
-            for (Field f : data.getClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(data.getClass())) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Object v = f.get(data);
@@ -527,7 +655,7 @@ public class FollowListExportHook {
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class
                             || android.content.Context.class.isAssignableFrom(f.getType()) || View.class.isAssignableFrom(f.getType())) continue;
                     try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1, row}); } catch (Throwable ignored) {}
@@ -537,7 +665,7 @@ public class FollowListExportHook {
     }
 
     private static String userId(Object user) {
-        for (Field f : user.getClass().getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(user.getClass())) {
             if (f.getType() != String.class || Modifier.isStatic(f.getModifiers()) || !Modifier.isFinal(f.getModifiers())) continue;
             try { f.setAccessible(true); Object v = f.get(user); if (v instanceof String s && s.matches("\\d+")) return s; } catch (Throwable ignored) {}
         }

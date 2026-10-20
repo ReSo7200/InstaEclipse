@@ -40,7 +40,7 @@ final class StoryMenuOptions {
         if (!Modifier.isStatic(method.getModifiers()) || method.getReturnType() != ArrayList.class
                 || method.getParameterCount() == 0 || method.getParameterTypes()[0] != owner) return false;
         int fields = 0;
-        for (Field field : owner.getDeclaredFields()) {
+        for (Field field : ps.reso.instaeclipse.utils.core.SafeReflect.fields(owner)) {
             if (!Modifier.isStatic(field.getModifiers()) && field.getType() == itemType) fields++;
         }
         return fields == 1;

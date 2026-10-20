@@ -17,6 +17,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Restores Instagram's NATIVE view-once / view-twice corner icon that the "Show View-Once/Twice
@@ -54,7 +55,7 @@ public class ViewOnceBadgeHook {
         try {
             // The render-props ctor inlines BOTH "once" and "replayable" to compute its
             // "isRaven" flag. RavenCornerIcon (0YKc.A00) also references both, so require <init>.
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .name("<init>")
                             .usingStrings("once", "replayable")));
@@ -136,7 +137,7 @@ public class ViewOnceBadgeHook {
         String cn = obj.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return;
         for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Class<?> t = f.getType();

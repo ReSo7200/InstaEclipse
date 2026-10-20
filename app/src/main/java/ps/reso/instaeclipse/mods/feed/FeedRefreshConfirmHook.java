@@ -40,9 +40,9 @@ public final class FeedRefreshConfirmHook {
         try {
             Class<?> container = cl.loadClass(CONTAINER);
             Method set = null;
-            for (Method m : container.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(container)) {
                 if (m.getName().equals("setListener") && m.getParameterCount() == 1
-                        && m.getParameterTypes()[0].isInterface() && m.getParameterTypes()[0].getDeclaredMethods().length == 1) {
+                        && m.getParameterTypes()[0].isInterface() && ps.reso.instaeclipse.utils.core.SafeReflect.methods(m.getParameterTypes()[0]).length == 1) {
                     set = m;
                 }
             }
@@ -56,7 +56,7 @@ public final class FeedRefreshConfirmHook {
             // callback, always a real call).
             final Class<?> type = set.getParameterTypes()[0];
             java.lang.reflect.Field field = null;
-            for (java.lang.reflect.Field f : container.getDeclaredFields()) if (f.getType() == type) field = f;
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(container)) if (f.getType() == type) field = f;
             if (field == null) {
                 ModuleLog.line(TAG + "❌ listener field not found");
                 return;

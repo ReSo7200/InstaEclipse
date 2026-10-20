@@ -105,6 +105,12 @@
         </activity>
 
         <activity
+            android:name=".mods.devops.config.DataImportActivity"
+            android:exported="false"
+            android:theme="@style/Theme.InstaEclipse">
+        </activity>
+
+        <activity
             android:name=".mods.devops.config.JsonExportActivity"
             android:exported="false"
             android:theme="@style/Theme.InstaEclipse" />
@@ -160,6 +166,13 @@
             android:exported="true" />
 
         <activity android:name=".mods.media.VideoFramePickerActivity" android:exported="false" android:theme="@style/Theme.InstaEclipse" />
+        <!-- Profile spoofer: picks your spoofed profile picture for Instagram's in-app menu. -->
+        <activity
+            android:name=".ui.ProfilePhotoPickerActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <service android:name=".mods.media.DownloadBrokerService" android:exported="true" />
 
         <!-- Xposed Meta-data -->
@@ -229,6 +242,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <!-- Post notifications (required API 33+ to show download progress) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Downloads to a chosen folder: let the app be started from Instagram (battery unrestricted). -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Android 9 and older: saving to shared storage. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
 
 </manifest>

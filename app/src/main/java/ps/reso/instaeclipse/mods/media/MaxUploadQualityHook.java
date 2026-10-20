@@ -12,6 +12,7 @@ import ps.reso.instaeclipse.xposedcompat.XposedBridge;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Force "Upload at highest quality" always on.
@@ -35,7 +36,7 @@ public class MaxUploadQualityHook {
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
         try {
-            List<MethodData> results = bridge.findMethod(FindMethod.create()
+            List<MethodData> results = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingEqStrings(List.of(PREF_KEY))
                             .returnType("boolean")

@@ -84,6 +84,7 @@ public class FeaturesFragment extends Fragment {
     private ActivityResultLauncher<String> notifPermLauncher;
     private ActivityResultLauncher<Intent> locationPickerLauncher;
     private ActivityResultLauncher<Intent> themeCustomizerLauncher;
+    private ActivityResultLauncher<String> profilePhotoLauncher;
 
     private String currentMenu = "main";
 
@@ -207,6 +208,8 @@ public class FeaturesFragment extends Fragment {
                     if ("theme".equals(currentMenu)) loadThemeMenu();
                 });
 
+        profilePhotoLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), this::onProfilePhotoPicked);
+
         dirPickerLauncher = registerForActivityResult(new ActivityResultContracts.OpenDocumentTree(), uri -> {
             if (uri != null) {
                 final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
@@ -231,6 +234,7 @@ public class FeaturesFragment extends Fragment {
                 editor.putString("downloaderCustomUri", uriString);
                 editor.putString("downloaderCustomPath", path);
                 editor.commit();
+                ps.reso.instaeclipse.utils.core.BackgroundAccess.askIfNeeded(requireContext(), localCache, true);
                 makeLocalCacheWorldReadable();
 
                 Intent intentUri = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF_STRING");
@@ -266,6 +270,17 @@ public class FeaturesFragment extends Fragment {
                 notifPermLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
             }
         }
+        if (ps.reso.instaeclipse.utils.core.BackgroundAccess.needsStoragePermission()
+                && ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0x5E);
+        }
+        // Downloads to a chosen folder need this app to start from Instagram, and the folder's grant.
+        String folder = localCache.getString("downloaderCustomUri", "");
+        if (ps.reso.instaeclipse.utils.core.BackgroundAccess.folderGrantLost(requireContext(), folder))
+            ps.reso.instaeclipse.utils.core.BackgroundAccess.askToRechooseFolder(requireContext(), () -> dirPickerLauncher.launch(null));
+        else if (!folder.isEmpty())
+            ps.reso.instaeclipse.utils.core.BackgroundAccess.askIfNeeded(requireContext(), localCache, false);
 
         recyclerFeatures = fragmentView.findViewById(R.id.recycler_features);
         recyclerFeatures.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -1115,6 +1130,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_bulk_unsend), "bulkUnsend"),
                 createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_distraction_hide_notes_tray), "hideNotesTray"),
+                createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_hide_dm_suggestions), "hideDmSuggestions"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_hide_dm_blend), "hideDmBlend"),
                 createSwitch(R.drawable.ic_block, "#5E5CE6", getString(R.string.ig_dialog_misc_hide_share_create_group), "hideShareCreateGroup")
         ));
@@ -1280,7 +1296,8 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI"),
                 createExtrasSwitch("#30D158", "hideOnboardingPrompts"),
-                createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_clean_feed_hide_plus), "hidePlusUpsells")
+                createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_clean_feed_hide_plus), "hidePlusUpsells"),
+                createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_hide_instants), "hideInstants")
         ));
         return defs;
     }
@@ -1313,6 +1330,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.menu_nav_gestures));
         defs.add(Arrays.asList(
                 createExtrasSwitch("#30D158", "disableSwipeToCamera"),
+                createSwitch(R.drawable.ic_home, "#30D158", getString(R.string.ig_back_leaves_home), "backLeavesHome"),
                 createClickable(R.drawable.ic_tune, "#30D158", getString(R.string.clean_ui_toggle_title), this::showCleanUiGestureDialog)
         ));
 
@@ -1620,7 +1638,7 @@ public class FeaturesFragment extends Fragment {
                     b.putExtra("value", ids[which]);
                     ps.reso.instaeclipse.utils.core.CommonUtils.broadcastToInstagram(requireContext(), b);
                     d.dismiss();
-                    Toast.makeText(requireContext(), R.string.ig_spoof_device_note, Toast.LENGTH_LONG).show();
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(), R.string.ig_spoof_device_note, Toast.LENGTH_LONG).show();
                     loadQualityMenu();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
@@ -1686,6 +1704,7 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_heart, A_SOCIAL, getString(R.string.ig_dialog_misc_disable_double_tap_like), "disableDoubleTapLike"),
                 createSwitch(R.drawable.ic_heart, A_SOCIAL, getString(R.string.ig_dialog_misc_like_undo), "likeUndo"),
+                createSwitch(R.drawable.ic_heart, A_SOCIAL, getString(R.string.ig_confirm_likes), "confirmLikes"),
                 createSwitch(R.drawable.ic_content_copy, A_SOCIAL, getString(R.string.ig_dialog_misc_copy_comment), "enableCopyComment"),
                 createSwitch(R.drawable.ic_search, A_SOCIAL, getString(R.string.ig_dialog_misc_comment_search), "commentSearch"),
                 createSwitch(R.drawable.ic_content_copy, A_SOCIAL, getString(R.string.ig_dialog_misc_copy_caption), "enableCaptionCopy"),
@@ -1705,6 +1724,12 @@ public class FeaturesFragment extends Fragment {
 
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_content_copy, A_SOCIAL, getString(R.string.ig_profile_menu_tools), "profileMenuTools"),
+                createSwitch(R.drawable.ic_heart, A_SOCIAL, getString(R.string.ig_post_counts_feature), "postCountSpoof"),
+                createSwitch(R.drawable.ic_eye, A_SOCIAL, getString(R.string.ig_profile_spoofer), "profileSpoofer"),
+                profileSpoofItem(),
+                createSwitch(R.drawable.ic_search, A_SOCIAL, getString(R.string.ig_profile_analyzer), "profileAnalyzer"),
+                createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_confirm_follows), "confirmFollows"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_misc_profile_follows_label), "profileFollowsYouLabel"),
                 createSwitch(R.drawable.ic_notification, A_SOCIAL, getString(R.string.ig_dialog_fancy_bio_font), "fancyBioFont"),
                 createSwitch(R.drawable.ic_block, A_SOCIAL, getString(R.string.ig_dialog_hide_threads_button), "hideThreadsButton"),
@@ -1715,6 +1740,80 @@ public class FeaturesFragment extends Fragment {
         ));
 
         return defs;
+    }
+
+    /** Profile spoofer values row: greyed out until "Profile spoofer" is on. */
+    private FeatureItem profileSpoofItem() {
+        FeatureItem item = createClickable(R.drawable.ic_tune, A_SOCIAL, getString(R.string.ig_profile_spoofer_edit), this::showProfileSpoofDialog);
+        item.requiresAnyOf = Arrays.asList("profileSpoofer");
+        return item;
+    }
+
+    /** The open spoofer editor, so a picked photo lands in it. */
+    private ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor profileSpoofEditor;
+
+    /** Same editor as inside Instagram (preview + grouped fields); the photo is picked here. */
+    private void showProfileSpoofDialog() {
+        Context c = requireContext();
+        ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values v = new ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values();
+        v.username = localCache.getString("spoofUsername", "");
+        v.name = localCache.getString("spoofName", "");
+        v.bio = localCache.getString("spoofBio", "");
+        v.avatar = localCache.getString("spoofAvatar", "");
+        v.posts = localCache.getInt("spoofPosts", -1);
+        v.followers = localCache.getInt("spoofFollowers", -1);
+        v.following = localCache.getInt("spoofFollowing", -1);
+        v.verified = localCache.getBoolean("spoofVerified", false);
+        int text = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorOnSurface, Color.WHITE);
+        int sub = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY);
+        int field = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorSurfaceContainerHighest, Color.DKGRAY);
+        int accent = com.google.android.material.color.MaterialColors.getColor(c, androidx.appcompat.R.attr.colorPrimary, 0xFF0095F6);
+        int border = com.google.android.material.color.MaterialColors.getColor(c, com.google.android.material.R.attr.colorOutlineVariant, 0x33808080);
+        ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor editor = new ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor(c, v,
+                new ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Palette(text, sub, field, accent, border),
+                () -> profilePhotoLauncher.launch("image/*"), null, null);
+        profileSpoofEditor = editor;
+        android.widget.ScrollView scroll = new android.widget.ScrollView(c);
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        editor.view().setPadding(pad, pad / 2, pad, 0);
+        scroll.addView(editor.view());
+        new MaterialAlertDialogBuilder(c)
+                .setTitle(R.string.ig_profile_spoofer_editor_title)
+                .setView(scroll)
+                .setPositiveButton(R.string.ig_profile_spoofer_save, (d, w) -> saveProfileSpoof(v, editor.values()))
+                .setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener(d -> { if (profileSpoofEditor == editor) profileSpoofEditor = null; })
+                .show();
+    }
+
+    /** Sends only what changed, so untouched settings keep Instagram's newer values. */
+    private void saveProfileSpoof(ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values old,
+                                  ps.reso.instaeclipse.utils.dialog.ProfileSpoofEditor.Values now) {
+        if (!now.username.equals(old.username)) putStringPref("spoofUsername", now.username);
+        if (!now.name.equals(old.name)) putStringPref("spoofName", now.name);
+        if (!now.bio.equals(old.bio)) putStringPref("spoofBio", now.bio);
+        if (!now.avatar.equals(old.avatar)) putStringPref("spoofAvatar", now.avatar);
+        if (now.posts != old.posts) putIntPref("spoofPosts", now.posts);
+        if (now.followers != old.followers) putIntPref("spoofFollowers", now.followers);
+        if (now.following != old.following) putIntPref("spoofFollowing", now.following);
+        if (now.verified != old.verified) putBoolPref("spoofVerified", now.verified);
+    }
+
+    /** Picked photo: downscaled, JPEG, Base64 (SpoofAvatar), into the open editor; saved with it. */
+    private void onProfilePhotoPicked(Uri uri) {
+        if (uri == null || !isAdded()) return;
+        Context app = requireContext().getApplicationContext();
+        new Thread(() -> {
+            String b64 = ps.reso.instaeclipse.utils.profile.SpoofAvatar.encode(app.getContentResolver(), uri);
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                if (b64 == null) {
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(app,
+                            app.getString(R.string.ig_profile_spoofer_photo_failed), Toast.LENGTH_SHORT).show();
+                } else if (profileSpoofEditor != null) {
+                    profileSpoofEditor.setAvatar(b64);
+                }
+            });
+        }, "IE-ProfilePhoto").start();
     }
 
     private void loadAppMenu() {
@@ -2088,45 +2187,28 @@ public class FeaturesFragment extends Fragment {
 
     private String storyRingColorText() {
         String v = localCache.getString("storyRingColor", "");
-        return getString(R.string.ig_story_ring_color) + "  ·  " + (v.isEmpty() ? getString(R.string.ig_story_ring_default) : v);
+        return getString(R.string.ig_story_ring_color) + "  ·  "
+                + (v.isEmpty() ? getString(R.string.ig_story_ring_default) : v.replace(",", " → "));
     }
 
+    /** Same picker as inside Instagram: live preview, one color or a gradient of up to 4. */
     private void chooseStoryRingColor() {
-        String[] presets = ps.reso.instaeclipse.utils.dialog.DialogUtils.STORY_RING_PRESETS;
-        CharSequence[] rows = new CharSequence[presets.length + 2];
-        String current = localCache.getString("storyRingColor", "");
-        rows[0] = getString(R.string.ig_story_ring_default);
-        int selected = current.isEmpty() ? 0 : rows.length - 1;
-        for (int i = 0; i < presets.length; i++) {
-            rows[i + 1] = ps.reso.instaeclipse.utils.dialog.DialogUtils.storyRingSwatch(presets[i]);
-            if (presets[i].equalsIgnoreCase(current)) selected = i + 1;
-        }
-        rows[rows.length - 1] = getString(R.string.ig_story_ring_custom);
-        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_story_ring_color)
-                .setSingleChoiceItems(rows, selected, (dialog, which) -> {
-                    dialog.dismiss();
-                    if (which == rows.length - 1) { customStoryRingColor(current); return; }
-                    putStringPref("storyRingColor", which == 0 ? "" : presets[which - 1]);
-                    loadStoriesMenu();
-                }).setNegativeButton(android.R.string.cancel, null).show();
-    }
-
-    private void customStoryRingColor(String current) {
-        android.widget.EditText input = new android.widget.EditText(requireContext());
-        input.setHint("#3897F0");
-        input.setText(current);
-        new MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.ig_story_ring_custom)
-                .setMessage(R.string.ig_story_ring_custom_hint)
-                .setView(input)
+        Context ctx = requireContext();
+        String[] picked = {localCache.getString("storyRingColor", "")};
+        int text = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSurface, Color.WHITE);
+        int sub = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY);
+        int field = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorSurfaceContainerHighest, Color.DKGRAY);
+        int accent = com.google.android.material.color.MaterialColors.getColor(ctx, androidx.appcompat.R.attr.colorPrimary, 0xFF0095F6);
+        View picker = ps.reso.instaeclipse.utils.dialog.RingColorPicker.build(ctx, picked[0],
+                new ps.reso.instaeclipse.utils.dialog.RingColorPicker.Palette(text, sub, field, accent), v -> picked[0] = v);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(ctx);
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        picker.setPadding(pad, pad / 2, pad, 0);
+        scroll.addView(picker);
+        new MaterialAlertDialogBuilder(ctx).setTitle(R.string.ig_story_ring_color)
+                .setView(scroll)
                 .setPositiveButton(android.R.string.ok, (d, w) -> {
-                    String v = input.getText().toString().trim().replace(" ", "");
-                    if (ps.reso.instaeclipse.mods.ui.StoryTrayHook.parseColors(v) == null) {
-                        Toast.makeText(requireContext(), R.string.ig_story_ring_invalid, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    StringBuilder norm = new StringBuilder();
-                    for (String p : v.split(",")) norm.append(norm.length() > 0 ? "," : "").append(p.startsWith("#") ? p : "#" + p);
-                    putStringPref("storyRingColor", norm.toString().toUpperCase(java.util.Locale.ROOT));
+                    putStringPref("storyRingColor", picked[0]);
                     loadStoriesMenu();
                 })
                 .setNegativeButton(android.R.string.cancel, null).show();
@@ -2611,18 +2693,11 @@ public class FeaturesFragment extends Fragment {
     // STAGING LOGIC
     // =========================================================
 
+    /** A switch applies at once, like in Instagram's menu: saved, stamped and sent to Instagram
+     *  live (or picked up by Instagram's sync on its next start / resume). No Save step. */
     private void stageChange(String prefKey, boolean isChecked) {
-        if (localCache.getBoolean(prefKey, "downloaderUseOriginal".equals(prefKey)) == isChecked) {
-            stagedChanges.remove(prefKey);
-        } else {
-            stagedChanges.put(prefKey, isChecked);
-        }
-
-        if (stagedChanges.isEmpty()) {
-            fabSave.hide();
-        } else {
-            fabSave.show();
-        }
+        if (localCache.getBoolean(prefKey, "downloaderUseOriginal".equals(prefKey)) == isChecked) return;
+        putBoolPref(prefKey, isChecked);
     }
 
     private void commitStagedChanges() {
@@ -2656,9 +2731,21 @@ public class FeaturesFragment extends Fragment {
     // LIFECYCLE BROADCAST REGISTRATION
     // =========================================================
 
+    /** Settings changed elsewhere (inside Instagram, pushed by its sync, or a restore) redraw the
+     *  page on screen, so both menus always show the same values. Coalesced and posted, so a burst
+     *  of changes or a change made from a switch callback never rebinds mid-toggle. */
+    private final Runnable syncRefresh = this::refreshVisibleMenu;
+    private final SharedPreferences.OnSharedPreferenceChangeListener prefsListener = (prefs, key) -> {
+        View v = getView();
+        if (v == null) return;
+        v.removeCallbacks(syncRefresh);
+        v.postDelayed(syncRefresh, 250);
+    };
+
     @Override
     public void onResume() {
         super.onResume();
+        if (localCache != null) localCache.registerOnSharedPreferenceChangeListener(prefsListener);
         IntentFilter filter = new IntentFilter("ps.reso.instaeclipse.ACTION_SEND_PREFS");
         if (prefsReply != null) prefsReply.cancel();
         prefsNonce = ps.reso.instaeclipse.utils.core.IpcSecurity.newNonce();
@@ -2673,6 +2760,7 @@ public class FeaturesFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        if (localCache != null) localCache.unregisterOnSharedPreferenceChangeListener(prefsListener);
         if (prefsReply != null) { prefsReply.cancel(); prefsReply = null; }
         if (configReply != null) { configReply.cancel(); configReply = null; }
     }

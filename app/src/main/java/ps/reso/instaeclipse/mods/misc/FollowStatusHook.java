@@ -70,7 +70,7 @@ public class FollowStatusHook {
         if (sHookedCallbackClasses.contains(className)) return;
         sHookedCallbackClasses.add(className);
 
-        for (Method m : cb.getClass().getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cb.getClass())) {
             if (java.lang.reflect.Modifier.isStatic(m.getModifiers())) continue;
             if (m.getParameterCount() == 0) continue;
             try {
@@ -156,7 +156,7 @@ public class FollowStatusHook {
         if (depth > 0) {
             Class<?> cls = obj.getClass();
             while (cls != null && cls != Object.class) {
-                for (Field f : cls.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                     if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                     f.setAccessible(true);
                     try {

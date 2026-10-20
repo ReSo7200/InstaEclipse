@@ -33,6 +33,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Playback speed for feed videos and a forced reel seek bar (#247).
@@ -167,7 +168,7 @@ public class PlaybackSpeedHook {
     private static Method findStatic(DexKitBridge bridge, ClassLoader cl, String key, String str, int params) throws Throwable {
         Method m = DexKitCache.isCacheValid() ? DexKitCache.loadMethod(key, cl) : null;
         if (m != null) return m;
-        for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+        for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                 .usingStrings(str).returnType("void")))) {
             Method c = md.getMethodInstance(cl);
             if (Modifier.isStatic(c.getModifiers()) && c.getParameterTypes().length == params) {
@@ -348,7 +349,7 @@ public class PlaybackSpeedHook {
             List<Method> cached = DexKitCache.isCacheValid() ? DexKitCache.loadMethods("PlaybackSpeed_setters", cl) : null;
             Method start = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("PlaybackSpeed_start", cl) : null;
             if (cached == null || cached.isEmpty() || start == null) {
-                List<ClassData> players = bridge.findClass(FindClass.create().matcher(ClassMatcher.create()
+                List<ClassData> players = DexKitQueryCache.findClass(bridge, FindClass.create().matcher(ClassMatcher.create()
                         .usingStrings("IgFeedVideoPlayer: Persistent Visible Cover Image")));
                 start = null;
                 // 452.0.0.22+ moved the (Media, …)boolean start method into a subclass of the class
@@ -356,12 +357,12 @@ public class PlaybackSpeedHook {
                 List<ClassData> scan = new ArrayList<>(players);
                 for (ClassData cd : players) {
                     try {
-                        scan.addAll(bridge.findClass(FindClass.create().matcher(ClassMatcher.create()
+                        scan.addAll(DexKitQueryCache.findClass(bridge, FindClass.create().matcher(ClassMatcher.create()
                                 .superClass(cd.getName()))));
                     } catch (Throwable ignored) {}
                 }
                 for (ClassData cd : scan) {
-                    for (Method m : cd.getInstance(cl).getDeclaredMethods()) {
+                    for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(cd.getInstance(cl))) {
                         Class<?>[] p = m.getParameterTypes();
                         if (p.length > 0 && p[0].getName().equals("com.instagram.feed.media.Media")
                                 && m.getReturnType() == boolean.class && !Modifier.isStatic(m.getModifiers())) {
@@ -372,9 +373,9 @@ public class PlaybackSpeedHook {
                     if (start != null) break;
                 }
                 cached = new ArrayList<>();
-                for (MethodData sp : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData sp : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("setPlaybackSpeed")))) {
-                    for (MethodData caller : sp.getCallers()) {
+                    for (MethodData caller : DexKitQueryCache.callers(bridge, sp)) {
                         try {
                             Method m = caller.getMethodInstance(cl);
                             Class<?>[] p = m.getParameterTypes();
@@ -404,7 +405,7 @@ public class PlaybackSpeedHook {
             // impl's "Playback started " callback fires for whichever video actually starts.
             Method started = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("PlaybackSpeed_started", cl) : null;
             if (started == null) {
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("Playback started ")))) {
                     Method m = md.getMethodInstance(cl);
                     if (!Modifier.isStatic(m.getModifiers())) { started = m; break; }
@@ -425,7 +426,7 @@ public class PlaybackSpeedHook {
             // speed is chosen, apply it there too (and override IG's own 1x calls).
             int storyHooks = 0;
             for (Method setter : SETTERS) {
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .paramTypes("float").returnType("void").addInvoke(MethodMatcher.create(setter))))) {
                     Method m;
                     try { m = md.getMethodInstance(cl); } catch (Throwable t) { continue; }
@@ -446,7 +447,7 @@ public class PlaybackSpeedHook {
                                 param.args[0] = speed;
                         }
                     });
-                    for (java.lang.reflect.Constructor<?> c : m.getDeclaringClass().getDeclaredConstructors()) {
+                    for (java.lang.reflect.Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(m.getDeclaringClass())) {
                         XposedBridge.hookMethod(c, new XC_MethodHook() {
                             @Override
                             protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method); remember(param.thisObject); }
@@ -469,7 +470,7 @@ public class PlaybackSpeedHook {
         try {
             Method gate = DexKitCache.isCacheValid() ? DexKitCache.loadMethod("PlaybackSpeed_scrubberGate", cl) : null;
             if (gate == null) {
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("android_purge_26_q2_ClipsExperimentUtil_shouldShowAttachedScrubber")
                         .returnType("boolean")))) {
                     Method m = md.getMethodInstance(cl);
@@ -551,7 +552,7 @@ public class PlaybackSpeedHook {
         String n = o.getClass().getName();
         if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) return null;
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try {
                     f.setAccessible(true);

@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Makes view-once and view-twice (replayable) media behave like permanent media.
@@ -61,7 +62,7 @@ public class GhostPermanentViewHook {
         }
 
         try {
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create()
                             .usingStrings("archived_media_timestamp", "view_mode")
                             .paramCount(1)));
@@ -123,7 +124,7 @@ public class GhostPermanentViewHook {
                 java.util.List<Long> keys = new java.util.ArrayList<>();
                 Class<?> cls = result.getClass();
                 while (cls != null && cls != Object.class) {
-                    for (Field f : cls.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                         if (f.getType() != int.class) continue;
                         f.setAccessible(true);
                         try { seenCount = f.getInt(result); } catch (Throwable ignored) {}
@@ -137,7 +138,7 @@ public class GhostPermanentViewHook {
                 // re-viewable media; stash the original once/twice type by each key for the render side.
                 cls = result.getClass();
                 while (cls != null && cls != Object.class) {
-                    for (Field f : cls.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                         if (f.getType() != String.class) continue;
                         f.setAccessible(true);
                         try {
@@ -177,7 +178,7 @@ public class GhostPermanentViewHook {
         String cn = obj.getClass().getName();
         if (!cn.startsWith("X.") && !cn.startsWith("com.instagram.")) return;
         for (Class<?> c = obj.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 f.setAccessible(true);
                 Class<?> t = f.getType();

@@ -32,6 +32,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Like undo window (#235): a like is held for {@link #DELAY_MS} behind a small "Liked · UNDO" bar
@@ -43,6 +44,9 @@ import ps.reso.instaeclipse.utils.log.ModuleLog;
  * call is a like (unlikes are sent immediately). Anchor: "source_of_like" + "fetchLikeCount".
  *
  * Undo only cancels the request; the heart may stay filled until the post is refreshed.
+ *
+ * <p>Ask before liking holds the heart button's tap before Instagram fills it (see
+ * {@link #hookHeartButtons}); other likes (double tap) are held here at the sender.
  */
 public class LikeUndoHook {
 
@@ -56,7 +60,7 @@ public class LikeUndoHook {
         Method target = DexKitCache.isCacheValid() ? DexKitCache.loadMethod(CACHE_KEY, Module.hostClassLoader) : null;
         if (target == null) {
             try {
-                List<MethodData> found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("source_of_like", "fetchLikeCount")
                         .returnType("void")));
                 for (MethodData md : found) {
@@ -80,20 +84,128 @@ public class LikeUndoHook {
         XposedBridge.hookMethod(sender, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                if (!FeatureFlags.likeUndo || REPLAYING.get() == Boolean.TRUE) return;
+                if (!(FeatureFlags.likeUndo || FeatureFlags.confirmLikes) || REPLAYING.get() == Boolean.TRUE) return;
                 Object media = null;
                 for (Object a : param.args) {
                     if (a != null && a.getClass().getName().equals("com.instagram.feed.media.Media")) { media = a; break; }
                 }
                 if (media == null || !HideSuggestedFeedItemsHook.isLiked(media)) return; // unlike → send now
+                // A heart tap confirmed a moment ago: Instagram sends it now, unless Undo holds it.
+                boolean confirmed = !FeatureFlags.confirmLikes || System.currentTimeMillis() <= confirmedUntil;
+                if (confirmed && !FeatureFlags.likeUndo) return;
                 Activity act = UIHookManager.getCurrentActivity();
                 if (act == null) return;
                 param.setResult(null);
-                hold(act, param.method, param.thisObject, param.args.clone());
+                Member method = param.method;
+                Object self = param.thisObject;
+                Object[] args = param.args.clone();
+                if (!confirmed) MAIN.post(() -> confirm(act, () -> {
+                    if (FeatureFlags.likeUndo) hold(act, method, self, args);
+                    else send(method, self, args);
+                }));
+                else hold(act, method, self, args);
             }
         });
         ModuleLog.line(TAG + "✅ Hooked " + sender.getDeclaringClass().getName() + "." + sender.getName());
         FeatureStatusTracker.setHooked("LikeUndo");
+        hookHeartButtons();
+        hookLikeEntry(sender);
+        FeatureStatusTracker.setHooked("ConfirmLikes");
+    }
+
+    /** Post like buttons (feed, carousel slide, reels): their heart shows "selected" once liked. */
+    private static final String[] HEARTS = {"row_feed_button_like", "row_feed_media_per_media_like_button", "clips_ufi_like_button"};
+    private static final java.util.Set<Integer> heartIds = new java.util.HashSet<>();
+    private static volatile long confirmedUntil;
+    private static boolean replayingTap;
+
+    /**
+     * Ask before liking holds the heart tap itself, before Instagram fills the heart, and replays it
+     * on Like; the like then passes the sender for a moment. Double-tap likes have no button, so
+     * they are still held at the sender (the heart may stay filled after Cancel).
+     */
+    private static void hookHeartButtons() {
+        XposedBridge.hookAllMethods(View.class, "performClick", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.confirmLikes || replayingTap) return;
+                View v = (View) param.thisObject;
+                if (heartIds.isEmpty()) {
+                    for (String name : HEARTS) {
+                        int id = v.getResources().getIdentifier(name, "id", v.getContext().getPackageName());
+                        if (id != 0) heartIds.add(id);
+                    }
+                    if (heartIds.isEmpty()) heartIds.add(-1);
+                }
+                // The heart itself, or the unnamed touch area that wraps it (feed).
+                View heart = heartIds.contains(v.getId()) ? v : null;
+                if (heart == null && v instanceof ViewGroup g)
+                    for (int i = 0; i < g.getChildCount() && heart == null; i++)
+                        if (heartIds.contains(g.getChildAt(i).getId())) heart = g.getChildAt(i);
+                if (heart == null || heart.isSelected()) return; // a filled heart: this is an unlike
+                ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                Activity act = activityOf(v.getContext());
+                if (act == null) return;
+                param.setResult(true);
+                MAIN.post(() -> confirm(act, () -> {
+                    confirmedUntil = System.currentTimeMillis() + 3000;
+                    replayingTap = true;
+                    try { v.performClick(); } finally { replayingTap = false; }
+                }));
+            }
+        });
+    }
+
+    /**
+     * Ask before liking, for hearts that aren't Views (the Compose feed heart on 451): the like
+     * entry (X.0A0e.A04 on 451, X.0E0b.A04 on 452; it takes the Activity and the Media, in the
+     * sender's class) updates the post's like state and then calls the sender. Held here, before
+     * the heart fills, so Cancel leaves it empty; Like replays it.
+     */
+    private static void hookLikeEntry(Method sender) {
+        int hooked = 0;
+        for (Method m : sender.getDeclaringClass().getDeclaredMethods()) {
+            if (m.equals(sender) || m.getReturnType() != void.class
+                    || java.lang.reflect.Modifier.isStatic(m.getModifiers())) continue;
+            boolean activity = false, media = false;
+            for (Class<?> p : m.getParameterTypes()) {
+                if (p == Activity.class) activity = true;
+                if (p.getName().equals("com.instagram.feed.media.Media")) media = true;
+            }
+            if (!activity || !media) continue;
+            XposedBridge.hookMethod(m, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (!FeatureFlags.confirmLikes || REPLAYING.get() == Boolean.TRUE
+                            || System.currentTimeMillis() <= confirmedUntil) return;
+                    Object media = null;
+                    for (Object a : param.args) {
+                        if (a != null && a.getClass().getName().equals("com.instagram.feed.media.Media")) { media = a; break; }
+                    }
+                    if (media == null || HideSuggestedFeedItemsHook.isLiked(media)) return; // already liked: not a new like
+                    Activity act = UIHookManager.getCurrentActivity();
+                    if (act == null) return;
+                    param.setResult(null);
+                    Member method = param.method;
+                    Object self = param.thisObject;
+                    Object[] args = param.args.clone();
+                    MAIN.post(() -> confirm(act, () -> {
+                        confirmedUntil = System.currentTimeMillis() + 3000;
+                        send(method, self, args);
+                    }));
+                }
+            });
+            hooked++;
+        }
+        ModuleLog.line(TAG + "like entry hooks=" + hooked);
+    }
+
+    private static Activity activityOf(android.content.Context c) {
+        while (c instanceof android.content.ContextWrapper w) {
+            if (c instanceof Activity a) return a;
+            c = w.getBaseContext();
+        }
+        return UIHookManager.getCurrentActivity();
     }
 
     private static void hold(Activity act, Member method, Object self, Object[] args) {
@@ -108,17 +220,41 @@ public class LikeUndoHook {
                     ps.reso.instaeclipse.utils.toast.IeToast.makeText(act, I18n.t(act, R.string.ig_like_undo_cancelled), Toast.LENGTH_SHORT).show();
                     return;
                 }
-                try {
-                    REPLAYING.set(Boolean.TRUE);
-                    XposedBridge.invokeOriginalMethod(method, self, args);
-                    ModuleLog.line(TAG + "like sent after the undo window");
-                } catch (Throwable t) {
-                    ModuleLog.line(TAG + "⚠️ send failed: " + t);
-                } finally {
-                    REPLAYING.remove();
-                }
+                send(method, self, args);
             }, DELAY_MS);
         });
+    }
+
+    /** Ask before liking: the like goes out only on Like; Cancel drops it. */
+    private static void confirm(Activity act, Runnable onLike) {
+        try {
+            ps.reso.instaeclipse.utils.dialog.IeDialog dlg = new ps.reso.instaeclipse.utils.dialog.IeDialog(act)
+                    .title(I18n.t(act, R.string.ig_confirm_like_title))
+                    .message(I18n.t(act, R.string.ig_confirm_like_message));
+            final boolean[] answered = {false};
+            dlg.secondary(act.getString(android.R.string.cancel), () -> answered[0] = true);
+            dlg.primary(I18n.t(act, R.string.ig_confirm_like_yes), () -> { answered[0] = true; onLike.run(); });
+            dlg.onDismiss(() -> { if (!answered[0]) ModuleLog.line(TAG + "like not confirmed"); });
+            dlg.show();
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ confirm: " + t);
+        }
+    }
+
+    private static void send(Member method, Object self, Object[] args) {
+        try {
+            // Called through the hook (which lets it pass while replaying): invoking the original
+            // directly isn't supported the same way on every framework (LSPatch).
+            REPLAYING.set(Boolean.TRUE);
+            Method m = (Method) method;
+            m.setAccessible(true);
+            m.invoke(self, args);
+            ModuleLog.line(TAG + "like sent");
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ send failed: " + t);
+        } finally {
+            REPLAYING.remove();
+        }
     }
 
     private static View showBar(Activity act, Runnable onUndo) {

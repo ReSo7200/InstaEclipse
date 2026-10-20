@@ -18,6 +18,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Handles Ghost Mode for Direct Messages (DM) in Instagram.
@@ -53,7 +54,7 @@ public class GhostDMSeenHook {
 
         try {
             // Step 1: Find all methods containing "mark_thread_seen-"
-            List<MethodData> methods = bridge.findMethod(FindMethod.create()
+            List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                     .matcher(MethodMatcher.create().usingStrings("mark_thread_seen-")));
 
             if (methods.isEmpty()) {

@@ -81,14 +81,14 @@ public class HomeFragment extends Fragment {
             "hidePlusUpsells", "expandCaptions",
             // Distraction-free
             "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore",
-            "disableComments", "hideNotesTray", "hideDmBlend", "hideThreadsButton", "readReceiptChats",
+            "disableComments", "hideNotesTray", "hideDmSuggestions", "hideInstants", "hideDmBlend", "hideThreadsButton", "readReceiptChats",
             // Navigation bar
-            "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile",
+            "hideTabHome", "hideTabReels", "hideTabCreate", "hideTabMessages", "hideTabActivity", "hideTabProfile", "backLeavesHome",
             // Misc
             "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableSearchHistory", "confirmCalls", "disableRepost", "showFollowerToast",
             "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
             "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "removeMetaAI",
-            "hideShareCreateGroup", "exactTimestamps", "likeUndo", "profileFollowsYouLabel", "fancyBioFont", "savedOnProfile",
+            "hideShareCreateGroup", "exactTimestamps", "likeUndo", "confirmLikes", "confirmFollows", "profileMenuTools", "postCountSpoof", "profileSpoofer", "profileAnalyzer", "profileFollowsYouLabel", "fancyBioFont", "savedOnProfile",
             "storyViewerSearch", "storyLinks", "storyInfo", "commentSearch", "followListExport", "followersHistory",
             // Lock / hide chats
             "lockDirectMessages", "lockWholeApp", "lockSavedCollections", "lockUseFingerprint",

@@ -17,6 +17,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Skips Instagram's optional "sync contacts" and "share location" onboarding pages. Bloks screens
@@ -35,7 +36,7 @@ public final class OnboardingPromptHook {
         List<Method> launchers = DexKitCache.isCacheValid() ? DexKitCache.loadMethods(CACHE, cl) : null;
         if (launchers == null || launchers.isEmpty()) {
             launchers = new ArrayList<>();
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("BKDataFetcher.fetch")
                     .paramTypes("android.content.Context", "com.instagram.bloks.hosting.IgBloksScreenConfig")
                     .returnType("void")))) {
@@ -52,7 +53,7 @@ public final class OnboardingPromptHook {
         }
         for (Method m : launchers) {
             List<Field> fields = new ArrayList<>();
-            for (Field f : m.getDeclaringClass().getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(m.getDeclaringClass())) {
                 if (f.getType() == String.class && !Modifier.isStatic(f.getModifiers())) {
                     f.setAccessible(true);
                     fields.add(f);

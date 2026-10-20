@@ -15,6 +15,7 @@ import ps.reso.instaeclipse.utils.core.DexKitCache;
 import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 public class HideSuggestedFeedItemsHook {
 
@@ -42,7 +43,7 @@ public class HideSuggestedFeedItemsHook {
                 boolean hasMedia = false;
                 boolean isThreadsUnit = false;
                 Object media = null;
-                for (Field f : result.getClass().getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(result.getClass())) {
                     String typeName = f.getType().getSimpleName();
                     if (typeName.equals("Media")) {
                         try {
@@ -102,7 +103,7 @@ public class HideSuggestedFeedItemsHook {
                     {"clips_netego", "media_or_ad"},
                     {"clips_netego", "stories_netego", "bloks_netego"}};
             for (String[] strings : queries) {
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(
                         MethodMatcher.create().usingStrings(strings)))) {
                     if (isFeedItemParser(md.getClassName(), classLoader)) { targetClass = md.getClassName(); break; }
                 }
@@ -132,10 +133,10 @@ public class HideSuggestedFeedItemsHook {
         try {
             Class<?> c = Class.forName(className, false, classLoader);
             boolean bridges = false, serializer = false;
-            for (Method m : c.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (m.isBridge()) bridges = true;
                 if (java.lang.reflect.Modifier.isStatic(m.getModifiers()) && m.getParameterCount() == 2) {
-                    for (Field f : m.getParameterTypes()[1].getDeclaredFields())
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(m.getParameterTypes()[1]))
                         if (f.getType().getName().equals("com.instagram.feed.media.Media")) { serializer = true; break; }
                 }
             }
@@ -155,7 +156,7 @@ public class HideSuggestedFeedItemsHook {
                     "com.instagram.feed.media.LiveTreeMediaDict"}) {
                 List<MethodData> found;
                 try {
-                    found = bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .declaredClass(owner)
                             .usingEqStrings(java.util.List.of("has_liked"))
                             .returnType("java.lang.Boolean")
@@ -183,7 +184,7 @@ public class HideSuggestedFeedItemsHook {
             Class<?> owner = getter.getDeclaringClass();
             if (!owner.isInstance(media)) {
                 target = null;
-                for (Field f : media.getClass().getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(media.getClass())) {
                     if (!owner.isAssignableFrom(f.getType())) continue;
                     f.setAccessible(true);
                     target = f.get(media);
@@ -200,7 +201,7 @@ public class HideSuggestedFeedItemsHook {
     private void hookBridgeMethod(String className, ClassLoader classLoader, XC_MethodHook hook)
             throws ClassNotFoundException {
         Class<?> clazz = Class.forName(className, false, classLoader);
-        for (Method m : clazz.getDeclaredMethods()) {
+        for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(clazz)) {
             if (m.isBridge()) {
                 XposedBridge.hookMethod(m, hook);
             }

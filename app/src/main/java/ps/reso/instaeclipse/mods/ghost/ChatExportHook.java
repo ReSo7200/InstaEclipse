@@ -56,6 +56,7 @@ import ps.reso.instaeclipse.utils.ghost.ThreadNames;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 import ps.reso.instaeclipse.utils.users.UserUtils;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Export a DM chat to an HTML file (#225): header button in the open chat.
@@ -85,30 +86,30 @@ public class ChatExportHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> store = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("getUnseenMessageCount directMessage is null")))) {
                 store = cl.loadClass(md.getClassName());
                 break;
             }
             if (store == null) { ModuleLog.line(TAG + "❌ message store not found"); return; }
-            for (Method m : store.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(store)) {
                 Class<?>[] p = m.getParameterTypes();
                 if (p.length == 1 && p[0] == boolean.class && m.getReturnType() == java.util.ArrayList.class) messagesMethod = m;
             }
-            for (Constructor<?> c : store.getDeclaredConstructors()) {
+            for (Constructor<?> c : ps.reso.instaeclipse.utils.core.SafeReflect.constructors(store)) {
                 XposedBridge.hookMethod(c, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method); STORES.put(param.thisObject, Boolean.TRUE); }
                 });
             }
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("timestamp_in_micro", "client_context").returnType("void").paramCount(2)))) {
                 Method m = md.getMethodInstance(cl);
                 if (Modifier.isStatic(m.getModifiers())) { serializer = m; break; }
             }
             if (serializer != null) {
                 Class<?> gen = serializer.getParameterTypes()[0];
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .paramTypes("java.io.Writer").returnType(gen.getName())))) {
                     Method m = md.getMethodInstance(cl);
                     if (Modifier.isStatic(m.getModifiers())) continue;
@@ -276,7 +277,7 @@ public class ChatExportHook {
                         }
                         ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(a, it, error -> {
                             if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
-                                    android.widget.Toast.makeText(a, error, android.widget.Toast.LENGTH_LONG).show());
+                                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, error, android.widget.Toast.LENGTH_LONG).show());
                         });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated export (" + count + " msgs, " + mUrls.size()
@@ -831,7 +832,7 @@ public class ChatExportHook {
 
     private static void addFields(ArrayDeque<Object[]> q, Object o, int depth) {
         for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-            for (Field f : k.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try { f.setAccessible(true); q.add(new Object[]{f.get(o), depth}); } catch (Throwable ignored) {}
             }
@@ -875,7 +876,7 @@ public class ChatExportHook {
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                     try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
                 }
@@ -928,7 +929,7 @@ public class ChatExportHook {
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                     try { f.setAccessible(true); q.add(new Object[]{f.get(o), d + 1}); } catch (Throwable ignored) {}
                 }
@@ -938,7 +939,7 @@ public class ChatExportHook {
 
     /** The User's id: its only non-static final String field (A06 on 452). */
     private static String userId(Object user) {
-        for (Field f : user.getClass().getDeclaredFields()) {
+        for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(user.getClass())) {
             if (f.getType() != String.class || Modifier.isStatic(f.getModifiers()) || !Modifier.isFinal(f.getModifiers())) continue;
             try { f.setAccessible(true); Object v = f.get(user); if (v instanceof String s && s.matches("\\d+")) return s; } catch (Throwable ignored) {}
         }

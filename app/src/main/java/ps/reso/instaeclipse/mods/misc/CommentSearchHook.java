@@ -45,6 +45,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 import ps.reso.instaeclipse.utils.users.UserUtils;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Search inside the comments sheet (#230).
@@ -87,14 +88,14 @@ public class CommentSearchHook {
     public void install(DexKitBridge bridge, ClassLoader cl) {
         try {
             Class<?> vm = null;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("select_comment_screen_pin_comment_tap")))) {
                 vm = cl.loadClass(md.getClassName());
                 break;
             }
             if (vm == null) { ModuleLog.line(TAG + "❌ view-model not found"); return; }
             int builders = 0;
-            for (Method m : vm.getDeclaredMethods()) {
+            for (Method m : ps.reso.instaeclipse.utils.core.SafeReflect.methods(vm)) {
                 if (!Modifier.isStatic(m.getModifiers()) || m.getReturnType().isPrimitive()
                         || m.getReturnType() == void.class || m.getParameterCount() < 10) continue;
                 boolean takesVm = false;
@@ -111,14 +112,14 @@ public class CommentSearchHook {
                 builders++;
             }
             try {
-                for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                         .usingStrings("parent_comment_id", "child_comment_count").returnType("void").paramCount(2)))) {
                     Method m = md.getMethodInstance(cl);
                     if (Modifier.isStatic(m.getModifiers())) { commentSerializer = m; break; }
                 }
                 if (commentSerializer != null) {
                     Class<?> gen = commentSerializer.getParameterTypes()[0];
-                    for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+                    for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                             .paramTypes("java.io.Writer").returnType(gen.getName())))) {
                         Method m = md.getMethodInstance(cl);
                         if (Modifier.isStatic(m.getModifiers())) continue;
@@ -132,7 +133,7 @@ public class CommentSearchHook {
                 ModuleLog.line(TAG + "⚠️ comment json: " + t);
             }
             int frags = 0;
-            for (MethodData md : bridge.findMethod(FindMethod.create().matcher(MethodMatcher.create()
+            for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(MethodMatcher.create()
                     .usingStrings("Failed to ingest comments close signal")))) {
                 Class<?> frag = cl.loadClass(md.getClassName());
                 try {
@@ -175,7 +176,7 @@ public class CommentSearchHook {
             Object user = null;
             String text = null;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                for (Field f : k.getDeclaredFields()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                     if (Modifier.isStatic(f.getModifiers())) continue;
                     try {
                         f.setAccessible(true);
@@ -414,7 +415,7 @@ public class CommentSearchHook {
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)
                 src.getClass().getConstructor(int.class, int.class).newInstance(w, w);
         for (Class<?> k = src.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+            for (java.lang.reflect.Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                 if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || !f.getType().isPrimitive()) continue;
                 try { f.setAccessible(true); f.set(lp, f.get(src)); } catch (Throwable ignored) {}
             }
@@ -962,7 +963,7 @@ public class CommentSearchHook {
                         }
                         ps.reso.instaeclipse.utils.ipc.CompanionBridge.downloadLegacy(ctx, it, error -> {
                             if (error != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() ->
-                                    android.widget.Toast.makeText(ctx, error, android.widget.Toast.LENGTH_LONG).show());
+                                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx, error, android.widget.Toast.LENGTH_LONG).show());
                         });
                         delegated = true;
                         ModuleLog.line(TAG + "delegated comment export (" + cCount + " comments, "
@@ -1086,7 +1087,7 @@ public class CommentSearchHook {
                     }
                 }
                 for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
-                    for (Field f : k.getDeclaredFields()) {
+                    for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(k)) {
                         if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive() || f.getType() == String.class) continue;
                         try { f.setAccessible(true); Object v = f.get(o); if (v != null) q.add(v); } catch (Throwable ignored) {}
                     }
@@ -1129,6 +1130,60 @@ public class CommentSearchHook {
     /** Scrolls the sheet's comment list to its end until nothing new loads for 3 s (IG fetches
      *  the next page itself near the end). Progress = comments collected so far. */
     private static void loadAll(java.util.function.IntConsumer progress, Runnable done) {
+        View root = sheet.get();
+        // Reels open comments in a half-height sheet; at that size the list can't scroll far
+        // enough for Instagram to fetch more pages. Drag the sheet open to full height first.
+        if (root != null && expandSheet(root)) {
+            MAIN.postDelayed(() -> startLoadAll(progress, done), 700);
+            return;
+        }
+        startLoadAll(progress, done);
+    }
+
+    /**
+     * Drags the comments sheet's handle to the top of the screen, the way a finger would: touch
+     * events dispatched into Instagram's own window, so no permission is needed and the sheet's
+     * own drag logic opens it. Returns true when a drag was started (the sheet was not open yet).
+     */
+    @android.annotation.SuppressLint("DiscouragedApi")
+    private static boolean expandSheet(View sheetRoot) {
+        try {
+            View decor = sheetRoot.getRootView();
+            int id = decor.getResources().getIdentifier("bottom_sheet_drag_handle_frame", "id", decor.getContext().getPackageName());
+            View handle = id != 0 ? decor.findViewById(id) : null;
+            if (handle == null || !handle.isShown()) return false;
+            int[] at = new int[2];
+            handle.getLocationInWindow(at);
+            float x = at[0] + handle.getWidth() / 2f, fromY = at[1] + handle.getHeight() / 2f;
+            float toY = decor.getHeight() * 0.06f;
+            if (fromY < decor.getHeight() * 0.25f) return false; // already (nearly) full height
+            final long down = android.os.SystemClock.uptimeMillis();
+            final int steps = 12;
+            decor.dispatchTouchEvent(android.view.MotionEvent.obtain(down, down, android.view.MotionEvent.ACTION_DOWN, x, fromY, 0));
+            for (int i = 1; i <= steps; i++) {
+                final float y = fromY + (toY - fromY) * i / steps;
+                final boolean last = i == steps;
+                MAIN.postDelayed(() -> {
+                    long now = android.os.SystemClock.uptimeMillis();
+                    android.view.MotionEvent move = android.view.MotionEvent.obtain(down, now, android.view.MotionEvent.ACTION_MOVE, x, y, 0);
+                    decor.dispatchTouchEvent(move);
+                    move.recycle();
+                    if (last) {
+                        android.view.MotionEvent up = android.view.MotionEvent.obtain(down, now + 10, android.view.MotionEvent.ACTION_UP, x, y, 0);
+                        decor.dispatchTouchEvent(up);
+                        up.recycle();
+                    }
+                }, i * 16L);
+            }
+            ModuleLog.line(TAG + "load all: opening the sheet to full height");
+            return true;
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ expand sheet: " + t);
+            return false;
+        }
+    }
+
+    private static void startLoadAll(java.util.function.IntConsumer progress, Runnable done) {
         View root = sheet.get();
         View list = root != null ? scrollable(root) : null; // inside the sheet, not the feed behind it
         ModuleLog.line(TAG + "load all: list=" + (list != null ? list.getClass().getName() + " h=" + list.getHeight() : null));

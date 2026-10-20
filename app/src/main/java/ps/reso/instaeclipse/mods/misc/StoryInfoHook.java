@@ -45,6 +45,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Story ⋯ menu extras: "Story Info" (exact times, music, location, hashtags, reshare source, app,
@@ -100,7 +101,7 @@ public class StoryInfoHook {
         StringBuilder keys = new StringBuilder();
         for (String key : KEYS) {
             try {
-                List<MethodData> found = bridge.findMethod(FindMethod.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass("com.instagram.feed.media.Media")
                                 .paramCount(0)
@@ -130,7 +131,7 @@ public class StoryInfoHook {
         if (DexKitCache.isCacheValid()) builders = DexKitCache.loadMethods("MentionButtons", classLoader);
         if (builders == null || builders.isEmpty()) {
             try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings("[INTERNAL] Pause Playback")));
                 builders = new ArrayList<>(
                         ps.reso.instaeclipse.mods.media.StoryDownloadHook.storyOptionBuilders(methods, classLoader));
@@ -278,7 +279,7 @@ public class StoryInfoHook {
         Method m = mapMethods.get(c);
         if (m == null) {
             Method zero = null, one = null;
-            for (Method cand : c.getDeclaredMethods()) {
+            for (Method cand : ps.reso.instaeclipse.utils.core.SafeReflect.methods(c)) {
                 if (cand.getReturnType() != Map.class || Modifier.isStatic(cand.getModifiers()) || !cand.isSynthetic()) continue;
                 if (cand.getParameterCount() == 0 && zero == null) zero = cand;
                 else if (cand.getParameterCount() == 1 && one == null
@@ -340,7 +341,7 @@ public class StoryInfoHook {
         // so the named models inside them are still reachable by find().
         Map<String, Object> out = new LinkedHashMap<>();
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
                 try {
                     f.setAccessible(true);
@@ -803,7 +804,7 @@ public class StoryInfoHook {
         String n = o.getClass().getName();
         if (!n.startsWith("com.instagram.") && !n.startsWith("X.")) return;
         for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass())
-            for (Field f : c.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
                 if (Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()) continue;
                 try { f.setAccessible(true); collectUsers(f.get(o), depth + 1, out, seen); } catch (Throwable ignored) {}
             }

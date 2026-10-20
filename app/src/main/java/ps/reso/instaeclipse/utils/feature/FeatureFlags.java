@@ -53,10 +53,13 @@ public class FeatureFlags {
     public static volatile boolean hideTabMessages = false;
     public static volatile boolean hideTabActivity = false;
     public static volatile boolean hideTabProfile = false;
+    public static volatile boolean backLeavesHome = false; // Back on the scrolled home feed leaves Instagram (#272)
     public static volatile boolean readReceiptChats = false; // per-chat read receipts, chosen in the chat menu
     public static volatile boolean hideDmBlend = false; // hide the Blend button in DM thread headers
     public static volatile boolean hideThreadsButton = false; // hide the Threads button on profiles
     public static volatile boolean hideNotesTray = false; // hide the Notes tray in the DM inbox (#241)
+    public static volatile boolean hideInstants = false; // the floating Instants stack
+    public static volatile boolean hideDmSuggestions = false; // no "Suggested for you" accounts under the DM inbox (#282)
     public static volatile boolean chatExport = false; // header button: export the open chat to HTML (#225)
     public static volatile boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
     public static volatile boolean translateMessages = false; // "Translate" in the DM message long-press menu
@@ -152,6 +155,20 @@ public class FeatureFlags {
     public static volatile boolean profileFollowsYouLabel = false; // "Follows you" label on profiles (#239)
     public static volatile boolean fancyBioFont = false; // Edit profile: fancy (Unicode) fonts for the bio
     public static volatile boolean likeUndo = false; // hold likes for a few seconds with an Undo bar (#235)
+    public static volatile boolean confirmLikes = false; // ask before a like is sent
+    public static volatile boolean confirmFollows = false; // ask before a follow is sent
+    public static volatile boolean postCountSpoof = false; // edit likes / comments / reposts / shares on your posts, this phone only
+    public static volatile boolean profileMenuTools = false; // profile ⋮ menu: copy username / bio, download all posts
+    public static volatile boolean profileSpoofer = false; // own profile counts / verified badge, shown on this phone only
+    public static volatile int     spoofFollowers = -1;    // -1 = unchanged
+    public static volatile int     spoofFollowing = -1;    // -1 = unchanged
+    public static volatile int     spoofPosts = -1;        // -1 = unchanged
+    public static volatile boolean spoofVerified = false;  // show the verified badge on your own profile
+    public static volatile String  spoofName = "";         // own profile header name, "" = unchanged
+    public static volatile String  spoofUsername = "";     // own profile action bar username, "" = unchanged
+    public static volatile String  spoofBio = "";          // own profile bio, "" = unchanged
+    public static volatile String  spoofAvatar = "";       // own profile picture: Base64 JPEG (max 320x320), "" = unchanged
+    public static volatile boolean profileAnalyzer = false; // watchlist: compare a profile's Followers / Following between analyses
     public static volatile boolean exactTimestamps = false; // absolute date/time instead of "3h ago" (#232)
     public static volatile String  exactTimestampFormat = ""; // its SimpleDateFormat pattern, "" = device default (#265)
     public static volatile String  spoofDevice = "";          // device Instagram sees: "" = real, "pixel", "s26" (DeviceSpoofHook)

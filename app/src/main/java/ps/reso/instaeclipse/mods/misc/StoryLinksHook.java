@@ -37,6 +37,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.feature.FeatureStatusTracker;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
+import ps.reso.instaeclipse.utils.core.DexKitQueryCache;
 
 /**
  * Story link stickers: when the open story has link stickers, the story ⋯ menu gets
@@ -76,7 +77,7 @@ public class StoryLinksHook {
         }
         for (String key : KEYS) {
             try {
-                List<MethodData> found = bridge.findMethod(FindMethod.create()
+                List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create()
                                 .declaredClass("com.instagram.feed.media.Media")
                                 .paramCount(0)
@@ -103,7 +104,7 @@ public class StoryLinksHook {
         if (DexKitCache.isCacheValid()) builders = DexKitCache.loadMethods("MentionButtons", classLoader);
         if (builders == null || builders.isEmpty()) {
             try {
-                List<MethodData> methods = bridge.findMethod(FindMethod.create()
+                List<MethodData> methods = DexKitQueryCache.findMethod(bridge, FindMethod.create()
                         .matcher(MethodMatcher.create().usingStrings("[INTERNAL] Pause Playback")));
                 builders = new ArrayList<>(
                         ps.reso.instaeclipse.mods.media.StoryDownloadHook.storyOptionBuilders(methods, classLoader));
@@ -238,7 +239,7 @@ public class StoryLinksHook {
         String n = o.getClass().getName();
         if (!n.startsWith("com.instagram.") && !n.startsWith("X.") && !n.startsWith("com.facebook.")) return;
         for (Class<?> cls = o.getClass(); cls != null && cls != Object.class; cls = cls.getSuperclass()) {
-            for (Field f : cls.getDeclaredFields()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(cls)) {
                 if (f.getType().isPrimitive() || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
                 try {
                     f.setAccessible(true);
