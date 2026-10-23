@@ -88,8 +88,10 @@ public class ReelsControlsHook {
             Class<?> refresh = XposedHelpers.findClass("instagram.features.clips.viewer.ui.ClipsSwipeRefreshLayout", cl);
             XposedHelpers.findAndHookMethod(refresh, "onInterceptTouchEvent", android.view.MotionEvent.class, new XC_MethodHook() {
                 @Override
-                protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                    if (FeatureFlags.reelsLockScroll) param.setResult(false);
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    if (!FeatureFlags.reelsLockScroll) return;
+                    ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    param.setResult(false);
                 }
             });
         } catch (Throwable t) {

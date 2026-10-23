@@ -1,6 +1,6 @@
 package ps.reso.instaeclipse.utils.toast;
 
-import android.app.ActivityManager;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
@@ -48,16 +48,42 @@ public final class IeToast {
         return new IeToast(ctx, t, duration);
     }
 
+    private static Toast activeToast;
+
+    private static void cancelActiveToast() {
+        if (activeToast != null) {
+            try { activeToast.cancel(); } catch (Throwable ignored) {}
+            activeToast = null;
+        }
+    }
+
+    private static void showSystemToast(Context app, CharSequence text, int duration) {
+        cancelActiveToast();
+        try {
+            Toast t = Toast.makeText(app, text, duration);
+            activeToast = t;
+            t.show();
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|Toast) system toast failed: " + t);
+        }
+    }
+
     public void show() {
         if (ctx == null || text == null || text.length() == 0) return;
         Runnable r = () -> {
+            Context app = ctx.getApplicationContext() != null ? ctx.getApplicationContext() : ctx;
             try {
-                if (inForeground(ctx)) showNow();
-                else Toast.makeText(ctx.getApplicationContext() != null ? ctx.getApplicationContext() : ctx,
-                        text, duration).show();
+                // Android 11+ (API 30+) deprecated custom-view toasts (Toast.setView). Using setView
+                // can orphan TYPE_TOAST window tokens when multiple toasts fire in rapid succession
+                // (e.g. saving an instant), leaving an un-dismissible popup stuck on screen until reboot.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    showSystemToast(app, text, duration);
+                } else {
+                    showNow();
+                }
             } catch (Throwable t) {
                 ModuleLog.line("(IE|Toast) fallback: " + t);
-                try { Toast.makeText(ctx, text, duration).show(); } catch (Throwable ignored) {}
+                showSystemToast(app, text, duration);
             }
         };
         if (Looper.myLooper() == Looper.getMainLooper()) r.run();
@@ -65,6 +91,7 @@ public final class IeToast {
     }
 
     private void showNow() {
+        cancelActiveToast();
         Context app = ctx.getApplicationContext() != null ? ctx.getApplicationContext() : ctx;
         float d = app.getResources().getDisplayMetrics().density;
         boolean dark = (app.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
@@ -117,30 +144,28 @@ public final class IeToast {
         root.addView(card);
 
         Toast toast = new Toast(app);
+        activeToast = toast;
         toast.setView(root);
         toast.setDuration(duration == Toast.LENGTH_LONG ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, (int) (96 * d));
-        card.setAlpha(0f);
-        card.setTranslationY(14 * d);
-        card.animate().alpha(1f).translationY(0f).setDuration(220).start();
+        root.addOnAttachStateChangeListener(new android.view.View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(android.view.View v) {
+                card.setAlpha(0f);
+                card.setTranslationY(14 * d);
+                card.animate().alpha(1f).translationY(0f).setDuration(220).start();
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(android.view.View v) {
+                card.animate().cancel();
+                if (activeToast == toast) activeToast = null;
+            }
+        });
         toast.show();
     }
 
-    /**
-     * Android 11+ silently drops custom-view toasts from a process that isn't in the foreground
-     * (e.g. the companion app's DownloadSaveService while Instagram is on screen), so those get a
-     * plain text toast instead.
-     */
-    private static boolean inForeground(Context c) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return true;
-        try {
-            ActivityManager.RunningAppProcessInfo info = new ActivityManager.RunningAppProcessInfo();
-            ActivityManager.getMyMemoryState(info);
-            return info.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
-        } catch (Throwable t) {
-            return true;
-        }
-    }
+
 
     /** Module drawable: from our own APK inside Instagram, from resources in the companion app. */
     private static Drawable moduleDrawable(Context c, int res) {

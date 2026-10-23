@@ -20,7 +20,6 @@ public final class JitGuard {
     private static final int K_ACC_COMPILE_DONT_BOTHER = 0x02000000; // art/libdexfile/dex/modifiers.h
     private static final int ACCESS_FLAGS_OFFSET = 4;                  // ArtMethod: declaring_class_, access_flags_
 
-    private static int calls;
     private static boolean broken;
     private static final Set<Class<?>> done = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
     private static Field backtrace, artMethod;
@@ -31,18 +30,15 @@ public final class JitGuard {
     /** hooked members whose stub was already looked for; replaced (never mutated) so reads need no lock */
     private static volatile IdentityHashMap<Object, Boolean> seen = new IdentityHashMap<>();
 
-    /** Called first thing in every hook callback with the hooked member. The first call for each
-     *  member scans right away (its stub is on the stack now); after that every 64th call samples. */
+    /** Called first thing in every hook callback with the hooked member. Scans on the first invocation
+     *  to protect the stub method (kAccCompileDontBother); subsequent calls return immediately without allocations. */
     public static void tick(Object member) {
-        if (broken) return;
-        boolean first = member != null && !seen.containsKey(member);
-        if (!first && ((++calls) & 0x3F) != 0) return;
-        if (first) {
-            synchronized (JitGuard.class) {
-                IdentityHashMap<Object, Boolean> next = new IdentityHashMap<>(seen);
-                next.put(member, Boolean.TRUE);
-                seen = next;
-            }
+        if (broken || member == null || seen.containsKey(member)) return;
+        synchronized (JitGuard.class) {
+            if (seen.containsKey(member)) return;
+            IdentityHashMap<Object, Boolean> next = new IdentityHashMap<>(seen);
+            next.put(member, Boolean.TRUE);
+            seen = next;
         }
         try {
             scan();

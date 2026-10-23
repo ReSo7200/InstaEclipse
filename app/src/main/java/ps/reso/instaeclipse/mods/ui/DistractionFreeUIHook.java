@@ -219,8 +219,9 @@ public class DistractionFreeUIHook {
         pagerTouchHooked = true;
         ps.reso.instaeclipse.xposedcompat.XC_MethodHook gate = new ps.reso.instaeclipse.xposedcompat.XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+            protected void beforeHookedMethod(MethodHookParam param) {
                 if (!FeatureFlags.disableReels) return;
+                ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (param.thisObject instanceof View self
                         && self.getParent() instanceof View p && p.getId() == tabPagerId) {
                     if (param.method.getName().equals("onInterceptTouchEvent")
