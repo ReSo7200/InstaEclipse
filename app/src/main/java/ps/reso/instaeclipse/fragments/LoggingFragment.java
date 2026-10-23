@@ -394,9 +394,10 @@ public class LoggingFragment extends Fragment {
     }
 
     static int classify(String s) {
+        if (s.contains("(IE|JitGuard) stubs protected:")) return KIND_OK;
         String l = s.toLowerCase(Locale.ROOT);
-        if (s.contains("❌") || l.contains("exception") || l.contains("error") || l.contains("failed")
-                || l.contains("fatal") || l.contains("crash")) return KIND_ERROR;
+        if (s.contains("❌") || (l.contains("exception") && !l.contains("throws ")) || l.contains("error")
+                || l.contains("failed") || l.contains("fatal") || l.contains("crash")) return KIND_ERROR;
         if (s.contains("⚠") || l.contains("warn") || l.contains("not found") || l.contains("timeout")
                 || l.contains("timed out") || l.contains("skipp") || l.contains("fallback")) return KIND_WARN;
         if (s.contains("✅") || s.contains("✔") || l.contains("hooked") || l.contains("success")
