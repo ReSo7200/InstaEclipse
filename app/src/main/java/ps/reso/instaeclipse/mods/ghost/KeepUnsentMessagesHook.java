@@ -86,7 +86,38 @@ public class KeepUnsentMessagesHook {
      *  in-thread unsent button to show only THIS chat's log. */
     public static volatile String currentThreadId = null;
 
+    private static volatile long lastTouchUp;
+    private static boolean touchHooked;
+
+    /** Delete for you runs on the main thread right after a tap, a remote unsend does not. */
+    private static boolean userDeletedLocally() {
+        boolean main = android.os.Looper.myLooper() == android.os.Looper.getMainLooper();
+        long age = (System.nanoTime() - lastTouchUp) / 1_000_000L;
+        ModuleLog.line("(IE|KeepUnsent) removal main=" + main + " touchAgeMs=" + age);
+        return main && age < 4000;
+    }
+
+    private static void hookTouch() {
+        if (touchHooked) return;
+        touchHooked = true;
+        try {
+            XposedBridge.hookMethod(android.app.Activity.class.getDeclaredMethod("dispatchTouchEvent",
+                    android.view.MotionEvent.class), new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    if (param.args[0] instanceof android.view.MotionEvent e
+                            && e.getActionMasked() == android.view.MotionEvent.ACTION_UP) {
+                        lastTouchUp = System.nanoTime();
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|KeepUnsent) touch hook failed: " + t.getMessage());
+        }
+    }
+
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        hookTouch();
         CurrentConversation.install(bridge, classLoader);
         ownership = UnsentMessageResolver.resolve(bridge, classLoader);
         if (ownership != null) retentionReady = hookReconcile(bridge, classLoader);
@@ -235,6 +266,11 @@ public class KeepUnsentMessagesHook {
                         : ownership.lookup(param.thisObject, param.args[0],
                         param.args[1] instanceof String ? (String) param.args[1] : null,
                         param.args[2] instanceof String ? (String) param.args[2] : null);
+                if (userDeletedLocally()) {
+                    if (selected != null) retained.forget(selected.threadEntry, selected.identity());
+                    else retained.clearStore(param.thisObject);
+                    return;
+                }
                 if (selected != null && selected.own) {
                     retained.forget(selected.threadEntry, selected.identity());
                     return; // Do not save our own message; native deletion still runs.
