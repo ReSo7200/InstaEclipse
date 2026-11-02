@@ -68,7 +68,10 @@ public class InstantSaveHook {
                     @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
                         try {
                             Object media = findInstantMedia(p.args);
-                            if (media != null) currentMedia = media;
+                            if (media != null) {
+                                currentMedia = media;
+                                if (FeatureFlags.keepInstantHistory) rememberInstant(media);
+                            }
                         } catch (Throwable ignored) {}
                     }
                 });
@@ -140,6 +143,29 @@ public class InstantSaveHook {
             }
         }
         return null;
+    }
+
+    private static void rememberInstant(Object media) {
+        final Context ctx = AndroidAppHelper.currentApplication();
+        if (ctx == null) return;
+        FeedVideoDownloadHook.executor.submit(() -> {
+            try {
+                String id = null;
+                try {
+                    Object v = media.getClass().getMethod("getId").invoke(media);
+                    if (v instanceof String s && !s.isEmpty()) id = s;
+                } catch (Throwable ignored) {}
+                if (id == null || ps.reso.instaeclipse.utils.media.InstantHistory.has(id)) return;
+                List<String> urls = FeedVideoDownloadHook.extractAllUrlsFromMedia(ctx, media);
+                if (urls == null || urls.isEmpty()) return;
+                String url = urls.get(0);
+                String author = FeedVideoDownloadHook.extractUsernameFromMediaObject(media);
+                ps.reso.instaeclipse.utils.media.InstantHistory.capture(id, author, url,
+                        FeedVideoDownloadHook.isVideoUrl(url), 0);
+            } catch (Throwable t) {
+                ModuleLog.line("(IE|InstantSave) history capture failed: " + t);
+            }
+        });
     }
 
     // Debounce so both preloaded viewer instances (and any duplicate invoke) don't double-save.

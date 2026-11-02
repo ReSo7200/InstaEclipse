@@ -188,7 +188,7 @@ public class DialogUtils {
         // ---- MEDIA ---- downloading, post-menu extras and uploads
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_media)));
         LinearLayout media = createGroupCard(context);
-        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "enableStickerDownload", "enableDmMediaDownload", "offerAudioDownload", "saveInstants", "cacheStories", "downloaderUsernameFolder", "downloaderAddTimestamp")));
+        media.addView(createMenuRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_dialog_menu_downloader), A_MEDIA, () -> showDownloaderOptions(context), onCount(context, "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload", "enableVoiceDownload", "enableStickerDownload", "enableDmMediaDownload", "offerAudioDownload", "saveInstants", "keepInstantHistory", "cacheStories", "downloaderUsernameFolder", "downloaderAddTimestamp")));
         media.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.menu_post_menu), A_MEDIA, () -> showPostMenuOptions(context), onCount(context, "copyMediaLink", "offerCopyImage", "offerMediaInfo", "uploadInstants")));
         media.addView(createMenuRow(context, R.drawable.ic_sparkle, I18n.t(context, R.string.menu_quality), A_MEDIA, () -> showQualityOptions(context), onCount(context, "highResolutionImages", "maxUploadQuality")));
         mainLayout.addView(media);
@@ -2465,6 +2465,8 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_downloader_offer_audio, "offerAudioDownload"),
                 // Save Instants (#184) — long-press a received Instant to save its media.
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_save_instants, "saveInstants"),
+                flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_instant_history_title, "keepInstantHistory"),
+                createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_instant_history_view), "#FF9F0A", v -> showInstantHistory(context)),
                 // Cache Stories (24h) — keep viewed stories locally so they survive expiry/deletion.
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_cache_stories, "cacheStories"),
                 createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_story_cache_view), "#FF9F0A", v -> showCachedStories(context))));
@@ -2594,6 +2596,47 @@ public class DialogUtils {
                     } catch (Throwable ignored) {}
                 }));
         showSectionDialog(context, I18n.t(context, R.string.ig_story_cache_view), layout, () -> {});
+    }
+
+    private static void showInstantHistory(Context context) {
+        LinearLayout layout = createSwitchLayout(context);
+        java.util.List<ps.reso.instaeclipse.utils.media.StoryCache.Entry> entries =
+                ps.reso.instaeclipse.utils.media.InstantHistory.entries();
+        if (entries.isEmpty()) {
+            layout.addView(createInfoSection(context, I18n.t(context, R.string.ig_instant_history_title),
+                    I18n.t(context, R.string.ig_instant_history_empty)));
+            showSectionDialog(context, I18n.t(context, R.string.ig_instant_history_view), layout, () -> {});
+            return;
+        }
+        java.util.LinkedHashMap<String, java.util.List<ps.reso.instaeclipse.utils.media.StoryCache.Entry>> byUser =
+                new java.util.LinkedHashMap<>();
+        for (ps.reso.instaeclipse.utils.media.StoryCache.Entry e : entries) {
+            String author = (e.author == null || e.author.isEmpty()) ? "unknown" : e.author;
+            byUser.computeIfAbsent(author, k -> new java.util.ArrayList<>()).add(e);
+        }
+        LinearLayout folders = card(context);
+        for (java.util.Map.Entry<String, java.util.List<ps.reso.instaeclipse.utils.media.StoryCache.Entry>> u : byUser.entrySet()) {
+            final String author = u.getKey();
+            final java.util.List<ps.reso.instaeclipse.utils.media.StoryCache.Entry> list = u.getValue();
+            folders.addView(createActionRow(context, R.drawable.ic_folder,
+                    author + "   (" + list.size() + ")", "#FF9F0A", v -> showUserStories(context, author, list)));
+        }
+        layout.addView(folders);
+        layout.addView(createActionRow(context, R.drawable.ic_delete, I18n.t(context, R.string.ig_instant_history_clear),
+                "#FF453A", v -> {
+                    try {
+                        IeDialog dlg = new IeDialog(context)
+                                .title(I18n.t(context, R.string.ig_instant_history_clear))
+                                .message(I18n.t(context, R.string.ig_instant_history_clear_confirm));
+                        dlg.secondary(context.getString(android.R.string.cancel), null);
+                        dlg.primary(I18n.t(context, R.string.ig_instant_history_clear), () -> {
+                            ps.reso.instaeclipse.utils.media.InstantHistory.clearAll();
+                            showInstantHistory(context);
+                        });
+                        dlg.show();
+                    } catch (Throwable ignored) {}
+                }));
+        showSectionDialog(context, I18n.t(context, R.string.ig_instant_history_view), layout, () -> {});
     }
 
     /** Level 2: the cached stories for one username. */

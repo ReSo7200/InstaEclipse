@@ -149,6 +149,7 @@ public class SettingsBackupManager {
         s.put("downloaderAddTimestamp",  FeatureFlags.downloaderAddTimestamp);
         s.put("copyMediaLink",           FeatureFlags.copyMediaLink);
         s.put("saveInstants",            FeatureFlags.saveInstants);
+        s.put("keepInstantHistory",      FeatureFlags.keepInstantHistory);
         s.put("uploadInstants",          FeatureFlags.uploadInstants);
 
         JSONObject root = new JSONObject();
@@ -315,6 +316,7 @@ public class SettingsBackupManager {
         if (s.has("downloaderAddTimestamp")) FeatureFlags.downloaderAddTimestamp  = s.getBoolean("downloaderAddTimestamp");
         if (s.has("copyMediaLink"))          FeatureFlags.copyMediaLink          = s.getBoolean("copyMediaLink");
         if (s.has("saveInstants"))           FeatureFlags.saveInstants           = s.getBoolean("saveInstants");
+        if (s.has("keepInstantHistory"))     FeatureFlags.keepInstantHistory     = s.getBoolean("keepInstantHistory");
         if (s.has("uploadInstants"))         FeatureFlags.uploadInstants         = s.getBoolean("uploadInstants");
     }
 
