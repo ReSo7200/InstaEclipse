@@ -391,6 +391,11 @@
     <string name="ig_hide_chat_no_thread">Couldn\'t identify this chat</string>
     <string name="ig_story_cache_title">Cache Stories (24h)</string>
     <string name="ig_dialog_misc_cache_stories">Cache Stories for 24h</string>
+    <string name="ig_instant_history_title">Keep viewed Instants</string>
+    <string name="ig_instant_history_view">View past Instants</string>
+    <string name="ig_instant_history_empty">No Instants yet. Turn this on and open some Instants, they will be kept here.</string>
+    <string name="ig_instant_history_clear">Clear past Instants</string>
+    <string name="ig_instant_history_clear_confirm">Delete all kept Instants? This cannot be undone.</string>
     <string name="ig_story_cache_view">View cached stories</string>
     <string name="ig_story_cache_empty">No cached stories yet. Turn this on, then view some stories — they\'ll be kept here for 24 hours.</string>
     <string name="ig_story_cache_clear">Clear cached stories</string>
