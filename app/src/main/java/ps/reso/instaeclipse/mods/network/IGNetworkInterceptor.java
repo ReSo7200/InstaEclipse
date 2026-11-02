@@ -149,6 +149,7 @@ public class IGNetworkInterceptor {
                                     if (FeatureFlags.isGhostViewOnce) {
                                         shouldDrop |= uri.getPath().endsWith("/item_replayed/");
                                         shouldDrop |= (uri.getPath().contains("/direct") && uri.getPath().endsWith("/item_seen/"));
+                                        shouldDrop |= uri.getPath().contains("/visual_threads/") && uri.getPath().endsWith("/seen/");
                                     }
                                     if (FeatureFlags.isGhostStory) {
                                         // Version-agnostic: getPath() excludes the ?reel=... query, so it
