@@ -1760,6 +1760,7 @@ public class DialogUtils {
             v.name = FeatureFlags.spoofName;
             v.bio = FeatureFlags.spoofBio;
             v.avatar = FeatureFlags.spoofAvatar;
+            v.targetId = FeatureFlags.spoofTargetId;
             v.posts = FeatureFlags.spoofPosts;
             v.followers = FeatureFlags.spoofFollowers;
             v.following = FeatureFlags.spoofFollowing;
@@ -1786,6 +1787,7 @@ public class DialogUtils {
         FeatureFlags.spoofName = v.name;
         FeatureFlags.spoofBio = v.bio;
         FeatureFlags.spoofAvatar = v.avatar;
+        FeatureFlags.spoofTargetId = v.targetId;
         FeatureFlags.spoofPosts = v.posts;
         FeatureFlags.spoofFollowers = v.followers;
         FeatureFlags.spoofFollowing = v.following;

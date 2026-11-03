@@ -1687,6 +1687,7 @@ public class FeaturesFragment extends Fragment {
         v.name = localCache.getString("spoofName", "");
         v.bio = localCache.getString("spoofBio", "");
         v.avatar = localCache.getString("spoofAvatar", "");
+        v.targetId = localCache.getString("spoofTargetId", "");
         v.posts = localCache.getInt("spoofPosts", -1);
         v.followers = localCache.getInt("spoofFollowers", -1);
         v.following = localCache.getInt("spoofFollowing", -1);
@@ -1720,6 +1721,7 @@ public class FeaturesFragment extends Fragment {
         if (!now.name.equals(old.name)) putStringPref("spoofName", now.name);
         if (!now.bio.equals(old.bio)) putStringPref("spoofBio", now.bio);
         if (!now.avatar.equals(old.avatar)) putStringPref("spoofAvatar", now.avatar);
+        if (!now.targetId.equals(old.targetId)) putStringPref("spoofTargetId", now.targetId);
         if (now.posts != old.posts) putIntPref("spoofPosts", now.posts);
         if (now.followers != old.followers) putIntPref("spoofFollowers", now.followers);
         if (now.following != old.following) putIntPref("spoofFollowing", now.following);
