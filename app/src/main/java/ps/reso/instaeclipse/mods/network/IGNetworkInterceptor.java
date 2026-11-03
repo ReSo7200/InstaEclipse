@@ -125,6 +125,8 @@ public class IGNetworkInterceptor {
                                 Object requestObj = param.args[0];
                                 URI uri = (URI) XposedHelpers.getObjectField(requestObj, finalUriFieldName);
 
+                                uri = redirectToCopiedProfile(requestObj, finalUriFieldName, uri);
+
                                 if (uri != null && uri.getPath() != null) {
                                     final String host = uri.getHost(); // null for opaque/relative URIs — guard before use
                                     boolean shouldDrop = false;
@@ -286,5 +288,29 @@ public class IGNetworkInterceptor {
         } catch (Exception e) {
             ModuleLog.line("(InstaEclipse | Interceptor): ❌ " + e.getMessage());
         }
+    }
+
+    /** Reads of your own followers, following and posts go to the copied profile (read only). */
+    private static URI redirectToCopiedProfile(Object request, String field, URI uri) {
+        try {
+            String target = FeatureFlags.spoofTargetId;
+            String self = ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.selfId();
+            if (!FeatureFlags.profileSpoofer || target == null || target.isEmpty() || self == null || self.equals(target)) return uri;
+            String path = uri.getPath();
+            if (path == null) return uri;
+            String[] reads = {"/friendships/" + self + "/followers/", "/friendships/" + self + "/following/",
+                    "/feed/user/" + self + "/"};
+            for (String read : reads) {
+                if (!path.endsWith(read)) continue;
+                String moved = path.replace("/" + self + "/", "/" + target + "/");
+                URI next = new URI(uri.getScheme(), uri.getAuthority(), moved, uri.getQuery(), uri.getFragment());
+                XposedHelpers.setObjectField(request, field, next);
+                ModuleLog.line("(IE|ProfileSpoof) read redirected: " + read.replace(self, "self"));
+                return next;
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|ProfileSpoof) redirect failed: " + t.getMessage());
+        }
+        return uri;
     }
 }

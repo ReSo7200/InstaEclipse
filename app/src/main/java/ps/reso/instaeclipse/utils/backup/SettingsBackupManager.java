@@ -126,6 +126,7 @@ public class SettingsBackupManager {
         s.put("spoofName",               FeatureFlags.spoofName);
         s.put("spoofUsername",           FeatureFlags.spoofUsername);
         s.put("spoofBio",                FeatureFlags.spoofBio);
+        s.put("spoofTargetId",           FeatureFlags.spoofTargetId);
         s.put("spoofAvatar",             FeatureFlags.spoofAvatar);
         s.put("profileAnalyzer",         FeatureFlags.profileAnalyzer);
         s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
@@ -293,6 +294,7 @@ public class SettingsBackupManager {
         if (s.has("spoofName"))              FeatureFlags.spoofName              = s.getString("spoofName");
         if (s.has("spoofUsername"))          FeatureFlags.spoofUsername          = s.getString("spoofUsername");
         if (s.has("spoofBio"))               FeatureFlags.spoofBio               = s.getString("spoofBio");
+        if (s.has("spoofTargetId"))          FeatureFlags.spoofTargetId          = s.getString("spoofTargetId");
         if (s.has("spoofAvatar") && ps.reso.instaeclipse.utils.profile.SpoofAvatar.isValid(s.getString("spoofAvatar")))
             FeatureFlags.spoofAvatar = s.getString("spoofAvatar");
         if (s.has("profileAnalyzer"))        FeatureFlags.profileAnalyzer        = s.getBoolean("profileAnalyzer");

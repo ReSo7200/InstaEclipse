@@ -43,7 +43,7 @@ public final class ProfileSpoofEditor {
 
     /** The spoofer's settings; "" / -1 = keep the real value. */
     public static final class Values {
-        public String username = "", name = "", bio = "", avatar = "";
+        public String username = "", name = "", bio = "", avatar = "", targetId = "";
         public int posts = -1, followers = -1, following = -1;
         public boolean verified;
     }
@@ -61,6 +61,7 @@ public final class ProfileSpoofEditor {
     private final TextView previewUsername, previewName, previewBio, previewPosts, previewFollowers, previewFollowing;
     private final TextView removePhoto;
     private String avatar;
+    private String targetId;
 
     /**
      * @param onChoosePhoto opens a picker; its result goes to {@link #setAvatar}
@@ -73,6 +74,7 @@ public final class ProfileSpoofEditor {
         this.d = ctx.getResources().getDisplayMetrics().density;
         this.knownUsername = knownUsername;
         this.avatar = v.avatar == null ? "" : v.avatar;
+        this.targetId = v.targetId == null ? "" : v.targetId;
 
         root = new LinearLayout(ctx);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -118,6 +120,24 @@ public final class ProfileSpoofEditor {
         LinearLayout.LayoutParams noteLp = matchWrap();
         noteLp.topMargin = dp(10);
         root.addView(note, noteLp);
+
+        // ---- Copy a profile ----
+        LinearLayout copy = section(R.string.ig_profile_spoofer_section_copy);
+        EditText copyUser = field(I18n.t(ctx, R.string.ig_profile_spoofer_copy_hint));
+        copyUser.setSingleLine(true);
+        copyUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        copy.addView(copyUser, matchWrap());
+        TextView copyButton = pill(I18n.t(ctx, R.string.ig_profile_spoofer_copy_button), true);
+        LinearLayout.LayoutParams copyLp = wrap();
+        copyLp.topMargin = dp(8);
+        copy.addView(copyButton, copyLp);
+        TextView copyNote = text(12, p.sub, false);
+        copyNote.setText(I18n.t(ctx, R.string.ig_profile_spoofer_copy_note));
+        LinearLayout.LayoutParams copyNoteLp = matchWrap();
+        copyNoteLp.topMargin = dp(6);
+        copyNoteLp.setMarginStart(dp(4));
+        copy.addView(copyNote, copyNoteLp);
+        copyButton.setOnClickListener(x -> copyFrom(copyUser.getText().toString(), copyButton));
 
         // ---- Identity ----
         LinearLayout identity = section(R.string.ig_profile_spoofer_section_identity);
@@ -217,6 +237,7 @@ public final class ProfileSpoofEditor {
         v.following = DialogUtils.parseSpoofCount(following.getText().toString());
         v.verified = verified.isChecked();
         v.avatar = avatar;
+        v.targetId = targetId;
         return v;
     }
 
@@ -226,9 +247,37 @@ public final class ProfileSpoofEditor {
         refresh();
     }
 
+    private void copyFrom(String typed, TextView button) {
+        button.setEnabled(false);
+        button.setAlpha(0.5f);
+        new Thread(() -> {
+            ps.reso.instaeclipse.utils.profile.ProfileLookup.Result r =
+                    ps.reso.instaeclipse.utils.profile.ProfileLookup.fetch(typed);
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                button.setEnabled(true);
+                button.setAlpha(1f);
+                if (r == null) {
+                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                            I18n.t(ctx, R.string.ig_profile_spoofer_copy_failed), android.widget.Toast.LENGTH_LONG).show();
+                    return;
+                }
+                username.setText(r.username);
+                name.setText(r.name);
+                bio.setText(r.bio);
+                posts.setText(r.posts >= 0 ? String.valueOf(r.posts) : "");
+                followers.setText(r.followers >= 0 ? String.valueOf(r.followers) : "");
+                following.setText(r.following >= 0 ? String.valueOf(r.following) : "");
+                verified.setChecked(r.verified);
+                targetId = r.id;
+                setAvatar(r.avatar);
+            });
+        }, "IE-ProfileLookup").start();
+    }
+
     public void reset() {
         for (EditText e : new EditText[]{username, name, bio, posts, followers, following}) e.setText("");
         verified.setChecked(false);
+        targetId = "";
         setAvatar("");
     }
 
