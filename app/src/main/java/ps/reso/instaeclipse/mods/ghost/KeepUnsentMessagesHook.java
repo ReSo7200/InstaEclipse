@@ -86,38 +86,39 @@ public class KeepUnsentMessagesHook {
      *  in-thread unsent button to show only THIS chat's log. */
     public static volatile String currentThreadId = null;
 
-    private static volatile long lastTouchUp;
-    private static boolean touchHooked;
+    private static final ThreadLocal<Boolean> DELETING_FOR_ME = new ThreadLocal<>();
+    private static final String DELETE_ANCHOR =
+            "deleteMessages - attempting to delete message with null id or pending state";
 
-    /** Delete for you runs on the main thread right after a tap, a remote unsend does not. */
     private static boolean userDeletedLocally() {
-        boolean main = android.os.Looper.myLooper() == android.os.Looper.getMainLooper();
-        long age = (System.nanoTime() - lastTouchUp) / 1_000_000L;
-        ModuleLog.line("(IE|KeepUnsent) removal main=" + main + " touchAgeMs=" + age);
-        return main && age < 4000;
+        return DELETING_FOR_ME.get() == Boolean.TRUE;
     }
 
-    private static void hookTouch() {
-        if (touchHooked) return;
-        touchHooked = true;
+    /** Instagram's own delete for you action removes through this method, so removals inside it are not unsends. */
+    private static void hookLocalDelete(DexKitBridge bridge, ClassLoader classLoader) {
+        XC_MethodHook mark = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) { DELETING_FOR_ME.set(Boolean.TRUE); }
+            @Override protected void afterHookedMethod(MethodHookParam param) { DELETING_FOR_ME.remove(); }
+        };
         try {
-            XposedBridge.hookMethod(android.app.Activity.class.getDeclaredMethod("dispatchTouchEvent",
-                    android.view.MotionEvent.class), new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {
-                    if (param.args[0] instanceof android.view.MotionEvent e
-                            && e.getActionMasked() == android.view.MotionEvent.ACTION_UP) {
-                        lastTouchUp = System.nanoTime();
-                    }
+            List<Method> found = DexKitCache.isCacheValid() ? DexKitCache.loadMethods("KeepUnsent_localDelete", classLoader) : null;
+            if (found == null || found.isEmpty()) {
+                found = new java.util.ArrayList<>();
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
+                        .matcher(MethodMatcher.create().usingStrings(DELETE_ANCHOR)))) {
+                    found.add(md.getMethodInstance(classLoader));
                 }
-            });
+                if (!found.isEmpty()) DexKitCache.saveMethods("KeepUnsent_localDelete", found);
+            }
+            for (Method m : found) XposedBridge.hookMethod(m, mark);
+            ModuleLog.line("(IE|KeepUnsent) local delete hooked " + found.size());
         } catch (Throwable t) {
-            ModuleLog.line("(IE|KeepUnsent) touch hook failed: " + t.getMessage());
+            ModuleLog.line("(IE|KeepUnsent) local delete lookup failed: " + t.getMessage());
         }
     }
 
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
-        hookTouch();
+        hookLocalDelete(bridge, classLoader);
         CurrentConversation.install(bridge, classLoader);
         ownership = UnsentMessageResolver.resolve(bridge, classLoader);
         if (ownership != null) retentionReady = hookReconcile(bridge, classLoader);
