@@ -112,7 +112,15 @@ public class GhostViewOnceHook {
                 // "raven_media" on 447 / hardcoded "visual_item_seen" on 436). Skipping it
                 // suppresses just the view-once "seen/opened" report; voice/other sends are
                 // different methods and are untouched.
-                if (FeatureFlags.isGhostViewOnce || (param.args.length > 3 && FeatureFlags.isGhostSeen)) param.setResult(null);
+                if (param.args.length > 3) {
+                    if (!FeatureFlags.isGhostSeen && !FeatureFlags.isGhostViewOnce) return;
+                    for (Object a : param.args) {
+                        if (a instanceof String s && ps.reso.instaeclipse.utils.ghost.ReadReceiptWhitelist.isAllowed(s)) return;
+                    }
+                    param.setResult(null);
+                    return;
+                }
+                if (FeatureFlags.isGhostViewOnce) param.setResult(null);
             }
         };
     }

@@ -75,6 +75,7 @@ public final class ProfileSpoofHook {
         hooked += hook(bridge, cl, "is_verified", "ProfileSpoofVerified", log, new String[]{"java.lang.Boolean", "boolean"}, 3);
         boolean session = trackAccount(cl);
         hookHeaderViews();
+        hookCountTaps();
         hookAvatarView();
         hookBioState(bridge, cl, log);
         if (hooked > 0 && session) FeatureStatusTracker.setHooked("ProfileSpoofer");
@@ -191,6 +192,7 @@ public final class ProfileSpoofHook {
                     if (value != null && isSelf(param.thisObject)) param.setResult(value);
                 }
             };
+            if (!found.isEmpty()) getters[which] = found.get(0);
             for (Method m : found) {
                 XposedBridge.hookMethod(m, hook);
                 log.append(", ").append(field).append("=").append(m.getName()).append("()")
@@ -210,6 +212,107 @@ public final class ProfileSpoofHook {
         int v = which == 0 ? FeatureFlags.spoofFollowers : which == 1 ? FeatureFlags.spoofFollowing : FeatureFlags.spoofPosts;
         if (v < 0) return null;
         return type == long.class || type == Long.class ? (Object) (long) v : (Object) v;
+    }
+
+    private static final Method[] getters = new Method[4];
+    private static volatile long redirectUntil;
+
+    /** True for a short while after you tap Followers or Following on your own profile. */
+    public static boolean listRedirectArmed() { return System.currentTimeMillis() < redirectUntil; }
+
+    private static void hookCountTaps() {
+        XposedBridge.hookAllMethods(android.view.View.class, "performClick", new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) {
+                if (!FeatureFlags.profileSpoofer || FeatureFlags.spoofTargetId.isEmpty()) return;
+                android.view.View v = (android.view.View) param.thisObject;
+                if (followersId == 0) resolveIds(v);
+                if (followersId <= 0 || !isCountView(v)) return;
+                if (ownProfileShown(v)) redirectUntil = System.currentTimeMillis() + 60_000;
+            }
+        });
+    }
+
+    /** The tapped view is a count or sits next to one inside the same header cell. */
+    private static boolean isCountView(android.view.View v) {
+        android.view.View node = v;
+        for (int i = 0; i < 2 && node != null; i++) {
+            if (hasId(node, 2)) return true;
+            android.view.ViewParent p = node.getParent();
+            node = p instanceof android.view.View pv ? pv : null;
+        }
+        return false;
+    }
+
+    private static boolean hasId(android.view.View v, int depth) {
+        int id = v.getId();
+        if (id != android.view.View.NO_ID && (id == followersId || id == followingId)) return true;
+        if (depth > 0 && v instanceof android.view.ViewGroup g) {
+            for (int i = 0; i < g.getChildCount(); i++) if (hasId(g.getChildAt(i), depth - 1)) return true;
+        }
+        return false;
+    }
+
+    public static boolean isOwn(Object user) { return isSelf(user); }
+
+    /** Copies the profile on screen (its User model plus the header views) into the spoofer. */
+    public static boolean copyProfile(android.app.Activity a, Object user, String username, String bio) {
+        try {
+            String id = userId(user);
+            if (id == null || username == null || user == null) return false;
+            android.view.View root = a.getWindow().getDecorView();
+            if (followersId == 0) resolveIds(root);
+            int posts = number(user, 2), followers = number(user, 0), following = number(user, 1);
+            Boolean verified = null;
+            if (getters[3] != null) verified = (Boolean) getters[3].invoke(user);
+            String name = "";
+            for (int vid : new int[]{nameId, nameAltId}) {
+                if (vid == 0) continue;
+                android.view.View v = root.findViewById(vid);
+                if (v instanceof android.widget.TextView t && t.isShown() && t.getText() != null && t.getText().length() > 0) {
+                    name = t.getText().toString();
+                    break;
+                }
+            }
+            String avatar = "";
+            android.view.View av = avatarId != 0 ? root.findViewById(avatarId) : null;
+            if (av instanceof android.widget.ImageView iv && iv.getDrawable() != null) {
+                android.graphics.drawable.Drawable d = iv.getDrawable();
+                int w = Math.max(1, d.getIntrinsicWidth() > 0 ? d.getIntrinsicWidth() : iv.getWidth());
+                int h = Math.max(1, d.getIntrinsicHeight() > 0 ? d.getIntrinsicHeight() : iv.getHeight());
+                android.graphics.Bitmap bm = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+                d.setBounds(0, 0, w, h);
+                d.draw(new android.graphics.Canvas(bm));
+                String b64 = ps.reso.instaeclipse.utils.profile.SpoofAvatar.encode(bm);
+                if (b64 != null) avatar = b64;
+            }
+            FeatureFlags.spoofTargetId = id;
+            FeatureFlags.spoofUsername = username;
+            FeatureFlags.spoofName = name;
+            FeatureFlags.spoofBio = bio == null ? "" : bio.trim();
+            FeatureFlags.spoofAvatar = avatar;
+            FeatureFlags.spoofPosts = posts;
+            FeatureFlags.spoofFollowers = followers;
+            FeatureFlags.spoofFollowing = following;
+            FeatureFlags.spoofVerified = Boolean.TRUE.equals(verified);
+            FeatureFlags.profileSpoofer = true;
+            ps.reso.instaeclipse.utils.core.SettingsManager.saveAllFlags();
+            refreshNow();
+            return true;
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "copy failed: " + t);
+            return false;
+        }
+    }
+
+    private static int number(Object user, int which) {
+        try {
+            Method m = getters[which];
+            if (m == null) return -1;
+            Object v = m.invoke(user);
+            return v instanceof Number n ? (int) Math.min(n.longValue(), Integer.MAX_VALUE) : -1;
+        } catch (Throwable t) {
+            return -1;
+        }
     }
 
     private static boolean isSelf(Object user) {

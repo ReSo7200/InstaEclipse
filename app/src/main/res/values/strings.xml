@@ -545,9 +545,12 @@
     <string name="ig_profile_spoofer_section_badge">Badge</string>
     <string name="ig_profile_spoofer_section_copy">Copy a profile</string>
     <string name="ig_profile_spoofer_copy_hint">Username to copy</string>
-    <string name="ig_profile_spoofer_copy_button">Copy profile</string>
-    <string name="ig_profile_spoofer_copy_note">Fills every field below from a public profile. Your Followers and Following lists then show that account\'s lists.</string>
-    <string name="ig_profile_spoofer_copy_failed">Could not read that profile. Check the username or try again later.</string>
+    <string name="ig_profile_spoofer_copy_button">Open profile</string>
+    <string name="ig_profile_spoofer_copy_note">Opens that profile in Instagram. Tap the three dots menu there and choose Use as spoofed profile. Your Followers and Following lists then show that account\'s lists.</string>
+    <string name="ig_profile_spoofer_copy_failed">Enter a valid username.</string>
+    <string name="ig_profile_spoofer_use_profile">Use as spoofed profile</string>
+    <string name="ig_profile_spoofer_copied">Profile copied into the spoofer</string>
+    <string name="ig_profile_spoofer_copy_missing">Could not read this profile yet. Wait for it to load and try again.</string>
     <string name="ig_profile_spoofer_section_picture">Picture</string>
     <string name="ig_profile_spoofer_username">Username</string>
     <string name="ig_profile_spoofer_name">Name</string>
