@@ -23,8 +23,7 @@ public class InstantHistory {
 
     private static final String INDEX = "ie_instant_history.json";
     private static final String DIR = "ie_instants";
-    private static final long TTL_MS = 30L * 24 * 60 * 60 * 1000;
-    private static final long MAX_BYTES = 300L * 1024 * 1024;
+    private static final long MAX_BYTES = 4L * 1024 * 1024 * 1024;
 
     private static final List<StoryCache.Entry> cache = new ArrayList<>();
     private static boolean loaded = false;
@@ -78,12 +77,11 @@ public class InstantHistory {
 
     /** Drops entries older than 24h, then oldest-first while over the size cap; deletes their files. */
     private static synchronized void prune() {
-        long now = System.currentTimeMillis();
         long total = 0;
         for (java.util.Iterator<StoryCache.Entry> it = cache.iterator(); it.hasNext(); ) {
             StoryCache.Entry e = it.next();
             File mf = new File(e.path);
-            if (now - e.at > TTL_MS || !mf.exists()) {
+            if (!mf.exists()) {
                 //noinspection ResultOfMethodCallIgnored
                 mf.delete();
                 it.remove();
