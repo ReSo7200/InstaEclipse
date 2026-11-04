@@ -137,7 +137,7 @@ public final class ProfileSpoofEditor {
         copyNoteLp.topMargin = dp(6);
         copyNoteLp.setMarginStart(dp(4));
         copy.addView(copyNote, copyNoteLp);
-        copyButton.setOnClickListener(x -> copyFrom(copyUser.getText().toString(), copyButton));
+        copyButton.setOnClickListener(x -> openProfile(copyUser.getText().toString()));
 
         // ---- Identity ----
         LinearLayout identity = section(R.string.ig_profile_spoofer_section_identity);
@@ -247,31 +247,23 @@ public final class ProfileSpoofEditor {
         refresh();
     }
 
-    private void copyFrom(String typed, TextView button) {
-        button.setEnabled(false);
-        button.setAlpha(0.5f);
-        new Thread(() -> {
-            ps.reso.instaeclipse.utils.profile.ProfileLookup.Result r =
-                    ps.reso.instaeclipse.utils.profile.ProfileLookup.fetch(typed);
-            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                button.setEnabled(true);
-                button.setAlpha(1f);
-                if (r == null) {
-                    ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
-                            I18n.t(ctx, R.string.ig_profile_spoofer_copy_failed), android.widget.Toast.LENGTH_LONG).show();
-                    return;
-                }
-                username.setText(r.username);
-                name.setText(r.name);
-                bio.setText(r.bio);
-                posts.setText(r.posts >= 0 ? String.valueOf(r.posts) : "");
-                followers.setText(r.followers >= 0 ? String.valueOf(r.followers) : "");
-                following.setText(r.following >= 0 ? String.valueOf(r.following) : "");
-                verified.setChecked(r.verified);
-                targetId = r.id;
-                setAvatar(r.avatar);
-            });
-        }, "IE-ProfileLookup").start();
+    private void openProfile(String typed) {
+        String clean = typed == null ? "" : typed.trim().replace("@", "");
+        if (!clean.matches("[A-Za-z0-9._]{1,30}")) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                    I18n.t(ctx, R.string.ig_profile_spoofer_copy_failed), android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse("https://www.instagram.com/" + clean + "/"));
+            i.setPackage("com.instagram.android");
+            i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            ctx.startActivity(i);
+        } catch (Throwable t) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                    I18n.t(ctx, R.string.ig_profile_spoofer_copy_failed), android.widget.Toast.LENGTH_LONG).show();
+        }
     }
 
     public void reset() {

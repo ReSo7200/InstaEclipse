@@ -87,11 +87,12 @@ public final class SpoofAvatar {
         }
     }
 
-    /** Same as {@link #encode(ContentResolver, Uri)} for downloaded image bytes. */
-    public static String encode(byte[] image) {
+    /** Same as {@link #encode(ContentResolver, Uri)} for a bitmap already on screen. */
+    public static String encode(Bitmap shown) {
         Bitmap src = null;
         try {
-            src = BitmapFactory.decodeByteArray(image, 0, image.length);
+            if (shown == null || shown.getWidth() == 0 || shown.getHeight() == 0) return null;
+            src = shown.copy(Bitmap.Config.ARGB_8888, false);
             if (src == null) return null;
             int side = Math.min(src.getWidth(), src.getHeight());
             int out = Math.min(side, MAX_SIDE);

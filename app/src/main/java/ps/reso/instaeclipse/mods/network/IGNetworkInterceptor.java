@@ -290,7 +290,7 @@ public class IGNetworkInterceptor {
         }
     }
 
-    /** Reads of your own followers, following and posts go to the copied profile (read only). */
+    /** Your followers and following lists, opened from your profile counts, go to the copied profile (read only). */
     private static URI redirectToCopiedProfile(Object request, String field, URI uri) {
         try {
             String target = FeatureFlags.spoofTargetId;
@@ -298,8 +298,8 @@ public class IGNetworkInterceptor {
             if (!FeatureFlags.profileSpoofer || target == null || target.isEmpty() || self == null || self.equals(target)) return uri;
             String path = uri.getPath();
             if (path == null) return uri;
-            String[] reads = {"/friendships/" + self + "/followers/", "/friendships/" + self + "/following/",
-                    "/feed/user/" + self + "/"};
+            if (!ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.listRedirectArmed()) return uri;
+            String[] reads = {"/friendships/" + self + "/followers/", "/friendships/" + self + "/following/"};
             for (String read : reads) {
                 if (!path.endsWith(read)) continue;
                 String moved = path.replace("/" + self + "/", "/" + target + "/");

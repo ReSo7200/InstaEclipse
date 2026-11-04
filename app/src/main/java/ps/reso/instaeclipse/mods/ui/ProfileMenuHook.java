@@ -69,7 +69,7 @@ public final class ProfileMenuHook {
             }
             XC_MethodHook onShow = new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                    if ((FeatureFlags.profileMenuTools || FeatureFlags.profileAnalyzer) && param.thisObject instanceof PopupWindow pw) inject(pw);
+                    if ((FeatureFlags.profileMenuTools || FeatureFlags.profileAnalyzer || FeatureFlags.profileSpoofer) && param.thisObject instanceof PopupWindow pw) inject(pw);
                 }
             };
             XposedBridge.hookAllMethods(PopupWindow.class, "showAsDropDown", onShow);
@@ -136,6 +136,18 @@ public final class ProfileMenuHook {
                     pw.dismiss();
                     ps.reso.instaeclipse.mods.media.ProfileDownloadAll.start(a, username);
                 }));
+            }
+            if (FeatureFlags.profileSpoofer) {
+                Object shown = findUser(a, username);
+                if (shown != null && !ProfileSpoofHook.isOwn(shown)) {
+                    column.addView(row(template, R.drawable.ic_tune, I18n.t(ctx, R.string.ig_profile_spoofer_use_profile), () -> {
+                        pw.dismiss();
+                        boolean ok = ProfileSpoofHook.copyProfile(a, shown, username, bioOf(a, username));
+                        ps.reso.instaeclipse.utils.toast.IeToast.makeText(a, I18n.t(a, ok
+                                ? R.string.ig_profile_spoofer_copied : R.string.ig_profile_spoofer_copy_missing),
+                                Toast.LENGTH_SHORT).show();
+                    }));
+                }
             }
             if (FeatureFlags.profileAnalyzer) {
                 column.addView(row(template, R.drawable.ic_search, I18n.t(ctx, R.string.ig_pa_analyze), () -> {
@@ -290,7 +302,7 @@ public final class ProfileMenuHook {
 
     /** The bio from the profile's User model: a User reachable from the shown fragments whose
      *  username matches the header. */
-    private static String bioOf(Activity a, String username) {
+    static String bioOf(Activity a, String username) {
         if (bioGetter == null) return null;
         try {
             Object user = findUser(a, username);
