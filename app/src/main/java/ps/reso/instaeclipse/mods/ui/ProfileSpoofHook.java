@@ -463,6 +463,7 @@ public final class ProfileSpoofHook {
 
     // ---- View level: counts, username, name, bio TextView, picture ------------------------
 
+    private static int tabTitleId, followTabsId;
     private static int followButtonId, followContextTextId, similarTitleId;
     private static final int[] hideIds = new int[4];
     private static int stackedFollowersId, stackedFollowingId, backId, profileTabId;
@@ -477,6 +478,10 @@ public final class ProfileSpoofHook {
                 int id = tv.getId();
                 if (id == android.view.View.NO_ID) return;
                 if (followersId == 0) resolveIds(tv);
+                if (id != 0 && id == tabTitleId && !FeatureFlags.spoofTargetId.isEmpty() && FeatureFlags.profileSpoofer) {
+                    tv.post(() -> hideMutualTab(tv));
+                    return;
+                }
                 boolean extra = id != 0 && (id == followButtonId || id == followContextTextId || id == similarTitleId);
                 if (id != followersId && id != followingId && id != titleId
                         && id != nameId && id != nameAltId && id != bioTextId && !extra) return;
@@ -516,6 +521,8 @@ public final class ProfileSpoofHook {
         stackedFollowersId = r.getIdentifier("profile_header_followers_stacked_familiar", "id", pkg);
         stackedFollowingId = r.getIdentifier("profile_header_following_stacked_familiar", "id", pkg);
         backId = r.getIdentifier("action_bar_button_back", "id", pkg);
+        tabTitleId = r.getIdentifier("title", "id", pkg);
+        followTabsId = r.getIdentifier("unified_follow_list_tab_layout", "id", pkg);
         followButtonId = r.getIdentifier("profile_header_follow_button", "id", pkg);
         followContextTextId = r.getIdentifier("profile_header_follow_context_text", "id", pkg);
         similarTitleId = r.getIdentifier("similar_accounts_carousel_title", "id", pkg);
@@ -537,6 +544,26 @@ public final class ProfileSpoofHook {
     }
 
     /** Your own profile is on screen: the account switcher chevron is shown. */
+    /** The Mutual tab of Followers and Following would show your friends: hide it on the copied profile. */
+    private static void hideMutualTab(android.view.View title) {
+        if (followTabsId == 0 || !listRedirectArmed()) return;
+        android.view.View node = title;
+        android.view.View strip = null, tab = null;
+        for (int i = 0; i < 8 && node != null; i++) {
+            android.view.ViewParent p = node.getParent();
+            if (!(p instanceof android.view.View pv)) return;
+            if (pv.getId() == followTabsId) {
+                strip = node;
+                break;
+            }
+            tab = node;
+            node = pv;
+        }
+        if (strip instanceof android.view.ViewGroup g && tab != null && g.indexOfChild(tab) == 0) {
+            tab.setVisibility(android.view.View.GONE);
+        }
+    }
+
     /** The copied account's profile is a normal profile: hide what makes it look like someone else's. */
     private static void hideCopiedExtras(android.view.View root) {
         for (int hid : hideIds) {
