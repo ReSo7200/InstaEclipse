@@ -76,6 +76,7 @@ public final class ProfileSpoofHook {
         boolean session = trackAccount(cl);
         hookHeaderViews();
         hookCountTaps();
+        hookListArguments(cl);
         hookAvatarView();
         hookBioState(bridge, cl, log);
         if (hooked > 0 && session) FeatureStatusTracker.setHooked("ProfileSpoofer");
@@ -216,6 +217,18 @@ public final class ProfileSpoofHook {
 
     private static final Method[] getters = new Method[4];
     private static volatile long redirectUntil;
+    private static volatile long infoUntil;
+
+    /** True while your own profile is in front (kept alive by taps on it). */
+    public static boolean infoRedirectArmed() { return System.currentTimeMillis() < infoUntil; }
+
+    public static boolean ownProfileOnScreen(android.view.View v) { return ownProfileShown(v); }
+
+    /** The profile in front is yours or the copied one. */
+    public static boolean spoofedProfileInFront(android.view.View v) {
+        if (!FeatureFlags.profileSpoofer) return false;
+        return ownProfileShown(v) || (!FeatureFlags.spoofTargetId.isEmpty() && infoRedirectArmed());
+    }
 
     /** True for a short while after you tap Followers or Following on your own profile. */
     public static boolean listRedirectArmed() { return System.currentTimeMillis() < redirectUntil; }
@@ -226,10 +239,70 @@ public final class ProfileSpoofHook {
                 if (!FeatureFlags.profileSpoofer || FeatureFlags.spoofTargetId.isEmpty()) return;
                 android.view.View v = (android.view.View) param.thisObject;
                 if (followersId == 0) resolveIds(v);
+                if (profileTabId > 0 && v.getId() == profileTabId) infoUntil = System.currentTimeMillis() + 30_000;
+                else if (infoRedirectArmed() || ownProfileShown(v)) infoUntil = System.currentTimeMillis() + 30_000;
                 if (followersId <= 0 || !isCountView(v)) return;
                 if (ownProfileShown(v)) redirectUntil = System.currentTimeMillis() + 60_000;
             }
         });
+    }
+
+    /** The list opened from your counts is told to load the copied account instead of you. */
+    private static void hookListArguments(ClassLoader cl) {
+        try {
+            Class<?> fragment = Class.forName("androidx.fragment.app.Fragment", false, cl);
+            XposedBridge.hookMethod(fragment.getMethod("setArguments", android.os.Bundle.class), new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) {
+                    if (!listRedirectArmed() || !(param.args[0] instanceof android.os.Bundle b)) return;
+                    String self = selfId, target = FeatureFlags.spoofTargetId;
+                    if (self == null || target.isEmpty()) return;
+                    boolean moved = false;
+                    for (String key : b.keySet()) {
+                        Object v = b.get(key);
+                        if ((key.endsWith("FOLLOWER_COUNT") || key.endsWith("FollowerCount")) && FeatureFlags.spoofFollowers >= 0) {
+                            b.putInt(key, FeatureFlags.spoofFollowers);
+                        } else if ((key.endsWith("FOLLOWING_COUNT") || key.endsWith("FollowingCount")) && FeatureFlags.spoofFollowing >= 0) {
+                            b.putInt(key, FeatureFlags.spoofFollowing);
+                        } else if (key.endsWith("PROFILE_USER_NAME") && !FeatureFlags.spoofUsername.isEmpty()) {
+                            b.putString(key, FeatureFlags.spoofUsername);
+                            moved = true;
+                        } else if (v != null && !(v instanceof String) && !(v instanceof Number) && !(v instanceof Boolean)
+                                && !(v instanceof android.os.Bundle) && v.getClass().getName().startsWith("com.instagram")) {
+                            moved |= swapId(v, self, target, 0);
+                        }
+                        if (self.equals(v)) {
+                            b.putString(key, target);
+                            moved = true;
+                        }
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "list arguments hook failed: " + t);
+        }
+    }
+
+    private static boolean swapId(Object o, String self, String target, int depth) {
+        boolean moved = false;
+        for (Class<?> c = o.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
+                if (Modifier.isStatic(f.getModifiers())) continue;
+                try {
+                    f.setAccessible(true);
+                    Object v = f.get(o);
+                    if (self.equals(v)) {
+                        f.set(o, target);
+                        moved = true;
+                    } else if (v instanceof Long l && l == Long.parseLong(self) && f.getType() == long.class) {
+                        f.setLong(o, Long.parseLong(target));
+                        moved = true;
+                    } else if (depth < 2 && v != null && v.getClass().getName().startsWith("com.instagram")) {
+                        moved |= swapId(v, self, target, depth + 1);
+                    }
+                } catch (Throwable ignored) {}
+            }
+        }
+        return moved;
     }
 
     /** The tapped view is a count or sits next to one inside the same header cell. */
@@ -245,7 +318,8 @@ public final class ProfileSpoofHook {
 
     private static boolean hasId(android.view.View v, int depth) {
         int id = v.getId();
-        if (id != android.view.View.NO_ID && (id == followersId || id == followingId)) return true;
+        if (id != android.view.View.NO_ID && (id == followersId || id == followingId
+                || id == stackedFollowersId || id == stackedFollowingId)) return true;
         if (depth > 0 && v instanceof android.view.ViewGroup g) {
             for (int i = 0; i < g.getChildCount(); i++) if (hasId(g.getChildAt(i), depth - 1)) return true;
         }
@@ -253,6 +327,13 @@ public final class ProfileSpoofHook {
     }
 
     public static boolean isOwn(Object user) { return isSelf(user); }
+
+    /** True for your own account and for the profile copied into the spoofer. */
+    public static boolean isOwnOrCopied(Object user) {
+        if (user == null) return false;
+        String id = userId(user);
+        return id != null && (id.equals(selfId) || (FeatureFlags.profileSpoofer && id.equals(FeatureFlags.spoofTargetId)));
+    }
 
     /** Copies the profile on screen (its User model plus the header views) into the spoofer. */
     public static boolean copyProfile(android.app.Activity a, Object user, String username, String bio) {
@@ -287,7 +368,7 @@ public final class ProfileSpoofHook {
             }
             FeatureFlags.spoofTargetId = id;
             FeatureFlags.spoofUsername = username;
-            FeatureFlags.spoofName = name;
+            FeatureFlags.spoofName = withoutFollowLabel(a, name);
             FeatureFlags.spoofBio = bio == null ? "" : bio.trim();
             FeatureFlags.spoofAvatar = avatar;
             FeatureFlags.spoofPosts = posts;
@@ -302,6 +383,15 @@ public final class ProfileSpoofHook {
             ModuleLog.line(TAG + "copy failed: " + t);
             return false;
         }
+    }
+
+    /** The "Follows you" label is drawn into the name view: never copy it with the name. */
+    private static String withoutFollowLabel(android.content.Context c, String name) {
+        for (int res : new int[]{ps.reso.instaeclipse.R.string.ig_profile_follows_you, ps.reso.instaeclipse.R.string.ig_profile_not_following_you}) {
+            String tail = " · " + ps.reso.instaeclipse.utils.i18n.I18n.t(c, res);
+            if (name.endsWith(tail)) return name.substring(0, name.length() - tail.length());
+        }
+        return name;
     }
 
     private static int number(Object user, int which) {
@@ -373,6 +463,9 @@ public final class ProfileSpoofHook {
 
     // ---- View level: counts, username, name, bio TextView, picture ------------------------
 
+    private static int followButtonId, followContextTextId, similarTitleId;
+    private static final int[] hideIds = new int[4];
+    private static int stackedFollowersId, stackedFollowingId, backId, profileTabId;
     private static int followersId, followingId, titleId, chevronId, nameId, nameAltId, bioTextId, avatarId, tabAvatarId;
     private static final ThreadLocal<Boolean> SETTING = new ThreadLocal<>();
 
@@ -384,8 +477,9 @@ public final class ProfileSpoofHook {
                 int id = tv.getId();
                 if (id == android.view.View.NO_ID) return;
                 if (followersId == 0) resolveIds(tv);
+                boolean extra = id != 0 && (id == followButtonId || id == followContextTextId || id == similarTitleId);
                 if (id != followersId && id != followingId && id != titleId
-                        && id != nameId && id != nameAltId && id != bioTextId) return;
+                        && id != nameId && id != nameAltId && id != bioTextId && !extra) return;
                 ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 tv.post(() -> apply(tv));
             }
@@ -419,6 +513,17 @@ public final class ProfileSpoofHook {
         android.content.res.Resources r = v.getResources();
         String pkg = v.getContext().getPackageName();
         followingId = r.getIdentifier("profile_header_familiar_following_value", "id", pkg);
+        stackedFollowersId = r.getIdentifier("profile_header_followers_stacked_familiar", "id", pkg);
+        stackedFollowingId = r.getIdentifier("profile_header_following_stacked_familiar", "id", pkg);
+        backId = r.getIdentifier("action_bar_button_back", "id", pkg);
+        followButtonId = r.getIdentifier("profile_header_follow_button", "id", pkg);
+        followContextTextId = r.getIdentifier("profile_header_follow_context_text", "id", pkg);
+        similarTitleId = r.getIdentifier("similar_accounts_carousel_title", "id", pkg);
+        hideIds[0] = r.getIdentifier("profile_header_actions_top_row", "id", pkg);
+        hideIds[1] = r.getIdentifier("row_profile_header_button_chaining", "id", pkg);
+        hideIds[2] = r.getIdentifier("similar_accounts_container", "id", pkg);
+        hideIds[3] = r.getIdentifier("profile_header_follow_context", "id", pkg);
+        profileTabId = r.getIdentifier("profile_tab", "id", pkg);
         titleId = r.getIdentifier("action_bar_title", "id", pkg);
         chevronId = r.getIdentifier("action_bar_title_chevron", "id", pkg);
         nameId = r.getIdentifier("profile_header_full_name_above_vanity", "id", pkg);
@@ -432,7 +537,35 @@ public final class ProfileSpoofHook {
     }
 
     /** Your own profile is on screen: the account switcher chevron is shown. */
+    /** The copied account's profile is a normal profile: hide what makes it look like someone else's. */
+    private static void hideCopiedExtras(android.view.View root) {
+        for (int hid : hideIds) {
+            if (hid == 0) continue;
+            android.view.View x = root.findViewById(hid);
+            if (x != null && x.getVisibility() != android.view.View.GONE) x.setVisibility(android.view.View.GONE);
+        }
+    }
+
     private static boolean ownProfileShown(android.view.View v) {
+        if (followersId == 0) resolveIds(v);
+        if (chevronShown(v)) return true;
+        // One account has no switcher chevron: the profile tab is selected and no back arrow is shown.
+        if (profileTabId == 0) return false;
+        android.view.View root = v.getRootView();
+        android.view.View tab = root.findViewById(profileTabId);
+        if (tab == null || !tab.isSelected()) return false;
+        java.util.ArrayDeque<android.view.View> st = new java.util.ArrayDeque<>();
+        st.push(root);
+        while (!st.isEmpty()) {
+            android.view.View x = st.pop();
+            if (!x.isShown()) continue;
+            if (x.getId() == backId && backId != 0 && onScreen(x)) return false;
+            if (x instanceof android.view.ViewGroup g) for (int i = 0; i < g.getChildCount(); i++) st.push(g.getChildAt(i));
+        }
+        return true;
+    }
+
+    private static boolean chevronShown(android.view.View v) {
         if (chevronId == 0) return false;
         // Your profile stays loaded behind other screens (isShown still true): look for a chevron
         // that is really on screen.
@@ -454,6 +587,7 @@ public final class ProfileSpoofHook {
 
     /** The title is the one next to the shown chevron (not another screen's action bar title). */
     private static boolean besideChevron(android.view.View title) {
+        if (!chevronShown(title)) return onScreen(title);
         android.view.ViewParent p = title.getParent();
         for (int i = 0; i < 5 && p instanceof android.view.ViewGroup g; i++, p = g.getParent()) {
             android.view.View c = g.findViewById(chevronId);
@@ -472,6 +606,10 @@ public final class ProfileSpoofHook {
         try {
             if (!tv.isAttachedToWindow() || !tv.isShown() || !ownProfileShown(tv)) return;
             int id = tv.getId();
+            if (id != 0 && (id == followButtonId || id == followContextTextId || id == similarTitleId)) {
+                if (!FeatureFlags.spoofTargetId.isEmpty()) hideCopiedExtras(tv.getRootView());
+                return;
+            }
             if (id == titleId) {
                 // The username only in the title next to the chevron (other screens' action bars
                 // reuse this id); the badge as before.
@@ -487,13 +625,13 @@ public final class ProfileSpoofHook {
                         setText(tv, user);
                     }
                 }
-                badge(tv, FeatureFlags.spoofVerified);
+                badge(tv, FeatureFlags.spoofVerified && FeatureFlags.spoofTargetId.isEmpty());
                 // The header may have bound before your profile was on screen: catch up.
                 applyHeader(tv.getRootView());
                 return;
             }
             if (id == nameId || id == nameAltId) {
-                String name = FeatureFlags.spoofName;
+                String name = withoutFollowLabel(tv.getContext(), FeatureFlags.spoofName);
                 // An empty name view is hidden by Instagram when you have no name; only fill a shown one.
                 if (name != null && !name.isEmpty()) setText(tv, name);
                 return;
@@ -548,7 +686,7 @@ public final class ProfileSpoofHook {
         try {
             if (!iv.isAttachedToWindow()) return;
             String value = FeatureFlags.spoofAvatar;
-            boolean want = FeatureFlags.profileSpoofer && value != null && !value.isEmpty() && ownProfileShown(iv);
+            boolean want = FeatureFlags.profileSpoofer && value != null && !value.isEmpty();
             boolean ours = iv.getDrawable() instanceof ps.reso.instaeclipse.utils.profile.SpoofAvatar.CircleDrawable;
             if (want && !ours) {
                 android.graphics.Bitmap bitmap = ps.reso.instaeclipse.utils.profile.SpoofAvatar.bitmap(value);
