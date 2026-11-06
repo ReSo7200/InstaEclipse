@@ -1051,6 +1051,15 @@ public class DialogUtils {
             }
         }
 
+        layout.addView(createActionRow(context, R.drawable.ic_search, I18n.t(context, R.string.ig_unsent_search), "#0A84FF",
+                v -> showUnsentSearch(context)));
+        layout.addView(createActionRow(context, R.drawable.ic_upload, I18n.t(context, R.string.ig_unsent_export_all), "#0A84FF", v -> {
+            String path = exportUnsentJson(context, "all_chats", entries);
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, path != null
+                    ? I18n.t(context, R.string.ig_dialog_unsent_exported, path)
+                    : I18n.t(context, R.string.ig_toast_download_failed, "export"), Toast.LENGTH_LONG).show();
+        }));
+
         LinearLayout foldersCard = card(context);
         for (java.util.Map.Entry<String, java.util.List<ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry>> t : byThread.entrySet()) {
             final String threadId = t.getKey();
@@ -1088,6 +1097,72 @@ public class DialogUtils {
         }));
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_unsent_title), layout, () -> {});
+    }
+
+    private static void showUnsentSearch(Context context) {
+        try {
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_unsent_search));
+            android.widget.EditText query = dlg.input(I18n.t(context, R.string.ig_unsent_search_hint));
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(I18n.t(context, R.string.ig_unsent_search_go), () -> showUnsentResults(context, query.getText().toString().trim()));
+            dlg.show();
+        } catch (Throwable ignored) {}
+    }
+
+    private static void showUnsentResults(Context context, String query) {
+        LinearLayout layout = createSwitchLayout(context);
+        String needle = query.toLowerCase(java.util.Locale.getDefault());
+        java.util.List<ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry> hits = new java.util.ArrayList<>();
+        java.util.Map<ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry, String> chats = new java.util.IdentityHashMap<>();
+        for (ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry e : ps.reso.instaeclipse.utils.ghost.UnsentLog.getAll()) {
+            String chat = ps.reso.instaeclipse.utils.ghost.ThreadNames.resolve(e.thread);
+            if (chat == null || chat.isEmpty()) chat = e.sender;
+            String hay = (e.text + " " + e.sender + " " + chat).toLowerCase(java.util.Locale.getDefault());
+            if (needle.isEmpty() || hay.contains(needle)) {
+                hits.add(e);
+                chats.put(e, chat == null ? "" : chat);
+            }
+        }
+        if (hits.isEmpty()) {
+            layout.addView(createInfoSection(context, I18n.t(context, R.string.ig_unsent_search), I18n.t(context, R.string.ig_unsent_search_none)));
+        } else {
+            layout.addView(createActionRow(context, R.drawable.ic_upload, I18n.t(context, R.string.ig_dialog_unsent_export), "#0A84FF", v -> {
+                String path = exportUnsentJson(context, query.isEmpty() ? "all_chats" : "search_" + query, hits);
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(context, path != null
+                        ? I18n.t(context, R.string.ig_dialog_unsent_exported, path)
+                        : I18n.t(context, R.string.ig_toast_download_failed, "export"), Toast.LENGTH_LONG).show();
+            }));
+            java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("MMM d, HH:mm", java.util.Locale.getDefault());
+            for (ps.reso.instaeclipse.utils.ghost.UnsentLog.Entry e : hits) {
+                LinearLayout row = new LinearLayout(context);
+                row.setOrientation(LinearLayout.VERTICAL);
+                int pad = dp(context, 14);
+                row.setPadding(pad, dp(context, 11), pad, dp(context, 12));
+                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+                bg.setColor(C_CARD);
+                bg.setCornerRadius(R_CARD);
+                bg.setStroke(Math.max(1, dp(context, 1)), 0x33FFFFFF);
+                row.setBackground(bg);
+                TextView meta = new TextView(context);
+                String chat = chats.get(e);
+                meta.setText((chat == null || chat.isEmpty() ? "" : chat + "  ") + fmt.format(new java.util.Date(e.time)));
+                meta.setTextColor(accent());
+                meta.setTextSize(13);
+                meta.setTypeface(Typeface.DEFAULT_BOLD);
+                TextView body = new TextView(context);
+                body.setText(e.text);
+                body.setTextColor(C_TEXT);
+                body.setTextSize(15);
+                body.setPadding(0, dp(context, 5), 0, 0);
+                body.setTextIsSelectable(true);
+                row.addView(meta);
+                row.addView(body);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+                lp.topMargin = dp(context, 8);
+                layout.addView(row, lp);
+            }
+        }
+        showSectionDialog(context, I18n.t(context, R.string.ig_unsent_search), layout, () -> {});
     }
 
     private static void showGhostOptions(Context context) {

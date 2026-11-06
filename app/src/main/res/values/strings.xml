@@ -346,6 +346,11 @@
     <string name="ig_dialog_ghost_edit_history">Keep Edit History of Messages</string>
     <string name="ig_dialog_unsent_title">Unsent Messages</string>
     <string name="ig_dialog_unsent_clear">Clear this chat\'s log</string>
+    <string name="ig_unsent_search">Search kept messages</string>
+    <string name="ig_unsent_search_hint">Text, name or chat</string>
+    <string name="ig_unsent_search_go">Search</string>
+    <string name="ig_unsent_search_none">Nothing matches.</string>
+    <string name="ig_unsent_export_all">Export all chats as JSON</string>
     <string name="ig_dialog_unsent_export">Export as JSON</string>
     <string name="ig_dialog_unsent_exported">Saved to %1$s</string>
     <string name="ig_dialog_auto_clear_cache">Auto-clear cache when large</string>
