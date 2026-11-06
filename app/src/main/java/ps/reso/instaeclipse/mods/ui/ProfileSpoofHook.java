@@ -561,6 +561,22 @@ public final class ProfileSpoofHook {
         }
         if (strip instanceof android.view.ViewGroup g && tab != null && g.indexOfChild(tab) == 0) {
             tab.setVisibility(android.view.View.GONE);
+            for (int i = 0; i < g.getChildCount(); i++) {
+                android.view.View t = g.getChildAt(i);
+                if (t.getVisibility() == android.view.View.GONE) continue;
+                android.view.ViewGroup.LayoutParams lp = t.getLayoutParams();
+                if (lp instanceof android.widget.LinearLayout.LayoutParams ll) {
+                    ll.width = 0;
+                    ll.weight = 1f;
+                    t.setLayoutParams(ll);
+                }
+            }
+            android.view.ViewGroup.LayoutParams sp = g.getLayoutParams();
+            if (sp != null && sp.width != android.view.ViewGroup.LayoutParams.MATCH_PARENT) {
+                sp.width = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+                g.setLayoutParams(sp);
+            }
+            g.requestLayout();
         }
     }
 
