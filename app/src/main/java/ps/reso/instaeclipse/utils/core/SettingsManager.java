@@ -192,6 +192,8 @@ public class SettingsManager {
         editor.putBoolean("copyMediaLink", FeatureFlags.copyMediaLink);
         editor.putBoolean("saveInstants", FeatureFlags.saveInstants);
         editor.putBoolean("keepInstantHistory", FeatureFlags.keepInstantHistory);
+        editor.putString("pinnedStoryUsers", FeatureFlags.pinnedStoryUsers);
+        editor.putInt("pinnedStoryLimit", FeatureFlags.pinnedStoryLimit);
         editor.putBoolean("uploadInstants", FeatureFlags.uploadInstants);
         editor.putBoolean("cacheStories", FeatureFlags.cacheStories);
         editor.putBoolean("customFontEnabled", FeatureFlags.customFontEnabled);
@@ -410,6 +412,8 @@ public class SettingsManager {
         FeatureFlags.copyMediaLink            = prefs.getBoolean("copyMediaLink", false);
         FeatureFlags.saveInstants             = prefs.getBoolean("saveInstants", false);
         FeatureFlags.keepInstantHistory       = prefs.getBoolean("keepInstantHistory", false);
+        FeatureFlags.pinnedStoryUsers         = prefs.getString("pinnedStoryUsers", "");
+        FeatureFlags.pinnedStoryLimit         = prefs.getInt("pinnedStoryLimit", 30);
         FeatureFlags.uploadInstants           = prefs.getBoolean("uploadInstants", false);
         FeatureFlags.cacheStories             = prefs.getBoolean("cacheStories", false);
         FeatureFlags.customFontEnabled        = prefs.getBoolean("customFontEnabled", false);

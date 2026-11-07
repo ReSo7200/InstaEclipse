@@ -151,6 +151,8 @@ public class SettingsBackupManager {
         s.put("copyMediaLink",           FeatureFlags.copyMediaLink);
         s.put("saveInstants",            FeatureFlags.saveInstants);
         s.put("keepInstantHistory",      FeatureFlags.keepInstantHistory);
+        s.put("pinnedStoryUsers",        FeatureFlags.pinnedStoryUsers);
+        s.put("pinnedStoryLimit",        FeatureFlags.pinnedStoryLimit);
         s.put("uploadInstants",          FeatureFlags.uploadInstants);
 
         JSONObject root = new JSONObject();
@@ -319,6 +321,8 @@ public class SettingsBackupManager {
         if (s.has("copyMediaLink"))          FeatureFlags.copyMediaLink          = s.getBoolean("copyMediaLink");
         if (s.has("saveInstants"))           FeatureFlags.saveInstants           = s.getBoolean("saveInstants");
         if (s.has("keepInstantHistory"))     FeatureFlags.keepInstantHistory     = s.getBoolean("keepInstantHistory");
+        if (s.has("pinnedStoryUsers"))       FeatureFlags.pinnedStoryUsers       = s.getString("pinnedStoryUsers");
+        if (s.has("pinnedStoryLimit"))       FeatureFlags.pinnedStoryLimit       = Math.max(1, s.getInt("pinnedStoryLimit"));
         if (s.has("uploadInstants"))         FeatureFlags.uploadInstants         = s.getBoolean("uploadInstants");
     }
 

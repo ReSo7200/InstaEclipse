@@ -2546,7 +2546,8 @@ public class DialogUtils {
                 createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_instant_history_view), "#FF9F0A", v -> showInstantHistory(context)),
                 // Cache Stories (24h) — keep viewed stories locally so they survive expiry/deletion.
                 flagSwitch(context, R.drawable.ic_download, "#FF9F0A", R.string.ig_dialog_misc_cache_stories, "cacheStories"),
-                createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_story_cache_view), "#FF9F0A", v -> showCachedStories(context))));
+                createActionRow(context, R.drawable.ic_eye, I18n.t(context, R.string.ig_story_cache_view), "#FF9F0A", v -> showCachedStories(context)),
+                createActionRow(context, R.drawable.ic_download, I18n.t(context, R.string.ig_story_pinned_title), "#FF9F0A", v -> showPinnedStories(context))));
 
         // Where and how files are saved.
         String folderRaw = FeatureFlags.downloaderCustomPath.isEmpty()
@@ -2714,6 +2715,26 @@ public class DialogUtils {
                     } catch (Throwable ignored) {}
                 }));
         showSectionDialog(context, I18n.t(context, R.string.ig_instant_history_view), layout, () -> {});
+    }
+
+    private static void showPinnedStories(Context context) {
+        try {
+            IeDialog dlg = new IeDialog(context).title(I18n.t(context, R.string.ig_story_pinned_title))
+                    .message(I18n.t(context, R.string.ig_story_pinned_note));
+            android.widget.EditText users = dlg.input(I18n.t(context, R.string.ig_story_pinned_users));
+            users.setText(FeatureFlags.pinnedStoryUsers);
+            android.widget.EditText limit = dlg.input(I18n.t(context, R.string.ig_story_pinned_limit));
+            limit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+            limit.setText(String.valueOf(FeatureFlags.pinnedStoryLimit));
+            dlg.secondary(context.getString(android.R.string.cancel), null);
+            dlg.primary(I18n.t(context, R.string.ig_profile_spoofer_save), () -> {
+                FeatureFlags.pinnedStoryUsers = users.getText().toString().trim();
+                int n = parseSpoofCount(limit.getText().toString());
+                FeatureFlags.pinnedStoryLimit = n < 1 ? 30 : n;
+                SettingsManager.saveAllFlags();
+            });
+            dlg.show();
+        } catch (Throwable ignored) {}
     }
 
     /** Level 2: the cached stories for one username. */
