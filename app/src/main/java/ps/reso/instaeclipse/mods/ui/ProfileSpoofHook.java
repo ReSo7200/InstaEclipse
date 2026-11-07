@@ -464,7 +464,7 @@ public final class ProfileSpoofHook {
 
     // ---- View level: counts, username, name, bio TextView, picture ------------------------
 
-    private static int tabTitleId, followTabsId;
+    private static int tabTitleId, followTabsId, rowButtonId, rowContainerId, rowUsernameId;
     private static int followButtonId, followContextTextId, similarTitleId;
     private static final int[] hideIds = new int[4];
     private static int stackedFollowersId, stackedFollowingId, backId, profileTabId;
@@ -481,6 +481,10 @@ public final class ProfileSpoofHook {
                 if (followersId == 0) resolveIds(tv);
                 if (id != 0 && id == tabTitleId && !FeatureFlags.spoofTargetId.isEmpty() && FeatureFlags.profileSpoofer) {
                     tv.post(() -> hideMutualTab(tv));
+                    return;
+                }
+                if (id != 0 && id == rowButtonId && !FeatureFlags.spoofTargetId.isEmpty() && FeatureFlags.profileSpoofer) {
+                    tv.post(() -> messageButton(tv));
                     return;
                 }
                 boolean extra = id != 0 && (id == followButtonId || id == followContextTextId || id == similarTitleId);
@@ -522,6 +526,9 @@ public final class ProfileSpoofHook {
         stackedFollowersId = r.getIdentifier("profile_header_followers_stacked_familiar", "id", pkg);
         stackedFollowingId = r.getIdentifier("profile_header_following_stacked_familiar", "id", pkg);
         backId = r.getIdentifier("action_bar_button_back", "id", pkg);
+        rowButtonId = r.getIdentifier("follow_list_row_large_follow_button", "id", pkg);
+        rowContainerId = r.getIdentifier("follow_list_container", "id", pkg);
+        rowUsernameId = r.getIdentifier("follow_list_username", "id", pkg);
         tabTitleId = r.getIdentifier("title", "id", pkg);
         followTabsId = r.getIdentifier("unified_follow_list_tab_layout", "id", pkg);
         followButtonId = r.getIdentifier("profile_header_follow_button", "id", pkg);
@@ -545,6 +552,56 @@ public final class ProfileSpoofHook {
     }
 
     /** Your own profile is on screen: the account switcher chevron is shown. */
+    /** On the copied account's lists, a Follow button becomes Message and opens a chat with that person. */
+    private static final java.util.Map<android.widget.TextView, Object[]> MESSAGE_LOOK = new java.util.WeakHashMap<>();
+
+    private static void messageButton(android.widget.TextView button) {
+        try {
+            CharSequence now = button.getText();
+            if (now == null || !(now.toString().equalsIgnoreCase("Follow") || now.toString().equalsIgnoreCase("Follow back"))) {
+                Object[] look = MESSAGE_LOOK.remove(button);
+                if (look != null) {
+                    button.setTextColor((Integer) look[0]);
+                    button.setBackground((android.graphics.drawable.Drawable) look[1]);
+                }
+                return;
+            }
+            android.view.View root = button.getRootView();
+            android.view.View title = titleId != 0 ? root.findViewById(titleId) : null;
+            if (!(title instanceof android.widget.TextView t) || !FeatureFlags.spoofUsername.equalsIgnoreCase(t.getText().toString().trim())) return;
+            android.view.View row = button;
+            for (int i = 0; i < 6 && row != null && row.getId() != rowContainerId; i++)
+                row = row.getParent() instanceof android.view.View p ? p : null;
+            if (row == null) return;
+            android.view.View name = row.findViewById(rowUsernameId);
+            if (!(name instanceof android.widget.TextView n)) return;
+            String user = n.getText().toString().trim();
+            if (!user.matches("[A-Za-z0-9._]{1,30}")) return;
+            setText(button, "Message");
+            boolean dark = (button.getResources().getConfiguration().uiMode
+                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            MESSAGE_LOOK.putIfAbsent(button, new Object[]{button.getCurrentTextColor(), button.getBackground()});
+            Runnable gray = () -> {
+                android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+                g.setColor(dark ? 0xFF363636 : 0xFFEFEFEF);
+                g.setCornerRadius(10 * button.getResources().getDisplayMetrics().density);
+                button.setBackground(g);
+                button.setTextColor(dark ? 0xFFFFFFFF : 0xFF000000);
+            };
+            gray.run();
+            button.postDelayed(gray, 150);
+            button.setOnClickListener(v -> {
+                try {
+                    android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                            android.net.Uri.parse("https://ig.me/m/" + user));
+                    i.setPackage(v.getContext().getPackageName());
+                    i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(i);
+                } catch (Throwable ignored) { }
+            });
+        } catch (Throwable ignored) { }
+    }
+
     /** The Mutual tab of Followers and Following would show your friends: hide it on the copied profile. */
     private static void hideMutualTab(android.view.View title) {
         if (followTabsId == 0 || !listRedirectArmed()) return;
