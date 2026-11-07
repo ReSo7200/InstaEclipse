@@ -423,7 +423,7 @@ public class StoryDownloadHook {
     private void installStoryCaptureHook(DexKitBridge bridge, ClassLoader cl) {
         XC_MethodHook capture = new XC_MethodHook() {
             @Override protected void afterHookedMethod(MethodHookParam p) { ps.reso.instaeclipse.utils.core.JitGuard.tick(p.method);
-                if (!FeatureFlags.cacheStories) return;
+                if (!FeatureFlags.cacheStories && FeatureFlags.pinnedStoryUsers.isEmpty()) return;
                 Object reelItem = null;
                 for (Object a : p.args) {
                     if (a != null && a.getClass().getName().equals("com.instagram.model.reels.ReelItem")) { reelItem = a; break; }
@@ -468,6 +468,7 @@ public class StoryDownloadHook {
                     if (v instanceof Long l && l > 0) expiring = l < 100000000000L ? l * 1000L : l; // sec→ms
                 } catch (Throwable ignored) {}
             }
+            if (!FeatureFlags.cacheStories && !ps.reso.instaeclipse.utils.media.StoryCache.isPinned(author)) return;
             final String fid = id, fauthor = author; final long fexp = expiring;
             FeedVideoDownloadHook.executor.submit(() ->
                     ps.reso.instaeclipse.utils.media.StoryCache.capture(fid, fauthor, url, video, fexp));

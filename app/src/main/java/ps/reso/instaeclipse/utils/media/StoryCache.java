@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.log.ModuleLog;
 
 /**
@@ -103,12 +104,25 @@ public class StoryCache {
         for (java.util.Iterator<Entry> it = cache.iterator(); it.hasNext(); ) {
             Entry e = it.next();
             File mf = new File(e.path);
-            if (now - e.at > TTL_MS || !mf.exists()) {
+            if ((now - e.at > TTL_MS && !isPinned(e.author)) || !mf.exists()) {
                 //noinspection ResultOfMethodCallIgnored
                 mf.delete();
                 it.remove();
             } else {
                 total += mf.length();
+            }
+        }
+        java.util.Map<String, Integer> kept = new java.util.HashMap<>();
+        for (int i = cache.size() - 1; i >= 0; i--) {
+            Entry e = cache.get(i);
+            if (!isPinned(e.author)) continue;
+            int n = kept.merge(e.author.toLowerCase(java.util.Locale.ROOT), 1, Integer::sum);
+            if (n > Math.max(1, FeatureFlags.pinnedStoryLimit)) {
+                File mf = new File(e.path);
+                total -= mf.length();
+                //noinspection ResultOfMethodCallIgnored
+                mf.delete();
+                cache.remove(i);
             }
         }
         // Size cap: cache is append-ordered (oldest first), so evict from the front.
@@ -120,6 +134,13 @@ public class StoryCache {
             mf.delete();
             it.remove();
         }
+    }
+
+    public static boolean isPinned(String author) {
+        if (author == null || author.isEmpty()) return false;
+        for (String u : FeatureFlags.pinnedStoryUsers.toLowerCase(java.util.Locale.ROOT).split("[,\\s@]+"))
+            if (!u.isEmpty() && u.equals(author.toLowerCase(java.util.Locale.ROOT))) return true;
+        return false;
     }
 
     public static synchronized boolean has(String id) {

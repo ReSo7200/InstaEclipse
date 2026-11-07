@@ -201,6 +201,8 @@ public class FeatureFlags {
     public static volatile boolean downloaderAddTimestamp = false;
     public static volatile boolean copyMediaLink = false;      // #117 — inject "Copy Media Link" (direct CDN url) into the post ⋮ menu
     public static volatile boolean keepInstantHistory = false;
+    public static volatile String  pinnedStoryUsers = "";
+    public static volatile int     pinnedStoryLimit = 30;
     public static volatile boolean saveInstants = false;        // #184 — long-press a received Instant (quicksnap) to save it
     public static volatile boolean uploadInstants = false;      // #199 — send an Instant from gallery (bitmap-swap into quicksnap send)
     public static volatile boolean cacheStories = false;        // cache viewed stories locally for 24h (survive expiry/deletion)
