@@ -1858,6 +1858,7 @@ public class DialogUtils {
     }
 
     private static void saveProfileSpoof(ProfileSpoofEditor.Values v) {
+        boolean copyRemoved = !FeatureFlags.spoofTargetId.isEmpty() && v.targetId.isEmpty();
         FeatureFlags.spoofUsername = v.username;
         FeatureFlags.spoofName = v.name;
         FeatureFlags.spoofBio = v.bio;
@@ -1869,6 +1870,30 @@ public class DialogUtils {
         FeatureFlags.spoofVerified = v.verified;
         SettingsManager.saveAllFlags();
         ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.refreshNow();
+        if (copyRemoved) askRestartAfterCopy(UIHookManager.getCurrentActivity());
+    }
+
+    private static void askRestartAfterCopy(Context context) {
+        if (context == null) return;
+        try {
+            IeDialog dlg = new IeDialog(context)
+                    .title(I18n.t(context, R.string.ig_profile_spoofer_editor_title))
+                    .message(I18n.t(context, R.string.ig_profile_spoofer_restart));
+            dlg.secondary(I18n.t(context, R.string.ig_profile_spoofer_restart_later), null);
+            dlg.primary(I18n.t(context, R.string.ig_dialog_restart_now), () -> {
+                Context app = context.getApplicationContext();
+                Intent launch = app.getPackageManager().getLaunchIntentForPackage(app.getPackageName());
+                if (launch != null) {
+                    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    android.app.PendingIntent pi = android.app.PendingIntent.getActivity(app, 0x1EB, launch,
+                            android.app.PendingIntent.FLAG_IMMUTABLE | android.app.PendingIntent.FLAG_CANCEL_CURRENT);
+                    android.app.AlarmManager am = (android.app.AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+                    if (am != null) am.set(android.app.AlarmManager.RTC, System.currentTimeMillis() + 400, pi);
+                }
+                android.os.Process.killProcess(android.os.Process.myPid());
+            });
+            dlg.show();
+        } catch (Throwable ignored) {}
     }
 
     /** A typed count, or -1 (keep the real one) when empty or not a number. */

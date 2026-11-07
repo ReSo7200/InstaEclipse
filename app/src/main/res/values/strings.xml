@@ -560,6 +560,9 @@
     <string name="ig_profile_spoofer_use_profile">Use as spoofed profile</string>
     <string name="ig_profile_spoofer_copied">Profile copied into the spoofer</string>
     <string name="ig_profile_spoofer_copy_missing">Could not read this profile yet. Wait for it to load and try again.</string>
+    <string name="ig_profile_spoofer_restart">Instagram keeps the copied profile in memory until it restarts. Restart it now to show your own profile again?</string>
+    <string name="ig_profile_spoofer_restart_later">Later</string>
+    <string name="ig_profile_spoofer_restart_toast">Restart Instagram to show your own profile again.</string>
     <string name="ig_profile_spoofer_section_picture">Picture</string>
     <string name="ig_profile_spoofer_username">Username</string>
     <string name="ig_profile_spoofer_name">Name</string>

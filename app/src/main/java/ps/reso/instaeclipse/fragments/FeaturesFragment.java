@@ -1721,7 +1721,12 @@ public class FeaturesFragment extends Fragment {
         if (!now.name.equals(old.name)) putStringPref("spoofName", now.name);
         if (!now.bio.equals(old.bio)) putStringPref("spoofBio", now.bio);
         if (!now.avatar.equals(old.avatar)) putStringPref("spoofAvatar", now.avatar);
-        if (!now.targetId.equals(old.targetId)) putStringPref("spoofTargetId", now.targetId);
+        if (!now.targetId.equals(old.targetId)) {
+            putStringPref("spoofTargetId", now.targetId);
+            if (now.targetId.isEmpty())
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(),
+                        getString(R.string.ig_profile_spoofer_restart_toast), Toast.LENGTH_LONG).show();
+        }
         if (now.posts != old.posts) putIntPref("spoofPosts", now.posts);
         if (now.followers != old.followers) putIntPref("spoofFollowers", now.followers);
         if (now.following != old.following) putIntPref("spoofFollowing", now.following);
