@@ -188,6 +188,7 @@ public final class ProfileSpoofHook {
             }
             XC_MethodHook hook = new XC_MethodHook() {
                 @Override protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
+                    if (which == 0) ps.reso.instaeclipse.mods.misc.FollowersAlert.observe(param.thisObject, param.getResult());
                     if (!FeatureFlags.profileSpoofer) return;
                     Object value = spoofed(which, ((Method) param.method).getReturnType());
                     if (value != null && isSelf(param.thisObject)) param.setResult(value);
