@@ -240,7 +240,10 @@ public final class ProfileSpoofHook {
                 if (!FeatureFlags.profileSpoofer || FeatureFlags.spoofTargetId.isEmpty()) return;
                 android.view.View v = (android.view.View) param.thisObject;
                 if (followersId == 0) resolveIds(v);
-                if (profileTabId > 0 && v.getId() == profileTabId) infoUntil = System.currentTimeMillis() + 30_000;
+                if (profileTabId > 0 && v.getId() == profileTabId) {
+                    infoUntil = System.currentTimeMillis() + 30_000;
+                    if (!FeatureFlags.spoofTargetId.isEmpty()) pullTwice(v);
+                }
                 else if (infoRedirectArmed() || ownProfileShown(v)) infoUntil = System.currentTimeMillis() + 30_000;
                 if (followersId <= 0 || !isCountView(v)) return;
                 if (ownProfileShown(v)) redirectUntil = System.currentTimeMillis() + 60_000;
@@ -307,6 +310,30 @@ public final class ProfileSpoofHook {
     }
 
     /** The tapped view is a count or sits next to one inside the same header cell. */
+    /** The first load can still show your own data: pull to refresh twice once the profile is open. */
+    private static void pullTwice(android.view.View tab) {
+        android.view.View decor = tab.getRootView();
+        android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+        for (long delay : new long[]{1500, 4500}) {
+            h.postDelayed(() -> {
+                try {
+                    if (!FeatureFlags.profileSpoofer || FeatureFlags.spoofTargetId.isEmpty() || !ownProfileShown(decor)) return;
+                    int w = decor.getWidth(), top = Math.round(decor.getHeight() * 0.30f);
+                    long t0 = android.os.SystemClock.uptimeMillis();
+                    int steps = 12;
+                    for (int i = 0; i <= steps + 1; i++) {
+                        int action = i == 0 ? android.view.MotionEvent.ACTION_DOWN
+                                : i == steps + 1 ? android.view.MotionEvent.ACTION_UP : android.view.MotionEvent.ACTION_MOVE;
+                        float y = top + (decor.getHeight() * 0.35f) * Math.min(i, steps) / steps;
+                        android.view.MotionEvent e = android.view.MotionEvent.obtain(t0, t0 + i * 16L, action, w / 2f, y, 0);
+                        e.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
+                        try { decor.dispatchTouchEvent(e); } finally { e.recycle(); }
+                    }
+                } catch (Throwable ignored) { }
+            }, delay);
+        }
+    }
+
     private static boolean isCountView(android.view.View v) {
         android.view.View node = v;
         for (int i = 0; i < 2 && node != null; i++) {
@@ -464,6 +491,7 @@ public final class ProfileSpoofHook {
 
     // ---- View level: counts, username, name, bio TextView, picture ------------------------
 
+    private static int followPagerId;
     private static int tabTitleId, followTabsId, rowButtonId, rowContainerId, rowUsernameId;
     private static int followButtonId, followContextTextId, similarTitleId;
     private static final int[] hideIds = new int[4];
@@ -529,6 +557,7 @@ public final class ProfileSpoofHook {
         rowButtonId = r.getIdentifier("follow_list_row_large_follow_button", "id", pkg);
         rowContainerId = r.getIdentifier("follow_list_container", "id", pkg);
         rowUsernameId = r.getIdentifier("follow_list_username", "id", pkg);
+        followPagerId = r.getIdentifier("unified_follow_list_view_pager", "id", pkg);
         tabTitleId = r.getIdentifier("title", "id", pkg);
         followTabsId = r.getIdentifier("unified_follow_list_tab_layout", "id", pkg);
         followButtonId = r.getIdentifier("profile_header_follow_button", "id", pkg);
@@ -617,7 +646,7 @@ public final class ProfileSpoofHook {
             tab = node;
             node = pv;
         }
-        if (strip instanceof android.view.ViewGroup g && tab != null && g.indexOfChild(tab) == 0) {
+        if (strip instanceof android.view.ViewGroup g && tab != null && g.getChildCount() >= 3 && g.indexOfChild(tab) == 0) {
             tab.setVisibility(android.view.View.GONE);
             for (int i = 0; i < g.getChildCount(); i++) {
                 android.view.View t = g.getChildAt(i);
@@ -635,6 +664,36 @@ public final class ProfileSpoofHook {
                 g.setLayoutParams(sp);
             }
             g.requestLayout();
+            lockMutualPage(title.getRootView());
+        }
+    }
+
+    private static final java.util.Set<android.view.View> LOCKED_PAGERS =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    /** The pager still holds the Mutual page: whenever it lands there, move it back to Followers. */
+    private static void lockMutualPage(android.view.View root) {
+        try {
+            android.view.View pager = followPagerId != 0 ? root.findViewById(followPagerId) : null;
+            if (pager == null || !LOCKED_PAGERS.add(pager)) return;
+            java.lang.reflect.Method getItem = pager.getClass().getMethod("getCurrentItem");
+            java.lang.reflect.Method setItem = pager.getClass().getMethod("setCurrentItem", int.class);
+            android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
+            Runnable watch = new Runnable() {
+                @Override public void run() {
+                    try {
+                        if (!pager.isAttachedToWindow() || !FeatureFlags.profileSpoofer || FeatureFlags.spoofTargetId.isEmpty()) {
+                            LOCKED_PAGERS.remove(pager);
+                            return;
+                        }
+                        if ((Integer) getItem.invoke(pager) == 0) setItem.invoke(pager, 1);
+                    } catch (Throwable ignored) { }
+                    h.postDelayed(this, 60);
+                }
+            };
+            h.post(watch);
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "mutual page lock failed: " + t);
         }
     }
 
