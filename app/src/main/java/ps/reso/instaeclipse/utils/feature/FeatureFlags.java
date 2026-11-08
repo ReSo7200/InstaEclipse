@@ -152,6 +152,7 @@ public class FeatureFlags {
     public static volatile boolean spoofVerified = false;  // show the verified badge on your own profile
     public static volatile String  spoofName = "";         // own profile header name, "" = unchanged
     public static volatile String  spoofUsername = "";     // own profile action bar username, "" = unchanged
+    public static volatile boolean spoofPrivate = false;   // the copied account is private
     public static volatile String  spoofTargetId = "";    // user id of the profile copied into the spoofer, "" = none
     public static volatile String  spoofBio = "";          // own profile bio, "" = unchanged
     public static volatile String  spoofAvatar = "";       // own profile picture: Base64 JPEG (max 320x320), "" = unchanged
