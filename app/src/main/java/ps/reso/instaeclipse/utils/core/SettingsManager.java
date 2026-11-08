@@ -161,6 +161,7 @@ public class SettingsManager {
         editor.putString("spoofUsername", FeatureFlags.spoofUsername);
         editor.putString("spoofBio", FeatureFlags.spoofBio);
         editor.putString("spoofTargetId", FeatureFlags.spoofTargetId);
+        editor.putBoolean("spoofPrivate", FeatureFlags.spoofPrivate);
         editor.putString("spoofAvatar", FeatureFlags.spoofAvatar);
         editor.putBoolean("profileAnalyzer", FeatureFlags.profileAnalyzer);
         editor.putBoolean("profileFollowsYouLabel", FeatureFlags.profileFollowsYouLabel);
@@ -381,6 +382,7 @@ public class SettingsManager {
         FeatureFlags.spoofUsername = prefs.getString("spoofUsername", "");
         FeatureFlags.spoofBio = prefs.getString("spoofBio", "");
         FeatureFlags.spoofTargetId = prefs.getString("spoofTargetId", "");
+        FeatureFlags.spoofPrivate = prefs.getBoolean("spoofPrivate", false);
         FeatureFlags.spoofAvatar = prefs.getString("spoofAvatar", "");
         FeatureFlags.profileAnalyzer = prefs.getBoolean("profileAnalyzer", false);
         FeatureFlags.profileFollowsYouLabel = prefs.getBoolean("profileFollowsYouLabel", false);

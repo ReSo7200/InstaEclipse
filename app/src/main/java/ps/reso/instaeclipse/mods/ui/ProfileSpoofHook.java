@@ -67,15 +67,18 @@ public final class ProfileSpoofHook {
     private static volatile boolean idFieldSearched;
 
     public void install(DexKitBridge bridge, ClassLoader cl) {
+        infoUntil = System.currentTimeMillis() + 30_000;
         int hooked = 0;
         StringBuilder log = new StringBuilder();
         hooked += hook(bridge, cl, "follower_count", "ProfileSpoofFollowers", log, new String[]{"java.lang.Integer", "int", "java.lang.Long", "long"}, 0);
         hooked += hook(bridge, cl, "following_count", "ProfileSpoofFollowing", log, new String[]{"java.lang.Integer", "int", "java.lang.Long", "long"}, 1);
         hooked += hook(bridge, cl, "media_count", "ProfileSpoofPosts", log, new String[]{"java.lang.Integer", "int", "java.lang.Long", "long"}, 2);
         hooked += hook(bridge, cl, "is_verified", "ProfileSpoofVerified", log, new String[]{"java.lang.Boolean", "boolean"}, 3);
+        hook(bridge, cl, "is_private", "ProfileSpoofPrivate", log, new String[]{"java.lang.Boolean", "boolean"}, 4);
         boolean session = trackAccount(cl);
         hookHeaderViews();
         hookCountTaps();
+        hookFollowChevron();
         hookListArguments(cl);
         hookAvatarView();
         hookBioState(bridge, cl, log);
@@ -210,13 +213,14 @@ public final class ProfileSpoofHook {
 
     /** The value to show for getter {@code which}, boxed to {@code type}; null = leave it alone. */
     private static Object spoofed(int which, Class<?> type) {
+        if (which == 4) return null;
         if (which == 3) return FeatureFlags.spoofVerified ? Boolean.TRUE : null;
         int v = which == 0 ? FeatureFlags.spoofFollowers : which == 1 ? FeatureFlags.spoofFollowing : FeatureFlags.spoofPosts;
         if (v < 0) return null;
         return type == long.class || type == Long.class ? (Object) (long) v : (Object) v;
     }
 
-    private static final Method[] getters = new Method[4];
+    private static final Method[] getters = new Method[5];
     private static volatile long redirectUntil;
     private static volatile long infoUntil;
 
@@ -403,6 +407,8 @@ public final class ProfileSpoofHook {
             FeatureFlags.spoofFollowers = followers;
             FeatureFlags.spoofFollowing = following;
             FeatureFlags.spoofVerified = Boolean.TRUE.equals(verified);
+            Boolean priv = getters[4] != null ? (Boolean) getters[4].invoke(user) : null;
+            FeatureFlags.spoofPrivate = Boolean.TRUE.equals(priv);
             FeatureFlags.profileSpoofer = true;
             ps.reso.instaeclipse.utils.core.SettingsManager.saveAllFlags();
             refreshNow();
@@ -491,7 +497,7 @@ public final class ProfileSpoofHook {
 
     // ---- View level: counts, username, name, bio TextView, picture ------------------------
 
-    private static int followPagerId;
+    private static int followPagerId, buttonContainerId, followWrapId;
     private static int tabTitleId, followTabsId, rowButtonId, rowContainerId, rowUsernameId;
     private static int followButtonId, followContextTextId, similarTitleId;
     private static final int[] hideIds = new int[4];
@@ -558,6 +564,8 @@ public final class ProfileSpoofHook {
         rowContainerId = r.getIdentifier("follow_list_container", "id", pkg);
         rowUsernameId = r.getIdentifier("follow_list_username", "id", pkg);
         followPagerId = r.getIdentifier("unified_follow_list_view_pager", "id", pkg);
+        buttonContainerId = r.getIdentifier("button_container", "id", pkg);
+        followWrapId = r.getIdentifier("profile_header_user_action_follow_button", "id", pkg);
         tabTitleId = r.getIdentifier("title", "id", pkg);
         followTabsId = r.getIdentifier("unified_follow_list_tab_layout", "id", pkg);
         followButtonId = r.getIdentifier("profile_header_follow_button", "id", pkg);
@@ -631,6 +639,239 @@ public final class ProfileSpoofHook {
         } catch (Throwable ignored) { }
     }
 
+    /** Instagram puts a chevron drawable on the Follow button after binding: keep it off our Edit profile button. */
+    private static void hookFollowChevron() {
+        XC_MethodHook hook = new XC_MethodHook() {
+            @Override protected void afterHookedMethod(MethodHookParam param) {
+                android.widget.TextView tv = (android.widget.TextView) param.thisObject;
+                if (followButtonId == 0 || tv.getId() != followButtonId || SETTING.get() == Boolean.TRUE
+                        || !FeatureFlags.profileSpoofer || FeatureFlags.spoofTargetId.isEmpty()
+                        || !"Edit profile".contentEquals(tv.getText())) return;
+                tv.post(() -> {
+                    SETTING.set(Boolean.TRUE);
+                    try { tv.setCompoundDrawablesRelative(null, null, null, null); } finally { SETTING.remove(); }
+                });
+            }
+        };
+        for (String name : new String[]{"setCompoundDrawablesRelative", "setCompoundDrawablesRelativeWithIntrinsicBounds",
+                "setCompoundDrawables", "setCompoundDrawablesWithIntrinsicBounds"})
+            XposedBridge.hookAllMethods(android.widget.TextView.class, name, hook);
+    }
+
+    /** Your own profile has Edit profile and Share profile there: make the copied profile's two buttons match. */
+    /** FollowButton draws its chevron itself: clear whatever drawable or image it keeps. */
+    private static void dropChevron(android.widget.TextView f) {
+        for (Class<?> c = f.getClass(); c != null && c != android.widget.TextView.class; c = c.getSuperclass()) {
+            for (java.lang.reflect.Field fl : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
+                if (Modifier.isStatic(fl.getModifiers())) continue;
+                try {
+                    fl.setAccessible(true);
+                    Object v = fl.get(f);
+                    if (v instanceof android.graphics.drawable.Drawable && !(v instanceof android.graphics.drawable.GradientDrawable)
+                            && f.getBackground() != v) fl.set(f, null);
+                } catch (Throwable ignored) { }
+            }
+        }
+        f.invalidate();
+    }
+
+    private static final String PLUS_TAG = "ie_top_plus", THREADS_TAG = "ie_top_threads", AVATAR_PLUS_TAG = "ie_avatar_plus";
+
+    /** Your own profile's top bar has a plus, Threads and a menu icon: give the copied profile the same. */
+    private static void restyleTopBar(android.view.View root, int color) {
+        try {
+            android.content.res.Resources r = root.getResources();
+            String pkg = root.getContext().getPackageName();
+            @android.annotation.SuppressLint("DiscouragedApi")
+            int barId = r.getIdentifier("action_bar_layout", "id", pkg);
+            @android.annotation.SuppressLint("DiscouragedApi")
+            int rightId = r.getIdentifier("right_action_bar_buttons", "id", pkg);
+            @android.annotation.SuppressLint("DiscouragedApi")
+            int leftId = r.getIdentifier("left_action_bar_buttons", "id", pkg);
+            android.view.View barView = barId != 0 ? root.findViewById(barId) : null;
+            android.view.View rightView = rightId != 0 ? root.findViewById(rightId) : null;
+            if (!(barView instanceof android.widget.LinearLayout bar) || !(rightView instanceof android.view.ViewGroup right)) return;
+            float d = r.getDisplayMetrics().density;
+            android.content.Context ctx = root.getContext();
+            android.view.View left = leftId != 0 ? root.findViewById(leftId) : null;
+            if (left == null || !(left instanceof android.view.ViewGroup lg) || lg.getChildCount() == 0) {
+                if (bar.findViewWithTag(PLUS_TAG) == null) {
+                    android.widget.ImageView plus = icon(ctx, ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(ps.reso.instaeclipse.R.drawable.ie_top_plus, color), PLUS_TAG);
+                    plus.setOnClickListener(v -> openLink(v.getContext(), "instagram://camera", false));
+                    bar.addView(plus, 0, new android.widget.LinearLayout.LayoutParams(Math.round(48 * d), android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+                }
+            }
+            android.view.View options = null;
+            for (int i = 0; i < right.getChildCount(); i++) {
+                android.view.View c = right.getChildAt(i);
+                if (c instanceof android.widget.ImageView && c.getTag() == null && "Options".contentEquals(String.valueOf(c.getContentDescription()))) options = c;
+            }
+            if (options instanceof android.widget.ImageView o) {
+                o.setImageDrawable(ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(ps.reso.instaeclipse.R.drawable.ie_top_menu, color));
+                o.setOnClickListener(v -> openLink(v.getContext(), "instagram://settings", false));
+                o.setOnLongClickListener(v -> true);
+            }
+            if (right.findViewWithTag(THREADS_TAG) == null && options != null) {
+                android.widget.ImageView threads = icon(ctx, ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(ps.reso.instaeclipse.R.drawable.ie_top_threads, color), THREADS_TAG);
+                threads.setOnClickListener(v -> {
+                    try {
+                        android.content.Intent i = v.getContext().getPackageManager().getLaunchIntentForPackage("com.instagram.barcelona");
+                        if (i != null) v.getContext().startActivity(i);
+                    } catch (Throwable ignored) { }
+                });
+                right.addView(threads, right.indexOfChild(options), new android.widget.LinearLayout.LayoutParams(options.getWidth() > 0 ? options.getWidth() : Math.round(48 * d), android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+            }
+            android.view.View titleView = titleId != 0 ? root.findViewById(titleId) : null;
+            if (titleView instanceof android.widget.TextView tt && FeatureFlags.spoofPrivate) {
+                android.graphics.drawable.Drawable lock = ps.reso.instaeclipse.utils.dialog.DialogUtils.moduleIcon(ps.reso.instaeclipse.R.drawable.ie_top_lock, color);
+                if (lock != null) {
+                    lock.setBounds(0, 0, Math.round(12 * d), Math.round(16 * d));
+                    tt.setCompoundDrawablesRelative(lock, null, null, null);
+                    tt.setCompoundDrawablePadding(Math.round(6 * d));
+                }
+            }
+            avatarPlus(root, d);
+            noteBubble(root, d, color);
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "top bar: " + t);
+        }
+    }
+
+    private static final java.util.Set<android.view.View> BUBBLE_ROWS =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+    private static final String BUBBLE_TAG = "ie_note_bubble";
+
+    /** The note bubble that sits over your picture when you have no note. */
+    private static void noteBubble(android.view.View root, float d, int textColor) {
+        if (avatarId == 0) return;
+        android.view.View av = root.findViewById(avatarId);
+        @android.annotation.SuppressLint("DiscouragedApi")
+        int rowId = root.getResources().getIdentifier("row_profile_header", "id", root.getContext().getPackageName());
+        android.view.View rowView = rowId != 0 ? root.findViewById(rowId) : null;
+        if (av == null || !(rowView instanceof android.view.ViewGroup row) || row.findViewWithTag(BUBBLE_TAG) != null) return;
+        if (BUBBLE_ROWS.add(row))
+            row.setPadding(row.getPaddingLeft(), row.getPaddingTop() + Math.round(34 * d), row.getPaddingRight(), row.getPaddingBottom());
+        boolean dark = (root.getResources().getConfiguration().uiMode
+                & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        android.widget.TextView bubble = new android.widget.TextView(
+                new android.view.ContextThemeWrapper(root.getContext(), android.R.style.Theme_DeviceDefault));
+        bubble.setTag(BUBBLE_TAG);
+        bubble.setId(android.view.View.generateViewId());
+        bubble.setText("Today's vibe...");
+        bubble.setTextSize(13);
+        bubble.setGravity(android.view.Gravity.CENTER);
+        bubble.setTextColor(dark ? 0xFFA8A8A8 : 0xFF737373);
+        bubble.setPadding(Math.round(14 * d), Math.round(8 * d), Math.round(14 * d), Math.round(8 * d));
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(dark ? 0xFF2C3036 : 0xFFEFEFEF);
+        bg.setCornerRadius(18 * d);
+        bubble.setBackground(bg);
+        bubble.setMaxWidth(Math.round(84 * d));
+        bubble.setMinWidth(Math.round(84 * d));
+        android.view.ViewGroup.MarginLayoutParams lp = new android.view.ViewGroup.MarginLayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.leftMargin = Math.round(18 * d);
+        lp.topMargin = Math.round(6 * d);
+        row.setClipChildren(false);
+        row.addView(bubble, lp);
+        bubble.setTranslationY(-34 * d);
+    }
+
+    private static android.widget.ImageView icon(android.content.Context ctx, android.graphics.drawable.Drawable d, String tag) {
+        android.widget.ImageView v = new android.widget.ImageView(ctx);
+        v.setTag(tag);
+        v.setImageDrawable(d);
+        v.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        return v;
+    }
+
+    /** The small plus on your own picture. */
+    private static void avatarPlus(android.view.View root, float d) {
+        if (avatarId == 0) return;
+        android.view.View av = root.findViewById(avatarId);
+        if (av == null || !(av.getParent() instanceof android.widget.FrameLayout frame) || frame.findViewWithTag(AVATAR_PLUS_TAG) != null) return;
+        android.widget.ImageView badge = icon(root.getContext(), new ps.reso.instaeclipse.utils.profile.ProfileIcons.PlusBadge(), AVATAR_PLUS_TAG);
+        int size = Math.round(20 * d);
+        android.widget.FrameLayout.LayoutParams lp = new android.widget.FrameLayout.LayoutParams(size, size,
+                android.view.Gravity.BOTTOM | android.view.Gravity.END);
+        frame.addView(badge, lp);
+        badge.setOnClickListener(v -> openLink(v.getContext(), "instagram://camera", false));
+    }
+
+    private static void restyleActions(android.view.View root) {
+        try {
+            if (hideIds[0] == 0 || !ownProfileShown(root)) return;
+            android.view.View row = root.findViewById(hideIds[0]);
+            if (row == null) return;
+            boolean dark = (root.getResources().getConfiguration().uiMode
+                    & android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+            int text = dark ? 0xFFFFFFFF : 0xFF000000;
+            android.view.View follow = row.findViewById(followButtonId);
+            if (follow instanceof android.widget.TextView f) {
+                setText(f, "Edit profile");
+                f.setCompoundDrawablesRelative(null, null, null, null);
+                android.view.View share = buttonContainerId != 0 ? row.findViewById(buttonContainerId) : null;
+                int color = text;
+                android.graphics.drawable.Drawable look = null;
+                if (share != null) {
+                    if (share.getBackground() != null && share.getBackground().getConstantState() != null)
+                        look = share.getBackground().getConstantState().newDrawable().mutate();
+                    if (share instanceof android.view.ViewGroup sg)
+                        for (int i = 0; i < sg.getChildCount(); i++)
+                            if (sg.getChildAt(i) instanceof android.widget.TextView st) color = st.getCurrentTextColor();
+                }
+                if (look == null) {
+                    android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable();
+                    g.setColor(dark ? 0xFF2C3036 : 0xFFEFEFEF);
+                    g.setCornerRadius(10 * f.getResources().getDisplayMetrics().density);
+                    look = g;
+                }
+                f.setTextColor(color);
+                f.setBackground(look);
+                f.setGravity(android.view.Gravity.CENTER);
+                f.setPadding(46, f.getPaddingTop(), 0, f.getPaddingBottom());
+                f.setCompoundDrawablePadding(0);
+                dropChevron(f);
+                android.view.View.OnClickListener edit = v -> openLink(v.getContext(), "instagram://editprofile", false);
+                f.setOnClickListener(edit);
+                android.view.View wrap = followWrapId != 0 ? row.findViewById(followWrapId) : null;
+                if (wrap != null) {
+                    wrap.setOnClickListener(edit);
+                    java.util.ArrayDeque<android.view.View> st = new java.util.ArrayDeque<>();
+                    st.push(wrap);
+                    while (!st.isEmpty()) {
+                        android.view.View x = st.pop();
+                        if (x instanceof android.widget.ImageView) x.setVisibility(android.view.View.GONE);
+                        else if (x instanceof android.view.ViewGroup vg) for (int i = 0; i < vg.getChildCount(); i++) st.push(vg.getChildAt(i));
+                    }
+                }
+            }
+            android.view.View message = buttonContainerId != 0 ? row.findViewById(buttonContainerId) : null;
+            if (message instanceof android.view.ViewGroup mg) {
+                for (int i = 0; i < mg.getChildCount(); i++)
+                    if (mg.getChildAt(i) instanceof android.widget.TextView t) setText(t, "Share profile");
+                message.setOnClickListener(v -> {
+                    String link = "https://www.instagram.com/" + FeatureFlags.spoofUsername + "/";
+                    android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                    send.setType("text/plain");
+                    send.putExtra(android.content.Intent.EXTRA_TEXT, link);
+                    android.content.Intent chooser = android.content.Intent.createChooser(send, null);
+                    chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                    try { v.getContext().startActivity(chooser); } catch (Throwable ignored) { }
+                });
+            }
+        } catch (Throwable ignored) { }
+    }
+
+    private static void openLink(android.content.Context c, String url, boolean external) {
+        try {
+            android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url));
+            i.setPackage(c.getPackageName());
+            i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            c.startActivity(i);
+        } catch (Throwable ignored) { }
+    }
+
     /** The Mutual tab of Followers and Following would show your friends: hide it on the copied profile. */
     private static void hideMutualTab(android.view.View title) {
         if (followTabsId == 0 || !listRedirectArmed()) return;
@@ -700,7 +941,7 @@ public final class ProfileSpoofHook {
     /** The copied account's profile is a normal profile: hide what makes it look like someone else's. */
     private static void hideCopiedExtras(android.view.View root) {
         for (int hid : hideIds) {
-            if (hid == 0) continue;
+            if (hid == 0 || hid == hideIds[0] || hid == hideIds[1]) continue;
             android.view.View x = root.findViewById(hid);
             if (x != null && x.getVisibility() != android.view.View.GONE) x.setVisibility(android.view.View.GONE);
         }
@@ -767,7 +1008,11 @@ public final class ProfileSpoofHook {
             if (!tv.isAttachedToWindow() || !tv.isShown() || !ownProfileShown(tv)) return;
             int id = tv.getId();
             if (id != 0 && (id == followButtonId || id == followContextTextId || id == similarTitleId)) {
-                if (!FeatureFlags.spoofTargetId.isEmpty()) hideCopiedExtras(tv.getRootView());
+                if (!FeatureFlags.spoofTargetId.isEmpty()) {
+                    hideCopiedExtras(tv.getRootView());
+                    restyleActions(tv.getRootView());
+                    tv.postDelayed(() -> restyleActions(tv.getRootView()), 200);
+                }
                 return;
             }
             if (id == titleId) {
@@ -786,6 +1031,10 @@ public final class ProfileSpoofHook {
                     }
                 }
                 badge(tv, FeatureFlags.spoofVerified && FeatureFlags.spoofTargetId.isEmpty());
+                if (!FeatureFlags.spoofTargetId.isEmpty()) {
+                    restyleTopBar(tv.getRootView(), tv.getCurrentTextColor());
+                    tv.postDelayed(() -> restyleTopBar(tv.getRootView(), tv.getCurrentTextColor()), 400);
+                }
                 // The header may have bound before your profile was on screen: catch up.
                 applyHeader(tv.getRootView());
                 return;
