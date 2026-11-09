@@ -321,6 +321,8 @@ public class IGNetworkInterceptor {
                         if (body == null) continue;
                         String text = new String(body, java.nio.charset.StandardCharsets.ISO_8859_1);
                         if (!text.contains(self)) continue;
+                        // Reads only: a mutation (anything that changes something) always goes out as sent.
+                        if (text.toLowerCase(java.util.Locale.ROOT).contains("mutation")) continue;
                         bf.set(holder, text.replace(self, target).getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
                         ModuleLog.line("(IE|ProfileSpoof) read redirected: graphql body");
                     }
