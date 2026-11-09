@@ -23,7 +23,8 @@ public class InstantHistory {
 
     private static final String INDEX = "ie_instant_history.json";
     private static final String DIR = "ie_instants";
-    private static final long MAX_BYTES = 4L * 1024 * 1024 * 1024;
+    // Kept until cleared, but never more than this: the oldest Instants go first (same cap as Cache Stories).
+    private static final long MAX_BYTES = 500L * 1024 * 1024;
 
     private static final List<StoryCache.Entry> cache = new ArrayList<>();
     private static boolean loaded = false;
@@ -75,7 +76,7 @@ public class InstantHistory {
         } catch (Throwable t) { ModuleLog.line("(IE|InstantHistory) save failed: " + t); }
     }
 
-    /** Drops entries older than 24h, then oldest-first while over the size cap; deletes their files. */
+    /** Drops entries whose file is gone, then the oldest while over the size cap; deletes their files. */
     private static synchronized void prune() {
         long total = 0;
         for (java.util.Iterator<StoryCache.Entry> it = cache.iterator(); it.hasNext(); ) {
@@ -108,7 +109,7 @@ public class InstantHistory {
     }
 
     /**
-     * Captures a story: downloads its media to the private cache dir and indexes it. Runs the
+     * Captures an Instant: downloads its media to the private files dir and indexes it. Runs the
      * network I/O on the caller's thread — call from a background executor. No-op if already cached.
      */
     public static void capture(String id, String author, String url, boolean video, long expiringAt) {
@@ -149,7 +150,7 @@ public class InstantHistory {
         } finally { if (c != null) c.disconnect(); }
     }
 
-    /** Snapshot of cached stories, newest first, for the viewer. */
+    /** Snapshot of kept Instants, newest first, for the viewer. */
     public static synchronized List<StoryCache.Entry> entries() {
         ensureLoaded();
         List<StoryCache.Entry> copy = new ArrayList<>(cache);
