@@ -1881,16 +1881,14 @@ public class DialogUtils {
                     .message(I18n.t(context, R.string.ig_profile_spoofer_restart));
             dlg.secondary(I18n.t(context, R.string.ig_profile_spoofer_restart_later), null);
             dlg.primary(I18n.t(context, R.string.ig_dialog_restart_now), () -> {
-                Context app = context.getApplicationContext();
-                Intent launch = app.getPackageManager().getLaunchIntentForPackage(app.getPackageName());
+                // Start the new task from the screen in front, then exit: a delayed alarm launch is
+                // blocked from the background on Android 10+, which left Instagram closed.
+                Intent launch = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
                 if (launch != null) {
                     launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    android.app.PendingIntent pi = android.app.PendingIntent.getActivity(app, 0x1EB, launch,
-                            android.app.PendingIntent.FLAG_IMMUTABLE | android.app.PendingIntent.FLAG_CANCEL_CURRENT);
-                    android.app.AlarmManager am = (android.app.AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
-                    if (am != null) am.set(android.app.AlarmManager.RTC, System.currentTimeMillis() + 400, pi);
+                    context.startActivity(launch);
                 }
-                android.os.Process.killProcess(android.os.Process.myPid());
+                Runtime.getRuntime().exit(0);
             });
             dlg.show();
         } catch (Throwable ignored) {}
