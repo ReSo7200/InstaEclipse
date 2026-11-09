@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Biểu tượng ứng dụng miễn phí (nhấn giữ logo Instagram)</string>
+    <string name="ig_app_icon_title">Biểu tượng ứng dụng</string>
+    <string name="ig_app_icon_note">Biểu tượng của chính Instagram, không cần đăng ký. Biểu tượng đổi khi bạn thoát ứng dụng; trình khởi chạy có thể chuyển nó xuống cuối danh sách ứng dụng.</string>
+    <string name="ig_app_icon_applied">Biểu tượng sẽ đổi thành %1$s khi bạn thoát Instagram</string>
+</resources>

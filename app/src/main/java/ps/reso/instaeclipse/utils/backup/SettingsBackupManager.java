@@ -50,6 +50,7 @@ public class SettingsBackupManager {
         s.put("hideCommunityNotes",         FeatureFlags.hideCommunityNotes);
         s.put("followingOnlyFeed",         FeatureFlags.followingOnlyFeed);
         s.put("hidePlusUpsells",            FeatureFlags.hidePlusUpsells);
+        s.put("freeAppIcons",               FeatureFlags.freeAppIcons);
         s.put("expandCaptions",             FeatureFlags.expandCaptions);
         s.put("offerAudioDownload",         FeatureFlags.offerAudioDownload);
         s.put("enableVoiceDownload",        FeatureFlags.enableVoiceDownload);
@@ -216,6 +217,7 @@ public class SettingsBackupManager {
         if (s.has("hideCommunityNotes"))        FeatureFlags.hideCommunityNotes        = s.getBoolean("hideCommunityNotes");
         if (s.has("followingOnlyFeed"))        FeatureFlags.followingOnlyFeed        = s.getBoolean("followingOnlyFeed");
         if (s.has("hidePlusUpsells"))           FeatureFlags.hidePlusUpsells           = s.getBoolean("hidePlusUpsells");
+        if (s.has("freeAppIcons"))              FeatureFlags.freeAppIcons              = s.getBoolean("freeAppIcons");
         if (s.has("expandCaptions"))            FeatureFlags.expandCaptions            = s.getBoolean("expandCaptions");
         if (s.has("offerAudioDownload"))        FeatureFlags.offerAudioDownload        = s.getBoolean("offerAudioDownload");
         if (s.has("enableVoiceDownload"))       FeatureFlags.enableVoiceDownload       = s.getBoolean("enableVoiceDownload");

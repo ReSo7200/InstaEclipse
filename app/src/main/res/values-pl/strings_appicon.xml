@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Darmowe ikony aplikacji (przytrzymaj logo Instagrama)</string>
+    <string name="ig_app_icon_title">Ikona aplikacji</string>
+    <string name="ig_app_icon_note">Własne ikony Instagrama, bez subskrypcji. Ikona zmienia się po wyjściu z aplikacji; launcher może przenieść ją na koniec listy aplikacji.</string>
+    <string name="ig_app_icon_applied">Ikona zmieni się na %1$s po wyjściu z Instagrama</string>
+</resources>

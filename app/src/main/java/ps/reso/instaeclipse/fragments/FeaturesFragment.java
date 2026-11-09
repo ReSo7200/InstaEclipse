@@ -1293,6 +1293,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI"),
                 createExtrasSwitch("#30D158", "hideOnboardingPrompts"),
                 createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_clean_feed_hide_plus), "hidePlusUpsells"),
+                createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_free_app_icons), "freeAppIcons"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_hide_instants), "hideInstants")
         ));
         return defs;
