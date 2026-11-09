@@ -257,6 +257,14 @@ final class SelectedMediaDownloads {
     }
 
     private static void start(Context ctx, Captured captured, boolean video, boolean batch, boolean local) {
+        // Standard with "Prefer videos that play everywhere" (#309, #311): Instagram's own pick can be
+        // AV1, which some players and WhatsApp refuse. Take the sharpest H.264 version instead, any
+        // resolution, through the Best path. With the switch off Standard is unchanged.
+        if (video && captured.original && FeatureFlags.downloaderCompatibility && captured.video != null) {
+            startVideo(ctx, captured.media.request(captured.video.filename,
+                    new DownloadRequest.Options(0, true, true)), batch, local);
+            return;
+        }
         if (captured.original && (video ? captured.media.originalPlan == null : captured.photoUrl == null)) {
             toast(ctx, I18n.t(ctx, R.string.ie_downloader_original_unavailable));
             return;
