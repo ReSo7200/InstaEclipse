@@ -117,6 +117,11 @@ public final class FeedRefreshConfirmHook {
         return trayId != 0 && container.findViewById(trayId) != null;
     }
 
+    /** The same "Refresh the feed?" dialog, for Back on the home feed (#300). */
+    public static void askBeforeRefresh(View view, Runnable refresh, Runnable cancel) {
+        ask(view, refresh, cancel);
+    }
+
     private static void ask(View view, Runnable refresh, Runnable cancel) {
         Context ctx = view.getContext();
         for (Context c = ctx; c instanceof android.content.ContextWrapper w; c = w.getBaseContext()) {
