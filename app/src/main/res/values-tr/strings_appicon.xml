@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Ücretsiz uygulama simgeleri (Instagram logosuna uzun bas)</string>
+    <string name="ig_app_icon_title">Uygulama simgesi</string>
+    <string name="ig_app_icon_note">Instagram\'ın kendi simgeleri, abonelik olmadan. Simge uygulamadan çıkınca değişir; başlatıcı onu uygulama listesinin sonuna taşıyabilir.</string>
+    <string name="ig_app_icon_applied">Instagram\'dan çıkınca simge %1$s olacak</string>
+</resources>

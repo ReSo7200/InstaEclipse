@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">أيقونات تطبيق مجانية (اضغط مطولًا على شعار Instagram)</string>
+    <string name="ig_app_icon_title">أيقونة التطبيق</string>
+    <string name="ig_app_icon_note">أيقونات Instagram نفسها بدون اشتراك. تتغيّر الأيقونة عند مغادرة التطبيق، وقد ينقلها المشغّل إلى آخر قائمة التطبيقات.</string>
+    <string name="ig_app_icon_applied">ستتغيّر الأيقونة إلى %1$s عند مغادرة Instagram</string>
+</resources>

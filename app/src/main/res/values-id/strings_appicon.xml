@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Ikon aplikasi gratis (tekan lama logo Instagram)</string>
+    <string name="ig_app_icon_title">Ikon aplikasi</string>
+    <string name="ig_app_icon_note">Ikon milik Instagram sendiri, tanpa langganan. Ikon berubah saat kamu keluar dari aplikasi; launcher mungkin memindahkannya ke akhir daftar aplikasi.</string>
+    <string name="ig_app_icon_applied">Ikon berubah ke %1$s saat kamu keluar dari Instagram</string>
+</resources>

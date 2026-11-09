@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Icone app gratis (tieni premuto il logo di Instagram)</string>
+    <string name="ig_app_icon_title">Icona dell\'app</string>
+    <string name="ig_app_icon_note">Le icone di Instagram, senza abbonamento. L\'icona cambia quando esci dall\'app; il launcher potrebbe spostarla in fondo all\'elenco delle app.</string>
+    <string name="ig_app_icon_applied">L\'icona diventerà %1$s quando esci da Instagram</string>
+</resources>

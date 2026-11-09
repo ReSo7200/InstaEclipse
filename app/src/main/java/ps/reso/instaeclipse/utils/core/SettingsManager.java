@@ -94,6 +94,7 @@ public class SettingsManager {
         editor.putBoolean("hideCommunityNotes", FeatureFlags.hideCommunityNotes);
         editor.putBoolean("followingOnlyFeed", FeatureFlags.followingOnlyFeed);
         editor.putBoolean("hidePlusUpsells", FeatureFlags.hidePlusUpsells);
+        editor.putBoolean("freeAppIcons", FeatureFlags.freeAppIcons);
         editor.putBoolean("expandCaptions", FeatureFlags.expandCaptions);
         editor.putBoolean("offerAudioDownload", FeatureFlags.offerAudioDownload);
         editor.putBoolean("enableVoiceDownload", FeatureFlags.enableVoiceDownload);
@@ -314,6 +315,7 @@ public class SettingsManager {
         FeatureFlags.hideCommunityNotes = prefs.getBoolean("hideCommunityNotes", false);
         FeatureFlags.followingOnlyFeed = prefs.getBoolean("followingOnlyFeed", false);
         FeatureFlags.hidePlusUpsells = prefs.getBoolean("hidePlusUpsells", false);
+        FeatureFlags.freeAppIcons = prefs.getBoolean("freeAppIcons", false);
         FeatureFlags.expandCaptions = prefs.getBoolean("expandCaptions", false);
         FeatureFlags.offerAudioDownload = prefs.getBoolean("offerAudioDownload", false);
         FeatureFlags.enableVoiceDownload = prefs.getBoolean("enableVoiceDownload", false);

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Δωρεάν εικονίδια εφαρμογής (παρατεταμένο πάτημα στο λογότυπο Instagram)</string>
+    <string name="ig_app_icon_title">Εικονίδιο εφαρμογής</string>
+    <string name="ig_app_icon_note">Τα δικά εικονίδια του Instagram, χωρίς συνδρομή. Το εικονίδιο αλλάζει όταν βγεις από την εφαρμογή· η αρχική οθόνη μπορεί να το μετακινήσει στο τέλος της λίστας εφαρμογών.</string>
+    <string name="ig_app_icon_applied">Το εικονίδιο θα γίνει %1$s όταν βγεις από το Instagram</string>
+</resources>

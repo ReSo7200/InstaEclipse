@@ -742,6 +742,7 @@ public class Module {
                     try {
                         if (!skip("SavedOnProfileHook")) new ps.reso.instaeclipse.mods.ui.SavedOnProfileHook().install(dexKitBridge, hostClassLoader);
                         if (!skip("HideHeaderButtonsHook")) new ps.reso.instaeclipse.mods.ui.HideHeaderButtonsHook().install(hostClassLoader);
+                        if (!skip("AppIconPickerHook")) new ps.reso.instaeclipse.mods.ui.AppIconPickerHook().install(hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(IE|SavedProfile) ❌ Failed to hook");
                     }

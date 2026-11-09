@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Бесплатные значки приложения (долгое нажатие на логотип Instagram)</string>
+    <string name="ig_app_icon_title">Значок приложения</string>
+    <string name="ig_app_icon_note">Собственные значки Instagram, без подписки. Значок меняется после выхода из приложения; лаунчер может переместить его в конец списка приложений.</string>
+    <string name="ig_app_icon_applied">Значок сменится на %1$s, когда вы выйдете из Instagram</string>
+</resources>

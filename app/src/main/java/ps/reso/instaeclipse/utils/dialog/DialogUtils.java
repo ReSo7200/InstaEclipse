@@ -1388,6 +1388,7 @@ public class DialogUtils {
                 flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_dialog_misc_remove_meta_ai, "removeMetaAI"),
                 extraSwitch(context, "#30D158", "hideOnboardingPrompts"),
                 flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_dialog_clean_feed_hide_plus, "hidePlusUpsells"),
+                flagSwitch(context, R.drawable.ic_sparkle, "#30D158", R.string.ig_free_app_icons, "freeAppIcons"),
                 flagSwitch(context, R.drawable.ic_block, "#30D158", R.string.ig_hide_instants, "hideInstants")));
 
         showSectionDialog(context, I18n.t(context, R.string.ig_dialog_section_distraction_free), layout, () -> {

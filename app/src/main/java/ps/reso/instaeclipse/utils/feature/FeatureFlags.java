@@ -77,6 +77,7 @@ public class FeatureFlags {
     public static volatile boolean maxUploadQuality = false; // force IG's "Upload at highest quality" switch always on
     public static volatile boolean expandCaptions = false; // feed captions without "… more" (#246)
     public static volatile boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
+    public static volatile boolean freeAppIcons = false; // long-press the logo: our free picker of Instagram's app icons
     public static volatile boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)
     // Extras (see ExtrasFeatures)
     public static volatile boolean hideStoriesTray = false; // hide the story tray only; stories still open from profiles

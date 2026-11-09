@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">免费应用图标（长按 Instagram 标志）</string>
+    <string name="ig_app_icon_title">应用图标</string>
+    <string name="ig_app_icon_note">Instagram 自带的图标，无需订阅。离开应用后图标才会更改；启动器可能会把它移到应用列表末尾。</string>
+    <string name="ig_app_icon_applied">离开 Instagram 后图标将变为 %1$s</string>
+</resources>

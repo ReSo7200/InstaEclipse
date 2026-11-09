@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Gratis appikoner (håll in Instagram-logotypen)</string>
+    <string name="ig_app_icon_title">Appikon</string>
+    <string name="ig_app_icon_note">Instagrams egna ikoner, utan prenumeration. Ikonen byts när du lämnar appen; startskärmen kan flytta den sist i applistan.</string>
+    <string name="ig_app_icon_applied">Ikonen byts till %1$s när du lämnar Instagram</string>
+</resources>
