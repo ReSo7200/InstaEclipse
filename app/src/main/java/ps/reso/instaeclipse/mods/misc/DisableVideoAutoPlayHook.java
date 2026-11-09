@@ -92,7 +92,6 @@ public class DisableVideoAutoPlayHook {
             Method targetMethod = method.getMethodInstance(Module.hostClassLoader);
             DexKitCache.saveMethod("AutoPlayDisable", targetMethod);
             hookMethod(targetMethod);
-            ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("DisableVideoAutoPlay");
             ModuleLog.line("(InstaEclipse | AutoPlayDisable): ✅ Hooked (dynamic check): " +
                     method.getClassName() + "." + method.getName());
         } catch (Exception e) {
@@ -107,6 +106,9 @@ public class DisableVideoAutoPlayHook {
                 if (FeatureFlags.disableVideoAutoPlay) param.setResult(true);
             }
         });
+        // Here, not only after a fresh lookup: from the second start on the method comes from the
+        // per-version cache, and the status then said it couldn't attach (#297).
+        ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("DisableVideoAutoPlay");
     }
 
     private void hookManualPlayOverlayLifecycle() {
