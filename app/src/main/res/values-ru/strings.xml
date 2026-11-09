@@ -821,4 +821,13 @@
     <string name="ig_followers_history_week">Последние 7 дней: %1$d отписались, %2$d новых</string>
     <string name="ig_followers_alert_fewer">У вас на %1$d подписчиков меньше, чем при последней проверке %2$s. Откройте «Подписчики» и нажмите «История подписчиков», чтобы узнать кто.</string>
     <string name="ig_followers_alert_stale">Последняя проверка подписчиков была %1$d дн. назад. Откройте «Подписчики» и нажмите «История подписчиков».</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Не подписан Instagram · Нажмите, чтобы доверять</string>
+    <string name="home_signer_trusted">Вы доверяете</string>
+    <string name="home_signer_trust_title">Доверять этому Instagram?</string>
+    <string name="home_signer_trust_message">Этот Instagram не подписан Instagram, поэтому он может быть изменён. InstaEclipse блокирует загрузки и синхронизацию настроек с ним, пока вы не отметите его как доверенный.\n\nДоверяйте ему, только если установили его сами. Доверенным считается только этот ключ подписи (%1$s…); Instagram с другой подписью снова будет заблокирован.</string>
+    <string name="home_signer_trust">Доверять</string>
+    <string name="home_signer_untrust_title">Больше не доверять этому Instagram?</string>
+    <string name="home_signer_untrust_message">Загрузки и синхронизация настроек с этим Instagram (ключ %1$s…) снова будут заблокированы.</string>
+    <string name="home_signer_untrust">Не доверять</string>
 </resources>

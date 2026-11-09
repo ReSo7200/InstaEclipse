@@ -822,4 +822,13 @@
     <string name="ig_followers_history_week">Son 7 gün: %1$d dayandırdı, %2$d yeni</string>
     <string name="ig_followers_alert_fewer">Son yoxlamanızdan (%2$s) bəri %1$d izləyiciniz azalıb. Kim olduğunu görmək üçün İzləyicilər bölməsini açın və İzləyici tarixçəsinə toxunun.</string>
     <string name="ig_followers_alert_stale">Son izləyici yoxlamanız %1$d gün əvvəl olub. İzləyicilər bölməsini açın və İzləyici tarixçəsinə toxunun.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Instagram tərəfindən imzalanmayıb · Güvənmək üçün toxunun</string>
+    <string name="home_signer_trusted">Sizin tərəfinizdən etibarlıdır</string>
+    <string name="home_signer_trust_title">Bu Instagram-a güvənilsin?</string>
+    <string name="home_signer_trust_message">Bu Instagram, Instagram tərəfindən imzalanmayıb, ona görə də dəyişdirilmiş ola bilər. Siz ona güvənənə qədər InstaEclipse onunla yükləmələri və ayarların sinxronlaşdırılmasını bloklayır.\n\nYalnız onu özünüz quraşdırmısınızsa güvənin. Yalnız bu imza açarına (%1$s…) güvənilir; fərqli imzalanmış Instagram yenidən bloklanır.</string>
+    <string name="home_signer_trust">Güvən</string>
+    <string name="home_signer_untrust_title">Bu Instagram-a artıq güvənilməsin?</string>
+    <string name="home_signer_untrust_message">Bu Instagram (açar %1$s…) ilə yükləmələr və ayarların sinxronlaşdırılması yenidən bloklanacaq.</string>
+    <string name="home_signer_untrust">Güvənməyi dayandır</string>
 </resources>

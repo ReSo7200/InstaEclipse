@@ -853,4 +853,13 @@
     <string name="ig_followers_history_week">Τελευταίες 7 ημέρες: %1$d σταμάτησαν, %2$d νέοι</string>
     <string name="ig_followers_alert_fewer">Έχεις %1$d λιγότερους ακόλουθους από τον τελευταίο έλεγχο στις %2$s. Άνοιξε τους Ακόλουθους και πάτησε Ιστορικό ακολούθων για να δεις ποιοι.</string>
     <string name="ig_followers_alert_stale">Ο τελευταίος έλεγχος ακολούθων ήταν πριν από %1$d ημέρες. Άνοιξε τους Ακόλουθους και πάτησε Ιστορικό ακολούθων.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Δεν έχει υπογραφεί από το Instagram · Πατήστε για να το εμπιστευτείτε</string>
+    <string name="home_signer_trusted">Το εμπιστεύεστε</string>
+    <string name="home_signer_trust_title">Να εμπιστευτείτε αυτό το Instagram;</string>
+    <string name="home_signer_trust_message">Αυτό το Instagram δεν έχει υπογραφεί από το Instagram, οπότε μπορεί να έχει τροποποιηθεί. Το InstaEclipse μπλοκάρει τις λήψεις και τον συγχρονισμό ρυθμίσεων με αυτό μέχρι να το εμπιστευτείτε.\n\nΕμπιστευτείτε το μόνο αν το εγκαταστήσατε εσείς. Μόνο αυτό το κλειδί υπογραφής (%1$s…) θεωρείται αξιόπιστο· ένα Instagram με διαφορετική υπογραφή θα μπλοκαριστεί ξανά.</string>
+    <string name="home_signer_trust">Εμπιστοσύνη</string>
+    <string name="home_signer_untrust_title">Διακοπή εμπιστοσύνης σε αυτό το Instagram;</string>
+    <string name="home_signer_untrust_message">Οι λήψεις και ο συγχρονισμός ρυθμίσεων με αυτό το Instagram (κλειδί %1$s…) θα μπλοκαριστούν ξανά.</string>
+    <string name="home_signer_untrust">Διακοπή εμπιστοσύνης</string>
 </resources>

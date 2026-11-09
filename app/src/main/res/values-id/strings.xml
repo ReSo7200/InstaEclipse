@@ -852,4 +852,13 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_followers_history_week">7 hari terakhir: %1$d berhenti, %2$d baru</string>
     <string name="ig_followers_alert_fewer">Pengikut Anda berkurang %1$d dibanding pemeriksaan terakhir pada %2$s. Buka Pengikut dan ketuk Riwayat pengikut untuk melihat siapa.</string>
     <string name="ig_followers_alert_stale">Pemeriksaan pengikut terakhir Anda %1$d hari yang lalu. Buka Pengikut dan ketuk Riwayat pengikut.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Tidak ditandatangani oleh Instagram · Ketuk untuk memercayai</string>
+    <string name="home_signer_trusted">Dipercaya oleh Anda</string>
+    <string name="home_signer_trust_title">Percayai Instagram ini?</string>
+    <string name="home_signer_trust_message">Instagram ini tidak ditandatangani oleh Instagram, jadi mungkin telah dimodifikasi. InstaEclipse memblokir unduhan dan sinkronisasi pengaturan dengannya sampai Anda memercayainya.\n\nPercayai hanya jika Anda menginstalnya sendiri. Hanya kunci tanda tangan ini (%1$s…) yang dipercaya; Instagram dengan tanda tangan lain akan diblokir lagi.</string>
+    <string name="home_signer_trust">Percayai</string>
+    <string name="home_signer_untrust_title">Berhenti memercayai Instagram ini?</string>
+    <string name="home_signer_untrust_message">Unduhan dan sinkronisasi pengaturan dengan Instagram ini (kunci %1$s…) akan diblokir lagi.</string>
+    <string name="home_signer_untrust">Berhenti memercayai</string>
 </resources>

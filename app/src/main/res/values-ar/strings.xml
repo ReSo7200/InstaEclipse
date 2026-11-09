@@ -818,4 +818,13 @@
     <string name="ig_followers_history_week">آخر 7 أيام: ‏%1$d ألغوا المتابعة، %2$d جدد</string>
     <string name="ig_followers_alert_fewer">لديك %1$d متابعين أقل مما كان عند آخر تحقق في %2$s. افتح المتابِعين واضغط على سجل المتابعين لمعرفة من.</string>
     <string name="ig_followers_alert_stale">كان آخر تحقق من المتابعين قبل %1$d أيام. افتح المتابِعين واضغط على سجل المتابعين.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">غير موقّع من Instagram · اضغط للوثوق به</string>
+    <string name="home_signer_trusted">موثوق من قبلك</string>
+    <string name="home_signer_trust_title">هل تثق بنسخة Instagram هذه؟</string>
+    <string name="home_signer_trust_message">نسخة Instagram هذه غير موقّعة من Instagram، لذا قد تكون معدّلة. يحظر InstaEclipse التنزيلات ومزامنة الإعدادات معها حتى تثق بها.\n\nثق بها فقط إذا ثبّتها بنفسك. مفتاح التوقيع هذا فقط (%1$s…) هو الموثوق؛ أي نسخة Instagram موقّعة بمفتاح مختلف ستُحظر مجددًا.</string>
+    <string name="home_signer_trust">ثق بها</string>
+    <string name="home_signer_untrust_title">التوقف عن الوثوق بنسخة Instagram هذه؟</string>
+    <string name="home_signer_untrust_message">سيتم حظر التنزيلات ومزامنة الإعدادات مع نسخة Instagram هذه (المفتاح %1$s…) مجددًا.</string>
+    <string name="home_signer_untrust">إيقاف الوثوق</string>
 </resources>

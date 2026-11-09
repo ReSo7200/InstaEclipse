@@ -873,4 +873,13 @@ Stay on this screen until it finishes.</string>
     <string name="ig_confirm_refresh">Ask Before Refreshing the Feed</string>
     <string name="ig_confirm_refresh_question">Refresh the feed?</string>
     <string name="ig_confirm_refresh_action">Refresh</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Not signed by Instagram · Tap to trust</string>
+    <string name="home_signer_trusted">Trusted by you</string>
+    <string name="home_signer_trust_title">Trust this Instagram?</string>
+    <string name="home_signer_trust_message">This Instagram isn\'t signed by Instagram, so it may be modified. InstaEclipse blocks downloads and settings sync with it until you trust it.\n\nTrust it only if you installed it yourself. Only this signing key (%1$s…) is trusted; a differently signed Instagram is blocked again.</string>
+    <string name="home_signer_trust">Trust</string>
+    <string name="home_signer_untrust_title">Stop trusting this Instagram?</string>
+    <string name="home_signer_untrust_message">Downloads and settings sync with this Instagram (key %1$s…) will be blocked again.</string>
+    <string name="home_signer_untrust">Stop trusting</string>
 </resources>

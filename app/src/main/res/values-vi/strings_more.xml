@@ -421,4 +421,13 @@
     <string name="ig_followers_history_week">7 ngày qua: %1$d bỏ theo dõi, %2$d mới</string>
     <string name="ig_followers_alert_fewer">Bạn có ít hơn %1$d người theo dõi so với lần kiểm tra trước vào %2$s. Mở Người theo dõi và nhấn Lịch sử người theo dõi để xem là ai.</string>
     <string name="ig_followers_alert_stale">Lần kiểm tra người theo dõi gần nhất là %1$d ngày trước. Mở Người theo dõi và nhấn Lịch sử người theo dõi.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Không được Instagram ký · Nhấn để tin cậy</string>
+    <string name="home_signer_trusted">Đã được bạn tin cậy</string>
+    <string name="home_signer_trust_title">Tin cậy Instagram này?</string>
+    <string name="home_signer_trust_message">Instagram này không được Instagram ký nên có thể đã bị sửa đổi. InstaEclipse chặn tải xuống và đồng bộ cài đặt với nó cho đến khi bạn tin cậy.\n\nChỉ tin cậy nếu bạn tự cài đặt nó. Chỉ khóa ký này (%1$s…) được tin cậy; Instagram được ký bằng khóa khác sẽ bị chặn lại.</string>
+    <string name="home_signer_trust">Tin cậy</string>
+    <string name="home_signer_untrust_title">Ngừng tin cậy Instagram này?</string>
+    <string name="home_signer_untrust_message">Tải xuống và đồng bộ cài đặt với Instagram này (khóa %1$s…) sẽ bị chặn lại.</string>
+    <string name="home_signer_untrust">Ngừng tin cậy</string>
 </resources>

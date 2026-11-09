@@ -824,4 +824,13 @@
     <string name="ig_followers_history_week">Últimos 7 días: %1$d dejaron de seguirte, %2$d nuevos</string>
     <string name="ig_followers_alert_fewer">Tienes %1$d seguidores menos que en tu última comprobación del %2$s. Abre Seguidores y toca Historial de seguidores para ver quiénes.</string>
     <string name="ig_followers_alert_stale">Tu última comprobación de seguidores fue hace %1$d días. Abre Seguidores y toca Historial de seguidores.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">No firmado por Instagram · Toca para confiar</string>
+    <string name="home_signer_trusted">Marcado como de confianza por ti</string>
+    <string name="home_signer_trust_title">¿Confiar en este Instagram?</string>
+    <string name="home_signer_trust_message">Este Instagram no está firmado por Instagram, así que puede estar modificado. InstaEclipse bloquea las descargas y la sincronización de ajustes con él hasta que confíes en él.\n\nConfía en él solo si lo instalaste tú. Solo se confía en esta clave de firma (%1$s…); un Instagram firmado de otra forma se vuelve a bloquear.</string>
+    <string name="home_signer_trust">Confiar</string>
+    <string name="home_signer_untrust_title">¿Dejar de confiar en este Instagram?</string>
+    <string name="home_signer_untrust_message">Las descargas y la sincronización de ajustes con este Instagram (clave %1$s…) se volverán a bloquear.</string>
+    <string name="home_signer_untrust">Dejar de confiar</string>
 </resources>
