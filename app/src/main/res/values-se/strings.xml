@@ -821,4 +821,13 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_followers_history_week">Senaste 7 dagarna: %1$d slutade, %2$d nya</string>
     <string name="ig_followers_alert_fewer">Du har %1$d färre följare än vid din senaste kontroll %2$s. Öppna Följare och tryck på Följarhistorik för att se vilka.</string>
     <string name="ig_followers_alert_stale">Din senaste följarkontroll var för %1$d dagar sedan. Öppna Följare och tryck på Följarhistorik.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Inte signerad av Instagram · Tryck för att lita på</string>
+    <string name="home_signer_trusted">Betrodd av dig</string>
+    <string name="home_signer_trust_title">Lita på denna Instagram?</string>
+    <string name="home_signer_trust_message">Denna Instagram är inte signerad av Instagram och kan därför vara modifierad. InstaEclipse blockerar nedladdningar och synkning av inställningar med den tills du litar på den.\n\nLita bara på den om du installerade den själv. Endast denna signeringsnyckel (%1$s…) är betrodd; en Instagram som är signerad på annat sätt blockeras igen.</string>
+    <string name="home_signer_trust">Lita på</string>
+    <string name="home_signer_untrust_title">Sluta lita på denna Instagram?</string>
+    <string name="home_signer_untrust_message">Nedladdningar och synkning av inställningar med denna Instagram (nyckel %1$s…) blockeras igen.</string>
+    <string name="home_signer_untrust">Sluta lita på</string>
 </resources>

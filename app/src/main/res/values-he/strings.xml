@@ -851,4 +851,13 @@
     <string name="ig_followers_history_week">7 הימים האחרונים: ‏%1$d הפסיקו, %2$d חדשים</string>
     <string name="ig_followers_alert_fewer">יש לך %1$d עוקבים פחות מאשר בבדיקה האחרונה ב-%2$s. פתח את העוקבים והקש על היסטוריית עוקבים כדי לראות מי.</string>
     <string name="ig_followers_alert_stale">בדיקת העוקבים האחרונה שלך הייתה לפני %1$d ימים. פתח את העוקבים והקש על היסטוריית עוקבים.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">לא חתום על ידי Instagram · הקש כדי לסמוך</string>
+    <string name="home_signer_trusted">מהימן לפי בחירתך</string>
+    <string name="home_signer_trust_title">לסמוך על Instagram הזה?</string>
+    <string name="home_signer_trust_message">Instagram הזה לא חתום על ידי Instagram, ולכן ייתכן שהוא שונה. InstaEclipse חוסם הורדות וסנכרון הגדרות איתו עד שתסמוך עליו.\n\nסמוך עליו רק אם התקנת אותו בעצמך. רק מפתח החתימה הזה (%1$s…) מהימן; Instagram שחתום אחרת ייחסם שוב.</string>
+    <string name="home_signer_trust">לסמוך</string>
+    <string name="home_signer_untrust_title">להפסיק לסמוך על Instagram הזה?</string>
+    <string name="home_signer_untrust_message">הורדות וסנכרון הגדרות עם Instagram הזה (מפתח %1$s…) ייחסמו שוב.</string>
+    <string name="home_signer_untrust">הפסק לסמוך</string>
 </resources>

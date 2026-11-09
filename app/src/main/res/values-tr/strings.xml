@@ -859,4 +859,13 @@
     <string name="ig_followers_history_week">Son 7 gün: %1$d takipten çıktı, %2$d yeni</string>
     <string name="ig_followers_alert_fewer">%2$s tarihindeki son kontrolüne göre %1$d takipçin daha az. Kimler olduğunu görmek için Takipçiler sekmesini aç ve Takipçi geçmişi düğmesine dokun.</string>
     <string name="ig_followers_alert_stale">Son takipçi kontrolün %1$d gün önceydi. Takipçiler sekmesini aç ve Takipçi geçmişi düğmesine dokun.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Instagram tarafından imzalanmamış · Güvenmek için dokunun</string>
+    <string name="home_signer_trusted">Sizin tarafınızdan güvenilir</string>
+    <string name="home_signer_trust_title">Bu Instagram\'a güvenilsin mi?</string>
+    <string name="home_signer_trust_message">Bu Instagram, Instagram tarafından imzalanmamış, bu yüzden değiştirilmiş olabilir. InstaEclipse, siz ona güvenene kadar bununla indirmeleri ve ayar senkronizasyonunu engeller.\n\nYalnızca kendiniz yüklediyseniz güvenin. Yalnızca bu imzalama anahtarına (%1$s…) güvenilir; farklı imzalanmış bir Instagram yeniden engellenir.</string>
+    <string name="home_signer_trust">Güven</string>
+    <string name="home_signer_untrust_title">Bu Instagram\'a artık güvenilmesin mi?</string>
+    <string name="home_signer_untrust_message">Bu Instagram (anahtar %1$s…) ile indirmeler ve ayar senkronizasyonu yeniden engellenecek.</string>
+    <string name="home_signer_untrust">Güvenmeyi bırak</string>
 </resources>

@@ -869,4 +869,13 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_followers_history_week">Ostatnie 7 dni: %1$d przestało, %2$d nowych</string>
     <string name="ig_followers_alert_fewer">Masz o %1$d obserwujących mniej niż przy ostatnim sprawdzeniu %2$s. Otwórz Obserwujący i dotknij Historia obserwujących, aby zobaczyć kto.</string>
     <string name="ig_followers_alert_stale">Ostatnie sprawdzenie obserwujących było %1$d dni temu. Otwórz Obserwujący i dotknij Historia obserwujących.</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">Niepodpisany przez Instagram · Stuknij, aby zaufać</string>
+    <string name="home_signer_trusted">Oznaczony przez ciebie jako zaufany</string>
+    <string name="home_signer_trust_title">Zaufać temu Instagramowi?</string>
+    <string name="home_signer_trust_message">Ten Instagram nie jest podpisany przez Instagram, więc może być zmodyfikowany. InstaEclipse blokuje pobieranie i synchronizację ustawień z nim, dopóki mu nie zaufasz.\n\nZaufaj mu tylko wtedy, gdy sam go zainstalowałeś. Zaufany jest tylko ten klucz podpisu (%1$s…); Instagram podpisany inaczej zostanie ponownie zablokowany.</string>
+    <string name="home_signer_trust">Zaufaj</string>
+    <string name="home_signer_untrust_title">Przestać ufać temu Instagramowi?</string>
+    <string name="home_signer_untrust_message">Pobieranie i synchronizacja ustawień z tym Instagramem (klucz %1$s…) zostaną ponownie zablokowane.</string>
+    <string name="home_signer_untrust">Przestań ufać</string>
 </resources>

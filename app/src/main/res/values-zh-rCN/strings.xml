@@ -852,4 +852,13 @@
     <string name="ig_followers_history_week">最近 7 天：%1$d 人取消关注，%2$d 位新粉丝</string>
     <string name="ig_followers_alert_fewer">与 %2$s 的上次检查相比，你的粉丝少了 %1$d 位。打开“粉丝”并点按“粉丝记录”查看是谁。</string>
     <string name="ig_followers_alert_stale">你上次检查粉丝是在 %1$d 天前。打开“粉丝”并点按“粉丝记录”。</string>
+    <!-- #299: trust an Instagram that isn't signed by Instagram -->
+    <string name="home_signer_untrusted">非 Instagram 签名 · 点击以信任</string>
+    <string name="home_signer_trusted">已由你信任</string>
+    <string name="home_signer_trust_title">要信任此 Instagram 吗？</string>
+    <string name="home_signer_trust_message">此 Instagram 未经 Instagram 签名，可能已被修改。在你信任它之前，InstaEclipse 会阻止与它之间的下载和设置同步。\n\n仅在你亲自安装时才信任它。只有此签名密钥（%1$s…）受信任；使用其他签名的 Instagram 会再次被阻止。</string>
+    <string name="home_signer_trust">信任</string>
+    <string name="home_signer_untrust_title">要停止信任此 Instagram 吗？</string>
+    <string name="home_signer_untrust_message">与此 Instagram（密钥 %1$s…）之间的下载和设置同步将再次被阻止。</string>
+    <string name="home_signer_untrust">停止信任</string>
 </resources>

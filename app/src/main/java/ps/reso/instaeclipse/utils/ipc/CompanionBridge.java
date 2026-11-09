@@ -57,8 +57,64 @@ public final class CompanionBridge {
                 expected[i] = (byte) Integer.parseInt(HOST_SIGNER_SHA256.substring(i * 2, i * 2 + 2), 16);
             if (context.getPackageManager().hasSigningCertificate(packageName, expected, PackageManager.CERT_INPUT_SHA256))
                 return true;
-            return lspatchOriginalSigner(context, packageName, expected);
+            if (lspatchOriginalSigner(context, packageName, expected)) return true;
+            return userTrusted(context, packageName);
         } catch (RuntimeException ignored) { return false; }
+    }
+
+    // ---- Trusted by the user (#299) ----
+    // An Instagram not signed by Instagram (a modified or re-signed build) is refused above. The
+    // user can trust the exact signing key of the copy installed now, from the companion app's
+    // home screen. Only that key is accepted: a differently signed Instagram is refused again.
+    private static final String TRUST_PREFS = "ie_trusted_hosts";
+    private static final String TRUST_KEY = "signers";
+
+    /** True when the package's signer is one the user chose to trust in the companion app. */
+    public static boolean userTrusted(Context context, String packageName) {
+        if (context == null || !BrokerPayload.HOST.equals(packageName)) return false;
+        try {
+            java.util.Set<String> trusted = context.getSharedPreferences(TRUST_PREFS, Context.MODE_PRIVATE)
+                    .getStringSet(TRUST_KEY, java.util.Collections.emptySet());
+            PackageManager pm = context.getPackageManager();
+            for (String hex : trusted) {
+                byte[] sha = hex(hex);
+                if (sha != null && pm.hasSigningCertificate(packageName, sha, PackageManager.CERT_INPUT_SHA256)) return true;
+            }
+        } catch (RuntimeException ignored) { }
+        return false;
+    }
+
+    /** SHA-256 (hex) of the key the installed package is signed with now; null if unknown or several. */
+    public static String currentSigner(Context context, String packageName) {
+        try {
+            android.content.pm.PackageInfo info = context.getPackageManager()
+                    .getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES);
+            android.content.pm.SigningInfo signing = info.signingInfo;
+            if (signing == null) return null;
+            android.content.pm.Signature[] signers = signing.getApkContentsSigners();
+            if (signers == null || signers.length != 1) return null;
+            byte[] sha = java.security.MessageDigest.getInstance("SHA-256").digest(signers[0].toByteArray());
+            StringBuilder sb = new StringBuilder(64);
+            for (byte b : sha) sb.append(String.format(java.util.Locale.ROOT, "%02x", b));
+            return sb.toString();
+        } catch (Exception ignored) { return null; }
+    }
+
+    /** Trust (or stop trusting) the key the installed Instagram is signed with now. */
+    public static boolean setUserTrusted(Context context, boolean trust) {
+        String signer = currentSigner(context, BrokerPayload.HOST);
+        if (signer == null) return false;
+        android.content.SharedPreferences prefs = context.getSharedPreferences(TRUST_PREFS, Context.MODE_PRIVATE);
+        java.util.Set<String> next = new java.util.HashSet<>(prefs.getStringSet(TRUST_KEY, java.util.Collections.emptySet()));
+        if (trust) next.add(signer); else next.remove(signer);
+        return prefs.edit().putStringSet(TRUST_KEY, next).commit();
+    }
+
+    private static byte[] hex(String s) {
+        if (s == null || s.length() != 64 || !s.matches("[0-9a-f]+")) return null;
+        byte[] out = new byte[32];
+        for (int i = 0; i < 32; i++) out[i] = (byte) Integer.parseInt(s.substring(i * 2, i * 2 + 2), 16);
+        return out;
     }
 
     /** Patched Instagram (sourceDir + install time) -> whether its recorded signer matched. */
@@ -264,7 +320,8 @@ public final class CompanionBridge {
                 finish(token, null);
             } catch (SecurityException denied) {
                 if (token != null) token.cancel();
-                finish(null, "Companion request denied");
+                // #299: a modified Instagram is refused until the user trusts it in the app.
+                finish(null, "Companion request denied. Open the InstaEclipse app to trust this Instagram");
             } catch (Exception failure) {
                 if (token != null) token.cancel();
                 finish(null, "Companion request failed");
