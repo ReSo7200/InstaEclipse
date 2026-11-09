@@ -48,6 +48,37 @@ public final class IeToast {
         return new IeToast(ctx, t, duration);
     }
 
+    /** Toasts sent by the companion app, shown here in Instagram's process (see {@link #relayFromCompanion}). */
+    public static final String ACTION_RELAY = "ps.reso.instaeclipse.ACTION_TOAST";
+    public static final String EXTRA_TEXT = "text";
+    public static final String EXTRA_LONG = "long";
+
+    /**
+     * Companion side: a toast from the companion's background service can only be a plain grey
+     * one on Android 11+. Instagram is usually what is on screen, so it is asked to show the
+     * InstaEclipse toast instead; if it doesn't answer (closed, older build) the companion shows
+     * its own as before.
+     */
+    public static void relayFromCompanion(Context ctx, CharSequence text, int duration) {
+        if (ctx == null || text == null || text.length() == 0) return;
+        Context app = ctx.getApplicationContext() != null ? ctx.getApplicationContext() : ctx;
+        String host = ps.reso.instaeclipse.utils.ipc.BrokerPayload.HOST;
+        Runnable local = () -> makeText(app, text, duration).show();
+        try {
+            if (!ps.reso.instaeclipse.utils.ipc.CompanionBridge.isTrustedHost(app, host)) { local.run(); return; }
+            android.content.Intent relay = new android.content.Intent(ACTION_RELAY).setPackage(host)
+                    .putExtra(EXTRA_TEXT, text.toString())
+                    .putExtra(EXTRA_LONG, duration == Toast.LENGTH_LONG);
+            app.sendOrderedBroadcast(relay, null, new android.content.BroadcastReceiver() {
+                @Override public void onReceive(Context c, android.content.Intent i) {
+                    if (getResultCode() != 1) local.run();
+                }
+            }, new Handler(Looper.getMainLooper()), 0, null, null);
+        } catch (Throwable t) {
+            local.run();
+        }
+    }
+
     public void show() {
         if (ctx == null || text == null || text.length() == 0) return;
         Runnable r = () -> {
@@ -131,7 +162,7 @@ public final class IeToast {
      * (e.g. the companion app's DownloadSaveService while Instagram is on screen), so those get a
      * plain text toast instead.
      */
-    private static boolean inForeground(Context c) {
+    public static boolean inForeground(Context c) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return true;
         try {
             ActivityManager.RunningAppProcessInfo info = new ActivityManager.RunningAppProcessInfo();
