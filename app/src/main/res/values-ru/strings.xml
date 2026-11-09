@@ -792,4 +792,33 @@
     <string name="ig_confirm_refresh">Спрашивать перед обновлением ленты</string>
     <string name="ig_confirm_refresh_question">Обновить ленту?</string>
     <string name="ig_confirm_refresh_action">Обновить</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Поиск по сохранённым сообщениям</string>
+    <string name="ig_unsent_search_hint">Текст, имя или чат</string>
+    <string name="ig_unsent_search_go">Найти</string>
+    <string name="ig_unsent_search_none">Ничего не найдено.</string>
+    <string name="ig_unsent_export_all">Экспортировать все чаты в JSON</string>
+    <string name="ig_instant_history_title">Сохранять просмотренные Instants</string>
+    <string name="ig_instant_history_view">Прошлые Instants</string>
+    <string name="ig_instant_history_empty">Instants пока нет. Включите эту функцию и откройте несколько Instants, они будут сохранены здесь.</string>
+    <string name="ig_instant_history_clear">Очистить прошлые Instants</string>
+    <string name="ig_instant_history_clear_confirm">Удалить все сохранённые Instants? Это действие нельзя отменить.</string>
+    <string name="ig_story_pinned_title">Сохранять истории выбранных аккаунтов</string>
+    <string name="ig_story_pinned_note">Истории этих аккаунтов, которые вы смотрите, сохраняются до достижения лимита, затем самые старые заменяются.</string>
+    <string name="ig_story_pinned_users">Имена пользователей через пробел или запятую</string>
+    <string name="ig_story_pinned_limit">Сколько историй хранить на аккаунт</string>
+    <string name="ig_profile_spoofer_section_copy">Скопировать профиль</string>
+    <string name="ig_profile_spoofer_copy_hint">Имя пользователя для копирования</string>
+    <string name="ig_profile_spoofer_copy_button">Открыть профиль</string>
+    <string name="ig_profile_spoofer_copy_note">Открывает этот профиль в Instagram. Нажмите там меню с тремя точками и выберите «Использовать как поддельный профиль». Ваши списки «Подписчики» и «Подписки» будут показывать списки этого аккаунта.</string>
+    <string name="ig_profile_spoofer_copy_failed">Введите корректное имя пользователя.</string>
+    <string name="ig_profile_spoofer_use_profile">Использовать как поддельный профиль</string>
+    <string name="ig_profile_spoofer_copied">Профиль скопирован в подмену профиля</string>
+    <string name="ig_profile_spoofer_copy_missing">Пока не удалось прочитать этот профиль. Дождитесь загрузки и попробуйте снова.</string>
+    <string name="ig_profile_spoofer_restart">Instagram хранит скопированный профиль в памяти до перезапуска. Перезапустить сейчас, чтобы снова показать ваш профиль?</string>
+    <string name="ig_profile_spoofer_restart_later">Позже</string>
+    <string name="ig_profile_spoofer_restart_toast">Перезапустите Instagram, чтобы снова показать свой профиль.</string>
+    <string name="ig_followers_history_week">Последние 7 дней: %1$d отписались, %2$d новых</string>
+    <string name="ig_followers_alert_fewer">У вас на %1$d подписчиков меньше, чем при последней проверке %2$s. Откройте «Подписчики» и нажмите «История подписчиков», чтобы узнать кто.</string>
+    <string name="ig_followers_alert_stale">Последняя проверка подписчиков была %1$d дн. назад. Откройте «Подписчики» и нажмите «История подписчиков».</string>
 </resources>

@@ -840,4 +840,33 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_confirm_refresh">Pytaj przed odświeżeniem kanału</string>
     <string name="ig_confirm_refresh_question">Odświeżyć kanał?</string>
     <string name="ig_confirm_refresh_action">Odśwież</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Szukaj w zachowanych wiadomościach</string>
+    <string name="ig_unsent_search_hint">Tekst, nazwa lub czat</string>
+    <string name="ig_unsent_search_go">Szukaj</string>
+    <string name="ig_unsent_search_none">Brak wyników.</string>
+    <string name="ig_unsent_export_all">Eksportuj wszystkie czaty jako JSON</string>
+    <string name="ig_instant_history_title">Zachowuj obejrzane Instants</string>
+    <string name="ig_instant_history_view">Pokaż wcześniejsze Instants</string>
+    <string name="ig_instant_history_empty">Brak Instants. Włącz tę opcję i otwórz kilka Instants, zostaną tu zachowane.</string>
+    <string name="ig_instant_history_clear">Wyczyść wcześniejsze Instants</string>
+    <string name="ig_instant_history_clear_confirm">Usunąć wszystkie zachowane Instants? Tej operacji nie można cofnąć.</string>
+    <string name="ig_story_pinned_title">Zachowuj relacje z wybranych kont</string>
+    <string name="ig_story_pinned_note">Relacje obejrzane z tych kont są zachowywane do osiągnięcia limitu, potem najstarsze są zastępowane.</string>
+    <string name="ig_story_pinned_users">Nazwy użytkowników oddzielone spacjami lub przecinkami</string>
+    <string name="ig_story_pinned_limit">Liczba relacji zachowywanych na konto</string>
+    <string name="ig_profile_spoofer_section_copy">Skopiuj profil</string>
+    <string name="ig_profile_spoofer_copy_hint">Nazwa użytkownika do skopiowania</string>
+    <string name="ig_profile_spoofer_copy_button">Otwórz profil</string>
+    <string name="ig_profile_spoofer_copy_note">Otwiera ten profil w Instagramie. Dotknij tam menu z trzema kropkami i wybierz Użyj jako fałszywego profilu. Twoje listy Obserwujący i Obserwowani pokażą wtedy listy tego konta.</string>
+    <string name="ig_profile_spoofer_copy_failed">Wpisz prawidłową nazwę użytkownika.</string>
+    <string name="ig_profile_spoofer_use_profile">Użyj jako fałszywego profilu</string>
+    <string name="ig_profile_spoofer_copied">Profil skopiowany do fałszywego profilu</string>
+    <string name="ig_profile_spoofer_copy_missing">Nie udało się jeszcze odczytać tego profilu. Poczekaj, aż się załaduje, i spróbuj ponownie.</string>
+    <string name="ig_profile_spoofer_restart">Instagram trzyma skopiowany profil w pamięci do ponownego uruchomienia. Uruchomić go ponownie teraz, aby znów pokazać Twój profil?</string>
+    <string name="ig_profile_spoofer_restart_later">Później</string>
+    <string name="ig_profile_spoofer_restart_toast">Uruchom ponownie Instagram, aby znów pokazać swój profil.</string>
+    <string name="ig_followers_history_week">Ostatnie 7 dni: %1$d przestało, %2$d nowych</string>
+    <string name="ig_followers_alert_fewer">Masz o %1$d obserwujących mniej niż przy ostatnim sprawdzeniu %2$s. Otwórz Obserwujący i dotknij Historia obserwujących, aby zobaczyć kto.</string>
+    <string name="ig_followers_alert_stale">Ostatnie sprawdzenie obserwujących było %1$d dni temu. Otwórz Obserwujący i dotknij Historia obserwujących.</string>
 </resources>

@@ -789,4 +789,33 @@
     <string name="ig_confirm_refresh">السؤال قبل تحديث الخلاصة</string>
     <string name="ig_confirm_refresh_question">تحديث الخلاصة؟</string>
     <string name="ig_confirm_refresh_action">تحديث</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">البحث في الرسائل المحفوظة</string>
+    <string name="ig_unsent_search_hint">نص أو اسم أو محادثة</string>
+    <string name="ig_unsent_search_go">بحث</string>
+    <string name="ig_unsent_search_none">لا توجد نتائج.</string>
+    <string name="ig_unsent_export_all">تصدير كل المحادثات بصيغة JSON</string>
+    <string name="ig_instant_history_title">الاحتفاظ بـ Instants التي شاهدتها</string>
+    <string name="ig_instant_history_view">عرض Instants السابقة</string>
+    <string name="ig_instant_history_empty">لا توجد Instants بعد. فعّل هذا الخيار وافتح بعض Instants، وسيتم الاحتفاظ بها هنا.</string>
+    <string name="ig_instant_history_clear">مسح Instants السابقة</string>
+    <string name="ig_instant_history_clear_confirm">حذف كل Instants المحفوظة؟ لا يمكن التراجع عن ذلك.</string>
+    <string name="ig_story_pinned_title">الاحتفاظ بقصص حسابات مختارة</string>
+    <string name="ig_story_pinned_note">يتم الاحتفاظ بالقصص التي تشاهدها من هذه الحسابات حتى بلوغ الحد، ثم تُستبدل الأقدم.</string>
+    <string name="ig_story_pinned_users">أسماء المستخدمين، مفصولة بمسافات أو فواصل</string>
+    <string name="ig_story_pinned_limit">عدد القصص المحفوظة لكل حساب</string>
+    <string name="ig_profile_spoofer_section_copy">نسخ ملف شخصي</string>
+    <string name="ig_profile_spoofer_copy_hint">اسم المستخدم المراد نسخه</string>
+    <string name="ig_profile_spoofer_copy_button">فتح الملف الشخصي</string>
+    <string name="ig_profile_spoofer_copy_note">يفتح هذا الملف الشخصي في Instagram. اضغط على قائمة النقاط الثلاث هناك واختر استخدام كملف شخصي مزيف. ستعرض بعدها قائمتا المتابِعين والمتابَعين لديك قوائم ذلك الحساب.</string>
+    <string name="ig_profile_spoofer_copy_failed">أدخل اسم مستخدم صالحًا.</string>
+    <string name="ig_profile_spoofer_use_profile">استخدام كملف شخصي مزيف</string>
+    <string name="ig_profile_spoofer_copied">تم نسخ الملف الشخصي إلى أداة التزييف</string>
+    <string name="ig_profile_spoofer_copy_missing">تعذّرت قراءة هذا الملف الشخصي بعد. انتظر حتى يكتمل تحميله ثم حاول مرة أخرى.</string>
+    <string name="ig_profile_spoofer_restart">يحتفظ Instagram بالملف الشخصي المنسوخ في الذاكرة حتى إعادة تشغيله. هل تريد إعادة تشغيله الآن لعرض ملفك الشخصي مرة أخرى؟</string>
+    <string name="ig_profile_spoofer_restart_later">لاحقًا</string>
+    <string name="ig_profile_spoofer_restart_toast">أعد تشغيل Instagram لعرض ملفك الشخصي مرة أخرى.</string>
+    <string name="ig_followers_history_week">آخر 7 أيام: ‏%1$d ألغوا المتابعة، %2$d جدد</string>
+    <string name="ig_followers_alert_fewer">لديك %1$d متابعين أقل مما كان عند آخر تحقق في %2$s. افتح المتابِعين واضغط على سجل المتابعين لمعرفة من.</string>
+    <string name="ig_followers_alert_stale">كان آخر تحقق من المتابعين قبل %1$d أيام. افتح المتابِعين واضغط على سجل المتابعين.</string>
 </resources>

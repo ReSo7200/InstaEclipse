@@ -823,4 +823,33 @@
     <string name="ig_confirm_refresh">刷新动态前确认</string>
     <string name="ig_confirm_refresh_question">要刷新动态吗？</string>
     <string name="ig_confirm_refresh_action">刷新</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">搜索已保存的消息</string>
+    <string name="ig_unsent_search_hint">文本、名称或聊天</string>
+    <string name="ig_unsent_search_go">搜索</string>
+    <string name="ig_unsent_search_none">没有匹配结果。</string>
+    <string name="ig_unsent_export_all">将所有聊天导出为 JSON</string>
+    <string name="ig_instant_history_title">保留看过的 Instants</string>
+    <string name="ig_instant_history_view">查看以往的 Instants</string>
+    <string name="ig_instant_history_empty">还没有 Instants。开启此功能并打开一些 Instants，它们会保留在这里。</string>
+    <string name="ig_instant_history_clear">清除以往的 Instants</string>
+    <string name="ig_instant_history_clear_confirm">删除所有已保留的 Instants？此操作无法撤销。</string>
+    <string name="ig_story_pinned_title">保留指定账号的限时动态</string>
+    <string name="ig_story_pinned_note">你查看的这些账号的限时动态会一直保留，直到达到上限，之后最旧的会被替换。</string>
+    <string name="ig_story_pinned_users">用户名，用空格或逗号分隔</string>
+    <string name="ig_story_pinned_limit">每个账号保留的限时动态数</string>
+    <string name="ig_profile_spoofer_section_copy">复制个人主页</string>
+    <string name="ig_profile_spoofer_copy_hint">要复制的用户名</string>
+    <string name="ig_profile_spoofer_copy_button">打开主页</string>
+    <string name="ig_profile_spoofer_copy_note">在 Instagram 中打开该主页。点按那里的三点菜单，选择“用作伪装资料”。之后你的“粉丝”和“关注”列表会显示该账号的列表。</string>
+    <string name="ig_profile_spoofer_copy_failed">请输入有效的用户名。</string>
+    <string name="ig_profile_spoofer_use_profile">用作伪装资料</string>
+    <string name="ig_profile_spoofer_copied">已将资料复制到个人主页伪装</string>
+    <string name="ig_profile_spoofer_copy_missing">暂时无法读取此主页。请等待加载完成后重试。</string>
+    <string name="ig_profile_spoofer_restart">Instagram 会在内存中保留复制的资料，直到重启。现在重启以重新显示你自己的主页吗？</string>
+    <string name="ig_profile_spoofer_restart_later">稍后</string>
+    <string name="ig_profile_spoofer_restart_toast">重启 Instagram 以重新显示你自己的主页。</string>
+    <string name="ig_followers_history_week">最近 7 天：%1$d 人取消关注，%2$d 位新粉丝</string>
+    <string name="ig_followers_alert_fewer">与 %2$s 的上次检查相比，你的粉丝少了 %1$d 位。打开“粉丝”并点按“粉丝记录”查看是谁。</string>
+    <string name="ig_followers_alert_stale">你上次检查粉丝是在 %1$d 天前。打开“粉丝”并点按“粉丝记录”。</string>
 </resources>
