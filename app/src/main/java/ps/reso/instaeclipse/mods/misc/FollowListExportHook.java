@@ -322,7 +322,12 @@ public class FollowListExportHook {
         AbsListView list = findList(root);
         Adapter ad = list != null ? list.getAdapter() : null;
         if (ad instanceof HeaderViewListAdapter h) ad = h.getWrappedAdapter();
-        return ad != null ? collect(ad, true) : new LinkedHashMap<>();
+        if (ad == null) return new LinkedHashMap<>();
+        // The list's own rows first: users in a list the adapter holds directly. "Suggested for you"
+        // sits in a separate helper object of the adapter, so it is left out (#304). Another layout
+        // that finds nobody this way keeps the wider walk used before.
+        Map<String, String[]> rows = collect(ad, true, true);
+        return !rows.isEmpty() ? rows : collect(ad, true, false);
     }
 
     private static void export(View root, Object frag) {
@@ -636,7 +641,7 @@ public class FollowListExportHook {
     }
 
     /** id → {username, full name, id} for every User reachable from the adapter, in order. */
-    private static Map<String, String[]> collect(Object adapter, boolean rowsOnly) {
+    private static Map<String, String[]> collect(Object adapter, boolean rowsOnly, boolean adapterListsOnly) {
         Map<String, String[]> out = new LinkedHashMap<>();
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         ArrayDeque<Object[]> q = new ArrayDeque<>();
@@ -659,6 +664,9 @@ public class FollowListExportHook {
                 continue;
             }
             if (d >= 4) continue;
+            // Only the adapter itself and list rows are opened: not helper objects such as the
+            // suggestions section or the session's user cache.
+            if (adapterListsOnly && d > 0 && !row) continue;
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())
