@@ -1,6 +1,6 @@
 package ps.reso.instaeclipse.utils.media;
 
-import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
+import android.app.AndroidAppHelper;
 import android.content.Context;
 
 import org.json.JSONArray;

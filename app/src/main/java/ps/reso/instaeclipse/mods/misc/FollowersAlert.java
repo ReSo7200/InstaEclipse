@@ -15,7 +15,7 @@ import ps.reso.instaeclipse.utils.feature.FeatureFlags;
 import ps.reso.instaeclipse.utils.i18n.I18n;
 import ps.reso.instaeclipse.utils.toast.IeToast;
 import ps.reso.instaeclipse.utils.users.FollowersHistory;
-import ps.reso.instaeclipse.xposedcompat.AndroidAppHelper;
+import android.app.AndroidAppHelper;
 
 /** Tells you when your follower count is below your last saved list, or the last check is old. */
 public final class FollowersAlert {
