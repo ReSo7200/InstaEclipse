@@ -823,4 +823,33 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_confirm_refresh">Tanya sebelum memuat ulang feed</string>
     <string name="ig_confirm_refresh_question">Muat ulang feed?</string>
     <string name="ig_confirm_refresh_action">Muat ulang</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Cari pesan yang disimpan</string>
+    <string name="ig_unsent_search_hint">Teks, nama, atau obrolan</string>
+    <string name="ig_unsent_search_go">Cari</string>
+    <string name="ig_unsent_search_none">Tidak ada yang cocok.</string>
+    <string name="ig_unsent_export_all">Ekspor semua obrolan sebagai JSON</string>
+    <string name="ig_instant_history_title">Simpan Instants yang dilihat</string>
+    <string name="ig_instant_history_view">Lihat Instants sebelumnya</string>
+    <string name="ig_instant_history_empty">Belum ada Instants. Aktifkan ini dan buka beberapa Instants, semuanya akan disimpan di sini.</string>
+    <string name="ig_instant_history_clear">Hapus Instants sebelumnya</string>
+    <string name="ig_instant_history_clear_confirm">Hapus semua Instants yang disimpan? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="ig_story_pinned_title">Simpan Story dari akun pilihan</string>
+    <string name="ig_story_pinned_note">Story yang Anda lihat dari akun-akun ini disimpan hingga batas tercapai, lalu yang terlama diganti.</string>
+    <string name="ig_story_pinned_users">Nama pengguna, dipisahkan spasi atau koma</string>
+    <string name="ig_story_pinned_limit">Jumlah Story yang disimpan per akun</string>
+    <string name="ig_profile_spoofer_section_copy">Salin profil</string>
+    <string name="ig_profile_spoofer_copy_hint">Nama pengguna yang akan disalin</string>
+    <string name="ig_profile_spoofer_copy_button">Buka profil</string>
+    <string name="ig_profile_spoofer_copy_note">Membuka profil itu di Instagram. Ketuk menu tiga titik di sana lalu pilih Gunakan sebagai profil palsu. Daftar Pengikut dan Mengikuti Anda akan menampilkan daftar akun tersebut.</string>
+    <string name="ig_profile_spoofer_copy_failed">Masukkan nama pengguna yang valid.</string>
+    <string name="ig_profile_spoofer_use_profile">Gunakan sebagai profil palsu</string>
+    <string name="ig_profile_spoofer_copied">Profil disalin ke pemalsu profil</string>
+    <string name="ig_profile_spoofer_copy_missing">Profil ini belum dapat dibaca. Tunggu hingga dimuat lalu coba lagi.</string>
+    <string name="ig_profile_spoofer_restart">Instagram menyimpan profil yang disalin di memori hingga dimulai ulang. Mulai ulang sekarang untuk menampilkan profil Anda sendiri lagi?</string>
+    <string name="ig_profile_spoofer_restart_later">Nanti</string>
+    <string name="ig_profile_spoofer_restart_toast">Mulai ulang Instagram untuk menampilkan profil Anda sendiri lagi.</string>
+    <string name="ig_followers_history_week">7 hari terakhir: %1$d berhenti, %2$d baru</string>
+    <string name="ig_followers_alert_fewer">Pengikut Anda berkurang %1$d dibanding pemeriksaan terakhir pada %2$s. Buka Pengikut dan ketuk Riwayat pengikut untuk melihat siapa.</string>
+    <string name="ig_followers_alert_stale">Pemeriksaan pengikut terakhir Anda %1$d hari yang lalu. Buka Pengikut dan ketuk Riwayat pengikut.</string>
 </resources>

@@ -792,4 +792,33 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_confirm_refresh">Fråga innan flödet uppdateras</string>
     <string name="ig_confirm_refresh_question">Uppdatera flödet?</string>
     <string name="ig_confirm_refresh_action">Uppdatera</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Sök i sparade meddelanden</string>
+    <string name="ig_unsent_search_hint">Text, namn eller chatt</string>
+    <string name="ig_unsent_search_go">Sök</string>
+    <string name="ig_unsent_search_none">Inga träffar.</string>
+    <string name="ig_unsent_export_all">Exportera alla chattar som JSON</string>
+    <string name="ig_instant_history_title">Behåll visade Instants</string>
+    <string name="ig_instant_history_view">Visa tidigare Instants</string>
+    <string name="ig_instant_history_empty">Inga Instants än. Slå på detta och öppna några Instants, de sparas här.</string>
+    <string name="ig_instant_history_clear">Rensa tidigare Instants</string>
+    <string name="ig_instant_history_clear_confirm">Ta bort alla sparade Instants? Detta kan inte ångras.</string>
+    <string name="ig_story_pinned_title">Behåll stories från valda konton</string>
+    <string name="ig_story_pinned_note">Stories du tittar på från dessa konton sparas tills gränsen nås, sedan ersätts de äldsta.</string>
+    <string name="ig_story_pinned_users">Användarnamn, separerade med mellanslag eller kommatecken</string>
+    <string name="ig_story_pinned_limit">Stories att spara per konto</string>
+    <string name="ig_profile_spoofer_section_copy">Kopiera en profil</string>
+    <string name="ig_profile_spoofer_copy_hint">Användarnamn att kopiera</string>
+    <string name="ig_profile_spoofer_copy_button">Öppna profil</string>
+    <string name="ig_profile_spoofer_copy_note">Öppnar profilen i Instagram. Tryck på menyn med tre prickar där och välj Använd som falsk profil. Dina listor Följare och Följer visar sedan det kontots listor.</string>
+    <string name="ig_profile_spoofer_copy_failed">Ange ett giltigt användarnamn.</string>
+    <string name="ig_profile_spoofer_use_profile">Använd som falsk profil</string>
+    <string name="ig_profile_spoofer_copied">Profilen kopierad till profilförfalskaren</string>
+    <string name="ig_profile_spoofer_copy_missing">Kunde inte läsa profilen än. Vänta tills den har laddats och försök igen.</string>
+    <string name="ig_profile_spoofer_restart">Instagram behåller den kopierade profilen i minnet tills den startas om. Starta om nu för att visa din egen profil igen?</string>
+    <string name="ig_profile_spoofer_restart_later">Senare</string>
+    <string name="ig_profile_spoofer_restart_toast">Starta om Instagram för att visa din egen profil igen.</string>
+    <string name="ig_followers_history_week">Senaste 7 dagarna: %1$d slutade, %2$d nya</string>
+    <string name="ig_followers_alert_fewer">Du har %1$d färre följare än vid din senaste kontroll %2$s. Öppna Följare och tryck på Följarhistorik för att se vilka.</string>
+    <string name="ig_followers_alert_stale">Din senaste följarkontroll var för %1$d dagar sedan. Öppna Följare och tryck på Följarhistorik.</string>
 </resources>

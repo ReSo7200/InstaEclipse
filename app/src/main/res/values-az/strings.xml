@@ -793,4 +793,33 @@
     <string name="ig_confirm_refresh">Lentni yeniləmədən əvvəl soruş</string>
     <string name="ig_confirm_refresh_question">Lent yenilənsin?</string>
     <string name="ig_confirm_refresh_action">Yenilə</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Saxlanılan mesajlarda axtar</string>
+    <string name="ig_unsent_search_hint">Mətn, ad və ya söhbət</string>
+    <string name="ig_unsent_search_go">Axtar</string>
+    <string name="ig_unsent_search_none">Heç nə tapılmadı.</string>
+    <string name="ig_unsent_export_all">Bütün söhbətləri JSON kimi ixrac et</string>
+    <string name="ig_instant_history_title">Baxılan Instants\'ı saxla</string>
+    <string name="ig_instant_history_view">Keçmiş Instants\'a bax</string>
+    <string name="ig_instant_history_empty">Hələ Instants yoxdur. Bunu aktiv edin və bir neçə Instant açın, onlar burada saxlanılacaq.</string>
+    <string name="ig_instant_history_clear">Keçmiş Instants\'ı təmizlə</string>
+    <string name="ig_instant_history_clear_confirm">Saxlanılan bütün Instants silinsin? Bu geri qaytarıla bilməz.</string>
+    <string name="ig_story_pinned_title">Seçilmiş hesabların hekayələrini saxla</string>
+    <string name="ig_story_pinned_note">Bu hesablardan baxdığınız hekayələr limitə çatana qədər saxlanılır, sonra ən köhnələri əvəz olunur.</string>
+    <string name="ig_story_pinned_users">İstifadəçi adları, boşluq və ya vergüllə ayrılmış</string>
+    <string name="ig_story_pinned_limit">Hər hesab üçün saxlanılacaq hekayə sayı</string>
+    <string name="ig_profile_spoofer_section_copy">Profili kopyala</string>
+    <string name="ig_profile_spoofer_copy_hint">Kopyalanacaq istifadəçi adı</string>
+    <string name="ig_profile_spoofer_copy_button">Profili aç</string>
+    <string name="ig_profile_spoofer_copy_note">Həmin profili Instagram-da açır. Orada üç nöqtə menyusuna toxunun və Saxta profil kimi istifadə et seçin. Bundan sonra İzləyicilər və İzlənilənlər siyahılarınız həmin hesabın siyahılarını göstərəcək.</string>
+    <string name="ig_profile_spoofer_copy_failed">Düzgün istifadəçi adı daxil edin.</string>
+    <string name="ig_profile_spoofer_use_profile">Saxta profil kimi istifadə et</string>
+    <string name="ig_profile_spoofer_copied">Profil saxtalaşdırıcıya kopyalandı</string>
+    <string name="ig_profile_spoofer_copy_missing">Bu profil hələ oxuna bilmədi. Yüklənməsini gözləyin və yenidən cəhd edin.</string>
+    <string name="ig_profile_spoofer_restart">Instagram kopyalanan profili yenidən başladılana qədər yaddaşda saxlayır. Öz profilinizi yenidən göstərmək üçün indi yenidən başladılsın?</string>
+    <string name="ig_profile_spoofer_restart_later">Sonra</string>
+    <string name="ig_profile_spoofer_restart_toast">Öz profilinizi yenidən göstərmək üçün Instagram-ı yenidən başladın.</string>
+    <string name="ig_followers_history_week">Son 7 gün: %1$d dayandırdı, %2$d yeni</string>
+    <string name="ig_followers_alert_fewer">Son yoxlamanızdan (%2$s) bəri %1$d izləyiciniz azalıb. Kim olduğunu görmək üçün İzləyicilər bölməsini açın və İzləyici tarixçəsinə toxunun.</string>
+    <string name="ig_followers_alert_stale">Son izləyici yoxlamanız %1$d gün əvvəl olub. İzləyicilər bölməsini açın və İzləyici tarixçəsinə toxunun.</string>
 </resources>

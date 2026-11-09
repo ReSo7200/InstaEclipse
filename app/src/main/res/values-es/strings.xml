@@ -795,4 +795,33 @@
     <string name="ig_confirm_refresh">Preguntar antes de actualizar el feed</string>
     <string name="ig_confirm_refresh_question">¿Actualizar el feed?</string>
     <string name="ig_confirm_refresh_action">Actualizar</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Buscar mensajes guardados</string>
+    <string name="ig_unsent_search_hint">Texto, nombre o chat</string>
+    <string name="ig_unsent_search_go">Buscar</string>
+    <string name="ig_unsent_search_none">No hay coincidencias.</string>
+    <string name="ig_unsent_export_all">Exportar todos los chats como JSON</string>
+    <string name="ig_instant_history_title">Conservar Instants vistos</string>
+    <string name="ig_instant_history_view">Ver Instants anteriores</string>
+    <string name="ig_instant_history_empty">Aún no hay Instants. Activa esta opción y abre algunos Instants, se guardarán aquí.</string>
+    <string name="ig_instant_history_clear">Borrar Instants anteriores</string>
+    <string name="ig_instant_history_clear_confirm">¿Eliminar todos los Instants guardados? Esta acción no se puede deshacer.</string>
+    <string name="ig_story_pinned_title">Conservar historias de cuentas elegidas</string>
+    <string name="ig_story_pinned_note">Las historias que veas de estas cuentas se conservan hasta alcanzar el límite; después se reemplazan las más antiguas.</string>
+    <string name="ig_story_pinned_users">Nombres de usuario, separados por espacios o comas</string>
+    <string name="ig_story_pinned_limit">Historias a conservar por cuenta</string>
+    <string name="ig_profile_spoofer_section_copy">Copiar un perfil</string>
+    <string name="ig_profile_spoofer_copy_hint">Nombre de usuario a copiar</string>
+    <string name="ig_profile_spoofer_copy_button">Abrir perfil</string>
+    <string name="ig_profile_spoofer_copy_note">Abre ese perfil en Instagram. Toca allí el menú de tres puntos y elige Usar como perfil falso. Tus listas de Seguidores y Seguidos mostrarán entonces las listas de esa cuenta.</string>
+    <string name="ig_profile_spoofer_copy_failed">Introduce un nombre de usuario válido.</string>
+    <string name="ig_profile_spoofer_use_profile">Usar como perfil falso</string>
+    <string name="ig_profile_spoofer_copied">Perfil copiado en Falsear perfil</string>
+    <string name="ig_profile_spoofer_copy_missing">Aún no se pudo leer este perfil. Espera a que cargue e inténtalo de nuevo.</string>
+    <string name="ig_profile_spoofer_restart">Instagram mantiene el perfil copiado en memoria hasta que se reinicia. ¿Reiniciarlo ahora para volver a mostrar tu propio perfil?</string>
+    <string name="ig_profile_spoofer_restart_later">Más tarde</string>
+    <string name="ig_profile_spoofer_restart_toast">Reinicia Instagram para volver a mostrar tu propio perfil.</string>
+    <string name="ig_followers_history_week">Últimos 7 días: %1$d dejaron de seguirte, %2$d nuevos</string>
+    <string name="ig_followers_alert_fewer">Tienes %1$d seguidores menos que en tu última comprobación del %2$s. Abre Seguidores y toca Historial de seguidores para ver quiénes.</string>
+    <string name="ig_followers_alert_stale">Tu última comprobación de seguidores fue hace %1$d días. Abre Seguidores y toca Historial de seguidores.</string>
 </resources>

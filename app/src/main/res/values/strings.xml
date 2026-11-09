@@ -663,8 +663,8 @@
     <string name="ig_followers_history_changes">Since %1$s: %2$d unfollowed, %3$d new</string>
     <string name="ig_followers_history_summary">%1$d followers · checked %2$s</string>
     <string name="ig_followers_history_week">Last 7 days: %1$d unfollowed, %2$d new</string>
-    <string name="ig_followers_alert_fewer">You have %1$d fewer followers than at your last check on %2$s. Open Followers and tap Check history to see who.</string>
-    <string name="ig_followers_alert_stale">Your last followers check was %1$d days ago. Open Followers and tap Check history.</string>
+    <string name="ig_followers_alert_fewer">You have %1$d fewer followers than at your last check on %2$s. Open Followers and tap Followers history to see who.</string>
+    <string name="ig_followers_alert_stale">Your last followers check was %1$d days ago. Open Followers and tap Followers history.</string>
     <string name="ig_followers_history_empty">No changes recorded yet.</string>
     <string name="ig_followers_history_unfollowed">Unfollowed you</string>
     <string name="ig_followers_history_followed">Followed you</string>

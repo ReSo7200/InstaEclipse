@@ -392,4 +392,33 @@
     <string name="ig_confirm_refresh">Hỏi trước khi làm mới bảng tin</string>
     <string name="ig_confirm_refresh_question">Làm mới bảng tin?</string>
     <string name="ig_confirm_refresh_action">Làm mới</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Tìm trong tin nhắn đã lưu</string>
+    <string name="ig_unsent_search_hint">Văn bản, tên hoặc cuộc trò chuyện</string>
+    <string name="ig_unsent_search_go">Tìm</string>
+    <string name="ig_unsent_search_none">Không có kết quả.</string>
+    <string name="ig_unsent_export_all">Xuất tất cả cuộc trò chuyện dạng JSON</string>
+    <string name="ig_instant_history_title">Giữ Instants đã xem</string>
+    <string name="ig_instant_history_view">Xem Instants trước đây</string>
+    <string name="ig_instant_history_empty">Chưa có Instants. Bật tính năng này và mở vài Instants, chúng sẽ được giữ ở đây.</string>
+    <string name="ig_instant_history_clear">Xóa Instants trước đây</string>
+    <string name="ig_instant_history_clear_confirm">Xóa tất cả Instants đã giữ? Không thể hoàn tác.</string>
+    <string name="ig_story_pinned_title">Giữ tin từ các tài khoản đã chọn</string>
+    <string name="ig_story_pinned_note">Tin bạn xem từ các tài khoản này được giữ đến khi đạt giới hạn, sau đó tin cũ nhất sẽ bị thay thế.</string>
+    <string name="ig_story_pinned_users">Tên người dùng, cách nhau bằng dấu cách hoặc dấu phẩy</string>
+    <string name="ig_story_pinned_limit">Số tin giữ cho mỗi tài khoản</string>
+    <string name="ig_profile_spoofer_section_copy">Sao chép hồ sơ</string>
+    <string name="ig_profile_spoofer_copy_hint">Tên người dùng cần sao chép</string>
+    <string name="ig_profile_spoofer_copy_button">Mở hồ sơ</string>
+    <string name="ig_profile_spoofer_copy_note">Mở hồ sơ đó trong Instagram. Nhấn vào menu ba chấm ở đó và chọn Dùng làm hồ sơ giả. Danh sách Người theo dõi và Đang theo dõi của bạn sẽ hiển thị danh sách của tài khoản đó.</string>
+    <string name="ig_profile_spoofer_copy_failed">Nhập tên người dùng hợp lệ.</string>
+    <string name="ig_profile_spoofer_use_profile">Dùng làm hồ sơ giả</string>
+    <string name="ig_profile_spoofer_copied">Đã sao chép hồ sơ vào công cụ giả mạo</string>
+    <string name="ig_profile_spoofer_copy_missing">Chưa đọc được hồ sơ này. Hãy chờ tải xong rồi thử lại.</string>
+    <string name="ig_profile_spoofer_restart">Instagram giữ hồ sơ đã sao chép trong bộ nhớ cho đến khi khởi động lại. Khởi động lại ngay để hiển thị lại hồ sơ của bạn?</string>
+    <string name="ig_profile_spoofer_restart_later">Để sau</string>
+    <string name="ig_profile_spoofer_restart_toast">Khởi động lại Instagram để hiển thị lại hồ sơ của bạn.</string>
+    <string name="ig_followers_history_week">7 ngày qua: %1$d bỏ theo dõi, %2$d mới</string>
+    <string name="ig_followers_alert_fewer">Bạn có ít hơn %1$d người theo dõi so với lần kiểm tra trước vào %2$s. Mở Người theo dõi và nhấn Lịch sử người theo dõi để xem là ai.</string>
+    <string name="ig_followers_alert_stale">Lần kiểm tra người theo dõi gần nhất là %1$d ngày trước. Mở Người theo dõi và nhấn Lịch sử người theo dõi.</string>
 </resources>

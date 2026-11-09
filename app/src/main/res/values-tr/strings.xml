@@ -830,4 +830,33 @@
     <string name="ig_confirm_refresh">Akışı yenilemeden önce sor</string>
     <string name="ig_confirm_refresh_question">Akış yenilensin mi?</string>
     <string name="ig_confirm_refresh_action">Yenile</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">Saklanan mesajlarda ara</string>
+    <string name="ig_unsent_search_hint">Metin, ad veya sohbet</string>
+    <string name="ig_unsent_search_go">Ara</string>
+    <string name="ig_unsent_search_none">Eşleşen bir şey yok.</string>
+    <string name="ig_unsent_export_all">Tüm sohbetleri JSON olarak dışa aktar</string>
+    <string name="ig_instant_history_title">Görüntülenen Instant\'ları sakla</string>
+    <string name="ig_instant_history_view">Geçmiş Instant\'ları gör</string>
+    <string name="ig_instant_history_empty">Henüz Instant yok. Bunu etkinleştir ve birkaç Instant aç, burada saklanacaklar.</string>
+    <string name="ig_instant_history_clear">Geçmiş Instant\'ları temizle</string>
+    <string name="ig_instant_history_clear_confirm">Saklanan tüm Instant\'lar silinsin mi? Bu işlem geri alınamaz.</string>
+    <string name="ig_story_pinned_title">Seçilen hesapların hikayelerini sakla</string>
+    <string name="ig_story_pinned_note">Bu hesaplardan izlediğin hikayeler sınıra ulaşılana kadar saklanır, sonra en eskileri değiştirilir.</string>
+    <string name="ig_story_pinned_users">Kullanıcı adları, boşluk veya virgülle ayrılmış</string>
+    <string name="ig_story_pinned_limit">Hesap başına saklanacak hikaye sayısı</string>
+    <string name="ig_profile_spoofer_section_copy">Profil kopyala</string>
+    <string name="ig_profile_spoofer_copy_hint">Kopyalanacak kullanıcı adı</string>
+    <string name="ig_profile_spoofer_copy_button">Profili aç</string>
+    <string name="ig_profile_spoofer_copy_note">O profili Instagram\'da açar. Oradaki üç nokta menüsüne dokun ve Sahte profil olarak kullan seçeneğini seç. Takipçi ve Takip listelerin artık o hesabın listelerini gösterir.</string>
+    <string name="ig_profile_spoofer_copy_failed">Geçerli bir kullanıcı adı gir.</string>
+    <string name="ig_profile_spoofer_use_profile">Sahte profil olarak kullan</string>
+    <string name="ig_profile_spoofer_copied">Profil, profil taklitçisine kopyalandı</string>
+    <string name="ig_profile_spoofer_copy_missing">Bu profil henüz okunamadı. Yüklenmesini bekle ve tekrar dene.</string>
+    <string name="ig_profile_spoofer_restart">Instagram kopyalanan profili yeniden başlatılana kadar bellekte tutar. Kendi profilini tekrar göstermek için şimdi yeniden başlatılsın mı?</string>
+    <string name="ig_profile_spoofer_restart_later">Daha sonra</string>
+    <string name="ig_profile_spoofer_restart_toast">Kendi profilini tekrar göstermek için Instagram\'ı yeniden başlat.</string>
+    <string name="ig_followers_history_week">Son 7 gün: %1$d takipten çıktı, %2$d yeni</string>
+    <string name="ig_followers_alert_fewer">%2$s tarihindeki son kontrolüne göre %1$d takipçin daha az. Kimler olduğunu görmek için Takipçiler sekmesini aç ve Takipçi geçmişi düğmesine dokun.</string>
+    <string name="ig_followers_alert_stale">Son takipçi kontrolün %1$d gün önceydi. Takipçiler sekmesini aç ve Takipçi geçmişi düğmesine dokun.</string>
 </resources>

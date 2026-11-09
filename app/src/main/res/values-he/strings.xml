@@ -822,4 +822,33 @@
     <string name="ig_confirm_refresh">לשאול לפני רענון הפיד</string>
     <string name="ig_confirm_refresh_question">לרענן את הפיד?</string>
     <string name="ig_confirm_refresh_action">רענן</string>
+    <!-- 0.8.3: kept messages search, past Instants, chosen stories, copy profile, followers alert -->
+    <string name="ig_unsent_search">חיפוש בהודעות שנשמרו</string>
+    <string name="ig_unsent_search_hint">טקסט, שם או צ\'אט</string>
+    <string name="ig_unsent_search_go">חיפוש</string>
+    <string name="ig_unsent_search_none">לא נמצאו תוצאות.</string>
+    <string name="ig_unsent_export_all">ייצוא כל הצ\'אטים כ-JSON</string>
+    <string name="ig_instant_history_title">שמור Instants שנצפו</string>
+    <string name="ig_instant_history_view">הצג Instants קודמים</string>
+    <string name="ig_instant_history_empty">אין עדיין Instants. הפעל את האפשרות ופתח כמה Instants, הם יישמרו כאן.</string>
+    <string name="ig_instant_history_clear">נקה Instants קודמים</string>
+    <string name="ig_instant_history_clear_confirm">למחוק את כל ה-Instants השמורים? לא ניתן לבטל פעולה זו.</string>
+    <string name="ig_story_pinned_title">שמור סטוריז מחשבונות נבחרים</string>
+    <string name="ig_story_pinned_note">סטוריז שאתה צופה בהם מחשבונות אלה נשמרים עד שמגיעים למגבלה, ואז הישנים ביותר מוחלפים.</string>
+    <string name="ig_story_pinned_users">שמות משתמש, מופרדים ברווחים או בפסיקים</string>
+    <string name="ig_story_pinned_limit">מספר סטוריז לשמירה לכל חשבון</string>
+    <string name="ig_profile_spoofer_section_copy">העתק פרופיל</string>
+    <string name="ig_profile_spoofer_copy_hint">שם משתמש להעתקה</string>
+    <string name="ig_profile_spoofer_copy_button">פתח פרופיל</string>
+    <string name="ig_profile_spoofer_copy_note">פותח את הפרופיל הזה ב-Instagram. הקש שם על תפריט שלוש הנקודות ובחר השתמש כפרופיל מזויף. רשימות העוקבים והנעקבים שלך יציגו אז את הרשימות של אותו חשבון.</string>
+    <string name="ig_profile_spoofer_copy_failed">הזן שם משתמש תקין.</string>
+    <string name="ig_profile_spoofer_use_profile">השתמש כפרופיל מזויף</string>
+    <string name="ig_profile_spoofer_copied">הפרופיל הועתק לזיוף הפרופיל</string>
+    <string name="ig_profile_spoofer_copy_missing">עדיין לא ניתן לקרוא את הפרופיל הזה. המתן לטעינה ונסה שוב.</string>
+    <string name="ig_profile_spoofer_restart">Instagram שומר את הפרופיל המועתק בזיכרון עד שהוא מופעל מחדש. להפעיל אותו מחדש עכשיו כדי להציג שוב את הפרופיל שלך?</string>
+    <string name="ig_profile_spoofer_restart_later">מאוחר יותר</string>
+    <string name="ig_profile_spoofer_restart_toast">הפעל מחדש את Instagram כדי להציג שוב את הפרופיל שלך.</string>
+    <string name="ig_followers_history_week">7 הימים האחרונים: ‏%1$d הפסיקו, %2$d חדשים</string>
+    <string name="ig_followers_alert_fewer">יש לך %1$d עוקבים פחות מאשר בבדיקה האחרונה ב-%2$s. פתח את העוקבים והקש על היסטוריית עוקבים כדי לראות מי.</string>
+    <string name="ig_followers_alert_stale">בדיקת העוקבים האחרונה שלך הייתה לפני %1$d ימים. פתח את העוקבים והקש על היסטוריית עוקבים.</string>
 </resources>
