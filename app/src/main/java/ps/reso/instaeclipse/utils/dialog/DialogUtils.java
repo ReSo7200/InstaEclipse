@@ -2539,10 +2539,9 @@ public class DialogUtils {
             FeatureFlags.downloaderAllowFallback = checked;
             SettingsManager.saveAllFlags();
         });
-        // The two switches only apply to Best, so they show only then.
+        // "Play everywhere" works in both modes (#309, #311); the lower-quality fallback only in Best.
         Runnable updateBestControls = () -> {
             int visibility = FeatureFlags.downloaderUseOriginal ? View.GONE : View.VISIBLE;
-            compatibility.setVisibility(visibility);
             lowerFallback.setVisibility(visibility);
         };
         View quality = createActionRow(context, R.drawable.ic_download,

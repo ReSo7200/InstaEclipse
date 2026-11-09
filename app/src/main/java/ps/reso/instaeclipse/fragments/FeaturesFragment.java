@@ -2202,9 +2202,9 @@ public class FeaturesFragment extends Fragment {
         List<FeatureItem> quality = new ArrayList<>();
         quality.add(createTool(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_quality),
                 downloadModeLabel(), this::chooseDownloadQuality));
-        // The two switches only apply to Best.
+        // "Play everywhere" works in both modes (#309, #311); the lower-quality fallback only in Best.
+        quality.add(createSwitch(R.drawable.ic_tune, "#FF9F0A", getString(R.string.ie_download_compatibility), "downloaderCompatibility"));
         if (!getCurrentState("downloaderUseOriginal")) {
-            quality.add(createSwitch(R.drawable.ic_tune, "#FF9F0A", getString(R.string.ie_download_compatibility), "downloaderCompatibility"));
             quality.add(createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ie_download_fallback), "downloaderAllowFallback"));
         }
         defs.add(quality);
