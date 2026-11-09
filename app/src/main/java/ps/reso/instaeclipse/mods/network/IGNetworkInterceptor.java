@@ -170,6 +170,8 @@ public class IGNetworkInterceptor {
                                                 || p.contains("/ig_meta_ai_side_chat_new_session/")
                                                 || p.contains("/create_ig_meta_ai_side_chat/")
                                                 || p.contains("/genai/response")
+                                                // AI bots offered in the Messages search (IG 452)
+                                                || p.contains("/direct_v2/search_gen_ai_bots/")
                                                 || (uri.getHost() != null && uri.getHost().contains("aistudio.instagram.com"));
                                     }
 
