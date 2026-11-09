@@ -1293,7 +1293,6 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_misc_remove_meta_ai), "removeMetaAI"),
                 createExtrasSwitch("#30D158", "hideOnboardingPrompts"),
                 createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_dialog_clean_feed_hide_plus), "hidePlusUpsells"),
-                createSwitch(R.drawable.ic_sparkle, "#30D158", getString(R.string.ig_free_app_icons), "freeAppIcons"),
                 createSwitch(R.drawable.ic_block, "#30D158", getString(R.string.ig_hide_instants), "hideInstants")
         ));
         return defs;
@@ -1914,6 +1913,10 @@ public class FeaturesFragment extends Fragment {
 
     private List<Object> buildThemeDefs() {
         List<Object> defs = new ArrayList<>();
+
+        defs.add(getString(R.string.ig_app_icon_title));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.ig_free_app_icons), "freeAppIcons")));
 
         defs.add(getString(R.string.theme_section_colors));
         defs.add(Arrays.asList(
