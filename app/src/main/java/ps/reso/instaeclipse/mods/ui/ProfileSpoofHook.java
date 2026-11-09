@@ -224,7 +224,7 @@ public final class ProfileSpoofHook {
     private static volatile long redirectUntil;
     private static volatile long infoUntil;
 
-    /** True while your own profile is in front (kept alive by taps on it). */
+    /** True for 30 s after the profile tab or a tap on your own profile; taps on other screens don't extend it. */
     public static boolean infoRedirectArmed() { return System.currentTimeMillis() < infoUntil; }
 
     public static boolean ownProfileOnScreen(android.view.View v) { return ownProfileShown(v); }
@@ -248,7 +248,8 @@ public final class ProfileSpoofHook {
                     infoUntil = System.currentTimeMillis() + 30_000;
                     if (!FeatureFlags.spoofTargetId.isEmpty()) pullTwice(v);
                 }
-                else if (infoRedirectArmed() || ownProfileShown(v)) infoUntil = System.currentTimeMillis() + 30_000;
+                // Only taps on your own profile keep the window open; taps elsewhere let it close.
+                else if (ownProfileShown(v)) infoUntil = System.currentTimeMillis() + 30_000;
                 if (followersId <= 0 || !isCountView(v)) return;
                 if (ownProfileShown(v)) redirectUntil = System.currentTimeMillis() + 60_000;
             }
