@@ -261,6 +261,9 @@ public class UIHookManager {
                         // Add the Ghost Emoji next to Inbox
                         addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
 
+                        // Durable health summary (independent of the toast setting).
+                        if (!CustomToast.toastShown) FeatureStatusTracker.logHealth(activity.getApplicationContext());
+
                         // 3. Show Success Toast
                         if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
                             CustomToast.toastShown = true;

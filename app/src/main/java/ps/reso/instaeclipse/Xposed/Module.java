@@ -123,6 +123,7 @@ public class Module {
                 return;
             }
             ModuleLog.line("(InstaEclipse): Xposed backend: " + ps.reso.instaeclipse.xposedcompat.XposedBridge.backend().name());
+            ps.reso.instaeclipse.utils.log.CrashReporter.install();
             try {
                 if (dexKitBridge == null) {
                     // Load the .so file from your module (if not already loaded)
