@@ -838,4 +838,6 @@
     <string name="ig_voice_messages_no_chat">افتح هذه المحادثة أولاً ثم حاول مجدداً.</string>
     <string name="ig_voice_play_failed">تعذّر تشغيل هذه الرسالة الصوتية</string>
     <string name="ig_voice_you">أنت</string>
+    <string name="ig_glass_tab_bar_section">شريط التنقل</string>
+    <string name="ig_glass_tab_bar">شريط تنقل زجاجي (أعد تشغيل إنستغرام)</string>
 </resources>

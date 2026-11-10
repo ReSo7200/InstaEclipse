@@ -893,4 +893,6 @@ Stay on this screen until it finishes.</string>
     <string name="ig_voice_messages_no_chat">Open this chat first, then try again.</string>
     <string name="ig_voice_play_failed">Couldn\'t play this voice message</string>
     <string name="ig_voice_you">You</string>
+    <string name="ig_glass_tab_bar_section">Navigation bar</string>
+    <string name="ig_glass_tab_bar">Glass navigation bar (restart Instagram)</string>
 </resources>

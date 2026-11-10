@@ -762,6 +762,13 @@ public class Module {
                         ModuleLog.line("(IE|SavedProfile) ❌ Failed to hook");
                     }
 
+                    // Glass navigation bar (#281)
+                    try {
+                        if (!skip("GlassTabBarHook")) new ps.reso.instaeclipse.mods.ui.GlassTabBarHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|GlassTabBar) ❌ Failed to hook");
+                    }
+
                     // Download a post/reel link shared to InstaEclipse from another app (#236)
                     try {
                         if (!skip("ShareLinkDownloadHook")) new ps.reso.instaeclipse.mods.media.ShareLinkDownloadHook().install(hostClassLoader);

@@ -424,4 +424,6 @@
     <string name="ig_update_button">Cập nhật ngay</string>
     <string name="ig_update_later">Để sau</string>
     <string name="ig_update_error_message">Không thể kiểm tra bản cập nhật. Vui lòng thử lại sau.</string>
+    <string name="ig_glass_tab_bar_section">Thanh điều hướng</string>
+    <string name="ig_glass_tab_bar">Thanh điều hướng kính mờ (khởi động lại Instagram)</string>
 </resources>

@@ -840,4 +840,6 @@
     <string name="ig_voice_messages_no_chat">請先開啟此聊天，然後再試一次。</string>
     <string name="ig_voice_play_failed">無法播放此語音訊息</string>
     <string name="ig_voice_you">你</string>
+    <string name="ig_glass_tab_bar_section">導覽列</string>
+    <string name="ig_glass_tab_bar">毛玻璃導覽列（需重新啟動 Instagram）</string>
 </resources>

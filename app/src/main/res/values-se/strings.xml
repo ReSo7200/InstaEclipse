@@ -841,4 +841,6 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="ig_voice_messages_no_chat">Öppna chatten först och försök sedan igen.</string>
     <string name="ig_voice_play_failed">Kunde inte spela upp röstmeddelandet</string>
     <string name="ig_voice_you">Du</string>
+    <string name="ig_glass_tab_bar_section">Navigeringsfält</string>
+    <string name="ig_glass_tab_bar">Navigeringsfält av glas (starta om Instagram)</string>
 </resources>

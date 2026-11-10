@@ -2304,6 +2304,11 @@ public class DialogUtils {
         layout.addView(cardOf(context,
                 flagSwitch(context, R.drawable.ic_palette, "#FF2D55", R.string.ig_free_app_icons, "freeAppIcons")));
 
+        // ---- Navigation bar: floating glass tab bar (#281), applies on the next Instagram start ----
+        layout.addView(sectionHeader(context, I18n.t(context, R.string.ig_glass_tab_bar_section)));
+        layout.addView(cardOf(context,
+                flagSwitch(context, R.drawable.ic_tune, "#FF2D55", R.string.ig_glass_tab_bar, "glassTabBar")));
+
         // ---- Colors ----
         // Enable-custom-theme + open the full color customizer.
         ToggleRow themeSwitch = createSwitch(context, R.drawable.ic_palette, "#FF2D55",

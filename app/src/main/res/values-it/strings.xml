@@ -775,4 +775,6 @@ Resta su questa schermata fino al termine.</string>
     <string name="ig_voice_messages_no_chat">Apri prima questa chat, poi riprova.</string>
     <string name="ig_voice_play_failed">Impossibile riprodurre questo messaggio vocale</string>
     <string name="ig_voice_you">Tu</string>
+    <string name="ig_glass_tab_bar_section">Barra di navigazione</string>
+    <string name="ig_glass_tab_bar">Barra di navigazione in vetro (riavvia Instagram)</string>
 </resources>

@@ -841,4 +841,6 @@
     <string name="ig_voice_messages_no_chat">Сначала откройте этот чат, затем повторите попытку.</string>
     <string name="ig_voice_play_failed">Не удалось воспроизвести это голосовое сообщение</string>
     <string name="ig_voice_you">Вы</string>
+    <string name="ig_glass_tab_bar_section">Панель навигации</string>
+    <string name="ig_glass_tab_bar">Стеклянная панель навигации (перезапустите Instagram)</string>
 </resources>

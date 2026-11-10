@@ -879,4 +879,6 @@
     <string name="ig_voice_messages_no_chat">Önce bu sohbeti aç, sonra tekrar dene.</string>
     <string name="ig_voice_play_failed">Bu sesli mesaj oynatılamadı</string>
     <string name="ig_voice_you">Sen</string>
+    <string name="ig_glass_tab_bar_section">Gezinme çubuğu</string>
+    <string name="ig_glass_tab_bar">Cam gezinme çubuğu (Instagram\'ı yeniden başlatın)</string>
 </resources>

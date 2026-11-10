@@ -889,4 +889,6 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="ig_voice_messages_no_chat">Najpierw otwórz ten czat, potem spróbuj ponownie.</string>
     <string name="ig_voice_play_failed">Nie udało się odtworzyć tej wiadomości głosowej</string>
     <string name="ig_voice_you">Ty</string>
+    <string name="ig_glass_tab_bar_section">Pasek nawigacji</string>
+    <string name="ig_glass_tab_bar">Szklany pasek nawigacji (uruchom ponownie Instagram)</string>
 </resources>

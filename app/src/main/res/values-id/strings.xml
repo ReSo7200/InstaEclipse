@@ -872,4 +872,6 @@ Tetap di layar ini sampai selesai.</string>
     <string name="ig_voice_messages_no_chat">Buka obrolan ini dulu, lalu coba lagi.</string>
     <string name="ig_voice_play_failed">Tidak dapat memutar pesan suara ini</string>
     <string name="ig_voice_you">Kamu</string>
+    <string name="ig_glass_tab_bar_section">Bilah navigasi</string>
+    <string name="ig_glass_tab_bar">Bilah navigasi kaca (mulai ulang Instagram)</string>
 </resources>
