@@ -200,7 +200,9 @@ public final class DeviceSpoofHook {
     public static void syncOverrides(Context context) {
         try {
             File marker = new File(context.getFilesDir(), APPLIED_MARKER);
-            boolean on = profile() != null;
+            // Lower ban risk: don't write developer-option overrides (only internal builds carry
+            // them); remove any that were written before. HDR via overrides is off while it's on.
+            boolean on = profile() != null && !ps.reso.instaeclipse.utils.core.Pace.on();
             if (on == marker.exists()) return;
             File file = new File(context.getFilesDir(), "mobileconfig/mc_overrides.json");
             String json = file.exists() ? new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8) : "{}";

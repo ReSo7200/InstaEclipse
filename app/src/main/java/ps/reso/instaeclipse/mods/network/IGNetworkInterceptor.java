@@ -233,9 +233,15 @@ public class IGNetworkInterceptor {
 
                                     // Analytics
                                     if (FeatureFlags.isAnalyticsBlocked) {
-                                        shouldDrop |= (host != null && (host.contains("graph.instagram.com")
-                                                || host.contains("graph.facebook.com")))
-                                                || uri.getPath().contains("/logging_client_events");
+                                        if (ps.reso.instaeclipse.utils.core.Pace.on()) {
+                                            // Lower ban risk: let normal telemetry keep flowing so the
+                                            // account doesn't look headless; drop only the heavy event log.
+                                            shouldDrop |= uri.getPath().contains("/logging_client_events");
+                                        } else {
+                                            shouldDrop |= (host != null && (host.contains("graph.instagram.com")
+                                                    || host.contains("graph.facebook.com")))
+                                                    || uri.getPath().contains("/logging_client_events");
+                                        }
                                     }
 
                                     // Misc
