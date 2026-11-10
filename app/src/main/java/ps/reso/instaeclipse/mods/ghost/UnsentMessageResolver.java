@@ -158,6 +158,8 @@ final class UnsentMessageResolver {
 
     Class<?> entryType() { return entryLookup.getReturnType(); }
 
+    Class<?> messageType() { return messageClass; }
+
     Selection lookup(Object store, Object threadKey, String messageId, String clientContext) {
         String id = identifier(messageId), client = identifier(clientContext);
         if (store == null || threadKey == null || (id == null && client == null)

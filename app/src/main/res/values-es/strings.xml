@@ -833,4 +833,6 @@
     <string name="home_signer_untrust_title">¿Dejar de confiar en este Instagram?</string>
     <string name="home_signer_untrust_message">Las descargas y la sincronización de ajustes con este Instagram (clave %1$s…) se volverán a bloquear.</string>
     <string name="home_signer_untrust">Dejar de confiar</string>
+    <string name="ie_unsent_label">Anulado</string>
+    <string name="ie_hide_unsent_label">Ocultar la etiqueta «Anulado» en los mensajes conservados</string>
 </resources>

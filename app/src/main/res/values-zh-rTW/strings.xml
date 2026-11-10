@@ -829,4 +829,6 @@
     <string name="home_signer_untrust_title">要停止信任此 Instagram 嗎？</string>
     <string name="home_signer_untrust_message">與此 Instagram（金鑰 %1$s…）之間的下載和設定同步將再次遭到封鎖。</string>
     <string name="home_signer_untrust">停止信任</string>
+    <string name="ie_unsent_label">已收回</string>
+    <string name="ie_hide_unsent_label">隱藏保留訊息上的「已收回」標籤</string>
 </resources>

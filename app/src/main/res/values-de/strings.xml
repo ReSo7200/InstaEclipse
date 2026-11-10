@@ -839,4 +839,6 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="home_signer_untrust_title">Diesem Instagram nicht mehr vertrauen?</string>
     <string name="home_signer_untrust_message">Downloads und die Synchronisierung der Einstellungen mit diesem Instagram (Schlüssel %1$s…) werden wieder blockiert.</string>
     <string name="home_signer_untrust">Nicht mehr vertrauen</string>
+    <string name="ie_unsent_label">Zurückgezogen</string>
+    <string name="ie_hide_unsent_label">Label „Zurückgezogen“ bei behaltenen Nachrichten ausblenden</string>
 </resources>

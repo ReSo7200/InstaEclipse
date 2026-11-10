@@ -864,4 +864,6 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="home_signer_untrust_title">Ne plus faire confiance à cet Instagram ?</string>
     <string name="home_signer_untrust_message">Les téléchargements et la synchronisation des paramètres avec cet Instagram (clé %1$s…) seront de nouveau bloqués.</string>
     <string name="home_signer_untrust">Ne plus faire confiance</string>
+    <string name="ie_unsent_label">Annulé</string>
+    <string name="ie_hide_unsent_label">Masquer l\'étiquette « Annulé » sur les messages conservés</string>
 </resources>

@@ -827,4 +827,6 @@
     <string name="home_signer_untrust_title">التوقف عن الوثوق بنسخة Instagram هذه؟</string>
     <string name="home_signer_untrust_message">سيتم حظر التنزيلات ومزامنة الإعدادات مع نسخة Instagram هذه (المفتاح %1$s…) مجددًا.</string>
     <string name="home_signer_untrust">إيقاف الوثوق</string>
+    <string name="ie_unsent_label">أُلغي إرسالها</string>
+    <string name="ie_hide_unsent_label">إخفاء علامة \"أُلغي إرسالها\" على الرسائل المحفوظة</string>
 </resources>

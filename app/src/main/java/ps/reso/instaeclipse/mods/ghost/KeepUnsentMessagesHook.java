@@ -62,8 +62,14 @@ public class KeepUnsentMessagesHook {
     private UnsentMessageResolver ownership;
     private boolean retentionReady;
 
+    private static volatile Boolean markerShown;
+
     public static void onSettingsChanged() {
         if (!FeatureFlags.keepUnsentMessages || !FeatureFlags.keepUnsentInChat) retained.clear();
+        // Redraw the "Unsent" marks only when their visibility actually flips (#222).
+        boolean shown = UnsentMarkerHook.enabled();
+        if (markerShown != null && markerShown != shown) UnsentMarkerHook.refreshVisible();
+        markerShown = shown;
     }
 
     /** Extract the thread id string from a DirectThreadKey (first non-empty String field). */
@@ -122,6 +128,7 @@ public class KeepUnsentMessagesHook {
         CurrentConversation.install(bridge, classLoader);
         ownership = UnsentMessageResolver.resolve(bridge, classLoader);
         if (ownership != null) retentionReady = hookReconcile(bridge, classLoader);
+        if (retentionReady) installMarker(bridge, classLoader);
         ModuleLog.line("(IE|KeepUnsent) sender binding=" + (ownership != null)
                 + "; optional in-chat binding=" + retentionReady);
         resolveEntryClass(bridge, classLoader);
@@ -283,6 +290,7 @@ public class KeepUnsentMessagesHook {
                             && retained.protect(selected.threadEntry, param.thisObject, selected.accountId,
                             thread, selected.identity(), selected.senderId, selected.message)) {
                         param.setResult(null);
+                        UnsentMarkerHook.refreshVisible(); // the row may already be on screen
                     }
                     return;
                 }
@@ -338,6 +346,18 @@ public class KeepUnsentMessagesHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|KeepUnsent) ❌ remove: " + t);
         }
+    }
+
+    /** "Unsent" mark on the rows of retained messages (#222), matched by message id. */
+    private void installMarker(DexKitBridge bridge, ClassLoader classLoader) {
+        final UnsentMessageResolver resolver = ownership;
+        UnsentMarkerHook.install(bridge, classLoader, resolver.messageType(), new UnsentMarkerHook.Matcher() {
+            @Override public boolean any() { return retained.size() > 0; }
+            @Override public boolean retained(Object message) {
+                String id = resolver.identityOf(message);
+                return id != null && retained.containsMessage(id);
+            }
+        });
     }
 
     /** Optional, session-only reconcile protection; refuse ambiguous or unrelated entry classes. */

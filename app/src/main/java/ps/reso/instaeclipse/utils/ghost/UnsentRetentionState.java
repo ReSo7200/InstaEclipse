@@ -159,6 +159,14 @@ public final class UnsentRetentionState {
 
     public synchronized int size() { return messageCount; }
 
+    /** True when a message with this id is retained in any thread entry. */
+    public synchronized boolean containsMessage(String messageId) {
+        if (messageId == null || messageCount == 0) return false;
+        for (LinkedHashMap<String, Record> records : byEntry.values())
+            if (records.containsKey(messageId)) return true;
+        return false;
+    }
+
     /** Feature-off must revoke session-only protection without deleting saved history. */
     public synchronized void clear() {
         byEntry.clear();

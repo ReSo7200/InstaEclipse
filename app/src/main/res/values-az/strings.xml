@@ -831,4 +831,6 @@
     <string name="home_signer_untrust_title">Bu Instagram-a artıq güvənilməsin?</string>
     <string name="home_signer_untrust_message">Bu Instagram (açar %1$s…) ilə yükləmələr və ayarların sinxronlaşdırılması yenidən bloklanacaq.</string>
     <string name="home_signer_untrust">Güvənməyi dayandır</string>
+    <string name="ie_unsent_label">Geri götürülüb</string>
+    <string name="ie_hide_unsent_label">Saxlanılan mesajlarda \"Geri götürülüb\" etiketini gizlət</string>
 </resources>

@@ -764,4 +764,6 @@ Resta su questa schermata fino al termine.</string>
     <string name="home_signer_untrust_title">Non fidarti più di questo Instagram?</string>
     <string name="home_signer_untrust_message">I download e la sincronizzazione delle impostazioni con questo Instagram (chiave %1$s…) verranno di nuovo bloccati.</string>
     <string name="home_signer_untrust">Non fidarti più</string>
+    <string name="ie_unsent_label">Annullato</string>
+    <string name="ie_hide_unsent_label">Nascondi l\'etichetta \"Annullato\" sui messaggi conservati</string>
 </resources>
