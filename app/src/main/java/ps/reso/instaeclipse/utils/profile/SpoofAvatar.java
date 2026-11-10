@@ -87,6 +87,39 @@ public final class SpoofAvatar {
         }
     }
 
+    /** Same as {@link #encode(ContentResolver, Uri)} for a bitmap already on screen. */
+    public static String encode(Bitmap shown) {
+        Bitmap src = null;
+        try {
+            if (shown == null || shown.getWidth() == 0 || shown.getHeight() == 0) return null;
+            src = shown.copy(Bitmap.Config.ARGB_8888, false);
+            if (src == null) return null;
+            int side = Math.min(src.getWidth(), src.getHeight());
+            int out = Math.min(side, MAX_SIDE);
+            Bitmap square = Bitmap.createBitmap(out, out, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(square);
+            c.drawColor(0xFFFFFFFF);
+            Rect from = new Rect((src.getWidth() - side) / 2, (src.getHeight() - side) / 2,
+                    (src.getWidth() + side) / 2, (src.getHeight() + side) / 2);
+            c.drawBitmap(src, from, new Rect(0, 0, out, out), new Paint(Paint.FILTER_BITMAP_FLAG));
+            for (int quality = 85; quality >= 40; quality -= 15) {
+                java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+                square.compress(Bitmap.CompressFormat.JPEG, quality, bytes);
+                String b64 = android.util.Base64.encodeToString(bytes.toByteArray(), android.util.Base64.NO_WRAP);
+                if (b64.length() <= MAX_CHARS) {
+                    square.recycle();
+                    return b64;
+                }
+            }
+            square.recycle();
+            return null;
+        } catch (Throwable t) {
+            return null;
+        } finally {
+            if (src != null) src.recycle();
+        }
+    }
+
     /** The picture of {@code value}, decoded once per value; null when empty or unreadable. */
     public static synchronized Bitmap bitmap(String value) {
         if (value == null || value.isEmpty()) return null;

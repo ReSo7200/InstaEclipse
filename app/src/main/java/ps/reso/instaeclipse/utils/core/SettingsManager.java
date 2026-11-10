@@ -159,6 +159,8 @@ public class SettingsManager {
         editor.putString("spoofName", FeatureFlags.spoofName);
         editor.putString("spoofUsername", FeatureFlags.spoofUsername);
         editor.putString("spoofBio", FeatureFlags.spoofBio);
+        editor.putString("spoofTargetId", FeatureFlags.spoofTargetId);
+        editor.putBoolean("spoofPrivate", FeatureFlags.spoofPrivate);
         editor.putString("spoofAvatar", FeatureFlags.spoofAvatar);
         editor.putBoolean("profileAnalyzer", FeatureFlags.profileAnalyzer);
         editor.putBoolean("profileFollowsYouLabel", FeatureFlags.profileFollowsYouLabel);
@@ -189,6 +191,9 @@ public class SettingsManager {
         editor.putBoolean("downloaderAddTimestamp", FeatureFlags.downloaderAddTimestamp);
         editor.putBoolean("copyMediaLink", FeatureFlags.copyMediaLink);
         editor.putBoolean("saveInstants", FeatureFlags.saveInstants);
+        editor.putBoolean("keepInstantHistory", FeatureFlags.keepInstantHistory);
+        editor.putString("pinnedStoryUsers", FeatureFlags.pinnedStoryUsers);
+        editor.putInt("pinnedStoryLimit", FeatureFlags.pinnedStoryLimit);
         editor.putBoolean("uploadInstants", FeatureFlags.uploadInstants);
         editor.putBoolean("cacheStories", FeatureFlags.cacheStories);
         editor.putBoolean("customFontEnabled", FeatureFlags.customFontEnabled);
@@ -374,6 +379,8 @@ public class SettingsManager {
         FeatureFlags.spoofName = prefs.getString("spoofName", "");
         FeatureFlags.spoofUsername = prefs.getString("spoofUsername", "");
         FeatureFlags.spoofBio = prefs.getString("spoofBio", "");
+        FeatureFlags.spoofTargetId = prefs.getString("spoofTargetId", "");
+        FeatureFlags.spoofPrivate = prefs.getBoolean("spoofPrivate", false);
         FeatureFlags.spoofAvatar = prefs.getString("spoofAvatar", "");
         FeatureFlags.profileAnalyzer = prefs.getBoolean("profileAnalyzer", false);
         FeatureFlags.profileFollowsYouLabel = prefs.getBoolean("profileFollowsYouLabel", false);
@@ -404,6 +411,9 @@ public class SettingsManager {
         FeatureFlags.downloaderAddTimestamp   = prefs.getBoolean("downloaderAddTimestamp", false);
         FeatureFlags.copyMediaLink            = prefs.getBoolean("copyMediaLink", false);
         FeatureFlags.saveInstants             = prefs.getBoolean("saveInstants", false);
+        FeatureFlags.keepInstantHistory       = prefs.getBoolean("keepInstantHistory", false);
+        FeatureFlags.pinnedStoryUsers         = prefs.getString("pinnedStoryUsers", "");
+        FeatureFlags.pinnedStoryLimit         = prefs.getInt("pinnedStoryLimit", 30);
         FeatureFlags.uploadInstants           = prefs.getBoolean("uploadInstants", false);
         FeatureFlags.cacheStories             = prefs.getBoolean("cacheStories", false);
         FeatureFlags.customFontEnabled        = prefs.getBoolean("customFontEnabled", false);

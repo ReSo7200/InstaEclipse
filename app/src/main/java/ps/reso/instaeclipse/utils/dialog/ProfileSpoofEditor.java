@@ -43,7 +43,7 @@ public final class ProfileSpoofEditor {
 
     /** The spoofer's settings; "" / -1 = keep the real value. */
     public static final class Values {
-        public String username = "", name = "", bio = "", avatar = "";
+        public String username = "", name = "", bio = "", avatar = "", targetId = "";
         public int posts = -1, followers = -1, following = -1;
         public boolean verified;
     }
@@ -61,6 +61,7 @@ public final class ProfileSpoofEditor {
     private final TextView previewUsername, previewName, previewBio, previewPosts, previewFollowers, previewFollowing;
     private final TextView removePhoto;
     private String avatar;
+    private String targetId;
 
     /**
      * @param onChoosePhoto opens a picker; its result goes to {@link #setAvatar}
@@ -73,6 +74,7 @@ public final class ProfileSpoofEditor {
         this.d = ctx.getResources().getDisplayMetrics().density;
         this.knownUsername = knownUsername;
         this.avatar = v.avatar == null ? "" : v.avatar;
+        this.targetId = v.targetId == null ? "" : v.targetId;
 
         root = new LinearLayout(ctx);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -118,6 +120,24 @@ public final class ProfileSpoofEditor {
         LinearLayout.LayoutParams noteLp = matchWrap();
         noteLp.topMargin = dp(10);
         root.addView(note, noteLp);
+
+        // ---- Copy a profile ----
+        LinearLayout copy = section(R.string.ig_profile_spoofer_section_copy);
+        EditText copyUser = field(I18n.t(ctx, R.string.ig_profile_spoofer_copy_hint));
+        copyUser.setSingleLine(true);
+        copyUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        copy.addView(copyUser, matchWrap());
+        TextView copyButton = pill(I18n.t(ctx, R.string.ig_profile_spoofer_copy_button), true);
+        LinearLayout.LayoutParams copyLp = wrap();
+        copyLp.topMargin = dp(8);
+        copy.addView(copyButton, copyLp);
+        TextView copyNote = text(12, p.sub, false);
+        copyNote.setText(I18n.t(ctx, R.string.ig_profile_spoofer_copy_note));
+        LinearLayout.LayoutParams copyNoteLp = matchWrap();
+        copyNoteLp.topMargin = dp(6);
+        copyNoteLp.setMarginStart(dp(4));
+        copy.addView(copyNote, copyNoteLp);
+        copyButton.setOnClickListener(x -> openProfile(copyUser.getText().toString()));
 
         // ---- Identity ----
         LinearLayout identity = section(R.string.ig_profile_spoofer_section_identity);
@@ -217,6 +237,7 @@ public final class ProfileSpoofEditor {
         v.following = DialogUtils.parseSpoofCount(following.getText().toString());
         v.verified = verified.isChecked();
         v.avatar = avatar;
+        v.targetId = targetId;
         return v;
     }
 
@@ -226,9 +247,29 @@ public final class ProfileSpoofEditor {
         refresh();
     }
 
+    private void openProfile(String typed) {
+        String clean = typed == null ? "" : typed.trim().replace("@", "");
+        if (!clean.matches("[A-Za-z0-9._]{1,30}")) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                    I18n.t(ctx, R.string.ig_profile_spoofer_copy_failed), android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            android.content.Intent i = new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse("https://www.instagram.com/" + clean + "/"));
+            i.setPackage("com.instagram.android");
+            i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            ctx.startActivity(i);
+        } catch (Throwable t) {
+            ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx,
+                    I18n.t(ctx, R.string.ig_profile_spoofer_copy_failed), android.widget.Toast.LENGTH_LONG).show();
+        }
+    }
+
     public void reset() {
         for (EditText e : new EditText[]{username, name, bio, posts, followers, following}) e.setText("");
         verified.setChecked(false);
+        targetId = "";
         setAvatar("");
     }
 

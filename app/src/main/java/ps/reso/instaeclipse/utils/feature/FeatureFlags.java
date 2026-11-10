@@ -152,6 +152,8 @@ public class FeatureFlags {
     public static volatile boolean spoofVerified = false;  // show the verified badge on your own profile
     public static volatile String  spoofName = "";         // own profile header name, "" = unchanged
     public static volatile String  spoofUsername = "";     // own profile action bar username, "" = unchanged
+    public static volatile boolean spoofPrivate = false;   // the copied account is private
+    public static volatile String  spoofTargetId = "";    // user id of the profile copied into the spoofer, "" = none
     public static volatile String  spoofBio = "";          // own profile bio, "" = unchanged
     public static volatile String  spoofAvatar = "";       // own profile picture: Base64 JPEG (max 320x320), "" = unchanged
     public static volatile boolean profileAnalyzer = false; // watchlist: compare a profile's Followers / Following between analyses
@@ -199,6 +201,9 @@ public class FeatureFlags {
     public static volatile boolean downloaderUsernameFolder = false;
     public static volatile boolean downloaderAddTimestamp = false;
     public static volatile boolean copyMediaLink = false;      // #117 — inject "Copy Media Link" (direct CDN url) into the post ⋮ menu
+    public static volatile boolean keepInstantHistory = false;
+    public static volatile String  pinnedStoryUsers = "";
+    public static volatile int     pinnedStoryLimit = 30;
     public static volatile boolean saveInstants = false;        // #184 — long-press a received Instant (quicksnap) to save it
     public static volatile boolean uploadInstants = false;      // #199 — send an Instant from gallery (bitmap-swap into quicksnap send)
     public static volatile boolean cacheStories = false;        // cache viewed stories locally for 24h (survive expiry/deletion)

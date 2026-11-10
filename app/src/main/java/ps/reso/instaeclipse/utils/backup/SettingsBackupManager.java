@@ -125,6 +125,8 @@ public class SettingsBackupManager {
         s.put("spoofName",               FeatureFlags.spoofName);
         s.put("spoofUsername",           FeatureFlags.spoofUsername);
         s.put("spoofBio",                FeatureFlags.spoofBio);
+        s.put("spoofTargetId",           FeatureFlags.spoofTargetId);
+        s.put("spoofPrivate",            FeatureFlags.spoofPrivate);
         s.put("spoofAvatar",             FeatureFlags.spoofAvatar);
         s.put("profileAnalyzer",         FeatureFlags.profileAnalyzer);
         s.put("profileFollowsYouLabel",  FeatureFlags.profileFollowsYouLabel);
@@ -148,6 +150,9 @@ public class SettingsBackupManager {
         s.put("downloaderAddTimestamp",  FeatureFlags.downloaderAddTimestamp);
         s.put("copyMediaLink",           FeatureFlags.copyMediaLink);
         s.put("saveInstants",            FeatureFlags.saveInstants);
+        s.put("keepInstantHistory",      FeatureFlags.keepInstantHistory);
+        s.put("pinnedStoryUsers",        FeatureFlags.pinnedStoryUsers);
+        s.put("pinnedStoryLimit",        FeatureFlags.pinnedStoryLimit);
         s.put("uploadInstants",          FeatureFlags.uploadInstants);
 
         JSONObject root = new JSONObject();
@@ -290,6 +295,8 @@ public class SettingsBackupManager {
         if (s.has("spoofName"))              FeatureFlags.spoofName              = s.getString("spoofName");
         if (s.has("spoofUsername"))          FeatureFlags.spoofUsername          = s.getString("spoofUsername");
         if (s.has("spoofBio"))               FeatureFlags.spoofBio               = s.getString("spoofBio");
+        if (s.has("spoofTargetId"))          FeatureFlags.spoofTargetId          = s.getString("spoofTargetId");
+        if (s.has("spoofPrivate"))           FeatureFlags.spoofPrivate           = s.getBoolean("spoofPrivate");
         if (s.has("spoofAvatar") && ps.reso.instaeclipse.utils.profile.SpoofAvatar.isValid(s.getString("spoofAvatar")))
             FeatureFlags.spoofAvatar = s.getString("spoofAvatar");
         if (s.has("profileAnalyzer"))        FeatureFlags.profileAnalyzer        = s.getBoolean("profileAnalyzer");
@@ -313,6 +320,9 @@ public class SettingsBackupManager {
         if (s.has("downloaderAddTimestamp")) FeatureFlags.downloaderAddTimestamp  = s.getBoolean("downloaderAddTimestamp");
         if (s.has("copyMediaLink"))          FeatureFlags.copyMediaLink          = s.getBoolean("copyMediaLink");
         if (s.has("saveInstants"))           FeatureFlags.saveInstants           = s.getBoolean("saveInstants");
+        if (s.has("keepInstantHistory"))     FeatureFlags.keepInstantHistory     = s.getBoolean("keepInstantHistory");
+        if (s.has("pinnedStoryUsers"))       FeatureFlags.pinnedStoryUsers       = s.getString("pinnedStoryUsers");
+        if (s.has("pinnedStoryLimit"))       FeatureFlags.pinnedStoryLimit       = Math.max(1, s.getInt("pinnedStoryLimit"));
         if (s.has("uploadInstants"))         FeatureFlags.uploadInstants         = s.getBoolean("uploadInstants");
     }
 

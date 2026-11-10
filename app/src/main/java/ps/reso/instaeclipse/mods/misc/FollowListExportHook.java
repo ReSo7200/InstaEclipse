@@ -559,6 +559,13 @@ public class FollowListExportHook {
                     if (ps.reso.instaeclipse.utils.users.FollowersHistory.LOST.equals(e.type)) lost++; else gained++;
                 head = I18n.t(ctx, R.string.ig_followers_history_changes, df.format(new Date(r.previousCheck)), lost, gained);
             }
+            int weekLost = 0, weekGained = 0;
+            long weekAgo = System.currentTimeMillis() - 7L * 24 * 3_600_000L;
+            for (ps.reso.instaeclipse.utils.users.FollowersHistory.Event e : state.events) {
+                if (e.ts < weekAgo) continue;
+                if (ps.reso.instaeclipse.utils.users.FollowersHistory.LOST.equals(e.type)) weekLost++; else weekGained++;
+            }
+            if (!state.events.isEmpty()) head += "\n" + I18n.t(ctx, R.string.ig_followers_history_week, weekLost, weekGained);
             if (state.lastCheck > 0)
                 head += "\n" + I18n.t(ctx, R.string.ig_followers_history_summary, state.users.size(), df.format(new Date(state.lastCheck)));
             if (error != null) head += "\n⚠️ " + error;

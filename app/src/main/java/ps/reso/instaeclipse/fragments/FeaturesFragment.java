@@ -1079,14 +1079,15 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createMasterSwitch(getString(R.string.ig_dialog_enable_disable_all), Arrays.asList(
                         "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive",
-                        "isGhostScreenshot", "isGhostViewOnce"
+                        "isGhostScreenshot", "isGhostViewOnce", "permanentViewMode"
                 )),
                 createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_dm_seen), "isGhostSeen"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_typing), "isGhostTyping"),
                 createSwitch(R.drawable.ic_story_ring, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_story_views), "isGhostStory"),
                 createSwitch(R.drawable.ic_live, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_live_presence), "isGhostLive"),
                 createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_ghost_bypass_screenshot), "isGhostScreenshot"),
-                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_view_once), "isGhostViewOnce")
+                createSwitch(R.drawable.ic_eye_off, "#5E5CE6", getString(R.string.ig_dialog_ghost_hide_view_once), "isGhostViewOnce"),
+                createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_ghost_permanent_view_once), "permanentViewMode")
         ));
 
         // Outside the master switch
@@ -1125,7 +1126,6 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_jump_first, "#5E5CE6", getString(R.string.ig_dialog_ghost_jump_first), "jumpToFirstMessage"),
                 createSwitch(R.drawable.ic_shield, "#5E5CE6", getString(R.string.ig_call_confirm), "confirmCalls"),
                 createSwitch(R.drawable.ic_camera, "#5E5CE6", getString(R.string.ig_dialog_ghost_allow_screenshots_dms), "allowScreenshots"),
-                createSwitch(R.drawable.ic_eye, "#5E5CE6", getString(R.string.ig_dialog_ghost_permanent_view_once), "permanentViewMode"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_translate_messages), "translateMessages"),
                 createSwitch(R.drawable.ic_chat, "#5E5CE6", getString(R.string.ig_dialog_bulk_unsend), "bulkUnsend"),
                 createSwitch(R.drawable.ic_download, "#5E5CE6", getString(R.string.ig_dialog_ghost_chat_export), "chatExport"),
@@ -1687,6 +1687,7 @@ public class FeaturesFragment extends Fragment {
         v.name = localCache.getString("spoofName", "");
         v.bio = localCache.getString("spoofBio", "");
         v.avatar = localCache.getString("spoofAvatar", "");
+        v.targetId = localCache.getString("spoofTargetId", "");
         v.posts = localCache.getInt("spoofPosts", -1);
         v.followers = localCache.getInt("spoofFollowers", -1);
         v.following = localCache.getInt("spoofFollowing", -1);
@@ -1720,6 +1721,12 @@ public class FeaturesFragment extends Fragment {
         if (!now.name.equals(old.name)) putStringPref("spoofName", now.name);
         if (!now.bio.equals(old.bio)) putStringPref("spoofBio", now.bio);
         if (!now.avatar.equals(old.avatar)) putStringPref("spoofAvatar", now.avatar);
+        if (!now.targetId.equals(old.targetId)) {
+            putStringPref("spoofTargetId", now.targetId);
+            if (now.targetId.isEmpty())
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(requireContext(),
+                        getString(R.string.ig_profile_spoofer_restart_toast), Toast.LENGTH_LONG).show();
+        }
         if (now.posts != old.posts) putIntPref("spoofPosts", now.posts);
         if (now.followers != old.followers) putIntPref("spoofFollowers", now.followers);
         if (now.following != old.following) putIntPref("spoofFollowing", now.following);
@@ -2183,6 +2190,7 @@ public class FeaturesFragment extends Fragment {
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_downloader_dm_media), "enableDmMediaDownload"),
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_downloader_offer_audio), "offerAudioDownload"),
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_save_instants), "saveInstants"),
+                createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_instant_history_title), "keepInstantHistory"),
                 createSwitch(R.drawable.ic_download, "#FF9F0A", getString(R.string.ig_dialog_misc_cache_stories), "cacheStories")
         ));
 
