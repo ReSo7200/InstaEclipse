@@ -636,6 +636,8 @@
     <string name="ig_dialog_unsent_unknown_chat">Okänd chatt</string>
     <string name="ig_dialog_clean_feed_hide_threads">Dölj Threads-förslag</string>
     <string name="ig_dialog_clean_feed_hide_liked">Dölj inlägg du redan har gillat</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Dölj förslag i Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Dölj betalda samarbeten och sponsrade inlägg</string>
     <string name="ig_nav_settings_title">Navigeringsinställningar</string>
     <string name="ig_nav_name_home">Hem</string>
     <string name="ig_nav_name_reels">Reels</string>

@@ -90,6 +90,8 @@ public class SettingsManager {
         // Clean Feed
         editor.putBoolean("hideSuggestionsInFeed", FeatureFlags.hideSuggestionsInFeed);
         editor.putBoolean("hideThreadsSuggestions", FeatureFlags.hideThreadsSuggestions);
+        editor.putBoolean("hideSuggestionsInReels", FeatureFlags.hideSuggestionsInReels);
+        editor.putBoolean("hidePaidPartnerships", FeatureFlags.hidePaidPartnerships);
         editor.putBoolean("hideLikedPosts", FeatureFlags.hideLikedPosts);
         editor.putBoolean("confirmFeedRefresh", FeatureFlags.confirmFeedRefresh);
         editor.putBoolean("hideCommunityNotes", FeatureFlags.hideCommunityNotes);
@@ -313,6 +315,8 @@ public class SettingsManager {
         // Clean Feed
         FeatureFlags.hideSuggestionsInFeed = prefs.getBoolean("hideSuggestionsInFeed", false);
         FeatureFlags.hideThreadsSuggestions = prefs.getBoolean("hideThreadsSuggestions", false);
+        FeatureFlags.hideSuggestionsInReels = prefs.getBoolean("hideSuggestionsInReels", false);
+        FeatureFlags.hidePaidPartnerships = prefs.getBoolean("hidePaidPartnerships", false);
         FeatureFlags.hideLikedPosts = prefs.getBoolean("hideLikedPosts", false);
         FeatureFlags.confirmFeedRefresh = prefs.getBoolean("confirmFeedRefresh", false);
         FeatureFlags.hideCommunityNotes = prefs.getBoolean("hideCommunityNotes", false);

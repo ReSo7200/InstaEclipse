@@ -669,6 +669,8 @@
     <string name="ig_dialog_unsent_unknown_chat">未知对话</string>
     <string name="ig_dialog_clean_feed_hide_threads">隐藏 Threads 推荐</string>
     <string name="ig_dialog_clean_feed_hide_liked">隐藏已赞过的帖子</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">隐藏 Reels 中的推荐内容</string>
+    <string name="ig_dialog_clean_feed_hide_paid">隐藏付费合作与赞助帖子</string>
     <string name="ig_nav_settings_title">导航设置</string>
     <string name="ig_nav_name_home">首页</string>
     <string name="ig_nav_name_reels">连续短片</string>

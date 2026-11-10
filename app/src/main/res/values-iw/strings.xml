@@ -668,6 +668,8 @@
     <string name="ig_dialog_unsent_unknown_chat">צ\'אט לא ידוע</string>
     <string name="ig_dialog_clean_feed_hide_threads">הסתר הצעות Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">הסתר פוסטים שכבר אהבת</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">הסתר הצעות ב-Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">הסתר שותפויות בתשלום ופוסטים ממומנים</string>
     <string name="ig_nav_settings_title">הגדרות ניווט</string>
     <string name="ig_nav_name_home">בית</string>
     <string name="ig_nav_name_reels">ריילז</string>

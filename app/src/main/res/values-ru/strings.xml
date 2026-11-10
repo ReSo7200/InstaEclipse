@@ -637,6 +637,8 @@
     <string name="ig_dialog_unsent_unknown_chat">Неизвестный чат</string>
     <string name="ig_dialog_clean_feed_hide_threads">Скрыть рекомендации Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Скрывать публикации, которые вам уже понравились</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Скрыть предложения в Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Скрывать платное партнёрство и рекламные публикации</string>
     <string name="ig_nav_settings_title">Настройки навигации</string>
     <string name="ig_nav_name_home">Главная</string>
     <string name="ig_nav_name_reels">Reels</string>

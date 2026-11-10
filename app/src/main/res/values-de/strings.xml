@@ -645,6 +645,8 @@
     <string name="ig_dialog_unsent_unknown_chat">Unbekannter Chat</string>
     <string name="ig_dialog_clean_feed_hide_threads">Threads-Vorschläge verbergen</string>
     <string name="ig_dialog_clean_feed_hide_liked">Bereits gelikte Beiträge verbergen</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Vorschläge in Reels ausblenden</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Bezahlte Partnerschaften &amp; gesponserte Beiträge ausblenden</string>
     <string name="ig_nav_settings_title">Navigationseinstellungen</string>
     <string name="ig_nav_name_home">Startseite</string>
     <string name="ig_nav_name_reels">Reels</string>

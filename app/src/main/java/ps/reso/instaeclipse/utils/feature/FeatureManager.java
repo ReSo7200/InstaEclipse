@@ -109,6 +109,18 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("HideThreadsSuggestions");
         }
 
+        if (FeatureFlags.hideSuggestionsInReels) {
+            FeatureStatusTracker.setEnabled("HideSuggestionsInReels", R.string.ig_dialog_clean_feed_hide_suggested_reels);
+        } else {
+            FeatureStatusTracker.setDisabled("HideSuggestionsInReels");
+        }
+
+        if (FeatureFlags.hidePaidPartnerships) {
+            FeatureStatusTracker.setEnabled("HidePaidPartnerships", R.string.ig_dialog_clean_feed_hide_paid);
+        } else {
+            FeatureStatusTracker.setDisabled("HidePaidPartnerships");
+        }
+
         if (FeatureFlags.expandCaptions) {
             FeatureStatusTracker.setEnabled("ExpandCaptions", R.string.ig_dialog_clean_feed_expand_captions);
         } else {

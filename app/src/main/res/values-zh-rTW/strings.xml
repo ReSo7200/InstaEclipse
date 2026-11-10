@@ -637,6 +637,8 @@
     <string name="ig_dialog_unsent_unknown_chat">未知對話</string>
     <string name="ig_dialog_clean_feed_hide_threads">隱藏 Threads 推薦</string>
     <string name="ig_dialog_clean_feed_hide_liked">隱藏已按讚的貼文</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">隱藏 Reels 中的推薦內容</string>
+    <string name="ig_dialog_clean_feed_hide_paid">隱藏付費合作與贊助貼文</string>
     <string name="ig_nav_settings_title">導覽設定</string>
     <string name="ig_nav_name_home">首頁</string>
     <string name="ig_nav_name_reels">Reels</string>

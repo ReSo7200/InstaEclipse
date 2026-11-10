@@ -636,6 +636,8 @@
     <string name="ig_dialog_unsent_unknown_chat">Conversa desconhecida</string>
     <string name="ig_dialog_clean_feed_hide_threads">Ocultar Sugestões do Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Ocultar Posts Já Curtidos</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Ocultar sugestões nos Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Ocultar parcerias pagas e posts patrocinados</string>
     <string name="ig_nav_settings_title">Configurações de navegação</string>
     <string name="ig_nav_name_home">Página inicial</string>
     <string name="ig_nav_name_reels">Reels</string>

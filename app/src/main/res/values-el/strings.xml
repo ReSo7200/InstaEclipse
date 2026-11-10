@@ -669,6 +669,8 @@
     <string name="ig_dialog_unsent_unknown_chat">Άγνωστη συνομιλία</string>
     <string name="ig_dialog_clean_feed_hide_threads">Απόκρυψη Προτάσεων Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Απόκρυψη Δημοσιεύσεων που Σας Αρέσουν Ήδη</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Απόκρυψη προτάσεων στα Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Απόκρυψη πληρωμένων συνεργασιών και χορηγούμενων δημοσιεύσεων</string>
     <string name="ig_nav_settings_title">Ρυθμίσεις πλοήγησης</string>
     <string name="ig_nav_name_home">Αρχική</string>
     <string name="ig_nav_name_reels">Reels</string>

@@ -39,7 +39,7 @@ public class CustomToast {
     private static String categoryOf(String key) {
         switch (key) {
             case "CustomTheme": case "CustomFont": case "CustomEmoji": case "ForceReelQuality":
-            case "HideSuggestionsInFeed": case "HideThreadsSuggestions": case "HideLikedPosts":
+            case "HideSuggestionsInFeed": case "HideThreadsSuggestions": case "HideLikedPosts": case "HideSuggestionsInReels": case "HidePaidPartnerships":
             case "HideNotesTray": case "HideDmSuggestions": case "HideInstants": case "StoryRingColor": case "StoryTraySize": case "RoundedFeedPosts":
             case "HidePlusUpsells": case "HideNavTabs": case "SpoofDevice":
                 return "Appearance";
