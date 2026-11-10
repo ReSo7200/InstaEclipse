@@ -194,6 +194,28 @@
                     android:layout_marginStart="70dp"
                     android:layout_marginBottom="4dp"
                     android:text="@string/help_lspatch_guide" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="?attr/colorOutlineVariant" />
+
+                <!-- No-root patcher: patch Instagram in place, original signature preserved. -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/patch_instagram_button"
+                    style="@style/Widget.Material3.Button.TonalButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="@string/patch_title"
+                    app:icon="@drawable/ic_shield"
+                    app:iconSize="18dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

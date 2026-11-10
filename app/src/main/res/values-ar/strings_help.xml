@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">جهازك غير مروّت؟ ثبّت هذا</string>
     <string name="help_lspatch_guide">اتبع دليل الإعداد</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">ترقيع إنستغرام (بدون روت)</string>
+    <string name="patch_intro">يرقّع إنستغرام حتى يعمل InstaEclipse دون روت، مع الحفاظ على توقيع إنستغرام الأصلي.</string>
+    <string name="patch_integrity_note">هذا لا يتجاوز Play Integrity.</string>
+    <string name="patch_choose_apk">اختر ملف (ملفات) APK لإنستغرام</string>
+    <string name="patch_no_selection">لم يتم اختيار أي APK بعد.</string>
+    <string name="patch_selected">%1$d ملف: %2$s</string>
+    <string name="patch_run">ترقيع وتثبيت</string>
+    <string name="patch_need_apk">اختر ملف APK واحدًا لإنستغرام على الأقل أولًا.</string>
+    <string name="patch_log_label">التقدّم</string>
+    <string name="patch_log_empty">ستظهر الخطوات هنا.</string>
+    <string name="patch_failed">فشل الترقيع: %1$s</string>
+    <string name="patch_install_success">تم تثبيت إنستغرام.</string>
+    <string name="patch_install_failed">فشل التثبيت: %1$s</string>
+    <string name="patch_step_copy">جارٍ نسخ ملفات APK المختارة</string>
+    <string name="patch_step_unbundle">جارٍ فك %1$s</string>
+    <string name="patch_step_install">بدء المثبّت</string>
+    <string name="patch_step_done">تم. أكّد التثبيت عند الطلب.</string>
+    <string name="patch_err_no_apk">لم يُعثر على APK في الاختيار.</string>
 </resources>

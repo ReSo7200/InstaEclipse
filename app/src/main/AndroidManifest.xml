@@ -103,6 +103,28 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <service android:name=".mods.media.DownloadBrokerService" android:exported="true" />
 
+        <!-- No-root Instagram patcher (LSPatch-style, original signature preserved). -->
+        <activity
+            android:name=".patcher.PatchInstagramActivity"
+            android:exported="false"
+            android:theme="@style/Theme.InstaEclipse" />
+
+        <!-- Receives PackageInstaller session status callbacks for the patched APK install. -->
+        <receiver
+            android:name=".patcher.PatchInstallReceiver"
+            android:exported="false" />
+
+        <!-- Hands the patched APK to the system installer. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/patch_file_paths" />
+        </provider>
+
         <!-- Xposed Meta-data -->
         <meta-data
             android:name="xposedmodule"
@@ -153,6 +175,9 @@
         <package android:name="com.instaclone.android" />
     </queries>
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- No-root patcher installs the patched Instagram through the system installer. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Signature permission guarding the companion -> Instagram broadcast bridge. Receivers
          registered inside the hooked process require senders to hold it, so only this APK

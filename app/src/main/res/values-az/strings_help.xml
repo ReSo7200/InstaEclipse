@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Root yoxdur? Bunu quraşdırın</string>
     <string name="help_lspatch_guide">Quraşdırma bələdçisinə baxın</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">Instagram-ı yamaqla (rootsuz)</string>
+    <string name="patch_intro">Instagram-ı yamaqlayır ki, InstaEclipse root olmadan yüklənsin, Instagram-ın orijinal imzasını saxlayaraq.</string>
+    <string name="patch_integrity_note">Bu, Play Integrity-ni keçmir.</string>
+    <string name="patch_choose_apk">Instagram APK-larını seçin</string>
+    <string name="patch_no_selection">Hələ APK seçilməyib.</string>
+    <string name="patch_selected">%1$d fayl: %2$s</string>
+    <string name="patch_run">Yamaqla və quraşdır</string>
+    <string name="patch_need_apk">Əvvəlcə ən azı bir Instagram APK seçin.</string>
+    <string name="patch_log_label">Gediş</string>
+    <string name="patch_log_empty">Addımlar burada görünəcək.</string>
+    <string name="patch_failed">Yamaqlama alınmadı: %1$s</string>
+    <string name="patch_install_success">Instagram quraşdırıldı.</string>
+    <string name="patch_install_failed">Quraşdırma alınmadı: %1$s</string>
+    <string name="patch_step_copy">Seçilmiş APK-lar kopyalanır</string>
+    <string name="patch_step_unbundle">%1$s açılır</string>
+    <string name="patch_step_install">Quraşdırıcı başladılır</string>
+    <string name="patch_step_done">Hazırdır. Soruşulduqda quraşdırmanı təsdiqləyin.</string>
+    <string name="patch_err_no_apk">Seçimdə APK tapılmadı.</string>
 </resources>
