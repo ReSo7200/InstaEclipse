@@ -11,6 +11,21 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class Pace {
     private Pace() {}
 
+    /** True when "Lower ban risk" is on. */
+    public static boolean on() {
+        return ps.reso.instaeclipse.utils.feature.FeatureFlags.safePacing;
+    }
+
+    /** {@code fastMs} when "Lower ban risk" is off, otherwise a random delay in {@code minMs}..{@code maxMs}. */
+    public static long between(long fastMs, long minMs, long maxMs) {
+        return on() ? between(minMs, maxMs) : fastMs;
+    }
+
+    /** {@code fastMs} when "Lower ban risk" is off, otherwise {@link #next(int, long, long, int, long, long)}. */
+    public static long next(long fastMs, int step, long minMs, long maxMs, int every, long restMinMs, long restMaxMs) {
+        return on() ? next(step, minMs, maxMs, every, restMinMs, restMaxMs) : fastMs;
+    }
+
     /** A random delay between {@code minMs} and {@code maxMs}. */
     public static long between(long minMs, long maxMs) {
         if (maxMs <= minMs) return minMs;

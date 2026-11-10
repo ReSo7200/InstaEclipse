@@ -33,6 +33,7 @@ public final class ExtrasFeatures {
             new Entry("reelsHideMetaAi", R.string.ig_dialog_extras_reels_hide_meta_ai, R.drawable.ic_sparkle),
             new Entry("reelsHidePills", R.string.ig_dialog_extras_reels_hide_pills, R.drawable.ic_eye_off),
             new Entry("reelsHideCommentBar", R.string.ig_dialog_extras_reels_hide_comment_bar, R.drawable.ic_chat),
+            new Entry("safePacing", R.string.ig_dialog_extras_safe_pacing, R.drawable.ic_shield),
             new Entry("unlimitedAccounts", R.string.ig_dialog_extras_unlimited_accounts, R.drawable.ic_settings_gear),
             new Entry("airplaneMode", R.string.ig_dialog_extras_airplane_mode, R.drawable.ic_eye_off),
             new Entry("highResolutionImages", R.string.ig_dialog_extras_high_res_images, R.drawable.ic_search),

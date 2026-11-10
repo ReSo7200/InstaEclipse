@@ -267,8 +267,8 @@ public class FollowListExportHook {
                     done.accept(complete);
                     return;
                 }
-                // Paced like a person scrolling, with a longer rest every 10 pages (see Pace).
-                h.postDelayed(this, more ? ps.reso.instaeclipse.utils.core.Pace.next(pages, 1500, 3000, 10, 6000, 10000) : 1500);
+                // With Lower ban risk on, paced like a person scrolling, with a longer rest every 10 pages (see Pace).
+                h.postDelayed(this, more ? ps.reso.instaeclipse.utils.core.Pace.next(500, pages, 1500, 3000, 10, 6000, 10000) : (ps.reso.instaeclipse.utils.core.Pace.on() ? 1500 : 500));
             }
         }.run();
     }

@@ -30,4 +30,5 @@
     <string name="ig_dialog_extras_reels_hide_meta_ai">Sembunyikan saran Meta AI</string>
     <string name="ig_dialog_extras_reels_hide_pills">Sembunyikan tombol template dan audio</string>
     <string name="ig_dialog_extras_reels_hide_comment_bar">Sembunyikan bilah komentar</string>
+    <string name="ig_dialog_extras_safe_pacing">Kurangi risiko blokir (tindakan massal lebih lambat)</string>
 </resources>

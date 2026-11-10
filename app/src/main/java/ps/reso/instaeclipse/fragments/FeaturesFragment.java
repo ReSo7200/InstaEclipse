@@ -1764,6 +1764,7 @@ public class FeaturesFragment extends Fragment {
 
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
+                createExtrasSwitch("#0A84FF", "safePacing"),
                 createExtrasSwitch("#0A84FF", "unlimitedAccounts"),
                 createExtrasSwitch("#0A84FF", "fixNotificationRegistration"),
                 createSwitch(R.drawable.ic_notification, "#0A84FF", getString(R.string.ig_dialog_misc_show_feature_toasts), "showFeatureToasts"),

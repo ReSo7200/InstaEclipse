@@ -126,7 +126,7 @@ public final class DeviceSpoofHook {
             set(Build.class, "PRODUCT", p.product);
             set(Build.class, "HARDWARE", p.device);
             set(Build.class, "BOARD", p.device);
-            set(Build.class, "FINGERPRINT", fingerprint(p));
+            set(Build.class, "FINGERPRINT", ps.reso.instaeclipse.utils.core.Pace.on() ? fingerprint(p) : p.fingerprint);
             set(Build.class, "ID", p.buildId);
             set(Build.class, "DISPLAY", p.buildId);
             set(Build.class, "SOC_MANUFACTURER", p.socManufacturer);
@@ -181,7 +181,7 @@ public final class DeviceSpoofHook {
                 case "name": return p.product;
             }
         }
-        if (FINGERPRINT_PROP.matcher(key).matches()) return fingerprint(p);
+        if (FINGERPRINT_PROP.matcher(key).matches()) return ps.reso.instaeclipse.utils.core.Pace.on() ? fingerprint(p) : p.fingerprint;
         switch (key) {
             case "ro.soc.manufacturer": return p.socManufacturer;
             case "ro.soc.model": return p.socModel;

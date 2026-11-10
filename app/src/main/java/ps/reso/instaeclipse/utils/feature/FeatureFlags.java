@@ -91,6 +91,7 @@ public class FeatureFlags {
     public static volatile boolean unlimitedAccounts = false; // lift the 5-account limit
     public static volatile boolean reelsLockScroll = false; // lock swiping between reels
     public static volatile boolean reelsAutoScroll = false; // unlock Instagram's own Reels auto-scroll option
+    public static volatile boolean safePacing = false; // slower, human-like bulk actions and a consistent spoofed fingerprint, to lower ban risk
     public static volatile boolean reelsBlurBars = false; // blurred cover behind letterboxed reels (#273)
     public static volatile boolean reelsHideFollow = false; // Clean up Reels: no Follow button (#279)
     public static volatile boolean reelsHideMetaAi = false; // Clean up Reels: no Meta AI prompts (#279)
