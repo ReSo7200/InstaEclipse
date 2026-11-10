@@ -24,4 +24,10 @@
     <string name="ig_dialog_location_current_title">מיקום נוכחי</string>
     <string name="ig_dialog_location_recent">מקומות אחרונים</string>
     <string name="ig_dialog_location_applied">המיקום הוחל</string>
+    <string name="ig_dialog_extras_reels_blur_bars">טשטוש הפסים סביב ה-Reels</string>
+    <string name="ig_dialog_reels_clean_up">ניקוי Reels</string>
+    <string name="ig_dialog_extras_reels_hide_follow">הסתרת כפתור המעקב</string>
+    <string name="ig_dialog_extras_reels_hide_meta_ai">הסתרת הצעות Meta AI</string>
+    <string name="ig_dialog_extras_reels_hide_pills">הסתרת כפתורי תבנית ואודיו</string>
+    <string name="ig_dialog_extras_reels_hide_comment_bar">הסתרת שורת התגובה</string>
 </resources>

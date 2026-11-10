@@ -24,4 +24,10 @@
     <string name="ig_dialog_location_current_title">Vị trí hiện tại</string>
     <string name="ig_dialog_location_recent">Gần đây</string>
     <string name="ig_dialog_location_applied">Đã áp dụng vị trí</string>
+    <string name="ig_dialog_extras_reels_blur_bars">Làm mờ các dải quanh Reels</string>
+    <string name="ig_dialog_reels_clean_up">Dọn gọn Reels</string>
+    <string name="ig_dialog_extras_reels_hide_follow">Ẩn nút Theo dõi</string>
+    <string name="ig_dialog_extras_reels_hide_meta_ai">Ẩn gợi ý Meta AI</string>
+    <string name="ig_dialog_extras_reels_hide_pills">Ẩn nút mẫu và âm thanh</string>
+    <string name="ig_dialog_extras_reels_hide_comment_bar">Ẩn thanh bình luận</string>
 </resources>
