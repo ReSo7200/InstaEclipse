@@ -116,6 +116,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
             if (lpparam.processName != null && !lpparam.processName.equals(lpparam.packageName)) {
                 return;
             }
+            ps.reso.instaeclipse.utils.log.CrashReporter.install();
             try {
                 if (dexKitBridge == null) {
                     // Load the .so file from your module (if not already loaded)

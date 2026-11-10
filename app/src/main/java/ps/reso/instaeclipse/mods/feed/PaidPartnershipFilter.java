@@ -60,13 +60,7 @@ public final class PaidPartnershipFilter {
         paidGetter = resolveGetter(bridge, classLoader, "PaidPartnershipGetter", "is_paid_partnership", "java.lang.Boolean");
         sponsorGetter = resolveGetter(bridge, classLoader, "SponsorTagsGetter", "sponsor_tags", "java.util.List");
         injectedGetter = resolveGetter(bridge, classLoader, "MediaInjectedGetter", "injected", null);
-        try {
-            Method m = Class.forName("com.instagram.feed.media.Media", false, classLoader).getMethod("getId");
-            m.setAccessible(true);
-            idGetter = m;
-        } catch (Throwable t) {
-            ModuleLog.line(TAG + "⚠️ Media.getId not found");
-        }
+        idGetter = resolveId(bridge, classLoader);
         hookOpenedRequests(bridge, classLoader);
     }
 
@@ -125,6 +119,44 @@ public final class PaidPartnershipFilter {
             }
             return getter.invoke(target);
         } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * The media's id getter, found through DexKit (declaredClass + name + no params), cached like the
+     * other anchors. {@code Media.getId()} is a stable, unobfuscated method, so the direct lookup is a
+     * last-resort fallback only; it is never anchored by an obfuscated name.
+     */
+    private static Method resolveId(DexKitBridge bridge, ClassLoader classLoader) {
+        try {
+            if (DexKitCache.isCacheValid()) {
+                Method cached = DexKitCache.loadMethod("MediaIdGetter", classLoader);
+                if (cached != null) return cached;
+            }
+            for (String owner : OWNERS) {
+                try {
+                    List<MethodData> found = DexKitQueryCache.findMethod(bridge, FindMethod.create().matcher(
+                            MethodMatcher.create().declaredClass(owner).name("getId")
+                                    .paramCount(0).returnType("java.lang.String")));
+                    for (MethodData md : found) {
+                        Method m = md.getMethodInstance(classLoader);
+                        m.setAccessible(true);
+                        DexKitCache.saveMethod("MediaIdGetter", m);
+                        ModuleLog.line(TAG + "✅ id getter " + owner + "." + m.getName());
+                        return m;
+                    }
+                } catch (Throwable ignored) {}
+            }
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "❌ id getter: " + t.getMessage());
+        }
+        try {
+            Method m = Class.forName(OWNERS[0], false, classLoader).getMethod("getId");
+            m.setAccessible(true);
+            return m;
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ Media.getId not found");
             return null;
         }
     }
