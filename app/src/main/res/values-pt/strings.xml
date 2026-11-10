@@ -839,4 +839,6 @@
     <string name="ig_voice_messages_no_chat">Abra esta conversa primeiro e tente novamente.</string>
     <string name="ig_voice_play_failed">Não foi possível reproduzir esta mensagem de voz</string>
     <string name="ig_voice_you">Você</string>
+    <string name="ig_glass_tab_bar_section">Barra de navegação</string>
+    <string name="ig_glass_tab_bar">Barra de navegação de vidro (reinicie o Instagram)</string>
 </resources>

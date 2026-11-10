@@ -1929,6 +1929,10 @@ public class FeaturesFragment extends Fragment {
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.ig_free_app_icons), "freeAppIcons")));
 
+        defs.add(getString(R.string.ig_glass_tab_bar_section));
+        defs.add(Arrays.asList(
+                createSwitch(R.drawable.ic_tune, "#FF375F", getString(R.string.ig_glass_tab_bar), "glassTabBar")));
+
         defs.add(getString(R.string.theme_section_colors));
         defs.add(Arrays.asList(
                 createSwitch(R.drawable.ic_palette, "#FF375F", getString(R.string.theme_enable), "customThemeEnabled"),

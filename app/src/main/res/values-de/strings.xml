@@ -850,4 +850,6 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="ig_voice_messages_no_chat">Öffne zuerst diesen Chat und versuche es dann erneut.</string>
     <string name="ig_voice_play_failed">Diese Sprachnachricht konnte nicht abgespielt werden</string>
     <string name="ig_voice_you">Du</string>
+    <string name="ig_glass_tab_bar_section">Navigationsleiste</string>
+    <string name="ig_glass_tab_bar">Navigationsleiste aus Glas (Instagram neu starten)</string>
 </resources>

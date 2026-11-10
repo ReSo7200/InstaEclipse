@@ -872,4 +872,6 @@
     <string name="ig_voice_messages_no_chat">请先打开此聊天，然后重试。</string>
     <string name="ig_voice_play_failed">无法播放此语音消息</string>
     <string name="ig_voice_you">你</string>
+    <string name="ig_glass_tab_bar_section">导航栏</string>
+    <string name="ig_glass_tab_bar">毛玻璃导航栏（需重启 Instagram）</string>
 </resources>

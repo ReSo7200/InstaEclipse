@@ -350,6 +350,7 @@ public class FeatureManager {
         reg(FeatureFlags.isAnalyticsBlocked,   "BlockAnalytics",       R.string.ig_dialog_ad_block_analytics);
         reg(FeatureFlags.hidePlusUpsells,      "HidePlusUpsells",      R.string.ig_dialog_clean_feed_hide_plus);
         reg(FeatureFlags.freeAppIcons,         "FreeAppIcons",         R.string.ig_free_app_icons);
+        reg(FeatureFlags.glassTabBar,          "GlassTabBar",          R.string.ig_glass_tab_bar);
         reg(FeatureFlags.disableVideoAutoPlay, "DisableVideoAutoPlay", R.string.ig_dialog_misc_disable_video_autoplay);
         reg(FeatureFlags.forceReelScrubber,    "ForceReelScrubber",    R.string.ig_dialog_downloader_reel_scrubber);
         reg(FeatureFlags.disableStoryFlipping, "DisableStoryFlipping", R.string.ig_dialog_misc_disable_story_autoswipe);

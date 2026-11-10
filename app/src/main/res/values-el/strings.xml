@@ -873,4 +873,6 @@
     <string name="ig_voice_messages_no_chat">Άνοιξε πρώτα αυτή τη συνομιλία και δοκίμασε ξανά.</string>
     <string name="ig_voice_play_failed">Δεν ήταν δυνατή η αναπαραγωγή αυτού του φωνητικού μηνύματος</string>
     <string name="ig_voice_you">Εσύ</string>
+    <string name="ig_glass_tab_bar_section">Γραμμή πλοήγησης</string>
+    <string name="ig_glass_tab_bar">Γυάλινη γραμμή πλοήγησης (επανεκκινήστε το Instagram)</string>
 </resources>

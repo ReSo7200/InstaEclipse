@@ -842,4 +842,6 @@
     <string name="ig_voice_messages_no_chat">Əvvəlcə bu söhbəti açın, sonra yenidən cəhd edin.</string>
     <string name="ig_voice_play_failed">Bu səsli mesajı oxutmaq olmadı</string>
     <string name="ig_voice_you">Siz</string>
+    <string name="ig_glass_tab_bar_section">Naviqasiya paneli</string>
+    <string name="ig_glass_tab_bar">Şüşə naviqasiya paneli (Instagram\'ı yenidən başladın)</string>
 </resources>

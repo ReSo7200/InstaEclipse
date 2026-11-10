@@ -871,4 +871,6 @@
     <string name="ig_voice_messages_no_chat">פתח קודם את הצ\'אט הזה ונסה שוב.</string>
     <string name="ig_voice_play_failed">לא ניתן להשמיע את ההודעה הקולית הזו</string>
     <string name="ig_voice_you">את/ה</string>
+    <string name="ig_glass_tab_bar_section">סרגל ניווט</string>
+    <string name="ig_glass_tab_bar">סרגל ניווט מזכוכית (הפעל מחדש את אינסטגרם)</string>
 </resources>

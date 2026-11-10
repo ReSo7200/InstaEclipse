@@ -844,4 +844,6 @@
     <string name="ig_voice_messages_no_chat">Abre primero este chat y vuelve a intentarlo.</string>
     <string name="ig_voice_play_failed">No se pudo reproducir este mensaje de voz</string>
     <string name="ig_voice_you">Tú</string>
+    <string name="ig_glass_tab_bar_section">Barra de navegación</string>
+    <string name="ig_glass_tab_bar">Barra de navegación de cristal (reinicia Instagram)</string>
 </resources>

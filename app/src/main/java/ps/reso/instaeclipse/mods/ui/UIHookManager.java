@@ -119,6 +119,9 @@ public class UIHookManager {
         ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.watchActivity(activity);
         ps.reso.instaeclipse.mods.ui.StoryTrayHook.watchActivity(activity);
 
+        // Glass navigation bar: draw Instagram's floating tab bar as blurred glass.
+        ps.reso.instaeclipse.mods.ui.GlassTabBarHook.watchActivity(activity);
+
         // Fancy bio fonts: the bio's "Change font" button opens the module's font picker.
         ps.reso.instaeclipse.mods.ui.FancyBioFontHook.watchActivity(activity);
 

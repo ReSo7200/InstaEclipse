@@ -875,4 +875,6 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="ig_voice_messages_no_chat">Ouvre d\'abord cette conversation, puis réessaie.</string>
     <string name="ig_voice_play_failed">Impossible de lire ce message vocal</string>
     <string name="ig_voice_you">Toi</string>
+    <string name="ig_glass_tab_bar_section">Barre de navigation</string>
+    <string name="ig_glass_tab_bar">Barre de navigation en verre (redémarrez Instagram)</string>
 </resources>
