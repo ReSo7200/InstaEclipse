@@ -30,4 +30,5 @@
     <string name="ig_dialog_extras_reels_hide_meta_ai">隐藏 Meta AI 提示</string>
     <string name="ig_dialog_extras_reels_hide_pills">隐藏模板和音频标签</string>
     <string name="ig_dialog_extras_reels_hide_comment_bar">隐藏评论栏</string>
+    <string name="ig_dialog_extras_safe_pacing">降低封号风险（批量操作放慢）</string>
 </resources>

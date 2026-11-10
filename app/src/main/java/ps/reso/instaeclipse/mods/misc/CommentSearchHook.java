@@ -1223,8 +1223,8 @@ public class CommentSearchHook {
                     done.run();
                     return;
                 }
-                MAIN.postDelayed(this, rv ? ps.reso.instaeclipse.utils.core.Pace.between(600, 1100)
-                        : ps.reso.instaeclipse.utils.core.Pace.between(800, 1300));
+                MAIN.postDelayed(this, rv ? ps.reso.instaeclipse.utils.core.Pace.between(300, 600, 1100)
+                        : ps.reso.instaeclipse.utils.core.Pace.between(450, 800, 1300));
             }
         };
         MAIN.post(loading);

@@ -30,4 +30,5 @@
     <string name="ig_dialog_extras_reels_hide_meta_ai">Nascondi i suggerimenti di Meta AI</string>
     <string name="ig_dialog_extras_reels_hide_pills">Nascondi i pulsanti modello e audio</string>
     <string name="ig_dialog_extras_reels_hide_comment_bar">Nascondi la barra dei commenti</string>
+    <string name="ig_dialog_extras_safe_pacing">Riduci il rischio di blocco (azioni di massa più lente)</string>
 </resources>

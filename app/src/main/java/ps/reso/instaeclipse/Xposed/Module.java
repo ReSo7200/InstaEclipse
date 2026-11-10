@@ -436,6 +436,7 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
 
                     // Extras: lift the 5-account limit
                     try {
+                        ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("safePacing"); // applied where bulk actions run (Pace)
                         if (!skip("AccountLimitHook")) new ps.reso.instaeclipse.mods.extras.AccountLimitHook().install(dexKitBridge, hostClassLoader);
                     } catch (Throwable t) {
                         ModuleLog.line("(InstaEclipse | UnlimitedAccounts): ❌ Failed to hook: " + t);

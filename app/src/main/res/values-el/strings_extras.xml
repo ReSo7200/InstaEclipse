@@ -30,4 +30,5 @@
     <string name="ig_dialog_extras_reels_hide_meta_ai">Απόκρυψη προτάσεων Meta AI</string>
     <string name="ig_dialog_extras_reels_hide_pills">Απόκρυψη κουμπιών προτύπου και ήχου</string>
     <string name="ig_dialog_extras_reels_hide_comment_bar">Απόκρυψη γραμμής σχολίων</string>
+    <string name="ig_dialog_extras_safe_pacing">Μείωση κινδύνου αποκλεισμού (πιο αργές μαζικές ενέργειες)</string>
 </resources>
