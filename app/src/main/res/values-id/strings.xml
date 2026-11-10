@@ -863,4 +863,11 @@ Tetap di layar ini sampai selesai.</string>
     <string name="home_signer_untrust">Berhenti memercayai</string>
     <string name="ie_unsent_label">Dibatalkan</string>
     <string name="ie_hide_unsent_label">Sembunyikan label Dibatalkan pada pesan yang disimpan</string>
+    <string name="ig_voice_messages">Pesan suara</string>
+    <string name="ig_dialog_voice_messages_list">Pesan suara di detail obrolan</string>
+    <string name="ig_voice_messages_loaded">Hanya pesan yang sudah dimuat di obrolan yang ditampilkan. Gulir ke atas di obrolan untuk memuat yang lebih lama.</string>
+    <string name="ig_voice_messages_empty">Tidak ada pesan suara di bagian obrolan yang sudah dimuat.</string>
+    <string name="ig_voice_messages_no_chat">Buka obrolan ini dulu, lalu coba lagi.</string>
+    <string name="ig_voice_play_failed">Tidak dapat memutar pesan suara ini</string>
+    <string name="ig_voice_you">Kamu</string>
 </resources>

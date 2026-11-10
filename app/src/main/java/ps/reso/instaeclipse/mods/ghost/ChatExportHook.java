@@ -78,7 +78,7 @@ public class ChatExportHook {
     private static final String USER = "com.instagram.user.model.User";
     private static final String SESSION = "com.instagram.common.session.UserSession";
     /** the viewer's user id, found next to the participants (set by {@link #participants}) */
-    private static volatile String selfId;
+    static volatile String selfId;
     private static final Map<Object, Boolean> STORES = Collections.synchronizedMap(new WeakHashMap<>());
     private static Method messagesMethod, serializer, factoryWriterMethod;
     private static Class<?> factoryClass;
@@ -646,7 +646,7 @@ public class ChatExportHook {
             + ".e{font-size:12px;opacity:.78;margin-top:4px;border-left:2px solid var(--line);padding-left:8px}.row.me .e{border-left-color:rgba(255,255,255,.5)}"
             + ".like{font-size:30px;line-height:1.1}";
 
-    private static long timestampMs(JSONObject j) {
+    static long timestampMs(JSONObject j) {
         try { return Long.parseLong(j.optString("timestamp", "0")) / 1000L; } catch (Throwable t) { return 0; }
     }
 
@@ -838,7 +838,7 @@ public class ChatExportHook {
             }
     }
 
-    private static JSONObject toJson(Object message) {
+    static JSONObject toJson(Object message) {
         try {
             if (!serializer.getParameterTypes()[1].isInstance(message)) return null;
             StringWriter sw = new StringWriter();
@@ -852,9 +852,27 @@ public class ChatExportHook {
         }
     }
 
+    /** The store's loaded messages as IG's own JSON (oldest first), or null when the store or the
+     *  serializer was not found on this build. Used by the voice messages list. */
+    static List<JSONObject> loadedMessages(Object store) {
+        if (store == null || messagesMethod == null || serializer == null || factoryClass == null) return null;
+        try {
+            List<?> msgs = (List<?>) messagesMethod.invoke(store, true);
+            List<JSONObject> out = new ArrayList<>();
+            if (msgs != null) for (Object m : msgs) {
+                JSONObject j = toJson(m);
+                if (j != null) out.add(j);
+            }
+            return out;
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ loaded messages: " + t);
+            return null;
+        }
+    }
+
     /** The live store for exactly this thread (its graph holds the thread id). Never guesses: stores of
      *  other chats (inbox prefetch) stay alive too, so without a confirmed match nothing is exported. */
-    private static Object findStore(String threadId) {
+    static Object findStore(String threadId) {
         if (threadId == null) return null;
         Object[] all;
         synchronized (STORES) { all = STORES.keySet().toArray(); }
@@ -903,7 +921,7 @@ public class ChatExportHook {
     }
 
     /** user id → username for every User reachable from the store (also finds {@link #selfId}). */
-    private static Map<String, String> participants(Object store) {
+    static Map<String, String> participants(Object store) {
         Map<String, String> out = new HashMap<>();
         selfId = null;
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());

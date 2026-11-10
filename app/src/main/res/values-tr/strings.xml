@@ -870,4 +870,11 @@
     <string name="home_signer_untrust">Güvenmeyi bırak</string>
     <string name="ie_unsent_label">Geri alındı</string>
     <string name="ie_hide_unsent_label">Saklanan mesajlarda \"Geri alındı\" etiketini gizle</string>
+    <string name="ig_voice_messages">Sesli mesajlar</string>
+    <string name="ig_dialog_voice_messages_list">Sohbet ayrıntılarında sesli mesajlar</string>
+    <string name="ig_voice_messages_loaded">Yalnızca sohbette yüklenmiş mesajlar listelenir. Eskileri yüklemek için sohbette yukarı kaydır.</string>
+    <string name="ig_voice_messages_empty">Bu sohbetin yüklenmiş kısmında sesli mesaj yok.</string>
+    <string name="ig_voice_messages_no_chat">Önce bu sohbeti aç, sonra tekrar dene.</string>
+    <string name="ig_voice_play_failed">Bu sesli mesaj oynatılamadı</string>
+    <string name="ig_voice_you">Sen</string>
 </resources>

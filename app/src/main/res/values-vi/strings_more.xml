@@ -432,4 +432,11 @@
     <string name="home_signer_untrust">Ngừng tin cậy</string>
     <string name="ie_unsent_label">Đã thu hồi</string>
     <string name="ie_hide_unsent_label">Ẩn nhãn \"Đã thu hồi\" trên tin nhắn được giữ lại</string>
+    <string name="ig_voice_messages">Tin nhắn thoại</string>
+    <string name="ig_dialog_voice_messages_list">Tin nhắn thoại trong chi tiết đoạn chat</string>
+    <string name="ig_voice_messages_loaded">Chỉ hiển thị các tin nhắn đã tải trong đoạn chat. Cuộn lên trong đoạn chat để tải tin cũ hơn.</string>
+    <string name="ig_voice_messages_empty">Không có tin nhắn thoại trong phần đã tải của đoạn chat này.</string>
+    <string name="ig_voice_messages_no_chat">Hãy mở đoạn chat này trước rồi thử lại.</string>
+    <string name="ig_voice_play_failed">Không thể phát tin nhắn thoại này</string>
+    <string name="ig_voice_you">Bạn</string>
 </resources>

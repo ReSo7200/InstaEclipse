@@ -835,4 +835,11 @@
     <string name="home_signer_untrust">Dejar de confiar</string>
     <string name="ie_unsent_label">Anulado</string>
     <string name="ie_hide_unsent_label">Ocultar la etiqueta «Anulado» en los mensajes conservados</string>
+    <string name="ig_voice_messages">Mensajes de voz</string>
+    <string name="ig_dialog_voice_messages_list">Mensajes de voz en los detalles del chat</string>
+    <string name="ig_voice_messages_loaded">Solo se muestran los mensajes cargados en el chat. Desplázate hacia arriba en el chat para cargar los más antiguos.</string>
+    <string name="ig_voice_messages_empty">No hay mensajes de voz en la parte cargada de este chat.</string>
+    <string name="ig_voice_messages_no_chat">Abre primero este chat y vuelve a intentarlo.</string>
+    <string name="ig_voice_play_failed">No se pudo reproducir este mensaje de voz</string>
+    <string name="ig_voice_you">Tú</string>
 </resources>

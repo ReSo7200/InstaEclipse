@@ -831,4 +831,11 @@
     <string name="home_signer_untrust">停止信任</string>
     <string name="ie_unsent_label">已收回</string>
     <string name="ie_hide_unsent_label">隱藏保留訊息上的「已收回」標籤</string>
+    <string name="ig_voice_messages">語音訊息</string>
+    <string name="ig_dialog_voice_messages_list">聊天詳細資料中的語音訊息</string>
+    <string name="ig_voice_messages_loaded">僅列出聊天中已載入的訊息。在聊天中向上捲動以載入更早的訊息。</string>
+    <string name="ig_voice_messages_empty">此聊天已載入的部分中沒有語音訊息。</string>
+    <string name="ig_voice_messages_no_chat">請先開啟此聊天，然後再試一次。</string>
+    <string name="ig_voice_play_failed">無法播放此語音訊息</string>
+    <string name="ig_voice_you">你</string>
 </resources>

@@ -841,4 +841,11 @@ Bleibe auf diesem Bildschirm, bis es fertig ist.</string>
     <string name="home_signer_untrust">Nicht mehr vertrauen</string>
     <string name="ie_unsent_label">Zurückgezogen</string>
     <string name="ie_hide_unsent_label">Label „Zurückgezogen“ bei behaltenen Nachrichten ausblenden</string>
+    <string name="ig_voice_messages">Sprachnachrichten</string>
+    <string name="ig_dialog_voice_messages_list">Sprachnachrichten in den Chat-Details</string>
+    <string name="ig_voice_messages_loaded">Nur im Chat geladene Nachrichten werden angezeigt. Scrolle im Chat nach oben, um ältere zu laden.</string>
+    <string name="ig_voice_messages_empty">Keine Sprachnachrichten im geladenen Teil dieses Chats.</string>
+    <string name="ig_voice_messages_no_chat">Öffne zuerst diesen Chat und versuche es dann erneut.</string>
+    <string name="ig_voice_play_failed">Diese Sprachnachricht konnte nicht abgespielt werden</string>
+    <string name="ig_voice_you">Du</string>
 </resources>

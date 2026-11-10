@@ -729,6 +729,14 @@ public class VoiceMessageDownloadHook {
         FeedVideoDownloadHook.downloadAudio(ctx, url, name, user);
     }
 
+    /** Saves a voice clip found outside the long-press menu (the chat's voice messages list), with
+     *  the same file naming as the menu's Download row. */
+    public static void saveVoice(Context ctx, String url, String user, String id) {
+        if (ctx == null || url == null || !url.startsWith("https://")) return;
+        String name = FeedVideoDownloadHook.buildFilename(user, "voice", id, true).replace(".mp4", ".m4a");
+        FeedVideoDownloadHook.downloadAudio(ctx, url, name, user);
+    }
+
     private static final java.util.regex.Pattern URL_SIZE = java.util.regex.Pattern.compile("[-.]w(\\d{2,5})h(\\d{2,5})");
 
     /** Pixel area named in a CDN URL's cache key ("...-w1080h1920..."), or 0 when it has none. */

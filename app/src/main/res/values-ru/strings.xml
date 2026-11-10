@@ -832,4 +832,11 @@
     <string name="home_signer_untrust">Не доверять</string>
     <string name="ie_unsent_label">Отозвано</string>
     <string name="ie_hide_unsent_label">Скрыть метку «Отозвано» у сохранённых сообщений</string>
+    <string name="ig_voice_messages">Голосовые сообщения</string>
+    <string name="ig_dialog_voice_messages_list">Голосовые сообщения в сведениях о чате</string>
+    <string name="ig_voice_messages_loaded">Показаны только сообщения, загруженные в чате. Прокрутите чат вверх, чтобы загрузить более старые.</string>
+    <string name="ig_voice_messages_empty">В загруженной части этого чата нет голосовых сообщений.</string>
+    <string name="ig_voice_messages_no_chat">Сначала откройте этот чат, затем повторите попытку.</string>
+    <string name="ig_voice_play_failed">Не удалось воспроизвести это голосовое сообщение</string>
+    <string name="ig_voice_you">Вы</string>
 </resources>

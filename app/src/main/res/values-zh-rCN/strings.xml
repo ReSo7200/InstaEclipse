@@ -863,4 +863,11 @@
     <string name="home_signer_untrust">停止信任</string>
     <string name="ie_unsent_label">已撤回</string>
     <string name="ie_hide_unsent_label">隐藏保留消息上的“已撤回”标签</string>
+    <string name="ig_voice_messages">语音消息</string>
+    <string name="ig_dialog_voice_messages_list">聊天详情中的语音消息</string>
+    <string name="ig_voice_messages_loaded">仅列出聊天中已加载的消息。在聊天中向上滚动以加载更早的消息。</string>
+    <string name="ig_voice_messages_empty">此聊天已加载的部分中没有语音消息。</string>
+    <string name="ig_voice_messages_no_chat">请先打开此聊天，然后重试。</string>
+    <string name="ig_voice_play_failed">无法播放此语音消息</string>
+    <string name="ig_voice_you">你</string>
 </resources>

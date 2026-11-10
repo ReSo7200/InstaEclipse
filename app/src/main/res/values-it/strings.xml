@@ -766,4 +766,11 @@ Resta su questa schermata fino al termine.</string>
     <string name="home_signer_untrust">Non fidarti più</string>
     <string name="ie_unsent_label">Annullato</string>
     <string name="ie_hide_unsent_label">Nascondi l\'etichetta \"Annullato\" sui messaggi conservati</string>
+    <string name="ig_voice_messages">Messaggi vocali</string>
+    <string name="ig_dialog_voice_messages_list">Messaggi vocali nei dettagli della chat</string>
+    <string name="ig_voice_messages_loaded">Sono elencati solo i messaggi caricati nella chat. Scorri in alto nella chat per caricare quelli più vecchi.</string>
+    <string name="ig_voice_messages_empty">Nessun messaggio vocale nella parte caricata di questa chat.</string>
+    <string name="ig_voice_messages_no_chat">Apri prima questa chat, poi riprova.</string>
+    <string name="ig_voice_play_failed">Impossibile riprodurre questo messaggio vocale</string>
+    <string name="ig_voice_you">Tu</string>
 </resources>

@@ -884,4 +884,11 @@ Stay on this screen until it finishes.</string>
     <string name="home_signer_untrust">Stop trusting</string>
     <string name="ie_unsent_label">Unsent</string>
     <string name="ie_hide_unsent_label">Hide the Unsent label on kept messages</string>
+    <string name="ig_voice_messages">Voice messages</string>
+    <string name="ig_dialog_voice_messages_list">Voice Messages in Chat Details</string>
+    <string name="ig_voice_messages_loaded">Only messages loaded in the chat are listed. Scroll up in the chat to load older ones.</string>
+    <string name="ig_voice_messages_empty">No voice messages in the loaded part of this chat.</string>
+    <string name="ig_voice_messages_no_chat">Open this chat first, then try again.</string>
+    <string name="ig_voice_play_failed">Couldn\'t play this voice message</string>
+    <string name="ig_voice_you">You</string>
 </resources>
