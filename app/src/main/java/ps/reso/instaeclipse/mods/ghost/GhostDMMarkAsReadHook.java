@@ -32,6 +32,8 @@ public class GhostDMMarkAsReadHook {
     private static volatile int sCachedContainerId = 0;
 
     public void install(ClassLoader classLoader) {
+        // Open-thread id for replaying the held-back "Seen" (GhostDMSeenHook.sendHeldBackSeen).
+        ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.install(classLoader);
         try {
             XposedHelpers.findAndHookMethod(View.class, "onAttachedToWindow", new XC_MethodHook() {
                 @Override
@@ -97,6 +99,10 @@ public class GhostDMMarkAsReadHook {
 
             View root = view.getRootView();
             View messageList = root.findViewById(messageListId);
+
+            // The chat is already read on this phone, so Instagram may not call the seen
+            // sender again on scroll: send the held-back "Seen" for this chat directly.
+            GhostDMSeenHook.sendHeldBackSeen(ps.reso.instaeclipse.utils.ghost.CurrentThreadTracker.currentThreadId());
 
             if (messageList instanceof ViewGroup group) {
                 // scrollBy with a large value is capped synchronously by RecyclerView's
