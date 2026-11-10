@@ -203,7 +203,7 @@ public class DialogUtils {
         // ---- TOOLS ---- app & account, developer, backup, restart, cache, about
         mainLayout.addView(sectionHeader(context, I18n.t(context, R.string.feat_group_tools)));
         LinearLayout tools = createGroupCard(context);
-        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.menu_app), A_TOOLS, () -> showAppOptions(context), onCount(context, "safePacing", "unlimitedAccounts", "fixNotificationRegistration", "showFeatureToasts", "openLinksExternally")));
+        tools.addView(createMenuRow(context, R.drawable.ic_settings_gear, I18n.t(context, R.string.menu_app), A_TOOLS, () -> showAppOptions(context), onCount(context, "safePacing", "unlimitedAccounts", "fixNotificationRegistration", "blockIncomingCalls", "showFeatureToasts", "openLinksExternally")));
         tools.addView(createMenuRow(context, R.drawable.ic_tune, I18n.t(context, R.string.ig_dialog_menu_dev_options), A_TOOLS, () -> showDevOptions(context), onCount(context, "isDevEnabled", "removeBuildExpiredPopup")));
         tools.addView(createMenuRow(context, R.drawable.ic_save, I18n.t(context, R.string.ig_dialog_menu_backup_restore), A_TOOLS, () -> showBackupRestoreOptions(context)));
         tools.addView(createMenuRow(context, R.drawable.ic_restart, I18n.t(context, R.string.ig_dialog_menu_restart), A_TOOLS, () -> showRestartSection(context)));
@@ -1924,6 +1924,7 @@ public class DialogUtils {
                 extraSwitch(context, "#0A84FF", "safePacing"),
                 extraSwitch(context, "#0A84FF", "unlimitedAccounts"),
                 extraSwitch(context, "#0A84FF", "fixNotificationRegistration"),
+                flagSwitch(context, R.drawable.ic_eye_off, "#0A84FF", R.string.ig_block_incoming_calls, "blockIncomingCalls"),
                 flagSwitch(context, R.drawable.ic_notification, "#0A84FF", R.string.ig_dialog_misc_show_feature_toasts, "showFeatureToasts"),
                 flagSwitch(context, R.drawable.ic_link, "#0A84FF", R.string.ig_dialog_open_links_externally, "openLinksExternally"),
                 createActionRow(context, R.drawable.ic_link, shareDomainLabel(context), "#0A84FF",

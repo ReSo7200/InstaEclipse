@@ -1767,6 +1767,7 @@ public class FeaturesFragment extends Fragment {
                 createExtrasSwitch("#0A84FF", "safePacing"),
                 createExtrasSwitch("#0A84FF", "unlimitedAccounts"),
                 createExtrasSwitch("#0A84FF", "fixNotificationRegistration"),
+                createSwitch(R.drawable.ic_eye_off, "#0A84FF", getString(R.string.ig_block_incoming_calls), "blockIncomingCalls"),
                 createSwitch(R.drawable.ic_notification, "#0A84FF", getString(R.string.ig_dialog_misc_show_feature_toasts), "showFeatureToasts"),
                 createSwitch(R.drawable.ic_link, "#0A84FF", getString(R.string.ig_dialog_open_links_externally), "openLinksExternally"),
                 createClickable(R.drawable.ic_link, "#0A84FF", shareDomainLabel(), this::showShareDomainDialog)

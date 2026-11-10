@@ -81,6 +81,9 @@ public class FeatureFlags {
     public static volatile boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
     public static volatile boolean freeAppIcons = false; // long-press the logo: our free picker of Instagram's app icons
     public static volatile boolean glassTabBar = false; // floating, see-through, blurred bottom tab bar (#281)
+    public static volatile boolean blockIncomingCalls = false; // hide incoming voice/video calls (still a missed call in history)
+    // per-chat call block list (DM thread ids); populated from the chat menu. Not yet persisted — see BlockIncomingCallsHook.
+    public static final java.util.Set<String> blockCallsThreads = java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<>());
     public static volatile boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)
     // Extras (see ExtrasFeatures)
     public static volatile boolean hideStoriesTray = false; // hide the story tray only; stories still open from profiles
