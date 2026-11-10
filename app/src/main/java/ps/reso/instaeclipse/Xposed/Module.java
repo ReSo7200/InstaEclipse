@@ -427,6 +427,20 @@ public class Module {
                         ModuleLog.line("(InstaEclipse | Reels): ❌ Failed to hook: " + t);
                     }
 
+                    // Extras: blurred cover in the bars around letterboxed reels (#273)
+                    try {
+                        if (!skip("ReelsBlurBarsHook")) new ps.reso.instaeclipse.mods.extras.ReelsBlurBarsHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | ReelsBlur): ❌ Failed to hook: " + t);
+                    }
+
+                    // Extras: Clean up Reels (#279)
+                    try {
+                        if (!skip("ReelsCleanupHook")) new ps.reso.instaeclipse.mods.extras.ReelsCleanupHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | ReelsCleanup): ❌ Failed to hook: " + t);
+                    }
+
                     // Extras: lift the 5-account limit
                     try {
                         if (!skip("AccountLimitHook")) new ps.reso.instaeclipse.mods.extras.AccountLimitHook().install(dexKitBridge, hostClassLoader);

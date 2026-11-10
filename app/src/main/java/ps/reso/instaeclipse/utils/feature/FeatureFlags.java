@@ -91,6 +91,11 @@ public class FeatureFlags {
     public static volatile boolean unlimitedAccounts = false; // lift the 5-account limit
     public static volatile boolean reelsLockScroll = false; // lock swiping between reels
     public static volatile boolean reelsAutoScroll = false; // unlock Instagram's own Reels auto-scroll option
+    public static volatile boolean reelsBlurBars = false; // blurred cover behind letterboxed reels (#273)
+    public static volatile boolean reelsHideFollow = false; // Clean up Reels: no Follow button (#279)
+    public static volatile boolean reelsHideMetaAi = false; // Clean up Reels: no Meta AI prompts (#279)
+    public static volatile boolean reelsHidePills = false; // Clean up Reels: no template / audio pills (#279)
+    public static volatile boolean reelsHideCommentBar = false; // Clean up Reels: no comment bar (#279)
     public static volatile boolean disableSwipeToCamera = false; // sideways swipe on the feed no longer opens the camera
     public static volatile boolean followingOnlyFeed = false; // home feed shows only accounts you follow
     public static volatile boolean confirmFeedRefresh = false; // ask before pull-to-refresh reloads the home feed (#278)

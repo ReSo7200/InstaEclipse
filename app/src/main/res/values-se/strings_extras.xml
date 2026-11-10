@@ -24,4 +24,10 @@
     <string name="ig_dialog_location_current_title">Aktuell plats</string>
     <string name="ig_dialog_location_recent">Senaste platser</string>
     <string name="ig_dialog_location_applied">Platsen har tillämpats</string>
+    <string name="ig_dialog_extras_reels_blur_bars">Gör fälten runt Reels suddiga</string>
+    <string name="ig_dialog_reels_clean_up">Rensa Reels</string>
+    <string name="ig_dialog_extras_reels_hide_follow">Dölj Följ-knappen</string>
+    <string name="ig_dialog_extras_reels_hide_meta_ai">Dölj Meta AI-förslag</string>
+    <string name="ig_dialog_extras_reels_hide_pills">Dölj mall- och ljudknappar</string>
+    <string name="ig_dialog_extras_reels_hide_comment_bar">Dölj kommentarsfältet</string>
 </resources>
