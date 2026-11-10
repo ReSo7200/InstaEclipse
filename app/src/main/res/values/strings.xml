@@ -895,4 +895,5 @@ Stay on this screen until it finishes.</string>
     <string name="ig_voice_you">You</string>
     <string name="ig_glass_tab_bar_section">Navigation bar</string>
     <string name="ig_glass_tab_bar">Glass navigation bar (restart Instagram)</string>
+    <string name="ig_block_incoming_calls">Block incoming calls</string>
 </resources>

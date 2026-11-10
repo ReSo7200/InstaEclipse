@@ -319,6 +319,13 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     }
 
                     try {
+                        if (!skip("BlockIncomingCallsHook"))
+                            new ps.reso.instaeclipse.mods.ghost.BlockIncomingCallsHook().install(lpparam.classLoader); // Block incoming calls
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | BlockCalls): ❌ Failed to hook");
+                    }
+
+                    try {
                         ps.reso.instaeclipse.utils.ghost.CurrentConversation.install(dexKitBridge, lpparam.classLoader);
                         ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.install();
                         if (!skip("KeepUnsentMessagesHook")) new KeepUnsentMessagesHook().install(dexKitBridge, lpparam.classLoader); // Keep Unsent
