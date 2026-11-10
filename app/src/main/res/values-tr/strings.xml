@@ -868,4 +868,6 @@
     <string name="home_signer_untrust_title">Bu Instagram\'a artık güvenilmesin mi?</string>
     <string name="home_signer_untrust_message">Bu Instagram (anahtar %1$s…) ile indirmeler ve ayar senkronizasyonu yeniden engellenecek.</string>
     <string name="home_signer_untrust">Güvenmeyi bırak</string>
+    <string name="ie_unsent_label">Geri alındı</string>
+    <string name="ie_hide_unsent_label">Saklanan mesajlarda \"Geri alındı\" etiketini gizle</string>
 </resources>

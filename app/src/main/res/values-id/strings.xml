@@ -861,4 +861,6 @@ Tetap di layar ini sampai selesai.</string>
     <string name="home_signer_untrust_title">Berhenti memercayai Instagram ini?</string>
     <string name="home_signer_untrust_message">Unduhan dan sinkronisasi pengaturan dengan Instagram ini (kunci %1$s…) akan diblokir lagi.</string>
     <string name="home_signer_untrust">Berhenti memercayai</string>
+    <string name="ie_unsent_label">Dibatalkan</string>
+    <string name="ie_hide_unsent_label">Sembunyikan label Dibatalkan pada pesan yang disimpan</string>
 </resources>

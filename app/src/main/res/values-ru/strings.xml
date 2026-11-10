@@ -830,4 +830,6 @@
     <string name="home_signer_untrust_title">Больше не доверять этому Instagram?</string>
     <string name="home_signer_untrust_message">Загрузки и синхронизация настроек с этим Instagram (ключ %1$s…) снова будут заблокированы.</string>
     <string name="home_signer_untrust">Не доверять</string>
+    <string name="ie_unsent_label">Отозвано</string>
+    <string name="ie_hide_unsent_label">Скрыть метку «Отозвано» у сохранённых сообщений</string>
 </resources>

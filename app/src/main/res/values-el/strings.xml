@@ -862,4 +862,6 @@
     <string name="home_signer_untrust_title">Διακοπή εμπιστοσύνης σε αυτό το Instagram;</string>
     <string name="home_signer_untrust_message">Οι λήψεις και ο συγχρονισμός ρυθμίσεων με αυτό το Instagram (κλειδί %1$s…) θα μπλοκαριστούν ξανά.</string>
     <string name="home_signer_untrust">Διακοπή εμπιστοσύνης</string>
+    <string name="ie_unsent_label">Αναιρέθηκε</string>
+    <string name="ie_hide_unsent_label">Απόκρυψη της ετικέτας «Αναιρέθηκε» στα μηνύματα που κρατήθηκαν</string>
 </resources>

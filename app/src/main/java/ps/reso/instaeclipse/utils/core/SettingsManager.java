@@ -56,6 +56,7 @@ public class SettingsManager {
         editor.putBoolean("showHideChatButton", FeatureFlags.showHideChatButton);
         editor.putBoolean("showDeletedMessagesButton", FeatureFlags.showDeletedMessagesButton);
         editor.putBoolean("keepUnsentInChat", FeatureFlags.keepUnsentInChat);
+        editor.putBoolean("hideUnsentLabel", FeatureFlags.hideUnsentLabel);
         editor.putBoolean("downloaderUseOriginal", FeatureFlags.downloaderUseOriginal);
         editor.putInt("downloaderQualityMaxShortSide", FeatureFlags.downloaderQualityMaxShortSide);
         editor.putInt("storyTrayScale", FeatureFlags.storyTrayScale);
@@ -277,6 +278,7 @@ public class SettingsManager {
         FeatureFlags.showHideChatButton = prefs.getBoolean("showHideChatButton", false);
         FeatureFlags.showDeletedMessagesButton = prefs.getBoolean("showDeletedMessagesButton", false);
         FeatureFlags.keepUnsentInChat = prefs.getBoolean("keepUnsentInChat", false);
+        FeatureFlags.hideUnsentLabel = prefs.getBoolean("hideUnsentLabel", false);
         FeatureFlags.downloaderUseOriginal = prefs.getBoolean("downloaderUseOriginal", true);
         FeatureFlags.downloaderQualityMaxShortSide = prefs.getInt("downloaderQualityMaxShortSide", 0);
         FeatureFlags.storyTrayScale = prefs.getInt("storyTrayScale", 100);

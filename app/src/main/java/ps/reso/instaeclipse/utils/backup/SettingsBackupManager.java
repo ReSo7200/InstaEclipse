@@ -69,6 +69,7 @@ public class SettingsBackupManager {
         s.put("jumpToFirstMessage",         FeatureFlags.jumpToFirstMessage);
         s.put("translateMessages",          FeatureFlags.translateMessages);
         s.put("bulkUnsend",                 FeatureFlags.bulkUnsend);
+        s.put("hideUnsentLabel",            FeatureFlags.hideUnsentLabel);
         s.put("chatExport",                 FeatureFlags.chatExport);
         s.put("hideTabHome", FeatureFlags.hideTabHome);
         s.put("hideTabReels", FeatureFlags.hideTabReels);
@@ -243,6 +244,7 @@ public class SettingsBackupManager {
         if (s.has("jumpToFirstMessage"))        FeatureFlags.jumpToFirstMessage        = s.getBoolean("jumpToFirstMessage");
         if (s.has("translateMessages"))         FeatureFlags.translateMessages         = s.getBoolean("translateMessages");
         if (s.has("bulkUnsend"))                FeatureFlags.bulkUnsend                = s.getBoolean("bulkUnsend");
+        if (s.has("hideUnsentLabel"))           FeatureFlags.hideUnsentLabel           = s.getBoolean("hideUnsentLabel");
         if (s.has("chatExport"))                FeatureFlags.chatExport                = s.getBoolean("chatExport");
         if (s.has("hideTabHome")) FeatureFlags.hideTabHome = s.getBoolean("hideTabHome");
         if (s.has("hideTabReels")) FeatureFlags.hideTabReels = s.getBoolean("hideTabReels");

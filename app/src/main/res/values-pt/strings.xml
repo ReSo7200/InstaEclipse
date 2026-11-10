@@ -828,4 +828,6 @@
     <string name="home_signer_untrust_title">Deixar de confiar neste Instagram?</string>
     <string name="home_signer_untrust_message">Downloads e a sincronização de configurações com este Instagram (chave %1$s…) serão bloqueados de novo.</string>
     <string name="home_signer_untrust">Deixar de confiar</string>
+    <string name="ie_unsent_label">Envio cancelado</string>
+    <string name="ie_hide_unsent_label">Ocultar a etiqueta \"Envio cancelado\" nas mensagens mantidas</string>
 </resources>

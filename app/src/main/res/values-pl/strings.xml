@@ -878,4 +878,6 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="home_signer_untrust_title">Przestać ufać temu Instagramowi?</string>
     <string name="home_signer_untrust_message">Pobieranie i synchronizacja ustawień z tym Instagramem (klucz %1$s…) zostaną ponownie zablokowane.</string>
     <string name="home_signer_untrust">Przestań ufać</string>
+    <string name="ie_unsent_label">Cofnięto</string>
+    <string name="ie_hide_unsent_label">Ukryj etykietę „Cofnięto” przy zachowanych wiadomościach</string>
 </resources>

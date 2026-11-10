@@ -860,4 +860,6 @@
     <string name="home_signer_untrust_title">להפסיק לסמוך על Instagram הזה?</string>
     <string name="home_signer_untrust_message">הורדות וסנכרון הגדרות עם Instagram הזה (מפתח %1$s…) ייחסמו שוב.</string>
     <string name="home_signer_untrust">הפסק לסמוך</string>
+    <string name="ie_unsent_label">בוטלה השליחה</string>
+    <string name="ie_hide_unsent_label">הסתרת התווית \"בוטלה השליחה\" בהודעות שנשמרו</string>
 </resources>

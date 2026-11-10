@@ -6,6 +6,7 @@ public class FeatureFlags {
     public static volatile boolean showHideChatButton = false;
     public static volatile boolean showDeletedMessagesButton = false;
     public static volatile boolean keepUnsentInChat = false;
+    public static volatile boolean hideUnsentLabel = false; // hide the "Unsent" mark on kept messages (#222)
     public static volatile boolean downloaderUseOriginal = true;
     public static volatile int downloaderQualityMaxShortSide = 0;
     public static volatile int feedCornerRadius = 0;       // rounded feed post corners in dp (#276), 0 = square

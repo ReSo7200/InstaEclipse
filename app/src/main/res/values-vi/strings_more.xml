@@ -430,4 +430,6 @@
     <string name="home_signer_untrust_title">Ngừng tin cậy Instagram này?</string>
     <string name="home_signer_untrust_message">Tải xuống và đồng bộ cài đặt với Instagram này (khóa %1$s…) sẽ bị chặn lại.</string>
     <string name="home_signer_untrust">Ngừng tin cậy</string>
+    <string name="ie_unsent_label">Đã thu hồi</string>
+    <string name="ie_hide_unsent_label">Ẩn nhãn \"Đã thu hồi\" trên tin nhắn được giữ lại</string>
 </resources>

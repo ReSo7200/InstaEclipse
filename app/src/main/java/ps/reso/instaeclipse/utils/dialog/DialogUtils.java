@@ -1208,6 +1208,8 @@ public class DialogUtils {
                 }),
                 flagSwitch(context, R.drawable.ic_chat, "#5E5CE6", R.string.ie_keep_unsent_in_chat, "keepUnsentInChat",
                         ps.reso.instaeclipse.mods.ghost.KeepUnsentMessagesHook::onSettingsChanged),
+                flagSwitch(context, R.drawable.ic_eye_off, "#5E5CE6", R.string.ie_hide_unsent_label, "hideUnsentLabel",
+                        ps.reso.instaeclipse.mods.ghost.KeepUnsentMessagesHook::onSettingsChanged),
                 flagSwitch(context, R.drawable.ic_delete, "#5E5CE6", R.string.ie_show_deleted_button, "showDeletedMessagesButton",
                         ps.reso.instaeclipse.mods.ghost.ConversationMenuHook::refreshAll),
                 createActionRow(context, R.drawable.ic_chat, I18n.t(context, R.string.ie_chat_actions), "#5E5CE6",

@@ -882,4 +882,6 @@ Stay on this screen until it finishes.</string>
     <string name="home_signer_untrust_title">Stop trusting this Instagram?</string>
     <string name="home_signer_untrust_message">Downloads and settings sync with this Instagram (key %1$s…) will be blocked again.</string>
     <string name="home_signer_untrust">Stop trusting</string>
+    <string name="ie_unsent_label">Unsent</string>
+    <string name="ie_hide_unsent_label">Hide the Unsent label on kept messages</string>
 </resources>

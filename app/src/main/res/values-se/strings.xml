@@ -830,4 +830,6 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="home_signer_untrust_title">Sluta lita på denna Instagram?</string>
     <string name="home_signer_untrust_message">Nedladdningar och synkning av inställningar med denna Instagram (nyckel %1$s…) blockeras igen.</string>
     <string name="home_signer_untrust">Sluta lita på</string>
+    <string name="ie_unsent_label">Ångrat</string>
+    <string name="ie_hide_unsent_label">Dölj etiketten Ångrat på sparade meddelanden</string>
 </resources>
