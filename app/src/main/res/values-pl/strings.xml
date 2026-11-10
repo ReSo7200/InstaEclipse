@@ -333,6 +333,8 @@
     <string name="ig_dialog_clean_feed_hide_suggested">Ukryj sugestie w Dla Ciebie</string>
     <string name="ig_dialog_clean_feed_hide_threads">Ukryj sugestie z Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Ukryj posty, które już polubiłeś</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Ukryj sugestie w Rolkach</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Ukryj płatne partnerstwa i posty sponsorowane</string>
     <string name="ig_nav_settings_title">Ustawienia nawigacji</string>
     <string name="ig_nav_name_home">Główna</string>
     <string name="ig_nav_name_reels">Rolki</string>

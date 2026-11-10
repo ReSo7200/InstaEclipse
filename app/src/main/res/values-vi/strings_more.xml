@@ -146,6 +146,8 @@
     <string name="theme_light_same">Giống giao diện chế độ tối</string>
     <string name="theme_light_stock">Instagram gốc (chỉ áp dụng giao diện ở chế độ tối)</string>
     <string name="ig_dialog_clean_feed_hide_liked">Ẩn bài viết bạn đã thích</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Ẩn gợi ý trong Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Ẩn bài hợp tác có trả phí và bài được tài trợ</string>
     <string name="ig_nav_settings_title">Cài đặt điều hướng</string>
     <string name="ig_nav_tabs_title">Ẩn tab điều hướng</string>
     <string name="ig_nav_name_home">Trang chủ</string>

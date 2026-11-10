@@ -195,6 +195,8 @@ public class FeatureFlags {
     // Clean Feed
     public static volatile boolean hideSuggestionsInFeed = false;
     public static volatile boolean hideThreadsSuggestions = false;
+    public static volatile boolean hideSuggestionsInReels = false; // drop suggested-account (netego) units from the Reels tab (#298)
+    public static volatile boolean hidePaidPartnerships = false; // drop paid partnership / sponsored posts and reels at parse time (#275)
 
     // Downloader
     public static volatile boolean enablePostDownload = false;

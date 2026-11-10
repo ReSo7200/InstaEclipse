@@ -635,6 +635,8 @@
     <string name="ig_dialog_unsent_unknown_chat">محادثة غير معروفة</string>
     <string name="ig_dialog_clean_feed_hide_threads">إخفاء اقتراحات Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">إخفاء المنشورات التي أعجبتك مسبقاً</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">إخفاء الاقتراحات في الريلز</string>
+    <string name="ig_dialog_clean_feed_hide_paid">إخفاء الشراكات المدفوعة والمنشورات الممولة</string>
     <string name="ig_nav_settings_title">إعدادات التنقل</string>
     <string name="ig_nav_name_home">الرئيسية</string>
     <string name="ig_nav_name_reels">ريلز</string>

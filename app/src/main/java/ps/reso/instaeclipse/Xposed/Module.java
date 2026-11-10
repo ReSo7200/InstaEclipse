@@ -378,6 +378,13 @@ public class Module {
                         ModuleLog.line("(InstaEclipse | HideSuggested): ❌ Failed to hook");
                     }
 
+                    // Reels tab: hide suggestions (#298) and paid partnerships / sponsored reels (#275)
+                    try {
+                        if (!skip("HideReelsItemsHook")) new ps.reso.instaeclipse.mods.feed.HideReelsItemsHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | ReelsFilter): ❌ Failed to hook");
+                    }
+
                     // Ads Blocker
                     try {
                         if (!skip("AdBlocker")) new AdBlocker().disableSponsoredContent(dexKitBridge, hostClassLoader);

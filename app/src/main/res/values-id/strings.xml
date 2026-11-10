@@ -668,6 +668,8 @@
     <string name="ig_dialog_unsent_unknown_chat">Obrolan tidak dikenal</string>
     <string name="ig_dialog_clean_feed_hide_threads">Sembunyikan Saran Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Sembunyikan Postingan yang Sudah Anda Sukai</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Sembunyikan saran di Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Sembunyikan kemitraan berbayar &amp; postingan bersponsor</string>
     <string name="ig_nav_settings_title">Pengaturan navigasi</string>
     <string name="ig_nav_name_home">Beranda</string>
     <string name="ig_nav_name_reels">Reels</string>

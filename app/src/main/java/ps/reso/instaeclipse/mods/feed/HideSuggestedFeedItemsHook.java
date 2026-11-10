@@ -31,7 +31,7 @@ public class HideSuggestedFeedItemsHook {
             @Override
             protected void afterHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
                 if (!FeatureFlags.hideSuggestionsInFeed && !FeatureFlags.hideThreadsSuggestions
-                        && !FeatureFlags.hideLikedPosts) return;
+                        && !FeatureFlags.hideLikedPosts && !FeatureFlags.hidePaidPartnerships) return;
 
                 Object result = param.getResult();
                 if (result == null) return;
@@ -67,6 +67,8 @@ public class HideSuggestedFeedItemsHook {
                     // Real post: only hidden when "Hide liked posts" is on and you already liked it.
                     // Applied at parse time, so a post liked now disappears on the next refresh.
                     if (FeatureFlags.hideLikedPosts && isLiked(media)) param.setResult(null);
+                    // Paid partnership / sponsored (boosted) posts (#275).
+                    else if (PaidPartnershipFilter.shouldHide(media)) param.setResult(null);
                     return;
                 }
                 if (!FeatureFlags.hideSuggestionsInFeed && !FeatureFlags.hideThreadsSuggestions) return;
@@ -80,6 +82,7 @@ public class HideSuggestedFeedItemsHook {
         };
 
         resolveHasLikedGetter(bridge, classLoader);
+        PaidPartnershipFilter.install(bridge, classLoader);
 
         if (DexKitCache.isCacheValid()) {
             String cached = DexKitCache.loadString(CACHE_KEY_PARSER);
@@ -217,5 +220,6 @@ public class HideSuggestedFeedItemsHook {
         if (FeatureFlags.hideSuggestionsInFeed) FeatureStatusTracker.setHooked("HideSuggestionsInFeed");
         if (FeatureFlags.hideThreadsSuggestions) FeatureStatusTracker.setHooked("HideThreadsSuggestions");
         if (FeatureFlags.hideLikedPosts && hasLikedGetter != null) FeatureStatusTracker.setHooked("HideLikedPosts");
+        if (FeatureFlags.hidePaidPartnerships && PaidPartnershipFilter.isReady()) FeatureStatusTracker.setHooked("HidePaidPartnerships");
     }
 }

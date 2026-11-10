@@ -708,6 +708,8 @@
     <string name="ig_toast_downloading_audio">Ses indiriliyor…</string>
     <string name="ig_toast_audio_saved">Ses kaydedildi</string>
     <string name="ig_dialog_clean_feed_hide_liked">Zaten Beğendiğiniz Gönderileri Gizle</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Reels Önerilerini Gizle</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Ücretli Ortaklıkları ve Sponsorlu Gönderileri Gizle</string>
     <string name="ig_nav_settings_title">Gezinme ayarları</string>
     <string name="ig_nav_name_home">Ana Sayfa</string>
     <string name="ig_nav_name_reels">Reels</string>

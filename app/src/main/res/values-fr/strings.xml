@@ -670,6 +670,8 @@
     <string name="ig_dialog_unsent_unknown_chat">Conversation inconnue</string>
     <string name="ig_dialog_clean_feed_hide_threads">Masquer les suggestions Threads</string>
     <string name="ig_dialog_clean_feed_hide_liked">Masquer les publications déjà aimées</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Masquer les suggestions dans les Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Masquer les partenariats rémunérés et publications sponsorisées</string>
     <string name="ig_nav_settings_title">Paramètres de navigation</string>
     <string name="ig_nav_name_home">Accueil</string>
     <string name="ig_nav_name_reels">Reels</string>

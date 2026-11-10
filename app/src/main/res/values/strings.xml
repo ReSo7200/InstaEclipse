@@ -474,6 +474,8 @@
     <string name="ig_dialog_clean_feed_hide_suggested">Hide Suggestions in Feed</string>
     <string name="ig_dialog_clean_feed_hide_threads">Hide Threads Suggestions</string>
     <string name="ig_dialog_clean_feed_hide_liked">Hide Posts You Already Liked</string>
+    <string name="ig_dialog_clean_feed_hide_suggested_reels">Hide Suggestions in Reels</string>
+    <string name="ig_dialog_clean_feed_hide_paid">Hide Paid Partnerships &amp; Sponsored Posts</string>
     <string name="ig_nav_settings_title">Navigation settings</string>
     <string name="ig_nav_tabs_title">Hide navigation tabs</string>
     <string name="ig_nav_name_home">Home</string>
