@@ -100,6 +100,7 @@ public class SettingsManager {
         editor.putBoolean("freeAppIcons", FeatureFlags.freeAppIcons);
         editor.putBoolean("glassTabBar", FeatureFlags.glassTabBar);
         editor.putBoolean("blockIncomingCalls", FeatureFlags.blockIncomingCalls);
+        editor.putStringSet("blockCallsThreads", new java.util.HashSet<>(FeatureFlags.blockCallsThreads));
         editor.putBoolean("expandCaptions", FeatureFlags.expandCaptions);
         editor.putBoolean("offerAudioDownload", FeatureFlags.offerAudioDownload);
         editor.putBoolean("enableVoiceDownload", FeatureFlags.enableVoiceDownload);
@@ -327,6 +328,8 @@ public class SettingsManager {
         FeatureFlags.freeAppIcons = prefs.getBoolean("freeAppIcons", false);
         FeatureFlags.glassTabBar = prefs.getBoolean("glassTabBar", false);
         FeatureFlags.blockIncomingCalls = prefs.getBoolean("blockIncomingCalls", false);
+        FeatureFlags.blockCallsThreads.clear();
+        FeatureFlags.blockCallsThreads.addAll(prefs.getStringSet("blockCallsThreads", java.util.Collections.emptySet()));
         FeatureFlags.expandCaptions = prefs.getBoolean("expandCaptions", false);
         FeatureFlags.offerAudioDownload = prefs.getBoolean("offerAudioDownload", false);
         FeatureFlags.enableVoiceDownload = prefs.getBoolean("enableVoiceDownload", false);

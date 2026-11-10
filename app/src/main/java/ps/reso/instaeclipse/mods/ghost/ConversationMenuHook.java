@@ -232,6 +232,16 @@ public final class ConversationMenuHook {
                 DialogUtils.showThreadUnsent(a, snapshot.threadId, chatTitle(a), () -> show(a));
             });
         }
+        boolean callsBlocked = snapshot.threadId != null
+                && FeatureFlags.blockCallsThreads.contains(snapshot.threadId);
+        labels.add(I18n.t(a, callsBlocked ? R.string.ie_unblock_calls_this_chat : R.string.ie_block_calls_this_chat));
+        actions.add(() -> {
+            if (snapshot.threadId == null) { message(a, R.string.ig_hide_chat_no_thread); return; }
+            if (callsBlocked) FeatureFlags.blockCallsThreads.remove(snapshot.threadId);
+            else FeatureFlags.blockCallsThreads.add(snapshot.threadId);
+            ps.reso.instaeclipse.utils.core.SettingsManager.saveAllFlags();
+        });
+
         if (labels.isEmpty()) { message(a, R.string.ie_chat_features_disabled); return; }
 
         try {

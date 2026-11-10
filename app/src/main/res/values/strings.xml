@@ -896,4 +896,6 @@ Stay on this screen until it finishes.</string>
     <string name="ig_glass_tab_bar_section">Navigation bar</string>
     <string name="ig_glass_tab_bar">Glass navigation bar (restart Instagram)</string>
     <string name="ig_block_incoming_calls">Block incoming calls</string>
+    <string name="ie_block_calls_this_chat">Block incoming calls from this chat</string>
+    <string name="ie_unblock_calls_this_chat">Unblock incoming calls from this chat</string>
 </resources>
