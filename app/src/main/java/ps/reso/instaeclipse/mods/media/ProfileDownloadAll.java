@@ -123,7 +123,7 @@ public final class ProfileDownloadAll {
                     return;
                 }
                 swipeUp(a, grid);
-                MAIN.postDelayed(this, TICK_MS);
+                MAIN.postDelayed(this, ps.reso.instaeclipse.utils.core.Pace.between(TICK_MS, TICK_MS * 2));
             }
         };
         MAIN.post(tick);

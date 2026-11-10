@@ -88,6 +88,18 @@ public final class DeviceSpoofHook {
     private static final Pattern PRODUCT_PROP = Pattern.compile("ro\\.product\\.(?:[a-z_]+\\.)?(model|brand|manufacturer|device|name)");
     private static final Pattern FINGERPRINT_PROP = Pattern.compile("ro\\.(?:[a-z_]+\\.)?build\\.fingerprint");
 
+    /**
+     * The profile's fingerprint with this phone's real Android version in it. The Android
+     * version itself isn't spoofed (Instagram's user agent reports the real one), so a fingerprint
+     * naming another version would describe a device that can't exist.
+     */
+    static String fingerprint(Profile p) {
+        if (p == null || p.fingerprint == null) return null;
+        String release = Build.VERSION.RELEASE;
+        if (release == null || release.isEmpty()) return p.fingerprint;
+        return p.fingerprint.replaceFirst(":[0-9][0-9.]*/", ":" + release + "/");
+    }
+
     private DeviceSpoofHook() {}
 
     public static String deviceName(String id) {
@@ -114,7 +126,7 @@ public final class DeviceSpoofHook {
             set(Build.class, "PRODUCT", p.product);
             set(Build.class, "HARDWARE", p.device);
             set(Build.class, "BOARD", p.device);
-            set(Build.class, "FINGERPRINT", p.fingerprint);
+            set(Build.class, "FINGERPRINT", fingerprint(p));
             set(Build.class, "ID", p.buildId);
             set(Build.class, "DISPLAY", p.buildId);
             set(Build.class, "SOC_MANUFACTURER", p.socManufacturer);
@@ -169,7 +181,7 @@ public final class DeviceSpoofHook {
                 case "name": return p.product;
             }
         }
-        if (FINGERPRINT_PROP.matcher(key).matches()) return p.fingerprint;
+        if (FINGERPRINT_PROP.matcher(key).matches()) return fingerprint(p);
         switch (key) {
             case "ro.soc.manufacturer": return p.socManufacturer;
             case "ro.soc.model": return p.socModel;

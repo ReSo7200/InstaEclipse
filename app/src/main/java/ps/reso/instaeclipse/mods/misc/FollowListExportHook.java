@@ -239,7 +239,7 @@ public class FollowListExportHook {
         Handler h = new Handler(Looper.getMainLooper());
         ps.reso.instaeclipse.utils.dialog.IeDialog dlg = progressDialog(root.getContext(), title);
         new Runnable() {
-            int idle = 0;
+            int idle = 0, pages = 0;
             boolean first = true;
             boolean stopped = false;
             @Override public void run() {
@@ -248,7 +248,7 @@ public class FollowListExportHook {
                     // isLoading() is the footer-spinner flag (true while more pages exist), so don't gate
                     // on it: the load-more method itself skips when a request is in flight or failed.
                     more = nextMaxIdField.get(pg) != null;
-                    if (more) pagerLoadMore.invoke(pg);
+                    if (more) { pagerLoadMore.invoke(pg); pages++; }
                     if (first) { first = false; ModuleLog.line(TAG + "pager start: more=" + more); }
                 } catch (Throwable t) {
                     ModuleLog.line(TAG + "⚠️ pager: " + t);
@@ -267,7 +267,8 @@ public class FollowListExportHook {
                     done.accept(complete);
                     return;
                 }
-                h.postDelayed(this, 500);
+                // Paced like a person scrolling, with a longer rest every 10 pages (see Pace).
+                h.postDelayed(this, more ? ps.reso.instaeclipse.utils.core.Pace.next(pages, 1500, 3000, 10, 6000, 10000) : 1500);
             }
         }.run();
     }
