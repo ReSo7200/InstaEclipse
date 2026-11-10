@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Inte rootad? Installera den här</string>
     <string name="help_lspatch_guide">Följ installationsguiden</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">Divtte Instagram (root haga)</string>
+    <string name="patch_intro">Divtte du Instagram vai InstaEclipse viežžojuvvo root haga, ja doalaha Instagrama álgovuolggalaš vuolláičállima.</string>
+    <string name="patch_integrity_note">Dát ii garvá Play Integrity.</string>
+    <string name="patch_choose_apk">Vállje Instagram APK(aid)</string>
+    <string name="patch_no_selection">APK ii leat vel válljejuvvon.</string>
+    <string name="patch_selected">%1$d fiila: %2$s</string>
+    <string name="patch_run">Divtte ja sajáiduhte</string>
+    <string name="patch_need_apk">Vállje vuos unnimusat ovtta Instagram APK.</string>
+    <string name="patch_log_label">Ovdáneapmi</string>
+    <string name="patch_log_empty">Lávkkit ihtet dása.</string>
+    <string name="patch_failed">Divodeapmi ii lihkostuvvan: %1$s</string>
+    <string name="patch_install_success">Instagram sajáiduhttojuvvon.</string>
+    <string name="patch_install_failed">Sajáiduhttin ii lihkostuvvan: %1$s</string>
+    <string name="patch_step_copy">Máŋgen válljejuvvon APK(aid)</string>
+    <string name="patch_step_unbundle">Rahpamin %1$s</string>
+    <string name="patch_step_install">Álggaheamin sajáiduhtti</string>
+    <string name="patch_step_done">Gárvvis. Nanne sajáiduhttima go jearrojuvvo.</string>
+    <string name="patch_err_no_apk">Ii gávdnojuvvon APK válljemis.</string>
 </resources>

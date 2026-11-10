@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch（JingMatrix）</string>
     <string name="help_lspatch_sub">未 Root？请安装此版本</string>
     <string name="help_lspatch_guide">查看安装指南</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">修补 Instagram（免 root）</string>
+    <string name="patch_intro">修补你的 Instagram，让 InstaEclipse 无需 root 即可加载，并保留 Instagram 的原始签名。</string>
+    <string name="patch_integrity_note">这不会绕过 Play Integrity。</string>
+    <string name="patch_choose_apk">选择 Instagram APK</string>
+    <string name="patch_no_selection">尚未选择 APK。</string>
+    <string name="patch_selected">%1$d 个文件：%2$s</string>
+    <string name="patch_run">修补并安装</string>
+    <string name="patch_need_apk">请先至少选择一个 Instagram APK。</string>
+    <string name="patch_log_label">进度</string>
+    <string name="patch_log_empty">步骤将显示在此处。</string>
+    <string name="patch_failed">修补失败：%1$s</string>
+    <string name="patch_install_success">已安装 Instagram。</string>
+    <string name="patch_install_failed">安装失败：%1$s</string>
+    <string name="patch_step_copy">正在复制所选的 APK</string>
+    <string name="patch_step_unbundle">正在解包 %1$s</string>
+    <string name="patch_step_install">正在启动安装程序</string>
+    <string name="patch_step_done">完成。出现提示时请确认安装。</string>
+    <string name="patch_err_no_apk">所选内容中未找到 APK。</string>
 </resources>

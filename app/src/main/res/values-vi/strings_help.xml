@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Chưa root? Cài bản này</string>
     <string name="help_lspatch_guide">Xem hướng dẫn cài đặt</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">Vá Instagram (không cần root)</string>
+    <string name="patch_intro">Vá Instagram của bạn để InstaEclipse tải mà không cần root, giữ nguyên chữ ký gốc của Instagram.</string>
+    <string name="patch_integrity_note">Điều này không vượt qua Play Integrity.</string>
+    <string name="patch_choose_apk">Chọn (các) APK Instagram</string>
+    <string name="patch_no_selection">Chưa chọn APK nào.</string>
+    <string name="patch_selected">%1$d tệp: %2$s</string>
+    <string name="patch_run">Vá và cài đặt</string>
+    <string name="patch_need_apk">Hãy chọn ít nhất một APK Instagram trước.</string>
+    <string name="patch_log_label">Tiến trình</string>
+    <string name="patch_log_empty">Các bước sẽ hiện ở đây.</string>
+    <string name="patch_failed">Vá thất bại: %1$s</string>
+    <string name="patch_install_success">Đã cài đặt Instagram.</string>
+    <string name="patch_install_failed">Cài đặt thất bại: %1$s</string>
+    <string name="patch_step_copy">Đang sao chép (các) APK đã chọn</string>
+    <string name="patch_step_unbundle">Đang giải nén %1$s</string>
+    <string name="patch_step_install">Đang khởi động trình cài đặt</string>
+    <string name="patch_step_done">Xong. Hãy xác nhận cài đặt khi được hỏi.</string>
+    <string name="patch_err_no_apk">Không tìm thấy APK trong lựa chọn.</string>
 </resources>

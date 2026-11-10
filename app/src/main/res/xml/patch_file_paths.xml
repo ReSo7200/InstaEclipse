@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="patch_cache" path="iepatch/" />
+    <external-cache-path name="patch_external_cache" path="iepatch/" />
+</paths>

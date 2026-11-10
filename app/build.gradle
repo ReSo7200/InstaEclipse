@@ -37,6 +37,17 @@ android {
         }
     }
     packagingOptions {
+        resources {
+            // The patcher's apkzlib / Bouncy Castle / Guava dependencies ship duplicate metadata.
+            excludes += [
+                    'META-INF/versions/9/OSGI-INF/MANIFEST.MF',
+                    'META-INF/DEPENDENCIES',
+                    'META-INF/INDEX.LIST',
+                    'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/LICENSE.md',
+                    'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/NOTICE.md',
+                    'META-INF/*.kotlin_module'
+            ]
+        }
         jniLibs {
             useLegacyPackaging true
         }
@@ -56,6 +67,15 @@ dependencies {
 
     // External library for shared preferences
     implementation libs.fileprefs
+
+    // No-root Instagram patcher: bundled zip/sign (apkzlib) and binary-manifest editor libraries,
+    // plus apkzlib's runtime dependencies (apksig for v2 signing, guava, Bouncy Castle).
+    implementation files('libs/apkzlib.jar')
+    implementation files('libs/ManifestEditor-1.0.2.jar')
+    implementation 'com.android.tools.build:apksig:8.7.0'
+    implementation 'com.google.guava:guava:33.4.0-android'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
     // Testing dependencies
     testImplementation libs.junit
     testRuntimeOnly files('libs/api-82.jar')

@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">אין רוט? התקינו את זה</string>
     <string name="help_lspatch_guide">למדריך ההתקנה</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">תיקון אינסטגרם (ללא רוט)</string>
+    <string name="patch_intro">מתקן את אינסטגרם כך ש-InstaEclipse ייטען ללא רוט, תוך שמירה על החתימה המקורית של אינסטגרם.</string>
+    <string name="patch_integrity_note">זה אינו עוקף את Play Integrity.</string>
+    <string name="patch_choose_apk">בחר קובצי APK של אינסטגרם</string>
+    <string name="patch_no_selection">עדיין לא נבחר APK.</string>
+    <string name="patch_selected">%1$d קבצים: %2$s</string>
+    <string name="patch_run">תקן והתקן</string>
+    <string name="patch_need_apk">בחר תחילה לפחות קובץ APK אחד של אינסטגרם.</string>
+    <string name="patch_log_label">התקדמות</string>
+    <string name="patch_log_empty">השלבים יופיעו כאן.</string>
+    <string name="patch_failed">התיקון נכשל: %1$s</string>
+    <string name="patch_install_success">אינסטגרם הותקן.</string>
+    <string name="patch_install_failed">ההתקנה נכשלה: %1$s</string>
+    <string name="patch_step_copy">מעתיק את קובצי ה-APK שנבחרו</string>
+    <string name="patch_step_unbundle">מחלץ את %1$s</string>
+    <string name="patch_step_install">מפעיל את תוכנת ההתקנה</string>
+    <string name="patch_step_done">הסתיים. אשר את ההתקנה כשתתבקש.</string>
+    <string name="patch_err_no_apk">לא נמצא APK בבחירה.</string>
 </resources>
