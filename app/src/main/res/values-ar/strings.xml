@@ -829,4 +829,11 @@
     <string name="home_signer_untrust">إيقاف الوثوق</string>
     <string name="ie_unsent_label">أُلغي إرسالها</string>
     <string name="ie_hide_unsent_label">إخفاء علامة \"أُلغي إرسالها\" على الرسائل المحفوظة</string>
+    <string name="ig_voice_messages">الرسائل الصوتية</string>
+    <string name="ig_dialog_voice_messages_list">الرسائل الصوتية في تفاصيل المحادثة</string>
+    <string name="ig_voice_messages_loaded">تظهر فقط الرسائل المحمّلة في المحادثة. مرّر للأعلى في المحادثة لتحميل الأقدم.</string>
+    <string name="ig_voice_messages_empty">لا توجد رسائل صوتية في الجزء المحمّل من هذه المحادثة.</string>
+    <string name="ig_voice_messages_no_chat">افتح هذه المحادثة أولاً ثم حاول مجدداً.</string>
+    <string name="ig_voice_play_failed">تعذّر تشغيل هذه الرسالة الصوتية</string>
+    <string name="ig_voice_you">أنت</string>
 </resources>

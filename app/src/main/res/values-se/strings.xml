@@ -832,4 +832,11 @@ Stanna på den här skärmen tills det är klart.</string>
     <string name="home_signer_untrust">Sluta lita på</string>
     <string name="ie_unsent_label">Ångrat</string>
     <string name="ie_hide_unsent_label">Dölj etiketten Ångrat på sparade meddelanden</string>
+    <string name="ig_voice_messages">Röstmeddelanden</string>
+    <string name="ig_dialog_voice_messages_list">Röstmeddelanden i chattdetaljer</string>
+    <string name="ig_voice_messages_loaded">Endast meddelanden som laddats i chatten visas. Skrolla upp i chatten för att ladda äldre.</string>
+    <string name="ig_voice_messages_empty">Inga röstmeddelanden i den laddade delen av chatten.</string>
+    <string name="ig_voice_messages_no_chat">Öppna chatten först och försök sedan igen.</string>
+    <string name="ig_voice_play_failed">Kunde inte spela upp röstmeddelandet</string>
+    <string name="ig_voice_you">Du</string>
 </resources>

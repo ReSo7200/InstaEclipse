@@ -866,4 +866,11 @@ Restez sur cet écran jusqu\'à la fin.</string>
     <string name="home_signer_untrust">Ne plus faire confiance</string>
     <string name="ie_unsent_label">Annulé</string>
     <string name="ie_hide_unsent_label">Masquer l\'étiquette « Annulé » sur les messages conservés</string>
+    <string name="ig_voice_messages">Messages vocaux</string>
+    <string name="ig_dialog_voice_messages_list">Messages vocaux dans les détails de la conversation</string>
+    <string name="ig_voice_messages_loaded">Seuls les messages chargés dans la conversation sont listés. Remonte dans la conversation pour charger les plus anciens.</string>
+    <string name="ig_voice_messages_empty">Aucun message vocal dans la partie chargée de cette conversation.</string>
+    <string name="ig_voice_messages_no_chat">Ouvre d\'abord cette conversation, puis réessaie.</string>
+    <string name="ig_voice_play_failed">Impossible de lire ce message vocal</string>
+    <string name="ig_voice_you">Toi</string>
 </resources>

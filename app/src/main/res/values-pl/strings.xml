@@ -880,4 +880,11 @@ Pozostań na tym ekranie do zakończenia.</string>
     <string name="home_signer_untrust">Przestań ufać</string>
     <string name="ie_unsent_label">Cofnięto</string>
     <string name="ie_hide_unsent_label">Ukryj etykietę „Cofnięto” przy zachowanych wiadomościach</string>
+    <string name="ig_voice_messages">Wiadomości głosowe</string>
+    <string name="ig_dialog_voice_messages_list">Wiadomości głosowe w szczegółach czatu</string>
+    <string name="ig_voice_messages_loaded">Widoczne są tylko wiadomości wczytane w czacie. Przewiń czat w górę, aby wczytać starsze.</string>
+    <string name="ig_voice_messages_empty">Brak wiadomości głosowych we wczytanej części tego czatu.</string>
+    <string name="ig_voice_messages_no_chat">Najpierw otwórz ten czat, potem spróbuj ponownie.</string>
+    <string name="ig_voice_play_failed">Nie udało się odtworzyć tej wiadomości głosowej</string>
+    <string name="ig_voice_you">Ty</string>
 </resources>

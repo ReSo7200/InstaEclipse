@@ -864,4 +864,11 @@
     <string name="home_signer_untrust">Διακοπή εμπιστοσύνης</string>
     <string name="ie_unsent_label">Αναιρέθηκε</string>
     <string name="ie_hide_unsent_label">Απόκρυψη της ετικέτας «Αναιρέθηκε» στα μηνύματα που κρατήθηκαν</string>
+    <string name="ig_voice_messages">Φωνητικά μηνύματα</string>
+    <string name="ig_dialog_voice_messages_list">Φωνητικά μηνύματα στις λεπτομέρειες συνομιλίας</string>
+    <string name="ig_voice_messages_loaded">Εμφανίζονται μόνο τα μηνύματα που έχουν φορτωθεί στη συνομιλία. Κύλισε προς τα πάνω για να φορτώσεις παλαιότερα.</string>
+    <string name="ig_voice_messages_empty">Δεν υπάρχουν φωνητικά μηνύματα στο φορτωμένο μέρος αυτής της συνομιλίας.</string>
+    <string name="ig_voice_messages_no_chat">Άνοιξε πρώτα αυτή τη συνομιλία και δοκίμασε ξανά.</string>
+    <string name="ig_voice_play_failed">Δεν ήταν δυνατή η αναπαραγωγή αυτού του φωνητικού μηνύματος</string>
+    <string name="ig_voice_you">Εσύ</string>
 </resources>

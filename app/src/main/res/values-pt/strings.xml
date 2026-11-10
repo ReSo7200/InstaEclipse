@@ -830,4 +830,11 @@
     <string name="home_signer_untrust">Deixar de confiar</string>
     <string name="ie_unsent_label">Envio cancelado</string>
     <string name="ie_hide_unsent_label">Ocultar a etiqueta \"Envio cancelado\" nas mensagens mantidas</string>
+    <string name="ig_voice_messages">Mensagens de voz</string>
+    <string name="ig_dialog_voice_messages_list">Mensagens de voz nos detalhes da conversa</string>
+    <string name="ig_voice_messages_loaded">Só aparecem as mensagens carregadas na conversa. Role a conversa para cima para carregar as mais antigas.</string>
+    <string name="ig_voice_messages_empty">Nenhuma mensagem de voz na parte carregada desta conversa.</string>
+    <string name="ig_voice_messages_no_chat">Abra esta conversa primeiro e tente novamente.</string>
+    <string name="ig_voice_play_failed">Não foi possível reproduzir esta mensagem de voz</string>
+    <string name="ig_voice_you">Você</string>
 </resources>

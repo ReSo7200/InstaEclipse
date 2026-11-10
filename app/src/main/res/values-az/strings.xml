@@ -833,4 +833,11 @@
     <string name="home_signer_untrust">Güvənməyi dayandır</string>
     <string name="ie_unsent_label">Geri götürülüb</string>
     <string name="ie_hide_unsent_label">Saxlanılan mesajlarda \"Geri götürülüb\" etiketini gizlət</string>
+    <string name="ig_voice_messages">Səsli mesajlar</string>
+    <string name="ig_dialog_voice_messages_list">Söhbət detallarında səsli mesajlar</string>
+    <string name="ig_voice_messages_loaded">Yalnız söhbətdə yüklənmiş mesajlar göstərilir. Köhnələri yükləmək üçün söhbətdə yuxarı sürüşdürün.</string>
+    <string name="ig_voice_messages_empty">Bu söhbətin yüklənmiş hissəsində səsli mesaj yoxdur.</string>
+    <string name="ig_voice_messages_no_chat">Əvvəlcə bu söhbəti açın, sonra yenidən cəhd edin.</string>
+    <string name="ig_voice_play_failed">Bu səsli mesajı oxutmaq olmadı</string>
+    <string name="ig_voice_you">Siz</string>
 </resources>

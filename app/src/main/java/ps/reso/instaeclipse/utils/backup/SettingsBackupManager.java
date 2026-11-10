@@ -71,6 +71,7 @@ public class SettingsBackupManager {
         s.put("bulkUnsend",                 FeatureFlags.bulkUnsend);
         s.put("hideUnsentLabel",            FeatureFlags.hideUnsentLabel);
         s.put("chatExport",                 FeatureFlags.chatExport);
+        s.put("voiceMessagesList",          FeatureFlags.voiceMessagesList);
         s.put("hideTabHome", FeatureFlags.hideTabHome);
         s.put("hideTabReels", FeatureFlags.hideTabReels);
         s.put("hideTabCreate", FeatureFlags.hideTabCreate);
@@ -246,6 +247,7 @@ public class SettingsBackupManager {
         if (s.has("bulkUnsend"))                FeatureFlags.bulkUnsend                = s.getBoolean("bulkUnsend");
         if (s.has("hideUnsentLabel"))           FeatureFlags.hideUnsentLabel           = s.getBoolean("hideUnsentLabel");
         if (s.has("chatExport"))                FeatureFlags.chatExport                = s.getBoolean("chatExport");
+        if (s.has("voiceMessagesList"))         FeatureFlags.voiceMessagesList         = s.getBoolean("voiceMessagesList");
         if (s.has("hideTabHome")) FeatureFlags.hideTabHome = s.getBoolean("hideTabHome");
         if (s.has("hideTabReels")) FeatureFlags.hideTabReels = s.getBoolean("hideTabReels");
         if (s.has("hideTabCreate")) FeatureFlags.hideTabCreate = s.getBoolean("hideTabCreate");

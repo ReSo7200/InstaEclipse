@@ -547,6 +547,13 @@ public class Module {
                         ModuleLog.line("(IE|ChatExport) ❌ Failed to hook");
                     }
 
+                    // Voice messages list on the chat details page (#307) — after ChatExportHook (message store)
+                    try {
+                        if (!skip("VoiceMessagesHook")) new ps.reso.instaeclipse.mods.ghost.VoiceMessagesHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|VoiceList) ❌ Failed to hook");
+                    }
+
                     // Export followers / following to CSV (#224)
                     try {
                         if (!skip("FollowListExportHook")) new ps.reso.instaeclipse.mods.misc.FollowListExportHook().install(dexKitBridge, hostClassLoader);

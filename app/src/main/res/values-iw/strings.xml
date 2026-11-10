@@ -862,4 +862,11 @@
     <string name="home_signer_untrust">הפסק לסמוך</string>
     <string name="ie_unsent_label">בוטלה השליחה</string>
     <string name="ie_hide_unsent_label">הסתרת התווית \"בוטלה השליחה\" בהודעות שנשמרו</string>
+    <string name="ig_voice_messages">הודעות קוליות</string>
+    <string name="ig_dialog_voice_messages_list">הודעות קוליות בפרטי הצ\'אט</string>
+    <string name="ig_voice_messages_loaded">מוצגות רק הודעות שנטענו בצ\'אט. גלול למעלה בצ\'אט כדי לטעון ישנות יותר.</string>
+    <string name="ig_voice_messages_empty">אין הודעות קוליות בחלק הטעון של הצ\'אט הזה.</string>
+    <string name="ig_voice_messages_no_chat">פתח קודם את הצ\'אט הזה ונסה שוב.</string>
+    <string name="ig_voice_play_failed">לא ניתן להשמיע את ההודעה הקולית הזו</string>
+    <string name="ig_voice_you">את/ה</string>
 </resources>

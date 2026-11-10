@@ -48,7 +48,7 @@ public class CustomToast {
             case "KeepEphemeralMessages": case "KeepUnsentMessages": case "PermanentViewMode":
             case "LockDirectMessages": case "HideSpecificChats": case "AdBlocker":
             case "DisableTrackingLinks": case "OpenLinksExternally": case "RemoveMetaAI": case "SpoofLastSeen":
-            case "DisableDiscoverPeople": case "ChatExport": case "EditHistory":
+            case "DisableDiscoverPeople": case "ChatExport": case "VoiceMessagesList": case "EditHistory":
             case "LockSavedCollections": case "DisableRepost": case "BlockAnalytics": case "LockWholeApp":
             case "DisableSearchHistory": case "ConfirmCalls":
                 return "Privacy";
