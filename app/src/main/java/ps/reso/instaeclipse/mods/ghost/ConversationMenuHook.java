@@ -150,7 +150,9 @@ public final class ConversationMenuHook {
             if (next == null) next = findInHeader(a, header, "thread_title");
             if (next == null) next = findInHeader(a, header, "action_bar_title");
             // The helper claims the existing native tap target without replacing any listener.
-            gesture.update(next, header, FeatureFlags.hideSpecificChats || FeatureFlags.keepUnsentMessages);
+            // The chat menu always offers at least "Block incoming calls from this chat", so the
+            // header long-press is always available (previously only with hide-chats / keep-unsent).
+            gesture.update(next, header, true);
             shortcut(a, root, header, HIDE,
                     FeatureFlags.hideSpecificChats && FeatureFlags.showHideChatButton,
                     R.drawable.ic_eye_off, R.string.ie_hide_this_chat);
