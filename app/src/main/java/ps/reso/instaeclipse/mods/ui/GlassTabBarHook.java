@@ -191,8 +191,10 @@ public final class GlassTabBarHook {
             bar.getViewTreeObserver().addOnScrollChangedListener(() -> refresh(bar));
             bar.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
                 hookPill(bar);
+                applyFixedGlass(bar);
                 refresh(bar);
             });
+            applyFixedGlass(bar);
         } catch (Throwable t) {
             ModuleLog.line(TAG + "⚠️ watch: " + t);
         }
@@ -209,9 +211,58 @@ public final class GlassTabBarHook {
 
     private static void refresh(View bar) {
         if (!FeatureFlags.glassTabBar || Build.VERSION.SDK_INT < 31) return;
+        if (bar.getBackground() instanceof GlassDrawable && bar.isShown()) { bar.invalidate(); return; }
         if (!(bar.getBackground() instanceof InsetDrawable bg) || pillClass == null) return;
         Drawable inner = bg.getDrawable();
         if (inner != null && inner.getClass() == pillClass && bar.isShown()) bar.invalidate();
+    }
+
+    /**
+     * Some builds/screens (e.g. the Reels tab, and IG 452 on some devices) draw the tab bar as a
+     * full-width bar with a plain opaque {@link ColorDrawable} background instead of the floating
+     * pill. The pill hook never fires there, so the bar stays solid. Replace that opaque background
+     * with a {@link GlassDrawable} that blurs the content behind the bar and tints it — the same
+     * glass look, applied to the fixed bar. Re-applied on layout because IG resets the background
+     * when the style changes.
+     */
+    private static void applyFixedGlass(View bar) {
+        if (!FeatureFlags.glassTabBar || Build.VERSION.SDK_INT < 31) return;
+        Drawable bg = bar.getBackground();
+        if (bg == null || bg instanceof GlassDrawable || bg instanceof InsetDrawable) return;
+        if (!(bg instanceof android.graphics.drawable.ColorDrawable cd)) return; // only the plain fill
+        if (Color.alpha(cd.getColor()) == 0) return; // already transparent, nothing to glass
+        try {
+            float density = bar.getResources().getDisplayMetrics().density;
+            bar.setBackground(new GlassDrawable(bar, cd.getColor(), density));
+        } catch (Throwable t) {
+            ModuleLog.line(TAG + "⚠️ fixed glass: " + t);
+        }
+    }
+
+    /** A view background that paints the glass look over the whole (fixed, full-width) tab bar. */
+    static final class GlassDrawable extends Drawable {
+        private final View host;
+        private final Glass glass;
+        private final int color;
+
+        GlassDrawable(View host, int color, float density) {
+            this.host = host;
+            this.color = color;
+            this.glass = new Glass(density);
+            this.glass.cornerRadius = 0f; // full-width rectangular bar, not a pill
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            if (!FeatureFlags.glassTabBar) return;
+            try {
+                glass.draw(canvas, getBounds(), host, color);
+            } catch (Throwable ignored) {}
+        }
+
+        @Override public void setAlpha(int alpha) {}
+        @Override public void setColorFilter(android.graphics.ColorFilter colorFilter) {}
+        @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
     }
 
     /** Hooks draw() of the drawable class Instagram uses for the floating pill (once). */
@@ -310,6 +361,7 @@ public final class GlassTabBarHook {
         private final RectF rect = new RectF();
         private Object clipNode, blurNode; // RenderNode (API 31+), kept as Object for older devices
         private boolean drawing;
+        float cornerRadius = -1f; // <0 = pill (height/2); >=0 = explicit radius (0 = rectangular)
 
         Glass(float density) {
             this.density = density;
@@ -319,7 +371,7 @@ public final class GlassTabBarHook {
 
         void draw(Canvas c, Rect b, View bar, int color) {
             rect.set(b);
-            float radius = rect.height() / 2f;
+            float radius = cornerRadius >= 0f ? cornerRadius : rect.height() / 2f;
             boolean dark = luminance(color) < 0.5f;
             boolean blurred = false;
             if (Build.VERSION.SDK_INT >= 31 && c.isHardwareAccelerated() && !drawing) {
