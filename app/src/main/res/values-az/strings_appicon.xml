@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Pulsuz tətbiq ikonları (Instagram loqosunu basılı saxlayın)</string>
+    <string name="ig_app_icon_title">Tətbiq ikonu</string>
+    <string name="ig_app_icon_note">Instagram-ın öz ikonları, abunəsiz. İkon tətbiqdən çıxanda dəyişir; başladıcı onu tətbiqlər siyahısının sonuna keçirə bilər.</string>
+    <string name="ig_app_icon_applied">Instagram-dan çıxanda ikon %1$s olacaq</string>
+</resources>

@@ -24,4 +24,11 @@
     <string name="ig_dialog_location_current_title">Ubicación actual</string>
     <string name="ig_dialog_location_recent">Lugares recientes</string>
     <string name="ig_dialog_location_applied">Ubicación aplicada</string>
+    <string name="ig_dialog_extras_reels_blur_bars">Desenfocar las barras alrededor de los Reels</string>
+    <string name="ig_dialog_reels_clean_up">Limpiar Reels</string>
+    <string name="ig_dialog_extras_reels_hide_follow">Ocultar botón Seguir</string>
+    <string name="ig_dialog_extras_reels_hide_meta_ai">Ocultar sugerencias de Meta AI</string>
+    <string name="ig_dialog_extras_reels_hide_pills">Ocultar botones de plantilla y audio</string>
+    <string name="ig_dialog_extras_reels_hide_comment_bar">Ocultar barra de comentarios</string>
+    <string name="ig_dialog_extras_safe_pacing">Reducir riesgo de bloqueo (acciones masivas más lentas)</string>
 </resources>

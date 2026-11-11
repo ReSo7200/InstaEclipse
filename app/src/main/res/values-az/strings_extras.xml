@@ -24,4 +24,11 @@
     <string name="ig_dialog_location_current_title">Cari məkan</string>
     <string name="ig_dialog_location_recent">Son məkanlar</string>
     <string name="ig_dialog_location_applied">Məkan tətbiq edildi</string>
+    <string name="ig_dialog_extras_reels_blur_bars">Reels ətrafındakı zolaqları bulanıqlaşdır</string>
+    <string name="ig_dialog_reels_clean_up">Reels-i təmizlə</string>
+    <string name="ig_dialog_extras_reels_hide_follow">İzlə düyməsini gizlət</string>
+    <string name="ig_dialog_extras_reels_hide_meta_ai">Meta AI təkliflərini gizlət</string>
+    <string name="ig_dialog_extras_reels_hide_pills">Şablon və səs düymələrini gizlət</string>
+    <string name="ig_dialog_extras_reels_hide_comment_bar">Şərh panelini gizlət</string>
+    <string name="ig_dialog_extras_safe_pacing">Ban riskini azalt (toplu əməliyyatlar daha yavaş)</string>
 </resources>

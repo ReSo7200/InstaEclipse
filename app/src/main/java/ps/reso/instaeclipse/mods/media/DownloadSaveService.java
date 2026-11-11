@@ -180,7 +180,9 @@ public class DownloadSaveService extends Service {
                         String verified = getString(result.lowerFallback ? R.string.ie_download_fallback_used
                                 : R.string.ie_download_verified, result.summary);
                         postDoneNotification(notificationId, verified, result.mime, saved);
-                        showToast(verified);
+                        // The toast gets the short form ("1080p video"); the details stay in the log.
+                        showToast(getString(result.lowerFallback ? R.string.ie_download_fallback_used
+                                : R.string.ie_download_verified, shortSummary(result)));
                         ModuleLog.line("(IE|Download) SAF published " + result.summary);
                     }
                     return;
@@ -202,7 +204,7 @@ public class DownloadSaveService extends Service {
                             : downloadAndSave(fUrl, fFile, fMime, fSave, fUser, fUF);
                 }
                 postDoneNotification(notificationId, "Saved: " + saved.filename, saved.mimeType, saved.uri);
-                showToast(getString(R.string.ig_toast_file_saved, saved.filename));
+                showToast(getString(R.string.ig_toast_file_saved, shortName(saved.filename)));
                 ModuleLog.line("(IE|Download) SAF published type=" + saved.mimeType);
             } catch (Throwable e) {
                 String reason = cancellation.isCancelled() ? getString(R.string.ie_download_cancelled)
@@ -741,7 +743,26 @@ public class DownloadSaveService extends Service {
         // Use application context — service context is invalid after stopSelf() fires
         Context appCtx = getApplicationContext();
         new Handler(Looper.getMainLooper()).post(() ->
-                ps.reso.instaeclipse.utils.toast.IeToast.makeText(appCtx, msg, Toast.LENGTH_SHORT).show());
+                ps.reso.instaeclipse.utils.toast.IeToast.relayFromCompanion(appCtx, msg, Toast.LENGTH_SHORT));
+    }
+
+    /** "1080p video" / "photo" / "audio" for the toast. */
+    private static String shortSummary(DownloadEngine.Result result) {
+        String mime = result.mime == null ? "" : result.mime;
+        DownloadEngine.Metadata m = result.metadata;
+        if (mime.startsWith("video")) {
+            int side = m == null ? 0 : Math.min(m.width, m.height);
+            return side > 0 ? side + "p video" : "video";
+        }
+        if (mime.startsWith("audio")) return "audio";
+        if (mime.startsWith("image")) return "photo";
+        return "file";
+    }
+
+    /** A long file name shortened in the middle, keeping its start and its end: "user_po…1149.mp4". */
+    static String shortName(String name) {
+        if (name == null || name.length() <= 32) return name;
+        return name.substring(0, 16) + "…" + name.substring(name.length() - 14);
     }
 
     private void ensureChannel() {

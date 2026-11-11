@@ -109,6 +109,18 @@ public class FeatureManager {
             FeatureStatusTracker.setDisabled("HideThreadsSuggestions");
         }
 
+        if (FeatureFlags.hideSuggestionsInReels) {
+            FeatureStatusTracker.setEnabled("HideSuggestionsInReels", R.string.ig_dialog_clean_feed_hide_suggested_reels);
+        } else {
+            FeatureStatusTracker.setDisabled("HideSuggestionsInReels");
+        }
+
+        if (FeatureFlags.hidePaidPartnerships) {
+            FeatureStatusTracker.setEnabled("HidePaidPartnerships", R.string.ig_dialog_clean_feed_hide_paid);
+        } else {
+            FeatureStatusTracker.setDisabled("HidePaidPartnerships");
+        }
+
         if (FeatureFlags.expandCaptions) {
             FeatureStatusTracker.setEnabled("ExpandCaptions", R.string.ig_dialog_clean_feed_expand_captions);
         } else {
@@ -293,6 +305,7 @@ public class FeatureManager {
 
         // ── Newer features (concise labels for the load toast's dense grid) ───
         reg(FeatureFlags.chatExport,           "ChatExport",           R.string.ig_chat_export);
+        reg(FeatureFlags.voiceMessagesList,    "VoiceMessagesList",    R.string.ig_voice_messages);
         reg(FeatureFlags.fancyBioFont,         "FancyBioFont",         R.string.ig_dialog_fancy_bio_font);
         reg(FeatureFlags.keepEditHistory,      "EditHistory",          R.string.ig_feat_edit_history);
         reg(FeatureFlags.jumpToFirstMessage,   "JumpToFirstMessage",   R.string.ig_jump_first_message);
@@ -336,6 +349,9 @@ public class FeatureManager {
         reg(FeatureFlags.isAdBlockEnabled,     "AdBlocker",            R.string.ig_dialog_ad_block_ads);
         reg(FeatureFlags.isAnalyticsBlocked,   "BlockAnalytics",       R.string.ig_dialog_ad_block_analytics);
         reg(FeatureFlags.hidePlusUpsells,      "HidePlusUpsells",      R.string.ig_dialog_clean_feed_hide_plus);
+        reg(FeatureFlags.freeAppIcons,         "FreeAppIcons",         R.string.ig_free_app_icons);
+        reg(FeatureFlags.glassTabBar,          "GlassTabBar",          R.string.ig_glass_tab_bar);
+        reg(FeatureFlags.blockIncomingCalls,   "BlockIncomingCalls",   R.string.ig_block_incoming_calls);
         reg(FeatureFlags.disableVideoAutoPlay, "DisableVideoAutoPlay", R.string.ig_dialog_misc_disable_video_autoplay);
         reg(FeatureFlags.forceReelScrubber,    "ForceReelScrubber",    R.string.ig_dialog_downloader_reel_scrubber);
         reg(FeatureFlags.disableStoryFlipping, "DisableStoryFlipping", R.string.ig_dialog_misc_disable_story_autoswipe);

@@ -239,7 +239,7 @@ public class FollowListExportHook {
         Handler h = new Handler(Looper.getMainLooper());
         ps.reso.instaeclipse.utils.dialog.IeDialog dlg = progressDialog(root.getContext(), title);
         new Runnable() {
-            int idle = 0;
+            int idle = 0, pages = 0;
             boolean first = true;
             boolean stopped = false;
             @Override public void run() {
@@ -248,7 +248,7 @@ public class FollowListExportHook {
                     // isLoading() is the footer-spinner flag (true while more pages exist), so don't gate
                     // on it: the load-more method itself skips when a request is in flight or failed.
                     more = nextMaxIdField.get(pg) != null;
-                    if (more) pagerLoadMore.invoke(pg);
+                    if (more) { pagerLoadMore.invoke(pg); pages++; }
                     if (first) { first = false; ModuleLog.line(TAG + "pager start: more=" + more); }
                 } catch (Throwable t) {
                     ModuleLog.line(TAG + "⚠️ pager: " + t);
@@ -267,7 +267,8 @@ public class FollowListExportHook {
                     done.accept(complete);
                     return;
                 }
-                h.postDelayed(this, 500);
+                // With Lower ban risk on, paced like a person scrolling, with a longer rest every 10 pages (see Pace).
+                h.postDelayed(this, more ? ps.reso.instaeclipse.utils.core.Pace.next(500, pages, 1500, 3000, 10, 6000, 10000) : (ps.reso.instaeclipse.utils.core.Pace.on() ? 1500 : 500));
             }
         }.run();
     }
@@ -322,7 +323,12 @@ public class FollowListExportHook {
         AbsListView list = findList(root);
         Adapter ad = list != null ? list.getAdapter() : null;
         if (ad instanceof HeaderViewListAdapter h) ad = h.getWrappedAdapter();
-        return ad != null ? collect(ad, true) : new LinkedHashMap<>();
+        if (ad == null) return new LinkedHashMap<>();
+        // The list's own rows first: users in a list the adapter holds directly. "Suggested for you"
+        // sits in a separate helper object of the adapter, so it is left out (#304). Another layout
+        // that finds nobody this way keeps the wider walk used before.
+        Map<String, String[]> rows = collect(ad, true, true);
+        return !rows.isEmpty() ? rows : collect(ad, true, false);
     }
 
     private static void export(View root, Object frag) {
@@ -559,6 +565,13 @@ public class FollowListExportHook {
                     if (ps.reso.instaeclipse.utils.users.FollowersHistory.LOST.equals(e.type)) lost++; else gained++;
                 head = I18n.t(ctx, R.string.ig_followers_history_changes, df.format(new Date(r.previousCheck)), lost, gained);
             }
+            int weekLost = 0, weekGained = 0;
+            long weekAgo = System.currentTimeMillis() - 7L * 24 * 3_600_000L;
+            for (ps.reso.instaeclipse.utils.users.FollowersHistory.Event e : state.events) {
+                if (e.ts < weekAgo) continue;
+                if (ps.reso.instaeclipse.utils.users.FollowersHistory.LOST.equals(e.type)) weekLost++; else weekGained++;
+            }
+            if (!state.events.isEmpty()) head += "\n" + I18n.t(ctx, R.string.ig_followers_history_week, weekLost, weekGained);
             if (state.lastCheck > 0)
                 head += "\n" + I18n.t(ctx, R.string.ig_followers_history_summary, state.users.size(), df.format(new Date(state.lastCheck)));
             if (error != null) head += "\n⚠️ " + error;
@@ -629,7 +642,7 @@ public class FollowListExportHook {
     }
 
     /** id → {username, full name, id} for every User reachable from the adapter, in order. */
-    private static Map<String, String[]> collect(Object adapter, boolean rowsOnly) {
+    private static Map<String, String[]> collect(Object adapter, boolean rowsOnly, boolean adapterListsOnly) {
         Map<String, String[]> out = new LinkedHashMap<>();
         Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
         ArrayDeque<Object[]> q = new ArrayDeque<>();
@@ -652,6 +665,9 @@ public class FollowListExportHook {
                 continue;
             }
             if (d >= 4) continue;
+            // Only the adapter itself and list rows are opened: not helper objects such as the
+            // suggestions section or the session's user cache.
+            if (adapterListsOnly && d > 0 && !row) continue;
             String n = o.getClass().getName();
             if (!n.startsWith("X.") && !n.startsWith("com.instagram.")) continue;
             for (Class<?> k = o.getClass(); k != null && k != Object.class; k = k.getSuperclass())

@@ -361,13 +361,23 @@ Download the latest InstaEclipse APK from [**Releases**](https://github.com/ReSo
 > [!CAUTION]
 > Using Hide My Applist? Do not hide InstaEclipse from Instagram. Instagram needs to see it, or the menu text goes missing and features stop working.
 
+### No root, in one tap (built in)
+
+> No extra app needed. InstaEclipse patches Instagram for you and keeps Instagram's original signature. It does not bypass Play Integrity.
+
+1. **Install InstaEclipse** from the APK.
+2. **Open Patch Instagram.** In the InstaEclipse app, go to Help and tap **Patch Instagram (no root)**.
+3. **Pick your Instagram APK(s)** — a base APK, a split set, or an `.apkm` / `.apks` / `.xapk` bundle.
+4. **Patch and install.** Watch the steps, then confirm the install prompt.
+5. **Open the menu.** Long press the Explore (search) tab.
+
 ### No root, with LSPatch
 
-> Needs [JingMatrix's LSPatch](https://github.com/JingMatrix/LSPatch/releases/latest) 1.0 or newer.
+> Prefer to patch yourself? Needs [JingMatrix's LSPatch](https://github.com/JingMatrix/LSPatch/releases/latest) 1.0 or newer.
 
 1. **Install InstaEclipse** from the APK.
 2. **Install LSPatch** (the JingMatrix fork).
-3. **Patch Instagram.** In LSPatch, tap **+**, pick the Instagram APK or the installed app, choose **Local Patch Mode**, turn on **Inject loader dex**, then tap **Start Patch**.
+3. **Patch Instagram.** In LSPatch, tap **+**, pick the Instagram APK or the installed app, choose **Local Patch Mode**, turn on **Inject loader dex**, set **Signature bypass** to the level that keeps the original signature, then tap **Start Patch**.
 4. **Install the patched APK** and log in.
 5. **Enable the module.** In LSPatch, open Manage, pick Instagram, open Modules and enable InstaEclipse.
 6. **Open the menu.** Long press the Explore (search) tab.

@@ -6,6 +6,7 @@ public class FeatureFlags {
     public static volatile boolean showHideChatButton = false;
     public static volatile boolean showDeletedMessagesButton = false;
     public static volatile boolean keepUnsentInChat = false;
+    public static volatile boolean hideUnsentLabel = false; // hide the "Unsent" mark on kept messages (#222)
     public static volatile boolean downloaderUseOriginal = true;
     public static volatile int downloaderQualityMaxShortSide = 0;
     public static volatile int feedCornerRadius = 0;       // rounded feed post corners in dp (#276), 0 = square
@@ -61,6 +62,7 @@ public class FeatureFlags {
     public static volatile boolean hideInstants = false; // the floating Instants stack
     public static volatile boolean hideDmSuggestions = false; // no "Suggested for you" accounts under the DM inbox (#282)
     public static volatile boolean chatExport = false; // header button: export the open chat to HTML (#225)
+    public static volatile boolean voiceMessagesList = false; // "Voice messages" on the chat details page (#307)
     public static volatile boolean jumpToFirstMessage = false; // header button: scroll a DM to its first message (#244)
     public static volatile boolean translateMessages = false; // "Translate" in the DM message long-press menu
     public static volatile boolean bulkUnsend = false; // "Unsend multiple" in the DM message long-press menu (#245)
@@ -77,6 +79,11 @@ public class FeatureFlags {
     public static volatile boolean maxUploadQuality = false; // force IG's "Upload at highest quality" switch always on
     public static volatile boolean expandCaptions = false; // feed captions without "… more" (#246)
     public static volatile boolean hidePlusUpsells = false; // hide Instagram Plus upsell buttons / badges
+    public static volatile boolean freeAppIcons = false; // long-press the logo: our free picker of Instagram's app icons
+    public static volatile boolean glassTabBar = false; // floating, see-through, blurred bottom tab bar (#281)
+    public static volatile boolean blockIncomingCalls = false; // hide incoming voice/video calls (still a missed call in history)
+    // per-chat call block list (DM thread ids); populated from the chat menu. Not yet persisted — see BlockIncomingCallsHook.
+    public static final java.util.Set<String> blockCallsThreads = java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<>());
     public static volatile boolean hideCommunityNotes = false; // hide community notes on posts/reels (#259)
     // Extras (see ExtrasFeatures)
     public static volatile boolean hideStoriesTray = false; // hide the story tray only; stories still open from profiles
@@ -87,6 +94,12 @@ public class FeatureFlags {
     public static volatile boolean unlimitedAccounts = false; // lift the 5-account limit
     public static volatile boolean reelsLockScroll = false; // lock swiping between reels
     public static volatile boolean reelsAutoScroll = false; // unlock Instagram's own Reels auto-scroll option
+    public static volatile boolean safePacing = false; // slower, human-like bulk actions and a consistent spoofed fingerprint, to lower ban risk
+    public static volatile boolean reelsBlurBars = false; // blurred cover behind letterboxed reels (#273)
+    public static volatile boolean reelsHideFollow = false; // Clean up Reels: no Follow button (#279)
+    public static volatile boolean reelsHideMetaAi = false; // Clean up Reels: no Meta AI prompts (#279)
+    public static volatile boolean reelsHidePills = false; // Clean up Reels: no template / audio pills (#279)
+    public static volatile boolean reelsHideCommentBar = false; // Clean up Reels: no comment bar (#279)
     public static volatile boolean disableSwipeToCamera = false; // sideways swipe on the feed no longer opens the camera
     public static volatile boolean followingOnlyFeed = false; // home feed shows only accounts you follow
     public static volatile boolean confirmFeedRefresh = false; // ask before pull-to-refresh reloads the home feed (#278)
@@ -152,6 +165,8 @@ public class FeatureFlags {
     public static volatile boolean spoofVerified = false;  // show the verified badge on your own profile
     public static volatile String  spoofName = "";         // own profile header name, "" = unchanged
     public static volatile String  spoofUsername = "";     // own profile action bar username, "" = unchanged
+    public static volatile boolean spoofPrivate = false;   // the copied account is private
+    public static volatile String  spoofTargetId = "";    // user id of the profile copied into the spoofer, "" = none
     public static volatile String  spoofBio = "";          // own profile bio, "" = unchanged
     public static volatile String  spoofAvatar = "";       // own profile picture: Base64 JPEG (max 320x320), "" = unchanged
     public static volatile boolean profileAnalyzer = false; // watchlist: compare a profile's Followers / Following between analyses
@@ -190,6 +205,8 @@ public class FeatureFlags {
     // Clean Feed
     public static volatile boolean hideSuggestionsInFeed = false;
     public static volatile boolean hideThreadsSuggestions = false;
+    public static volatile boolean hideSuggestionsInReels = false; // drop suggested-account (netego) units from the Reels tab (#298)
+    public static volatile boolean hidePaidPartnerships = false; // drop paid partnership / sponsored posts and reels at parse time (#275)
 
     // Downloader
     public static volatile boolean enablePostDownload = false;
@@ -199,6 +216,9 @@ public class FeatureFlags {
     public static volatile boolean downloaderUsernameFolder = false;
     public static volatile boolean downloaderAddTimestamp = false;
     public static volatile boolean copyMediaLink = false;      // #117 — inject "Copy Media Link" (direct CDN url) into the post ⋮ menu
+    public static volatile boolean keepInstantHistory = false;
+    public static volatile String  pinnedStoryUsers = "";
+    public static volatile int     pinnedStoryLimit = 30;
     public static volatile boolean saveInstants = false;        // #184 — long-press a received Instant (quicksnap) to save it
     public static volatile boolean uploadInstants = false;      // #199 — send an Instant from gallery (bitmap-swap into quicksnap send)
     public static volatile boolean cacheStories = false;        // cache viewed stories locally for 24h (survive expiry/deletion)

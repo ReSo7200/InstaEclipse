@@ -24,4 +24,11 @@
     <string name="ig_dialog_location_current_title">Τρέχουσα τοποθεσία</string>
     <string name="ig_dialog_location_recent">Πρόσφατες τοποθεσίες</string>
     <string name="ig_dialog_location_applied">Η τοποθεσία εφαρμόστηκε</string>
+    <string name="ig_dialog_extras_reels_blur_bars">Θόλωμα των λωρίδων γύρω από τα Reels</string>
+    <string name="ig_dialog_reels_clean_up">Καθαρισμός Reels</string>
+    <string name="ig_dialog_extras_reels_hide_follow">Απόκρυψη κουμπιού Ακολούθησης</string>
+    <string name="ig_dialog_extras_reels_hide_meta_ai">Απόκρυψη προτάσεων Meta AI</string>
+    <string name="ig_dialog_extras_reels_hide_pills">Απόκρυψη κουμπιών προτύπου και ήχου</string>
+    <string name="ig_dialog_extras_reels_hide_comment_bar">Απόκρυψη γραμμής σχολίων</string>
+    <string name="ig_dialog_extras_safe_pacing">Μείωση κινδύνου αποκλεισμού (πιο αργές μαζικές ενέργειες)</string>
 </resources>

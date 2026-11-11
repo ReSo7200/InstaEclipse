@@ -125,6 +125,8 @@ public class IGNetworkInterceptor {
                                 Object requestObj = param.args[0];
                                 URI uri = (URI) XposedHelpers.getObjectField(requestObj, finalUriFieldName);
 
+                                uri = redirectToCopiedProfile(requestObj, finalUriFieldName, uri);
+
                                 if (uri != null && uri.getPath() != null) {
                                     final String host = uri.getHost(); // null for opaque/relative URIs — guard before use
                                     boolean shouldDrop = false;
@@ -149,6 +151,7 @@ public class IGNetworkInterceptor {
                                     if (FeatureFlags.isGhostViewOnce) {
                                         shouldDrop |= uri.getPath().endsWith("/item_replayed/");
                                         shouldDrop |= (uri.getPath().contains("/direct") && uri.getPath().endsWith("/item_seen/"));
+                                        shouldDrop |= uri.getPath().contains("/visual_threads/") && uri.getPath().endsWith("/seen/");
                                     }
                                     if (FeatureFlags.isGhostStory) {
                                         // Version-agnostic: getPath() excludes the ?reel=... query, so it
@@ -167,6 +170,8 @@ public class IGNetworkInterceptor {
                                                 || p.contains("/ig_meta_ai_side_chat_new_session/")
                                                 || p.contains("/create_ig_meta_ai_side_chat/")
                                                 || p.contains("/genai/response")
+                                                // AI bots offered in the Messages search (IG 452)
+                                                || p.contains("/direct_v2/search_gen_ai_bots/")
                                                 || (uri.getHost() != null && uri.getHost().contains("aistudio.instagram.com"));
                                     }
 
@@ -228,9 +233,15 @@ public class IGNetworkInterceptor {
 
                                     // Analytics
                                     if (FeatureFlags.isAnalyticsBlocked) {
-                                        shouldDrop |= (host != null && (host.contains("graph.instagram.com")
-                                                || host.contains("graph.facebook.com")))
-                                                || uri.getPath().contains("/logging_client_events");
+                                        if (ps.reso.instaeclipse.utils.core.Pace.on()) {
+                                            // Lower ban risk: let normal telemetry keep flowing so the
+                                            // account doesn't look headless; drop only the heavy event log.
+                                            shouldDrop |= uri.getPath().contains("/logging_client_events");
+                                        } else {
+                                            shouldDrop |= (host != null && (host.contains("graph.instagram.com")
+                                                    || host.contains("graph.facebook.com")))
+                                                    || uri.getPath().contains("/logging_client_events");
+                                        }
                                     }
 
                                     // Misc
@@ -285,5 +296,78 @@ public class IGNetworkInterceptor {
         } catch (Exception e) {
             ModuleLog.line("(InstaEclipse | Interceptor): ❌ " + e.getMessage());
         }
+    }
+
+    /** Your followers and following lists, opened from your profile counts, go to the copied profile (read only). */
+    private static URI moveRequest(Object request, URI uri, String movedPath, String what) throws Exception {
+        URI next = new URI(uri.getScheme(), uri.getAuthority(), movedPath, uri.getQuery(), uri.getFragment());
+        for (Class<?> c = request.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+            for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
+                if (f.getType() != URI.class || java.lang.reflect.Modifier.isStatic(f.getModifiers())) continue;
+                f.setAccessible(true);
+                if (uri.equals(f.get(request))) f.set(request, next);
+            }
+        }
+        ModuleLog.line("(IE|ProfileSpoof) read redirected: " + what);
+        return next;
+    }
+
+    /** Profile queries carry your id in the request body: send the copied account's instead. */
+    private static void swapBody(Object request, String self, String target) {
+        try {
+            for (Class<?> c = request.getClass(); c != null && c != Object.class; c = c.getSuperclass()) {
+                for (Field f : ps.reso.instaeclipse.utils.core.SafeReflect.fields(c)) {
+                    if (java.lang.reflect.Modifier.isStatic(f.getModifiers()) || f.getType().isPrimitive()
+                            || f.getType() == String.class || f.getType() == URI.class) continue;
+                    f.setAccessible(true);
+                    Object holder = f.get(request);
+                    if (holder == null || holder.getClass().getName().startsWith("java.")) continue;
+                    for (Field bf : ps.reso.instaeclipse.utils.core.SafeReflect.fields(holder.getClass())) {
+                        if (bf.getType() != byte[].class || java.lang.reflect.Modifier.isStatic(bf.getModifiers())) continue;
+                        bf.setAccessible(true);
+                        byte[] body = (byte[]) bf.get(holder);
+                        if (body == null) continue;
+                        String text = new String(body, java.nio.charset.StandardCharsets.ISO_8859_1);
+                        if (!text.contains(self)) continue;
+                        // Reads only: a mutation (anything that changes something) always goes out as sent.
+                        if (text.toLowerCase(java.util.Locale.ROOT).contains("mutation")) continue;
+                        bf.set(holder, text.replace(self, target).getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                        ModuleLog.line("(IE|ProfileSpoof) read redirected: graphql body");
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|ProfileSpoof) body swap failed: " + t.getMessage());
+        }
+    }
+
+    private static URI redirectToCopiedProfile(Object request, String field, URI uri) {
+        try {
+            String target = FeatureFlags.spoofTargetId;
+            String self = ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.selfId();
+            if (!FeatureFlags.profileSpoofer || target == null || target.isEmpty() || self == null || self.equals(target)) return uri;
+            String path = uri.getPath();
+            if (path == null) return uri;
+            boolean armed = ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.listRedirectArmed();
+            if (ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.infoRedirectArmed() && path.endsWith("/users/" + self + "/info/")) {
+                return moveRequest(request, uri, path.replace("/" + self + "/", "/" + target + "/"), "info");
+            }
+            boolean profile = ps.reso.instaeclipse.mods.ui.ProfileSpoofHook.infoRedirectArmed();
+            if (profile && path.endsWith("/users/" + self + "/info_stream/")) {
+                return moveRequest(request, uri, path.replace("/" + self + "/", "/" + target + "/"), "info_stream");
+            }
+            if (profile && path.endsWith("/wwwgraphql/ig/query/")) swapBody(request, self, target);
+            String[] reads = armed
+                    ? new String[]{"/friendships/" + self + "/followers/", "/friendships/" + self + "/following/",
+                            "/usertags/" + self + "/feed/", "/feed/user/" + self + "/", "/feed/user/" + self + "/story/"}
+                    : new String[]{"/usertags/" + self + "/feed/", "/feed/user/" + self + "/", "/feed/user/" + self + "/story/"};
+            for (String read : reads) {
+                if (!path.endsWith(read)) continue;
+                return moveRequest(request, uri, path.replace("/" + self + "/", "/" + target + "/"), read);
+            }
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|ProfileSpoof) redirect failed: " + t.getMessage());
+        }
+        return uri;
     }
 }

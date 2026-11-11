@@ -73,12 +73,12 @@ public class HomeFragment extends Fragment {
             // Ghost mode
             "isGhostSeen", "isGhostTyping", "isGhostStory", "isGhostLive", "allowScreenshots",
             "isGhostScreenshot", "isGhostViewOnce", "permanentViewMode", "keepEphemeralMessages",
-            "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "translateMessages", "bulkUnsend", "chatExport",
+            "keepUnsentMessages", "keepEditHistory", "jumpToFirstMessage", "translateMessages", "bulkUnsend", "chatExport", "voiceMessagesList",
             // Ads & analytics
             "isAdBlockEnabled", "isAnalyticsBlocked", "disableTrackingLinks", "openLinksExternally",
             // Clean feed
-            "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideLikedPosts", "confirmFeedRefresh", "hideCommunityNotes", "followingOnlyFeed",
-            "hidePlusUpsells", "expandCaptions",
+            "hideSuggestionsInFeed", "hideThreadsSuggestions", "hideSuggestionsInReels", "hidePaidPartnerships", "hideLikedPosts", "confirmFeedRefresh", "hideCommunityNotes", "followingOnlyFeed",
+            "hidePlusUpsells", "freeAppIcons", "glassTabBar", "expandCaptions",
             // Distraction-free
             "disableStories", "disableFeed", "disableReels", "disableReelsExceptDM", "disableExplore",
             "disableComments", "hideNotesTray", "hideDmSuggestions", "hideInstants", "hideDmBlend", "hideThreadsButton", "readReceiptChats",
@@ -99,7 +99,7 @@ public class HomeFragment extends Fragment {
             "enablePostDownload", "enableStoryDownload", "enableReelDownload", "enableProfileDownload",
             "downloaderUsernameFolder", "downloaderAddTimestamp", "copyMediaLink", "offerAudioDownload",
             "enableVoiceDownload", "enableStickerDownload", "enableDmMediaDownload", "offerCopyImage", "offerMediaInfo", "offerPlaybackSpeed",
-            "forceReelScrubber", "holdLeftSlowMotion", "maxUploadQuality", "saveInstants", "uploadInstants", "cacheStories",
+            "forceReelScrubber", "holdLeftSlowMotion", "maxUploadQuality", "saveInstants", "keepInstantHistory", "uploadInstants", "cacheStories",
             // Developer
             "isDevEnabled", "removeBuildExpiredPopup"
     };
@@ -337,6 +337,7 @@ public class HomeFragment extends Fragment {
         }
 
         instagramVariantText.setText(CommonUtils.getVariantLabel(pkg));
+        showSignerTrust(pkg);
 
         instagramInfoIcon.setOnClickListener(v -> {
             Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -346,6 +347,50 @@ public class HomeFragment extends Fragment {
         });
 
         launchInstagramButton.setOnClickListener(v -> launchPackage(pkg));
+    }
+
+    private android.content.res.ColorStateList variantDefaultColors;
+
+    /**
+     * #299: an Instagram that isn't signed by Instagram (modified or re-signed) is refused for
+     * downloads and settings sync. Its status line says so and offers to trust that exact key;
+     * the first time such a key is seen the question is asked right away.
+     */
+    private void showSignerTrust(String pkg) {
+        if (variantDefaultColors == null) variantDefaultColors = instagramVariantText.getTextColors();
+        instagramVariantText.setTextColor(variantDefaultColors);
+        instagramVariantText.setOnClickListener(null);
+        instagramVariantText.setClickable(false);
+        if (!CommonUtils.IG_PACKAGE_NAME.equals(pkg)) return;
+        Context ctx = requireContext();
+        String signer = ps.reso.instaeclipse.utils.ipc.CompanionBridge.currentSigner(ctx, pkg);
+        if (signer == null) return;
+        boolean byUser = ps.reso.instaeclipse.utils.ipc.CompanionBridge.userTrusted(ctx, pkg);
+        if (!byUser && ps.reso.instaeclipse.utils.ipc.CompanionBridge.isTrustedHost(ctx, pkg)) return; // official
+        // Not the variant label: "Official" would contradict "Not signed by Instagram".
+        String label = getString(byUser ? R.string.home_signer_trusted : R.string.home_signer_untrusted);
+        instagramVariantText.setText(label);
+        if (!byUser) instagramVariantText.setTextColor(COLOR_ERROR);
+        instagramVariantText.setOnClickListener(v -> askSignerTrust(pkg, signer, byUser));
+        SharedPreferences seen = ctx.getSharedPreferences("ie_trusted_hosts", Context.MODE_PRIVATE);
+        if (!byUser && !seen.getBoolean("asked_" + signer, false)) {
+            seen.edit().putBoolean("asked_" + signer, true).apply();
+            askSignerTrust(pkg, signer, false);
+        }
+    }
+
+    private void askSignerTrust(String pkg, String signer, boolean trusted) {
+        if (!isAdded()) return;
+        String key = signer.substring(0, 16).replaceAll("(.{4})(?!$)", "$1 ");
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(trusted ? R.string.home_signer_untrust_title : R.string.home_signer_trust_title)
+                .setMessage(getString(trusted ? R.string.home_signer_untrust_message : R.string.home_signer_trust_message, key))
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(trusted ? R.string.home_signer_untrust : R.string.home_signer_trust, (d, w) -> {
+                    ps.reso.instaeclipse.utils.ipc.CompanionBridge.setUserTrusted(requireContext(), !trusted);
+                    showSignerTrust(pkg);
+                })
+                .show();
     }
 
     private void launchPackage(String pkg) {

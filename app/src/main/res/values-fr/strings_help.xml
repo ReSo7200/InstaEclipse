@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Pas rooté ? Installez ceci</string>
     <string name="help_lspatch_guide">Suivre le guide d\'installation</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">Patcher Instagram (sans root)</string>
+    <string name="patch_intro">Patche votre Instagram pour qu\'InstaEclipse se charge sans root, en conservant la signature d\'origine d\'Instagram.</string>
+    <string name="patch_integrity_note">Cela ne contourne pas Play Integrity.</string>
+    <string name="patch_choose_apk">Choisir le(s) APK Instagram</string>
+    <string name="patch_no_selection">Aucun APK choisi pour l\'instant.</string>
+    <string name="patch_selected">%1$d fichier(s) : %2$s</string>
+    <string name="patch_run">Patcher et installer</string>
+    <string name="patch_need_apk">Choisissez d\'abord au moins un APK Instagram.</string>
+    <string name="patch_log_label">Progression</string>
+    <string name="patch_log_empty">Les étapes apparaîtront ici.</string>
+    <string name="patch_failed">Échec du patch : %1$s</string>
+    <string name="patch_install_success">Instagram installé.</string>
+    <string name="patch_install_failed">Échec de l\'installation : %1$s</string>
+    <string name="patch_step_copy">Copie du ou des APK choisis</string>
+    <string name="patch_step_unbundle">Décompression de %1$s</string>
+    <string name="patch_step_install">Lancement de l\'installateur</string>
+    <string name="patch_step_done">Terminé. Confirmez l\'installation lorsque c\'est demandé.</string>
+    <string name="patch_err_no_apk">Aucun APK trouvé dans la sélection.</string>
 </resources>

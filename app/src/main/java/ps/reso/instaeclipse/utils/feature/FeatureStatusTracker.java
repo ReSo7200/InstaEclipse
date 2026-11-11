@@ -74,4 +74,36 @@ public class FeatureStatusTracker {
     public static boolean hasEnabledFeatures() {
         return !features.isEmpty();
     }
+
+    /** Enabled features whose hook did not attach on this Instagram version (for the health log). */
+    public static java.util.List<String> brokenLabels(Context ctx) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        synchronized (broken) {
+            for (String name : broken) {
+                if (!hooked.contains(name)) out.add(getLabel(ctx, name));
+            }
+        }
+        java.util.Collections.sort(out);
+        return out;
+    }
+
+    /**
+     * Writes one line to the module log naming the enabled features that failed to attach, so the
+     * Logs tab shows them after the load toast is gone. Nothing is logged when all attached.
+     */
+    public static void logHealth(Context ctx) {
+        try {
+            java.util.List<String> bad = brokenLabels(ctx);
+            int ok = hooked.size();
+            if (bad.isEmpty()) {
+                ps.reso.instaeclipse.utils.log.ModuleLog.line(
+                        "(InstaEclipse | Health): " + ok + " features attached, none failed");
+            } else {
+                ps.reso.instaeclipse.utils.log.ModuleLog.line(
+                        "(InstaEclipse | Health): " + ok + " attached, " + bad.size()
+                                + " did NOT attach on this Instagram version: " + String.join(", ", bad));
+            }
+        } catch (Throwable ignored) {
+        }
+    }
 }

@@ -123,6 +123,7 @@ public class Module {
                 return;
             }
             ModuleLog.line("(InstaEclipse): Xposed backend: " + ps.reso.instaeclipse.xposedcompat.XposedBridge.backend().name());
+            ps.reso.instaeclipse.utils.log.CrashReporter.install();
             try {
                 if (dexKitBridge == null) {
                     // Load the .so file from your module (if not already loaded)
@@ -265,6 +266,7 @@ public class Module {
                     }
                     try {
                         UIHookManager.registerSettingsRestoreReceiver(context);
+                        UIHookManager.registerToastRelayReceiver(context);
                         ps.reso.instaeclipse.mods.media.DataBackup.registerRestoreReceiver(context);
                     } catch (Throwable e) {
                         ModuleLog.line("(InstaEclipse | RestoreReceiver): ❌ " + e.getMessage());
@@ -324,6 +326,13 @@ public class Module {
                     }
 
                     try {
+                        if (!skip("BlockIncomingCallsHook"))
+                            new ps.reso.instaeclipse.mods.ghost.BlockIncomingCallsHook().install(lpparam.classLoader); // Block incoming calls
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | BlockCalls): ❌ Failed to hook");
+                    }
+
+                    try {
                         ps.reso.instaeclipse.utils.ghost.CurrentConversation.install(dexKitBridge, lpparam.classLoader);
                         ps.reso.instaeclipse.mods.ghost.ConversationMenuHook.install();
                         if (!skip("KeepUnsentMessagesHook")) new KeepUnsentMessagesHook().install(dexKitBridge, lpparam.classLoader); // Keep Unsent
@@ -377,6 +386,13 @@ public class Module {
                         ModuleLog.line("(InstaEclipse | HideSuggested): ❌ Failed to hook");
                     }
 
+                    // Reels tab: hide suggestions (#298) and paid partnerships / sponsored reels (#275)
+                    try {
+                        if (!skip("HideReelsItemsHook")) new ps.reso.instaeclipse.mods.feed.HideReelsItemsHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | ReelsFilter): ❌ Failed to hook");
+                    }
+
                     // Ads Blocker
                     try {
                         if (!skip("AdBlocker")) new AdBlocker().disableSponsoredContent(dexKitBridge, hostClassLoader);
@@ -419,8 +435,23 @@ public class Module {
                         ModuleLog.line("(InstaEclipse | Reels): ❌ Failed to hook: " + t);
                     }
 
+                    // Extras: blurred cover in the bars around letterboxed reels (#273)
+                    try {
+                        if (!skip("ReelsBlurBarsHook")) new ps.reso.instaeclipse.mods.extras.ReelsBlurBarsHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | ReelsBlur): ❌ Failed to hook: " + t);
+                    }
+
+                    // Extras: Clean up Reels (#279)
+                    try {
+                        if (!skip("ReelsCleanupHook")) new ps.reso.instaeclipse.mods.extras.ReelsCleanupHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable t) {
+                        ModuleLog.line("(InstaEclipse | ReelsCleanup): ❌ Failed to hook: " + t);
+                    }
+
                     // Extras: lift the 5-account limit
                     try {
+                        ps.reso.instaeclipse.utils.feature.FeatureStatusTracker.setHooked("safePacing"); // applied where bulk actions run (Pace)
                         if (!skip("AccountLimitHook")) new ps.reso.instaeclipse.mods.extras.AccountLimitHook().install(dexKitBridge, hostClassLoader);
                     } catch (Throwable t) {
                         ModuleLog.line("(InstaEclipse | UnlimitedAccounts): ❌ Failed to hook: " + t);
@@ -544,6 +575,13 @@ public class Module {
                         if (!skip("ChatExportHook")) new ps.reso.instaeclipse.mods.ghost.ChatExportHook().install(dexKitBridge, hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(IE|ChatExport) ❌ Failed to hook");
+                    }
+
+                    // Voice messages list on the chat details page (#307) — after ChatExportHook (message store)
+                    try {
+                        if (!skip("VoiceMessagesHook")) new ps.reso.instaeclipse.mods.ghost.VoiceMessagesHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|VoiceList) ❌ Failed to hook");
                     }
 
                     // Export followers / following to CSV (#224)
@@ -742,8 +780,16 @@ public class Module {
                     try {
                         if (!skip("SavedOnProfileHook")) new ps.reso.instaeclipse.mods.ui.SavedOnProfileHook().install(dexKitBridge, hostClassLoader);
                         if (!skip("HideHeaderButtonsHook")) new ps.reso.instaeclipse.mods.ui.HideHeaderButtonsHook().install(hostClassLoader);
+                        if (!skip("AppIconPickerHook")) new ps.reso.instaeclipse.mods.ui.AppIconPickerHook().install(hostClassLoader);
                     } catch (Throwable ignored) {
                         ModuleLog.line("(IE|SavedProfile) ❌ Failed to hook");
+                    }
+
+                    // Glass navigation bar (#281)
+                    try {
+                        if (!skip("GlassTabBarHook")) new ps.reso.instaeclipse.mods.ui.GlassTabBarHook().install(dexKitBridge, hostClassLoader);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(IE|GlassTabBar) ❌ Failed to hook");
                     }
 
                     // Download a post/reel link shared to InstaEclipse from another app (#236)

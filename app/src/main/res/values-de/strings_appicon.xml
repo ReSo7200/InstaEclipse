@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">Kostenlose App-Icons (Instagram-Logo lange drücken)</string>
+    <string name="ig_app_icon_title">App-Icon</string>
+    <string name="ig_app_icon_note">Instagrams eigene Icons, ohne Abo. Das Icon wechselt, wenn du die App verlässt; der Launcher verschiebt es eventuell ans Ende der App-Liste.</string>
+    <string name="ig_app_icon_applied">Das Icon wechselt zu %1$s, wenn du Instagram verlässt</string>
+</resources>

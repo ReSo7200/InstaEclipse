@@ -62,8 +62,14 @@ public class KeepUnsentMessagesHook {
     private UnsentMessageResolver ownership;
     private boolean retentionReady;
 
+    private static volatile Boolean markerShown;
+
     public static void onSettingsChanged() {
         if (!FeatureFlags.keepUnsentMessages || !FeatureFlags.keepUnsentInChat) retained.clear();
+        // Redraw the "Unsent" marks only when their visibility actually flips (#222).
+        boolean shown = UnsentMarkerHook.enabled();
+        if (markerShown != null && markerShown != shown) UnsentMarkerHook.refreshVisible();
+        markerShown = shown;
     }
 
     /** Extract the thread id string from a DirectThreadKey (first non-empty String field). */
@@ -86,10 +92,43 @@ public class KeepUnsentMessagesHook {
      *  in-thread unsent button to show only THIS chat's log. */
     public static volatile String currentThreadId = null;
 
+    private static final ThreadLocal<Boolean> DELETING_FOR_ME = new ThreadLocal<>();
+    private static final String DELETE_ANCHOR =
+            "deleteMessages - attempting to delete message with null id or pending state";
+
+    private static boolean userDeletedLocally() {
+        return DELETING_FOR_ME.get() == Boolean.TRUE;
+    }
+
+    /** Instagram's own delete for you action removes through this method, so removals inside it are not unsends. */
+    private static void hookLocalDelete(DexKitBridge bridge, ClassLoader classLoader) {
+        XC_MethodHook mark = new XC_MethodHook() {
+            @Override protected void beforeHookedMethod(MethodHookParam param) { DELETING_FOR_ME.set(Boolean.TRUE); }
+            @Override protected void afterHookedMethod(MethodHookParam param) { DELETING_FOR_ME.remove(); }
+        };
+        try {
+            List<Method> found = DexKitCache.isCacheValid() ? DexKitCache.loadMethods("KeepUnsent_localDelete", classLoader) : null;
+            if (found == null || found.isEmpty()) {
+                found = new java.util.ArrayList<>();
+                for (MethodData md : DexKitQueryCache.findMethod(bridge, FindMethod.create()
+                        .matcher(MethodMatcher.create().usingStrings(DELETE_ANCHOR)))) {
+                    found.add(md.getMethodInstance(classLoader));
+                }
+                if (!found.isEmpty()) DexKitCache.saveMethods("KeepUnsent_localDelete", found);
+            }
+            for (Method m : found) XposedBridge.hookMethod(m, mark);
+            ModuleLog.line("(IE|KeepUnsent) local delete hooked " + found.size());
+        } catch (Throwable t) {
+            ModuleLog.line("(IE|KeepUnsent) local delete lookup failed: " + t.getMessage());
+        }
+    }
+
     public void install(DexKitBridge bridge, ClassLoader classLoader) {
+        hookLocalDelete(bridge, classLoader);
         CurrentConversation.install(bridge, classLoader);
         ownership = UnsentMessageResolver.resolve(bridge, classLoader);
         if (ownership != null) retentionReady = hookReconcile(bridge, classLoader);
+        if (retentionReady) installMarker(bridge, classLoader);
         ModuleLog.line("(IE|KeepUnsent) sender binding=" + (ownership != null)
                 + "; optional in-chat binding=" + retentionReady);
         resolveEntryClass(bridge, classLoader);
@@ -235,6 +274,11 @@ public class KeepUnsentMessagesHook {
                         : ownership.lookup(param.thisObject, param.args[0],
                         param.args[1] instanceof String ? (String) param.args[1] : null,
                         param.args[2] instanceof String ? (String) param.args[2] : null);
+                if (userDeletedLocally()) {
+                    if (selected != null) retained.forget(selected.threadEntry, selected.identity());
+                    else retained.clearStore(param.thisObject);
+                    return;
+                }
                 if (selected != null && selected.own) {
                     retained.forget(selected.threadEntry, selected.identity());
                     return; // Do not save our own message; native deletion still runs.
@@ -246,6 +290,7 @@ public class KeepUnsentMessagesHook {
                             && retained.protect(selected.threadEntry, param.thisObject, selected.accountId,
                             thread, selected.identity(), selected.senderId, selected.message)) {
                         param.setResult(null);
+                        UnsentMarkerHook.refreshVisible(); // the row may already be on screen
                     }
                     return;
                 }
@@ -301,6 +346,18 @@ public class KeepUnsentMessagesHook {
         } catch (Throwable t) {
             ModuleLog.line("(IE|KeepUnsent) ❌ remove: " + t);
         }
+    }
+
+    /** "Unsent" mark on the rows of retained messages (#222), matched by message id. */
+    private void installMarker(DexKitBridge bridge, ClassLoader classLoader) {
+        final UnsentMessageResolver resolver = ownership;
+        UnsentMarkerHook.install(bridge, classLoader, resolver.messageType(), new UnsentMarkerHook.Matcher() {
+            @Override public boolean any() { return retained.size() > 0; }
+            @Override public boolean retained(Object message) {
+                String id = resolver.identityOf(message);
+                return id != null && retained.containsMessage(id);
+            }
+        });
     }
 
     /** Optional, session-only reconcile protection; refuse ambiguous or unrelated entry classes. */

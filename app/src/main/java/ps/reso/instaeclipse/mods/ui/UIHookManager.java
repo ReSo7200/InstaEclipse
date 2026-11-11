@@ -119,6 +119,9 @@ public class UIHookManager {
         ps.reso.instaeclipse.mods.ui.DistractionFreeUIHook.watchActivity(activity);
         ps.reso.instaeclipse.mods.ui.StoryTrayHook.watchActivity(activity);
 
+        // Glass navigation bar: draw Instagram's floating tab bar as blurred glass.
+        ps.reso.instaeclipse.mods.ui.GlassTabBarHook.watchActivity(activity);
+
         // Fancy bio fonts: the bio's "Change font" button opens the module's font picker.
         ps.reso.instaeclipse.mods.ui.FancyBioFontHook.watchActivity(activity);
 
@@ -258,6 +261,9 @@ public class UIHookManager {
                         // Add the Ghost Emoji next to Inbox
                         addGhostEmojiNextToInbox(activity, GhostModeUtils.isGhostModeActive());
 
+                        // Durable health summary (independent of the toast setting).
+                        if (!CustomToast.toastShown) FeatureStatusTracker.logHealth(activity.getApplicationContext());
+
                         // 3. Show Success Toast
                         if (FeatureFlags.showFeatureToasts && !CustomToast.toastShown) {
                             CustomToast.toastShown = true;
@@ -320,6 +326,28 @@ public class UIHookManager {
         };
         ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver,
                 new IntentFilter("ps.reso.instaeclipse.ACTION_IMPORT_CONFIG"));
+    }
+
+    /** Shows the companion app's download toasts in Instagram, in the InstaEclipse style. */
+    public static void registerToastRelayReceiver(android.content.Context context) {
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(android.content.Context ctx, Intent intent) {
+                String text = intent.getStringExtra(ps.reso.instaeclipse.utils.toast.IeToast.EXTRA_TEXT);
+                if (text == null || text.isEmpty() || text.length() > 500) return;
+                if (!ps.reso.instaeclipse.utils.toast.IeToast.inForeground(ctx)) return; // the companion shows its own
+                ps.reso.instaeclipse.utils.toast.IeToast.makeText(ctx.getApplicationContext(), text,
+                        intent.getBooleanExtra(ps.reso.instaeclipse.utils.toast.IeToast.EXTRA_LONG, false)
+                                ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+                if (isOrderedBroadcast()) setResultCode(1);
+            }
+        };
+        try {
+            ps.reso.instaeclipse.utils.core.IpcSecurity.registerCompanionOnlyReceiver(context, receiver,
+                    new IntentFilter(ps.reso.instaeclipse.utils.toast.IeToast.ACTION_RELAY));
+        } catch (Throwable e) {
+            ModuleLog.line("(InstaEclipse | ToastRelay): ❌ " + e.getMessage());
+        }
     }
 
     /** Registers a receiver in the Instagram process to restore settings from a backup JSON. */

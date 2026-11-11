@@ -531,7 +531,8 @@ public final class BulkUnsend {
                     Object r = future instanceof java.util.concurrent.Future<?> f ? f.get(10, java.util.concurrent.TimeUnit.SECONDS) : future;
                     ModuleLog.line(TAG + "unsend → " + r + " (key from " + (threadKeyOf(m) != null ? "message" : "thread") + ")");
                     ok++;
-                    Thread.sleep(250);
+                    // With Lower ban risk on, paced so a large batch doesn't look like a script (see Pace).
+                    Thread.sleep(ps.reso.instaeclipse.utils.core.Pace.next(250, ok, 1200, 2500, 15, 5000, 8000));
                 } catch (Throwable t) {
                     ModuleLog.line(TAG + "⚠️ unsend: " + t + " / " + t.getCause());
                 }

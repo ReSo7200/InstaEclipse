@@ -31,6 +31,7 @@ public final class BackLeavesHomeHook {
     private static final String FEED_LIST = "MainFeedRecyclerView";
     private static int sheetId = -1;
     private static Class<?> mainActivity;
+    private static final ThreadLocal<Boolean> REPLAYING = new ThreadLocal<>();
 
     public void install(ClassLoader cl) {
         try {
@@ -46,12 +47,27 @@ public final class BackLeavesHomeHook {
             XposedBridge.hookMethod(back, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) { ps.reso.instaeclipse.utils.core.JitGuard.tick(param.method);
-                    if (!FeatureFlags.backLeavesHome || !(param.thisObject instanceof Activity a)
-                            || !mainActivity.isInstance(a)) return;
+                    if (!(param.thisObject instanceof Activity a) || !mainActivity.isInstance(a)) return;
+                    if (REPLAYING.get() == Boolean.TRUE) return;
+                    if (!FeatureFlags.backLeavesHome && !FeatureFlags.confirmFeedRefresh) return;
                     try {
                         if (!homeFeedInFront(a)) return;
-                        a.moveTaskToBack(true);
+                        if (FeatureFlags.backLeavesHome) {
+                            a.moveTaskToBack(true);
+                            param.setResult(null);
+                            return;
+                        }
+                        // Ask before refreshing (#300): Back on the scrolled home feed goes to the top
+                        // and refreshes, so it waits for the same answer as a pull. Cancel stays put.
                         param.setResult(null);
+                        final java.lang.reflect.Member method = param.method;
+                        ps.reso.instaeclipse.mods.feed.FeedRefreshConfirmHook.askBeforeRefresh(
+                                a.findViewById(android.R.id.content), () -> {
+                                    REPLAYING.set(Boolean.TRUE);
+                                    try { XposedBridge.invokeOriginalMethod(method, a, null); }
+                                    catch (Throwable t) { ModuleLog.line(TAG + "⚠️ back: " + t); }
+                                    finally { REPLAYING.remove(); }
+                                }, () -> { });
                     } catch (Throwable ignored) { }
                 }
             });

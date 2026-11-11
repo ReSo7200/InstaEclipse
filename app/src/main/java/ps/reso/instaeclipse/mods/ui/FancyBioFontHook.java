@@ -27,54 +27,76 @@ import ps.reso.instaeclipse.utils.text.FancyText;
 public final class FancyBioFontHook {
 
     private static final Map<Activity, Boolean> WATCHED = Collections.synchronizedMap(new WeakHashMap<>());
-    private static int bioId, cardId, labelId;
+    private static int editorId, bioId, cardId, labelId;
+    private static boolean idsResolved;
 
     private FancyBioFontHook() {}
 
     public static void watchActivity(Activity a) {
         // watched even while off, so switching it on works without leaving the screen
         if (WATCHED.containsKey(a)) return;
-        if (bioId == 0) {
+        if (!idsResolved) {
             String pkg = a.getPackageName();
+            // IG 451+: the bio editor is edit_bio_layout (the old "bio" id now only tags the
+            // Edit-profile list row, so anchor the editor container first, fall back to "bio").
+            editorId = a.getResources().getIdentifier("edit_bio_layout", "id", pkg);
             bioId = a.getResources().getIdentifier("bio", "id", pkg);
             cardId = a.getResources().getIdentifier("form_field_second_right_add_on_button_card", "id", pkg);
             labelId = a.getResources().getIdentifier("form_field_second_right_add_on_button_text", "id", pkg);
-            if (bioId == 0 || cardId == 0) return;
+            idsResolved = true;
+            if ((editorId == 0 && bioId == 0) || cardId == 0) return;
+        } else if ((editorId == 0 && bioId == 0) || cardId == 0) {
+            return;
         }
         WATCHED.put(a, true);
         View decor = a.getWindow().getDecorView();
         decor.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             if (!FeatureFlags.fancyBioFont) return;
-            View bio = decor.findViewById(bioId);
-            if (bio != null) wire(a, bio);
+            View editor = editorId != 0 ? decor.findViewById(editorId) : null;
+            if (editor == null && bioId != 0) editor = decor.findViewById(bioId);
+            if (editor != null) wire(a, editor);
         });
         FeatureStatusTracker.setHooked("FancyBioFont");
     }
 
-    private static void wire(Activity a, View bio) {
-        View card = bio.findViewById(cardId);
-        EditText input = input(bio);
-        if (card == null || input == null) return;
+    private static void wire(Activity a, View editor) {
+        View card = editor.findViewById(cardId);
+        if (card == null) return;
+        EditText input = input(editor, card);
+        if (input == null) return;
         String label = I18n.t(a, R.string.ig_fancy_font_button);
         TextView text = labelId != 0 ? card.findViewById(labelId) : null;
         if (text != null && text.getText().toString().startsWith(label) && card.getTag(R.id.ie_fancy_font) != null) return;
         if (text != null) text.setText(label);
         hideIcons(card);
-        View.OnClickListener open = v -> pick(a, input);
+        TextView labelView = text;
+        View.OnClickListener open = v -> pick(a, input, labelView);
         card.setOnClickListener(open);
         if (text != null) text.setOnClickListener(open);
         card.setTag(R.id.ie_fancy_font, Boolean.TRUE);
     }
 
-    /** The bio's text field (the form field around it reports itself as an EditText too). */
-    private static EditText input(View v) {
-        if (v instanceof EditText e && !(v instanceof ViewGroup)) return e;
+    /**
+     * The bio's editable text field. The prism form field around it also reports itself as an
+     * EditText, so we take the deepest EditText under the editor (the real input) and never the
+     * "Change font" button's own subtree.
+     */
+    private static EditText input(View editor, View card) {
+        EditText[] best = new EditText[1];
+        int[] bestDepth = {-1};
+        collectInput(editor, card, 0, best, bestDepth);
+        return best[0];
+    }
+
+    private static void collectInput(View v, View card, int depth, EditText[] best, int[] bestDepth) {
+        if (v == card) return; // skip the change-font button's own views
+        if (v instanceof EditText e && depth > bestDepth[0]) {
+            best[0] = e;
+            bestDepth[0] = depth;
+        }
         if (v instanceof ViewGroup g)
-            for (int i = 0; i < g.getChildCount(); i++) {
-                EditText e = input(g.getChildAt(i));
-                if (e != null) return e;
-            }
-        return null;
+            for (int i = 0; i < g.getChildCount(); i++)
+                collectInput(g.getChildAt(i), card, depth + 1, best, bestDepth);
     }
 
     /** The upsell's gem icon: it's no longer a paid feature. */
@@ -91,7 +113,7 @@ public final class FancyBioFontHook {
     /** The style new typing gets, per bio field (0 = normal). */
     private static final Map<EditText, Integer> STYLE = Collections.synchronizedMap(new WeakHashMap<>());
 
-    private static void pick(Activity a, EditText input) {
+    private static void pick(Activity a, EditText input, TextView label) {
         CharSequence[] rows = new CharSequence[FancyText.NAMES.length];
         for (int i = 0; i < rows.length; i++)
             rows[i] = FancyText.convert("Abc 123", i) + "   ·  " + FancyText.NAMES[i];
@@ -101,8 +123,6 @@ public final class FancyBioFontHook {
         dlg.choices(rows, current != null ? current : 0, i -> {
             if (!STYLE.containsKey(input)) input.addTextChangedListener(new Typing(input));
             STYLE.put(input, i);
-            View bio = a.getWindow().getDecorView().findViewById(bioId);
-            TextView label = bio != null && labelId != 0 ? bio.findViewById(labelId) : null;
             if (label != null) label.setText(i == 0 ? I18n.t(a, R.string.ig_fancy_font_button)
                     : I18n.t(a, R.string.ig_fancy_font_button) + ": " + FancyText.NAMES[i]);
             input.requestFocus();

@@ -24,4 +24,11 @@
     <string name="ig_dialog_location_current_title">الموقع الحالي</string>
     <string name="ig_dialog_location_recent">الأماكن الأخيرة</string>
     <string name="ig_dialog_location_applied">تم تطبيق الموقع</string>
+    <string name="ig_dialog_extras_reels_blur_bars">تمويه الأشرطة حول الريلز</string>
+    <string name="ig_dialog_reels_clean_up">تنظيف الريلز</string>
+    <string name="ig_dialog_extras_reels_hide_follow">إخفاء زر المتابعة</string>
+    <string name="ig_dialog_extras_reels_hide_meta_ai">إخفاء اقتراحات Meta AI</string>
+    <string name="ig_dialog_extras_reels_hide_pills">إخفاء أزرار القالب والصوت</string>
+    <string name="ig_dialog_extras_reels_hide_comment_bar">إخفاء شريط التعليق</string>
+    <string name="ig_dialog_extras_safe_pacing">تقليل خطر الحظر (إجراءات جماعية أبطأ)</string>
 </resources>

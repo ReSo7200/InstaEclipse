@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ig_free_app_icons">סמלי אפליקציה בחינם (לחיצה ארוכה על הלוגו של Instagram)</string>
+    <string name="ig_app_icon_title">סמל האפליקציה</string>
+    <string name="ig_app_icon_note">הסמלים של Instagram עצמה, בלי מנוי. הסמל משתנה כשיוצאים מהאפליקציה; ייתכן שהמשגר יעביר אותו לסוף רשימת האפליקציות.</string>
+    <string name="ig_app_icon_applied">הסמל ישתנה ל-%1$s כשתצא מ-Instagram</string>
+</resources>

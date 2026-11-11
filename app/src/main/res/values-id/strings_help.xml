@@ -14,4 +14,24 @@
     <string name="help_lspatch_title">LSPatch (JingMatrix)</string>
     <string name="help_lspatch_sub">Belum root? Pasang ini</string>
     <string name="help_lspatch_guide">Ikuti panduan pemasangan</string>
+
+    <!-- No-root Instagram patcher -->
+    <string name="patch_title">Patch Instagram (tanpa root)</string>
+    <string name="patch_intro">Mem-patch Instagram Anda agar InstaEclipse termuat tanpa root, dengan mempertahankan tanda tangan asli Instagram.</string>
+    <string name="patch_integrity_note">Ini tidak melewati Play Integrity.</string>
+    <string name="patch_choose_apk">Pilih APK Instagram</string>
+    <string name="patch_no_selection">Belum ada APK yang dipilih.</string>
+    <string name="patch_selected">%1$d berkas: %2$s</string>
+    <string name="patch_run">Patch dan pasang</string>
+    <string name="patch_need_apk">Pilih setidaknya satu APK Instagram dulu.</string>
+    <string name="patch_log_label">Kemajuan</string>
+    <string name="patch_log_empty">Langkah-langkah akan muncul di sini.</string>
+    <string name="patch_failed">Patch gagal: %1$s</string>
+    <string name="patch_install_success">Instagram terpasang.</string>
+    <string name="patch_install_failed">Pemasangan gagal: %1$s</string>
+    <string name="patch_step_copy">Menyalin APK yang dipilih</string>
+    <string name="patch_step_unbundle">Membongkar %1$s</string>
+    <string name="patch_step_install">Memulai pemasang</string>
+    <string name="patch_step_done">Selesai. Konfirmasi pemasangan saat diminta.</string>
+    <string name="patch_err_no_apk">Tidak ada APK ditemukan dalam pilihan.</string>
 </resources>
