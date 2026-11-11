@@ -239,25 +239,58 @@ public final class GlassTabBarHook {
         }
     }
 
-    /** A view background that paints the glass look over the whole (fixed, full-width) tab bar. */
+    /**
+     * A translucent, rounded background for the fixed full-width tab bar (the Reels screen, and any
+     * build/screen that uses the fixed style). Unlike the floating pill on Home/Search/Profile, the
+     * content directly behind this bar is the reel's video surface (a SurfaceView/TextureView), which
+     * cannot be captured into a blur RenderNode — a blur there renders nothing and falls back to an
+     * opaque fill, i.e. a solid black bar. So instead of blurring, we paint a see-through tint in the
+     * bar's own (themed) color as a floating rounded pill, letting the reel show straight through the
+     * nav the way glass should. Icons are Instagram's own views drawn on top and stay crisp.
+     */
     static final class GlassDrawable extends Drawable {
-        private final View host;
-        private final Glass glass;
         private final int color;
+        private final float density;
+        private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint edge = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final RectF r = new RectF();
 
         GlassDrawable(View host, int color, float density) {
-            this.host = host;
             this.color = color;
-            this.glass = new Glass(density);
-            this.glass.cornerRadius = 0f; // full-width rectangular bar, not a pill
+            this.density = density;
+            edge.setStyle(Paint.Style.STROKE);
+            edge.setStrokeWidth(Math.max(1f, density * 0.75f));
         }
 
         @Override
         public void draw(Canvas canvas) {
             if (!FeatureFlags.glassTabBar) return;
             try {
-                glass.draw(canvas, getBounds(), host, color);
+                Rect b = getBounds();
+                if (b.isEmpty()) return;
+                int base = color | 0xFF000000;
+                int opaqueColor = base;
+                if (IgThemeEngine.isActive()) {
+                    try { opaqueColor = IgColorRemapEngine.remap(base) | 0xFF000000; } catch (Throwable ignored) {}
+                }
+                boolean dark = luminance(opaqueColor) < 0.5f;
+                float side = density * 10f;          // inset so it floats like a pill, reel at the edges
+                float radius = density * 26f;
+                r.set(b.left + side, b.top, b.right - side, b.bottom);
+                // See-through tint: the reel shows through, icons stay legible over it.
+                int a = Math.round(255 * 0.42f);
+                fill.setColor((opaqueColor & 0x00FFFFFF) | (a << 24));
+                canvas.drawRoundRect(r, radius, radius, fill);
+                // Faint edge to define the glass against the moving video.
+                edge.setColor(dark ? 0x2EFFFFFF : 0x1F000000);
+                float inset = edge.getStrokeWidth() / 2f;
+                r.inset(inset, inset);
+                canvas.drawRoundRect(r, radius - inset, radius - inset, edge);
             } catch (Throwable ignored) {}
+        }
+
+        private static float luminance(int c) {
+            return (0.299f * Color.red(c) + 0.587f * Color.green(c) + 0.114f * Color.blue(c)) / 255f;
         }
 
         @Override public void setAlpha(int alpha) {}
