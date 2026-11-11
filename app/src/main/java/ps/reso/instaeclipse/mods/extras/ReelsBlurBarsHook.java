@@ -200,6 +200,7 @@ public class ReelsBlurBarsHook {
 
         private Bitmap coverBitmap() {
             Drawable d = cover.getDrawable();
+            if (d == null) return null;
             if (d instanceof BitmapDrawable bd) {
                 Bitmap b = bd.getBitmap();
                 if (b != null && !b.isRecycled()) return b;
@@ -211,12 +212,45 @@ public class ReelsBlurBarsHook {
                     if (m.getReturnType() == Bitmap.class) igGetBitmap = m;
                 } catch (Throwable ignored) {}
             }
-            if (igGetBitmap == null) return null;
+            if (igGetBitmap != null) {
+                try {
+                    Object o = igGetBitmap.invoke(cover);
+                    if (o instanceof Bitmap b && !b.isRecycled()) return b;
+                } catch (Throwable ignored) {}
+            }
+            // IG's cover is a custom drawable (not a BitmapDrawable and no getBitmap): rasterize
+            // whatever it is currently showing into a bitmap we can blur. Cached by drawable.
+            return rasterize(d);
+        }
+
+        private Drawable renderedFrom;
+        private Bitmap renderedBmp;
+
+        private Bitmap rasterize(Drawable d) {
+            int w = d.getIntrinsicWidth(), h = d.getIntrinsicHeight();
+            if (w <= 0 || h <= 0) { w = cover.getWidth(); h = cover.getHeight(); }
+            if (w <= 0 || h <= 0) return null;
+            int max = 720; // the layer is blurred and downscaled anyway
+            if (w > max || h > max) {
+                float s = Math.min(max / (float) w, max / (float) h);
+                w = Math.max(1, Math.round(w * s));
+                h = Math.max(1, Math.round(h * s));
+            }
+            if (d == renderedFrom && renderedBmp != null && !renderedBmp.isRecycled()
+                    && renderedBmp.getWidth() == w && renderedBmp.getHeight() == h) return renderedBmp;
             try {
-                Object o = igGetBitmap.invoke(cover);
-                if (o instanceof Bitmap b && !b.isRecycled()) return b;
-            } catch (Throwable ignored) {}
-            return null;
+                Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+                Canvas c = new Canvas(bmp);
+                Rect old = d.copyBounds();
+                d.setBounds(0, 0, w, h);
+                d.draw(c);
+                d.setBounds(old); // restore the live drawable's bounds
+                renderedFrom = d;
+                renderedBmp = bmp;
+                return bmp;
+            } catch (Throwable t) {
+                return null;
+            }
         }
 
         @Override
